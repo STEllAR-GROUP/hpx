@@ -56,7 +56,7 @@ namespace hpx::util {
     {
         using namespace asio::ip;
         std::error_code ec;
-        address_v4 addr4 = address_v4::from_string(addr.c_str(), ec);
+        address_v4 addr4 = address_v4::from_string(addr.c_str(), ec);    //-V821
         if (!ec)
         {    // it's an IPV4 address
             ep = tcp::endpoint(address(addr4), port);
@@ -65,7 +65,8 @@ namespace hpx::util {
 
         if (!force_ipv4)
         {
-            address_v6 addr6 = address_v6::from_string(addr.c_str(), ec);
+            address_v6 addr6 =    //-V821
+                address_v6::from_string(addr.c_str(), ec);
             if (!ec)
             {    // it's an IPV6 address
                 ep = tcp::endpoint(address(addr6), port);
@@ -112,10 +113,14 @@ namespace hpx::util {
 
             asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
 
-            while (force_ipv4 && it != tcp::resolver::iterator() &&
-                !it->endpoint().address().is_v4())
+            // skip ipv6 results, if required
+            if (force_ipv4)
             {
-                ++it;
+                while (it != tcp::resolver::iterator() &&
+                    !it->endpoint().address().is_v4())
+                {
+                    ++it;
+                }
             }
 
             HPX_ASSERT(it != asio::ip::tcp::resolver::iterator());

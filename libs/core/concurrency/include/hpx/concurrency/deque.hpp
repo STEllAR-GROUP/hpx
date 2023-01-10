@@ -73,7 +73,7 @@ namespace hpx::lockfree {
         {
         }
 
-        deque_node(deque_node const& p) noexcept
+        deque_node(deque_node const& p) noexcept    //-V730
           : left(p.left.load(std::memory_order_relaxed))
           , right(p.right.load(std::memory_order_relaxed))
         {

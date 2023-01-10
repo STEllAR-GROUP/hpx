@@ -25,7 +25,7 @@
 #include <string>
 #include <system_error>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx ::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     class pool_timer : public std::enable_shared_from_this<pool_timer>
@@ -56,7 +56,7 @@ namespace hpx { namespace util { namespace detail {
         {
             return is_terminated_;
         }
-        void timer_handler(const std::error_code&);
+        void timer_handler(std::error_code const&);
 
         void terminate();    // handle system shutdown
         bool stop_locked();
@@ -106,7 +106,7 @@ namespace hpx { namespace util { namespace detail {
     {
     }
 
-    void pool_timer::timer_handler(const std::error_code& err)
+    void pool_timer::timer_handler(std::error_code const& err)
     {
         if (!is_stopped_ || !is_terminated_)
         {
@@ -147,7 +147,7 @@ namespace hpx { namespace util { namespace detail {
 
             HPX_ASSERT(timer_ != nullptr);
             timer_->expires_from_now(time_duration.value());
-            timer_->async_wait(hpx::bind_front(
+            timer_->async_wait(hpx::bind_front(    //-V779
                 &pool_timer::timer_handler, this->shared_from_this()));
 
             return true;
@@ -204,10 +204,10 @@ namespace hpx { namespace util { namespace detail {
             ;    // there is nothing we can do here
         }
     }
-}}}    // namespace hpx::util::detail
+}    // namespace hpx::util::detail
 
-namespace hpx { namespace util {
-    pool_timer::pool_timer() {}
+namespace hpx::util {
+    pool_timer::pool_timer() = default;
 
     pool_timer::pool_timer(hpx::function<bool()> const& f,
         hpx::function<void()> const& on_term, std::string const& description,
@@ -242,4 +242,4 @@ namespace hpx { namespace util {
     {
         return timer_->is_terminated();
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

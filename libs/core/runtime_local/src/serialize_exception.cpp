@@ -121,7 +121,7 @@ namespace hpx::runtime_local::detail {
                 throw_auxinfo_ = *auxinfo_;
         }
         catch (...)
-        {
+        {    //-V565
             // do nothing
         }
 

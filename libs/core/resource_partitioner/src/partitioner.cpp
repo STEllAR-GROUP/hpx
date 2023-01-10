@@ -129,7 +129,7 @@ namespace hpx::resource {
 
         detail::partitioner& create_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data)
         {
             std::unique_ptr<detail::partitioner>& rp =
                 detail::get_partitioner();
@@ -159,7 +159,7 @@ namespace hpx::resource {
         partitioner_.set_default_pool_name(name);
     }
 
-    const std::string& partitioner::get_default_pool_name() const
+    std::string const& partitioner::get_default_pool_name() const
     {
         return partitioner_.get_default_pool_name();
     }

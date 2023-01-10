@@ -9,8 +9,9 @@
 #include <ostream>
 
 namespace hpx::execution::experimental {
+
     std::ostream& operator<<(
-        std::ostream& os, fork_join_executor::loop_schedule const& schedule)
+        std::ostream& os, fork_join_executor::loop_schedule schedule)
     {
         switch (schedule)
         {

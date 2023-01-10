@@ -260,11 +260,11 @@ namespace hpx { namespace threads {
             return threads::thread_description("<unknown>");
         }
 
-        threads::thread_description get_lco_description() const
+        threads::thread_description get_lco_description() const    //-V524
         {
             return threads::thread_description("<unknown>");
         }
-        threads::thread_description set_lco_description(
+        threads::thread_description set_lco_description(    //-V524
             threads::thread_description /*value*/)
         {
             return threads::thread_description("<unknown>");

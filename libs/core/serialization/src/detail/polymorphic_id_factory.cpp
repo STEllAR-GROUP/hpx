@@ -32,14 +32,14 @@ namespace hpx::serialization::detail {
             cache.resize(id + 1, nullptr);    //-V106
             cache[id] = ctor;                 //-V108
         }
-        else if (cache[id] == nullptr)
+        else if (cache[id] == nullptr)    //-V108
         {
             cache[id] = ctor;    //-V108
         }
     }
 
     void id_registry::register_factory_function(
-        const std::string& type_name, ctor_t ctor)
+        std::string const& type_name, ctor_t ctor)
     {
         HPX_ASSERT(ctor != nullptr);
 
@@ -52,7 +52,7 @@ namespace hpx::serialization::detail {
     }
 
     void id_registry::register_typename(
-        const std::string& type_name, std::uint32_t id)
+        std::string const& type_name, std::uint32_t id)
     {
         HPX_ASSERT(id != invalid_id);
 
@@ -101,11 +101,11 @@ namespace hpx::serialization::detail {
         {
             typename_to_id_t::const_iterator it = typename_to_id.find(d.first);
             HPX_ASSERT(it != typename_to_id.end());
-            cache_id(it->second, d.second);
+            cache_id(it->second, d.second);    //-V783
         }
     }
 
-    std::uint32_t id_registry::try_get_id(const std::string& type_name) const
+    std::uint32_t id_registry::try_get_id(std::string const& type_name) const
     {
         typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
         if (it == typename_to_id.end())
@@ -137,7 +137,7 @@ namespace hpx::serialization::detail {
         return factory.get();
     }
 
-    std::uint32_t polymorphic_id_factory::get_id(const std::string& type_name)
+    std::uint32_t polymorphic_id_factory::get_id(std::string const& type_name)
     {
         std::uint32_t id = id_registry::instance().try_get_id(type_name);
 

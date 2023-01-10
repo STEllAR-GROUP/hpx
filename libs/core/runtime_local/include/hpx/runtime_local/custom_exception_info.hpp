@@ -28,7 +28,7 @@ namespace hpx {
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
         // [locality] tag.
-        HPX_DEFINE_ERROR_INFO(throw_locality, std::uint32_t);
+        HPX_DEFINE_ERROR_INFO(throw_locality, std::uint32_t);    //-V835
 
         // Stores the information about the hostname of the locality the exception
         // has been raised on. This information will show up in error messages
@@ -38,17 +38,17 @@ namespace hpx {
         // Stores the information about the pid of the OS process the exception
         // has been raised on. This information will show up in error messages
         // under the [pid] tag.
-        HPX_DEFINE_ERROR_INFO(throw_pid, std::int64_t);
+        HPX_DEFINE_ERROR_INFO(throw_pid, std::int64_t);    //-V835
 
         // Stores the information about the shepherd thread the exception has been
         // raised on. This information will show up in error messages under the
         // [shepherd] tag.
-        HPX_DEFINE_ERROR_INFO(throw_shepherd, std::size_t);
+        HPX_DEFINE_ERROR_INFO(throw_shepherd, std::size_t);    //-V835
 
         // Stores the information about the HPX thread the exception has been
         // raised on. This information will show up in error messages under the
         // [thread_id] tag.
-        HPX_DEFINE_ERROR_INFO(throw_thread_id, std::size_t);
+        HPX_DEFINE_ERROR_INFO(throw_thread_id, std::size_t);    //-V835
 
         // Stores the information about the HPX thread name the exception has been
         // raised on. This information will show up in error messages under the

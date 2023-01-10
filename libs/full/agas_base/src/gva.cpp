@@ -18,14 +18,14 @@ namespace hpx::agas {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Archive>
-    void gva::save(Archive& ar, const unsigned int /*version*/) const
+    void gva::save(Archive& ar, unsigned int const /*version*/) const
     {
         std::size_t lva = reinterpret_cast<std::size_t>(lva_);
-        ar << prefix << type << count << lva << offset;
-    }    //-V128
+        ar << prefix << type << count << lva << offset;    //-V128
+    }
 
     template <typename Archive>
-    void gva::load(Archive& ar, const unsigned int version)
+    void gva::load(Archive& ar, unsigned int const version)
     {
         if (version > HPX_AGAS_VERSION)
         {
@@ -39,10 +39,10 @@ namespace hpx::agas {
     }
 
     template void gva::save(
-        hpx::serialization::output_archive& ar, const unsigned int) const;
+        hpx::serialization::output_archive& ar, unsigned int const) const;
 
     template void gva::load(
-        hpx::serialization::input_archive& ar, const unsigned int);
+        hpx::serialization::input_archive& ar, unsigned int const);
 
     ///////////////////////////////////////////////////////////////////////////
     std::ostream& operator<<(std::ostream& os, gva const& addr)

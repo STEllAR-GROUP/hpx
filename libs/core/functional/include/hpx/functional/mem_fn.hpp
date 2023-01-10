@@ -26,10 +26,8 @@ namespace hpx {
             {
             }
 
-            constexpr mem_fn(mem_fn const& other) noexcept
-              : _pm(other._pm)
-            {
-            }
+            constexpr mem_fn(mem_fn const& other) noexcept = default;
+            constexpr mem_fn& operator=(mem_fn const& other) noexcept = default;
 
             template <typename... Ts>
             constexpr util::invoke_result_t<MemberPointer, Ts...> operator()(

@@ -34,7 +34,7 @@ namespace hpx::util {
             construct_type const& construct, destruct_type const& destruct)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            funcs_.push_back(value_type(construct, destruct));
+            funcs_.emplace_back(construct, destruct);
         }
 
         void construct_all()

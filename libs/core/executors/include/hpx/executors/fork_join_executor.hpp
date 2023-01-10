@@ -598,8 +598,8 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::optional<std::uint32_t> index;
                             while ((index = local_queue.pop_left()))
                             {
-                                auto it = std::next(
-                                    hpx::util::begin(shape), index.value());
+                                auto it =
+                                    std::next(hpx::util::begin(shape), *index);
                                 invoke_helper(index_pack_type{},
                                     element_function, *it, argument_pack);
                             }
@@ -625,7 +625,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 while ((index = neighbor_queue.pop_right()))
                                 {
                                     auto it = std::next(
-                                        hpx::util::begin(shape), index.value());
+                                        hpx::util::begin(shape), *index);
                                     invoke_helper(index_pack_type{},
                                         element_function, *it, argument_pack);
                                 }
@@ -884,7 +884,7 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     HPX_CORE_EXPORT std::ostream& operator<<(
-        std::ostream& os, fork_join_executor::loop_schedule const& schedule);
+        std::ostream& os, fork_join_executor::loop_schedule schedule);
 }}}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {

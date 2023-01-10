@@ -77,6 +77,7 @@ namespace hpx { namespace mpi { namespace experimental {
             // constructor used for creation directly by invoke
             future_data(init_no_addref no_addref)
               : hpx::lcos::detail::future_data<int>(no_addref)
+              , request_()
             {
             }
 

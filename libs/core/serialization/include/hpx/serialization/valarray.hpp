@@ -11,6 +11,7 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <valarray>
 
 namespace hpx::serialization {
@@ -18,9 +19,9 @@ namespace hpx::serialization {
     template <typename T>
     void serialize(input_archive& ar, std::valarray<T>& arr, int /* version */)
     {
-        std::size_t sz = 0;
+        std::uint64_t sz = 0;
         ar >> sz;
-        arr.resize(sz);
+        arr.resize(static_cast<std::size_t>(sz));
 
         if (sz == 0)
             return;
@@ -33,7 +34,7 @@ namespace hpx::serialization {
     void serialize(
         output_archive& ar, std::valarray<T> const& arr, int /* version */)
     {
-        std::size_t const sz = arr.size();
+        auto const sz = static_cast<std::uint64_t>(arr.size());
         ar << sz;
         for (auto const& v : arr)
             ar << v;

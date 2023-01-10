@@ -23,7 +23,7 @@ namespace hpx::util {
           , a_save_(s.flags())
         {
         }
-        ios_flags_saver(state_type& s, aspect_type const& a)
+        ios_flags_saver(state_type& s, aspect_type a)
           : s_save_(s)
           , a_save_(s.flags(a))
         {

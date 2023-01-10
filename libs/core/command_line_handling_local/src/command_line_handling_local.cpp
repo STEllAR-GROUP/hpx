@@ -206,7 +206,7 @@ namespace hpx::local::detail {
             threads::topology& top = threads::create_topology();
             return threads::count(top.get_cpubind_mask());
         }
-        return threads::hardware_concurrency();
+        return static_cast<std::size_t>(threads::hardware_concurrency());
     }
 
     std::size_t get_number_of_default_cores(bool use_process_mask)
@@ -430,7 +430,8 @@ namespace hpx::local::detail {
     void command_line_handling::check_pu_offset() const
     {
         if (pu_offset_ != std::size_t(-1) &&
-            pu_offset_ >= hpx::threads::hardware_concurrency())
+            pu_offset_ >=
+                static_cast<std::size_t>(hpx::threads::hardware_concurrency()))
         {
             throw hpx::detail::command_line_error(
                 "Invalid command line option --hpx:pu-offset, value must be "
@@ -441,7 +442,9 @@ namespace hpx::local::detail {
     void command_line_handling::check_pu_step() const
     {
         if (hpx::threads::hardware_concurrency() > 1 &&
-            (pu_step_ == 0 || pu_step_ >= hpx::threads::hardware_concurrency()))
+            (pu_step_ == 0 ||
+                pu_step_ >= static_cast<std::size_t>(
+                                hpx::threads::hardware_concurrency())))
         {
             throw hpx::detail::command_line_error(
                 "Invalid command line option --hpx:pu-step, value must be "

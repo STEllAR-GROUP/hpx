@@ -19,7 +19,6 @@ namespace hpx::serialization {
     void serialize(
         input_archive& ar, std::set<T, Compare, Allocator>& set, unsigned)
     {
-        set.clear();
         std::uint64_t size;
         ar >> size;
 

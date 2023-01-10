@@ -126,7 +126,6 @@ namespace hpx::util::logging::formatter {
     std::unique_ptr<high_precision_time> high_precision_time::make(
         std::string const& format)
     {
-        return std::unique_ptr<high_precision_time>(
-            new high_precision_time_impl(format));
+        return std::make_unique<high_precision_time_impl>(format);
     }
 }    // namespace hpx::util::logging::formatter

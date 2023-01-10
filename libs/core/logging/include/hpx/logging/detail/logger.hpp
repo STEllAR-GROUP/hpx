@@ -179,7 +179,7 @@ namespace hpx::util::logging {
 
     private:
         mutable std::vector<message> m_cache;
-        mutable bool m_is_caching_off;
+        mutable bool m_is_caching_off = false;
         writer::named_write m_writer;
         level m_level;
     };

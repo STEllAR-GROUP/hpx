@@ -157,7 +157,7 @@ namespace hpx::debug {
     }
 
     ipaddr::ipaddr(std::uint32_t a) noexcept
-      : data_(reinterpret_cast<const uint8_t*>(&ipdata_))
+      : data_(reinterpret_cast<uint8_t const*>(&ipdata_))    //-V206
       , ipdata_(a)
     {
     }
@@ -174,13 +174,12 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     namespace detail {
 
-        std::ostream& operator<<(
-            std::ostream& os, current_time_print_helper const&)
+        std::ostream& operator<<(std::ostream& os, current_time_print_helper)
         {
             static std::chrono::steady_clock::time_point log_t_start =
                 std::chrono::steady_clock::now();
 
-            auto now = std::chrono::steady_clock::now();
+            auto now = std::chrono::steady_clock::now();    //-V656
             auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(
                 now - log_t_start)
                             .count();
@@ -218,7 +217,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     mem_crc32::mem_crc32(
         void const* a, std::size_t len, char const* txt) noexcept
-      : addr_(reinterpret_cast<const uint64_t*>(a))
+      : addr_(reinterpret_cast<std::uint64_t const*>(a))    //-V206
       , len_(len)
       , txt_(txt)
     {
@@ -233,9 +232,9 @@ namespace hpx::debug {
            << hpx::debug::hex<6>(p.len_)
            << " CRC32:" << hpx::debug::hex<8>(crc32(p.addr_, p.len_)) << "\n";
 
-        for (std::size_t i = 0;
-             i < (std::min)(size_t(std::ceil(p.len_ / 8.0)), std::size_t(128));
-             i++)
+        auto max_value = (std::min)(
+            std::size_t(std::ceil(double(p.len_) / 8.0)), std::size_t(128));
+        for (std::size_t i = 0; i < max_value; i++)
         {
             os << hpx::debug::hex<16>(*uintBuf++) << " ";
         }
@@ -275,7 +274,8 @@ namespace hpx::debug {
 #else
             char** env = environ;
 #endif
-            std::vector<std::string> env_strings{"_RANK=", "_NODEID="};
+            std::vector<std::string> env_strings{
+                "_RANK=", "_NODEID="};    //-V826
             for (char** current = env; *current; ++current)
             {
                 auto e = std::string(*current);
@@ -292,8 +292,7 @@ namespace hpx::debug {
             return -1;
         }
 
-        std::ostream& operator<<(
-            std::ostream& os, hostname_print_helper const& h)
+        std::ostream& operator<<(std::ostream& os, hostname_print_helper h)
         {
             os << debug::str<13>(h.get_hostname()) << " ";
             return os;

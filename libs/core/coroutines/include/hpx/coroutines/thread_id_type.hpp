@@ -51,11 +51,11 @@ namespace hpx::threads {
             return *this;
         }
 
-        explicit constexpr thread_id(thread_id_repr const& thrd) noexcept
+        explicit constexpr thread_id(thread_id_repr thrd) noexcept
           : thrd_(thrd)
         {
         }
-        constexpr thread_id& operator=(thread_id_repr const& rhs) noexcept
+        constexpr thread_id& operator=(thread_id_repr rhs) noexcept
         {
             thrd_ = rhs;
             return *this;

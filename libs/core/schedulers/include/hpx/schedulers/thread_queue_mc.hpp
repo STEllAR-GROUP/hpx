@@ -232,7 +232,7 @@ namespace hpx::threads::policies {
                     // returned to the caller as otherwise the thread would
                     // go out of scope right away.
                     HPX_ASSERT(id != nullptr);
-                    *id = HPX_MOVE(tid);
+                    *id = HPX_MOVE(tid);    //-V1004
                 }
 
                 if (&ec != &throws)
@@ -280,7 +280,7 @@ namespace hpx::threads::policies {
                     debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 return true;
             }
-            if (check_new && add_new(32, this, false) > 0)
+            if (check_new && add_new(32, this, false) > 0)    //-V112
             {
                 // use check_now false to prevent infinite recursion
                 return get_next_thread(thrd, other_end, false);

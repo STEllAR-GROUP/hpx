@@ -173,8 +173,9 @@ namespace hpx::threads::policies {
           , initialized_(false)
           , debug_init_(false)
           , thread_init_counter_(0)
+          , pool_index_(std::size_t(-1))
         {
-            set_scheduler_mode(scheduler_mode::default_);
+            scheduler_base::set_scheduler_mode(scheduler_mode::default_);
             HPX_ASSERT(num_workers_ != 0);
         }
 
@@ -362,9 +363,9 @@ namespace hpx::threads::policies {
                 }
                 thread_num = select_active_pu(l, thread_num);
                 // cppcheck-suppress redundantAssignment
-                domain_num = d_lookup_[thread_num];
+                domain_num = d_lookup_[thread_num];    //-V519
                 // cppcheck-suppress redundantAssignment
-                q_index = q_lookup_[thread_num];
+                q_index = q_lookup_[thread_num];    //-V519
                 break;
             }
             case thread_schedule_hint_mode::thread:
@@ -388,7 +389,7 @@ namespace hpx::threads::policies {
                 if (local_num != std::size_t(-1) &&
                     d_lookup_[local_num] == domain_num)
                 {
-                    thread_num = local_num;
+                    thread_num = local_num;    //-V1048
                     q_index = q_lookup_[thread_num];
                 }
                 else
@@ -533,25 +534,21 @@ namespace hpx::threads::policies {
                     return result;
                 }
 
-                if (steal_core)
+                if (q_counts_[domain] > 1)
                 {
-                    if (q_counts_[domain] > 1)
+                    // steal from other cores on this numa domain?
+                    // use q+1 to avoid testing the same local queue again
+                    q_index = fast_mod((q_index + 1), q_counts_[domain]);
+                    result =
+                        operation_HP(domain, q_index, origin, var, true, true);
+                    result = result ||
+                        operation(domain, q_index, origin, var, true, true);
+                    if (result)
                     {
-                        // steal from other cores on this numa domain?
-                        // use q+1 to avoid testing the same local queue again
-                        q_index = fast_mod((q_index + 1), q_counts_[domain]);
-                        result = operation_HP(
-                            domain, q_index, origin, var, true, true);
-                        result = result ||
-                            operation(domain, q_index, origin, var, true, true);
-                        if (result)
-                        {
-                            spq_deb.debug(debug::str<>(prefix),
-                                "steal_after_local this numa", "stolen", "D",
-                                debug::dec<2>(domain), "Q",
-                                debug::dec<3>(q_index));
-                            return result;
-                        }
+                        spq_deb.debug(debug::str<>(prefix),
+                            "steal_after_local this numa", "stolen", "D",
+                            debug::dec<2>(domain), "Q", debug::dec<3>(q_index));
+                        return result;
                     }
                 }
 
@@ -567,9 +564,8 @@ namespace hpx::threads::policies {
                         if (result)
                         {
                             spq_deb.debug(debug::str<>(prefix),
-                                "steal_after_local other numa BP/HP",
-                                (d == 0 ? "taken" : "stolen"), "D",
-                                debug::dec<2>(domain), "Q",
+                                "steal_after_local other numa BP/HP", "stolen",
+                                "D", debug::dec<2>(domain), "Q",
                                 debug::dec<3>(q_index));
                             return result;
                         }
@@ -584,9 +580,8 @@ namespace hpx::threads::policies {
                         if (result)
                         {
                             spq_deb.debug(debug::str<>(prefix),
-                                "steal_after_local other numa NP/LP",
-                                (d == 0 ? "taken" : "stolen"), "D",
-                                debug::dec<2>(domain), "Q",
+                                "steal_after_local other numa NP/LP", "stolen",
+                                "D", debug::dec<2>(domain), "Q",
                                 debug::dec<3>(q_index));
                             return result;
                         }
@@ -1131,7 +1126,7 @@ namespace hpx::threads::policies {
                         // if we will own the queue, create it
                         np_queue =
                             new thread_queue_type(queue_parameters_, index);
-                        owner_mask |= 4;
+                        owner_mask |= 4;    //-V112
                     }
                     else
                     {
@@ -1373,18 +1368,18 @@ namespace hpx::threads::policies {
         core_ratios cores_per_queue_;
 
         // when true, new tasks are added round robing to thread queues
-        bool round_robin_;
+        bool round_robin_ = true;
 
         // when true, tasks are
-        bool steal_hp_first_;
+        bool steal_hp_first_ = true;
 
         // when true, numa_stealing permits stealing across numa domains,
         // when false, no stealing takes place across numa domains,
-        bool numa_stealing_;
+        bool numa_stealing_ = true;
 
         // when true, core_stealing permits stealing between cores(queues),
         // when false, no stealing takes place between any cores(queues)
-        bool core_stealing_;
+        bool core_stealing_ = true;
 
         // number of worker threads assigned to this pool
         std::size_t num_workers_;

@@ -21,21 +21,24 @@ namespace hpx::util {
         {
             std::string::const_iterator start = it;
             std::string result(1, *it);    // copy '['
-            if (*++it == '!')
+            if (++it != end)
             {
-                result.append(1, '^');    // negated character set
-            }
-            else if (*it == ']')
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "regex_from_character_set",
-                    "Invalid pattern (empty character set) at: {}",
-                    std::string(start, end));
-                return "";
-            }
-            else
-            {
-                result.append(1, *it);    // append this character
+                if (*it == '!')
+                {
+                    result.append(1, '^');    // negated character set
+                }
+                else if (*it == ']')
+                {
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "regex_from_character_set",
+                        "Invalid pattern (empty character set) at: {}",
+                        std::string(start, end));
+                    return "";
+                }
+                else
+                {
+                    result.append(1, *it);    // append this character
+                }
             }
 
             // copy while in character set

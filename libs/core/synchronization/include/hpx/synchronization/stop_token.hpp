@@ -84,17 +84,19 @@ namespace hpx {
 
             // bits 0-30 - token ref count (31 bits)
             static constexpr flag_t token_ref_increment = 1ull;
-            static constexpr flag_t token_ref_mask = 0x7fffffffull;
+            static constexpr flag_t token_ref_mask = 0x7fffffffull;    //-V112
 
             // bit 31 - stop-requested
             static constexpr flag_t stop_requested_flag = 1ull << 31;
 
             // bits 32-62 - source ref count (31 bits)
             static constexpr flag_t source_ref_increment = token_ref_increment
-                << 32;
-            static constexpr flag_t source_ref_mask = token_ref_mask << 32;
+                << 32;    // -V112
+            static constexpr flag_t source_ref_mask = token_ref_mask
+                << 32;    // -V112
             // bit 63 - locked
-            static constexpr flag_t locked_flag = stop_requested_flag << 32;
+            static constexpr flag_t locked_flag = stop_requested_flag
+                << 32;    // -V112
 
         public:
             constexpr stop_state() noexcept
@@ -668,9 +670,14 @@ namespace hpx::p2300_stop_token {
         }
 
         [[nodiscard]] friend constexpr bool operator==(
-            never_stop_token const&, never_stop_token const&) noexcept
+            never_stop_token, never_stop_token) noexcept
         {
             return true;
+        }
+        [[nodiscard]] friend constexpr bool operator!=(
+            never_stop_token, never_stop_token) noexcept
+        {
+            return false;
         }
     };
 
@@ -829,6 +836,12 @@ namespace hpx::p2300_stop_token {
             in_place_stop_token const& rhs) noexcept
         {
             return lhs.source_ == rhs.source_;
+        }
+        [[nodiscard]] friend constexpr bool operator!=(
+            in_place_stop_token const& lhs,
+            in_place_stop_token const& rhs) noexcept
+        {
+            return !(lhs == rhs);
         }
 
         friend void swap(

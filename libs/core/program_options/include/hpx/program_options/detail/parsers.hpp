@@ -24,6 +24,7 @@ namespace hpx::program_options {
         std::vector<std::basic_string<Char>> const& xargs)
       : detail::cmdline(to_internal(xargs))
     {
+        this->cmdline::m_desc = nullptr;
     }
 
     template <typename Char>
@@ -31,8 +32,8 @@ namespace hpx::program_options {
         int argc, Char const* const argv[])
       : detail::cmdline(to_internal(
             std::vector<std::basic_string<Char>>(argv + 1, argv + argc)))
-      , m_desc()
     {
+        this->cmdline::m_desc = nullptr;
     }
 
     template <typename Char>
@@ -40,7 +41,7 @@ namespace hpx::program_options {
         options_description const& desc)
     {
         detail::cmdline::set_options_description(desc);
-        m_desc = &desc;
+        this->cmdline::m_desc = &desc;
         return *this;
     }
 
@@ -92,8 +93,8 @@ namespace hpx::program_options {
         // eventually inside the parsed results This will be handy to format
         // recognizable options for diagnostic messages if everything blows up
         // much later on
-        parsed_options result(
-            m_desc, detail::cmdline::get_canonical_option_prefix());
+        parsed_options result(this->cmdline::m_desc,
+            detail::cmdline::get_canonical_option_prefix());
         result.options = detail::cmdline::run();
 
         // Presence of parsed_options -> wparsed_options conversion does the

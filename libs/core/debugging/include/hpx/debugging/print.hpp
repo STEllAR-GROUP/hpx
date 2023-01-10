@@ -245,7 +245,7 @@ namespace hpx::debug {
         struct current_time_print_helper
         {
             HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& os, current_time_print_helper const&);
+                std::ostream& os, current_time_print_helper);
         };
     }    // namespace detail
 
@@ -285,7 +285,7 @@ namespace hpx::debug {
         }
 
         template <typename... Args>
-        void tuple_print(std::ostream& os, const std::tuple<Args...>& t)
+        void tuple_print(std::ostream& os, std::tuple<Args...> const& t)
         {
             tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
         }
@@ -302,7 +302,7 @@ namespace hpx::debug {
             HPX_CORE_EXPORT int guess_rank() const;
 
             HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& os, hostname_print_helper const& h);
+                std::ostream& os, hostname_print_helper h);
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ namespace hpx::debug {
         double const delay_;
         std::tuple<Args...> const message_;
         //
-        timed_var(double const& delay, Args const&... args)
+        timed_var(double delay, Args const&... args)
           : time_start_(std::chrono::steady_clock::now())
           , delay_(delay)
           , message_(args...)
@@ -432,7 +432,7 @@ namespace hpx::debug {
     template <>
     struct enable_print<false>
     {
-        explicit constexpr enable_print(const char*) noexcept {}
+        explicit constexpr enable_print(char const*) noexcept {}
 
         constexpr bool is_enabled() const noexcept
         {
@@ -501,7 +501,7 @@ namespace hpx::debug {
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        constexpr int make_timer(const double, Args const&...) const noexcept
+        constexpr int make_timer(double const, Args const&...) const noexcept
         {
             return 0;
         }
@@ -533,7 +533,7 @@ namespace hpx::debug {
         {
         }
 
-        explicit constexpr enable_print(const char* p) noexcept
+        explicit constexpr enable_print(char const* p) noexcept
           : prefix_(p)
         {
         }
@@ -616,7 +616,7 @@ namespace hpx::debug {
 
         template <typename... Args>
         timed_var<Args...> make_timer(
-            const double delay, const Args... args) const
+            double const delay, const Args... args) const
         {
             return timed_var<Args...>(delay, args...);
         }

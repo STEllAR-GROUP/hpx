@@ -140,7 +140,7 @@ namespace hpx::serialization {
             save(flags_);
 
             // send the zero-copy limit
-            save(zero_copy_serialization_threshold);
+            save(static_cast<std::uint64_t>(zero_copy_serialization_threshold));
 
             bool has_filter = filter != nullptr;
             save(has_filter);

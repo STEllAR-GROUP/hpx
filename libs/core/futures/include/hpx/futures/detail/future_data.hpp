@@ -348,13 +348,13 @@ namespace hpx::lcos::detail {
     private:
         static void construct(void* p)
         {
-            hpx::construct_at(static_cast<result_type*>(p));
+            hpx::construct_at(static_cast<result_type*>(p));    //-V206
         }
 
         template <typename T, typename... Ts>
         static void construct(void* p, T&& t, Ts&&... ts)
         {
-            hpx::construct_at(static_cast<result_type*>(p),
+            hpx::construct_at(static_cast<result_type*>(p),    //-V206
                 future_data_result<Result>::set(HPX_FORWARD(T, t)),
                 HPX_FORWARD(Ts, ts)...);
         }

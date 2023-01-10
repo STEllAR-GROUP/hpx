@@ -238,7 +238,7 @@ namespace hpx {
             return HPX_FORWARD(F, f)(&xi);
         }
         catch (...)
-        {
+        {    //-V565
         }
         return HPX_FORWARD(F, f)(nullptr);
     }

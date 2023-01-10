@@ -162,8 +162,9 @@ namespace hpx::program_options::detail {
             std::size_t max_limit) const noexcept override;
 
         // Nonstandard override
-        virtual int do_length(std::mbstate_t const& s, char const* from,
-            char const* from_end, std::size_t max_limit) const noexcept
+        virtual int do_length(std::mbstate_t const& s,    //-V835
+            char const* from, char const* from_end,
+            std::size_t max_limit) const noexcept
         {
             return do_length(
                 const_cast<std::mbstate_t&>(s), from, from_end, max_limit);

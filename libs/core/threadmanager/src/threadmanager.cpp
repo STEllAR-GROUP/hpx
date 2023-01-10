@@ -222,8 +222,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-local_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -233,9 +233,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
                 break;
             }
@@ -261,8 +262,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, num_high_priority_queues,
                     thread_queue_init, "core-local_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -272,9 +273,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
 
                 break;
@@ -302,8 +304,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, num_high_priority_queues,
                     thread_queue_init, "core-local_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -313,9 +315,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -337,8 +340,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-static_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -348,9 +351,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
                 break;
             }
@@ -375,8 +379,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, num_high_priority_queues,
                     thread_queue_init, "core-static_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -386,9 +390,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
                 break;
             }
@@ -416,8 +421,8 @@ namespace hpx { namespace threads {
                     thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -427,9 +432,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -463,8 +469,8 @@ namespace hpx { namespace threads {
                     thread_queue_init,
                     "core-abp_fifo_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -474,9 +480,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
 #else
                 throw hpx::detail::command_line_error(
@@ -498,8 +505,8 @@ namespace hpx { namespace threads {
                     thread_pool_init.affinity_data_, thread_queue_init,
                     "core-shared_priority_queue_scheduler");
 
-                std::unique_ptr<local_sched_type> sched(
-                    new local_sched_type(init));
+                std::unique_ptr<local_sched_type> sched =
+                    std::make_unique<local_sched_type>(init);
 
                 // set the default scheduler flags
                 sched->set_scheduler_mode(thread_pool_init.mode_);
@@ -509,9 +516,10 @@ namespace hpx { namespace threads {
                     !numa_sensitive);
 
                 // instantiate the pool
-                std::unique_ptr<thread_pool_base> pool(
-                    new hpx::threads::detail::scheduled_thread_pool<
-                        local_sched_type>(HPX_MOVE(sched), thread_pool_init));
+                std::unique_ptr<thread_pool_base> pool =
+                    std::make_unique<hpx::threads::detail::
+                            scheduled_thread_pool<local_sched_type>>(
+                        HPX_MOVE(sched), thread_pool_init);
                 pools_.push_back(HPX_MOVE(pool));
                 break;
             }
@@ -527,12 +535,12 @@ namespace hpx { namespace threads {
             std::size_t nt = rp.get_num_threads(pool_iter->get_pool_index());
             for (std::size_t i = 0; i < nt; i++)
             {
-                threads_lookup_.push_back(pool_iter->get_pool_id());
+                threads_lookup_.emplace_back(pool_iter->get_pool_id());
             }
         }
     }
 
-    threadmanager::~threadmanager() {}
+    threadmanager::~threadmanager() = default;
 
     void threadmanager::init()
     {
@@ -551,8 +559,8 @@ namespace hpx { namespace threads {
 
     void threadmanager::print_pools(std::ostream& os)
     {
-        os << "The thread-manager owns " << pools_.size()    //  -V128
-           << " pool(s) : \n";
+        os << "The thread-manager owns "
+           << static_cast<std::uint64_t>(pools_.size()) << " pool(s) : \n";
 
         for (auto&& pool_iter : pools_)
         {
@@ -666,7 +674,7 @@ namespace hpx { namespace threads {
     mask_type threadmanager::get_idle_core_mask()
     {
         mask_type mask = mask_type();
-        resize(mask, hardware_concurrency());
+        resize(mask, static_cast<std::size_t>(hardware_concurrency()));
 
         std::lock_guard<mutex_type> lk(mtx_);
 
@@ -1110,7 +1118,7 @@ namespace hpx { namespace threads {
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(suspend_pool(*pool_iter));
+                fs.emplace_back(suspend_pool(*pool_iter));
             }
 
             hpx::wait_all(fs);
@@ -1132,7 +1140,7 @@ namespace hpx { namespace threads {
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(resume_pool(*pool_iter));
+                fs.emplace_back(resume_pool(*pool_iter));
             }
             hpx::wait_all(fs);
         }

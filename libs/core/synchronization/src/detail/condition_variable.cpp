@@ -146,7 +146,7 @@ namespace hpx::lcos::local::detail {
             // update reference to queue for all queue entries
             for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
             {
-                qe->q_ = &queue;
+                qe->q_ = &queue;    //-V506
             }
 
             do
@@ -245,7 +245,7 @@ namespace hpx::lcos::local::detail {
             // update reference to queue for all queue entries
             for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
             {
-                qe->q_ = &queue;
+                qe->q_ = &queue;    //-V506
             }
 
             while (!queue.empty())

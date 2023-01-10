@@ -60,7 +60,7 @@ namespace hpx::program_options {
       , m_options_prefix(po.m_options_prefix)
     {
         for (auto const& option : po.options)
-            options.push_back(woption_from_option(option));
+            options.emplace_back(woption_from_option(option));
     }
 
     template <typename Char>

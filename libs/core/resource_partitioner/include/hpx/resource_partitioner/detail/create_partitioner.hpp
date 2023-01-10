@@ -23,5 +23,5 @@ namespace hpx::resource::detail {
 
     HPX_CORE_EXPORT partitioner& create_partitioner(
         resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-        hpx::threads::policies::detail::affinity_data affinity_data);
+        hpx::threads::policies::detail::affinity_data const& affinity_data);
 }    // namespace hpx::resource::detail

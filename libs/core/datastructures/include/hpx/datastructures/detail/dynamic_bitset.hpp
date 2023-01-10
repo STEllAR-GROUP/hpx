@@ -73,7 +73,7 @@ namespace hpx::detail {
         template <typename T>
         constexpr unsigned char const* object_representation(T* p) noexcept
         {
-            return static_cast<unsigned const char*>(
+            return static_cast<unsigned char const*>(
                 static_cast<void const*>(p));
         }
 
@@ -266,12 +266,12 @@ namespace hpx::detail {
         using block_width_type = typename buffer_type::size_type;
 
         static constexpr block_width_type bits_per_block =
-            std::numeric_limits<Block>::digits;
+            static_cast<block_width_type>(std::numeric_limits<Block>::digits);
         static constexpr size_type npos = static_cast<size_type>(-1);
 
     public:
         // A proxy class to simulate lvalues of bit type.
-        class reference
+        class reference    //-V690
         {
             friend class dynamic_bitset<Block, Allocator>;
 
@@ -286,7 +286,7 @@ namespace hpx::detail {
             void operator&() = delete;
 
         public:
-            // copy constructor: compiler generated
+            reference(reference const& rhs) = default;
 
             constexpr operator bool() const noexcept
             {
@@ -1769,7 +1769,7 @@ namespace hpx::detail {
         size_type asize(a.num_blocks());
         size_type bsize(b.num_blocks());
         HPX_ASSERT(asize == 3);
-        HPX_ASSERT(bsize == 4);
+        HPX_ASSERT(bsize == 4);    //-V112
 
         if (!bsize)
         {
@@ -2076,7 +2076,7 @@ namespace hpx::detail {
 
     // gives a const-reference to the highest block
     template <typename Block, typename Allocator>
-    inline const Block& dynamic_bitset<Block, Allocator>::highest_block()
+    inline Block const& dynamic_bitset<Block, Allocator>::highest_block()
         const noexcept
     {
         HPX_ASSERT(size() > 0 && num_blocks() > 0);

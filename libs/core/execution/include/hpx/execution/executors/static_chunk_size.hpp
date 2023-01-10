@@ -75,7 +75,7 @@ namespace hpx::execution::experimental {
             // Return a chunk size that is a power of two; and that leads to at
             // least 2 chunks per core, and at most 4 chunks per core.
             std::size_t chunk_size = 1;
-            while (chunk_size * cores * 4 < num_tasks)
+            while (chunk_size * cores * 4 < num_tasks)    //-V112
             {
                 chunk_size *= 2;
             }
@@ -89,7 +89,7 @@ namespace hpx::execution::experimental {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive& ar, const unsigned int /* version */)
+        void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
             ar & chunk_size_;

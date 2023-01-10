@@ -102,7 +102,7 @@ namespace hpx { namespace util {
         }
 
         // create mappings
-        thread_map_.push_back(detail::os_thread_data(name, type));
+        thread_map_.emplace_back(name, type);
 
         std::size_t idx = thread_map_.size() - 1;
         label_map_[name] = idx;
@@ -148,12 +148,13 @@ namespace hpx { namespace util {
         std::lock_guard<mutex_type> m(mtx_);
 
         auto idx = static_cast<std::size_t>(tix);
-        if (idx >= thread_map_.size() || !thread_map_[tix].is_valid())
+        if (idx >= thread_map_.size() ||
+            !thread_map_[tix].is_valid())    //-V108
         {
             return false;
         }
 
-        thread_map_[tix].cleanup_ = cb;
+        thread_map_[tix].cleanup_ = cb;    //-V108
         return true;
     }
 
@@ -162,12 +163,13 @@ namespace hpx { namespace util {
         std::lock_guard<mutex_type> m(mtx_);
 
         auto idx = static_cast<std::size_t>(tix);
-        if (idx >= thread_map_.size() || !thread_map_[tix].is_valid())
+        if (idx >= thread_map_.size() ||
+            !thread_map_[tix].is_valid())    //-V108
         {
             return false;
         }
 
-        thread_map_[tix].cleanup_.reset();
+        thread_map_[tix].cleanup_.reset();    //-V108
         return true;
     }
 

@@ -19,6 +19,7 @@
 #include <hpx/type_support/static.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -43,15 +44,15 @@ namespace hpx::serialization::detail {
         static constexpr std::uint32_t invalid_id = ~0u;
 
         HPX_CORE_EXPORT void register_factory_function(
-            const std::string& type_name, ctor_t ctor);
+            std::string const& type_name, ctor_t ctor);
 
         HPX_CORE_EXPORT void register_typename(
-            const std::string& type_name, std::uint32_t id);
+            std::string const& type_name, std::uint32_t id);
 
         HPX_CORE_EXPORT void fill_missing_typenames();
 
         HPX_CORE_EXPORT std::uint32_t try_get_id(
-            const std::string& type_name) const;
+            std::string const& type_name) const;
 
         std::uint32_t get_max_registered_id() const
         {
@@ -95,7 +96,7 @@ namespace hpx::serialization::detail {
         template <class T>
         static T* create(std::uint32_t id, std::string const* name = nullptr)
         {
-            const cache_t& vec = id_registry::instance().cache;
+            cache_t const& vec = id_registry::instance().cache;
 
             if (id >= vec.size())    //-V104
             {
@@ -114,13 +115,13 @@ namespace hpx::serialization::detail {
                     "polymorphic_id_factory::create", msg);
             }
 
-            ctor_t ctor = vec[id];
+            ctor_t ctor = vec[static_cast<std::size_t>(id)];
             HPX_ASSERT(ctor != nullptr);    //-V108
             return static_cast<T*>(ctor());
         }
 
         HPX_CORE_EXPORT static std::uint32_t get_id(
-            const std::string& type_name);
+            std::string const& type_name);
 
     private:
         polymorphic_id_factory() = default;

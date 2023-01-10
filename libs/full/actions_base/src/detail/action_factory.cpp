@@ -120,7 +120,7 @@ namespace hpx { namespace actions { namespace detail {
 
         std::vector<std::string> result;
 
-        for (const value_type& v : typename_to_ctor_)
+        for (value_type const& v : typename_to_ctor_)
         {
             if (!typename_to_id_.count(v.first))
             {
@@ -167,7 +167,8 @@ namespace hpx { namespace actions { namespace detail {
             return nullptr;
         }
 
-        std::pair<ctor_t, ctor_t> const& ctors = this_.cache_[id];
+        std::pair<ctor_t, ctor_t> const& ctors =
+            this_.cache_[static_cast<std::size_t>(id)];
         if (ctors.first == nullptr || ctors.second == nullptr)    // -V108
         {
             std::string msg("Unknown type descriptor " + std::to_string(id));

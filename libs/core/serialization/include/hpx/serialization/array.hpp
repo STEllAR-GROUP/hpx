@@ -116,7 +116,7 @@ namespace hpx::serialization {
     // implement serialization for std::array
     template <typename Archive, typename T, std::size_t N>
     void serialize(
-        Archive& ar, std::array<T, N>& a, const unsigned int /* version */)
+        Archive& ar, std::array<T, N>& a, unsigned int const /* version */)
     {
         // clang-format off
         ar & hpx::serialization::make_array(a.data(), a.size());
@@ -141,16 +141,16 @@ namespace hpx::serialization {
     }
 
     template <typename T>
-    HPX_FORCEINLINE output_archive& operator&(
-        output_archive& ar, array<T> t)    //-V524
+    HPX_FORCEINLINE output_archive& operator&(    //-V524
+        output_archive& ar, array<T> t)
     {
         ar.save(t);
         return ar;
     }
 
     template <typename T>
-    HPX_FORCEINLINE input_archive& operator&(
-        input_archive& ar, array<T> t)    //-V524
+    HPX_FORCEINLINE input_archive& operator&(    //-V524
+        input_archive& ar, array<T> t)
     {
         ar.load(t);
         return ar;
@@ -174,8 +174,8 @@ namespace hpx::serialization {
     }
 
     template <typename T, std::size_t N>
-    HPX_FORCEINLINE output_archive& operator&(
-        output_archive& ar, T (&t)[N])    //-V524
+    HPX_FORCEINLINE output_archive& operator&(    //-V524
+        output_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
         ar.save(array);
@@ -183,8 +183,8 @@ namespace hpx::serialization {
     }
 
     template <typename T, std::size_t N>
-    HPX_FORCEINLINE input_archive& operator&(
-        input_archive& ar, T (&t)[N])    //-V524
+    HPX_FORCEINLINE input_archive& operator&(    //-V524
+        input_archive& ar, T (&t)[N])
     {
         array<T> array = make_array(t, N);
         ar.load(array);
