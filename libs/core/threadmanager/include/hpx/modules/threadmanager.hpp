@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c)      2017 Shoshana Jakobovits
@@ -393,6 +393,34 @@ namespace hpx { namespace threads {
 #endif
 
     private:
+        policies::thread_queue_init_parameters get_init_parameters() const;
+        void create_scheduler_user_defined(
+            hpx::resource::scheduler_function const&,
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&);
+        void create_scheduler_local(thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_priority_fifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_priority_lifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_static(thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_static_priority(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_abp_priority_fifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_abp_priority_lifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_shared_priority(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+
         mutable mutex_type mtx_;    // mutex protecting the members
 
         hpx::util::runtime_configuration& rtcfg_;

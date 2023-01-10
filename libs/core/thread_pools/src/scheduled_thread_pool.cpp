@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/schedulers/background_scheduler.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
@@ -22,6 +23,10 @@ template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
 template class HPX_CORE_EXPORT hpx::threads::policies::static_queue_scheduler<>;
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::static_queue_scheduler<>>;
+
+template class HPX_CORE_EXPORT hpx::threads::policies::background_scheduler<>;
+template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
+    hpx::threads::policies::background_scheduler<>>;
 
 template class HPX_CORE_EXPORT
     hpx::threads::policies::local_priority_queue_scheduler<>;
