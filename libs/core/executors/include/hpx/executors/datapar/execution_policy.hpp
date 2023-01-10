@@ -282,7 +282,10 @@ namespace hpx { namespace execution {
             hpx::execution::experimental::to_non_par_t,
             par_simd_policy_shim<Executor, Parameters> const& policy)
         {
-            return simd.on(policy.executor()).with(policy.parameters());
+            return simd_policy()
+                // executor can't be weaker than sequential
+                // .on(policy.executor())
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
@@ -316,7 +319,8 @@ namespace hpx { namespace execution {
             par_simd_task_policy_shim<Executor, Parameters> const& policy)
         {
             return simd_task_policy()
-                .on(policy.executor())
+                // executor can't be weaker than sequential
+                // .on(policy.executor())
                 .with(policy.parameters());
         }
 
