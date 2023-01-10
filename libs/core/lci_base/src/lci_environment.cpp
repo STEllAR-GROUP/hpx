@@ -107,6 +107,7 @@ namespace hpx { namespace util {
     // We need this progress thread to send early parcels
     std::unique_ptr<std::thread> lci_environment::prg_thread_p = nullptr;
     std::atomic<bool> lci_environment::prg_thread_flag = false;
+    hpx::spinlock prg_thread_mtx;
 
     ///////////////////////////////////////////////////////////////////////////
     LCI_error_t lci_environment::init_lci()
@@ -222,11 +223,14 @@ namespace hpx { namespace util {
 
     void lci_environment::join_prg_thread_if_running()
     {
-        if (prg_thread_flag.load())
+        if (prg_thread_p)
         {
-            HPX_ASSERT(prg_thread_p != nullptr);
-            prg_thread_flag = false;
-            prg_thread_p->join();
+            std::lock_guard<hpx::spinlock> l(prg_thread_mtx);
+            if (prg_thread_p) {
+                prg_thread_flag = false;
+                prg_thread_p->join();
+                prg_thread_p.reset();
+            }
         }
     }
 
