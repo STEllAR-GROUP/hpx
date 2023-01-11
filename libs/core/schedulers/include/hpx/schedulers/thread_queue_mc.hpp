@@ -166,7 +166,8 @@ namespace hpx::threads::policies {
         // items)
         std::int64_t get_queue_length() const noexcept
         {
-            return work_items_count_.data_.load(std::memory_order_relaxed) +
+            return std::int64_t(work_items_count_.data_.load(
+                       std::memory_order_relaxed)) +
                 new_tasks_count_.data_.load(std::memory_order_relaxed);
         }
 

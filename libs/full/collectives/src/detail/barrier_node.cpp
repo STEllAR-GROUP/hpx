@@ -185,8 +185,8 @@ namespace hpx { namespace distributed { namespace detail {
         if (rank_ == 0)
         {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-            hpx::future<void> result = future.then(hpx::launch::sync,
-                [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
+            hpx::future<void> result =
+                future.then(hpx::launch::sync, [this_](hpx::future<void>&& f) {
                     LAPP_(info).format("barrier_node::do_wait: rank_({}): "
                                        "entering barrier done",
                         this_->rank_);
@@ -223,8 +223,8 @@ namespace hpx { namespace distributed { namespace detail {
 #endif
         }
 
-        hpx::future<void> result = future.then(hpx::launch::sync,
-            [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
+        hpx::future<void> result =
+            future.then(hpx::launch::sync, [this_](hpx::future<void>&& f) {
                 LAPP_(info).format(
                     "barrier_node::do_wait: rank_({}): entering barrier done",
                     this_->rank_);
@@ -272,8 +272,7 @@ namespace hpx { namespace distributed { namespace detail {
         // Once we know that all our children entered the barrier, we
         // flag ourself
         hpx::future<void> result = hpx::when_all(futures).then(
-            hpx::launch::sync,
-            [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
+            hpx::launch::sync, [this_](hpx::future<void>&& f) {
                 LAPP_(info).format(
                     "barrier_node::gather: rank_({}): recursive gather done",
                     this_->rank_);
@@ -332,8 +331,7 @@ namespace hpx { namespace distributed { namespace detail {
         // Once we notified our children, we mark ourself ready.
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::future<void> result = hpx::when_all(futures).then(
-            hpx::launch::sync,
-            [this_ = HPX_MOVE(this_)](hpx::future<void>&& f) {
+            hpx::launch::sync, [this_](hpx::future<void>&& f) {
                 LAPP_(info).format(
                     "barrier_node::set_event: rank_({}): mark ourselves ready",
                     this_->rank_);

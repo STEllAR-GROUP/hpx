@@ -651,7 +651,7 @@ namespace hpx::naming {
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((std::int32_t(log2credits) << gid_type::credit_shift) &
+                ((std::int64_t(log2credits) << gid_type::credit_shift) &
                     gid_type::credit_mask) |
                 gid_type::has_credits_mask);
         }

@@ -86,8 +86,8 @@ namespace hpx::distributed {
             std::vector<std::size_t> const& ranks, std::size_t rank);
 
         /// \cond NOINTERNAL
-        barrier(barrier&& other);
-        barrier& operator=(barrier&& other);
+        barrier(barrier&& other) noexcept;
+        barrier& operator=(barrier&& other) noexcept;
 
         /// \cond NOINTERNAL
         ~barrier();

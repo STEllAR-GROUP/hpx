@@ -456,8 +456,22 @@ namespace hpx { namespace detail {
             }
         }
 
+        // Use of a moved from object: '(*<vs_0>)'
+        //
+        // We can safely disable the warning as we know that
+        // async_local_impl_all() has not touched the arguments if it returns
+        // false.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)
+#endif
+
         return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
             HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////

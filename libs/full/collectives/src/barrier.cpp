@@ -16,6 +16,7 @@
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/state.hpp>
+#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -27,11 +28,13 @@
 namespace hpx { namespace distributed {
 
     barrier::barrier(std::string const& base_name)
-      : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-                wrapping_type(new wrapped_type(base_name,
-                    static_cast<std::size_t>(
-                        hpx::get_num_localities(hpx::launch::sync)),
-                    static_cast<std::size_t>(hpx::get_locality_id()))))
+      : node_(hpx::construct_at(
+            static_cast<wrapping_type*>(
+                hpx::components::component_heap<wrapping_type>().alloc()),
+            new wrapped_type(base_name,
+                static_cast<std::size_t>(
+                    hpx::get_num_localities(hpx::launch::sync)),
+                static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
         {
@@ -42,9 +45,11 @@ namespace hpx { namespace distributed {
     }
 
     barrier::barrier(std::string const& base_name, std::size_t num)
-      : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-                wrapping_type(new wrapped_type(base_name, num,
-                    static_cast<std::size_t>(hpx::get_locality_id()))))
+      : node_(hpx::construct_at(
+            static_cast<wrapping_type*>(
+                hpx::components::component_heap<wrapping_type>().alloc()),
+            new wrapped_type(base_name, num,
+                static_cast<std::size_t>(hpx::get_locality_id()))))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
         {
@@ -56,8 +61,10 @@ namespace hpx { namespace distributed {
 
     barrier::barrier(
         std::string const& base_name, std::size_t num, std::size_t rank)
-      : node_(new (hpx::components::component_heap<wrapping_type>().alloc())
-                wrapping_type(new wrapped_type(base_name, num, rank)))
+      : node_(hpx::construct_at(
+            static_cast<wrapping_type*>(
+                hpx::components::component_heap<wrapping_type>().alloc()),
+            new wrapped_type(base_name, num, rank)))
     {
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
         {
@@ -74,10 +81,10 @@ namespace hpx { namespace distributed {
         HPX_ASSERT(rank_it != ranks.end());
 
         std::size_t barrier_rank = std::distance(ranks.begin(), rank_it);
-        node_.reset(
-            new (hpx::components::component_heap<wrapping_type>().alloc())
-                wrapping_type(
-                    new wrapped_type(base_name, ranks.size(), barrier_rank)));
+        node_.reset(hpx::construct_at(
+            static_cast<wrapping_type*>(
+                hpx::components::component_heap<wrapping_type>().alloc()),
+            new wrapped_type(base_name, ranks.size(), barrier_rank)));
 
         if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
         {
@@ -89,13 +96,13 @@ namespace hpx { namespace distributed {
 
     barrier::barrier() = default;
 
-    barrier::barrier(barrier&& other)
+    barrier::barrier(barrier&& other) noexcept
       : node_(HPX_MOVE(other.node_))
     {
         other.node_.reset();
     }
 
-    barrier& barrier::operator=(barrier&& other)
+    barrier& barrier::operator=(barrier&& other) noexcept
     {
         release();
         node_ = HPX_MOVE(other.node_);

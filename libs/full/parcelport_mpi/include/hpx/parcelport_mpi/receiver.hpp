@@ -101,6 +101,12 @@ namespace hpx::parcelset::policies::mpi {
             connection_ptr res;
             util::mpi_environment::scoped_try_lock l;
 
+            // Caller failing to hold lock 'header_lock' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+
             if (l.locked)
             {
                 MPI_Status status;
@@ -114,6 +120,11 @@ namespace hpx::parcelset::policies::mpi {
                     return res;
                 }
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
+
             return res;
         }
 

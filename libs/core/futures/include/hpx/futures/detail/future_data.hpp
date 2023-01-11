@@ -372,12 +372,23 @@ namespace hpx::lcos::detail {
         using mutex_type = typename base_type::mutex_type;
 
     public:
+        // Variable 'hpx::lcos::detail::future_data_base<void>::storage_' is
+        // uninitialized.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
         future_data_base() = default;
 
         explicit future_data_base(init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
+
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#endif
 
         template <typename... Ts>
         future_data_base(init_no_addref no_addref, std::in_place_t, Ts&&... ts)
@@ -471,12 +482,20 @@ namespace hpx::lcos::detail {
                 return;
             }
 
+            // 26111: Caller failing to release lock 'this->mtx_'
+            // 26115: Failing to release lock 'this->mtx_'
+            // 26800: Use of a moved from object 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26111 26115 26800)
+#endif
+
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
             //       waiting on the future (most futures are not shared), and
             //       b) our implementation of condition_variable::notify_one
             //       relinquishes the lock before resuming the waiting thread
-            //       which avoids suspension of this thread when it tries to
+            //       that avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
                 cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
@@ -493,6 +512,10 @@ namespace hpx::lcos::detail {
             {
                 handle_on_completed(HPX_MOVE(on_completed));
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         void set_exception(std::exception_ptr data) override
@@ -531,12 +554,20 @@ namespace hpx::lcos::detail {
                 return;
             }
 
+            // 26111: Caller failing to release lock 'this->mtx_'
+            // 26115: Failing to release lock 'this->mtx_'
+            // 26800: Use of a moved from object 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26111 26115 26800)
+#endif
+
             // Note: we use notify_one repeatedly instead of notify_all as we
             //       know: a) that most of the time we have at most one thread
             //       waiting on the future (most futures are not shared), and
             //       b) our implementation of condition_variable::notify_one
             //       relinquishes the lock before resuming the waiting thread
-            //       which avoids suspension of this thread when it tries to
+            //       that avoids suspension of this thread when it tries to
             //       re-lock the mutex while exiting from condition_variable::wait
             while (
                 cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
@@ -553,6 +584,10 @@ namespace hpx::lcos::detail {
             {
                 handle_on_completed(HPX_MOVE(on_completed));
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         // helper functions for setting data (if successful) or the error (if

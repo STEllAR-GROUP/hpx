@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -604,6 +604,7 @@ namespace hpx::threads::detail {
         while (true)
         {
             thread_id_ref_type thrd = HPX_MOVE(next_thrd);
+            next_thrd = thread_id_ref_type();
 
             // Get the next HPX thread from the queue
             bool running = this_state.load(std::memory_order_relaxed) <
@@ -969,6 +970,7 @@ namespace hpx::threads::detail {
                             static_cast<std::int16_t>(num_thread)),
                         idle_loop_count);
                 }
+
                 // call back into invoking context
                 if (!params.inner_.empty())
                 {

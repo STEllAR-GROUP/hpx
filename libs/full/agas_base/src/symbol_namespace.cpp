@@ -271,11 +271,10 @@ namespace hpx { namespace agas {
                     {
                         bool has_credits =
                             naming::detail::has_credits(e.second);
-                        result[HPX_MOVE(e.first)] =
-                            hpx::id_type(HPX_MOVE(e.second),
-                                has_credits ?
-                                    hpx::id_type::management_type::managed :
-                                    hpx::id_type::management_type::unmanaged);
+                        result[e.first] = hpx::id_type(HPX_MOVE(e.second),
+                            has_credits ?
+                                hpx::id_type::management_type::managed :
+                                hpx::id_type::management_type::unmanaged);
                     }
                 }
                 return result;

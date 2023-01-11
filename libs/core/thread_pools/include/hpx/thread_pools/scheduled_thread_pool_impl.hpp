@@ -133,9 +133,8 @@ namespace hpx::threads::detail {
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os) const
     {
         os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
-           << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
-           << "\n"
-           << "is running on PUs : \n";
+           << "] with scheduler " << Scheduler::get_scheduler_name()
+           << "\nis running on PUs : \n";
         os << hpx::threads::to_string(get_used_processing_units())
 #ifdef HPX_HAVE_MAX_CPU_COUNT
            << " "

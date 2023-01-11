@@ -75,12 +75,17 @@ namespace hpx::detail {
         //   alignment_size alignment.
         // - heap_storage: A pointer to base_type that is used when objects
         //   don't fit in the embedded storage.
-        union
+        union storage
         {
             std::aligned_storage_t<embedded_storage_size, alignment_size>
                 embedded_storage;
             base_type* heap_storage = nullptr;
-        };
+
+            storage()
+              : embedded_storage{{}}
+            {
+            }
+        } data;
         base_type* object =
             const_cast<base_type*>(get_empty_vtable<base_type>());
 
@@ -99,7 +104,7 @@ namespace hpx::detail {
         bool using_embedded_storage() const noexcept
         {
             return object ==
-                reinterpret_cast<base_type const*>(&embedded_storage);
+                reinterpret_cast<base_type const*>(&data.embedded_storage);
         }
 
         bool empty() const noexcept
@@ -122,8 +127,8 @@ namespace hpx::detail {
             }
             else
             {
-                delete heap_storage;
-                heap_storage = nullptr;
+                delete data.heap_storage;
+                data.heap_storage = nullptr;
             }
 
             reset_vtable();
@@ -139,15 +144,16 @@ namespace hpx::detail {
             {
                 if (other.using_embedded_storage())
                 {
-                    auto p = reinterpret_cast<base_type*>(&embedded_storage);
+                    auto p =
+                        reinterpret_cast<base_type*>(&data.embedded_storage);
                     other.get().move_into(p);
                     object = p;
                 }
                 else
                 {
-                    heap_storage = other.heap_storage;
-                    other.heap_storage = nullptr;
-                    object = heap_storage;
+                    data.heap_storage = other.data.heap_storage;
+                    other.data.heap_storage = nullptr;
+                    object = data.heap_storage;
                 }
 
                 other.reset_vtable();
@@ -207,14 +213,14 @@ namespace hpx::detail {
 
             if constexpr (can_use_embedded_storage<Impl>())
             {
-                Impl* p = reinterpret_cast<Impl*>(&embedded_storage);
+                Impl* p = reinterpret_cast<Impl*>(&data.embedded_storage);
                 hpx::construct_at(p, HPX_FORWARD(Ts, ts)...);
                 object = p;
             }
             else
             {
-                heap_storage = new Impl(HPX_FORWARD(Ts, ts)...);
-                object = heap_storage;
+                data.heap_storage = new Impl(HPX_FORWARD(Ts, ts)...);
+                object = data.heap_storage;
             }
         }
     };
@@ -229,9 +235,8 @@ namespace hpx::detail {
 
         using typename storage_base_type::base_type;
 
-        using storage_base_type::embedded_storage;
+        using storage_base_type::data;
         using storage_base_type::empty;
-        using storage_base_type::heap_storage;
         using storage_base_type::object;
         using storage_base_type::release;
         using storage_base_type::using_embedded_storage;
@@ -246,14 +251,14 @@ namespace hpx::detail {
                 if (other.using_embedded_storage())
                 {
                     base_type* p =
-                        reinterpret_cast<base_type*>(&embedded_storage);
+                        reinterpret_cast<base_type*>(&data.embedded_storage);
                     other.get().clone_into(p);
                     object = p;
                 }
                 else
                 {
-                    heap_storage = other.get().clone();
-                    object = heap_storage;
+                    data.heap_storage = other.get().clone();
+                    object = data.heap_storage;
                 }
             }
         }

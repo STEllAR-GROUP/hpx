@@ -69,6 +69,11 @@ namespace hpx {
 
             bound_action& operator=(bound_action const&) = delete;
 
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)    //  Use of a moved from object: '(*<vs_0>)'
+#endif
+
             template <typename... Us>
             HPX_FORCEINLINE bool post(Us&&... vs) const
             {
@@ -103,6 +108,10 @@ namespace hpx {
                     detail::bind_eval<Ts const&, sizeof...(Us)>::call(
                         _args.template get<Is>(), HPX_FORWARD(Us, vs)...)...);
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
             template <typename... Us>
             HPX_FORCEINLINE result_type operator()(Us&&... vs) const
@@ -183,7 +192,7 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
     // serialization of the bound action object
     template <typename Archive, typename F, typename... Ts>
@@ -192,4 +201,4 @@ namespace hpx { namespace serialization {
     {
         bound.serialize(ar, version);
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

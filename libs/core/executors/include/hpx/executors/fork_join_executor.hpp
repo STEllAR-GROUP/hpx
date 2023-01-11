@@ -457,13 +457,15 @@ namespace hpx { namespace execution { namespace experimental {
               , region_data_(num_threads_)
             {
                 HPX_ASSERT(pool_);
-                if (num_threads_ > pool_->get_os_thread_count())
+                if (pool_ == nullptr ||
+                    num_threads_ > pool_->get_os_thread_count())
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "for_join_executor::shared_data::shared_data",
                         hpx::util::format("unexpected number of PUs in given "
                                           "mask: {}, available threads: {}",
-                            pu_mask, pool_->get_os_thread_count()));
+                            pu_mask,
+                            pool_ ? pool_->get_os_thread_count() : -1));
                 }
 
                 init_threads();

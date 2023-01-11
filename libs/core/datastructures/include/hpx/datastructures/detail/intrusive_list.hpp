@@ -103,7 +103,8 @@ namespace hpx::detail {
         void erase(Entry const* e) noexcept
         {
             HPX_ASSERT(num_entries != 0);
-            HPX_ASSERT(e != nullptr);
+            if (e == nullptr)
+                return;
 
             --num_entries;
             if (e->next != nullptr)

@@ -376,12 +376,21 @@ namespace hpx {
 #endif
 
     private:
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)    //  Use of a moved from object: '(*other)'
+#endif
+
         template <std::size_t... Is, typename UTuple>
         constexpr HPX_HOST_DEVICE tuple(util::index_pack<Is...>, UTuple&& other)
           : _members(std::piecewise_construct,
                 hpx::get<Is>(HPX_FORWARD(UTuple, other))...)
         {
         }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     public:
         // template <class... UTypes> constexpr tuple(const tuple<UTypes...>& u);
@@ -937,10 +946,20 @@ namespace hpx {
             Tuples_&&... tuples)
             -> tuple_cat_result_of_t<decltype(is_pack), decltype(tuple_pack)>
         {
+            //  Use of a moved from object: '(*<tuples_0>)'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)
+#endif
+
             return tuple_cat_result_of_t<decltype(is_pack),
                 decltype(tuple_pack)>{
                 tuple_cat_element<Is, util::pack<Tuples...>>::get(
                     HPX_FORWARD(Tuples_, tuples)...)...};
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
     }    // namespace detail
 

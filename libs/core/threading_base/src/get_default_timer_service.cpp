@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2020 Nikunj Gupta
 //
@@ -22,13 +22,11 @@ namespace hpx::threads::detail {
         get_default_timer_service_f = HPX_MOVE(f);
     }
 
-    asio::io_context* get_default_timer_service()
+    asio::io_context& get_default_timer_service()
     {
-        asio::io_context* timer_service = nullptr;
         if (detail::get_default_timer_service_f)
         {
-            timer_service = detail::get_default_timer_service_f();
-            HPX_ASSERT(timer_service);
+            return detail::get_default_timer_service_f();
         }
         else
         {
@@ -48,7 +46,5 @@ namespace hpx::threads::detail {
                 "hpx::threads::detail::set_get_default_timer_service.");
 #endif
         }
-
-        return timer_service;
     }
 }    // namespace hpx::threads::detail

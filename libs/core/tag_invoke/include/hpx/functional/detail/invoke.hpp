@@ -35,19 +35,13 @@ namespace hpx::util::detail {
 
     // when `pm` is a pointer to member of a class `C` and `T` does not
     // satisfy the previous two items;
+    //
+    // Note: NVCC requires to use std::forward below
     template <typename C, typename T>
     static constexpr auto mem_ptr_target(T&& v) noexcept(
-#if defined(HPX_CUDA_VERSION)
         noexcept(*std::forward<T>(v))) -> decltype(*std::forward<T>(v))
-#else
-        noexcept(*HPX_FORWARD(T, v))) -> decltype(*HPX_FORWARD(T, v))
-#endif
     {
-#if defined(HPX_CUDA_VERSION)
         return *std::forward<T>(v);
-#else
-        return *HPX_FORWARD(T, v);
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -108,8 +102,17 @@ namespace hpx::util::detail {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)    //  Use of a moved from object: '(*t1)'
+#endif
+
             return (detail::mem_ptr_target<C>(HPX_FORWARD(T1, t1)).*pm)(
                 HPX_FORWARD(Tn, tn)...);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -34,5 +34,5 @@ namespace hpx { namespace detail {
     HPX_CORE_EXPORT threads::thread_pool_base* get_default_pool();
     HPX_CORE_EXPORT threads::mask_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num);
-    HPX_CORE_EXPORT asio::io_context* get_default_timer_service();
+    HPX_CORE_EXPORT asio::io_context& get_default_timer_service();
 }}    // namespace hpx::detail

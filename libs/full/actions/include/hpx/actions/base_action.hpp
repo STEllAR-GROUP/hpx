@@ -170,13 +170,14 @@ namespace hpx { namespace actions {
         void save_base(hpx::serialization::output_archive& ar);
 
     protected:
-        threads::thread_priority priority_;
-        threads::thread_stacksize stacksize_;
+        threads::thread_priority priority_ = threads::thread_priority::default_;
+        threads::thread_stacksize stacksize_ =
+            threads::thread_stacksize::default_;
 
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        std::uint32_t parent_locality_;
+        std::uint32_t parent_locality_ = 0;
         threads::thread_id_type parent_id_;
-        std::uint64_t parent_phase_;
+        std::uint64_t parent_phase_ = 0;
 #endif
     };
 }}    // namespace hpx::actions

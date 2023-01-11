@@ -59,12 +59,12 @@ namespace hpx::execution::experimental::detail {
     static constexpr std::uint32_t get_bulk_scheduler_chunk_size(
         std::uint32_t const num_threads, std::size_t const n)
     {
-        std::uint32_t chunk_size = 1;
+        std::uint64_t chunk_size = 1;
         while (chunk_size * num_threads * 8 < n)
         {
             chunk_size *= 2;
         }
-        return chunk_size;
+        return static_cast<std::uint32_t>(chunk_size);
     }
 
     template <std::size_t... Is, typename F, typename T, typename Ts>

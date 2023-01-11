@@ -303,7 +303,7 @@ namespace hpx {
                 {
                 }
 
-                keep_alive(keep_alive&& o)
+                keep_alive(keep_alive&& o) noexcept
                   : ptr_(o.ptr_.release(), &wrapping_deleter)
                 {
                 }

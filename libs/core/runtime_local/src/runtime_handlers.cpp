@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -148,7 +148,7 @@ namespace hpx { namespace detail {
         return &rt->get_thread_manager().default_pool();
     }
 
-    asio::io_context* get_default_timer_service()
+    asio::io_context& get_default_timer_service()
     {
         hpx::runtime* rt = get_runtime_ptr();
         if (rt == nullptr)
@@ -158,7 +158,7 @@ namespace hpx { namespace detail {
                 "The runtime system is not active");
         }
 
-        return &get_thread_pool("timer-pool")->get_io_service();
+        return get_thread_pool("timer-pool")->get_io_service();
     }
 
     threads::mask_type get_pu_mask(

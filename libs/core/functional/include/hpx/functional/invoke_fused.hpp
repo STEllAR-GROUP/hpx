@@ -67,8 +67,17 @@ namespace hpx {
                 Tuple&& t) noexcept(noexcept(HPX_INVOKE(HPX_FORWARD(F, f),
                 hpx::get<Is>(HPX_FORWARD(Tuple, t))...)))
         {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)    //  Use of a moved from object: '(*t)'
+#endif
+
             return HPX_INVOKE(
                 HPX_FORWARD(F, f), hpx::get<Is>(HPX_FORWARD(Tuple, t))...);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
     }    // namespace detail
 

@@ -1341,11 +1341,12 @@ namespace hpx::threads::policies {
         typedef queue_holder_numa<thread_queue_type> numa_queues;
 
         // for each numa domain, the number of queues available
-        std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_counts_;
+        std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_counts_ = {};
         // index of first queue on each nume domain
-        std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_offset_;
+        std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_offset_ = {};
         // one item per numa domain of a container for queues on that domain
-        std::array<numa_queues, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> numa_holder_;
+        std::array<numa_queues, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> numa_holder_ =
+            {};
 
         // lookups for local thread_num into arrays
 #if !defined(HPX_HAVE_MAX_CPU_COUNT)

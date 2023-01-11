@@ -171,7 +171,7 @@ namespace hpx::threads::policies {
             // ASAN gets confused by reusing threads/stacks
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             // Check for an unused thread object.
-            if (!heap->empty())    //-V522
+            if (heap && !heap->empty())    //-V522
             {
                 // Take ownership of the thread object and rebind it.
                 thrd = heap->back();
@@ -242,6 +242,12 @@ namespace hpx::threads::policies {
                 std::pair<thread_map_type::iterator, bool> p =
                     thread_map_.emplace(thrd.noref());
 
+                // 26110: Caller failing to hold lock 'lk'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+
                 if (HPX_UNLIKELY(!p.second))
                 {
                     --addfrom->new_tasks_count_.data_;
@@ -251,6 +257,10 @@ namespace hpx::threads::policies {
                         "Couldn't add new thread to the thread map");
                     return 0;
                 }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
                 ++thread_map_count_;
 

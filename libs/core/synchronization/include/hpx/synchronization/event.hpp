@@ -58,7 +58,17 @@ namespace hpx::lcos::local {
             event_.store(true, std::memory_order_release);
 
             std::unique_lock<mutex_type> l(mtx_);
+
+            // 26115: Failing to release lock 'this->mtx_.data_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
             set_locked(HPX_MOVE(l));
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         /// \brief Reset the event

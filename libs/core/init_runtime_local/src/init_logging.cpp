@@ -317,8 +317,10 @@ namespace hpx { namespace util {
                 util::section const* logini = ini.get_section(sec);
                 HPX_ASSERT(nullptr != logini);
 
-                result.level_ = logini->get_entry("level", empty_string);
-                if (!result.level_.empty())
+                result.level_ = logini ?
+                    logini->get_entry("level", empty_string) :
+                    empty_string;
+                if (logini && !result.level_.empty())
                 {
                     result.dest_ =
                         logini->get_entry("destination", empty_string);

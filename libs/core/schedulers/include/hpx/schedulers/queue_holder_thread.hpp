@@ -489,7 +489,7 @@ namespace hpx::threads::policies {
             // ASAN gets confused by reusing threads/stacks
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             // Check for an unused thread object.
-            if (!heap->empty())    //-V522
+            if (heap && !heap->empty())    //-V522
             {
                 // Take ownership of the thread object and rebind it.
                 tid = heap->front();
