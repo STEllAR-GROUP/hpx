@@ -52,10 +52,9 @@ namespace hpx::execution::experimental {
                 {
                     HPX_ASSERT_MSG(false,
                         "set_error was called on the receiver of "
-                        "start_detached, "
-                        "terminating. If you want to allow errors from the "
-                        "predecessor sender, handle them first with e.g. "
-                        "let_error.");
+                        "start_detached, terminating. If you want to allow "
+                        "errors from the predecessor sender, handle them first "
+                        "with e.g. let_error.");
                     std::terminate();
                 }
 

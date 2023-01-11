@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <cstddef>
-
 #if defined(HPX_HAVE_DATAPAR)
 
 #if !defined(__CUDACC__)

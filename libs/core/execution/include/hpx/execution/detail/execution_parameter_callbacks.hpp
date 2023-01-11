@@ -13,7 +13,8 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
+
     /// \cond NOINTERNAL
     using get_os_thread_count_type = hpx::function<std::size_t()>;
     HPX_CORE_EXPORT void set_get_os_thread_count(get_os_thread_count_type f);
@@ -25,4 +26,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
     HPX_CORE_EXPORT threads::mask_type get_pu_mask(
         threads::topology&, std::size_t);
     /// \endcond
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

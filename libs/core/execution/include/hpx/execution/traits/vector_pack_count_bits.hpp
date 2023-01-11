@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,12 +11,14 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(bool value)
+namespace hpx::parallel::traits {
+
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr std::size_t count_bits(
+        bool value) noexcept
     {
         return value ? 1 : 0;
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #if defined(HPX_HAVE_DATAPAR)
 

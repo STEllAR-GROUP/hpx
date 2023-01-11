@@ -337,7 +337,7 @@ namespace hpx::lcos::detail {
     public:
         using argument_type = Sequence;
 
-        when_any(argument_type&& lazy_values) noexcept
+        explicit when_any(argument_type&& lazy_values) noexcept
           : lazy_values_(HPX_MOVE(lazy_values))
           , index_(when_any_result<Sequence>::index_error())
           , goal_reached_on_calling_thread_(false)

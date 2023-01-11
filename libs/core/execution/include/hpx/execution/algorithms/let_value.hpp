@@ -294,8 +294,9 @@ namespace hpx::execution::experimental {
                                                 HPX_MOVE(receiver));
                                     }));
 #else
-                            // MSVC doesn't get copy elision quite right, the operation
-                            // state must be constructed explicitly directly in place
+                            // earlier versions of MSVC don't get copy elision
+                            // quite right, the operation state must be
+                            // constructed explicitly directly in place
                             op_state.successor_op_state
                                 .template emplace_f<operation_state_type>(
                                     hpx::execution::experimental::connect,

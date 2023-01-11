@@ -210,8 +210,9 @@ namespace hpx::execution::experimental {
                                 scheduler_sender_receiver{*this});
                         }));
 #else
-                    // MSVC doesn't get copy elision quite right, the operation
-                    // state must be constructed explicitly directly in place
+                    // earlier versions of MSVC don't get copy elision quite
+                    // right, the operation state must be constructed explicitly
+                    // directly in place
                     scheduler_op_state.emplace_f(
                         hpx::execution::experimental::connect,
                         hpx::execution::experimental::schedule(

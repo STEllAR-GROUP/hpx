@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // dispatch point used for launch_policy implementations
@@ -324,4 +324,4 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

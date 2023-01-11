@@ -160,5 +160,4 @@ namespace hpx::execution::experimental {
             return detail::read_sender<Tag>{};
         }
     } read{};
-
 }    // namespace hpx::execution::experimental

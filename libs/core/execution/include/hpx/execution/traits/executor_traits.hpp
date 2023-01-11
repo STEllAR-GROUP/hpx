@@ -20,26 +20,35 @@
 #include <utility>
 
 namespace hpx {
+
     template <typename R>
     class future;
 }    // namespace hpx
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
 
     namespace experimental {
-        ///////////////////////////////////////////////////////////////////////
+
+        struct adaptive_static_chunk_size;
+        struct auto_chunk_size;
+        struct dynamic_chunk_size;
+        struct guided_chunk_size;
+        struct persistent_auto_chunk_size;
         struct static_chunk_size;
+        struct num_cores;
     }    // namespace experimental
 
     ///////////////////////////////////////////////////////////////////////////
     struct sequenced_execution_tag;
     struct parallel_execution_tag;
     struct unsequenced_execution_tag;
-}}    // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(post)
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(sync_execute)
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(async_execute)
@@ -97,8 +106,8 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Components that create groups of execution agents may use execution
-    // categories to communicate the forward progress and ordering guarantees
-    // of these execution agents with respect to other agents within the same
+    // categories to communicate the forward progress and ordering guarantees of
+    // these execution agents with respect to other agents within the same
     // group.
 
     ///////////////////////////////////////////////////////////////////////////
@@ -159,6 +168,7 @@ namespace hpx { namespace parallel { namespace execution {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Executor, typename T, typename Ts,
             typename Enable = void>
         struct executor_future;
@@ -222,10 +232,10 @@ namespace hpx { namespace parallel { namespace execution {
     template <typename Executor, typename T, typename... Ts>
     using executor_future_t =
         typename executor_future<Executor, T, Ts...>::type;
+}    // namespace hpx::parallel::execution
 
-}}}    // namespace hpx::parallel::execution
+namespace hpx::traits {
 
-namespace hpx { namespace traits {
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct has_post_member
@@ -356,5 +366,4 @@ namespace hpx { namespace traits {
     template <typename Executor>
     using executor_parameters_type_t =
         typename executor_parameters_type<Executor>::type;
-
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

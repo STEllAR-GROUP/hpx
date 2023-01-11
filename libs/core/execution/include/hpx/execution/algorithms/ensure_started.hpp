@@ -41,8 +41,8 @@ namespace hpx::execution::experimental {
     // called, or if execution::connect() is called but the returned
     // operation-state is destroyed before execution::start() is called, then a
     // stop-request is sent to the eagerly launched operation and the operation
-    // is detached and will run to completion in the background. Its result
-    // will be discarded when it eventually completes.
+    // is detached and will run to completion in the background. Its result will
+    // be discarded when it eventually completes.
     //
     // Note that the application will need to make sure that resources are kept
     // alive in the case that the operation detaches. e.g. by holding a

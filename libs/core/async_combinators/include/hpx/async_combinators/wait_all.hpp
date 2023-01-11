@@ -267,7 +267,7 @@ namespace hpx::detail {
         static constexpr bool is_end_v = is_end<I>::value;
 
     public:
-        wait_all_frame(Tuple const& t)
+        explicit wait_all_frame(Tuple const& t) noexcept
           : base_type(init_no_addref{})
           , t_(t)
         {
@@ -329,8 +329,8 @@ namespace hpx::detail {
             next = std::decay_t<Iter>{};
             end = std::decay_t<Iter>{};
 
-            // All elements of the sequence are ready now, proceed to the
-            // next argument.
+            // All elements of the sequence are ready now, proceed to the next
+            // argument.
             do_await<I + 1>();
         }
 
@@ -360,8 +360,8 @@ namespace hpx::detail {
                     if (!next_future_data->is_ready(std::memory_order_relaxed))
                     {
                         // Attach a continuation to this future which will
-                        // re-evaluate it and continue to the next argument
-                        // (if any).
+                        // re-evaluate it and continue to the next argument (if
+                        // any).
                         next_future_data->set_on_completed(
                             [this_ = HPX_MOVE(this_)]() -> void {
                                 this_->template await_future<I>();
@@ -389,7 +389,7 @@ namespace hpx::detail {
             if constexpr (is_end_v<I>)
             {
                 // simply make ourself ready
-                this->set_value(util::unused);
+                this->set_data(util::unused);
             }
             else
             {

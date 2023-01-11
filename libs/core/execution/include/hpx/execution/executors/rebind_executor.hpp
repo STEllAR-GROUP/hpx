@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,9 +14,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Category1, typename Category2>
         struct is_not_weaker : std::false_type
@@ -45,6 +47,10 @@ namespace hpx { namespace parallel { namespace execution {
             hpx::execution::parallel_execution_tag> : std::true_type
         {
         };
+
+        template <typename Category1, typename Category2>
+        inline constexpr bool is_not_weaker_v =
+            is_not_weaker<Category1, Category2>::value;
         /// \endcond
     }    // namespace detail
 
@@ -59,11 +65,11 @@ namespace hpx { namespace parallel { namespace execution {
         using parameters_type = std::decay_t<Parameters>;
 
         using category1 = typename policy_type::execution_category;
-        using category2 = typename hpx::traits::executor_execution_category<
-            executor_type>::type;
+        using category2 =
+            hpx::traits::executor_execution_category_t<executor_type>;
 
-        static_assert(detail::is_not_weaker<category2, category1>::value,
-            "detail::is_not_weaker<category2, category1>::value");
+        static_assert(detail::is_not_weaker_v<category2, category1>,
+            "detail::is_not_weaker_v<category2, category1>");
         /// \endcond
 
         /// The type of the rebound execution policy
@@ -71,20 +77,22 @@ namespace hpx { namespace parallel { namespace execution {
             parameters_type>::type;
     };
 
+    template <typename ExPolicy, typename Executor, typename Parameters>
+    using rebind_executor_t =
+        typename rebind_executor<ExPolicy, Executor, Parameters>::type;
+
     //////////////////////////////////////////////////////////////////////////
-    struct create_rebound_policy_t
+    inline constexpr struct create_rebound_policy_t final
     {
         template <typename ExPolicy, typename Executor, typename Parameters>
         constexpr decltype(auto) operator()(
             ExPolicy&&, Executor&& exec, Parameters&& parameters) const
         {
             using rebound_type =
-                typename rebind_executor<ExPolicy, Executor, Parameters>::type;
+                rebind_executor_t<ExPolicy, Executor, Parameters>;
 
             return rebound_type(HPX_FORWARD(Executor, exec),
                 HPX_FORWARD(Parameters, parameters));
         }
-    };
-
-    inline constexpr create_rebound_policy_t create_rebound_policy{};
-}}}    // namespace hpx::parallel::execution
+    } create_rebound_policy{};
+}    // namespace hpx::parallel::execution

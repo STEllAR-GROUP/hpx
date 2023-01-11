@@ -22,8 +22,7 @@ namespace hpx::execution::experimental::detail {
     struct single_result
     {
         static_assert(sizeof(Variants) == 0,
-            "expected a single variant with a single type in "
-            "value_types_of_t");
+            "expected a single variant with a single type in value_types_of_t");
     };
 
     template <>
@@ -48,17 +47,16 @@ namespace hpx::execution::experimental::detail {
     struct single_result<meta::pack<meta::pack<T, U, Ts...>>>
     {
         static_assert(sizeof(T) == 0,
-            "expected a single variant with a single type in "
-            "value_types_of_t (single variant with two or more "
-            "types given)");
+            "expected a single variant with a single type in value_types_of_t "
+            "(single variant with two or more types given)");
     };
 
     template <typename T, typename U, typename... Ts>
     struct single_result<meta::pack<T, U, Ts...>>
     {
         static_assert(sizeof(T) == 0,
-            "expected a single variant with a single type in "
-            "value_types_of_t (two or more variants)");
+            "expected a single variant with a single type in value_types_of_t "
+            "(two or more variants)");
     };
 
     template <typename Variants>

@@ -11,7 +11,8 @@
 #if defined(HPX_HAVE_DATAPAR)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename V, typename NewT>
     struct rebind_pack;
@@ -22,7 +23,7 @@ namespace hpx { namespace parallel { namespace traits {
 
     template <typename V, typename ValueType, typename Enable = void>
     struct vector_pack_store;
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/eve/vector_pack_load_store.hpp>

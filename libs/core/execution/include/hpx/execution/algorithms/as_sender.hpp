@@ -175,8 +175,8 @@ namespace hpx::execution::experimental {
             using base_type::future_;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    as_sender_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, as_sender_sender>>>
             explicit as_sender_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {
@@ -204,8 +204,8 @@ namespace hpx::execution::experimental {
             using base_type::future_;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    as_sender_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, as_sender_sender>>>
             explicit as_sender_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {

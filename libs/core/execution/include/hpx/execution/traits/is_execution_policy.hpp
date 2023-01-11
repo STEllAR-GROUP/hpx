@@ -13,54 +13,56 @@
 
 #include <type_traits>
 
+namespace hpx::detail {
+
+    /// \cond NOINTERNAL
+    template <typename T>
+    struct is_execution_policy : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct is_parallel_execution_policy : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct is_sequenced_execution_policy : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct is_async_execution_policy : std::false_type
+    {
+    };
+
+    template <typename Executor>
+    struct is_rebound_execution_policy : std::false_type
+    {
+    };
+
+    template <typename Executor>
+    struct is_unsequenced_execution_policy : std::false_type
+    {
+    };
+
+    template <typename Executor>
+    struct is_vectorpack_execution_policy : std::false_type
+    {
+    };
+    /// \endcond
+}    // namespace hpx::detail
+
 namespace hpx {
-    namespace detail {
-        /// \cond NOINTERNAL
-        template <typename T>
-        struct is_execution_policy : std::false_type
-        {
-        };
-
-        template <typename T>
-        struct is_parallel_execution_policy : std::false_type
-        {
-        };
-
-        template <typename T>
-        struct is_sequenced_execution_policy : std::false_type
-        {
-        };
-
-        template <typename T>
-        struct is_async_execution_policy : std::false_type
-        {
-        };
-
-        template <typename Executor>
-        struct is_rebound_execution_policy : std::false_type
-        {
-        };
-
-        template <typename Executor>
-        struct is_unsequenced_execution_policy : std::false_type
-        {
-        };
-
-        template <typename Executor>
-        struct is_vectorpack_execution_policy : std::false_type
-        {
-        };
-        /// \endcond
-    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     /// 1. The type is_execution_policy can be used to detect execution
-    ///    policies for the purpose of excluding function signatures
-    ///    from otherwise ambiguous overload resolution participation.
+    ///    policies for the purpose of excluding function signatures from
+    ///    otherwise ambiguous overload resolution participation.
     /// 2. If T is the type of a standard or implementation-defined execution
     ///    policy, is_execution_policy<T> shall be publicly derived from
-    ///    integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
+    ///    integral_constant<bool, true>, otherwise from integral_constant<bool,
+    ///    false>.
     /// 3. The behavior of a program that adds specializations for
     ///    is_execution_policy is undefined.
     ///
@@ -101,8 +103,8 @@ namespace hpx {
     ///            parallelization
     ///
     /// 1. The type is_sequenced_execution_policy can be used to detect
-    ///    non-parallel execution policies for the purpose of excluding
-    ///    function signatures from otherwise ambiguous overload resolution
+    ///    non-parallel execution policies for the purpose of excluding function
+    ///    signatures from otherwise ambiguous overload resolution
     ///    participation.
     /// 2. If T is the type of a standard or implementation-defined execution
     ///    policy, is_sequenced_execution_policy<T> shall be publicly derived
@@ -127,13 +129,13 @@ namespace hpx {
     ///            asynchronous
     ///
     /// 1. The type is_async_execution_policy can be used to detect
-    ///    asynchronous execution policies for the purpose of excluding
-    ///    function signatures from otherwise ambiguous overload resolution
+    ///    asynchronous execution policies for the purpose of excluding function
+    ///    signatures from otherwise ambiguous overload resolution
     ///    participation.
     /// 2. If T is the type of a standard or implementation-defined execution
-    ///    policy, is_async_execution_policy<T> shall be publicly derived
-    ///    from integral_constant<bool, true>, otherwise from
-    ///    integral_constant<bool, false>.
+    ///    policy, is_async_execution_policy<T> shall be publicly derived from
+    ///    integral_constant<bool, true>, otherwise from integral_constant<bool,
+    ///    false>.
     /// 3. The behavior of a program that adds specializations for
     ///    is_async_execution_policy is undefined.
     ///
@@ -180,7 +182,7 @@ namespace hpx {
     inline constexpr bool is_vectorpack_execution_policy_v =
         is_vectorpack_execution_policy<T>::value;
 
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     // execution_policy_has_scheduler_executor evaluates to true if the executor
     // the given policy contains returns senders from its scheduling functions
     template <typename T, typename Enable = void>

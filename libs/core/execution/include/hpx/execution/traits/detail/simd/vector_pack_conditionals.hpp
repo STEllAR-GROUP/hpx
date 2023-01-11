@@ -12,15 +12,14 @@
 
 #include <hpx/execution/traits/detail/simd/vector_pack_simd.hpp>
 
-#include <cstddef>
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(
         datapar::experimental::simd_mask<T, Abi> const& msk,
         datapar::experimental::simd<T, Abi> const& v_true,
-        datapar::experimental::simd<T, Abi> const& v_false)
+        datapar::experimental::simd<T, Abi> const& v_false) noexcept
     {
         return datapar::experimental::choose(msk, v_true, v_false);
     }
@@ -30,10 +29,10 @@ namespace hpx { namespace parallel { namespace traits {
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         datapar::experimental::simd_mask<T, Abi> const& msk,
         datapar::experimental::simd<T, Abi>& v,
-        datapar::experimental::simd<T, Abi> const& val)
+        datapar::experimental::simd<T, Abi> const& val) noexcept
     {
         datapar::experimental::mask_assign(msk, v, val);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

@@ -205,7 +205,7 @@ namespace hpx::execution::experimental {
             {
             }
 
-            run_loop& get_run_loop() const
+            run_loop& get_run_loop() const noexcept
             {
                 return loop;
             }
@@ -290,6 +290,7 @@ namespace hpx::execution::experimental {
         }
 
         run_loop(run_loop&&) = delete;
+        run_loop& operator=(run_loop&&) = delete;
 
         // If count is not 0 or if state is running, invokes terminate().
         // Otherwise, has no effects.
