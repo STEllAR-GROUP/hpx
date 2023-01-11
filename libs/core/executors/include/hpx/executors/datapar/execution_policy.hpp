@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,6 +20,7 @@
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
+#include <hpx/modules/properties.hpp>
 #include <hpx/serialization/serialize.hpp>
 
 #include <type_traits>
@@ -195,152 +196,164 @@ namespace hpx { namespace execution {
         /// \cond NOINTERN
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             simd_policy_shim<Executor, Parameters> const& policy)
         {
             return simd_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
+            hpx::execution::experimental::to_par_t tag,
             simd_policy_shim<Executor, Parameters> const& policy)
         {
-            return par_simd.on(policy.executor()).with(policy.parameters());
+            return par_simd_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_simd_t,
+            hpx::execution::experimental::to_non_simd_t tag,
             simd_policy_shim<Executor, Parameters> const& policy)
         {
-            return seq.on(policy.executor()).with(policy.parameters());
+            return sequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_simd_t,
+            hpx::execution::experimental::to_simd_t tag,
             sequenced_policy_shim<Executor, Parameters> const& policy)
         {
-            return simd.on(policy.executor()).with(policy.parameters());
+            return simd_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             simd_task_policy_shim<Executor, Parameters> const& policy)
         {
-            return simd.on(policy.executor()).with(policy.parameters());
-        }
-
-        template <typename Executor, typename Parameters>
-        constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
-            simd_task_policy_shim<Executor, Parameters> const& policy)
-        {
-            return par_simd_task_policy()
-                .on(policy.executor())
+            return simd_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_simd_t,
+            hpx::execution::experimental::to_par_t tag,
+            simd_task_policy_shim<Executor, Parameters> const& policy)
+        {
+            return par_simd_task_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
+        }
+
+        template <typename Executor, typename Parameters>
+        constexpr decltype(auto) tag_invoke(
+            hpx::execution::experimental::to_non_simd_t tag,
             simd_task_policy_shim<Executor, Parameters> const& policy)
         {
             return sequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_simd_t,
+            hpx::execution::experimental::to_simd_t tag,
             sequenced_task_policy_shim<Executor, Parameters> const& policy)
         {
             return simd_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             par_simd_policy_shim<Executor, Parameters> const& policy)
         {
             return par_simd_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
+            hpx::execution::experimental::to_non_par_t tag,
             par_simd_policy_shim<Executor, Parameters> const& policy)
         {
             return simd_policy()
-                // executor can't be weaker than sequential
-                // .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_simd_t,
+            hpx::execution::experimental::to_non_simd_t tag,
             par_simd_policy_shim<Executor, Parameters> const& policy)
         {
-            return par.on(policy.executor()).with(policy.parameters());
+            return parallel_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_simd_t,
+            hpx::execution::experimental::to_simd_t tag,
             parallel_policy_shim<Executor, Parameters> const& policy)
         {
-            return par_simd.on(policy.executor()).with(policy.parameters());
+            return par_simd_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             par_simd_task_policy_shim<Executor, Parameters> const& policy)
         {
-            return par_simd.on(policy.executor()).with(policy.parameters());
+            return par_simd_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
+            hpx::execution::experimental::to_non_par_t tag,
             par_simd_task_policy_shim<Executor, Parameters> const& policy)
         {
             return simd_task_policy()
-                // executor can't be weaker than sequential
-                // .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_simd_t,
+            hpx::execution::experimental::to_non_simd_t tag,
             par_simd_task_policy_shim<Executor, Parameters> const& policy)
         {
             return parallel_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_simd_t,
+            hpx::execution::experimental::to_simd_t tag,
             parallel_task_policy_shim<Executor, Parameters> const& policy)
         {
             return par_simd_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
         /// \endcond

@@ -15,6 +15,8 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/executors/execution_policy_mappings.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
@@ -238,6 +240,17 @@ namespace hpx::execution {
         {
             return threads::detail::get_self_or_default_pool()
                 ->get_used_processing_unit(hpx::get_worker_thread_num(), true);
+        }
+
+        friend decltype(auto) tag_invoke(hpx::execution::experimental::to_par_t,
+            [[maybe_unused]] sequenced_executor const& exec)
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            return hpx::execution::experimental::with_annotation(
+                parallel_executor(), exec.annotation_);
+#else
+            return parallel_executor();
+#endif
         }
 
     private:
