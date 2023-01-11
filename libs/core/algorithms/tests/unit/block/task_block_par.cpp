@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-using hpx::parallel::define_task_block;
+using hpx::experimental::define_task_block;
 
 ///////////////////////////////////////////////////////////////////////////////
 void define_task_block_test()

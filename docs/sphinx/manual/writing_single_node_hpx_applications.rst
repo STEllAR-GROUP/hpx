@@ -241,7 +241,7 @@ align the APIs exposed from |hpx| with current and future C++ Standards.
 
 At this point, |hpx| implements several of the C++ Standardization working
 papers, most notably |cpp11_n4104|_ (Working Draft, Technical Specification for
-C++ Extensions for Parallelism), |cpp11_n4088|_ (Task Blocks), and
+C++ Extensions for Parallelism), |cpp17_n4755|_ (Task Blocks), and
 |cpp11_n4406|_ (Parallel Algorithms Need Executors).
 
 .. _parallel_algorithms:
@@ -875,7 +875,7 @@ Using task blocks
 =================
 
 The ``define_task_block``, ``run`` and the ``wait`` functions implemented based
-on |cpp11_n4088|_ are based on the ``task_block`` concept that is a part of the
+on |cpp17_n4755|_ are based on the ``task_block`` concept that is a part of the
 common subset of the |ppl|_ and the |tbb|_ libraries.
 
 These implementations adopt a simpler syntax than exposed by those libraries---
@@ -909,9 +909,9 @@ results::
     }
 
 The example above demonstrates the use of two of the functions,
-:cpp:func:`hpx::parallel::define_task_block` and the
-:cpp:member:`hpx::parallel::task_block::run` member function of a
-:cpp:class:`hpx::parallel::task_block`.
+:cpp:func:`hpx::experimental::define_task_block` and the
+:cpp:member:`hpx::experimental::task_block::run` member function of a
+:cpp:class:`hpx::experimental::task_block`.
 
 The ``task_block`` function delineates a region in a program code potentially
 containing invocations of threads spawned by the ``run`` member function of the
@@ -956,7 +956,7 @@ Using execution policies with task blocks
 .........................................
 
 |hpx| implements some extensions for ``task_block`` beyond the actual
-standards proposal |cpp11_n4088|_. The main addition is that a ``task_block``
+standards proposal |cpp17_n4755|_. The main addition is that a ``task_block``
 can be invoked with an execution policy as its first argument, very similar to
 the parallel algorithms.
 
@@ -984,12 +984,12 @@ created ``task_block``. In the following example the use of an explicit
         return compute(n) + left + right;
     }
 
-This also causes the :cpp:class:`hpx::parallel::v2::task_block` object to be a
+This also causes the :cpp:class:`hpx::experimental::task_block` object to be a
 template in our implementation. The template argument is the type of the
 execution policy used to create the task block. The template argument defaults
 to :cpp:class:`hpx::execution::parallel_policy`.
 
-|hpx| still supports calling :cpp:func:`hpx::parallel::v2::define_task_block`
+|hpx| still supports calling :cpp:func:`hpx::experimental::define_task_block`
 without an explicit execution policy. In this case the task block will run using
 the :cpp:class:`hpx::execution::parallel_policy`.
 
@@ -1028,7 +1028,7 @@ function enables this use case::
         return compute(n) + left + right;
     }
 
-|hpx| still supports calling :cpp:func:`hpx::parallel::v2::task_block::run`
+|hpx| still supports calling :cpp:func:`hpx::experimental::task_block::run`
 without an explicit executor object. In this case the task will be run using the
 executor associated with the execution policy that was used to call
-:cpp:func:`hpx::parallel::v2::define_task_block`.
+:cpp:func:`hpx::experimental::define_task_block`.
