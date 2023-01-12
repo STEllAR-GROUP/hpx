@@ -299,7 +299,7 @@ namespace hpx { namespace experimental {
         }
 
     private:
-        hpx::execution::experimental::task_group tasks_;
+        hpx::experimental::task_group tasks_;
         threads::thread_id_type id_;
         ExPolicy policy_;
     };

@@ -31,7 +31,7 @@
 #include <utility>
 
 /// Top-level namespace
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx { namespace experimental {
 
     /// \brief A \c task_group represents concurrent execution of a
     ///        group of tasks. Tasks can be dynamically added to the
@@ -147,4 +147,12 @@ namespace hpx { namespace execution { namespace experimental {
         hpx::exception_list errors_;
         std::atomic<bool> has_arrived_;
     };
+}}    // namespace hpx::experimental
+
+namespace hpx { namespace execution { namespace experimental {
+
+    using task_group HPX_DEPRECATED_V(1, 9,
+        "hpx::execution:experimental::task_group is deprecated, use "
+        "hpx::experimental::task_group instead") =
+        hpx::experimental::task_group;
 }}}    // namespace hpx::execution::experimental

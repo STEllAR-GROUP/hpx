@@ -183,7 +183,7 @@ void test_mixed_arguments(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type test3(std::shared_ptr<hpx::execution::experimental::task_group> tg)
+hpx::id_type test3(std::shared_ptr<hpx::experimental::task_group> tg)
 {
     tg->wait();
     return hpx::find_here();
@@ -197,7 +197,7 @@ void wait_a_while()
 
 void test_task_group_argument(hpx::id_type const& id)
 {
-    std::vector<std::shared_ptr<hpx::execution::experimental::task_group>> args;
+    std::vector<std::shared_ptr<hpx::experimental::task_group>> args;
     args.reserve(numparcels_default);
 
     std::vector<hpx::future<hpx::id_type>> results;
@@ -207,7 +207,7 @@ void test_task_group_argument(hpx::id_type const& id)
     std::vector<hpx::parcelset::parcel> parcels;
     for (std::size_t i = 0; i != numparcels_default; ++i)
     {
-        auto tg = std::make_shared<hpx::execution::experimental::task_group>();
+        auto tg = std::make_shared<hpx::experimental::task_group>();
         tg->run(wait_a_while);
         tg->run(wait_a_while);
         tg->run(wait_a_while);

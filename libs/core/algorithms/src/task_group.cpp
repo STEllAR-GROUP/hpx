@@ -14,7 +14,7 @@
 
 #include <exception>
 
-namespace hpx::execution::experimental {
+namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     task_group::on_exit::on_exit(task_group& tg)
@@ -115,4 +115,4 @@ namespace hpx::execution::experimental {
     }
 
     void task_group::serialize(serialization::input_archive&, unsigned const) {}
-}    // namespace hpx::execution::experimental
+}    // namespace hpx::experimental
