@@ -74,6 +74,12 @@ namespace hpx::threads::policies {
         /// exponential idle-back off
         enable_idle_backoff = 0x0800,
 
+        /// The scheduler will only call a provided callback function from a
+        /// special HPX thread to enable performing background-work, for
+        /// instance driving networking progress or garbage-collect AGAS. No
+        /// 'normal' work scheduling is performed.
+        do_background_work_only = 0x1000,
+
         // clang-format off
         /// This option represents the default mode.
         default_ =
@@ -99,7 +105,8 @@ namespace hpx::threads::policies {
             assign_work_thread_parent |
             steal_high_priority_first |
             steal_after_local |
-            enable_idle_backoff
+            enable_idle_backoff |
+            do_background_work_only
         // clang-format on
     };
 
