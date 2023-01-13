@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,6 +22,7 @@
 #include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
+#include <hpx/modules/properties.hpp>
 #include <hpx/serialization/serialize.hpp>
 
 #include <memory>
@@ -240,7 +241,7 @@ namespace hpx { namespace execution {
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            constexpr void serialize(Archive& ar, const unsigned int) noexcept
+            constexpr void serialize(Archive& ar, unsigned int const) noexcept
             {
                 // clang-format off
                 ar & exec_ & params_;
@@ -574,240 +575,255 @@ namespace hpx { namespace execution {
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             sequenced_policy_shim<Executor, Parameters> const& policy)
         {
             return sequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
+            hpx::execution::experimental::to_par_t tag,
             sequenced_policy_shim<Executor, Parameters> const& policy)
         {
-            return par.on(policy.executor()).with(policy.parameters());
+            return parallel_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_unseq_t,
+            hpx::execution::experimental::to_unseq_t tag,
             sequenced_policy_shim<Executor, Parameters> const& policy)
         {
-            return unseq.on(policy.executor()).with(policy.parameters());
+            return unsequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             sequenced_task_policy_shim<Executor, Parameters> const& policy)
         {
-            return seq.on(policy.executor()).with(policy.parameters());
-        }
-
-        template <typename Executor, typename Parameters>
-        constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
-            sequenced_task_policy_shim<Executor, Parameters> const& policy)
-        {
-            return parallel_task_policy()
-                .on(policy.executor())
+            return sequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_unseq_t,
+            hpx::execution::experimental::to_par_t tag,
+            sequenced_task_policy_shim<Executor, Parameters> const& policy)
+        {
+            return parallel_task_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
+        }
+
+        template <typename Executor, typename Parameters>
+        constexpr decltype(auto) tag_invoke(
+            hpx::execution::experimental::to_unseq_t tag,
             sequenced_task_policy_shim<Executor, Parameters> const& policy)
         {
             return unsequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             parallel_task_policy_shim<Executor, Parameters> const& policy)
         {
-            return par.on(policy.executor()).with(policy.parameters());
+            return parallel_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
+            hpx::execution::experimental::to_non_par_t tag,
             parallel_task_policy_shim<Executor, Parameters> const& policy)
         {
             return sequenced_task_policy()
-                // executor can't be weaker than sequential
-                // .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_unseq_t,
+            hpx::execution::experimental::to_unseq_t tag,
             parallel_task_policy_shim<Executor, Parameters> const& policy)
         {
             return parallel_unsequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             parallel_policy_shim<Executor, Parameters> const& policy)
         {
             return parallel_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
+            hpx::execution::experimental::to_non_par_t tag,
             parallel_policy_shim<Executor, Parameters> const& policy)
         {
             return sequenced_policy()
-                // executor can't be weaker than sequential
-                // .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_unseq_t,
+            hpx::execution::experimental::to_unseq_t tag,
             parallel_policy_shim<Executor, Parameters> const& policy)
         {
             return parallel_unsequenced_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             parallel_unsequenced_task_policy_shim<Executor, Parameters> const&
                 policy)
         {
-            return par_unseq.on(policy.executor()).with(policy.parameters());
-        }
-
-        template <typename Executor, typename Parameters>
-        constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
-            parallel_unsequenced_task_policy_shim<Executor, Parameters> const&
-                policy)
-        {
-            return unsequenced_task_policy()
-                // executor can't be weaker than sequential
-                // .on(policy.executor())
+            return parallel_unsequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_unseq_t,
+            hpx::execution::experimental::to_non_par_t tag,
+            parallel_unsequenced_task_policy_shim<Executor, Parameters> const&
+                policy)
+        {
+            return unsequenced_task_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
+        }
+
+        template <typename Executor, typename Parameters>
+        constexpr decltype(auto) tag_invoke(
+            hpx::execution::experimental::to_non_unseq_t tag,
             parallel_unsequenced_task_policy_shim<Executor, Parameters> const&
                 policy)
         {
             return parallel_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             parallel_unsequenced_policy_shim<Executor, Parameters> const&
                 policy)
         {
             return parallel_unsequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_par_t,
+            hpx::execution::experimental::to_non_par_t tag,
             parallel_unsequenced_policy_shim<Executor, Parameters> const&
                 policy)
         {
-            // executor can't be weaker than sequential
-            // .on(policy.executor())
-            return unseq.with(policy.parameters());
+            return unsequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_unseq_t,
+            hpx::execution::experimental::to_non_unseq_t tag,
             parallel_unsequenced_policy_shim<Executor, Parameters> const&
                 policy)
         {
-            return par.on(policy.executor()).with(policy.parameters());
+            return parallel_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_task_t,
+            hpx::execution::experimental::to_non_task_t tag,
             unsequenced_task_policy_shim<Executor, Parameters> const& policy)
         {
-            return unseq.on(policy.executor()).with(policy.parameters());
-        }
-
-        template <typename Executor, typename Parameters>
-        constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
-            unsequenced_task_policy_shim<Executor, Parameters> const& policy)
-        {
-            return parallel_unsequenced_task_policy()
-                .on(policy.executor())
+            return unsequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_unseq_t,
+            hpx::execution::experimental::to_par_t tag,
+            unsequenced_task_policy_shim<Executor, Parameters> const& policy)
+        {
+            return parallel_unsequenced_task_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
+        }
+
+        template <typename Executor, typename Parameters>
+        constexpr decltype(auto) tag_invoke(
+            hpx::execution::experimental::to_non_unseq_t tag,
             unsequenced_task_policy_shim<Executor, Parameters> const& policy)
         {
             return sequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_task_t,
+            hpx::execution::experimental::to_task_t tag,
             unsequenced_policy_shim<Executor, Parameters> const& policy)
         {
             return unsequenced_task_policy()
-                .on(policy.executor())
+                .on(hpx::experimental::prefer(tag, policy.executor()))
                 .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_par_t,
+            hpx::execution::experimental::to_par_t tag,
             unsequenced_policy_shim<Executor, Parameters> const& policy)
         {
-            return par_unseq.on(policy.executor()).with(policy.parameters());
+            return parallel_unsequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         template <typename Executor, typename Parameters>
         constexpr decltype(auto) tag_invoke(
-            hpx::execution::experimental::to_non_unseq_t,
+            hpx::execution::experimental::to_non_unseq_t tag,
             unsequenced_policy_shim<Executor, Parameters> const& policy)
         {
-            return seq.on(policy.executor()).with(policy.parameters());
+            return sequenced_policy()
+                .on(hpx::experimental::prefer(tag, policy.executor()))
+                .with(policy.parameters());
         }
 
         ///////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,6 +23,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/detail/index_queue_spawning.hpp>
+#include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
@@ -125,8 +126,7 @@ namespace hpx::execution {
             Policy l =
                 parallel::execution::detail::get_default_policy<Policy>::call())
           : pool_(nullptr)
-          , policy_(
-                l, threads::thread_priority::default_, stacksize, schedulehint)
+          , policy_(l, l.priority(), stacksize, schedulehint)
         {
         }
 
@@ -135,8 +135,7 @@ namespace hpx::execution {
             Policy l =
                 parallel::execution::detail::get_default_policy<Policy>::call())
           : pool_(nullptr)
-          , policy_(l, threads::thread_priority::default_,
-                threads::thread_stacksize::default_, schedulehint)
+          , policy_(l, l.priority(), l.stacksize(), schedulehint)
         {
         }
 
@@ -145,6 +144,16 @@ namespace hpx::execution {
                 parallel::execution::detail::get_default_policy<Policy>::call())
           : pool_(nullptr)
           , policy_(l)
+        {
+        }
+
+        constexpr explicit parallel_policy_executor(
+            threads::thread_pool_base* pool, Policy l,
+            std::size_t hierarchical_threshold =
+                hierarchical_threshold_default_)
+          : pool_(pool)
+          , policy_(l)
+          , hierarchical_threshold_(hierarchical_threshold)
         {
         }
 
@@ -434,6 +443,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Ts, ts)...);
 #endif
         }
+
+        // map execution policy categories to proper executor
+        friend decltype(auto) tag_invoke(
+            hpx::execution::experimental::to_non_par_t,
+            parallel_policy_executor const& exec)
+        {
+            if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+            {
+                return exec;
+            }
+            else
+            {
+                auto non_par_exec =
+                    parallel_policy_executor<launch::sync_policy>(exec.pool_,
+                        launch::sync_policy(exec.policy_.priority(),
+                            exec.policy_.stacksize(), exec.policy_.hint()),
+                        exec.hierarchical_threshold_);
+
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+                return hpx::execution::experimental::with_annotation(
+                    HPX_MOVE(non_par_exec), exec.annotation_);
+#else
+                return non_par_exec;
+#endif
+            }
+        }
         /// \endcond
 
     private:
@@ -443,9 +478,16 @@ namespace hpx::execution {
             if (num_cores_ != 0)
                 return num_cores_;
 
-            auto pool =
-                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            return pool->get_os_thread_count();
+            if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+            {
+                return 1;
+            }
+            else
+            {
+                auto pool =
+                    pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+                return pool->get_os_thread_count();
+            }
         }
 
         std::size_t get_first_core() const
