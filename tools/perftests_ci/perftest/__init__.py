@@ -52,10 +52,11 @@ def run(local, targets_and_opts):
 
     data = json.loads(output)
 
-    data[var._project_name] = {'commit': _git_commit(), 'datetime': _git_datetime()}
+    data[var._project_name] = {
+        'commit': _git_commit(), 'datetime': _git_datetime()}
     data['environment'] = {
         'hostname': env.hostname(),
-        'clustername': env.clustername(local),
+        'clustername': env.clustername(),
         'compiler': buildinfo.compiler,
         'datetime': _now(),
         'envfile': buildinfo.envfile
