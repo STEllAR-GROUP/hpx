@@ -11,11 +11,35 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/util.hpp>
+
 #include <hpx/assert.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
+#include <hpx/plugin_factories/parcelport_factory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset_base/detail/gatherer.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
+
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/sender_connection.hpp>
+#include <hpx/parcelport_lci/backlog_queue.hpp>
+#include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/locality.hpp>
+#include <hpx/parcelport_lci/receiver.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -26,6 +50,7 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
+    struct sender_connection;
     struct sender
     {
         using connection_type = sender_connection;
@@ -35,27 +60,9 @@ namespace hpx::parcelset::policies::lci {
 
         void run() noexcept {}
 
-        connection_ptr create_connection(int dest, parcelset::parcelport* pp)
-        {
-            return std::make_shared<connection_type>(dest, pp);
-        }
+        connection_ptr create_connection(int dest, parcelset::parcelport* pp);
 
-        bool background_work() noexcept
-        {
-            // We first try to accept a new connection
-            LCI_request_t request;
-            request.flag = LCI_ERR_RETRY;
-            LCI_queue_pop(util::lci_environment::get_scq(), &request);
-
-            if (request.flag == LCI_OK)
-            {
-                auto* sharedPtr_p = (connection_ptr*) request.user_context;
-                (*sharedPtr_p)->done();
-                delete sharedPtr_p;
-                return true;
-            }
-            return false;
-        }
+        bool background_work(size_t num_thread) noexcept;
 
         // connectionless interface
         using buffer_type = std::vector<char>;
@@ -66,15 +73,7 @@ namespace hpx::parcelset::policies::lci {
 
         static bool send(parcelset::parcelport* pp,
             parcelset::locality const& dest, parcel_buffer_type buffer,
-            callback_fn_type&& callbackFn)
-        {
-            int dest_rank = dest.get<locality>().rank();
-            auto connection =
-                std::make_shared<sender_connection>(dest_rank, pp);
-            connection->buffer_ = HPX_MOVE(buffer);
-            connection->async_write(HPX_MOVE(callbackFn), nullptr);
-            return true;
-        }
+            callback_fn_type&& callbackFn);
     };
 
 }    // namespace hpx::parcelset::policies::lci
