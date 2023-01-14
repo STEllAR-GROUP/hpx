@@ -316,8 +316,8 @@ namespace hpx::traits {
                     enable_lci_progress_pool)
             {
                 rp.create_thread_pool("lci-progress-pool",
-                    hpx::resource::scheduling_policy::local,
-                    hpx::threads::policies::scheduler_mode::do_background_work);
+                    hpx::resource::scheduling_policy::static_,
+                    hpx::threads::policies::scheduler_mode::do_background_work_only);
                 rp.add_resource(rp.numa_domains()[0].cores()[0].pus()[0],
                     "lci-progress-pool");
             }
@@ -344,7 +344,7 @@ namespace hpx::traits {
 #endif
                 "max_connections = "
                 "${HPX_HAVE_PARCELPORT_LCI_MAX_CONNECTIONS:8192}\n"
-                "rp_prg_pool = 0\n";
+                "rp_prg_pool = 1\n";
         }
     };
 }    // namespace hpx::traits
