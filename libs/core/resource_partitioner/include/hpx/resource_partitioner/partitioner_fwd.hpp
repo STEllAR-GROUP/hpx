@@ -86,6 +86,8 @@ namespace hpx::resource {
             hpx::threads::thread_pool_init_parameters,
             hpx::threads::policies::thread_queue_init_parameters)>;
 
+    using background_work_function = hpx::function<bool(std::size_t)>;
+
     // Choose same names as in command-line options except with _ instead of
     // -.
 

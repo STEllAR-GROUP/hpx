@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,18 +9,15 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/hardware/timestamp.hpp>
 #include <hpx/modules/itt_notify.hpp>
+#include <hpx/thread_pools/detail/background_thread.hpp>
+#include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
+#include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
-#endif
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
@@ -91,92 +88,6 @@ namespace hpx::threads::detail {
         {
             disable_restore();
 
-            if (thread_->restore_state(prev_state_, orig_state_))
-            {
-                newstate = prev_state_;
-                return true;
-            }
-            return false;
-        }
-
-        // disable default handling in destructor
-        void disable_restore() noexcept
-        {
-            need_restore_state_ = false;
-        }
-
-        constexpr thread_id_ref_type const& get_next_thread() const noexcept
-        {
-            return next_thread_id_;
-        }
-
-        thread_id_ref_type move_next_thread() noexcept
-        {
-            return HPX_MOVE(next_thread_id_);
-        }
-
-    private:
-        thread_data* thread_;
-        thread_state prev_state_;
-        thread_state orig_state_;
-        thread_id_ref_type next_thread_id_;
-        bool need_restore_state_;
-    };
-
-    class switch_status_background
-    {
-    public:
-        switch_status_background(
-            thread_id_ref_type const& t, thread_state prev_state) noexcept
-          : thread_(get_thread_id_data(t))
-          , prev_state_(prev_state)
-          , next_thread_id_(nullptr)
-          , need_restore_state_(
-                thread_->set_state_tagged(thread_schedule_state::active,
-                    prev_state_, orig_state_, std::memory_order_relaxed))
-        {
-        }
-
-        ~switch_status_background()
-        {
-            if (need_restore_state_)
-            {
-                store_state(prev_state_);
-            }
-        }
-
-        constexpr bool is_valid() const noexcept
-        {
-            return need_restore_state_;
-        }
-
-        // allow to change the state the thread will be switched to after
-        // execution
-        thread_state operator=(thread_result_type&& new_state) noexcept
-        {
-            prev_state_ = thread_state(
-                new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            if (new_state.second != nullptr)
-            {
-                next_thread_id_ = HPX_MOVE(new_state.second);
-            }
-            return prev_state_;
-        }
-
-        // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute
-        // this HPX-thread in the meantime.
-        thread_schedule_state get_previous() const noexcept
-        {
-            return prev_state_.state();
-        }
-
-        // This restores the previous state, while making sure that the original
-        // state has not been changed since we started executing this thread.
-        // The function returns true if the state has been set, false otherwise.
-        bool store_state(thread_state& newstate) noexcept
-        {
-            disable_restore();
             if (thread_->restore_state(prev_state_, orig_state_))
             {
                 newstate = prev_state_;
@@ -311,238 +222,6 @@ namespace hpx::threads::detail {
         bool& is_active_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-    struct scheduling_counters
-    {
-        scheduling_counters(std::int64_t& executed_threads,
-            std::int64_t& executed_thread_phases, std::int64_t& tfunc_time,
-            std::int64_t& exec_time, std::int64_t& idle_loop_count,
-            std::int64_t& busy_loop_count, bool& is_active,
-            std::int64_t& background_work_duration,
-            std::int64_t& background_send_duration,
-            std::int64_t& background_receive_duration) noexcept
-          : executed_threads_(executed_threads)
-          , executed_thread_phases_(executed_thread_phases)
-          , tfunc_time_(tfunc_time)
-          , exec_time_(exec_time)
-          , idle_loop_count_(idle_loop_count)
-          , busy_loop_count_(busy_loop_count)
-          , background_work_duration_(background_work_duration)
-          , background_send_duration_(background_send_duration)
-          , background_receive_duration_(background_receive_duration)
-          , is_active_(is_active)
-        {
-        }
-
-        std::int64_t& executed_threads_;
-        std::int64_t& executed_thread_phases_;
-        std::int64_t& tfunc_time_;
-        std::int64_t& exec_time_;
-        std::int64_t& idle_loop_count_;
-        std::int64_t& busy_loop_count_;
-        std::int64_t& background_work_duration_;
-        std::int64_t& background_send_duration_;
-        std::int64_t& background_receive_duration_;
-        bool& is_active_;
-    };
-#else
-    struct scheduling_counters
-    {
-        scheduling_counters(std::int64_t& executed_threads,
-            std::int64_t& executed_thread_phases, std::int64_t& tfunc_time,
-            std::int64_t& exec_time, std::int64_t& idle_loop_count,
-            std::int64_t& busy_loop_count, bool& is_active) noexcept
-          : executed_threads_(executed_threads)
-          , executed_thread_phases_(executed_thread_phases)
-          , tfunc_time_(tfunc_time)
-          , exec_time_(exec_time)
-          , idle_loop_count_(idle_loop_count)
-          , busy_loop_count_(busy_loop_count)
-          , is_active_(is_active)
-        {
-        }
-
-        std::int64_t& executed_threads_;
-        std::int64_t& executed_thread_phases_;
-        std::int64_t& tfunc_time_;
-        std::int64_t& exec_time_;
-        std::int64_t& idle_loop_count_;
-        std::int64_t& busy_loop_count_;
-        bool& is_active_;
-    };
-
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
-
-    struct scheduling_callbacks
-    {
-        using callback_type = hpx::move_only_function<void()>;
-        using background_callback_type = hpx::move_only_function<bool()>;
-
-        explicit scheduling_callbacks(callback_type&& outer,
-            callback_type&& inner = callback_type(),
-            background_callback_type&& background = background_callback_type(),
-            std::size_t max_background_threads =
-                (std::numeric_limits<std::size_t>::max)(),
-            std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
-            std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX)
-          : outer_(HPX_MOVE(outer))
-          , inner_(HPX_MOVE(inner))
-          , background_(HPX_MOVE(background))
-          , max_background_threads_(max_background_threads)
-          , max_idle_loop_count_(max_idle_loop_count)
-          , max_busy_loop_count_(max_busy_loop_count)
-        {
-        }
-
-        callback_type outer_;
-        callback_type inner_;
-        background_callback_type background_;
-        std::size_t const max_background_threads_;
-        std::int64_t const max_idle_loop_count_;
-        std::int64_t const max_busy_loop_count_;
-    };
-
-    template <typename SchedulingPolicy>
-    thread_id_ref_type create_background_thread(SchedulingPolicy& scheduler,
-        scheduling_callbacks& callbacks,
-        std::shared_ptr<bool>& background_running, std::size_t num_thread,
-        std::int64_t& idle_loop_count)
-    {
-        threads::thread_schedule_hint schedulehint(
-            static_cast<std::int16_t>(num_thread));
-
-        thread_id_ref_type background_thread;
-        background_running.reset(new bool(true));
-        thread_init_data background_init(
-            [&, background_running](
-                thread_restart_state) -> thread_result_type {
-                while (*background_running)
-                {
-                    if (callbacks.background_())
-                    {
-                        // we only update the idle_loop_count if
-                        // background_running is true. If it was false, this
-                        // task was given back to the scheduler.
-                        if (*background_running)
-                            idle_loop_count = 0;
-                    }
-                    // Force yield...
-                    hpx::execution_base::this_thread::yield("background_work");
-                }
-
-                return thread_result_type(
-                    thread_schedule_state::terminated, invalid_thread_id);
-            },
-            hpx::threads::thread_description("background_work"),
-            thread_priority::high_recursive, schedulehint,
-            thread_stacksize::large,
-            // Create in suspended to prevent the thread from being scheduled
-            // directly...
-            thread_schedule_state::suspended, true, &scheduler);
-
-        scheduler.SchedulingPolicy::create_thread(
-            background_init, &background_thread, hpx::throws);
-        HPX_ASSERT(background_thread);
-        scheduler.SchedulingPolicy::increment_background_thread_count();
-        // We can now set the state to pending
-        get_thread_id_data(background_thread)
-            ->set_state(thread_schedule_state::pending);
-        return background_thread;
-    }
-
-    // This function tries to invoke the background work thread. It returns
-    // false when we need to give the background thread back to scheduler and
-    // create a new one that is supposed to be executed inside the
-    // scheduling_loop, true otherwise
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-    template <typename SchedulingPolicy>
-    bool call_background_thread(thread_id_ref_type& background_thread,
-        thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
-        std::size_t num_thread, bool /* running */,
-        std::int64_t& background_work_exec_time_init,
-        hpx::execution_base::this_thread::detail::agent_storage*
-            context_storage)
-#else
-    template <typename SchedulingPolicy>
-    bool call_background_thread(thread_id_ref_type& background_thread,
-        thread_id_ref_type& next_thrd, SchedulingPolicy& scheduler,
-        std::size_t num_thread, bool /* running */,
-        hpx::execution_base::this_thread::detail::agent_storage*
-            context_storage)
-#endif
-    {
-        if (HPX_UNLIKELY(background_thread))
-        {
-            thread_state state =
-                get_thread_id_data(background_thread)->get_state();
-            thread_schedule_state state_val = state.state();
-
-            // we should only deal with pending here.
-            HPX_ASSERT(thread_schedule_state::pending == state_val);
-
-            // tries to set state to active (only if state is still
-            // the same as 'state')
-            detail::switch_status_background thrd_stat(
-                background_thread, state);
-
-            if (HPX_LIKELY(thrd_stat.is_valid() &&
-                    thrd_stat.get_previous() == thread_schedule_state::pending))
-            {
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-                // measure background work duration
-                background_work_duration_counter bg_work_duration(
-                    background_work_exec_time_init);
-                background_exec_time_wrapper bg_exec_time(bg_work_duration);
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
-
-                // invoke background thread
-                thrd_stat =
-                    (*get_thread_id_data(background_thread))(context_storage);
-
-                thread_id_ref_type next = thrd_stat.move_next_thread();
-                if (next != nullptr && next != background_thread)
-                {
-                    if (next_thrd == nullptr)
-                    {
-                        next_thrd = HPX_MOVE(next);
-                    }
-                    else
-                    {
-                        auto* scheduler =
-                            get_thread_id_data(next)->get_scheduler_base();
-                        scheduler->schedule_thread(HPX_MOVE(next),
-                            threads::thread_schedule_hint(
-                                static_cast<std::int16_t>(num_thread)),
-                            true);
-                        scheduler->do_some_work(num_thread);
-                    }
-                }
-            }
-            thrd_stat.store_state(state);
-            state_val = state.state();
-
-            if (HPX_LIKELY(state_val == thread_schedule_state::pending_boost))
-            {
-                get_thread_id_data(background_thread)
-                    ->set_state(thread_schedule_state::pending);
-            }
-            else if (thread_schedule_state::terminated == state_val)
-            {
-                scheduler.SchedulingPolicy::decrement_background_thread_count();
-                background_thread = thread_id_type();
-            }
-            else if (thread_schedule_state::suspended == state_val)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
         scheduling_counters& counters, scheduling_callbacks& params)
@@ -561,11 +240,7 @@ namespace hpx::threads::detail {
         std::int64_t& idle_loop_count = counters.idle_loop_count_;
         std::int64_t& busy_loop_count = counters.busy_loop_count_;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
-        std::int64_t& bg_work_exec_time_init =
-            counters.background_work_duration_;
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
+        background_work_exec_time bg_work_exec_time_init(counters);
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(idle_rate);
@@ -573,10 +248,10 @@ namespace hpx::threads::detail {
         // spin for some time after queues have become empty
         bool may_exit = false;
 
-        std::shared_ptr<bool> background_running = nullptr;
+        std::shared_ptr<bool> background_running;
         thread_id_ref_type background_thread;
 
-        if (scheduler.SchedulingPolicy::has_scheduler_mode(
+        if (scheduler.has_scheduler_mode(
                 policies::scheduler_mode::do_background_work) &&
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
@@ -600,9 +275,8 @@ namespace hpx::threads::detail {
                 hpx::state::pre_sleep;
 
             // extract the stealing mode once per loop iteration
-            bool enable_stealing =
-                scheduler.SchedulingPolicy::has_scheduler_mode(
-                    policies::scheduler_mode::enable_stealing);
+            bool enable_stealing = scheduler.has_scheduler_mode(
+                policies::scheduler_mode::enable_stealing);
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
@@ -610,7 +284,7 @@ namespace hpx::threads::detail {
             //                       a while
             bool enable_stealing_staged = enable_stealing;
             if (enable_stealing_staged &&
-                !scheduler.SchedulingPolicy::has_scheduler_mode(
+                !scheduler.has_scheduler_mode(
                     policies::scheduler_mode::fast_idle_mode))
             {
                 enable_stealing_staged =
@@ -618,7 +292,7 @@ namespace hpx::threads::detail {
             }
 
             if (HPX_LIKELY(thrd ||
-                    scheduler.SchedulingPolicy::get_next_thread(
+                    scheduler.get_next_thread(
                         num_thread, running, thrd, enable_stealing)))
             {
                 [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(
@@ -634,7 +308,8 @@ namespace hpx::threads::detail {
                 // Only pending HPX threads will be executed. Any non-pending
                 // HPX threads are leftovers from a set_state() call for a
                 // previously pending HPX thread (see comments above).
-                thread_state state = get_thread_id_data(thrd)->get_state();
+                auto* thrdptr = get_thread_id_data(thrd);
+                thread_state state = thrdptr->get_state();
                 thread_schedule_state state_val = state.state();
 
                 if (HPX_LIKELY(thread_schedule_state::pending == state_val))
@@ -662,7 +337,6 @@ namespace hpx::threads::detail {
                             {
                                 is_active_wrapper utilization(
                                     counters.is_active_);
-                                auto* thrdptr = get_thread_id_data(thrd);
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
                                 // util::itt::undo_frame_context undoframe(fctx);
@@ -755,9 +429,8 @@ namespace hpx::threads::detail {
                         if (HPX_LIKELY(next_thrd == nullptr))
                         {
                             // schedule other work
-                            scheduler.SchedulingPolicy::wait_or_add_new(
-                                num_thread, running, idle_loop_count,
-                                enable_stealing_staged, added);
+                            scheduler.wait_or_add_new(num_thread, running,
+                                idle_loop_count, enable_stealing_staged, added);
                         }
 
                         // schedule this thread again, make sure it ends up at
@@ -772,8 +445,7 @@ namespace hpx::threads::detail {
                     else if (HPX_UNLIKELY(state_val ==
                                  thread_schedule_state::pending_boost))
                     {
-                        get_thread_id_data(thrd)->set_state(
-                            thread_schedule_state::pending);
+                        thrdptr->set_state(thread_schedule_state::pending);
 
                         if (HPX_LIKELY(next_thrd == nullptr))
                         {
@@ -787,9 +459,9 @@ namespace hpx::threads::detail {
                             else
                             {
                                 // schedule other work
-                                scheduler.SchedulingPolicy::wait_or_add_new(
-                                    num_thread, running, idle_loop_count,
-                                    enable_stealing_staged, added);
+                                scheduler.wait_or_add_new(num_thread, running,
+                                    idle_loop_count, enable_stealing_staged,
+                                    added);
 
                                 // schedule this thread again immediately with
                                 // boosted priority
@@ -825,7 +497,6 @@ namespace hpx::threads::detail {
                     // might happen, if some thread has been added to the
                     // scheduler queue already but the state has not been reset
                     // yet
-                    auto* thrdptr = get_thread_id_data(thrd);
                     auto priority = thrdptr->get_priority();
                     scheduler.SchedulingPolicy::schedule_thread(HPX_MOVE(thrd),
                         threads::thread_schedule_hint(
@@ -852,9 +523,8 @@ namespace hpx::threads::detail {
             {
                 ++idle_loop_count;
 
-                if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        running, idle_loop_count, enable_stealing_staged,
-                        added))
+                if (scheduler.wait_or_add_new(num_thread, running,
+                        idle_loop_count, enable_stealing_staged, added))
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit = !running &&
@@ -880,7 +550,7 @@ namespace hpx::threads::detail {
 
                         if (can_exit)
                         {
-                            if (!scheduler.SchedulingPolicy::has_scheduler_mode(
+                            if (!scheduler.has_scheduler_mode(
                                     policies::scheduler_mode::delay_exit))
                             {
                                 // If this is an inner scheduler, try to exit
@@ -889,20 +559,17 @@ namespace hpx::threads::detail {
                                 {
                                     HPX_ASSERT(background_running);
                                     *background_running = false;    //-V522
-                                    auto priority =
-                                        get_thread_id_data(background_thread)
-                                            ->get_priority();
 
-                                    scheduler.SchedulingPolicy::
-                                        decrement_background_thread_count();
-                                    scheduler.SchedulingPolicy::schedule_thread(
-                                        HPX_MOVE(background_thread),
-                                        threads::thread_schedule_hint(
-                                            static_cast<std::int16_t>(
-                                                num_thread)),
-                                        true, priority);
-                                    scheduler.SchedulingPolicy::do_some_work(
-                                        num_thread);
+                                    // do background work in parcel layer and in agas
+                                    [[maybe_unused]] bool has_exited =
+                                        call_background_thread(
+                                            background_thread, next_thrd,
+                                            scheduler, num_thread,
+                                            bg_work_exec_time_init,
+                                            context_storage);
+
+                                    // the background thread should have exited
+                                    HPX_ASSERT(has_exited);
 
                                     background_thread = thread_id_type();
                                     background_running.reset();
@@ -924,7 +591,7 @@ namespace hpx::threads::detail {
                     }
                 }
                 else if (!may_exit && added == 0 &&
-                    (scheduler.SchedulingPolicy::has_scheduler_mode(
+                    (scheduler.has_scheduler_mode(
                         policies::scheduler_mode::fast_idle_mode)))
                 {
                     // speed up idle suspend if no work was stolen
@@ -932,25 +599,19 @@ namespace hpx::threads::detail {
                     added = std::size_t(-1);
                 }
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, running, bg_work_exec_time_init,
+                        scheduler, num_thread, bg_work_exec_time_init,
                         context_storage))
-#else
-                if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, running, context_storage))
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
                     // Let the current background thread terminate as soon as
                     // possible. No need to reschedule, as another LCO will set
                     // it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
+
                     *background_running = false;
-                    scheduler
-                        .SchedulingPolicy::decrement_background_thread_count();
+                    scheduler.decrement_background_thread_count();
 
                     // Create a new one that will replace the current such we
                     // avoid deadlock situations, if all background threads are
@@ -985,26 +646,20 @@ namespace hpx::threads::detail {
             {
                 busy_loop_count = 0;
 
-#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
-    defined(HPX_HAVE_THREAD_IDLE_RATES)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, running, bg_work_exec_time_init,
+                        scheduler, num_thread, bg_work_exec_time_init,
                         context_storage))
-#else
-                // do background work in parcel layer and in agas
-                if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, running, context_storage))
-#endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
                 {
                     // Let the current background thread terminate as soon as
                     // possible. No need to reschedule, as another LCO will set
                     // it to pending and schedule it back eventually
                     HPX_ASSERT(background_thread);
                     HPX_ASSERT(background_running);
+
                     *background_running = false;
-                    scheduler
-                        .SchedulingPolicy::decrement_background_thread_count();
+                    scheduler.decrement_background_thread_count();
+
                     // Create a new one which will replace the current such we
                     // avoid deadlock situations, if all background threads are
                     // blocked.
@@ -1036,17 +691,15 @@ namespace hpx::threads::detail {
                     {
                         HPX_ASSERT(background_running);
                         *background_running = false;
-                        auto priority = get_thread_id_data(background_thread)
-                                            ->get_priority();
 
-                        scheduler.SchedulingPolicy::
-                            decrement_background_thread_count();
-                        scheduler.SchedulingPolicy::schedule_thread(
-                            HPX_MOVE(background_thread),
-                            threads::thread_schedule_hint(
-                                static_cast<std::int16_t>(num_thread)),
-                            true, priority);
-                        scheduler.SchedulingPolicy::do_some_work(num_thread);
+                        // do background work in parcel layer and in agas
+                        [[maybe_unused]] bool has_exited =
+                            call_background_thread(background_thread, next_thrd,
+                                scheduler, num_thread, bg_work_exec_time_init,
+                                context_storage);
+
+                        // the background thread should have exited
+                        HPX_ASSERT(has_exited);
 
                         background_thread = thread_id_type();
                         background_running.reset();

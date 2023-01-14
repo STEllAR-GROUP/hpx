@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,10 +21,8 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <vector>
-
-#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -45,7 +43,7 @@ namespace hpx::threads::policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_static_queue_scheduler_terminated_queue>
-    class static_queue_scheduler
+    class static_queue_scheduler final
       : public local_queue_scheduler<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>
     {
@@ -60,7 +58,7 @@ namespace hpx::threads::policies {
         {
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "static_queue_scheduler";
         }
@@ -73,11 +71,10 @@ namespace hpx::threads::policies {
             scheduler_base::set_scheduler_mode(mode);
         }
 
-        /// Return the next thread to be executed, return false if none is
-        /// available
+        // Return the next thread to be executed, return false if none is
+        // available
         bool get_next_thread(std::size_t num_thread, bool,
-            threads::thread_id_ref_type& thrd,
-            bool /*enable_stealing*/) override
+            threads::thread_id_ref_type& thrd, bool /*enable_stealing*/)
         {
             using thread_queue_type = typename base_type::thread_queue_type;
 
@@ -102,7 +99,7 @@ namespace hpx::threads::policies {
         // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
             [[maybe_unused]] std::int64_t& idle_loop_count,
-            bool /*enable_stealing*/, std::size_t& added) override
+            bool /*enable_stealing*/, std::size_t& added)
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 
@@ -149,5 +146,3 @@ namespace hpx::threads::policies {
         }
     };
 }    // namespace hpx::threads::policies
-
-#include <hpx/config/warnings_suffix.hpp>

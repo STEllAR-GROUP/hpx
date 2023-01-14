@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,7 +30,7 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -166,7 +166,7 @@ namespace hpx::threads::policies {
             }
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "local_priority_queue_scheduler";
         }
@@ -649,7 +649,7 @@ namespace hpx::threads::policies {
         // Return the next thread to be executed, return false if none is
         // available
         bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_ref_type& thrd, bool enable_stealing) override
+            threads::thread_id_ref_type& thrd, bool enable_stealing)
         {
             HPX_ASSERT(num_thread < num_queues_);
             thread_queue_type* this_high_priority_queue = nullptr;
@@ -737,7 +737,7 @@ namespace hpx::threads::policies {
             return low_priority_queue_.get_next_thread(thrd);
         }
 
-        /// Schedule the passed thread
+        // Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
@@ -1265,7 +1265,7 @@ namespace hpx::threads::policies {
         // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
-            std::size_t& added) override
+            std::size_t& added)
         {
             bool result = true;
 

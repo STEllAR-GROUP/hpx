@@ -148,15 +148,17 @@ namespace hpx::resource {
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
         scheduling_policy sched /*= scheduling_policy::unspecified*/,
-        hpx::threads::policies::scheduler_mode mode)
+        hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
     {
-        partitioner_.create_thread_pool(name, sched, mode);
+        partitioner_.create_thread_pool(name, sched, mode, HPX_MOVE(func));
     }
 
-    void partitioner::create_thread_pool(
-        std::string const& name, scheduler_function scheduler_creation)
+    void partitioner::create_thread_pool(std::string const& name,
+        scheduler_function scheduler_creation, background_work_function func)
     {
-        partitioner_.create_thread_pool(name, scheduler_creation);
+        partitioner_.create_thread_pool(
+            name, scheduler_creation, HPX_MOVE(func));
     }
 
     void partitioner::set_default_pool_name(std::string const& name)

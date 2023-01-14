@@ -51,10 +51,12 @@ namespace hpx::resource::detail {
         static std::size_t num_threads_overall;
 
         init_pool_data(std::string const& name, scheduling_policy policy,
-            hpx::threads::policies::scheduler_mode mode);
+            hpx::threads::policies::scheduler_mode mode,
+            background_work_function func = background_work_function());
 
         init_pool_data(std::string const& name, scheduler_function create_func,
-            hpx::threads::policies::scheduler_mode mode);
+            hpx::threads::policies::scheduler_mode mode,
+            background_work_function func = background_work_function());
 
     private:
         friend class resource::detail::partitioner;
@@ -72,6 +74,9 @@ namespace hpx::resource::detail {
         std::size_t num_threads_;
         hpx::threads::policies::scheduler_mode mode_;
         scheduler_function create_function_;
+
+        // possible additional beckground work to run on this scheduler
+        background_work_function background_work_;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -89,12 +94,14 @@ namespace hpx::resource::detail {
         void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_);
+                hpx::threads::policies::scheduler_mode::default_,
+            background_work_function func = background_work_function());
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
-        void create_thread_pool(
-            std::string const& name, scheduler_function scheduler_creation);
+        void create_thread_pool(std::string const& name,
+            scheduler_function scheduler_creation,
+            background_work_function func = background_work_function());
 
         // Functions to add processing units to thread pools via the
         // pu/core/numa_domain API
@@ -143,6 +150,9 @@ namespace hpx::resource::detail {
         std::size_t get_num_threads(std::size_t pool_index) const;
 
         hpx::threads::policies::scheduler_mode get_scheduler_mode(
+            std::size_t pool_index) const;
+
+        background_work_function get_background_work(
             std::size_t pool_index) const;
 
         std::string const& get_pool_name(std::size_t index) const;

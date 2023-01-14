@@ -40,7 +40,7 @@ namespace hpx::threads {
 
     namespace policies {
 
-        struct scheduler_base;
+        struct HPX_CORE_EXPORT scheduler_base;
     }
     class HPX_CORE_EXPORT thread_pool_base;
 
