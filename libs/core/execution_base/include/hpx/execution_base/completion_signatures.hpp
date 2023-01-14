@@ -358,8 +358,6 @@ namespace hpx::execution::experimental {
                     Sender>::completion_signatures{};
             }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            // TODO: Handle a case where is_awaitable_v<Sender,Promise> where
-            // Promise type is not void.
             else if constexpr (is_awaitable_v<Sender>)
             {
                 using result_type = await_result_t<Sender>;
@@ -860,12 +858,12 @@ namespace hpx::execution::experimental {
                 else if constexpr (decays_to<Error, std::error_code>)
                 {
                     self.result->template emplace<2>(
-                        make_exception_ptr(system_error(err)));
+                        std::make_exception_ptr(std::system_error(err)));
                 }
                 else
                 {
                     self.result->template emplace<2>(
-                        make_exception_ptr(HPX_FORWARD(Error, err)));
+                        std::make_exception_ptr(HPX_FORWARD(Error, err)));
                 }
                 self.continuation.resume();
             }
@@ -968,11 +966,7 @@ namespace hpx::execution::experimental {
         template <typename T, typename Promise>
         static constexpr bool is_noexcept() noexcept
         {
-            if constexpr (is_awaitable_v<T>)
-            {
-                return true;
-            }
-            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 using Sender = detail::sender_awaitable_t<Promise, T>;
                 return std::is_nothrow_constructible_v<Sender, T,
@@ -989,11 +983,7 @@ namespace hpx::execution::experimental {
             as_awaitable_t, T&& t,
             Promise& promise) noexcept(is_noexcept<T, Promise>())
         {
-            if constexpr (is_awaitable_v<T>)
-            {
-                return HPX_FORWARD(T, t);
-            }
-            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
