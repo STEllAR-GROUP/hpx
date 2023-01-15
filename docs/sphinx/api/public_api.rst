@@ -935,7 +935,7 @@ Classes
    +---------------------------------------------------------+
    | Class                                                   |
    +=========================================================+
-   | :cpp:class:`hpx::execution::experimental::task_group`   |
+   | :cpp:class:`hpx::experimental::task_group`              |
    +---------------------------------------------------------+
 
 .. _public_api_header_hpx_thread:

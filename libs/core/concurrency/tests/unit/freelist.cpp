@@ -141,8 +141,8 @@ struct freelist_tester
         if constexpr (Bounded)
             test_running.store(true);
 
-        hpx::execution::experimental::task_group alloc_threads;
-        hpx::execution::experimental::task_group dealloc_threads;
+        hpx::experimental::task_group alloc_threads;
+        hpx::experimental::task_group dealloc_threads;
 
         for (int i = 0; i != thread_count; ++i)
             dealloc_threads.run(&freelist_tester::deallocate, this);

@@ -22,7 +22,7 @@ int fib(int n)
 
     int x = 0, y = 0;
 
-    hpx::execution::experimental::task_group g;
+    hpx::experimental::task_group g;
     g.run([&x, n] { x = fib(n - 1); });    // spawn a task
     g.run([&y, n] { y = fib(n - 2); });    // spawn another task
     g.wait();                              // wait for both tasks to complete
@@ -45,7 +45,7 @@ int fib1(int n)
 
     int x = 0, y = 0;
 
-    hpx::execution::experimental::task_group g;
+    hpx::experimental::task_group g;
     g.run([&x, n] { x = fib1(n - 1); });    // spawn a task
     g.wait();                               // wait for both tasks to complete
 
@@ -72,7 +72,7 @@ int fib(Executor&& exec, int n)
 
     int x = 0, y = 0;
 
-    hpx::execution::experimental::task_group g;
+    hpx::experimental::task_group g;
     g.run(
         exec, [&](int n) { x = fib(exec, n); }, n - 1);
     g.run(
@@ -94,7 +94,7 @@ void task_group_test3()
     bool caught_exception = false;
     try
     {
-        hpx::execution::experimental::task_group g;
+        hpx::experimental::task_group g;
         g.run([] { throw std::runtime_error("test1"); });
         g.run([] { throw std::runtime_error("test2"); });
         throws_exception = false;
