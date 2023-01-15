@@ -31,18 +31,34 @@ namespace hpx::util::detail {
 
     template <typename Lock>
     std::enable_if_t<has_owns_lock_v<Lock>> assert_owns_lock(
-        Lock& l, long) noexcept
+        [[maybe_unused]] Lock& l, long) noexcept
     {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+
         HPX_ASSERT_LOCKED(l, l.owns_lock());
-        HPX_UNUSED(l);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 
     template <typename Lock>
     std::enable_if_t<has_owns_lock_v<Lock>> assert_doesnt_own_lock(
-        Lock& l, long) noexcept
+        [[maybe_unused]] Lock& l, long) noexcept
     {
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+
         HPX_ASSERT_LOCKED(l, !l.owns_lock());
-        HPX_UNUSED(l);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 }    // namespace hpx::util::detail
 

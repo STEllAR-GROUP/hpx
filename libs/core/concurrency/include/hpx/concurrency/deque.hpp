@@ -383,11 +383,21 @@ namespace hpx::lockfree {
         }
 
     public:
+        //  Variable 'padding' is uninitialized
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
         explicit deque(std::size_t initial_nodes = 128)
           : anchor_()
           , pool_(initial_nodes)
         {
         }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         // Not thread-safe.
         // Complexity: O(N*Processes)

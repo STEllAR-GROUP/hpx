@@ -43,6 +43,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <system_error>
 
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
@@ -293,7 +294,8 @@ namespace hpx::threads::coroutines {
             // https://stackoverflow.com/a/20930496/269943
             std::ptrdiff_t get_available_stack_space() const noexcept
             {
-                MEMORY_BASIC_INFORMATION mbi;                     // page range
+                MEMORY_BASIC_INFORMATION mbi;    // page range
+                std::memset(&mbi, '\0', sizeof(mbi));
                 VirtualQuery((PVOID) &mbi, &mbi, sizeof(mbi));    // get range
                 return (std::ptrdiff_t) &mbi -
                     (std::ptrdiff_t) mbi.AllocationBase;

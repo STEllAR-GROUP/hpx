@@ -46,9 +46,12 @@ namespace hpx { namespace actions { namespace detail {
     {
         char const* action_name =
             hpx::actions::detail::get_action_name<Action>();
-        HPX_ASSERT(nullptr != action_name);
-        action_registry::instance().register_factory(
-            action_name, &create, &create_cont);
+        HPX_ASSERT(action_name != nullptr);
+        if (action_name != nullptr)
+        {
+            action_registry::instance().register_factory(
+                action_name, &create, &create_cont);
+        }
     }
 
     template <typename Action>

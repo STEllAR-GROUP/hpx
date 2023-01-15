@@ -1125,7 +1125,7 @@ namespace hpx { namespace performance_counters {
         counter_info complemented_info = info;
         complement_counter_info(complemented_info, ec);
         if (ec)
-            result_type();
+            return result_type();
 
         ensure_counter_prefix(complemented_info.fullname_);
         // pre-pend prefix, if necessary
@@ -1214,7 +1214,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_value::serialize(
-        serialization::output_archive& ar, const unsigned int)
+        serialization::output_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
@@ -1222,7 +1222,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_value::serialize(
-        serialization::input_archive& ar, const unsigned int)
+        serialization::input_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
@@ -1230,7 +1230,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_values_array::serialize(
-        serialization::output_archive& ar, const unsigned int)
+        serialization::output_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
@@ -1238,7 +1238,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_values_array::serialize(
-        serialization::input_archive& ar, const unsigned int)
+        serialization::input_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
@@ -1247,7 +1247,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_type_path_elements::serialize(
-        serialization::output_archive& ar, const unsigned int)
+        serialization::output_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & objectname_ & countername_ & parameters_;
@@ -1255,7 +1255,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_type_path_elements::serialize(
-        serialization::input_archive& ar, const unsigned int)
+        serialization::input_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & objectname_ & countername_ & parameters_;
@@ -1264,7 +1264,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_path_elements::serialize(
-        serialization::output_archive& ar, const unsigned int)
+        serialization::output_archive& ar, unsigned int const)
     {
         typedef counter_type_path_elements base_type;
         hpx::serialization::base_object_type<counter_path_elements, base_type>
@@ -1278,7 +1278,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_path_elements::serialize(
-        serialization::input_archive& ar, const unsigned int)
+        serialization::input_archive& ar, unsigned int const)
     {
         typedef counter_type_path_elements base_type;
         hpx::serialization::base_object_type<counter_path_elements, base_type>
@@ -1293,7 +1293,7 @@ namespace hpx { namespace performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_info::serialize(
-        serialization::output_archive& ar, const unsigned int)
+        serialization::output_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & type_ & version_ & status_ & fullname_ & helptext_ &
@@ -1302,7 +1302,7 @@ namespace hpx { namespace performance_counters {
     }
 
     void counter_info::serialize(
-        serialization::input_archive& ar, const unsigned int)
+        serialization::input_archive& ar, unsigned int const)
     {
         // clang-format off
         ar & type_ & version_ & status_ & fullname_ & helptext_ &

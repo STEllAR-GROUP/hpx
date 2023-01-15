@@ -81,8 +81,10 @@ namespace hpx::threads::policies {
             idle_backoff_data& data = wait_counts_[num_thread].data_;
 
             // Exponential back-off with a maximum sleep time.
-            double exponent = (std::min)(double(data.wait_count_),
-                double(std::numeric_limits<double>::max_exponent - 1));
+            static constexpr std::int64_t const max_exponent =
+                std::numeric_limits<double>::max_exponent;
+            double exponent =
+                (std::min)(double(data.wait_count_), double(max_exponent - 1));
 
             std::chrono::milliseconds period(std::lround((std::min)(
                 data.max_idle_backoff_time_, std::pow(2.0, exponent))));

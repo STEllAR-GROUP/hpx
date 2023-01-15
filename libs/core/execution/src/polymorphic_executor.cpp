@@ -32,6 +32,7 @@ namespace hpx::parallel::execution::detail {
         vtable const* /* empty_vtable */)
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (other.object != nullptr)
         {
@@ -44,6 +45,7 @@ namespace hpx::parallel::execution::detail {
         polymorphic_executor_base&& other, vtable const* empty_vptr) noexcept
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (object == &other.storage)
         {

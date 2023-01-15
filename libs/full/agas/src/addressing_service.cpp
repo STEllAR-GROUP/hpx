@@ -32,6 +32,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -395,14 +396,14 @@ namespace hpx { namespace agas {
                 prefix = resolved_prefix.get_gid();
 
                 {
-                    std::lock_guard<mutex_type> lock(console_cache_mtx_);
+                    std::unique_lock<mutex_type> lock(console_cache_mtx_);
                     if (console_cache_ == naming::invalid_locality_id)
                     {
                         console_cache_ = console;
                     }
                     else
                     {
-                        HPX_ASSERT(console_cache_ == console);
+                        HPX_ASSERT_LOCKED(lock, console_cache_ == console);
                     }
                 }
 
@@ -1948,7 +1949,7 @@ namespace hpx { namespace agas {
     void dump_refcnt_requests(
         std::unique_lock<addressing_service::mutex_type>& l,
         addressing_service::refcnt_requests_type const& requests,
-        const char* func_name)
+        char const* func_name)
     {
         HPX_ASSERT(l.owns_lock());
 
@@ -1976,7 +1977,7 @@ namespace hpx { namespace agas {
         std::unique_lock<addressing_service::mutex_type>& l, error_code& ec)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_ASSERT(l.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(l);
 
         try
         {
@@ -2027,7 +2028,7 @@ namespace hpx { namespace agas {
             for (requests_type::iterator it = requests.begin(); it != end; ++it)
             {
                 server::primary_namespace::decrement_credit_action action;
-                hpx::post(action, HPX_MOVE(it->first), HPX_MOVE(it->second));
+                hpx::post(action, it->first, HPX_MOVE(it->second));
             }
 
             if (&ec != &throws)
@@ -2051,7 +2052,7 @@ namespace hpx { namespace agas {
         std::unique_lock<addressing_service::mutex_type>& l)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        HPX_ASSERT(l.owns_lock());
+        HPX_ASSERT_OWNS_LOCK(l);
 
         if (refcnt_requests_->empty())
         {
@@ -2101,7 +2102,7 @@ namespace hpx { namespace agas {
         {
             server::primary_namespace::decrement_credit_action action;
             lazy_results.push_back(
-                hpx::async(action, HPX_MOVE(it->first), HPX_MOVE(it->second)));
+                hpx::async(action, it->first, HPX_MOVE(it->second)));
         }
 
         return lazy_results;

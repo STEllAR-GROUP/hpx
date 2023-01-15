@@ -266,7 +266,16 @@ namespace hpx::naming {
                     // mark gid as being split
                     set_credit_split_mask_for_gid(gid);
 
+                    // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
                     l.unlock();
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
                     // We add HPX_GLOBALCREDIT_INITIAL credits for the new gid
                     // and HPX_GLOBALCREDIT_INITIAL - 2 for the old one.

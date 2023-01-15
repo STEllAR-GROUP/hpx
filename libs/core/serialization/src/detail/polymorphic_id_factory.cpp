@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -29,8 +30,8 @@ namespace hpx::serialization::detail {
     {
         if (id >= cache.size())    //-V104
         {
-            cache.resize(id + 1, nullptr);    //-V106
-            cache[id] = ctor;                 //-V108
+            cache.resize(std::size_t(id) + 1, nullptr);
+            cache[id] = ctor;    //-V108
         }
         else if (cache[id] == nullptr)    //-V108
         {

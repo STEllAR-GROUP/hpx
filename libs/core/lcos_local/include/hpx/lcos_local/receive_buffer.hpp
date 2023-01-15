@@ -13,6 +13,7 @@
 #include <hpx/modules/futures.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -169,10 +170,10 @@ namespace hpx::lcos::local {
             std::shared_ptr<entry_data> entry;
 
             {
-                std::lock_guard<mutex_type> l(mtx_);
+                std::unique_lock<mutex_type> l(mtx_);
 
                 iterator it = get_buffer_entry(step);
-                HPX_ASSERT(it != buffer_map_.end());
+                HPX_ASSERT_LOCKED(l, it != buffer_map_.end());
 
                 entry = it->second;
 

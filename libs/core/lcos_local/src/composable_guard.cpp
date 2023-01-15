@@ -213,16 +213,19 @@ namespace hpx::lcos::local {
         ~run_composable_cleanup()
         {
             detail::guard_task* zero = nullptr;
+
             // If single_guard is false, then this is one of the setup tasks for
             // a multi-guarded task. By not setting the next field, we halt
             // processing on items queued to this guard.
-            HPX_ASSERT(task != nullptr);
-            task->check_();
-            if (!task->next.compare_exchange_strong(zero, task))
+            if (task != nullptr)
             {
-                HPX_ASSERT(zero != nullptr);
-                run_composable(zero);
-                free(task);
+                task->check_();
+                if (!task->next.compare_exchange_strong(zero, task))
+                {
+                    HPX_ASSERT(zero != nullptr);
+                    run_composable(zero);
+                    free(task);
+                }
             }
         }
     };
@@ -256,18 +259,20 @@ namespace hpx::lcos::local {
     {
         if (task == &empty)
             return;
-        HPX_ASSERT(task != nullptr);
-        task->check_();
-        if (task->single_guard)
+        if (task != nullptr)
         {
-            run_composable_cleanup rcc(task);
-            task->run();
-        }
-        else
-        {
-            task->run();
-            // Note that by this point in the execution the task data structure
-            // has probably been deleted.
+            task->check_();
+            if (task->single_guard)
+            {
+                run_composable_cleanup rcc(task);
+                task->run();
+            }
+            else
+            {
+                task->run();
+                // Note that by this point in the execution the task data
+                // structure has probably been deleted.
+            }
         }
     }
 

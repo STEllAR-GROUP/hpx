@@ -180,16 +180,18 @@ namespace hpx::threads {
 #endif
             [[maybe_unused]] on_exit_reset_held_lock_data held_locks;
 
-            HPX_ASSERT(thrd_data->get_state().state() ==
-                thread_schedule_state::active);
+            HPX_ASSERT(thrd_data != nullptr &&
+                thrd_data->get_state().state() ==
+                    thread_schedule_state::active);
             HPX_ASSERT(state != thread_schedule_state::active);
 
             // actual yield operation
             statex = self_.yield(
                 threads::thread_result_type(state, threads::invalid_thread_id));
 
-            HPX_ASSERT(get_thread_id_data(id)->get_state().state() ==
-                thread_schedule_state::active);
+            HPX_ASSERT(thrd_data != nullptr &&
+                thrd_data->get_state().state() ==
+                    thread_schedule_state::active);
         }
 
         // handle interruption, if needed

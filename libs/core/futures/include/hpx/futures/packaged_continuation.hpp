@@ -254,6 +254,11 @@ namespace hpx::lcos::detail {
                     if (this->is_ready())
                         return;    // nothing we can do
 
+                    // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
                     if (id_ != threads::invalid_thread_id)
                     {
                         // interrupt the executing thread
@@ -274,6 +279,10 @@ namespace hpx::lcos::detail {
                             "continuation<Future, ContResult>::cancel",
                             "future can't be canceled at this time");
                     }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
                 },
                 [&](std::exception_ptr ep) {
                     this->started_ = true;

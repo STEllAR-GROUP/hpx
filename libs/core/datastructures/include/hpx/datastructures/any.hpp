@@ -89,12 +89,12 @@ namespace hpx::util::detail::any {
         virtual ~fxn_ptr_table() = default;
         virtual fxn_ptr_table* get_ptr() = 0;
 
-        std::type_info const& (*get_type)();
-        void (*static_delete)(void**);
-        void (*destruct)(void**);
-        void (*clone)(void* const*, void**);
-        void (*copy)(void* const*, void**);
-        bool (*equal_to)(void* const*, void* const*);
+        std::type_info const& (*get_type)() = nullptr;
+        void (*static_delete)(void**) = nullptr;
+        void (*destruct)(void**) = nullptr;
+        void (*clone)(void* const*, void**) = nullptr;
+        void (*copy)(void* const*, void**) = nullptr;
+        bool (*equal_to)(void* const*, void* const*) = nullptr;
     };
 
     template <>
@@ -103,10 +103,10 @@ namespace hpx::util::detail::any {
         virtual ~fxn_ptr_table() = default;
         virtual fxn_ptr_table* get_ptr() = 0;
 
-        std::type_info const& (*get_type)();
-        void (*static_delete)(void**);
-        void (*destruct)(void**);
-        bool (*equal_to)(void* const*, void* const*);
+        std::type_info const& (*get_type)() = nullptr;
+        void (*static_delete)(void**) = nullptr;
+        void (*destruct)(void**) = nullptr;
+        bool (*equal_to)(void* const*, void* const*) = nullptr;
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -118,9 +118,9 @@ namespace hpx::util::detail::any {
         fxn_ptr_table* get_ptr() override = 0;
 
         std::basic_istream<Char>& (*stream_in)(
-            std::basic_istream<Char>&, void**);
+            std::basic_istream<Char>&, void**) = nullptr;
         std::basic_ostream<Char>& (*stream_out)(
-            std::basic_ostream<Char>&, void* const*);
+            std::basic_ostream<Char>&, void* const*) = nullptr;
     };
 
     ////////////////////////////////////////////////////////////////////////

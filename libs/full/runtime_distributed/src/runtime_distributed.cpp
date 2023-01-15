@@ -1477,23 +1477,23 @@ namespace hpx {
     {
         HPX_ASSERT(name != nullptr);
 #ifdef HPX_HAVE_IO_POOL
-        if (0 == std::strncmp(name, "io", 2))
+        if (name && 0 == std::strncmp(name, "io", 2))
             return &io_pool_;
 #endif
 #if defined(HPX_HAVE_NETWORKING)
-        if (0 == std::strncmp(name, "parcel", 6))
+        if (name && 0 == std::strncmp(name, "parcel", 6))
             return parcel_handler_.get_thread_pool(name);
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
-        if (0 == std::strncmp(name, "timer", 5))
+        if (name && 0 == std::strncmp(name, "timer", 5))
             return &timer_pool_;
 #endif
-        if (0 == std::strncmp(name, "main", 4))    //-V112
+        if (name && 0 == std::strncmp(name, "main", 4))    //-V112
             return &main_pool_;
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
             "runtime_distributed::get_thread_pool",
-            "unknown thread pool requested: {}", name);
+            "unknown thread pool requested: {}", name ? name : "<unknown>");
         return nullptr;
     }
 
