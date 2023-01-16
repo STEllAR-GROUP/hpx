@@ -68,6 +68,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       print_to_console
       receive_buffer
       sierpinski
+      simple_master_slave
       zerocopy_rdma
   )
 endif()
