@@ -52,6 +52,16 @@ namespace hpx::threads {
       : detail::thread_data_reference_counting(addref)
       , current_state_(thread_state(
             init_data.initial_state, thread_restart_state::signaled))
+      , priority_(init_data.priority)
+      , stacksize_enum_(init_data.stacksize)
+      , requested_interrupt_(false)
+      , enabled_interrupt_(true)
+      , ran_exit_funcs_(exit_func_state::none)
+      , is_stackless_(is_stackless)
+      , last_worker_thread_num_(std::uint16_t(-1))
+      , scheduler_base_(init_data.scheduler_base)
+      , queue_(queue)
+      , stacksize_(stacksize)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
       , description_(init_data.description)
       , lco_description_()
@@ -107,7 +117,13 @@ namespace hpx::threads {
     thread_data::~thread_data()
     {
         LTM_(debug).format("thread_data::~thread_data({})", this);
-        free_thread_exit_callbacks();
+
+        // Exit functions should have been executed.
+        HPX_ASSERT(exit_funcs_.empty() ||
+            ran_exit_funcs_.load(std::memory_order_relaxed) ==
+                exit_func_state::none ||
+            ran_exit_funcs_.load(std::memory_order_relaxed) ==
+                exit_func_state::processed);
     }
 
     void thread_data::destroy_thread()
@@ -121,20 +137,55 @@ namespace hpx::threads {
 
     void thread_data::run_thread_exit_callbacks()
     {
-        std::unique_lock<hpx::util::detail::spinlock> l(
-            spinlock_pool::spinlock_for(this));
-
-        while (!exit_funcs_.empty())
+        // when leaving this function the state must be 'processed'
+        while (true)
         {
+            exit_func_state expected = exit_func_state::ready;
+            if (ran_exit_funcs_.compare_exchange_strong(
+                    expected, exit_func_state::processed))
             {
-                hpx::unlock_guard<std::unique_lock<hpx::util::detail::spinlock>>
-                    ul(l);
-                if (!exit_funcs_.front().empty())
-                    exit_funcs_.front()();
+                // run exit functions only if there are any (state is 'ready')
+                std::unique_lock<hpx::util::detail::spinlock> l(
+                    spinlock_pool::spinlock_for(this));
+
+                while (!exit_funcs_.empty())
+                {
+                    if (!exit_funcs_.front().empty())
+                    {
+                        auto f = exit_funcs_.front();
+                        exit_funcs_.pop_front();
+
+                        hpx::unlock_guard<
+                            std::unique_lock<hpx::util::detail::spinlock>>
+                            ul(l);
+                        f();
+                    }
+                    else
+                    {
+                        exit_funcs_.pop_front();
+                    }
+                }
+
+                // clear all exit functions now as they are not needed anymore
+                exit_funcs_.clear();
+                return;
             }
-            exit_funcs_.pop_front();
+            else if (expected == exit_func_state::none)
+            {
+                if (ran_exit_funcs_.compare_exchange_strong(
+                        expected, exit_func_state::processed))
+                {
+                    return;
+                }
+
+                // try again, state was set to ready or processed by now
+            }
+            else
+            {
+                HPX_ASSERT(expected == exit_func_state::processed);
+                return;
+            }
         }
-        ran_exit_funcs_ = true;
     }
 
     bool thread_data::add_thread_exit_callback(hpx::function<void()> const& f)
@@ -149,20 +200,28 @@ namespace hpx::threads {
             return false;
         }
 
-        exit_funcs_.push_front(f);
+        // don't register any more exit callback if the thread has already
+        // exited
+        exit_func_state expected = exit_func_state::none;
+        if (!ran_exit_funcs_.compare_exchange_strong(
+                expected, exit_func_state::ready))
+        {
+            // the state was not none (i.e. ready or processed), bail out if it
+            // was processed
+            if (expected == exit_func_state::processed)
+            {
+                return false;
+            }
+        }
 
-        return true;
-    }
+        HPX_ASSERT(ran_exit_funcs_.load(std::memory_order_relaxed) ==
+            exit_func_state::ready);
 
-    void thread_data::free_thread_exit_callbacks()
-    {
         std::lock_guard<hpx::util::detail::spinlock> l(
             spinlock_pool::spinlock_for(this));
 
-        // Exit functions should have been executed.
-        HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);
-
-        exit_funcs_.clear();
+        exit_funcs_.push_front(f);
+        return true;
     }
 
     bool thread_data::interruption_point(bool throw_on_interrupt)
@@ -196,8 +255,6 @@ namespace hpx::threads {
             "thread_data::rebind_base({}), description({}), phase({}), rebind",
             this, get_description(), get_thread_phase());
 
-        free_thread_exit_callbacks();
-
         current_state_.store(thread_state(
             init_data.initial_state, thread_restart_state::signaled));
 
@@ -219,7 +276,7 @@ namespace hpx::threads {
         priority_ = init_data.priority;
         requested_interrupt_ = false;
         enabled_interrupt_ = true;
-        ran_exit_funcs_ = false;
+        ran_exit_funcs_.store(exit_func_state::none, std::memory_order_relaxed);
 
         runs_as_child_.store(init_data.schedulehint.runs_as_child_mode() ==
                 hpx::threads::thread_execution_hint::run_as_child,
