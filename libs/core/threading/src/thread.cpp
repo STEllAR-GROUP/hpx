@@ -112,7 +112,6 @@ namespace hpx {
                 "run_thread_exit_callbacks", "null thread id encountered");
         }
         threads::run_thread_exit_callbacks(id);
-        threads::free_thread_exit_callbacks(id);
     }
 
     threads::thread_result_type thread::thread_function_nullary(
@@ -214,17 +213,18 @@ namespace hpx {
         }
         this_thread::interruption_point();
 
+        // invalidate this object
+        threads::thread_id_ref_type id = detach_locked();
+
         // register callback function to be called when thread exits
-        if (threads::add_thread_exit_callback(id_.noref(),
-                hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
+        if (threads::add_thread_exit_callback(
+                id.noref(), hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
-            unlock_guard ul(l);
+            l.unlock();
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }
-
-        detach_locked();    // invalidate this object
     }
 
     // extensions
