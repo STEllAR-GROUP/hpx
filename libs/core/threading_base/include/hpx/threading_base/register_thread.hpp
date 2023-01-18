@@ -59,7 +59,6 @@ namespace hpx::threads {
                 auto* p = get_self_id_data();
 
                 p->run_thread_exit_callbacks();
-                p->free_thread_exit_callbacks();
 
                 return threads::thread_result_type(
                     threads::thread_schedule_state::terminated,
@@ -86,7 +85,6 @@ namespace hpx::threads {
                 auto* p = get_self_id_data();
 
                 p->run_thread_exit_callbacks();
-                p->free_thread_exit_callbacks();
 
                 return threads::thread_result_type(
                     threads::thread_schedule_state::terminated,

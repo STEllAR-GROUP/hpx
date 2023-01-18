@@ -187,7 +187,7 @@ namespace hpx::threads::policies {
         }
 
         // get/set scheduler mode
-        void set_scheduler_mode(scheduler_mode mode) override
+        void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // clang-format off
             scheduler_base::set_scheduler_mode(mode);
@@ -307,8 +307,6 @@ namespace hpx::threads::policies {
 
             auto msg = spq_deb.declare_variable<char const*>(nullptr);
 
-            std::unique_lock<pu_mutex_type> l;
-
             using threads::thread_schedule_hint_mode;
             switch (data.schedulehint.mode)
             {
@@ -361,7 +359,7 @@ namespace hpx::threads::policies {
                             ->worker_next(
                                 static_cast<std::size_t>(num_workers_));
                 }
-                thread_num = select_active_pu(l, thread_num);
+                thread_num = select_active_pu(thread_num);
                 // cppcheck-suppress redundantAssignment
                 domain_num = d_lookup_[thread_num];    //-V519
                 // cppcheck-suppress redundantAssignment
@@ -373,7 +371,7 @@ namespace hpx::threads::policies {
                 spq_deb.set(msg, "HINT_THREAD");
                 // @TODO. We should check that the thread num is valid
                 // Create thread on requested worker thread
-                thread_num = select_active_pu(l, data.schedulehint.hint);
+                thread_num = select_active_pu(data.schedulehint.hint);
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;
@@ -650,7 +648,7 @@ namespace hpx::threads::policies {
         // Return the next thread to be executed, return false if none available
         bool wait_or_add_new(std::size_t /* thread_num */, bool /* running */,
             std::int64_t& /* idle_loop_count */, bool /*enable_stealing*/,
-            std::size_t& added)
+            std::size_t& added, thread_id_ref_type* = nullptr)
         {
             std::size_t this_thread = local_thread_number();
             HPX_ASSERT(this_thread < num_workers_);
@@ -757,7 +755,7 @@ namespace hpx::threads::policies {
                         "assign_work_round_robin", "thread_num", thread_num,
                         debug::threadinfo<threads::thread_id_ref_type*>(&thrd));
                 }
-                thread_num = select_active_pu(l, thread_num, allow_fallback);
+                thread_num = select_active_pu(thread_num, allow_fallback);
                 break;
             }
             case thread_schedule_hint_mode::thread:
@@ -768,7 +766,7 @@ namespace hpx::threads::policies {
                 spq_deb.debug(debug::str<>("schedule_thread"),
                     "received HINT_THREAD", debug::dec<3>(schedulehint.hint));
                 thread_num =
-                    select_active_pu(l, schedulehint.hint, allow_fallback);
+                    select_active_pu(schedulehint.hint, allow_fallback);
                 domain_num = d_lookup_[thread_num];
                 q_index = q_lookup_[thread_num];
                 break;

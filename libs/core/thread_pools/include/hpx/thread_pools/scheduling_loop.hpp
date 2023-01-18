@@ -525,7 +525,7 @@ namespace hpx::threads::detail {
                 ++idle_loop_count;
 
                 if (scheduler.wait_or_add_new(num_thread, running,
-                        idle_loop_count, enable_stealing_staged, added))
+                        idle_loop_count, enable_stealing_staged, added, &next_thrd))
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit = !running &&
@@ -600,6 +600,14 @@ namespace hpx::threads::detail {
                     added = std::size_t(-1);
                 }
 
+                // if stealing yielded a new task, run it first
+                if (next_thrd != nullptr)
+                {
+                    continue;
+                }
+
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
                 // do background work in parcel layer and in agas
                 if (!call_background_thread(background_thread, next_thrd,
                         scheduler, num_thread, bg_work_exec_time_init,

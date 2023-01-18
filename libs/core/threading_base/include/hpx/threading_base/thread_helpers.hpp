@@ -385,9 +385,6 @@ namespace hpx::threads {
     HPX_CORE_EXPORT bool add_thread_exit_callback(thread_id_type const& id,
         hpx::function<void()> const& f, error_code& ec = throws);
 
-    HPX_CORE_EXPORT void free_thread_exit_callbacks(
-        thread_id_type const& id, error_code& ec = throws);
-
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT std::size_t get_thread_data(
         thread_id_type const& id, error_code& ec = throws);

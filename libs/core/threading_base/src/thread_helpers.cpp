@@ -348,22 +348,6 @@ namespace hpx::threads {
         return get_thread_id_data(id)->add_thread_exit_callback(f);
     }
 
-    void free_thread_exit_callbacks(thread_id_type const& id, error_code& ec)
-    {
-        if (HPX_UNLIKELY(!id))
-        {
-            HPX_THROWS_IF(ec, hpx::error::null_thread_id,
-                "hpx::threads::add_thread_exit_callback",
-                "null thread id encountered");
-            return;
-        }
-
-        if (&ec != &throws)
-            ec = make_success_code();
-
-        get_thread_id_data(id)->free_thread_exit_callbacks();
-    }
-
     ///////////////////////////////////////////////////////////////////////////
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
     char const* get_thread_backtrace(thread_id_type const& id, error_code& ec)

@@ -77,7 +77,7 @@ namespace hpx {
                 intrusive_ptr_add_ref(px);
         }
 
-        ~intrusive_ptr()
+        HPX_FORCEINLINE ~intrusive_ptr() noexcept
         {
             if (px != nullptr)
                 intrusive_ptr_release(px);

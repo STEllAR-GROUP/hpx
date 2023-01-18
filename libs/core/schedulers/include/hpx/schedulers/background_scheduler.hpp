@@ -63,7 +63,7 @@ namespace hpx::threads::policies {
             return "background_scheduler";
         }
 
-        void set_scheduler_mode(scheduler_mode mode) override
+        void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // this scheduler does not support stealing or numa stealing, but
             // needs to enable background work
@@ -89,7 +89,7 @@ namespace hpx::threads::policies {
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
         constexpr bool wait_or_add_new(std::size_t, bool running, std::int64_t&,
-            bool, std::size_t&) noexcept
+            bool, std::size_t&, thread_id_ref_type* = nullptr)
         {
             return !running;
         }

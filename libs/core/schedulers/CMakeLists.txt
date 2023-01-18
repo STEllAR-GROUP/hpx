@@ -52,12 +52,15 @@ add_hpx_module(
   COMPAT_HEADERS ${schedulers_compat_headers}
   SOURCES ${schedulers_sources}
   MODULE_DEPENDENCIES
+    hpx_affinity
+    hpx_concurrency
     hpx_config
     hpx_assertion
     hpx_errors
     hpx_format
     hpx_functional
     hpx_logging
+    hpx_synchronization
     hpx_threading_base
   CMAKE_SUBDIRS examples tests
 )

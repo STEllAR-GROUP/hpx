@@ -66,7 +66,7 @@ namespace hpx::threads::policies {
                 policies::scheduler_mode::enable_stealing_numa);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) override
+        void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = policies::scheduler_mode(

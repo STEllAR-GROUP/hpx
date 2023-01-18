@@ -13,9 +13,11 @@
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/thread_support/spinlock.hpp>
 
-namespace hpx { namespace util {
+#include <utility>
 
-    /// Lockable spinlock class
+namespace hpx::util {
+
+    // Lockable spinlock class
     struct spinlock
     {
     public:
@@ -25,9 +27,14 @@ namespace hpx { namespace util {
         hpx::util::detail::spinlock m;
 
     public:
-        spinlock(char const* /*desc*/ = nullptr)
+        spinlock() noexcept
         {
-            HPX_ITT_SYNC_CREATE(this, "util::spinlock", "");
+            HPX_ITT_SYNC_CREATE(this, "util::spinlock", nullptr);
+        }
+
+        explicit spinlock(char const* desc) noexcept
+        {
+            HPX_ITT_SYNC_CREATE(this, "util::spinlock", desc);
         }
 
         ~spinlock()
@@ -35,7 +42,8 @@ namespace hpx { namespace util {
             HPX_ITT_SYNC_DESTROY(this);
         }
 
-        void lock() noexcept
+        void lock() noexcept(
+            noexcept(util::register_lock(std::declval<spinlock*>())))
         {
             HPX_ITT_SYNC_PREPARE(this);
             m.lock();
@@ -43,7 +51,8 @@ namespace hpx { namespace util {
             util::register_lock(this);
         }
 
-        bool try_lock() noexcept
+        bool try_lock() noexcept(
+            noexcept(util::register_lock(std::declval<spinlock*>())))
         {
             HPX_ITT_SYNC_PREPARE(this);
             if (m.try_lock())
@@ -56,7 +65,8 @@ namespace hpx { namespace util {
             return false;
         }
 
-        void unlock() noexcept
+        void unlock() noexcept(
+            noexcept(util::unregister_lock(std::declval<spinlock*>())))
         {
             HPX_ITT_SYNC_RELEASING(this);
             m.unlock();
@@ -64,5 +74,4 @@ namespace hpx { namespace util {
             util::unregister_lock(this);
         }
     };
-
-}}    // namespace hpx::util
+}    // namespace hpx::util
