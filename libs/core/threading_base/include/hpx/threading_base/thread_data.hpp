@@ -480,6 +480,7 @@ namespace hpx { namespace threads {
 
         bool add_thread_exit_callback(function<void()> const& f);
         void run_thread_exit_callbacks();
+        void free_thread_exit_callbacks();
 
         HPX_FORCEINLINE constexpr bool is_stackless() const noexcept
         {
@@ -501,8 +502,7 @@ namespace hpx { namespace threads {
         void set_last_worker_thread_num(
             std::size_t last_worker_thread_num) noexcept
         {
-            last_worker_thread_num_ =
-                static_cast<std::uint16_t>(last_worker_thread_num);
+            last_worker_thread_num_ = last_worker_thread_num;
         }
 
         constexpr std::ptrdiff_t get_stack_size() const noexcept
@@ -589,34 +589,6 @@ namespace hpx { namespace threads {
         mutable std::atomic<thread_state> current_state_;
 
         ///////////////////////////////////////////////////////////////////////
-        thread_priority priority_;
-        thread_stacksize stacksize_enum_;
-
-        bool requested_interrupt_;
-        bool enabled_interrupt_;
-
-        enum class exit_func_state
-        {
-            none,
-            ready,
-            processed
-        };
-
-        std::atomic<exit_func_state> ran_exit_funcs_;
-        bool const is_stackless_;
-
-        std::uint16_t last_worker_thread_num_;
-
-        // reference to scheduler which created/manages this thread
-        policies::scheduler_base* scheduler_base_;
-        void* queue_;
-
-        std::ptrdiff_t stacksize_;
-
-        // Singly linked list (heap-allocated)
-        std::forward_list<hpx::function<void()>> exit_funcs_;
-
-        ///////////////////////////////////////////////////////////////////////
         // Debugging/logging information
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
         threads::thread_description description_;
@@ -640,6 +612,26 @@ namespace hpx { namespace threads {
         util::backtrace const* backtrace_;
 #endif
 #endif
+        ///////////////////////////////////////////////////////////////////////
+        thread_priority priority_;
+
+        bool requested_interrupt_;
+        bool enabled_interrupt_;
+        bool ran_exit_funcs_;
+        bool const is_stackless_;
+
+        // Singly linked list (heap-allocated)
+        std::forward_list<hpx::function<void()>> exit_funcs_;
+
+        // reference to scheduler which created/manages this thread
+        policies::scheduler_base* scheduler_base_;
+        std::size_t last_worker_thread_num_;
+
+        std::ptrdiff_t stacksize_;
+        thread_stacksize stacksize_enum_;
+
+        void* queue_;
+
     public:
 #if defined(HPX_HAVE_APEX)
         std::shared_ptr<util::external_timer::task_wrapper> timer_data_;

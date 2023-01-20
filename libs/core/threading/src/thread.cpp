@@ -112,6 +112,7 @@ namespace hpx {
                 "run_thread_exit_callbacks", "null thread id encountered");
         }
         threads::run_thread_exit_callbacks(id);
+        threads::free_thread_exit_callbacks(id);
     }
 
     threads::thread_result_type thread::thread_function_nullary(
@@ -187,30 +188,8 @@ namespace hpx {
 
     static void resume_thread(threads::thread_id_ref_type const& id)
     {
-        auto state = threads::get_thread_state(id.noref()).state();
-        HPX_ASSERT(state != threads::thread_schedule_state::terminated);
-
-        if (state != threads::thread_schedule_state::suspended)
-        {
-            // reschedule this function call if the target thread is not yet
-            // suspended
-            threads::thread_init_data data(
-                [id](threads::thread_restart_state) {
-                    resume_thread(id);
-                    return threads::thread_result_type(
-                        threads::thread_schedule_state::terminated,
-                        threads::invalid_thread_id);
-                },
-                "resume_thread for thread::join");
-
-            threads::detail::create_work(
-                get_thread_id_data(id)->get_scheduler_base(), data);
-        }
-        else
-        {
-            threads::set_thread_state(
-                id.noref(), threads::thread_schedule_state::pending);
-        }
+        threads::set_thread_state(
+            id.noref(), threads::thread_schedule_state::pending);
     }
 
     void thread::join()
@@ -235,18 +214,17 @@ namespace hpx {
         }
         this_thread::interruption_point();
 
-        // invalidate this object
-        threads::thread_id_ref_type id = detach_locked();
-
         // register callback function to be called when thread exits
-        if (threads::add_thread_exit_callback(
-                id.noref(), hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
+        if (threads::add_thread_exit_callback(id_.noref(),
+                hpx::bind_front(&resume_thread, HPX_MOVE(this_id))))
         {
             // wait for thread to be terminated
-            l.unlock();
+            unlock_guard ul(l);
             this_thread::suspend(
                 threads::thread_schedule_state::suspended, "thread::join");
         }
+
+        detach_locked();    // invalidate this object
     }
 
     // extensions

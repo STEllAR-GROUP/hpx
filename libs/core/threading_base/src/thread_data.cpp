@@ -52,16 +52,6 @@ namespace hpx::threads {
       : detail::thread_data_reference_counting(addref)
       , current_state_(thread_state(
             init_data.initial_state, thread_restart_state::signaled))
-      , priority_(init_data.priority)
-      , stacksize_enum_(init_data.stacksize)
-      , requested_interrupt_(false)
-      , enabled_interrupt_(true)
-      , ran_exit_funcs_(exit_func_state::none)
-      , is_stackless_(is_stackless)
-      , last_worker_thread_num_(std::uint16_t(-1))
-      , scheduler_base_(init_data.scheduler_base)
-      , queue_(queue)
-      , stacksize_(stacksize)
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
       , description_(init_data.description)
       , lco_description_()
@@ -77,6 +67,16 @@ namespace hpx::threads {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
       , backtrace_(nullptr)
 #endif
+      , priority_(init_data.priority)
+      , requested_interrupt_(false)
+      , enabled_interrupt_(true)
+      , ran_exit_funcs_(false)
+      , is_stackless_(is_stackless)
+      , scheduler_base_(init_data.scheduler_base)
+      , last_worker_thread_num_(std::size_t(-1))
+      , stacksize_(stacksize)
+      , stacksize_enum_(init_data.stacksize)
+      , queue_(queue)
     {
         LTM_(debug).format(
             "thread::thread({}), description({})", this, get_description());
@@ -106,13 +106,7 @@ namespace hpx::threads {
     thread_data::~thread_data()
     {
         LTM_(debug).format("thread_data::~thread_data({})", this);
-
-        // Exit functions should have been executed.
-        HPX_ASSERT(exit_funcs_.empty() ||
-            ran_exit_funcs_.load(std::memory_order_relaxed) ==
-                exit_func_state::none ||
-            ran_exit_funcs_.load(std::memory_order_relaxed) ==
-                exit_func_state::processed);
+        free_thread_exit_callbacks();
     }
 
     void thread_data::destroy_thread()
@@ -126,70 +120,47 @@ namespace hpx::threads {
 
     void thread_data::run_thread_exit_callbacks()
     {
-        // when leaving this function the state must be 'processed'
-        exit_func_state expected = exit_func_state::none;
-        if (!ran_exit_funcs_.compare_exchange_strong(
-                expected, exit_func_state::processed))
+        std::unique_lock<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+
+        while (!exit_funcs_.empty())
         {
-            // state was 'ready' or 'processed'
-            if (expected == exit_func_state::ready &&
-                ran_exit_funcs_.compare_exchange_strong(
-                    expected, exit_func_state::processed))
             {
-                // run exit functions only if there are any (state is
-                // 'ready')
-                std::unique_lock<hpx::util::detail::spinlock> l(
-                    spinlock_pool::spinlock_for(this));
-
-                while (!exit_funcs_.empty())
-                {
-                    auto f = exit_funcs_.front();
-                    if (!f.empty())
-                    {
-                        f();
-                    }
-                    exit_funcs_.pop_front();
-                }
+                hpx::unlock_guard<std::unique_lock<hpx::util::detail::spinlock>>
+                    ul(l);
+                if (!exit_funcs_.front().empty())
+                    exit_funcs_.front()();
             }
-            else
-            {
-                HPX_ASSERT(expected == exit_func_state::processed);
-            }
+            exit_funcs_.pop_front();
         }
-
-        HPX_ASSERT(ran_exit_funcs_.load(std::memory_order_relaxed) ==
-            exit_func_state::processed);
+        ran_exit_funcs_ = true;
     }
 
     bool thread_data::add_thread_exit_callback(hpx::function<void()> const& f)
     {
-        if (get_state().state() == thread_schedule_state::terminated)
+        std::lock_guard<hpx::util::detail::spinlock> l(
+            spinlock_pool::spinlock_for(this));
+
+        if (ran_exit_funcs_ ||
+            get_state().state() == thread_schedule_state::terminated)
         {
             return false;
         }
 
-        // don't register any more exit callback if the thread has already
-        // exited
-        exit_func_state expected = exit_func_state::none;
-        if (!ran_exit_funcs_.compare_exchange_strong(
-                expected, exit_func_state::ready))
-        {
-            // the state was not none (i.e. ready or processed), bail out if it
-            // was processed
-            if (expected == exit_func_state::processed)
-            {
-                return false;
-            }
-        }
+        exit_funcs_.push_front(f);
 
-        HPX_ASSERT(ran_exit_funcs_.load(std::memory_order_relaxed) ==
-            exit_func_state::ready);
+        return true;
+    }
 
+    void thread_data::free_thread_exit_callbacks()
+    {
         std::lock_guard<hpx::util::detail::spinlock> l(
             spinlock_pool::spinlock_for(this));
 
-        exit_funcs_.push_front(f);
-        return true;
+        // Exit functions should have been executed.
+        HPX_ASSERT(exit_funcs_.empty() || ran_exit_funcs_);
+
+        exit_funcs_.clear();
     }
 
     bool thread_data::interruption_point(bool throw_on_interrupt)
@@ -223,6 +194,8 @@ namespace hpx::threads {
             "thread_data::rebind_base({}), description({}), phase({}), rebind",
             this, get_description(), get_thread_phase());
 
+        free_thread_exit_callbacks();
+
         current_state_.store(thread_state(
             init_data.initial_state, thread_restart_state::signaled));
 
@@ -244,10 +217,10 @@ namespace hpx::threads {
         priority_ = init_data.priority;
         requested_interrupt_ = false;
         enabled_interrupt_ = true;
-        ran_exit_funcs_.store(exit_func_state::none, std::memory_order_relaxed);
+        ran_exit_funcs_ = false;
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
-        last_worker_thread_num_ = std::uint16_t(-1);
+        last_worker_thread_num_ = std::size_t(-1);
 
         // We explicitly set the logical stack size again as it can be different
         // from what the previous use required. However, the physical stack size
