@@ -84,7 +84,7 @@ namespace hpx::threads::coroutines::detail::posix {
     inline void* alloc_stack(std::size_t size)
     {
         void* real_stack = ::mmap(nullptr, size + EXEC_PAGESIZE,
-            PROT_EXEC | PROT_READ | PROT_WRITE,
+            PROT_READ | PROT_WRITE,
 #if defined(__APPLE__)
             MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
 #elif defined(__FreeBSD__)
