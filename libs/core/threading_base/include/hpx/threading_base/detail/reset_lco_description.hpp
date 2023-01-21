@@ -14,6 +14,8 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::threads::detail {
 
     struct HPX_CORE_EXPORT reset_lco_description
@@ -29,5 +31,7 @@ namespace hpx::threads::detail {
         error_code& ec_;
     };
 }    // namespace hpx::threads::detail
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif    // HPX_HAVE_THREAD_DESCRIPTION
