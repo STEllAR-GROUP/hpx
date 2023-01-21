@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,7 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -31,9 +31,9 @@ namespace hpx::threads::policies {
 
     ///////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
-    using default_static_queue_scheduler_terminated_queue = lockfree_lifo;
+    using default_background_scheduler_terminated_queue = lockfree_lifo;
 #else
-    using default_static_queue_scheduler_terminated_queue = lockfree_fifo;
+    using default_background_scheduler_terminated_queue = lockfree_fifo;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ namespace hpx::threads::policies {
         typename PendingQueuing = lockfree_fifo,
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
-            default_static_queue_scheduler_terminated_queue>
-    class background_scheduler
+            default_background_scheduler_terminated_queue>
+    class background_scheduler final
       : public local_queue_scheduler<Mutex, PendingQueuing, StagedQueuing,
             TerminatedQueuing>
     {
@@ -58,7 +58,7 @@ namespace hpx::threads::policies {
         {
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "background_scheduler";
         }
@@ -76,11 +76,11 @@ namespace hpx::threads::policies {
         }
 
         // Return the next thread to be executed, return false if none is
-        // available. Note that this scheduler can't be used for any real work,
-        // only background work is processed by the scheduling loop
-        bool get_next_thread(
-            std::size_t, bool, threads::thread_id_ref_type&, bool) override
+        // available
+        constexpr bool get_next_thread(
+            std::size_t, bool, threads::thread_id_ref_type&, bool) noexcept
         {
+            // this scheduler does not maintain any thread queues
             return false;
         }
 
@@ -88,43 +88,29 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        bool wait_or_add_new(std::size_t, bool running, std::int64_t&, bool,
-            std::size_t&) override
+        constexpr bool wait_or_add_new(std::size_t, bool running, std::int64_t&,
+            bool, std::size_t&) noexcept
         {
             return !running;
         }
 
-        void create_thread(
-            thread_init_data&, thread_id_ref_type*, error_code&) override
-        {
-            HPX_THROW_EXCEPTION(error::bad_function_call,
-                "background_scheduler::create_thread",
-                "This scheduler does not support managing 'normal' threads");
-        }
-
         void schedule_thread(threads::thread_id_ref_type,
-            threads::thread_schedule_hint, bool,
+            threads::thread_schedule_hint, bool = false,
             thread_priority = thread_priority::default_) override
         {
-            HPX_THROW_EXCEPTION(error::bad_function_call,
+            HPX_THROW_EXCEPTION(hpx::error::bad_function_call,
                 "background_scheduler::schedule_thread",
-                "This scheduler does not support managing 'normal' threads");
+                "unexpected call to background_scheduler::schedule_thread");
         }
 
         void schedule_thread_last(threads::thread_id_ref_type,
-            threads::thread_schedule_hint, bool,
+            threads::thread_schedule_hint, bool = false,
             thread_priority = thread_priority::default_) override
         {
-            HPX_THROW_EXCEPTION(error::bad_function_call,
+            HPX_THROW_EXCEPTION(hpx::error::bad_function_call,
                 "background_scheduler::schedule_thread_last",
-                "This scheduler does not support managing 'normal' threads");
-        }
-
-        void destroy_thread(threads::thread_data*) override
-        {
-            HPX_THROW_EXCEPTION(error::bad_function_call,
-                "background_scheduler::destroy_thread",
-                "This scheduler does not support managing 'normal' threads");
+                "unexpected call to "
+                "background_scheduler::schedule_thread_last");
         }
     };
 }    // namespace hpx::threads::policies

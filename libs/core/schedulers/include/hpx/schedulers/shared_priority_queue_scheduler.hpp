@@ -36,7 +36,7 @@
 #include <memory>
 #include <mutex>
 #include <numeric>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -111,7 +111,7 @@ namespace hpx::threads::policies {
         typename PendingQueuing = concurrentqueue_fifo,
         typename TerminatedQueuing =
             default_shared_priority_queue_scheduler_terminated_queue>
-    class shared_priority_queue_scheduler : public scheduler_base
+    class shared_priority_queue_scheduler final : public scheduler_base
     {
     public:
         using has_periodic_maintenance = std::false_type;
@@ -181,7 +181,7 @@ namespace hpx::threads::policies {
 
         virtual ~shared_priority_queue_scheduler() = default;
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "shared_priority_queue_scheduler";
         }
@@ -592,8 +592,8 @@ namespace hpx::threads::policies {
         }
 
         // Return the next thread to be executed, return false if none available
-        virtual bool get_next_thread(std::size_t thread_num, bool running,
-            threads::thread_id_ref_type& thrd, bool enable_stealing) override
+        bool get_next_thread(std::size_t thread_num, bool running,
+            threads::thread_id_ref_type& thrd, bool enable_stealing)
         {
             std::size_t this_thread = local_thread_number();
             HPX_ASSERT(this_thread < num_workers_);
@@ -648,9 +648,9 @@ namespace hpx::threads::policies {
         }
 
         // Return the next thread to be executed, return false if none available
-        virtual bool wait_or_add_new(std::size_t /* thread_num */,
-            bool /* running */, std::int64_t& /* idle_loop_count */,
-            bool /*enable_stealing*/, std::size_t& added) override
+        bool wait_or_add_new(std::size_t /* thread_num */, bool /* running */,
+            std::int64_t& /* idle_loop_count */, bool /*enable_stealing*/,
+            std::size_t& added)
         {
             std::size_t this_thread = local_thread_number();
             HPX_ASSERT(this_thread < num_workers_);
@@ -1218,7 +1218,7 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::on_stop_thread",
-                    "Invalid thread number: {}", std::to_string(thread_num));
+                    "Invalid thread number: {}", thread_num);
             }
             // @TODO Do we need to do any queue related cleanup here?
         }
@@ -1230,7 +1230,7 @@ namespace hpx::threads::policies {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "shared_priority_queue_scheduler::on_error",
-                    "Invalid thread number: {}", std::to_string(thread_num));
+                    "Invalid thread number: {}", thread_num);
             }
             // @TODO Do we need to do any queue related cleanup here?
         }

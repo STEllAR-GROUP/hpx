@@ -15,7 +15,7 @@
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
 
-namespace hpx::threads {
+namespace hpx::threads::detail {
 
     ////////////////////////////////////////////////////////////////////////////
     struct background_work_duration_counter
@@ -57,6 +57,6 @@ namespace hpx::threads {
         std::int64_t timestamp_;
         background_work_duration_counter& background_work_duration_;
     };
-}    // namespace hpx::threads
+}    // namespace hpx::threads::detail
 
 #endif

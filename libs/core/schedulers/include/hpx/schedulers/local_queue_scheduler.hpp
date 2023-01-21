@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,7 +28,7 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -131,7 +131,7 @@ namespace hpx::threads::policies {
                 delete queues_[i];
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "local_queue_scheduler";
         }
@@ -328,9 +328,8 @@ namespace hpx::threads::policies {
 
         // Return the next thread to be executed, return false if none is
         // available
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_ref_type& thrd,
-            bool /*enable_stealing*/) override
+        bool get_next_thread(std::size_t num_thread, bool running,
+            threads::thread_id_ref_type& thrd, bool /*enable_stealing*/)
         {
             std::size_t queues_size = queues_.size();
 
@@ -711,9 +710,9 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool /* enable_stealing */,
-            std::size_t& added) override
+            std::size_t& added)
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());

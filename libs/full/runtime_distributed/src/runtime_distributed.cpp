@@ -57,6 +57,7 @@
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
+#include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 #include <hpx/thread_support/set_thread_name.hpp>
 #include <hpx/threading_base/external_timer.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
@@ -118,9 +119,9 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
             // count background work duration
             {
-                threads::background_work_duration_counter bg_send_duration(
-                    background_work_exec_time_send);
-                threads::background_exec_time_wrapper bg_exec_time(
+                threads::detail::background_work_duration_counter
+                    bg_send_duration(background_work_exec_time_send);
+                threads::detail::background_exec_time_wrapper bg_exec_time(
                     bg_send_duration);
 
                 if (hpx::parcelset::do_background_work(
@@ -131,9 +132,9 @@ namespace hpx {
             }
 
             {
-                threads::background_work_duration_counter bg_receive_duration(
-                    background_work_exec_time_receive);
-                threads::background_exec_time_wrapper bg_exec_time(
+                threads::detail::background_work_duration_counter
+                    bg_receive_duration(background_work_exec_time_receive);
+                threads::detail::background_exec_time_wrapper bg_exec_time(
                     bg_receive_duration);
 
                 if (hpx::parcelset::do_background_work(num_thread,
@@ -1846,7 +1847,7 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     // shortcut for get_runtime().get_agas_client()
     resolver_client& get_agas_client()
@@ -1860,11 +1861,11 @@ namespace hpx { namespace naming {
         auto* rtd = get_runtime_distributed_ptr();
         return rtd ? &rtd->get_agas_client() : nullptr;
     }
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_NETWORKING)
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
 
     bool do_background_work(
         std::size_t num_thread, parcelport_background_mode mode)
@@ -1886,5 +1887,5 @@ namespace hpx { namespace parcelset {
         auto* rtd = get_runtime_distributed_ptr();
         return rtd ? &rtd->get_parcel_handler() : nullptr;
     }
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 #endif
