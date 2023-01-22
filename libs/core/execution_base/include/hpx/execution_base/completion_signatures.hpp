@@ -20,6 +20,8 @@
 
 #include <type_traits>
 #include <utility>
+#include "hpx/config/forward.hpp"
+#include "hpx/functional/tag_invoke.hpp"
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <hpx/assert.hpp>
@@ -808,6 +810,40 @@ namespace hpx::execution::experimental {
 
     struct as_awaitable_t;
 
+    template <typename T, typename = void>
+    inline constexpr bool has_id_v = false;
+
+    template <typename T>
+    inline constexpr bool has_id_v<T, std::void_t<typename T::Id>> = true;
+
+    template <typename T>
+    struct has_id : std::integral_constant<bool, has_id_v<T>>
+    {
+    };
+
+    template <bool val = true>
+    struct Id_f
+    {
+        template <typename T>
+        using apply = typename T::Id;
+    };
+
+    template <typename T>
+    struct Y
+    {
+        using type = T;
+    };
+
+    template <>
+    struct Id_f<false>
+    {
+        template <typename T>
+        using apply = Y<T>;
+    };
+
+    template <typename T>
+    using Id = hpx::meta::invoke<Id_f<has_id<T>::value>, T>;
+
     namespace detail {
 
         // clang-format off
@@ -827,6 +863,9 @@ namespace hpx::execution::experimental {
         template <typename Value>
         using coroutine_expected_result_t = hpx::variant<hpx::monostate,
             value_or_void_t<Value>, std::exception_ptr>;
+
+        template <typename Promise>
+        using coroutine_env_t = hpx::util::invoke_result_t<get_env_t, Promise>;
 
         template <typename Value>
         struct receiver_base
@@ -873,12 +912,13 @@ namespace hpx::execution::experimental {
         };
 
         template <typename PromiseId, typename Value>
-        struct sender_awaitable_base
+        struct receiver
         {
-            using Promise = hpx::meta::hidden<PromiseId>;
-            struct receiver : receiver_base<Value>
+            using Promise = hpx::meta::type<PromiseId>;
+            struct type : receiver_base<Value>
             {
-                friend void tag_invoke(set_stopped_t, receiver&& self) noexcept
+                using Id = receiver;
+                friend void tag_invoke(set_stopped_t, type&& self) noexcept
                 {
                     auto continuation =
                         hpx::coro::coroutine_handle<Promise>::from_address(
@@ -887,18 +927,33 @@ namespace hpx::execution::experimental {
                         continuation.promise().unhandled_stopped();
                     stopped_continuation.resume();
                 }
-
-                // Forward get_env query to the coroutine promise
-                friend auto tag_invoke(get_env_t, receiver const& self)
-                    -> env_of_t<Promise>
+                friend coroutine_env_t<Promise&> tag_invoke(
+                    get_env_t, const type& self)
                 {
-                    auto continuation =
-                        hpx::coro::coroutine_handle<Promise>::from_address(
-                            self.continuation.address());
-                    return get_env(continuation.promise());
+                    if constexpr (hpx::meta::value<
+                                      hpx::functional::is_tag_invocable<
+                                          get_env_t, Promise&>>)
+                    {
+                        auto continuation =
+                            hpx::coro::coroutine_handle<Promise>::from_address(
+                                self.continuation.address());
+                        return get_env(continuation.promise());
+                    }
+                    else
+                    {
+                        return no_env{};
+                    }
                 }
             };
+        };
 
+        template <typename Sender, typename Promise>
+        using receiver_t = hpx::meta::type<receiver<Id<Promise>,
+            single_sender_value_t<Sender, coroutine_env_t<Promise>>>>;
+
+        template <typename PromiseId, typename Value>
+        struct sender_awaitable_base
+        {
             constexpr bool await_ready() const noexcept
             {
                 return false;
@@ -936,13 +991,8 @@ namespace hpx::execution::experimental {
         struct sender_awaitable;
 
         template <typename Promise, typename Sender>
-        using sender_awaitable_t = sender_awaitable<hpx::meta::hidden<Promise>,
-            hpx::meta::hidden<Sender>>;
-
-        template <typename Sender, typename Promise>
-        using receiver =
-            typename sender_awaitable_base<hpx::meta::hidden<Promise>,
-                single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
+        using sender_awaitable_t =
+            hpx::meta::type<sender_awaitable<Id<Promise>, Id<Sender>>>;
 
         // clang-format off
         template <typename Sender, typename Env = no_env>
@@ -1097,7 +1147,7 @@ namespace hpx::execution::experimental {
             {
                 Fun&& fun;
 
-                bool await_ready() noexcept
+                constexpr bool await_ready() noexcept
                 {
                     return false;
                 }
@@ -1122,7 +1172,7 @@ namespace hpx::execution::experimental {
         }
     };
 
-    struct operation_base : hpx::functional::tag<operation_base>
+    struct operation_base
     {
         hpx::coro::coroutine_handle<> coro_handle;
 
@@ -1152,73 +1202,79 @@ namespace hpx::execution::experimental {
     struct promise;
 
     template <typename ReceiverId>
-    struct operation : operation_base
+    struct operation
     {
-        using promise_type = promise<ReceiverId>;
-        using operation_base::operation_base;
+        struct type : operation_base
+        {
+            using promise_type = hpx::meta::type<promise<ReceiverId>>;
+            using operation_base::operation_base;
+        };
     };
 
     template <typename ReceiverId>
-    struct promise : promise_base
+    struct promise
     {
         using Receiver = hpx::meta::type<ReceiverId>;
-
-        explicit promise(auto&, Receiver& rcvr_) noexcept
-          : rcvr(rcvr_)
+        struct type : promise_base
         {
-        }
-
-        hpx::coro::coroutine_handle<> unhandled_stopped() noexcept
-        {
-            set_stopped(std::move(rcvr));
-            // Returning noop_coroutine here causes the __connect_awaitable
-            // coroutine to never resume past the point where it co_await's
-            // the awaitable.
-            return hpx::coro::noop_coroutine();
-        }
-
-        operation<ReceiverId> get_return_object() noexcept
-        {
-            return operation<ReceiverId>{
-                hpx::coro::coroutine_handle<promise>::from_promise(*this)};
-        }
-
-        template <typename Awaitable>
-        auto await_transform(Awaitable&& await) noexcept(
-            hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
-                Awaitable, promise&> ||
-            !hpx::functional::is_tag_invocable_v<as_awaitable_t, Awaitable,
-                promise&>)
-
-        {
-            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t,
-                              Awaitable, promise&>)
+            using Id = promise;
+            explicit type(auto&, Receiver& rcvr_) noexcept
+              : rcvr(rcvr_)
             {
-                return as_awaitable(HPX_FORWARD(Awaitable, await), *this);
             }
-            else
+
+            hpx::coro::coroutine_handle<> unhandled_stopped() noexcept
             {
-                return HPX_FORWARD(Awaitable, await);
+                set_stopped(std::move(rcvr));
+                // Returning noop_coroutine here causes the __connect_awaitable
+                // coroutine to never resume past the point where it co_await's
+                // the awaitable.
+                return hpx::coro::noop_coroutine();
             }
-        }
 
-        // Pass through the get_env receiver query
-        friend auto tag_invoke(get_env_t, promise const& self)
-            -> env_of_t<Receiver>
-        {
-            return get_env(self.rcvr);
-        }
+            hpx::meta::type<operation<ReceiverId>> get_return_object() noexcept
+            {
+                return hpx::meta::type<operation<ReceiverId>>{
+                    hpx::coro::coroutine_handle<type>::from_promise(*this)};
+            }
 
-        Receiver& rcvr;
+            template <typename Awaitable>
+            auto await_transform(Awaitable&& await) noexcept(
+                hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
+                    Awaitable, promise&> ||
+                !hpx::functional::is_tag_invocable_v<as_awaitable_t, Awaitable,
+                    promise&>)
+
+            {
+                if constexpr (hpx::functional::is_tag_invocable_v<
+                                  as_awaitable_t, Awaitable, promise&>)
+                {
+                    return as_awaitable(HPX_FORWARD(Awaitable, await), *this);
+                }
+                else
+                {
+                    return HPX_FORWARD(Awaitable, await);
+                }
+            }
+
+            // Pass through the get_env receiver query
+            friend auto tag_invoke(get_env_t, type const& self)
+                -> env_of_t<Receiver>
+            {
+                return get_env(self.rcvr);
+            }
+
+            Receiver& rcvr;
+        };
     };
 
     template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
-    using promise_t = promise<hpx::meta::hidden<Receiver>>;
+    using promise_t = hpx::meta::type<promise<Id<Receiver>>>;
 
     template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
-    using operation_t = operation<hpx::meta::hidden<Receiver>>;
+    using operation_t = hpx::meta::type<operation<Id<Receiver>>>;
 
     inline constexpr struct connect_awaitable_t
     {
@@ -1327,34 +1383,33 @@ namespace hpx::execution::experimental {
 
         template <typename PromiseId, typename SenderId>
         struct sender_awaitable
-          : sender_awaitable_base<PromiseId,
-                single_sender_value_t<hpx::meta::type<SenderId>,
-                    env_of_t<hpx::meta::type<PromiseId>>>>
         {
-        private:
             using Promise = hpx::meta::type<PromiseId>;
             using Sender = hpx::meta::type<SenderId>;
             using Env = env_of_t<Promise>;
             using Value = single_sender_value_t<Sender, Env>;
-            using Base = sender_awaitable_base<PromiseId, Value>;
-            using receiver = typename Base::receiver;
 
-            connect_result_t<Sender, receiver> op_state_;
-
-        public:
-            sender_awaitable(Sender&& sender,
-                hpx::coro::coroutine_handle<Promise>
-                    hcoro) noexcept(has_nothrow_connect<Sender,
-                receiver>::value)
-              : op_state_(connect(HPX_FORWARD(Sender, sender),
-                    receiver{{&this->result, hcoro}}))
+            struct type : sender_awaitable_base<PromiseId, Value>
             {
-            }
+                type(Sender&& sender,
+                    hpx::coro::coroutine_handle<Promise>
+                        hcoro) noexcept(has_nothrow_connect<Sender,
+                    receiver>::value)
+                  : op_state_(connect(HPX_FORWARD(Sender, sender),
+                        receiver{{&this->result, hcoro}}))
+                {
+                }
 
-            void await_suspend(hpx::coro::coroutine_handle<Promise>) noexcept
-            {
-                start(op_state_);
-            }
+                void await_suspend(
+                    hpx::coro::coroutine_handle<Promise>) noexcept
+                {
+                    start(op_state_);
+                }
+
+            private:
+                using receiver = receiver_t<Sender, Promise>;
+                connect_result_t<Sender, receiver> op_state_;
+            };
         };
     }     // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES

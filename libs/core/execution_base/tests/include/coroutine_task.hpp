@@ -73,6 +73,14 @@ struct forward_stop_request
         stop_source_.request_stop();
     }
 };
+template <typename ParentPromise, typename = void>
+struct default_awaiter_context
+{
+    explicit default_awaiter_context(
+        default_awaiter_context&, ParentPromise&) noexcept
+    {
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // This is the context that is associated with basic_task's promise type
@@ -84,17 +92,8 @@ struct default_task_context_impl
 
     // This is the context associated with basic_task's awaiter. By default
     // it does nothing.
-    template <typename ParentPromise,
-        typename =
-            std::enable_if_t<indirect_stop_token_provider<ParentPromise>>,
-        typename = void>
-    struct awaiter_context
-    {
-        explicit awaiter_context(
-            default_task_context_impl&, ParentPromise&) noexcept
-        {
-        }
-    };
+    template <typename ParentPromise, typename T>
+    friend struct default_awaiter_context;
 
     friend auto tag_invoke(hpx::execution::experimental::get_stop_token_t,
         const default_task_context_impl& self) noexcept
@@ -114,8 +113,8 @@ public:
     template <typename ThisPromise>
     using promise_context_t = default_task_context_impl;
 
-    template <typename ThisPromise, class ParentPromise = void>
-    using awaiter_context_t = awaiter_context<ParentPromise>;
+    template <typename ThisPromise, typename ParentPromise = void>
+    using awaiter_context_t = default_awaiter_context<ParentPromise>;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,14 +122,15 @@ public:
 // the parent coroutine's promise type is known, is a stop_token_provider,
 // and its stop token type is neither in_place_stop_token nor unstoppable.
 template <typename ParentPromise>
-struct default_task_context_impl::awaiter_context<ParentPromise>
+struct default_awaiter_context<ParentPromise,
+    std::enable_if_t<indirect_stop_token_provider<ParentPromise>>>
 {
     using stop_token_t = hpx::execution::experimental::stop_token_of_t<
         hpx::execution::experimental::env_of_t<ParentPromise>>;
     using stop_callback_t =
         typename stop_token_t::template callback_type<forward_stop_request>;
 
-    explicit awaiter_context(
+    explicit default_awaiter_context(
         default_task_context_impl& self, ParentPromise& parent) noexcept
       // Register a callback that will request stop on this basic_task's
       // stop_source when stop is requested on the parent coroutine's stop
@@ -151,12 +151,14 @@ struct default_task_context_impl::awaiter_context<ParentPromise>
 // If the parent coroutine's type has a stop token of type in_place_stop_token,
 // we don't need to register a stop callback.
 template <typename ParentPromise>
-struct default_task_context_impl::awaiter_context<ParentPromise,
-    std::enable_if_t<std::is_same_v<hpx::experimental::in_place_stop_source,
-        hpx::execution::experimental::stop_token_of_t<
-            hpx::execution::experimental::env_of_t<ParentPromise>>>>>
+struct default_awaiter_context<ParentPromise,
+    std::enable_if_t<
+        std::is_same_v<hpx::experimental::in_place_stop_source,
+            hpx::execution::experimental::stop_token_of_t<
+                hpx::execution::experimental::env_of_t<ParentPromise>>> &&
+        indirect_stop_token_provider<ParentPromise>>>
 {
-    explicit awaiter_context(
+    explicit default_awaiter_context(
         default_task_context_impl& self, ParentPromise& parent) noexcept
     {
         self.stop_token_ = hpx::execution::experimental::get_stop_token(
@@ -167,15 +169,16 @@ struct default_task_context_impl::awaiter_context<ParentPromise,
 template <typename Token>
 inline bool unstoppable_token = !Token::stop_possible();
 
-// // If the parent coroutine's stop token is unstoppable, there's no point
-// // forwarding stop tokens or stop requests at all.
+// If the parent coroutine's stop token is unstoppable, there's no point
+// forwarding stop tokens or stop requests at all.
 template <typename ParentPromise>
-struct default_task_context_impl::awaiter_context<ParentPromise,
+struct default_awaiter_context<ParentPromise,
     std::enable_if_t<
         unstoppable_token<hpx::execution::experimental::stop_token_of_t<
-            hpx::execution::experimental::env_of_t<ParentPromise>>>>>
+            hpx::execution::experimental::env_of_t<ParentPromise>>> &&
+        indirect_stop_token_provider<ParentPromise>>>
 {
-    explicit awaiter_context(
+    explicit default_awaiter_context(
         default_task_context_impl&, ParentPromise&) noexcept
     {
     }
@@ -184,17 +187,18 @@ struct default_task_context_impl::awaiter_context<ParentPromise,
 // Finally, if we don't know the parent coroutine's promise type, assume the
 // worst and save a type-erased stop callback.
 template <>
-struct default_task_context_impl::awaiter_context<void>
+struct default_awaiter_context<void>
 {
-    explicit awaiter_context(default_task_context_impl&, auto&) noexcept {}
+    explicit default_awaiter_context(default_task_context_impl&, auto&) noexcept
+    {
+    }
 
     template <typename ParentPromise,
         typename =
             std::enable_if_t<indirect_stop_token_provider<ParentPromise>>>
-    explicit awaiter_context(
+    explicit default_awaiter_context(
         default_task_context_impl& self, ParentPromise& parent)
     {
-        // static_assert(indirect_stop_token_provider<ParentPromise>);
         // Register a callback that will request stop on this basic_task's
         // stop_source when stop is requested on the parent coroutine's stop
         // token.
@@ -274,13 +278,15 @@ inline constexpr bool
 
 ////////////////////////////////////////////////////////////////////////////////
 // basic_task
-template <typename T, class Context = default_task_context<T>>
+template <typename T, typename Context = default_task_context<T>>
 class basic_task
 {
     struct _promise;
 
 public:
     using promise_type = _promise;
+    using type = basic_task;
+    using Id = basic_task;
 
     basic_task(basic_task&& that) noexcept
       : coro_(std::exchange(that.coro_, {}))
@@ -345,10 +351,19 @@ private:
         hpx::coro::coroutine_handle<_promise> coro_;
         std::optional<awaiter_context_t<_promise, ParentPromise>> context_{};
 
+        ~task_awaitable()
+        {
+            if (coro_)
+            {
+                coro_.destroy();
+            }
+        }
+
         static std::false_type await_ready() noexcept
         {
             return {};
         }
+
         template <typename ParentPromise2>
         hpx::coro::coroutine_handle<> await_suspend(
             hpx::coro::coroutine_handle<ParentPromise2> parent) noexcept
@@ -408,13 +423,13 @@ private:
         task_traits_t<>, task_traits_t<T>>;
 
     explicit basic_task(
-        hpx::coro::coroutine_handle<promise_type> __coro) noexcept
-      : coro_(__coro)
+        hpx::coro::coroutine_handle<promise_type> hcoro) noexcept
+      : coro_(hcoro)
     {
     }
 
     hpx::coro::coroutine_handle<promise_type> coro_;
 };
 
-template <typename T>
-using task = basic_task<T, default_task_context<T>>;
+template <typename T, typename Context = default_task_context<T>>
+using task = basic_task<T, Context>;

@@ -63,6 +63,9 @@ namespace hpx::execution::experimental {
         //  -- end note]
         struct no_env
         {
+            using type = no_env;
+            using Id = no_env;
+
             template <typename Tag, typename Env>
             friend std::enable_if_t<std::is_same_v<no_env, std::decay_t<Env>>>
                 tag_invoke(Tag, Env) = delete;
@@ -70,40 +73,49 @@ namespace hpx::execution::experimental {
 
         struct empty_env
         {
+            using type = empty_env;
+            using Id = empty_env;
         };
 
-        template <typename Tag, typename Value,
-            typename BaseEnvId = meta::hidden<empty_env>>
+        template <typename Tag, typename Value, typename BaseEnvId = empty_env>
         struct env
         {
             using BaseEnv = meta::type<BaseEnvId>;
 
-            HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
-            HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
-
-            // Forward only the receiver queries
-            template <typename Tag2, typename... Args,
-                typename = std::enable_if_t<functional::is_tag_invocable_v<Tag2,
-                    BaseEnv const&, Args...>>>
-            friend constexpr auto tag_invoke(
-                Tag2 tag, env const& self, Args&&... args) noexcept
-                -> functional::tag_invoke_result_t<Tag2, BaseEnv const&,
-                    Args...>
+            struct type
             {
-                return HPX_FORWARD(Tag2, tag)(
-                    self.base_env_, HPX_FORWARD(Args, args)...);
-            }
+                using Id = env;
 
-            template <typename... Args>
-            friend constexpr auto
-            tag_invoke(Tag, env const& self, Args&&...) noexcept(
-                std::is_nothrow_copy_constructible_v<
-                    util::unwrap_reference_t<Value>>)
-                -> util::unwrap_reference_t<Value>
-            {
-                return self.value_;
-            }
+                HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
+                HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
+
+                // Forward only the receiver queries
+                template <typename Tag2, typename... Args,
+                    typename = std::enable_if_t<functional::is_tag_invocable_v<
+                        Tag2, BaseEnv const&, Args...>>>
+                friend constexpr auto tag_invoke(
+                    Tag2 tag, env const& self, Args&&... args) noexcept
+                    -> functional::tag_invoke_result_t<Tag2, BaseEnv const&,
+                        Args...>
+                {
+                    return HPX_FORWARD(Tag2, tag)(
+                        self.base_env_, HPX_FORWARD(Args, args)...);
+                }
+
+                template <typename... Args>
+                friend constexpr auto
+                tag_invoke(Tag, env const& self, Args&&...) noexcept(
+                    std::is_nothrow_copy_constructible_v<
+                        util::unwrap_reference_t<Value>>)
+                    -> util::unwrap_reference_t<Value>
+                {
+                    return self.value_;
+                }
+            };
         };
+
+        template <typename Tag, typename Value, typename BaseEnvId>
+        using env_t = hpx::meta::type<env<Tag, Value, BaseEnvId>>;
 
         template <typename Tag>
         struct make_env_t
