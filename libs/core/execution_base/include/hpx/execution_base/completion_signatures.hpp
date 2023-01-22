@@ -20,8 +20,6 @@
 
 #include <type_traits>
 #include <utility>
-#include "hpx/config/forward.hpp"
-#include "hpx/functional/tag_invoke.hpp"
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <hpx/assert.hpp>
