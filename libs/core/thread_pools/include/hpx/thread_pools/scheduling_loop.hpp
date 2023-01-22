@@ -15,6 +15,7 @@
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scheduling_log.hpp>
+#include <hpx/threading_base/detail/switch_status.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -33,93 +34,6 @@
 namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////
-    // helper class for switching thread state in and out during execution
-    class switch_status
-    {
-    public:
-        switch_status(
-            thread_id_ref_type const& t, thread_state prev_state) noexcept
-          : thread_(get_thread_id_data(t))
-          , prev_state_(prev_state)
-          , next_thread_id_(nullptr)
-          , need_restore_state_(thread_->set_state_tagged(
-                thread_schedule_state::active, prev_state_, orig_state_))
-        {
-        }
-
-        ~switch_status()
-        {
-            if (need_restore_state_)
-            {
-                store_state(prev_state_);
-            }
-        }
-
-        constexpr bool is_valid() const noexcept
-        {
-            return need_restore_state_;
-        }
-
-        // allow to change the state the thread will be switched to after
-        // execution
-        thread_state operator=(thread_result_type&& new_state) noexcept
-        {
-            prev_state_ = thread_state(
-                new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
-            if (new_state.second != nullptr)
-            {
-                next_thread_id_ = HPX_MOVE(new_state.second);
-            }
-            return prev_state_;
-        }
-
-        // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute
-        // this HPX-thread in the meantime.
-        thread_schedule_state get_previous() const noexcept
-        {
-            return prev_state_.state();
-        }
-
-        // This restores the previous state, while making sure that the original
-        // state has not been changed since we started executing this thread.
-        // The function returns true if the state has been set, false otherwise.
-        bool store_state(thread_state& newstate) noexcept
-        {
-            disable_restore();
-
-            if (thread_->restore_state(prev_state_, orig_state_))
-            {
-                newstate = prev_state_;
-                return true;
-            }
-            return false;
-        }
-
-        // disable default handling in destructor
-        void disable_restore() noexcept
-        {
-            need_restore_state_ = false;
-        }
-
-        constexpr thread_id_ref_type const& get_next_thread() const noexcept
-        {
-            return next_thread_id_;
-        }
-
-        thread_id_ref_type move_next_thread() noexcept
-        {
-            return HPX_MOVE(next_thread_id_);
-        }
-
-    private:
-        thread_data* thread_;
-        thread_state prev_state_;
-        thread_state orig_state_;
-        thread_id_ref_type next_thread_id_;
-        bool need_restore_state_;
-    };
-
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
     struct idle_collect_rate
     {
@@ -256,8 +170,8 @@ namespace hpx::threads::detail {
             num_thread < params.max_background_threads_ &&
             !params.background_.empty())
         {
-            background_thread = create_background_thread(scheduler, params,
-                background_running, num_thread, idle_loop_count);
+            background_thread = create_background_thread(scheduler, num_thread,
+                params, background_running, idle_loop_count);
         }
 
         hpx::execution_base::this_thread::detail::agent_storage*
@@ -525,7 +439,8 @@ namespace hpx::threads::detail {
                 ++idle_loop_count;
 
                 if (scheduler.wait_or_add_new(num_thread, running,
-                        idle_loop_count, enable_stealing_staged, added))
+                        idle_loop_count, enable_stealing_staged, added,
+                        &next_thrd))
                 {
                     // Clean up terminated threads before trying to exit
                     bool can_exit = !running &&
@@ -600,27 +515,17 @@ namespace hpx::threads::detail {
                     added = std::size_t(-1);
                 }
 
-                // do background work in parcel layer and in agas
-                if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, bg_work_exec_time_init,
-                        context_storage))
+                // if stealing yielded a new task, run it first
+                if (next_thrd != nullptr)
                 {
-                    // Let the current background thread terminate as soon as
-                    // possible. No need to reschedule, as another LCO will set
-                    // it to pending and schedule it back eventually
-                    HPX_ASSERT(background_thread);
-                    HPX_ASSERT(background_running);
-
-                    *background_running = false;
-                    scheduler.decrement_background_thread_count();
-
-                    // Create a new one that will replace the current such we
-                    // avoid deadlock situations, if all background threads are
-                    // blocked.
-                    background_thread =
-                        create_background_thread(scheduler, params,
-                            background_running, num_thread, idle_loop_count);
+                    continue;
                 }
+
+                // do background work in parcel layer and in agas
+                call_and_create_background_thread(background_thread, next_thrd,
+                    scheduler, num_thread, bg_work_exec_time_init,
+                    context_storage, params, background_running,
+                    idle_loop_count);
 
                 // call back into invoking context
                 if (!params.inner_.empty())
@@ -649,26 +554,10 @@ namespace hpx::threads::detail {
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if (!call_background_thread(background_thread, next_thrd,
-                        scheduler, num_thread, bg_work_exec_time_init,
-                        context_storage))
-                {
-                    // Let the current background thread terminate as soon as
-                    // possible. No need to reschedule, as another LCO will set
-                    // it to pending and schedule it back eventually
-                    HPX_ASSERT(background_thread);
-                    HPX_ASSERT(background_running);
-
-                    *background_running = false;
-                    scheduler.decrement_background_thread_count();
-
-                    // Create a new one which will replace the current such we
-                    // avoid deadlock situations, if all background threads are
-                    // blocked.
-                    background_thread =
-                        create_background_thread(scheduler, params,
-                            background_running, num_thread, idle_loop_count);
-                }
+                call_and_create_background_thread(background_thread, next_thrd,
+                    scheduler, num_thread, bg_work_exec_time_init,
+                    context_storage, params, background_running,
+                    idle_loop_count);
             }
             else if (idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {

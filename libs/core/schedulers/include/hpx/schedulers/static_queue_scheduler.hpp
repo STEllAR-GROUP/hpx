@@ -63,7 +63,7 @@ namespace hpx::threads::policies {
             return "static_queue_scheduler";
         }
 
-        void set_scheduler_mode(scheduler_mode mode) override
+        void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
@@ -98,8 +98,8 @@ namespace hpx::threads::policies {
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
-            [[maybe_unused]] std::int64_t& idle_loop_count,
-            bool /*enable_stealing*/, std::size_t& added)
+            [[maybe_unused]] std::int64_t& idle_loop_count, bool,
+            std::size_t& added, thread_id_ref_type* = nullptr)
         {
             HPX_ASSERT(num_thread < this->queues_.size());
 

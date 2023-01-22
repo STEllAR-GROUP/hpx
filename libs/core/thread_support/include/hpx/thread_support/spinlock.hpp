@@ -44,7 +44,7 @@ namespace hpx::util::detail {
                 !m.exchange(true, std::memory_order_acquire);
         }
 
-        void lock() noexcept
+        HPX_FORCEINLINE void lock() noexcept
         {
             // Wait for lock to be released without generating cache misses
             // Similar implementation to hpx::spinlock

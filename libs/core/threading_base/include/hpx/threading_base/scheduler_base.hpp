@@ -64,7 +64,7 @@ namespace hpx::threads::policies {
         using pu_mutex_type = std::mutex;
 
         scheduler_base(std::size_t num_threads, char const* description = "",
-            thread_queue_init_parameters thread_queue_init =
+            thread_queue_init_parameters const& thread_queue_init =
                 thread_queue_init_parameters{},
             scheduler_mode mode = scheduler_mode::nothing_special);
 
@@ -107,7 +107,7 @@ namespace hpx::threads::policies {
         virtual void suspend(std::size_t num_thread);
         virtual void resume(std::size_t num_thread);
 
-        std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
+        std::size_t select_active_pu(
             std::size_t num_thread, bool allow_fallback = false);
 
         // allow to access/manipulate states
@@ -139,20 +139,20 @@ namespace hpx::threads::policies {
         // by schedulers that do not support certain operations/modes.
         // All other mode set functions should call this one to ensure
         // that flags are always consistent
-        virtual void set_scheduler_mode(scheduler_mode mode);
+        virtual void set_scheduler_mode(scheduler_mode mode) noexcept;
 
         // add a flag to the scheduler mode flags
-        void add_scheduler_mode(scheduler_mode mode);
+        void add_scheduler_mode(scheduler_mode mode) noexcept;
 
         // remove flag from scheduler mode
-        void remove_scheduler_mode(scheduler_mode mode);
+        void remove_scheduler_mode(scheduler_mode mode) noexcept;
 
         // add flag to scheduler mode
         void add_remove_scheduler_mode(
-            scheduler_mode to_add_mode, scheduler_mode to_remove_mode);
+            scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept;
 
         // conditionally add or remove depending on set true/false
-        void update_scheduler_mode(scheduler_mode mode, bool set);
+        void update_scheduler_mode(scheduler_mode mode, bool set) noexcept;
 
         pu_mutex_type& get_pu_mutex(std::size_t num_thread) noexcept
         {
@@ -332,7 +332,7 @@ namespace hpx::threads::policies {
 
         std::vector<pu_mutex_type> pu_mtxs_;
 
-        std::vector<std::atomic<hpx::state>> states_;
+        std::vector<util::cache_line_data<std::atomic<hpx::state>>> states_;
         char const* description_;
 
         thread_queue_init_parameters thread_queue_init_;

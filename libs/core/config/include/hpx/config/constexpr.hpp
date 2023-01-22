@@ -21,8 +21,8 @@
 #endif
 
 /// This macro evaluates to ``constexpr`` for host code and expands nothing for
-/// NVCC
-#if defined(__NVCC__)
+/// NVCC or HIP
+#if defined(__NVCC__) || defined(__HIP_DEVICE_COMPILE__)
 #define HPX_HOST_DEVICE_CONSTEXPR
 #else
 #define HPX_HOST_DEVICE_CONSTEXPR constexpr

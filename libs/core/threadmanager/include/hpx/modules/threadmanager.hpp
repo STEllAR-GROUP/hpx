@@ -257,7 +257,7 @@ namespace hpx { namespace threads {
             return get_pool(pool_name).get_numa_domain_bitmap();
         }
 
-        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        void set_scheduler_mode(threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -265,7 +265,7 @@ namespace hpx { namespace threads {
             }
         }
 
-        void add_scheduler_mode(threads::policies::scheduler_mode mode)
+        void add_scheduler_mode(threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -275,7 +275,7 @@ namespace hpx { namespace threads {
 
         void add_remove_scheduler_mode(
             threads::policies::scheduler_mode to_add_mode,
-            threads::policies::scheduler_mode to_remove_mode)
+            threads::policies::scheduler_mode to_remove_mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -284,7 +284,8 @@ namespace hpx { namespace threads {
             }
         }
 
-        void remove_scheduler_mode(threads::policies::scheduler_mode mode)
+        void remove_scheduler_mode(
+            threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -363,16 +364,16 @@ namespace hpx { namespace threads {
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        std::int64_t avg_idle_rate(bool reset);
+        std::int64_t avg_idle_rate(bool reset) noexcept;
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::int64_t avg_creation_idle_rate(bool reset);
-        std::int64_t avg_cleanup_idle_rate(bool reset);
+        std::int64_t avg_creation_idle_rate(bool reset) noexcept;
+        std::int64_t avg_cleanup_idle_rate(bool reset) noexcept;
 #endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        std::int64_t get_executed_threads(bool reset);
-        std::int64_t get_executed_thread_phases(bool reset);
+        std::int64_t get_executed_threads(bool reset) noexcept;
+        std::int64_t get_executed_thread_phases(bool reset) noexcept;
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
         std::int64_t get_thread_duration(bool reset);
         std::int64_t get_thread_phase_duration(bool reset);

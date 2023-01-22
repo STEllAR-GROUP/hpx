@@ -23,8 +23,8 @@ namespace hpx::threads::detail {
     ///////////////////////////////////////////////////////////////////////////
     thread_id_ref_type create_background_thread(
         threads::policies::scheduler_base& scheduler_base,
-        scheduling_callbacks& callbacks,
-        std::shared_ptr<bool>& background_running, std::size_t num_thread,
+        std::size_t num_thread, scheduling_callbacks& callbacks,
+        std::shared_ptr<bool>& background_running,
         std::int64_t& idle_loop_count)
     {
         threads::thread_schedule_hint schedulehint(
@@ -239,5 +239,37 @@ namespace hpx::threads::detail {
             }
         }
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    bool call_and_create_background_thread(
+        thread_id_ref_type& background_thread, thread_id_ref_type& next_thrd,
+        threads::policies::scheduler_base& scheduler_base,
+        std::size_t num_thread, background_work_exec_time& exec_time,
+        hpx::execution_base::this_thread::detail::agent_storage*
+            context_storage,
+        scheduling_callbacks& callbacks, std::shared_ptr<bool>& running,
+        std::int64_t& idle_loop_count)
+    {
+        if (!call_background_thread(background_thread, next_thrd,
+                scheduler_base, num_thread, exec_time, context_storage))
+        {
+            // Let the current background thread terminate as soon as possible.
+            // No need to reschedule, as another thread will set it to pending
+            // and schedule it back eventually
+            HPX_ASSERT(background_thread);
+            HPX_ASSERT(running);
+
+            *running = false;
+            scheduler_base.decrement_background_thread_count();
+
+            // Create a new one that will replace the current such we avoid
+            // deadlock situations, if all background threads are blocked.
+            background_thread = create_background_thread(scheduler_base,
+                num_thread, callbacks, running, idle_loop_count);
+
+            return true;
+        }
+        return false;
     }
 }    // namespace hpx::threads::detail
