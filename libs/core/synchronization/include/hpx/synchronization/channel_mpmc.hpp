@@ -57,12 +57,6 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT(size != 0);
 
-            // invoke constructors for allocated buffer
-            for (std::size_t i = 0; i != size_; ++i)
-            {
-                hpx::construct_at(&buffer_[i]);
-            }
-
             head_.data_ = 0;
             tail_.data_ = 0;
         }
@@ -94,16 +88,9 @@ namespace hpx::lcos::local {
 
         ~bounded_channel()
         {
-            std::unique_lock<mutex_type> l(mtx_.data_);
-
-            // invoke destructors for allocated buffer
-            for (std::size_t i = 0; i != size_; ++i)
-            {
-                std::destroy_at(&buffer_[i]);
-            }
-
             if (!closed_)
             {
+                std::unique_lock<mutex_type> l(mtx_.data_);
                 close(l);
             }
         }
@@ -138,7 +125,11 @@ namespace hpx::lcos::local {
             return true;
         }
 
-        bool set(T&& t) noexcept
+        // clang-format off
+        bool set(T&& t) noexcept(
+            noexcept(std::declval<std::unique_lock<mutex_type>&>().lock()) &&
+            noexcept(std::declval<std::unique_lock<mutex_type>&>().unlock()))
+        // clang-format on
         {
             std::unique_lock<mutex_type> l(mtx_.data_);
             if (closed_)

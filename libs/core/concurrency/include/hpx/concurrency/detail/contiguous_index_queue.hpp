@@ -167,7 +167,7 @@ namespace hpx::concurrency::detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::nullopt;
+                    return hpx::optional<T>(hpx::nullopt);
                 }
 
                 // reduce pipeline pressure
@@ -198,7 +198,7 @@ namespace hpx::concurrency::detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::nullopt;
+                    return hpx::optional<T>(hpx::nullopt);
                 }
 
                 // reduce pipeline pressure

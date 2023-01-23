@@ -83,16 +83,16 @@ namespace hpx::threads::coroutines::detail::posix {
 
     inline void* alloc_stack(std::size_t size)
     {
-        void* real_stack = ::mmap(nullptr, size + EXEC_PAGESIZE,
-            PROT_EXEC | PROT_READ | PROT_WRITE,
+        void* real_stack =
+            ::mmap(nullptr, size + EXEC_PAGESIZE, PROT_READ | PROT_WRITE,
 #if defined(__APPLE__)
-            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
 #elif defined(__FreeBSD__)
-            MAP_PRIVATE | MAP_ANON,
+                MAP_PRIVATE | MAP_ANON,
 #else
-            MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
 #endif
-            -1, 0);
+                -1, 0);
 
         if (real_stack == MAP_FAILED)
         {

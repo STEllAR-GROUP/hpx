@@ -43,6 +43,7 @@
 #include <vector>
 
 namespace hpx { namespace threads {
+
     namespace detail {
         void check_num_high_priority_queues(
             std::size_t num_threads, std::size_t num_high_priority_queues)
@@ -531,6 +532,8 @@ namespace hpx { namespace threads {
             resource::scheduling_policy sched_type = rp.which_scheduler(name);
             std::size_t num_threads_in_pool = rp.get_num_threads(i);
             policies::scheduler_mode scheduler_mode = rp.get_scheduler_mode(i);
+            resource::background_work_function background_work =
+                rp.get_background_work(i);
 
             // make sure the first thread-pool that gets instantiated is the
             // default one
@@ -546,9 +549,57 @@ namespace hpx { namespace threads {
                 }
             }
 
+            threads::detail::network_background_callback_type
+                overall_background_work;
+            if (!background_work.empty())
+            {
+                if (!network_background_callback_.empty())
+                {
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+                    overall_background_work =
+                        [this, background_work](std::size_t num_thread,
+                            std::int64_t& t1, std::int64_t& t2) -> bool {
+                        bool result = background_work(num_thread);
+                        return network_background_callback_(
+                                   num_thread, t1, t2) ||
+                            result;
+                    };
+#else
+                    overall_background_work =
+                        [this, background_work](
+                            std::size_t num_thread) -> bool {
+                        bool result = background_work(num_thread);
+                        return network_background_callback_(num_thread) ||
+                            result;
+                    };
+#endif
+                }
+                else
+                {
+#if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
+    defined(HPX_HAVE_THREAD_IDLE_RATES)
+                    overall_background_work =
+                        [background_work](std::size_t num_thread, std::int64_t&,
+                            std::int64_t&) -> bool {
+                        return background_work(num_thread);
+                    };
+#else
+                    overall_background_work = background_work;
+#endif
+                }
+
+                max_background_threads =
+                    (std::max)(num_threads_in_pool, max_background_threads);
+            }
+            else
+            {
+                overall_background_work = network_background_callback_;
+            }
+
             thread_pool_init_parameters thread_pool_init(name, i,
                 scheduler_mode, num_threads_in_pool, thread_offset, notifier_,
-                rp.get_affinity_data(), network_background_callback_,
+                rp.get_affinity_data(), overall_background_work,
                 max_background_threads, max_idle_loop_count,
                 max_busy_loop_count);
 
@@ -959,7 +1010,7 @@ namespace hpx { namespace threads {
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-    std::int64_t threadmanager::avg_idle_rate(bool reset)
+    std::int64_t threadmanager::avg_idle_rate(bool reset) noexcept
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -968,7 +1019,7 @@ namespace hpx { namespace threads {
     }
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-    std::int64_t threadmanager::avg_creation_idle_rate(bool reset)
+    std::int64_t threadmanager::avg_creation_idle_rate(bool reset) noexcept
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -976,7 +1027,7 @@ namespace hpx { namespace threads {
         return result;
     }
 
-    std::int64_t threadmanager::avg_cleanup_idle_rate(bool reset)
+    std::int64_t threadmanager::avg_cleanup_idle_rate(bool reset) noexcept
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -987,7 +1038,7 @@ namespace hpx { namespace threads {
 #endif
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-    std::int64_t threadmanager::get_executed_threads(bool reset)
+    std::int64_t threadmanager::get_executed_threads(bool reset) noexcept
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -995,7 +1046,7 @@ namespace hpx { namespace threads {
         return result;
     }
 
-    std::int64_t threadmanager::get_executed_thread_phases(bool reset)
+    std::int64_t threadmanager::get_executed_thread_phases(bool reset) noexcept
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)

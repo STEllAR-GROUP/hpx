@@ -51,11 +51,13 @@ namespace hpx::resource::detail {
     std::size_t init_pool_data::num_threads_overall = 0;
 
     init_pool_data::init_pool_data(std::string const& name,
-        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode)
+        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
       : pool_name_(name)
       , scheduling_policy_(sched)
       , num_threads_(0)
       , mode_(mode)
+      , background_work_(HPX_MOVE(func))
     {
         if (name.empty())
         {
@@ -67,12 +69,14 @@ namespace hpx::resource::detail {
 
     init_pool_data::init_pool_data(std::string const& name,
         scheduler_function create_func,
-        hpx::threads::policies::scheduler_mode mode)
+        hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
       : pool_name_(name)
       , scheduling_policy_(scheduling_policy::user_defined)
       , num_threads_(0)
       , mode_(mode)
       , create_function_(HPX_MOVE(create_func))
+      , background_work_(HPX_MOVE(func))
     {
         if (name.empty())
         {
@@ -586,7 +590,8 @@ namespace hpx::resource::detail {
 
     // create a new thread_pool
     void partitioner::create_thread_pool(std::string const& pool_name,
-        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode)
+        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
     {
         if (pool_name.empty())
         {
@@ -600,8 +605,8 @@ namespace hpx::resource::detail {
 
         if (pool_name == get_default_pool_name())
         {
-            initial_thread_pools_[0] =
-                detail::init_pool_data(get_default_pool_name(), sched, mode);
+            initial_thread_pools_[0] = detail::init_pool_data(
+                get_default_pool_name(), sched, mode, HPX_MOVE(func));
             return;
         }
 
@@ -619,12 +624,13 @@ namespace hpx::resource::detail {
             }
         }
 
-        initial_thread_pools_.emplace_back(pool_name, sched, mode);
+        initial_thread_pools_.emplace_back(
+            pool_name, sched, mode, HPX_MOVE(func));
     }
 
     // create a new thread_pool
-    void partitioner::create_thread_pool(
-        std::string const& pool_name, scheduler_function scheduler_creation)
+    void partitioner::create_thread_pool(std::string const& pool_name,
+        scheduler_function scheduler_creation, background_work_function func)
     {
         if (pool_name.empty())
         {
@@ -638,9 +644,9 @@ namespace hpx::resource::detail {
 
         if (pool_name == get_default_pool_name())
         {
-            initial_thread_pools_[0] =
-                detail::init_pool_data(get_default_pool_name(),
-                    HPX_MOVE(scheduler_creation), default_scheduler_mode_);
+            initial_thread_pools_[0] = detail::init_pool_data(
+                get_default_pool_name(), HPX_MOVE(scheduler_creation),
+                default_scheduler_mode_, HPX_MOVE(func));
             return;
         }
 
@@ -658,8 +664,9 @@ namespace hpx::resource::detail {
             }
         }
 
-        initial_thread_pools_.emplace_back(
-            pool_name, HPX_MOVE(scheduler_creation), default_scheduler_mode_);
+        initial_thread_pools_.emplace_back(pool_name,
+            HPX_MOVE(scheduler_creation), default_scheduler_mode_,
+            HPX_MOVE(func));
     }
 
     // ----------------------------------------------------------------------
@@ -851,6 +858,13 @@ namespace hpx::resource::detail {
     {
         std::unique_lock<mutex_type> l(mtx_);
         return get_pool_data(l, pool_index).mode_;
+    }
+
+    background_work_function partitioner::get_background_work(
+        std::size_t pool_index) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_index).background_work_;
     }
 
     detail::init_pool_data const& partitioner::get_pool_data(

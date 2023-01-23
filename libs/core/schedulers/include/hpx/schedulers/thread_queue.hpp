@@ -446,7 +446,10 @@ namespace hpx::threads::policies {
                 // do not lock mutex while deleting all threads, do it piece-wise
                 while (true)
                 {
-                    std::lock_guard<mutex_type> lk(mtx_);
+                    std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
+                    if (!lk.owns_lock())
+                        break;    // avoid long wait on lock
+
                     if (cleanup_terminated_locked(false))
                     {
                         return true;
@@ -455,16 +458,18 @@ namespace hpx::threads::policies {
                 return false;
             }
 
-            std::lock_guard<mutex_type> lk(mtx_);
+            std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
+            if (!lk.owns_lock())
+                return false;    // avoid long wait on lock
+
             return cleanup_terminated_locked(false);
         }
 
-        explicit thread_queue(std::size_t queue_num = std::size_t(-1),
-            thread_queue_init_parameters parameters =
-                thread_queue_init_parameters{})
+        explicit thread_queue(thread_queue_init_parameters const& parameters =
+                                  thread_queue_init_parameters{})
           : parameters_(parameters)
           , thread_map_count_(0)
-          , work_items_(128, queue_num)
+          , work_items_(128)
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
           , work_items_wait_(0)
           , work_items_wait_count_(0)

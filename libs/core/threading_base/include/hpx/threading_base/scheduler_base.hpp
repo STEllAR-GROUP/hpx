@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -55,7 +55,7 @@ namespace hpx::threads::policies {
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct HPX_CORE_EXPORT scheduler_base
+    struct scheduler_base
     {
     public:
         HPX_NON_COPYABLE(scheduler_base);
@@ -64,7 +64,7 @@ namespace hpx::threads::policies {
         using pu_mutex_type = std::mutex;
 
         scheduler_base(std::size_t num_threads, char const* description = "",
-            thread_queue_init_parameters thread_queue_init =
+            thread_queue_init_parameters const& thread_queue_init =
                 thread_queue_init_parameters{},
             scheduler_mode mode = scheduler_mode::nothing_special);
 
@@ -107,7 +107,7 @@ namespace hpx::threads::policies {
         virtual void suspend(std::size_t num_thread);
         virtual void resume(std::size_t num_thread);
 
-        std::size_t select_active_pu(std::unique_lock<pu_mutex_type>& l,
+        std::size_t select_active_pu(
             std::size_t num_thread, bool allow_fallback = false);
 
         // allow to access/manipulate states
@@ -139,20 +139,20 @@ namespace hpx::threads::policies {
         // by schedulers that do not support certain operations/modes.
         // All other mode set functions should call this one to ensure
         // that flags are always consistent
-        virtual void set_scheduler_mode(scheduler_mode mode);
+        virtual void set_scheduler_mode(scheduler_mode mode) noexcept;
 
         // add a flag to the scheduler mode flags
-        void add_scheduler_mode(scheduler_mode mode);
+        void add_scheduler_mode(scheduler_mode mode) noexcept;
 
         // remove flag from scheduler mode
-        void remove_scheduler_mode(scheduler_mode mode);
+        void remove_scheduler_mode(scheduler_mode mode) noexcept;
 
         // add flag to scheduler mode
         void add_remove_scheduler_mode(
-            scheduler_mode to_add_mode, scheduler_mode to_remove_mode);
+            scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept;
 
         // conditionally add or remove depending on set true/false
-        void update_scheduler_mode(scheduler_mode mode, bool set);
+        void update_scheduler_mode(scheduler_mode mode, bool set) noexcept;
 
         pu_mutex_type& get_pu_mutex(std::size_t num_thread) noexcept
         {
@@ -165,7 +165,7 @@ namespace hpx::threads::policies {
         std::size_t domain_from_local_thread_index(std::size_t n);
 
         // assumes queues use index 0..N-1 and correspond to the pool cores
-        std::size_t num_domains(const std::size_t workers);
+        std::size_t num_domains(std::size_t const workers);
 
         // either threads in same domain, or not in same domain
         // depending on the predicate
@@ -226,9 +226,6 @@ namespace hpx::threads::policies {
         virtual void create_thread(
             thread_init_data& data, thread_id_ref_type* id, error_code& ec) = 0;
 
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_ref_type& thrd, bool enable_stealing) = 0;
-
         virtual void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
@@ -240,10 +237,6 @@ namespace hpx::threads::policies {
             thread_priority priority = thread_priority::default_) = 0;
 
         virtual void destroy_thread(threads::thread_data* thrd) = 0;
-
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            std::int64_t& idle_loop_count, bool enable_stealing,
-            std::size_t& added) = 0;
 
         virtual void on_start_thread(std::size_t num_thread) = 0;
         virtual void on_stop_thread(std::size_t num_thread) = 0;
@@ -339,7 +332,7 @@ namespace hpx::threads::policies {
 
         std::vector<pu_mutex_type> pu_mtxs_;
 
-        std::vector<std::atomic<hpx::state>> states_;
+        std::vector<util::cache_line_data<std::atomic<hpx::state>>> states_;
         char const* description_;
 
         thread_queue_init_parameters thread_queue_init_;

@@ -80,7 +80,7 @@ namespace hpx::lockfree {
         }
 
         deque_node(deque_node* lptr, deque_node* rptr, T const& v,
-            tag_t ltag = 0, tag_t rtag = 0)
+            tag_t ltag = 0, tag_t rtag = 0) noexcept
           : left(pointer(lptr, ltag))
           , right(pointer(rptr, rtag))
           , data(v)
@@ -125,7 +125,7 @@ namespace hpx::lockfree {
         {
         }
 
-        explicit deque_anchor(pair const& p)
+        explicit deque_anchor(pair const& p) noexcept
           : pair_(p)
         {
         }

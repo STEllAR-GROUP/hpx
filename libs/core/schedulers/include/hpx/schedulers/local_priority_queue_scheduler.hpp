@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,7 +30,7 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -120,7 +120,7 @@ namespace hpx::threads::policies {
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
-          , low_priority_queue_(init.num_queues_ - 1, thread_queue_init_)
+          , low_priority_queue_(thread_queue_init_)
           , bound_queues_(num_queues_)
           , queues_(num_queues_)
           , high_priority_queues_(num_queues_)
@@ -132,9 +132,9 @@ namespace hpx::threads::policies {
                 for (std::size_t i = 0; i != num_queues_; ++i)
                 {
                     bound_queues_[i].data_ =
-                        new thread_queue_type(i, thread_queue_init_);
+                        new thread_queue_type(thread_queue_init_);
                     queues_[i].data_ =
-                        new thread_queue_type(i, thread_queue_init_);
+                        new thread_queue_type(thread_queue_init_);
                 }
 
                 HPX_ASSERT(num_high_priority_queues_ != 0);
@@ -142,7 +142,7 @@ namespace hpx::threads::policies {
                 for (std::size_t i = 0; i != num_high_priority_queues_; ++i)
                 {
                     high_priority_queues_[i].data_ =
-                        new thread_queue_type(i, thread_queue_init_);
+                        new thread_queue_type(thread_queue_init_);
                 }
                 for (std::size_t i = num_high_priority_queues_;
                      i != num_queues_; ++i)
@@ -166,7 +166,7 @@ namespace hpx::threads::policies {
             }
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "local_priority_queue_scheduler";
         }
@@ -550,8 +550,7 @@ namespace hpx::threads::policies {
                 num_thread %= num_queues_;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread);
+            num_thread = select_active_pu(num_thread);
 
             data.schedulehint.mode = thread_schedule_hint_mode::thread;
             data.schedulehint.hint = static_cast<std::int16_t>(num_thread);
@@ -649,7 +648,7 @@ namespace hpx::threads::policies {
         // Return the next thread to be executed, return false if none is
         // available
         bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_ref_type& thrd, bool enable_stealing) override
+            threads::thread_id_ref_type& thrd, bool enable_stealing)
         {
             HPX_ASSERT(num_thread < num_queues_);
             thread_queue_type* this_high_priority_queue = nullptr;
@@ -737,7 +736,7 @@ namespace hpx::threads::policies {
             return low_priority_queue_.get_next_thread(thrd);
         }
 
-        /// Schedule the passed thread
+        // Schedule the passed thread
         void schedule_thread(threads::thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
@@ -763,8 +762,7 @@ namespace hpx::threads::policies {
                 num_thread %= num_queues_;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             [[maybe_unused]] auto* thrdptr = get_thread_id_data(thrd);
             switch (priority)
@@ -875,8 +873,7 @@ namespace hpx::threads::policies {
                 num_thread %= num_queues_;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             switch (priority)
             {
@@ -886,7 +883,8 @@ namespace hpx::threads::policies {
             case thread_priority::boost:
             {
                 std::size_t num = num_thread % num_high_priority_queues_;
-                high_priority_queues_[num].data_->schedule_thread(thrd, true);
+                high_priority_queues_[num].data_->schedule_thread(
+                    HPX_MOVE(thrd), true);
             }
             break;
             case thread_priority::low:
@@ -1265,7 +1263,7 @@ namespace hpx::threads::policies {
         // be terminated (i.e. no more work has to be done).
         bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool enable_stealing,
-            std::size_t& added) override
+            std::size_t& added, thread_id_ref_type* = nullptr)
         {
             bool result = true;
 
@@ -1400,15 +1398,15 @@ namespace hpx::threads::policies {
             {
                 HPX_ASSERT(bound_queues_[num_thread].data_ == nullptr);
                 bound_queues_[num_thread].data_ =
-                    new thread_queue_type(num_thread, thread_queue_init_);
+                    new thread_queue_type(thread_queue_init_);
 
                 queues_[num_thread].data_ =
-                    new thread_queue_type(num_thread, thread_queue_init_);
+                    new thread_queue_type(thread_queue_init_);
 
                 if (num_thread < num_high_priority_queues_)
                 {
                     high_priority_queues_[num_thread].data_ =
-                        new thread_queue_type(num_thread, thread_queue_init_);
+                        new thread_queue_type(thread_queue_init_);
                 }
             }
             else
@@ -1466,7 +1464,7 @@ namespace hpx::threads::policies {
             else
                 first_mask = pu_mask;
 
-            auto iterate = [&](hpx::function<bool(std::size_t)> f) {
+            auto iterate = [&](auto&& f) {
                 // check our neighbors in a radial fashion (left and right
                 // alternating, increasing distance each iteration)
                 std::ptrdiff_t i = 1;

@@ -5,6 +5,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
+    background_scheduler
     cross_pool_injection
     named_pool_executor
     resource_partitioner_info
@@ -20,6 +21,8 @@ set(tests
     # suspend_thread_timed
     used_pus
 )
+
+set(background_scheduler_PARAMETERS THREADS_PER_LOCALITY 2)
 
 set(cross_pool_injection_PARAMETERS THREADS_PER_LOCALITY -1 TIMEOUT 300)
 set(scheduler_binding_check_PARAMETERS THREADS_PER_LOCALITY -1)

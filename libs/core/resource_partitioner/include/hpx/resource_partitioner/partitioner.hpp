@@ -153,11 +153,13 @@ namespace hpx::resource {
         HPX_CORE_EXPORT void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_);
+                hpx::threads::policies::scheduler_mode::default_,
+            background_work_function func = background_work_function());
 
         // Create a custom thread pool with a callback function
-        HPX_CORE_EXPORT void create_thread_pool(
-            std::string const& name, scheduler_function scheduler_creation);
+        HPX_CORE_EXPORT void create_thread_pool(std::string const& name,
+            scheduler_function scheduler_creation,
+            background_work_function func = background_work_function());
 
         // allow the default pool to be renamed to something else
         HPX_CORE_EXPORT void set_default_pool_name(std::string const& name);

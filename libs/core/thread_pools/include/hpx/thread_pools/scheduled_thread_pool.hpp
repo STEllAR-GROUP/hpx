@@ -272,12 +272,13 @@ namespace hpx::threads::detail {
 #endif    // HPX_HAVE_BACKGROUND_THREAD_COUNTERS
 
 #if defined(HPX_HAVE_THREAD_IDLE_RATES)
-        std::int64_t avg_idle_rate_all(bool reset) override;
-        std::int64_t avg_idle_rate(std::size_t, bool) override;
+        std::int64_t avg_idle_rate_all(bool reset) noexcept override;
+        std::int64_t avg_idle_rate(std::size_t, bool) noexcept override;
 
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
-        std::int64_t avg_creation_idle_rate(std::size_t, bool) override;
-        std::int64_t avg_cleanup_idle_rate(std::size_t, bool) override;
+        std::int64_t avg_creation_idle_rate(
+            std::size_t, bool) noexcept override;
+        std::int64_t avg_cleanup_idle_rate(std::size_t, bool) noexcept override;
 #endif
 #endif
 

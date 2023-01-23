@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -213,17 +213,24 @@ namespace hpx {
     {
     private:
         template <typename Future>
-        friend HPX_FORCEINLINE void tag_invoke(
-            wait_any_t, std::vector<Future> const& futures)
+        static HPX_FORCEINLINE void wait_any_impl(
+            std::vector<Future> const& futures)
         {
             hpx::wait_some(1, futures);
         }
 
         template <typename Future>
         friend HPX_FORCEINLINE void tag_invoke(
+            wait_any_t, std::vector<Future> const& futures)
+        {
+            wait_any_t::wait_any_impl(futures);
+        }
+
+        template <typename Future>
+        friend HPX_FORCEINLINE void tag_invoke(
             wait_any_t, std::vector<Future>& lazy_values)
         {
-            tag_invoke(wait_any_t{},
+            wait_any_t::wait_any_impl(
                 const_cast<std::vector<Future> const&>(lazy_values));
         }
 
@@ -231,22 +238,29 @@ namespace hpx {
         friend HPX_FORCEINLINE void tag_invoke(
             wait_any_t, std::vector<Future>&& lazy_values)
         {
-            tag_invoke(wait_any_t{},
+            wait_any_t::wait_any_impl(
                 const_cast<std::vector<Future> const&>(lazy_values));
         }
 
         template <typename Future, std::size_t N>
-        friend HPX_FORCEINLINE void tag_invoke(
-            wait_any_t, std::array<Future, N> const& futures)
+        static HPX_FORCEINLINE void wait_any_impl(
+            std::array<Future, N> const& futures)
         {
             hpx::wait_some(1, futures);
         }
 
         template <typename Future, std::size_t N>
         friend HPX_FORCEINLINE void tag_invoke(
+            wait_any_t, std::array<Future, N> const& futures)
+        {
+            wait_any_t::wait_any_impl(futures);
+        }
+
+        template <typename Future, std::size_t N>
+        friend HPX_FORCEINLINE void tag_invoke(
             wait_any_t, std::array<Future, N>& lazy_values)
         {
-            tag_invoke(wait_any_t{},
+            wait_any_t::wait_any_impl(
                 const_cast<std::array<Future, N> const&>(lazy_values));
         }
 
@@ -254,7 +268,7 @@ namespace hpx {
         friend HPX_FORCEINLINE void tag_invoke(
             wait_any_t, std::array<Future, N>&& lazy_values)
         {
-            tag_invoke(wait_any_t{},
+            wait_any_t::wait_any_impl(
                 const_cast<std::array<Future, N> const&>(lazy_values));
         }
 

@@ -52,7 +52,8 @@ namespace hpx::util {
         internal_allocator() = default;
 
         template <typename U>
-        constexpr internal_allocator(internal_allocator<U> const&) noexcept
+        constexpr explicit internal_allocator(
+            internal_allocator<U> const&) noexcept
         {
         }
 

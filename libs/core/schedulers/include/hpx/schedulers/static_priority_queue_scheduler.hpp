@@ -1,5 +1,5 @@
 //  Copyright (c)      2013 Thomas Heller
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,9 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
-#include <string>
-
-#include <hpx/config/warnings_prefix.hpp>
+#include <string_view>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -47,7 +45,7 @@ namespace hpx::threads::policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_static_priority_queue_scheduler_terminated_queue>
-    class HPX_CORE_EXPORT static_priority_queue_scheduler
+    class static_priority_queue_scheduler final
       : public local_priority_queue_scheduler<Mutex, PendingQueuing,
             StagedQueuing, TerminatedQueuing>
     {
@@ -68,7 +66,7 @@ namespace hpx::threads::policies {
                 policies::scheduler_mode::enable_stealing_numa);
         }
 
-        void set_scheduler_mode(scheduler_mode mode) override
+        void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
             mode = policies::scheduler_mode(
@@ -78,11 +76,9 @@ namespace hpx::threads::policies {
             scheduler_base::set_scheduler_mode(mode);
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "static_priority_queue_scheduler";
         }
     };
 }    // namespace hpx::threads::policies
-
-#include <hpx/config/warnings_suffix.hpp>
