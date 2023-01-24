@@ -61,7 +61,7 @@ are passed through to the underlying C++ compiler.
 """)
     sys.exit(2)
 
-pkgconf_suffix = ''
+pkgconf_suffix = ['_release', '_relwithdebuginfo', '_debug', '_minsizerel']
 i = 1
 while i < len(sys.argv):
 
@@ -76,7 +76,6 @@ while i < len(sys.argv):
     elif sys.argv[i].startswith('--exe='):
         output=sys.argv[i][6:]
         app = output
-        #args += ['-o',app+'.exe']
         application = True
     elif sys.argv[i].startswith('--comp='):
         app_name = sys.argv[i][7:]
@@ -95,26 +94,28 @@ while i < len(sys.argv):
         minusc = True
         pass
     elif sys.argv[i].startswith('-g'):
-        pkgconf_suffix = '_debug'
+        pkgconf_suffix = ['_debug']
         args += [sys.argv[i]]
-    elif sys.argv[i].startswith('-rd'):
-        pkgconf_suffix = '_relwithdebinfo'
-        args += [sys.argv[i]]
-    elif sys.argv[i].startswith('-mr'):
-        pkgconf_suffix = '_minsizerel'
-        args += [sys.argv[i]]
+    elif sys.argv[i] == '--rd':
+        pkgconf_suffix = ['_relwithdebuginfo']
+    elif sys.argv[i] == '--mr':
+        pkgconf_suffix = ['_minsizerel']
+    elif sys.argv[i] == '-r':
+        pkgconf_suffix = ['_release']
     else:
-        pkgconf_suffix = '_release'
         args += [sys.argv[i]]
 
     i += 1
 
 pkgconf = None
 for path in pkgconfpath:
-    hpath = os.path.join(path,"hpx_application")+pkgconf_suffix+".pc"
-    if os.path.exists(hpath):
-        pkgconf = path
+    if pkgconf is not None:
         break
+    for suffix in pkgconf_suffix:
+        hpath = os.path.join(path,"hpx_application")+suffix+".pc"
+        if os.path.exists(hpath):
+            pkgconf = path
+            break
 
 if pkgconf == None:
     sys.stderr.write('Cannot locate HPX\n')
@@ -126,14 +127,12 @@ if pkg in os.environ:
 else:
     os.environ[pkg] = pkgconf
 
-args += ["-Wl,--start-group"]
 if application:
-    args += ["`pkg-config --cflags --libs hpx_application" + pkgconf_suffix + "`"]
+    args += ["`pkg-config --cflags --libs hpx_application" + suffix + "`"]
 elif component:
-    args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
+    args += ["`pkg-config --cflags --libs hpx_component" + suffix + "`"]
 else:
-    args += ["`pkg-config --cflags hpx_application" + pkgconf_suffix + "`"]
-args += ["-Wl,--end-group"]
+    args += ["`pkg-config --cflags hpx_application" + suffix + "`"]
 
 if not component and not application and not minusc:
     usage()
