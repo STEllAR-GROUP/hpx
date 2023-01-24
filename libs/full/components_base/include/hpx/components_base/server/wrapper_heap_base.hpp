@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/generate_unique_ids.hpp>
 
 #include <cstddef>
 
@@ -29,8 +28,8 @@ namespace hpx { namespace util {
         virtual bool did_alloc(void* p) const = 0;
         virtual void free(void* p, std::size_t count = 1) = 0;
 
-        virtual naming::gid_type get_gid(util::unique_id_ranges& ids, void* p,
-            components::component_type type) = 0;
+        virtual naming::gid_type get_gid(
+            void* p, components::component_type type) = 0;
 
         virtual std::size_t heap_count() const = 0;
         virtual std::size_t size() const = 0;

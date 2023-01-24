@@ -90,9 +90,8 @@ namespace hpx { namespace components { namespace detail {
 
         HPX_ASSERT(naming::detail::has_credits(gid));
 
-        // We have to assume this credit was split as otherwise the gid
-        // returned at this point will control the lifetime of the
-        // component.
+        // We have to assume this credit was split as otherwise the gid returned
+        // at this point will control the lifetime of the component.
         naming::detail::set_credit_split_mask_for_gid(gid);
         return gid;
     }

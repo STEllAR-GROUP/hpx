@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -29,7 +28,7 @@
 #define HPX_DEBUG_WRAPPER_HEAP 0
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace one_size_heap_allocators {
@@ -99,8 +98,8 @@ namespace hpx { namespace components { namespace detail {
         //
         // The pointer given by the parameter p must have been allocated by
         // this instance of a wrapper_heap
-        naming::gid_type get_gid(util::unique_id_ranges& ids, void* p,
-            components::component_type type) override;
+        naming::gid_type get_gid(
+            void* p, components::component_type type) override;
 
         void set_gid(naming::gid_type const& g);
 
@@ -167,6 +166,6 @@ namespace hpx { namespace components { namespace detail {
         {
         }
     };
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail
 
 #include <hpx/config/warnings_suffix.hpp>
