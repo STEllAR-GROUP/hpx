@@ -8,6 +8,7 @@ configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON"
 if [ "${build_type}" = "Debug" ]; then
     configure_extra_options+=" -DHPX_WITH_PARCELPORT_COUNTERS=ON"
+    configure_extra_options+=" -DLCI_DEBUG=ON"
 fi
 
 hostname
