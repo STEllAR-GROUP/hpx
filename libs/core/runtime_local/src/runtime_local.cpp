@@ -1319,15 +1319,18 @@ namespace hpx {
 
     threads::thread_result_type runtime::run_helper(
         hpx::function<runtime::hpx_main_function_type> const& func, int& result,
-        bool call_startup)
+        bool call_startup, void (*handle_print_bind)(std::size_t))
     {
         bool caught_exception = false;
         try
         {
+            // no need to do late command line handling if this is called from
+            // the distributed runtime
+            if (handle_print_bind != nullptr)
             {
                 hpx::program_options::options_description options;
                 result = hpx::local::detail::handle_late_commandline_options(
-                    get_config(), options, &detail::handle_print_bind);
+                    get_config(), options, handle_print_bind);
                 if (result)
                 {
                     lbt_ << "runtime_local::run_helper: bootstrap "
@@ -1434,8 +1437,9 @@ namespace hpx {
         lbt_ << "(1st stage) runtime::start: launching run_helper "
                 "HPX thread";
 
-        threads::thread_init_data data(hpx::bind(&runtime::run_helper, this,
-                                           func, std::ref(result_), true),
+        threads::thread_init_data data(
+            hpx::bind(&runtime::run_helper, this, func, std::ref(result_), true,
+                &detail::handle_print_bind),
             "run_helper", threads::thread_priority::normal,
             threads::thread_schedule_hint(0), threads::thread_stacksize::large);
 
