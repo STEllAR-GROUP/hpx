@@ -26,9 +26,7 @@ but rather generates the files needed by your build tool (GNU make, Visual
 Studio, etc.) for building |hpx|. If CMake is not already installed in your
 system, you can download it and install it here: |cmake_download|_.
 
-Once |cmake| has been run, the build process can be started. The |hpx| build
-process is highly configurable through |cmake|, and various |cmake| variables
-influence the build process. The build process consists of the following parts:
+Once |cmake| has been run, the build process can be started. The build process consists of the following parts:
 
 * The |hpx| core libraries (target ``core``): This forms the basic set of |hpx|
   libraries.
@@ -45,11 +43,12 @@ influence the build process. The build process consists of the following parts:
   :option:`HPX_WITH_DOCUMENTATION:BOOL`\ ``=On``. For more information see
   :ref:`documentation`.
 
-For a complete list of available |cmake| variables that influence the build of
-|hpx|, see :ref:`cmake_variables`.
 
-The variables can be used to refine the recipes that can be found at
-:ref:`build_recipes` which show some basic steps on how to build |hpx| for a
+The |hpx| build process is highly configurable through |cmake|, and various |cmake| variables
+influence the build process. A list with the most important |cmake| variables can be found in
+the section that follows, while the complete list of available |cmake| variables is in
+:ref:`cmake_variables`. These variables can be used to refine the recipes that can be found at
+:ref:`build_recipes`, a section that shows some basic steps on how to build |hpx| for a
 specific platform.
 
 In order to use |hpx|, only the core libraries are required. In order to use the optional
@@ -58,38 +57,38 @@ libraries, you need to specify them as link dependencies in your build (See
 
 .. _important_cmake_options:
 
-Most important |cmake| options 
+Most important |cmake| options
 ==============================
 
-While building |hpx|, you are provided with multiple CMake options which correspond 
-to different configurations. Below, there is a set of the most important and frequently 
+While building |hpx|, you are provided with multiple CMake options which correspond
+to different configurations. Below, there is a set of the most important and frequently
 used CMake options.
 
 .. option:: HPX_WITH_MALLOC
 
-   Use a custom allocator. Using a custom allocator tuned for multithreaded applications is very 
-   important for the performance of |hpx| applications. When debugging applications, it's useful to set 
-   this to ``system``, as custom allocators can hide some memory-related bugs. Note that setting this to 
+   Use a custom allocator. Using a custom allocator tuned for multithreaded applications is very
+   important for the performance of |hpx| applications. When debugging applications, it's useful to set
+   this to ``system``, as custom allocators can hide some memory-related bugs. Note that setting this to
    something other than ``system`` requires an external dependency.
 
 .. option:: HPX_WITH_CUDA
 
-   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard |cmake| variable, 
-   like ``CMAKE_CXX_COMPILER``. 
+   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard |cmake| variable,
+   like ``CMAKE_CXX_COMPILER``.
 
 .. option:: HPX_WITH_PARCELPORT_MPI
 
-   Enable the MPI parcelport. This enables the use of MPI for the networking operations in the HPX runtime. 
-   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. However, 
+   Enable the MPI parcelport. This enables the use of MPI for the networking operations in the HPX runtime.
+   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. However,
    it is the recommended parcelport.
 
 .. option:: HPX_WITH_PARCELPORT_TCP
 
-   Enable the TCP parcelport. Enables the use of TCP for networking in the runtime. The default value is ``ON``. 
+   Enable the TCP parcelport. Enables the use of TCP for networking in the runtime. The default value is ``ON``.
    However, it's only recommended for debugging purposes, as it is slower than the MPI parcelport.
 
 .. option:: HPX_WITH_APEX
-   
+
    Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|
    applications. In particular, it provides information about individual tasks in the |hpx| runtime.
 
@@ -104,14 +103,14 @@ used CMake options.
 
 .. option:: HPX_WITH_CXX_STANDARD
 
-   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17. 
+   Set a specific C++ standard version e.g. ``HPX_WITH_CXX_STANDARD=20``. The default and minimum value is 17.
 
 .. option:: HPX_WITH_EXAMPLES
 
    Build examples.
 
 .. option:: HPX_WITH_TESTS
-   
+
    Build tests.
 
 For a complete list of available |cmake| variables that influence the build of
@@ -350,83 +349,3 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
   .. figure:: ../_static/images/vs_build_output.png
 
      Visual Studio build output.
-
-.. _tests_examples:
-
-Tests and examples
-==================
-
-Running tests
--------------
-
-To build the tests:
-
-.. code-block:: shell-session
-
-    $ cmake --build . --target tests
-
-To control which tests to run use ``ctest``:
-
-* To run single tests, for example a test for ``for_loop``:
-
-.. code-block:: shell-session
-
-    $ ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
-
-* To run a whole group of tests:
-
-.. code-block:: shell-session
-
-    $ ctest --output-on-failure -R tests.unit
-
-Running examples
-----------------
-
-* To build (and install) all examples invoke:
-
-.. code-block:: shell-session
-
-   $ cmake -DHPX_WITH_EXAMPLES=On .
-   $ make examples
-   $ make install
-
-* To build the ``hello_world_1`` example run:
-
-.. code-block:: shell-session
-
-   $ make hello_world_1
-
-|hpx| executables end up in the ``bin`` directory in your build directory. You
-can now run ``hello_world_1`` and should see the following output:
-
-.. code-block:: shell-session
-
-   $ ./bin/hello_world_1
-   Hello World!
-
-You've just run an example which prints ``Hello World!`` from the |hpx| runtime.
-The source for the example is in ``examples/quickstart/hello_world_1.cpp``. The
-``hello_world_distributed`` example (also available in the
-``examples/quickstart`` directory) is a distributed hello world program, which is
-described in :ref:`examples_hello_world`. It provides a gentle introduction to
-the distributed aspects of |hpx|.
-
-.. tip::
-
-   Most build targets in |hpx| have two names: a simple name and
-   a hierarchical name corresponding to what type of example or
-   test the target is. If you are developing |hpx| it is often helpful to run
-   ``make help`` to get a list of available targets. For example, ``make help |
-   grep hello_world`` outputs the following:
-
-   .. code-block:: sh
-
-      ... examples.quickstart.hello_world_2
-      ... hello_world_2
-      ... examples.quickstart.hello_world_1
-      ... hello_world_1
-      ... examples.quickstart.hello_world_distributed
-      ... hello_world_distributed
-
-   It is also possible to build, for instance, all quickstart examples using ``make
-   examples.quickstart``.

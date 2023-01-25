@@ -17,7 +17,8 @@ Examples
 The following sections analyze some examples to help you get familiar with the
 |hpx| style of programming. We start off with simple examples that utilize basic
 |hpx| elements and then begin to expose the reader to the more complex and
-powerful |hpx| concepts.
+powerful |hpx| concepts. Section :ref:`building_tests_examples` shows how you
+can build the examples.
 
 .. toctree::
    :maxdepth: 1
