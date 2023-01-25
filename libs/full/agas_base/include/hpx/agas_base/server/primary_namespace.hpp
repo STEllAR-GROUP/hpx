@@ -37,11 +37,11 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     HPX_EXPORT naming::gid_type bootstrap_primary_namespace_gid();
     HPX_EXPORT hpx::id_type bootstrap_primary_namespace_id();
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 /// \brief AGAS's primary namespace maps 128-bit global identifiers (GIDs) to
 /// resolved addresses.
@@ -231,7 +231,7 @@ namespace hpx::agas::server {
         void dump_refcnt_matches(refcnt_table_type::iterator lower_it,
             refcnt_table_type::iterator upper_it, naming::gid_type const& lower,
             naming::gid_type const& upper, std::unique_lock<mutex_type>& l,
-            const char* func_name);
+            char const* func_name);
 #endif
 
         // helper function
@@ -293,6 +293,10 @@ namespace hpx::agas::server {
     private:
         resolved_type resolve_gid_locked(std::unique_lock<mutex_type>& l,
             naming::gid_type const& gid, error_code& ec);
+
+        resolved_type resolve_gid_locked_non_local(
+            std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
+            error_code& ec);
 
         void increment(naming::gid_type const& lower,
             naming::gid_type const& upper, std::int64_t& credits,

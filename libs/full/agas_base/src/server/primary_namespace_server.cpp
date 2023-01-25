@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     naming::gid_type bootstrap_primary_namespace_gid()
     {
@@ -45,9 +45,9 @@ namespace hpx { namespace agas {
         return hpx::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
             hpx::id_type::management_type::unmanaged);
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     void primary_namespace::register_server_instance(
         char const* servicename, std::uint32_t locality_id, error_code& ec)
@@ -97,7 +97,7 @@ namespace hpx { namespace agas { namespace server {
         std::unique_lock<mutex_type> l(mutex_);
 
         wait_for_migration_locked(l, id, hpx::throws);
-        resolved_type r = resolve_gid_locked(l, id, hpx::throws);
+        resolved_type r = resolve_gid_locked_non_local(l, id, hpx::throws);
         if (get<0>(r) == naming::invalid_gid)
         {
             l.unlock();
@@ -375,6 +375,16 @@ namespace hpx { namespace agas { namespace server {
         return true;
     }    // }}}
 
+    inline primary_namespace::resolved_type resolve_local_id(
+        naming::gid_type const& id) noexcept
+    {
+        naming::gid_type locality = naming::get_locality_from_gid(id);
+        gva addr(locality,
+            naming::detail::get_component_type_from_gid(id.get_msb()), 1,
+            id.get_lsb());
+        return primary_namespace::resolved_type(id, addr, locality);
+    }
+
     primary_namespace::resolved_type primary_namespace::resolve_gid(
         naming::gid_type const& id)
     {    // {{{ resolve_gid implementation
@@ -386,6 +396,13 @@ namespace hpx { namespace agas { namespace server {
 
         resolved_type r;
 
+        // handle (non-migratable) components located on this locality first
+        if (naming::refers_to_local_lva(id) &&
+            !naming::refers_to_virtual_memory(id))
+        {
+            r = resolve_local_id(id);
+        }
+        else
         {
             std::unique_lock<mutex_type> l(mutex_);
 
@@ -396,7 +413,7 @@ namespace hpx { namespace agas { namespace server {
             }
 
             // now, resolve the id
-            r = resolve_gid_locked(l, id, hpx::throws);
+            r = resolve_gid_locked_non_local(l, id, hpx::throws);
         }
 
         if (get<0>(r) == naming::invalid_gid)
@@ -630,8 +647,9 @@ namespace hpx { namespace agas { namespace server {
         refcnt_table_type::iterator lower_it,
         refcnt_table_type::iterator upper_it, naming::gid_type const& lower,
         naming::gid_type const& upper, std::unique_lock<mutex_type>& l,
-        const char* func_name)
-    {    // dump_refcnt_matches implementation
+        char const* func_name)
+    {
+        // dump_refcnt_matches implementation
         HPX_ASSERT(l.owns_lock());
 
         if (lower_it == refcnts_.end() && upper_it == refcnts_.end())
@@ -943,7 +961,7 @@ namespace hpx { namespace agas { namespace server {
     void primary_namespace::free_components_sync(
         free_entry_list_type& free_list, naming::gid_type const& lower,
         naming::gid_type const& upper, error_code& ec)
-    {    // {{{ free_components_sync implementation
+    {
         using hpx::get;
 
         ///////////////////////////////////////////////////////////////////////////
@@ -992,24 +1010,36 @@ namespace hpx { namespace agas { namespace server {
 
         if (&ec != &throws)
             ec = make_success_code();
-    }    // }}}
+    }
 
     primary_namespace::resolved_type primary_namespace::resolve_gid_locked(
         std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
         error_code& ec)
-    {    // {{{ resolve_gid_locked implementation
+    {
         HPX_ASSERT_OWNS_LOCK(l);
 
         // handle (non-migratable) components located on this locality first
         if (naming::refers_to_local_lva(gid) &&
             !naming::refers_to_virtual_memory(gid))
         {
-            naming::gid_type locality = naming::get_locality_from_gid(gid);
-            gva addr(locality,
-                naming::detail::get_component_type_from_gid(gid.get_msb()), 1,
-                gid.get_lsb());
-            return resolved_type(gid, addr, locality);
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return resolve_local_id(gid);
         }
+
+        return resolve_gid_locked_non_local(l, gid, ec);
+    }
+
+    primary_namespace::resolved_type
+    primary_namespace::resolve_gid_locked_non_local(
+        std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
+        error_code& ec)
+    {
+        HPX_ASSERT_OWNS_LOCK(l);
+
+        HPX_ASSERT(!(naming::refers_to_local_lva(gid) &&
+            !naming::refers_to_virtual_memory(gid)));
 
         // parameters
         naming::gid_type id = gid;
@@ -1090,7 +1120,7 @@ namespace hpx { namespace agas { namespace server {
             ec = make_success_code();
 
         return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
-    }    // }}}
+    }
 
     // access current counter values
     std::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)
@@ -1317,5 +1347,4 @@ namespace hpx { namespace agas { namespace server {
         }
     }
 #endif
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server

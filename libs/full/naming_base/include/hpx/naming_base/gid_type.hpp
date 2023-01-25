@@ -37,7 +37,11 @@ namespace hpx::naming {
     namespace detail {
 
         constexpr bool is_locked(gid_type const& gid) noexcept;
-    }
+
+        ///////////////////////////////////////////////////////////////////////
+        constexpr std::uint64_t strip_internal_bits_from_gid(
+            std::uint64_t msb) noexcept;
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT gid_type operator+(
@@ -106,7 +110,7 @@ namespace hpx::naming {
         {
         }
 
-        explicit inline constexpr gid_type(
+        explicit constexpr gid_type(
             std::uint64_t msb_id, std::uint64_t lsb_id) noexcept;
         explicit inline gid_type(std::uint64_t msb_id, void* lsb_id) noexcept;
 
@@ -201,9 +205,18 @@ namespace hpx::naming {
         }
 
         // comparison is required as well
-        friend HPX_EXPORT bool operator==(
-            gid_type const& lhs, gid_type const& rhs) noexcept;
-        friend bool operator!=(
+        friend constexpr bool operator==(
+            gid_type const& lhs, gid_type const& rhs) noexcept
+        {
+            std::int64_t lhs_msb =
+                detail::strip_internal_bits_from_gid(lhs.id_msb_);
+            std::int64_t rhs_msb =
+                detail::strip_internal_bits_from_gid(rhs.id_msb_);
+
+            return (lhs_msb == rhs_msb) && (lhs.id_lsb_ == rhs.id_lsb_);
+        }
+
+        friend constexpr bool operator!=(
             gid_type const& lhs, gid_type const& rhs) noexcept
         {
             return !(lhs == rhs);
@@ -290,7 +303,7 @@ namespace hpx::naming {
             HPX_ITT_SYNC_RELEASED(this);
         }
 
-        mutex_type& get_mutex() const noexcept
+        constexpr mutex_type& get_mutex() const noexcept
         {
             return const_cast<mutex_type&>(*this);
         }
@@ -360,56 +373,43 @@ namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
-    inline gid_type get_gid_from_locality_id(
-        std::uint32_t locality_id) noexcept HPX_SUPER_PURE;
-
-    inline gid_type get_gid_from_locality_id(std::uint32_t locality_id) noexcept
+    constexpr gid_type get_gid_from_locality_id(
+        std::uint32_t locality_id) noexcept
     {
         return gid_type(
             (std::uint64_t(locality_id) + 1) << gid_type::locality_id_shift,
-            nullptr);
+            std::uint64_t(0));
     }
 
-    inline std::uint32_t get_locality_id_from_gid(
-        std::uint64_t msb) noexcept HPX_PURE;
-
-    inline std::uint32_t get_locality_id_from_gid(std::uint64_t msb) noexcept
+    constexpr std::uint32_t get_locality_id_from_gid(std::uint64_t msb) noexcept
     {
         return std::uint32_t(msb >> gid_type::locality_id_shift) - 1;
     }
 
-    inline std::uint32_t get_locality_id_from_gid(
-        gid_type const& id) noexcept HPX_PURE;
-
-    inline std::uint32_t get_locality_id_from_gid(gid_type const& id) noexcept
+    constexpr std::uint32_t get_locality_id_from_gid(
+        gid_type const& id) noexcept
     {
         return get_locality_id_from_gid(id.get_msb());
     }
 
-    inline gid_type get_locality_from_gid(gid_type const& id) noexcept
+    constexpr gid_type get_locality_from_gid(gid_type const& id) noexcept
     {
         return get_gid_from_locality_id(get_locality_id_from_gid(id));
     }
 
-    inline bool is_locality(gid_type const& gid) noexcept
+    constexpr bool is_locality(gid_type const& gid) noexcept
     {
         return get_locality_from_gid(gid) == gid;
     }
 
-    inline std::uint64_t replace_locality_id(
-        std::uint64_t msb, std::uint32_t locality_id) noexcept HPX_PURE;
-
-    inline std::uint64_t replace_locality_id(
+    constexpr std::uint64_t replace_locality_id(
         std::uint64_t msb, std::uint32_t locality_id) noexcept
     {
         msb &= ~gid_type::locality_id_mask;
         return msb | get_gid_from_locality_id(locality_id).get_msb();
     }
 
-    inline gid_type replace_locality_id(
-        gid_type const& gid, std::uint32_t locality_id) noexcept HPX_PURE;
-
-    inline gid_type replace_locality_id(
+    constexpr gid_type replace_locality_id(
         gid_type const& gid, std::uint32_t locality_id) noexcept
     {
         std::uint64_t msb = gid.get_msb() & ~gid_type::locality_id_mask;
@@ -540,7 +540,7 @@ namespace hpx::naming {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline gid_type get_stripped_gid(gid_type const& id) noexcept
+        constexpr gid_type get_stripped_gid(gid_type const& id) noexcept
         {
             std::uint64_t const msb =
                 strip_internal_bits_from_gid(id.get_msb());
@@ -588,7 +588,7 @@ namespace hpx::naming {
             return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
         }
 
-        inline void set_dont_store_in_cache(gid_type& gid) noexcept
+        constexpr void set_dont_store_in_cache(gid_type& gid) noexcept
         {
             gid.set_msb(gid.get_msb() | gid_type::dont_cache_mask);
         }
@@ -599,13 +599,13 @@ namespace hpx::naming {
             return (id.get_msb() & gid_type::is_migratable) ? true : false;
         }
 
-        inline void set_is_migratable(gid_type& gid) noexcept
+        constexpr void set_is_migratable(gid_type& gid) noexcept
         {
             gid.set_msb(gid.get_msb() | gid_type::is_migratable);
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline constexpr gid_type get_stripped_gid_except_dont_cache(
+        constexpr gid_type get_stripped_gid_except_dont_cache(
             gid_type const& gid) noexcept
         {
             std::uint64_t const msb =
