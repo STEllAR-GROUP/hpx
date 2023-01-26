@@ -117,7 +117,12 @@ namespace hpx::parcelset {
 
             void initialized() override
             {
-                util::lci_environment::join_prg_thread_if_running();
+                if (util::lci_environment::enabled() &&
+                    hpx::parcelset::policies::lci::parcelport::
+                        enable_lci_progress_pool)
+                {
+                    util::lci_environment::join_prg_thread_if_running();
+                }
             }
 
             // Start the handling of connections.
