@@ -313,15 +313,27 @@ namespace hpx::traits {
             cfg.num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::lci_environment::rank());
-            hpx::parcelset::policies::lci::parcelport::
-                enable_lci_progress_pool = hpx::util::get_entry_as<bool>(
-                    cfg.rtcfg_, "hpx.parcel.lci.rp_prg_pool",
-                    false /* Does not matter*/);
-            hpx::parcelset::policies::lci::parcelport::
-                enable_background_only_scheduler =
-                    hpx::util::get_entry_as<bool>(cfg.rtcfg_,
-                        "hpx.parcel.lci.background_only_scheduler",
+            std::size_t num_threads = hpx::util::get_entry_as<size_t>(
+                cfg.rtcfg_, "hpx.os_threads", 1);
+            if (num_threads > 1)
+            {
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_lci_progress_pool = hpx::util::get_entry_as<bool>(
+                        cfg.rtcfg_, "hpx.parcel.lci.rp_prg_pool",
                         false /* Does not matter*/);
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_background_only_scheduler =
+                        hpx::util::get_entry_as<bool>(cfg.rtcfg_,
+                            "hpx.parcel.lci.background_only_scheduler",
+                            false /* Does not matter*/);
+            }
+            else
+            {
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_lci_progress_pool = false;
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_background_only_scheduler = false;
+            }
         }
 
         static void init(hpx::resource::partitioner& rp) noexcept
