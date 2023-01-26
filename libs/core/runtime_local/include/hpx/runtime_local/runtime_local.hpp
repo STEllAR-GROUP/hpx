@@ -398,7 +398,8 @@ namespace hpx {
 
         threads::thread_result_type run_helper(
             hpx::function<runtime::hpx_main_function_type> const& func,
-            int& result, bool call_startup_functions);
+            int& result, bool call_startup_functions,
+            void (*handle_print_bind)(std::size_t) = nullptr);
 
         void wait_helper(
             std::mutex& mtx, std::condition_variable& cond, bool& running);
