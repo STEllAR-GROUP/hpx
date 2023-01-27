@@ -19,7 +19,6 @@
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
@@ -179,7 +178,6 @@ namespace hpx::threads::detail {
 
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(idle_rate);
-        HPX_UNUSED(tfunc_time_collector);
 
         // spin for some time after queues have become empty
         bool may_exit = false;
@@ -237,8 +235,6 @@ namespace hpx::threads::detail {
                     scheduler.get_next_thread(
                         num_thread, running, thrd, enable_stealing)))
             {
-                HPX_UNUSED(tfunc_time_collector);
-
                 HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() ==
                     &scheduler);
 
@@ -273,7 +269,6 @@ namespace hpx::threads::detail {
 
                             [[maybe_unused]] tfunc_time_wrapper
                                 tfunc_time_collector_inner(idle_rate);
-                            HPX_UNUSED(tfunc_time_collector);
 
                             // thread returns new required state store the
                             // returned state in the thread
@@ -294,7 +289,7 @@ namespace hpx::threads::detail {
                                 // and add to aggregate execution time.
                                 [[maybe_unused]] exec_time_wrapper
                                     exec_time_collector(idle_rate);
-                                HPX_UNUSED(exec_time_collector);
+
 #if defined(HPX_HAVE_APEX)
                                 // get the APEX data pointer, in case we are
                                 // resuming the thread and have to restore any
@@ -470,8 +465,8 @@ namespace hpx::threads::detail {
                 ++idle_loop_count;
 
                 next_thrd = nullptr;
-                if (scheduler.wait_or_add_new(num_thread,
-                        running, idle_loop_count, enable_stealing_staged, added,
+                if (scheduler.wait_or_add_new(num_thread, running,
+                        idle_loop_count, enable_stealing_staged, added,
                         &next_thrd))
                 {
                     // Clean up terminated threads before trying to exit

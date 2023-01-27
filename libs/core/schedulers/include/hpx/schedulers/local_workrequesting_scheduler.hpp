@@ -32,6 +32,7 @@
 #include <mutex>
 #include <random>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -46,7 +47,7 @@
 // different working principle if compared to the classic work-stealing. Instead
 // of actively pulling work from the work queues of neighboring cores it relies
 // on a push model. Cores that run out of work post steal requests that are
-// handled by cores that have work awailable by actively sending tasks to the
+// handled by cores that have work available by actively sending tasks to the
 // requesting core.
 //
 // When a worker runs out of tasks, it becomes a thief by sending steal requests
@@ -115,18 +116,18 @@ namespace hpx::threads::policies {
         using thread_queue_type = thread_queue<Mutex, PendingQueuing,
             StagedQueuing, TerminatedQueuing>;
 
-    public:
         struct init_parameter
         {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
-                std::size_t num_high_priority_queues = std::size_t(-1),
+                std::size_t num_high_priority_queues = static_cast<std::size_t>(
+                    -1),
                 thread_queue_init_parameters const& thread_queue_init =
                     thread_queue_init_parameters{},
                 char const* description = "local_workrequesting_scheduler")
               : num_queues_(num_queues)
               , num_high_priority_queues_(
-                    num_high_priority_queues == std::size_t(-1) ?
+                    num_high_priority_queues == static_cast<std::size_t>(-1) ?
                         num_queues :
                         num_high_priority_queues)
               , thread_queue_init_(thread_queue_init)
@@ -159,7 +160,8 @@ namespace hpx::threads::policies {
         struct task_data
         {
             explicit HPX_HOST_DEVICE_CONSTEXPR task_data(
-                std::uint16_t num_thread = std::uint16_t(-1)) noexcept
+                std::uint16_t num_thread = static_cast<std::uint16_t>(
+                    -1)) noexcept
               : num_thread_(num_thread)
             {
             }
@@ -188,8 +190,8 @@ namespace hpx::threads::policies {
             {
             }
 
-            steal_request(std::size_t num_thread, task_channel* channel,
-                mask_cref_type victims, bool idle, bool stealhalf)
+            steal_request(std::size_t const num_thread, task_channel* channel,
+                mask_cref_type victims, bool idle, bool const stealhalf)
               : channel_(channel)
               , victims_(victims)
               , num_thread_(static_cast<std::uint16_t>(num_thread))
@@ -220,6 +222,11 @@ namespace hpx::threads::policies {
               : victims_()
             {
             }
+
+            scheduler_data(scheduler_data const&) = delete;
+            scheduler_data(scheduler_data&&) = delete;
+            scheduler_data& operator=(scheduler_data const&) = delete;
+            scheduler_data& operator=(scheduler_data&&) = delete;
 
             ~scheduler_data()
             {
@@ -330,9 +337,18 @@ namespace hpx::threads::policies {
             }
         }
 
+        local_workrequesting_scheduler(
+            local_workrequesting_scheduler const&) = delete;
+        local_workrequesting_scheduler(
+            local_workrequesting_scheduler&&) = delete;
+        local_workrequesting_scheduler& operator=(
+            local_workrequesting_scheduler const&) = delete;
+        local_workrequesting_scheduler& operator=(
+            local_workrequesting_scheduler&&) = delete;
+
         ~local_workrequesting_scheduler() override = default;
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "local_workrequesting_scheduler";
         }
@@ -659,9 +675,9 @@ namespace hpx::threads::policies {
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode::thread ?
                 data.schedulehint.hint :
-                std::size_t(-1);
+                static_cast<std::size_t>(-1);
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % num_queues_;
             }
@@ -889,7 +905,7 @@ namespace hpx::threads::policies {
         // Return the next thread to be executed, return false if none is
         // available
         bool get_next_thread(std::size_t num_thread, bool running,
-            thread_id_ref_type& thrd, bool enable_stealing) override
+            thread_id_ref_type& thrd, bool enable_stealing)
         {
             HPX_ASSERT(num_thread < num_queues_);
 
@@ -968,9 +984,9 @@ namespace hpx::threads::policies {
         void schedule_thread(thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority priority = thread_priority::default_) override
         {
-            std::size_t num_thread = std::size_t(-1);
+            std::size_t num_thread = static_cast<std::size_t>(-1);
             if (schedulehint.mode == thread_schedule_hint_mode::thread)
             {
                 num_thread = schedulehint.hint;
@@ -980,7 +996,7 @@ namespace hpx::threads::policies {
                 allow_fallback = false;
             }
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % num_queues_;
             }
@@ -1038,9 +1054,9 @@ namespace hpx::threads::policies {
         void schedule_thread_last(thread_id_ref_type thrd,
             threads::thread_schedule_hint schedulehint,
             bool allow_fallback = false,
-            thread_priority priority = thread_priority::normal) override
+            thread_priority priority = thread_priority::default_) override
         {
-            std::size_t num_thread = std::size_t(-1);
+            std::size_t num_thread = static_cast<std::size_t>(-1);
             if (schedulehint.mode == thread_schedule_hint_mode::thread)
             {
                 num_thread = schedulehint.hint;
@@ -1050,7 +1066,7 @@ namespace hpx::threads::policies {
                 allow_fallback = false;
             }
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % num_queues_;
             }
@@ -1109,12 +1125,11 @@ namespace hpx::threads::policies {
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new
         // items)
-        std::int64_t get_queue_length(
-            std::size_t num_thread = std::size_t(-1)) const override
+        std::int64_t get_queue_length(std::size_t num_thread) const override
         {
             // Return queue length of one specific queue.
             std::int64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            if (static_cast<std::size_t>(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < num_queues_);
                 auto const& d = data_[num_thread].data_;
@@ -1150,12 +1165,12 @@ namespace hpx::threads::policies {
         std::int64_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
-            std::size_t num_thread = std::size_t(-1),
+            std::size_t num_thread = static_cast<std::size_t>(-1),
             bool /* reset */ = false) const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            if (static_cast<std::size_t>(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < num_queues_);
 
@@ -1207,7 +1222,6 @@ namespace hpx::threads::policies {
                         "local_workrequesting_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority::unknown)");
-                    return 0;
                 }
                 }
                 return 0;
@@ -1275,7 +1289,6 @@ namespace hpx::threads::policies {
                     "local_workrequesting_scheduler::get_thread_count",
                     "unknown thread priority value "
                     "(thread_priority::unknown)");
-                return 0;
             }
             }
             return count;
@@ -1444,7 +1457,7 @@ namespace hpx::threads::policies {
                 // generate at most 3 random numbers before resorting to more
                 // expensive algorithm
                 std::uniform_int_distribution<std::int16_t> uniform(
-                    0, std::int16_t(num_queues_ - 1));
+                    0, static_cast<std::int16_t>(num_queues_ - 1));
 
                 int attempts = 0;
                 do
@@ -1461,8 +1474,9 @@ namespace hpx::threads::policies {
 
             // to avoid infinite trials we randomly select one of the possible
             // victims
-            std::uniform_int_distribution<std::int16_t> uniform(
-                0, std::int16_t(num_queues_ - count(req.victims_) - 1));
+            std::uniform_int_distribution<std::int16_t> uniform(0,
+                static_cast<std::int16_t>(
+                    num_queues_ - count(req.victims_) - 1));
 
             // generate one more random number
             std::size_t selected_victim = uniform(gen_);
@@ -1489,7 +1503,7 @@ namespace hpx::threads::policies {
         std::size_t next_victim([[maybe_unused]] scheduler_data& d,
             steal_request const& req) noexcept
         {
-            std::size_t victim = std::size_t(-1);
+            std::size_t victim;
 
             // return thief if max steal attempts has been reached or no more
             // cores are available for stealing
@@ -1516,7 +1530,7 @@ namespace hpx::threads::policies {
             }
 
             // couldn't find victim, return steal request to thief
-            if (victim == std::size_t(-1))
+            if (victim == static_cast<std::size_t>(-1))
             {
                 victim = req.num_thread_;
                 HPX_ASSERT(victim != d.num_thread_);
@@ -1650,7 +1664,7 @@ namespace hpx::threads::policies {
         bool wait_or_add_new(std::size_t num_thread, bool running,
             [[maybe_unused]] std::int64_t& idle_loop_count,
             bool enable_stealing, std::size_t& added,
-            thread_id_ref_type* next_thrd = nullptr) override
+            thread_id_ref_type* next_thrd = nullptr)
         {
             HPX_ASSERT(num_thread < num_queues_);
 
@@ -1755,11 +1769,11 @@ namespace hpx::threads::policies {
                 low_priority_queue_.on_start_thread(num_thread);
             }
 
-            std::size_t num_threads = num_queues_;
+            std::size_t const num_threads = num_queues_;
             //auto const& topo = create_topology();
 
             // Initially set all bits, code below resets the bits corresponding
-            // to cores that can serve as a vistim for the current core. A set
+            // to cores that can serve as a victim for the current core. A set
             // bit in this mask means 'do not steal from this core'.
             resize(d.victims_, num_threads);
             reset(d.victims_);
@@ -1889,7 +1903,7 @@ namespace hpx::threads::policies {
             }
         }
 
-        void reset_thread_distribution() override
+        void reset_thread_distribution() noexcept override
         {
             curr_queue_.store(0, std::memory_order_release);
         }

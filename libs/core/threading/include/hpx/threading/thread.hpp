@@ -168,11 +168,9 @@ namespace hpx {
             return threads::invalid_thread_id != id_;
         }
 
-        threads::thread_id_ref_type detach_locked()
+        void detach_locked()
         {
-            threads::thread_id_ref_type id;
-            std::swap(id, id_);
-            return id;
+            id_ = threads::invalid_thread_id;
         }
 
         void start_thread(threads::thread_pool_base* pool,
