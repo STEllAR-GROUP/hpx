@@ -457,8 +457,7 @@ namespace hpx::threads::policies {
 
             if (delete_all)
             {
-                // do not lock mutex while deleting all threads, do it
-                // piece-wise
+                // do not lock mutex while deleting all threads, do it piece-wise
                 while (true)
                 {
                     std::unique_lock<mutex_type> lk(mtx_, std::try_to_lock);
