@@ -115,6 +115,16 @@ namespace hpx::parcelset {
                 util::lci_environment::finalize();
             }
 
+            void initialized() override
+            {
+                if (util::lci_environment::enabled() &&
+                    hpx::parcelset::policies::lci::parcelport::
+                        enable_lci_progress_pool)
+                {
+                    util::lci_environment::join_prg_thread_if_running();
+                }
+            }
+
             // Start the handling of connections.
             bool do_run()
             {
@@ -175,17 +185,56 @@ namespace hpx::parcelset {
                 if (stopped_)
                     return false;
 
-                bool has_work = false;
-                if (mode & parcelport_background_mode_send)
+                static thread_local int do_lci_progress = -1;
+                if (do_lci_progress == -1)
                 {
-                    has_work = sender_.background_work();
+                    if (enable_lci_progress_pool &&
+                        hpx::threads::get_self_id() !=
+                            hpx::threads::invalid_thread_id &&
+                        hpx::this_thread::get_pool() ==
+                            &hpx::resource::get_thread_pool(
+                                "lci-progress-pool"))
+                    {
+                        do_lci_progress = 1;
+                    }
+                    else
+                    {
+                        do_lci_progress = 0;
+                    }
                 }
-                if (mode & parcelport_background_mode_receive)
+
+                bool has_work = false;
+                if (do_lci_progress)
                 {
-                    has_work = receiver_.background_work() || has_work;
+                    // magic number
+                    int max_idle_loop_count = 1000;
+                    int idle_loop_count = 0;
+                    while (idle_loop_count < max_idle_loop_count)
+                    {
+                        while (util::lci_environment::do_progress())
+                        {
+                            has_work = true;
+                            idle_loop_count = 0;
+                        }
+                        ++idle_loop_count;
+                    }
+                }
+                else
+                {
+                    if (mode & parcelport_background_mode_send)
+                    {
+                        has_work = sender_.background_work();
+                    }
+                    if (mode & parcelport_background_mode_receive)
+                    {
+                        has_work = receiver_.background_work() || has_work;
+                    }
                 }
                 return has_work;
             }
+
+            static bool enable_lci_progress_pool;
+            static bool enable_background_only_scheduler;
 
         private:
             using mutex_type = hpx::spinlock;
@@ -233,6 +282,8 @@ namespace hpx::parcelset {
                 }
             }
         };
+        bool parcelport::enable_lci_progress_pool = false;
+        bool parcelport::enable_background_only_scheduler = true;
     }    // namespace policies::lci
 }    // namespace hpx::parcelset
 
@@ -262,10 +313,54 @@ namespace hpx::traits {
             cfg.num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             cfg.node_ = static_cast<std::size_t>(util::lci_environment::rank());
+            std::size_t num_threads = hpx::util::get_entry_as<size_t>(
+                cfg.rtcfg_, "hpx.os_threads", 1);
+            if (num_threads > 1)
+            {
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_lci_progress_pool = hpx::util::get_entry_as<bool>(
+                        cfg.rtcfg_, "hpx.parcel.lci.rp_prg_pool",
+                        false /* Does not matter*/);
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_background_only_scheduler =
+                        hpx::util::get_entry_as<bool>(cfg.rtcfg_,
+                            "hpx.parcel.lci.background_only_scheduler",
+                            false /* Does not matter*/);
+            }
+            else
+            {
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_lci_progress_pool = false;
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_background_only_scheduler = false;
+            }
         }
 
-        // TODO: implement creation of custom thread pool here
-        static void init(hpx::resource::partitioner&) noexcept {}
+        static void init(hpx::resource::partitioner& rp) noexcept
+        {
+            if (util::lci_environment::enabled() &&
+                hpx::parcelset::policies::lci::parcelport::
+                    enable_lci_progress_pool)
+            {
+                if (hpx::parcelset::policies::lci::parcelport::
+                        enable_background_only_scheduler)
+                {
+                    rp.create_thread_pool("lci-progress-pool",
+                        hpx::resource::scheduling_policy::static_,
+                        hpx::threads::policies::scheduler_mode::
+                            do_background_work_only);
+                }
+                else
+                {
+                    rp.create_thread_pool("lci-progress-pool",
+                        hpx::resource::scheduling_policy::local,
+                        hpx::threads::policies::scheduler_mode::
+                            do_background_work);
+                }
+                rp.add_resource(rp.numa_domains()[0].cores()[0].pus()[0],
+                    "lci-progress-pool");
+            }
+        }
 
         static void destroy()
         {
@@ -287,7 +382,9 @@ namespace hpx::traits {
                 "}\n"
 #endif
                 "max_connections = "
-                "${HPX_HAVE_PARCELPORT_LCI_MAX_CONNECTIONS:8192}\n";
+                "${HPX_HAVE_PARCELPORT_LCI_MAX_CONNECTIONS:8192}\n"
+                "rp_prg_pool = 1\n"
+                "background_only_scheduler = 1\n";
         }
     };
 }    // namespace hpx::traits

@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -31,7 +32,9 @@ namespace hpx { namespace util {
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
         static void finalize();
 
+        static void join_prg_thread_if_running();
         static void progress_fn();
+        static bool do_progress();
 
         static bool enabled();
 
@@ -79,7 +82,7 @@ namespace hpx { namespace util {
         static LCI_endpoint_t h_ep_;
         static LCI_comp_t rt_cq_r_;
         static LCI_comp_t h_cq_r_;
-        static std::thread* prg_thread_p;
+        static std::unique_ptr<std::thread> prg_thread_p;
         static std::atomic<bool> prg_thread_flag;
     };
 }}    // namespace hpx::util
