@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,18 +7,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
-#include <hpx/modules/errors.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
+#else
+#include <hpx/assert.hpp>
 #endif
 #include <hpx/type_support/unused.hpp>
 
-#include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/util/detail/chunk_size.hpp>
+#include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
@@ -27,16 +24,16 @@
 #include <algorithm>
 #include <cstddef>
 #include <exception>
-#include <list>
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         // The static partitioner with cleanup spawns several chunks of
         // iterations for each available core. The number of iterations is
@@ -48,27 +45,32 @@ namespace hpx { namespace parallel { namespace util {
             using parameters_type = typename ExPolicy::executor_parameters_type;
             using executor_type = typename ExPolicy::executor_type;
 
-            using scoped_executor_parameters =
-                detail::scoped_executor_parameters_ref<parameters_type,
-                    executor_type>;
-
             using handle_local_exceptions =
                 detail::handle_local_exceptions<ExPolicy>;
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Cleanup>
-            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
-                F1&& f1, F2&& f2, Cleanup&& cleanup)
+            static R call(ExPolicy_&& orgpolicy, FwdIter first,
+                std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
+                // this is a fork-join invocation, prevent tasks from being
+                // stolen, if possible
+                auto policy = parallel::util::adapt_thread_priority(
+                    HPX_FORWARD(ExPolicy_, orgpolicy),
+                    hpx::threads::thread_priority::bound);
+
                 // inform parameter traits
+                using scoped_executor_parameters =
+                    detail::scoped_executor_parameters_ref<parameters_type,
+                        typename decltype(policy)::executor_type>;
+
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 try
                 {
                     auto&& items = detail::partition<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        HPX_FORWARD(F1, f1));
+                        policy, first, count, HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
 
@@ -180,15 +182,13 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename Items, typename F, typename Cleanup>
             static hpx::future<R> reduce(
-                std::shared_ptr<scoped_executor_parameters>&& scoped_params,
-                Items&& workitems, F&& f, Cleanup&& cleanup)
+                [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
+                    scoped_params,
+                [[maybe_unused]] Items&& workitems, [[maybe_unused]] F&& f,
+                [[maybe_unused]] Cleanup&& cleanup)
             {
                 // wait for all tasks to finish
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-                HPX_UNUSED(scoped_params);
-                HPX_UNUSED(workitems);
-                HPX_UNUSED(f);
-                HPX_UNUSED(cleanup);
                 HPX_ASSERT(false);
                 return hpx::future<R>{};
 #else
@@ -217,10 +217,12 @@ namespace hpx { namespace parallel { namespace util {
     // Result:   intermediate result type of first step
     template <typename ExPolicy, typename R = void, typename Result = R>
     struct partitioner_with_cleanup
-      : detail::select_partitioner<typename std::decay<ExPolicy>::type,
+      : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::static_partitioner_with_cleanup,
             detail::task_static_partitioner_with_cleanup>::template apply<R,
             Result>
     {
     };
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util
+
+// namespace hpx::parallel::util

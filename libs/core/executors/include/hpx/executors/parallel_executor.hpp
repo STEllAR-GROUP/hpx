@@ -10,9 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
@@ -26,18 +24,13 @@
 #include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/functional/one_shot.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -46,7 +39,6 @@
 #include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::parallel::execution::detail {
 
@@ -212,7 +204,8 @@ namespace hpx::execution {
 
         friend constexpr parallel_policy_executor tag_invoke(
             hpx::parallel::execution::with_processing_units_count_t,
-            parallel_policy_executor const& exec, std::size_t num_cores)
+            parallel_policy_executor const& exec,
+            std::size_t num_cores) noexcept
         {
             auto exec_with_num_cores = exec;
             exec_with_num_cores.num_cores_ = num_cores;
@@ -226,6 +219,23 @@ namespace hpx::execution {
             std::size_t = 0)
         {
             return exec.get_num_cores();
+        }
+
+        friend constexpr parallel_policy_executor tag_invoke(
+            hpx::execution::experimental::with_first_core_t,
+            parallel_policy_executor const& exec,
+            std::size_t first_core) noexcept
+        {
+            auto exec_with_first_core = exec;
+            exec_with_first_core.first_core_ = first_core;
+            return exec_with_first_core;
+        }
+
+        friend constexpr std::size_t tag_invoke(
+            hpx::execution::experimental::get_first_core_t,
+            parallel_policy_executor const& exec) noexcept
+        {
+            return exec.get_first_core();
         }
 
         friend auto tag_invoke(
@@ -272,7 +282,8 @@ namespace hpx::execution {
             return !(*this == rhs);
         }
 
-        constexpr parallel_policy_executor const& context() const noexcept
+        [[nodiscard]] constexpr parallel_policy_executor const& context()
+            const noexcept
         {
             return *this;
         }
@@ -282,7 +293,7 @@ namespace hpx::execution {
             policy_ = HPX_MOVE(policy);
         }
 
-        constexpr Policy const& policy() const noexcept
+        [[nodiscard]] constexpr Policy const& policy() const noexcept
         {
             return policy_;
         }
@@ -398,11 +409,12 @@ namespace hpx::execution {
                 exec.pool_ :
                 threads::detail::get_self_or_default_pool();
 
-            bool do_not_combine_tasks = hpx::threads::do_not_combine_tasks(
-                exec.policy().get_hint().sharing_mode());
-
             // use scheduling based on index_queue if no hierarchical threshold
             // is given
+            bool const do_not_combine_tasks =
+                hpx::threads::do_not_combine_tasks(
+                    exec.policy().get_hint().sharing_mode());
+
             if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
             {
                 return parallel::execution::detail::
@@ -473,10 +485,12 @@ namespace hpx::execution {
 
     private:
         /// \cond NOINTERNAL
-        std::size_t get_num_cores() const
+        [[nodiscard]] std::size_t get_num_cores() const
         {
             if (num_cores_ != 0)
+            {
                 return num_cores_;
+            }
 
             if constexpr (std::is_same_v<Policy, launch::sync_policy>)
             {
@@ -484,21 +498,20 @@ namespace hpx::execution {
             }
             else
             {
-                auto pool =
+                if (policy_.get_policy() == hpx::detail::launch_policy::sync)
+                {
+                    return 1;
+                }
+
+                auto const* pool =
                     pool_ ? pool_ : threads::detail::get_self_or_default_pool();
                 return pool->get_os_thread_count();
             }
         }
 
-        std::size_t get_first_core() const noexcept
+        [[nodiscard]] std::size_t get_first_core() const noexcept
         {
-            if (policy_.hint().mode !=
-                    hpx::threads::thread_schedule_hint_mode::none &&
-                policy_.hint().hint != -1)
-            {
-                return policy_.hint().hint;
-            }
-            return 0;
+            return first_core_;
         }
 
         friend class hpx::serialization::access;
@@ -507,7 +520,7 @@ namespace hpx::execution {
         void serialize(Archive& ar, unsigned int const /* version */)
         {
             // clang-format off
-            ar & policy_ & hierarchical_threshold_ & num_cores_;
+            ar & policy_ & hierarchical_threshold_ & first_core_ & num_cores_;
             // clang-format on
         }
         /// \endcond
@@ -519,6 +532,7 @@ namespace hpx::execution {
         threads::thread_pool_base* pool_;
         Policy policy_;
         std::size_t hierarchical_threshold_ = hierarchical_threshold_default_;
+        std::size_t first_core_ = 0;
         std::size_t num_cores_ = 0;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* annotation_ = nullptr;

@@ -12,7 +12,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -22,11 +21,13 @@
 // clang-format off
 #if defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                  \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT > 64)
+
 #  if defined(HPX_HAVE_MAX_CPU_COUNT)
 #    include <bitset>
 #  else
 #    include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #  endif
+
 #endif
 // clang-format on
 
@@ -39,6 +40,7 @@ namespace hpx::threads {
 #if !defined(HPX_HAVE_MORE_THAN_64_THREADS) ||                                 \
     (defined(HPX_HAVE_MAX_CPU_COUNT) && HPX_HAVE_MAX_CPU_COUNT <= 64)
     using mask_type = std::uint64_t;
+    using mask_rvref_type = std::uint64_t;
     using mask_cref_type = std::uint64_t;
 
     constexpr inline std::uint64_t bits(std::size_t idx) noexcept
@@ -80,10 +82,10 @@ namespace hpx::threads {
         return CHAR_BIT * sizeof(mask_type);
     }
 
-    constexpr inline void resize(mask_type& /*mask*/, std::size_t s) noexcept
+    constexpr inline void resize(
+        mask_type& /*mask*/, [[maybe_unused]] std::size_t s) noexcept
     {
         HPX_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
-        HPX_UNUSED(s);
     }
 
     constexpr inline std::size_t find_first(mask_cref_type mask) noexcept
@@ -140,20 +142,20 @@ namespace hpx::threads {
     }
 
 #else
-    // clang-format off
-#  if defined(HPX_HAVE_MAX_CPU_COUNT)
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
     using mask_type = std::bitset<HPX_HAVE_MAX_CPU_COUNT>;
+    using mask_rvref_type = std::bitset<HPX_HAVE_MAX_CPU_COUNT>&&;
     using mask_cref_type = std::bitset<HPX_HAVE_MAX_CPU_COUNT> const&;
 
     inline void set(mask_type& mask, std::size_t idx) noexcept;
 
-#  else
+#else
     using mask_type = hpx::detail::dynamic_bitset<std::uint64_t>;
+    using mask_rvref_type = hpx::detail::dynamic_bitset<std::uint64_t>&&;
     using mask_cref_type = hpx::detail::dynamic_bitset<std::uint64_t> const&;
 
     inline void set(mask_type& mask, std::size_t idx) noexcept;
-#  endif
-    // clang-format on
+#endif
 
     inline bool any(mask_cref_type mask) noexcept
     {
@@ -177,7 +179,7 @@ namespace hpx::threads {
 
     inline void unset(mask_type& mask, std::size_t idx) noexcept
     {
-        mask.set(idx, 0);
+        mask.set(idx, false);
     }
 
     inline std::size_t mask_size(mask_cref_type mask) noexcept
@@ -185,21 +187,19 @@ namespace hpx::threads {
         return mask.size();
     }
 
-    // clang-format off
-    inline void resize(mask_type& mask, std::size_t s)
+    inline void resize(
+        [[maybe_unused]] mask_type& mask, [[maybe_unused]] std::size_t s)
     {
-#  if defined(HPX_HAVE_MAX_CPU_COUNT)
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
         HPX_ASSERT(s <= mask.size());
-        HPX_UNUSED(mask);
-        HPX_UNUSED(s);
-#  else
+#else
         return mask.resize(s);
-#  endif
+#endif
     }
 
     inline std::size_t find_first(mask_cref_type mask) noexcept
     {
-#  if defined(HPX_HAVE_MAX_CPU_COUNT)
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (mask.any())
         {
             for (std::size_t i = 0; i != HPX_HAVE_MAX_CPU_COUNT; ++i)
@@ -209,11 +209,10 @@ namespace hpx::threads {
             }
         }
         return ~std::size_t(0);
-#  else
+#else
         return mask.find_first();
-#  endif
+#endif
     }
-    // clang-format on
 
     inline bool equal(
         mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0) noexcept

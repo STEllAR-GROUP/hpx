@@ -1,5 +1,5 @@
 //  Copyright (c) 2019-2020 ETH Zurich
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,30 +10,23 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/concurrency/detail/non_contiguous_index_queue.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_list.hpp>
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/executors/detail/hierarchical_spawning.hpp>
-#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/detail/invoke.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
@@ -221,7 +214,8 @@ namespace hpx::parallel::execution::detail {
         // Compute a chunk size given a number of worker threads and a total
         // number of items n. Returns a power-of-2 chunk size that produces at
         // most 8 and at least 4 chunks per worker thread.
-        constexpr std::uint32_t get_chunk_size(std::uint32_t const n) noexcept
+        constexpr std::uint32_t get_chunk_size(
+            std::uint32_t const n) const noexcept
         {
             std::uint32_t chunk_size = 1;
             while (chunk_size * num_threads * 8 < n)
@@ -231,16 +225,18 @@ namespace hpx::parallel::execution::detail {
             return chunk_size;
         }
 
-        static hpx::threads::mask_type full_mask(std::size_t num_threads)
+        static hpx::threads::mask_type full_mask(
+            std::size_t first_thread, std::size_t num_threads)
         {
-            std::size_t overall_threads = hpx::threads::hardware_concurrency();
+            std::size_t const overall_threads =
+                hpx::threads::hardware_concurrency();
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, overall_threads);
 
-            auto& rp = hpx::resource::get_partitioner();
+            auto const& rp = hpx::resource::get_partitioner();
             for (std::size_t i = 0; i != num_threads; ++i)
             {
-                auto thread_mask = rp.get_pu_mask(i);
+                auto thread_mask = rp.get_pu_mask(i + first_thread);
                 for (std::size_t j = 0; j != overall_threads; ++j)
                 {
                     if (threads::test(thread_mask, j))
@@ -255,7 +251,7 @@ namespace hpx::parallel::execution::detail {
         static hpx::threads::mask_type limit_mask(
             hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
         {
-            std::size_t num_cores = hpx::threads::hardware_concurrency();
+            std::size_t const num_cores = hpx::threads::hardware_concurrency();
 
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, num_cores);
@@ -305,11 +301,11 @@ namespace hpx::parallel::execution::detail {
         // contains no chunks no task will be spawned.
         template <typename Task>
         void do_work_task(hpx::threads::thread_description const& desc,
-            threads::thread_pool_base* pool, Task&& task_f) const
+            threads::thread_pool_base* pool, bool dont_bind_to_core,
+            Task&& task_f) const
         {
             std::uint32_t const worker_thread = task_f.worker_thread;
-            auto& queue = queues[worker_thread].data_;
-            if (queue.empty())
+            if (queues[worker_thread].data_.empty())
             {
                 // If the queue is empty we don't spawn a task. We only signal
                 // that this "task" is ready.
@@ -321,18 +317,32 @@ namespace hpx::parallel::execution::detail {
             auto post_policy = hpx::execution::experimental::with_stacksize(
                 policy, threads::thread_stacksize::small_);
 
-            // launch task on new thread, apply hint if none was given.
-            auto hint = hpx::execution::experimental::get_hint(post_policy);
-            if (hint == hpx::threads::thread_schedule_hint())
+            if (dont_bind_to_core)
             {
-                auto policy =
-                    hpx::execution::experimental::with_hint(post_policy,
-                        hpx::threads::thread_schedule_hint(
-                            hpx::threads::thread_schedule_hint_mode::thread,
-                            worker_thread));
+                // Make sure the new task is not bound to a particular core, if
+                // requested. This prevents the main thread from potentially
+                // being occupied in asynchronous scenarios.
+                hpx::threads::thread_priority const priority =
+                    hpx::execution::experimental::get_priority(post_policy);
+                if (priority == hpx::threads::thread_priority::bound)
+                {
+                    post_policy = hpx::execution::experimental::with_priority(
+                        post_policy, hpx::threads::thread_priority::normal);
+                }
+            }
+
+            // launch task on new HPX-thread
+            auto hint = hpx::execution::experimental::get_hint(policy);
+            if (hint.mode == hpx::threads::thread_schedule_hint_mode::none &&
+                hint.hint == -1)
+            {
+                // apply hint if none was given
+                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
+                hint.hint = worker_thread + first_thread;
 
                 hpx::detail::post_policy_dispatch<Launch>::call(
-                    policy, desc, pool, HPX_FORWARD(Task, task_f));
+                    hpx::execution::experimental::with_hint(post_policy, hint),
+                    desc, pool, HPX_FORWARD(Task, task_f));
             }
             else
             {
@@ -343,15 +353,17 @@ namespace hpx::parallel::execution::detail {
 
     public:
         template <typename F_, typename... Ts_>
-        index_queue_bulk_state(std::size_t num_threads, Launch l, F_&& f,
-            Shape const& shape, Ts_&&... ts) noexcept
+        index_queue_bulk_state(std::size_t first_thread,
+            std::size_t num_threads, Launch l, F_&& f, Shape const& shape,
+            Ts_&&... ts) noexcept
           : base_type(init_no_addref{})
+          , first_thread(static_cast<std::uint32_t>(first_thread))
           , num_threads(num_threads)
           , policy(HPX_MOVE(l))
           , f(HPX_FORWARD(F_, f))
           , shape(shape)
           , ts(HPX_FORWARD(Ts_, ts)...)
-          , pu_mask(full_mask(num_threads))
+          , pu_mask(full_mask(first_thread, num_threads))
           , queues(num_threads)
         {
             tasks_remaining.data_.store(num_threads, std::memory_order_relaxed);
@@ -366,11 +378,12 @@ namespace hpx::parallel::execution::detail {
 
             // Calculate chunk size and number of chunks
             std::uint32_t chunk_size = get_chunk_size(size);
-            std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
+            std::uint32_t const num_chunks =
+                (size + chunk_size - 1) / chunk_size;
 
             // launch only as many tasks as we have chunks
-            std::size_t num_pus = num_threads;
-            if (num_chunks < std::uint32_t(num_threads))
+            std::size_t const num_pus = num_threads;
+            if (num_chunks < static_cast<std::uint32_t>(num_threads))
             {
                 num_threads = num_chunks;
                 tasks_remaining.data_ = num_chunks;
@@ -380,7 +393,7 @@ namespace hpx::parallel::execution::detail {
             HPX_ASSERT(hpx::threads::count(pu_mask) == num_threads);
 
             // thread placement
-            hpx::threads::thread_schedule_hint hint =
+            hpx::threads::thread_schedule_hint const hint =
                 hpx::execution::experimental::get_hint(policy);
 
             using placement = hpx::threads::thread_placement_hint;
@@ -404,17 +417,17 @@ namespace hpx::parallel::execution::detail {
 
             // Spawn the worker threads for all except the local queue.
             auto local_worker_thread =
-                std::uint32_t(hpx::get_local_worker_thread_num());
+                static_cast<std::uint32_t>(hpx::get_local_worker_thread_num());
             std::uint32_t worker_thread = 0;
             bool main_thread_ok = false;
 
-            auto& rp = hpx::resource::get_partitioner();
+            auto const& rp = hpx::resource::get_partitioner();
             std::size_t main_pu_num = rp.get_pu_num(local_worker_thread);
             if (!hpx::threads::test(pu_mask, main_pu_num) || num_threads == 1)
             {
                 main_thread_ok = true;
                 local_worker_thread = worker_thread++;
-                main_pu_num = rp.get_pu_num(local_worker_thread);
+                main_pu_num = rp.get_pu_num(local_worker_thread + first_thread);
             }
 
             bool reverse_placement =
@@ -426,7 +439,7 @@ namespace hpx::parallel::execution::detail {
             for (std::uint32_t pu = 0;
                  worker_thread != num_threads && pu != num_pus; ++pu)
             {
-                std::size_t pu_num = rp.get_pu_num(pu);
+                std::size_t const pu_num = rp.get_pu_num(pu + first_thread);
 
                 // The queue for the local thread is handled later inline.
                 if (!main_thread_ok && pu == local_worker_thread)
@@ -436,7 +449,8 @@ namespace hpx::parallel::execution::detail {
                     HPX_ASSERT(hpx::threads::test(pu_mask, pu_num));
                     main_thread_ok = true;
                     local_worker_thread = worker_thread++;
-                    main_pu_num = rp.get_pu_num(local_worker_thread);
+                    main_pu_num =
+                        rp.get_pu_num(local_worker_thread + first_thread);
                     continue;
                 }
 
@@ -453,7 +467,7 @@ namespace hpx::parallel::execution::detail {
                 }
 
                 // Schedule task for this worker thread
-                do_work_task(desc, pool,
+                do_work_task(desc, pool, false,
                     task_function<index_queue_bulk_state>{this, size,
                         chunk_size, worker_thread, reverse_placement,
                         allow_stealing});
@@ -461,19 +475,22 @@ namespace hpx::parallel::execution::detail {
                 ++worker_thread;
             }
 
-            // the main thread should have been associated with a queue
-            HPX_ASSERT(main_thread_ok);
-
             // there have to be as many HPX threads as there are set bits in
             // the PU-mask
             HPX_ASSERT(worker_thread == num_threads);
 
-            // Handle the queue for the local thread.
-            do_work_task(desc, pool,
-                task_function<index_queue_bulk_state>{this, size, chunk_size,
-                    local_worker_thread, reverse_placement, allow_stealing});
+            // the main thread should have been associated with a queue
+            if (main_thread_ok)
+            {
+                // Handle the queue for the local thread.
+                do_work_task(desc, pool, true,
+                    task_function<index_queue_bulk_state>{this, size,
+                        chunk_size, local_worker_thread, reverse_placement,
+                        allow_stealing});
+            }
         }
 
+        std::uint32_t first_thread;
         std::size_t num_threads;
         Launch policy;
         std::decay_t<F> f;
@@ -497,8 +514,9 @@ namespace hpx::parallel::execution::detail {
     template <typename Launch, typename F, typename S, typename... Ts>
     decltype(auto) index_queue_bulk_async_execute_void(
         hpx::threads::thread_description const& desc,
-        threads::thread_pool_base* pool, std::size_t num_threads, Launch policy,
-        F&& f, S const& shape, Ts&&... ts)
+        threads::thread_pool_base* pool, std::size_t first_thread,
+        std::size_t num_threads, Launch policy, F&& f, S const& shape,
+        Ts&&... ts)
     {
         HPX_ASSERT(pool);
 
@@ -511,8 +529,8 @@ namespace hpx::parallel::execution::detail {
 
         using shared_state = index_queue_bulk_state<Launch, F, S, Ts...>;
         hpx::intrusive_ptr<shared_state> p(
-            new shared_state(num_threads, HPX_MOVE(policy), HPX_FORWARD(F, f),
-                shape, HPX_FORWARD(Ts, ts)...),
+            new shared_state(first_thread, num_threads, HPX_MOVE(policy),
+                HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...),
             false);
 
         p->execute(desc, pool);
@@ -537,8 +555,9 @@ namespace hpx::parallel::execution::detail {
         }
         else
         {
-            return index_queue_bulk_async_execute_void(desc, pool, num_threads,
-                policy, HPX_FORWARD(F, f), shape, HPX_FORWARD(Ts, ts)...);
+            return index_queue_bulk_async_execute_void(desc, pool, first_thread,
+                num_threads, policy, HPX_FORWARD(F, f), shape,
+                HPX_FORWARD(Ts, ts)...);
         }
     }
 

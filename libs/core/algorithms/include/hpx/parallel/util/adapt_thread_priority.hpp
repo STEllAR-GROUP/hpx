@@ -1,4 +1,4 @@
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,28 +20,28 @@ namespace hpx::parallel::util {
             hpx::is_execution_policy_v<ExPolicy>
         )>
     // clang-format on
-    decltype(auto) adapt_sharing_mode(
-        ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
+    decltype(auto) adapt_thread_priority(
+        ExPolicy&& policy, hpx::threads::thread_priority new_priority)
     {
-        static constexpr bool supports_sharing_hint =
+        static constexpr bool supports_priority =
             hpx::functional::is_tag_invocable_v<
-                hpx::execution::experimental::with_hint_t,
-                std::decay_t<ExPolicy>, hpx::threads::thread_schedule_hint>;
+                hpx::execution::experimental::with_priority_t,
+                std::decay_t<ExPolicy>, hpx::threads::thread_priority>;
 
-        if constexpr (supports_sharing_hint)
+        if constexpr (supports_priority)
         {
-            hpx::threads::thread_schedule_hint hint =
-                hpx::execution::experimental::get_hint(policy);
+            hpx::threads::thread_priority priority =
+                hpx::execution::experimental::get_priority(policy);
 
-            // modify sharing hint only if it is the default (do not overwrite
-            // user supplied values)
-            if (hint.sharing_mode() == hpx::threads::thread_sharing_hint::none)
+            // modify priority only if it is the default (do not overwrite user
+            // supplied values)
+            if (priority == hpx::threads::thread_priority::default_)
             {
-                hint.sharing_mode(sharing);
+                priority = new_priority;
             }
 
-            return hpx::execution::experimental::with_hint(
-                HPX_FORWARD(ExPolicy, policy), hint);
+            return hpx::execution::experimental::with_priority(
+                HPX_FORWARD(ExPolicy, policy), priority);
         }
         else
         {

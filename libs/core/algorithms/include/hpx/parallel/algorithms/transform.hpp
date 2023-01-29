@@ -457,7 +457,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         struct transform
           : public detail::algorithm<transform<IterPair>, IterPair>
         {
-            transform()
+            constexpr transform() noexcept
               : transform::algorithm("transform")
             {
             }

@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 
+#include <cstddef>
 #include <type_traits>
 
 namespace hpx::execution::experimental {
@@ -150,6 +151,30 @@ namespace hpx::execution::experimental {
 
     template <>
     struct is_scheduling_property<get_annotation_t> : std::true_type
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    inline constexpr struct with_first_core_t final
+      : detail::property_base<with_first_core_t>
+    {
+    } with_first_core{};
+
+    inline constexpr struct get_first_core_t final
+      : hpx::functional::detail::tag_fallback<get_first_core_t>
+    {
+    private:
+        // simply return nullptr if get_annotation is not supported
+        template <typename Target>
+        friend HPX_FORCEINLINE constexpr std::size_t tag_fallback_invoke(
+            get_first_core_t, Target&&) noexcept
+        {
+            return 0;
+        }
+    } get_first_core{};
+
+    template <>
+    struct is_scheduling_property<get_first_core_t> : std::true_type
     {
     };
 }    // namespace hpx::execution::experimental
