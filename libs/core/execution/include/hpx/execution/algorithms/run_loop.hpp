@@ -141,6 +141,9 @@ namespace hpx::execution::experimental {
         class run_loop_scheduler
         {
         public:
+            using type = run_loop_scheduler;
+            using id = run_loop_scheduler;
+
             struct run_loop_sender
             {
                 explicit run_loop_sender(run_loop& loop) noexcept
@@ -152,7 +155,8 @@ namespace hpx::execution::experimental {
                 friend run_loop_scheduler;
 
                 template <typename Receiver>
-                using operation_state = run_loop_opstate<Receiver>;
+                using operation_state =
+                    run_loop_opstate<hpx::meta::get_id_t<Receiver>>;
 
                 template <typename Receiver>
                 friend operation_state<Receiver> tag_invoke(

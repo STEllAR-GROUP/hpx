@@ -64,7 +64,7 @@ namespace hpx::execution::experimental {
         struct no_env
         {
             using type = no_env;
-            using Id = no_env;
+            using id = no_env;
 
             template <typename Tag, typename Env>
             friend std::enable_if_t<std::is_same_v<no_env, std::decay_t<Env>>>
@@ -74,7 +74,7 @@ namespace hpx::execution::experimental {
         struct empty_env
         {
             using type = empty_env;
-            using Id = empty_env;
+            using id = empty_env;
         };
 
         template <typename Tag, typename Value, typename BaseEnvId = empty_env>
@@ -84,7 +84,7 @@ namespace hpx::execution::experimental {
 
             struct type
             {
-                using Id = env;
+                using id = env;
 
                 HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
                 HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
@@ -94,7 +94,7 @@ namespace hpx::execution::experimental {
                     typename = std::enable_if_t<functional::is_tag_invocable_v<
                         Tag2, BaseEnv const&, Args...>>>
                 friend constexpr auto tag_invoke(
-                    Tag2 tag, env const& self, Args&&... args) noexcept
+                    Tag2 tag, type const& self, Args&&... args) noexcept
                     -> functional::tag_invoke_result_t<Tag2, BaseEnv const&,
                         Args...>
                 {
@@ -104,7 +104,7 @@ namespace hpx::execution::experimental {
 
                 template <typename... Args>
                 friend constexpr auto
-                tag_invoke(Tag, env const& self, Args&&...) noexcept(
+                tag_invoke(Tag, type const& self, Args&&...) noexcept(
                     std::is_nothrow_copy_constructible_v<
                         util::unwrap_reference_t<Value>>)
                     -> util::unwrap_reference_t<Value>
@@ -115,7 +115,8 @@ namespace hpx::execution::experimental {
         };
 
         template <typename Tag, typename Value, typename BaseEnvId>
-        using env_t = hpx::meta::type<env<Tag, Value, BaseEnvId>>;
+        using env_t =
+            hpx::meta::type<env<Tag, Value, hpx::meta::get_id_t<BaseEnvId>>>;
 
         template <typename Tag>
         struct make_env_t
@@ -131,8 +132,7 @@ namespace hpx::execution::experimental {
 
             template <typename Value, typename BaseEnv>
             constexpr auto operator()(Value&& value, BaseEnv&& base_env) const
-                -> env<Tag, std::decay_t<Value>,
-                    meta::hidden<std::decay_t<BaseEnv>>>
+                -> env<Tag, std::decay_t<Value>, std::decay_t<BaseEnv>>
             {
                 return {
                     HPX_FORWARD(Value, value), HPX_FORWARD(BaseEnv, base_env)};

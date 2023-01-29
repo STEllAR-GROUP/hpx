@@ -33,6 +33,7 @@ namespace hpx {
 
     template <typename T>
     using type_identity_t = typename type_identity<T>::type;
+
 }    // namespace hpx
 
 namespace hpx::util {
