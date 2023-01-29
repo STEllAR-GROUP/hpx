@@ -43,13 +43,11 @@ namespace hpx { namespace util {
 
         static LCI_endpoint_t& lci_endpoint();
 
-        static LCI_endpoint_t& rt_endpoint();
+        static LCI_endpoint_t& get_endpoint();
 
-        static LCI_endpoint_t& h_endpoint();
+        static LCI_comp_t& get_scq();
 
-        static LCI_comp_t& rt_queue();
-
-        static LCI_comp_t& h_queue();
+        static LCI_comp_t& get_rcq();
 
         static std::string get_processor_name();
 
@@ -77,11 +75,9 @@ namespace hpx { namespace util {
     private:
         static mutex_type mtx_;
         static bool enabled_;
-        static LCI_endpoint_t ep_;
-        static LCI_endpoint_t rt_ep_;
-        static LCI_endpoint_t h_ep_;
-        static LCI_comp_t rt_cq_r_;
-        static LCI_comp_t h_cq_r_;
+        static LCI_endpoint_t ep;
+        static LCI_comp_t scq;
+        static LCI_comp_t rcq;
         static std::unique_ptr<std::thread> prg_thread_p;
         static std::atomic<bool> prg_thread_flag;
     };
