@@ -49,6 +49,7 @@ namespace hpx::parcelset::policies::lci {
           , pp_(pp)
           , there_(parcelset::locality(locality(dst_rank)))
         {
+            iovec.count = -1;
         }
 
         ~sender_connection()
