@@ -223,6 +223,8 @@ Functions
    :cpp:func:`hpx::make_unique_any_nonser`
    =======================================  ================================================
 
+.. _public_api_header_hpx_assert:
+
 ``hpx/assert.hpp``
 ==================
 
@@ -564,6 +566,8 @@ Examples
 .. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
    :language: c++
    :lines: 7-
+
+.. _public_api_header_hpx_init:
 
 ``hpx/init.hpp``
 ================
@@ -1158,6 +1162,8 @@ Functions
    | :cpp:func:`hpx::unwrapping_all`  |
    +----------------------------------+
 
+.. _public_api_header_hpx_version:
+
 ``hpx/version.hpp``
 ===================
 
@@ -1213,6 +1219,8 @@ Functions
    +-----------------------------------------+
    | :cpp:func:`hpx::build_date_time`        |
    +-----------------------------------------+
+
+.. _public_api_header_hpx_wrap_main:
 
 ``hpx/wrap_main.hpp``
 =====================
