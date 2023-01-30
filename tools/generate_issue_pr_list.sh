@@ -7,7 +7,7 @@
 # file BOOST_LICENSE_1_0.rst or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 # This script generates issue and PR lists for the current release. The output
-# is meant to be used in the release notes for each release. It relie on the hub
+# is meant to be used in the release notes for each release. It relies on the hub
 # command line tool (https://hub.github.com/), jq, and sed.
 # To only list the last ones in order to just update the list in the release
 # notes, specify --limit as an argument of this script, this makes the request
