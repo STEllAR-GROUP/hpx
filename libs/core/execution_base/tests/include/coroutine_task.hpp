@@ -41,9 +41,8 @@ inline constexpr bool stop_token_provider = std::integral_constant<bool,
         void>>::value;
 
 template <typename T>
-inline constexpr bool indirect_stop_token_provider =
-    stop_token_provider<hpx::functional::tag_invoke_result_t<
-        hpx::execution::experimental::get_env_t, T>>;
+inline constexpr bool indirect_stop_token_provider = stop_token_provider<
+    hpx::util::invoke_result_t<hpx::execution::experimental::get_env_t, T>>;
 
 template <>
 inline constexpr bool indirect_stop_token_provider<void> =

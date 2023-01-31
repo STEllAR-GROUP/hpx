@@ -1345,8 +1345,7 @@ namespace hpx::execution::experimental {
                 is_awaitable_v<Awaitable, promise_t<Receiver>>>,
             typename = std::enable_if_t<
                 is_receiver_of_v<Receiver, completions_t<Receiver, Awaitable>>>>
-        operation_t<Receiver> operator()(
-            Awaitable&& await, Receiver&& rcvr) const
+        operation_t<Receiver> operator()(Awaitable&& await, Receiver rcvr) const
         {
             return impl(
                 HPX_FORWARD(Awaitable, await), HPX_FORWARD(Receiver, rcvr));
