@@ -69,6 +69,19 @@ namespace hpx { namespace sycl { namespace experimental {
                     },
                     command_event);
             }
+            future_data(init_no_addref no_addref, other_allocator const& alloc,
+                cl::sycl::event command_event, cl::sycl::queue &command_queue)
+              : lcos::detail::future_data_allocator<void, Allocator>(
+                    no_addref, alloc) 
+          {
+                command_queue.submit(
+                    [fdp = hpx::intrusive_ptr<future_data>(this), command_event](cl::sycl::handler& h) {
+                    h.depends_on(command_event);
+                    h.host_task([fdp]() {
+                        fdp->set_data(hpx::util::unused);
+                      });
+                    });
+          }
         };
 
         // -------------------------------------------------------------
@@ -98,9 +111,39 @@ namespace hpx { namespace sycl { namespace experimental {
                 p.release(), false);
         }
         // -------------------------------------------------------------
+        template <typename Allocator>
+        hpx::future<void> get_future(
+            Allocator const& a, cl::sycl::event command_event, cl::sycl::queue &command_queue)
+        {
+            using shared_state = future_data<Allocator>;
+
+            using other_allocator = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<shared_state>;
+            using traits = std::allocator_traits<other_allocator>;
+
+            using init_no_addref = typename shared_state::init_no_addref;
+
+            using unique_ptr = std::unique_ptr<shared_state,
+                util::allocator_deleter<other_allocator>>;
+
+            other_allocator alloc(a);
+            unique_ptr p(traits::allocate(alloc, 1),
+                hpx::util::allocator_deleter<other_allocator>{alloc});
+
+            traits::construct(
+                alloc, p.get(), init_no_addref{}, alloc, command_event, command_queue);
+
+            return hpx::traits::future_access<future<void>>::create(
+                p.release(), false);
+        }
+        // -------------------------------------------------------------
         // non allocator version of : get future with an event set
         HPX_CORE_EXPORT hpx::future<void> get_future(
             cl::sycl::event command_event);
+        // -------------------------------------------------------------
+        // non allocator version of : get future with an event set
+        HPX_CORE_EXPORT hpx::future<void> get_future(
+            cl::sycl::event command_event, cl::sycl::queue &command_queue);
         // -------------------------------------------------------------
         /// Convenience wrapper to get future from just a queue
         HPX_FORCEINLINE hpx::future<void> get_future(
@@ -111,7 +154,10 @@ namespace hpx { namespace sycl { namespace experimental {
             // launch returns
             cl::sycl::event event = command_queue.submit(
                 [](cl::sycl::handler& h) { h.single_task([]() {}); });
-            return get_future(event);
+            /* cl::sycl::event event2 = command_queue.submit( */
+            /*     [event](cl::sycl::handler& h) {h.depends_on(event); h.host_task([]() {printf("bla");}); }); */
+            /* return get_future(event, command_queue); */
+            return get_future(event, command_queue);
         }
     }    // namespace detail
 }}}      // namespace hpx::sycl::experimental
