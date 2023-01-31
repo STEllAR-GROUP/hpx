@@ -141,8 +141,8 @@ if(TARGET Vc::vc)
   set(execution_optional_dependencies Vc::vc)
 endif()
 
-if(TARGET Eve::eve)
-  set(execution_optional_dependencies Eve::eve)
+if(TARGET eve::eve)
+  set(execution_optional_dependencies eve::eve)
 endif()
 
 if(TARGET SVE::sve)

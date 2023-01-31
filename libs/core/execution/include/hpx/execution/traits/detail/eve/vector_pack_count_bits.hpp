@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <cstddef>
 
-#include <eve/function/count_true.hpp>
+#include <eve/module/core.hpp>
 
 namespace hpx::parallel::traits {
 

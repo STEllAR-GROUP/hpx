@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_DATAPAR_EVE)
-#include <eve/function/first_true.hpp>
+#include <eve/module/core.hpp>
 
 namespace hpx::parallel::traits {
 
