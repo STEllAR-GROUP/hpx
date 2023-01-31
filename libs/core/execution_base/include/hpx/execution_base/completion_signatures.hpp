@@ -270,6 +270,20 @@ namespace hpx::execution::experimental {
         };
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
+        // https://github.com/NVIDIA/stdexec/pull/733#issue-1537242117
+        //
+        // We were inconsistent about whether promise types were directly
+        // queryable, or whether they implemented get_env. Now we expect
+        // promise types to implement get_env, and if they don't they are
+        // implicitly given an empty environment.
+        //
+        // In get_completion_signatures, we were testing for awaitability
+        // using the Env arg as a promise type, which was picking up stray
+        // await_transform functions that connect would not use,
+        // leading to an inconsistency.
+        //
+        // -- Eric Niebler
+        //
         // To be kept in sync with the promise type used in connect_awaitable
         template <typename Env>
         struct env_promise
@@ -304,7 +318,7 @@ namespace hpx::execution::experimental {
             bool await_ready();
             void await_suspend(
                 hpx::coro::coroutine_handle<env_promise<no_env>> const&);
-            dependent_completion_signatures<env_promise<no_env>> await_resume();
+            dependent_completion_signatures await_resume();
 #endif
         };
     }    // namespace detail
