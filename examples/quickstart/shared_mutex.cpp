@@ -23,6 +23,8 @@
 #include <shared_mutex>
 #include <vector>
 
+///////////////////////////////////////////////////////////////////////////////
+//[shared_mutex_docs
 int const writers = 3;
 int const readers = 3;
 int const cycles = 10;
@@ -93,6 +95,7 @@ int hpx_main()
 
     return hpx::local::finalize();
 }
+//]
 
 int main(int argc, char* argv[])
 {

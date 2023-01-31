@@ -1,39 +1,218 @@
 ..
     Copyright (C) 2012 Bryce Adelstein-Lelbach
     Copyright (C) 2007-2016 Hartmut Kaiser
+    Copyright (C) 2023 Dimitra Karatza
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _writing_single_node_hpx_applications:
+.. _writing_single_node_applications:
 
-======================================
-Writing single-node |hpx| applications
-======================================
+================================
+Writing single-node applications
+================================
 
-|hpx| is a C++ Standard Library for Concurrency and Parallelism. This means that
-it implements all of the corresponding facilities as defined by the C++
-Standard. Additionally, |hpx| implements functionalities proposed as part
-of the ongoing C++ standardization process. This section focuses on the features
-available in |hpx| for parallel and concurrent computation on a single node,
-although many of the features presented here are also implemented to work in the
+Being a C++ Standard Library for Concurrency and Parallelism, |hpx| implements all
+of the corresponding facilities as defined by the C++ Standard but also those which
+are proposed as part of the ongoing C++ standardization process. This section focuses
+on the features available in |hpx| for parallel and concurrent computation on a single
+node, although many of the features presented here are also implemented to work in the
 distributed case.
 
-.. _lcos:
+.. _synchronization_objects:
 
-Using :term:`LCO`\ s
-====================
+Synchronization objects
+=======================
 
-:term:`Lightweight Control Object`\ s (LCOs) provide synchronization for |hpx| applications. Most
-of them are familiar from other frameworks, but a few of them work in slightly
-different ways adapted to |hpx|. The following synchronization objects are available in |hpx|:
+The following objects are providing synchronization for |hpx| applications:
 
-#. ``future``
+#. :ref:`barrier`
+#. :ref:`condition_variable`
+#. :ref:`latch`
+#. :ref:`mutex`
+#. :ref:`shared_mutex`
+#. :ref:`semaphore`
+#. :ref:`guards`
 
-#. ``queue``
+.. _barrier:
 
-#. ``barrier``
+Barrier
+-------
+
+:ref:`Barriers <public_api_header_hpx_barrier>` are used for synchronizing multiple threads.
+They provide a synchronization point, where all threads must wait until they have all reached
+the barrier, before they can continue execution. This allows multiple threads to work together
+to solve a common task, and ensures that no thread starts working on the next task until all
+threads have completed the current task. This ensures that all threads are in the same state
+before performing any further operations, leading to a more consistent and accurate computation.
+
+Unlike latches, barriers are reusable: once the participating threads are released from a
+barrier's synchronization point, they can re-use the same barrier. It is thus useful for
+managing repeated tasks, or phases of a larger task, that are handled by multiple threads.
+The code below shows how barriers can be used to synchronize two threads:
+
+.. literalinclude:: ../../examples/quickstart/barrier_docs.cpp
+   :language: c++
+   :start-after: //[barrier_main
+   :end-before: //]
+
+In this example, two ``hpx::future`` objects are created, each representing a separate thread of
+execution. The ``wait`` function of the ``hpx::barrier`` object is called by each thread. The
+threads will wait at the barrier until both have reached it. Once both threads have reached
+the barrier, they can continue with their next task.
+
+.. _condition_variable:
+
+Condition variable
+------------------
+
+A condition variable is a synchronization primitive in |hpx| that allows a thread to wait for a
+specific condition to be satisfied before continuing execution. It is typically used in conjunction
+with a mutex or a lock to protect shared data that is being modified by multiple threads. Hence, it
+blocks one or more threads until another thread both modifies a shared variable (the condition) and
+notifies the `condition_variable`.
+
+TODO: add example
+
+.. _latch:
+
+Latch
+-----
+
+A latch is a downward counter which can be used to synchronize threads. The value of the counter is
+initialized on creation. Threads may block on the latch until the counter is decremented to zero.
+There is no possibility to increase or reset the counter, which makes the latch a single-use barrier.
+
+In |hpx|, a latch is implemented as a counting semaphore, which can be initialized with a specific count
+value and decremented each time a thread reaches the latch. When the count value reaches zero, all
+waiting threads are unblocked and allowed to continue execution. The code below shows how latch can
+be used to synchronize 16 threads:
+
+.. literalinclude:: ../../examples/quickstart/latch_local.cpp
+   :language: c++
+   :start-after: //[latch_docs
+   :end-before: //]
+
+In the above code, the ``hpx_main`` function creates a latch object ``l`` with a count of ``num_threads + 1``
+and ``num_threads`` number of threads using ``hpx::async``. These threads call the ``wait_for_latch``
+function and pass the reference to the latch object. In the ``wait_for_latch`` function, the thread calls the
+``arrive_and_wait`` method on the latch, which decrements the count of the latch and causes the thread to wait
+until the count reaches zero. Finally, the main thread waits for all the threads to arrive at the latch by
+calling the ``arrive_and_wait`` method and then waits for all the threads to finish by calling the
+``hpx::wait_all`` method.
+
+.. _mutex:
+
+Mutex
+-----
+
+A mutex (short for "mutual exclusion") is a synchronization primitive in |hpx| used to control access to a
+shared resource, ensuring that only one thread can access it at a time. A mutex is used to protect data
+structures from race conditions and other synchronization-related issues. When a thread acquires a mutex,
+other threads that try to access the same resource will be blocked until the mutex is released.
+
+TODO: add example
+
+.. _shared_mutex:
+
+Shared mutex
+------------
+
+A shared mutex is a synchronization primitive that can be used to protect shared data from being
+simultaneously accessed by multiple threads. In contrast to other mutex types which facilitate
+exclusive access, a ``shared_mutex`` has two levels of access:
+
+* `Exclusive access` prevents any other thread from acquiring the mutex, just as with the normal mutex.
+  It does not matter if the other thread tries to acquire shared or exclusive access.
+* `Shared access` allows multiple threads to acquire the mutex, but all of them only in shared mode.
+  Exclusive access is not granted until all of the previous shared holders have returned the mutex
+  (typically, as long as an exclusive request is waiting, new shared ones are queued to be granted after
+  the exclusive access).
+
+Shared mutexes are especially useful when shared data can be safely read by any number of threads
+simultaneously, but a thread may only write the same data when no other thread is reading or writing
+at the same time. A typical scenario is a database: The data can be read simultaneously by different
+threads with no problem. However, modification of the database is critical: if some threads read data
+while another one is writing,  the threads reading may receive inconsistent data. Hence, while a thread
+is writing, reading should not be allowed. After writing is complete, reads can occur simultaneously again.
+The code below shows how ``shared_mutex`` can be used to synchronize reads and writes:
+
+.. literalinclude:: ../../examples/quickstart/shared_mutex.cpp
+   :language: c++
+   :start-after: //[shared_mutex_docs
+   :end-before: //]
+
+The above code creates ``writers`` and ``readers`` threads, each of which will perform ``cycles`` of operations.
+Both the writer and reader threads use the ``hpx::shared_mutex`` object ``stm`` to synchronize access to a shared
+resource.
+
+* For the writer threads, a ``unique_lock`` on the shared mutex is acquired before each write operation and is released
+  after the operation is complete.
+* For the reader threads, a ``shared_lock`` on the shared mutex is acquired before each read operation and is released
+  after the operation is complete.
+
+Before each operation, both the reader and writer threads sleep for a random time period, which is generated using
+a random number generator. The random time period simulates the processing time of the operation.
+
+.. _semaphore:
+
+Semaphore
+---------
+
+Semaphores are a synchronization mechanism used to control concurrent access to a shared resource. The two
+types of semaphores are:
+
+* counting semaphore: it has a counter that is bigger than zero. The counter is initialized in the constructor.
+  Acquiring the semaphore decreases the counter and releasing the semaphore increases the counter. If a thread
+  tries to acquire the semaphore when the counter is zero, the thread will block until another thread increments
+  the counter by releasing the semaphore. Unlike ``hpx::mutex``, a ``hpx::counting_semaphore`` is not bound to a
+  thread, which means that the acquire and release call of a semaphore can happen on different threads.
+* binary semaphore: it is an alias for a ``hpx::counting_semaphore<1>``. In this case, the least maximal value
+  is 1. ``hpx::binary_semaphores`` can be used to implement locks.
+
+TODO: add example
+
+.. _guards:
+
+Composable guards
+-----------------
+
+Composable guards operate in a manner similar to locks, but are applied only to
+asynchronous functions. The guard (or guards) is automatically locked at the
+beginning of a specified task and automatically unlocked at the end. Because
+guards are never added to an existing task's execution context, the calling of
+guards is freely composable and can never deadlock.
+
+To call an application with a single guard, simply declare the guard and call
+``run_guarded()`` with a function ``(task)``::
+
+     hpx::lcos::local::guard gu;
+     run_guarded(gu,task);
+
+If a single method needs to run with multiple guards, use a guard set::
+
+     boost::shared<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
+     boost::shared<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
+     gs.add(*gu1);
+     gs.add(*gu2);
+     run_guarded(gs,task);
+
+Guards use two atomic operations (which are not called repeatedly) to manage
+what they do, so overhead should be extremely low.
+
+.. _execution_control:
+
+Execution control
+=================
+
+The following objects are providing control of the execution in |hpx| applications:
+
+#. ``Future``
+#. ``Channel``
+#. ``Task block``
+#. ``Task group``
+#. ``Thread``
 
 Channels
 --------
@@ -70,52 +249,6 @@ channel can be used as a range of values:
    :language: c++
    :start-after: //[channel
    :end-before: //]
-
-Composable guards
------------------
-
-Composable guards operate in a manner similar to locks, but are applied only to
-asynchronous functions. The guard (or guards) is automatically locked at the
-beginning of a specified task and automatically unlocked at the end. Because
-guards are never added to an existing task's execution context, the calling of
-guards is freely composable and can never deadlock.
-
-To call an application with a single guard, simply declare the guard and call
-run_guarded() with a function (task)::
-
-     hpx::lcos::local::guard gu;
-     run_guarded(gu,task);
-
-If a single method needs to run with multiple guards, use a guard set::
-
-     boost::shared<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
-     boost::shared<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
-     gs.add(*gu1);
-     gs.add(*gu2);
-     run_guarded(gs,task);
-
-Guards use two atomic operations (which are not called repeatedly) to manage
-what they do, so overhead should be extremely low. The following guards are available in |hpx|:
-
-#. ``conditional_trigger``
-
-#. ``counting_semaphore``
-
-#. ``dataflow``
-
-#. ``event``
-
-#. ``mutex``
-
-#. ``once``
-
-#. ``recursive_mutex``
-
-#. ``spinlock``
-
-#. ``spinlock_no_backoff``
-
-#. ``trigger``
 
 .. _extend_futures:
 
