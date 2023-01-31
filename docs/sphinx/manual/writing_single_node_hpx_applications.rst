@@ -67,11 +67,11 @@ the barrier, they can continue with their next task.
 Condition variable
 ------------------
 
-A condition variable is a synchronization primitive in |hpx| that allows a thread to wait for a
-specific condition to be satisfied before continuing execution. It is typically used in conjunction
-with a mutex or a lock to protect shared data that is being modified by multiple threads. Hence, it
-blocks one or more threads until another thread both modifies a shared variable (the condition) and
-notifies the `condition_variable`.
+A :ref:`condition variable <public_api_header_hpx_condition_variable>` is a synchronization primitive
+in |hpx| that allows a thread to wait for a specific condition to be satisfied before continuing
+execution. It is typically used in conjunction with a mutex or a lock to protect shared data that is
+being modified by multiple threads. Hence, it blocks one or more threads until another thread both
+modifies a shared variable (the condition) and notifies the `condition_variable`.
 
 TODO: add example
 
@@ -80,9 +80,10 @@ TODO: add example
 Latch
 -----
 
-A latch is a downward counter which can be used to synchronize threads. The value of the counter is
-initialized on creation. Threads may block on the latch until the counter is decremented to zero.
-There is no possibility to increase or reset the counter, which makes the latch a single-use barrier.
+A :ref:`latch <public_api_header_hpx_latch>` is a downward counter which can be used to synchronize threads.
+The value of the counter is initialized on creation. Threads may block on the latch until the counter is
+decremented to zero. There is no possibility to increase or reset the counter, which makes the latch a
+single-use barrier.
 
 In |hpx|, a latch is implemented as a counting semaphore, which can be initialized with a specific count
 value and decremented each time a thread reaches the latch. When the count value reaches zero, all
@@ -107,10 +108,11 @@ calling the ``arrive_and_wait`` method and then waits for all the threads to fin
 Mutex
 -----
 
-A mutex (short for "mutual exclusion") is a synchronization primitive in |hpx| used to control access to a
-shared resource, ensuring that only one thread can access it at a time. A mutex is used to protect data
-structures from race conditions and other synchronization-related issues. When a thread acquires a mutex,
-other threads that try to access the same resource will be blocked until the mutex is released.
+A :ref:`mutex <public_api_header_hpx_mutex>` (short for "mutual exclusion") is a synchronization primitive in
+|hpx| used to control access to a shared resource, ensuring that only one thread can access it at a time. A
+mutex is used to protect data structures from race conditions and other synchronization-related issues. When
+a thread acquires a mutex, other threads that try to access the same resource will be blocked until the mutex
+is released.
 
 TODO: add example
 
@@ -119,9 +121,9 @@ TODO: add example
 Shared mutex
 ------------
 
-A shared mutex is a synchronization primitive that can be used to protect shared data from being
-simultaneously accessed by multiple threads. In contrast to other mutex types which facilitate
-exclusive access, a ``shared_mutex`` has two levels of access:
+A :ref:`shared mutex <public_api_header_hpx_shared_mutex>` is a synchronization primitive that can be used
+to protect shared data from being simultaneously accessed by multiple threads. In contrast to other mutex
+types which facilitate exclusive access, a ``shared_mutex`` has two levels of access:
 
 * `Exclusive access` prevents any other thread from acquiring the mutex, just as with the normal mutex.
   It does not matter if the other thread tries to acquire shared or exclusive access.
@@ -160,8 +162,8 @@ a random number generator. The random time period simulates the processing time 
 Semaphore
 ---------
 
-Semaphores are a synchronization mechanism used to control concurrent access to a shared resource. The two
-types of semaphores are:
+:ref:`Semaphores <public_api_header_hpx_semaphore>` are a synchronization mechanism used to control concurrent
+access to a shared resource. The two types of semaphores are:
 
 * counting semaphore: it has a counter that is bigger than zero. The counter is initialized in the constructor.
   Acquiring the semaphore decreases the counter and releasing the semaphore increases the counter. If a thread
@@ -208,52 +210,31 @@ Execution control
 
 The following objects are providing control of the execution in |hpx| applications:
 
-#. ``Future``
-#. ``Channel``
-#. ``Task block``
-#. ``Task group``
-#. ``Thread``
+#. :ref:`future`
+#. :ref:`channel`
+#. :ref:`task_block`
+#. :ref:`task_group`
+#. :ref:`thread`
 
-Channels
---------
+.. _future:
 
-Channels combine communication (the exchange of a value) with synchronization
-(guaranteeing that two calculations (tasks) are in a known state). A channel can
-transport any number of values of a given type from a sender to a receiver:
+Futures
+-------
 
-.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
-   :language: c++
-   :start-after: //[local_channel_minimal
-   :end-before: //]
+:ref:`Futures <public_api_header_hpx_future>` are a mechanism to represent the result of a
+potentially asynchronous operation. A future is a type that represents a value that will
+become available at some point in the future, and it can be used to write asynchronous and
+parallel code. Futures can be returned from functions that perform time-consuming operations,
+allowing the calling code to continue executing while the function performs its work. The
+value of the future is set when the operation completes and can be accessed later. Futures
+are used in |hpx| to write asynchronous and parallel code.
 
-Channels can be handed to another thread (or in case of channel components, to
-other localities), thus establishing a communication channel between two
-independent places in the program:
-
-.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
-   :language: c++
-   :start-after: //[local_channel_send_receive
-   :end-before: //]
-
-Note how :cpp:member:`hpx::lcos::local::channel::get` without any arguments
-returns a future which is ready when a value has been set on the channel. The
-launch policy ``hpx::launch::sync`` can be used to make
-:cpp:member:`hpx::lcos::local::channel::get` block until a value is set and
-return the value directly.
-
-A channel component is created on one :term:`locality` and can be sent to
-another :term:`locality` using an action. This example also demonstrates how a
-channel can be used as a range of values:
-
-.. literalinclude:: ../../examples/quickstart/channel_docs.cpp
-   :language: c++
-   :start-after: //[channel
-   :end-before: //]
+TODO: expand
 
 .. _extend_futures:
 
 Extended facilities for futures
-===============================
+...............................
 
 Concurrency is about both decomposing and composing the program from the parts
 that work well individually and together. It is in the composition of connected
@@ -361,6 +342,239 @@ allowing users to compose several futures in a more flexible way.
        finish and call a function for each of the future objects as soon as it
        becomes ready.
      * |hpx| only
+
+.. _channel:
+
+Channels
+--------
+
+:ref:`Channels <public_api_header_hpx_channel>` combine communication (the exchange of a value)
+with synchronization (guaranteeing that two calculations (tasks) are in a known state). A channel
+can transport any number of values of a given type from a sender to a receiver:
+
+.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
+   :language: c++
+   :start-after: //[local_channel_minimal
+   :end-before: //]
+
+Channels can be handed to another thread (or in case of channel components, to
+other localities), thus establishing a communication channel between two
+independent places in the program:
+
+.. literalinclude:: ../../examples/quickstart/local_channel_docs.cpp
+   :language: c++
+   :start-after: //[local_channel_send_receive
+   :end-before: //]
+
+Note how :cpp:member:`hpx::lcos::local::channel::get` without any arguments
+returns a future which is ready when a value has been set on the channel. The
+launch policy ``hpx::launch::sync`` can be used to make
+:cpp:member:`hpx::lcos::local::channel::get` block until a value is set and
+return the value directly.
+
+A channel component is created on one :term:`locality` and can be sent to
+another :term:`locality` using an action. This example also demonstrates how a
+channel can be used as a range of values:
+
+.. literalinclude:: ../../examples/quickstart/channel_docs.cpp
+   :language: c++
+   :start-after: //[channel
+   :end-before: //]
+
+
+.. _task_block:
+
+Task blocks
+-----------
+
+:ref:`Task blocks <public_api_header_hpx_task_block>` in |hpx| provide a way to
+structure and organize the execution of tasks in a parallel program, making it
+easier to manage dependencies between tasks. A task block actually is a group of
+tasks that can be executed in parallel. Tasks in a task block can depend on other
+tasks in the same task block. The task block allows the runtime to optimize
+the execution of tasks, by scheduling them in an optimal order based on the
+dependencies between them.
+
+The ``define_task_block``, ``run`` and the ``wait`` functions implemented based
+on |cpp17_n4755|_ are based on the ``task_block`` concept that is a part of the
+common subset of the |ppl|_ and the |tbb|_ libraries.
+
+These implementations adopt a simpler syntax than exposed by those libraries---
+one that is influenced by language-based concepts, such as spawn and sync from
+|cilk_pp|_ and async and finish from |x10|_. They improve on existing practice in
+the following ways:
+
+* The exception handling model is simplified and more consistent with normal C++
+  exceptions.
+* Most violations of strict fork-join parallelism can be enforced at compile
+  time (with compiler assistance, in some cases).
+* The syntax allows scheduling approaches other than child stealing.
+
+Consider an example of a parallel traversal of a tree, where a user-provided
+function compute is applied to each node of the tree, returning the sum of the
+results::
+
+    template <typename Func>
+    int traverse(node& n, Func && compute)
+    {
+        int left = 0, right = 0;
+        define_task_block(
+            [&](task_block<>& tr) {
+                if (n.left)
+                    tr.run([&] { left = traverse(*n.left, compute); });
+                if (n.right)
+                    tr.run([&] { right = traverse(*n.right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+The example above demonstrates the use of two of the functions,
+:cpp:func:`hpx::experimental::define_task_block` and the
+:cpp:member:`hpx::experimental::task_block::run` member function of a
+:cpp:class:`hpx::experimental::task_block`.
+
+The ``task_block`` function delineates a region in a program code potentially
+containing invocations of threads spawned by the ``run`` member function of the
+``task_block`` class. The ``run`` function spawns an |hpx| thread, a unit of
+work that is allowed to execute in parallel with respect to the caller. Any
+parallel tasks spawned by ``run`` within the task block are joined back to a
+single thread of execution at the end of the ``define_task_block``. ``run``
+takes a user-provided function object ``f`` and starts it asynchronously---i.e.,
+it may return before the execution of ``f`` completes. The |hpx| scheduler may
+choose to run ``f`` immediately or delay running ``f`` until compute resources
+become available.
+
+A ``task_block`` can be constructed only by ``define_task_block`` because it has
+no public constructors. Thus, ``run`` can be invoked directly or indirectly
+only from a user-provided function passed to ``define_task_block``::
+
+    void g();
+
+    void f(task_block<>& tr)
+    {
+        tr.run(g);          // OK, invoked from within task_block in h
+    }
+
+    void h()
+    {
+        define_task_block(f);
+    }
+
+    int main()
+    {
+        task_block<> tr;    // Error: no public constructor
+        tr.run(g);          // No way to call run outside of a define_task_block
+        return 0;
+    }
+
+.. _task_block_extensions:
+
+Extensions for task blocks
+..........................
+
+Using execution policies with task blocks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|hpx| implements some extensions for ``task_block`` beyond the actual
+standards proposal |cpp17_n4755|_. The main addition is that a ``task_block``
+can be invoked with an execution policy as its first argument, very similar to
+the parallel algorithms.
+
+An execution policy is an object that expresses the requirements on the
+ordering of functions invoked as a consequence of the invocation of a
+task block. Enabling passing an execution policy to ``define_task_block``
+gives the user control over the amount of parallelism employed by the
+created ``task_block``. In the following example the use of an explicit
+``par`` execution policy makes the user's intent explicit::
+
+    template <typename Func>
+    int traverse(node *n, Func&& compute)
+    {
+        int left = 0, right = 0;
+
+        define_task_block(
+            execution::par,                // execution::parallel_policy
+            [&](task_block<>& tb) {
+                if (n->left)
+                    tb.run([&] { left = traverse(n->left, compute); });
+                if (n->right)
+                    tb.run([&] { right = traverse(n->right, compute); });
+            });
+
+        return compute(n) + left + right;
+    }
+
+This also causes the :cpp:class:`hpx::experimental::task_block` object to be a
+template in our implementation. The template argument is the type of the
+execution policy used to create the task block. The template argument defaults
+to :cpp:class:`hpx::execution::parallel_policy`.
+
+|hpx| still supports calling :cpp:func:`hpx::experimental::define_task_block`
+without an explicit execution policy. In this case the task block will run using
+the :cpp:class:`hpx::execution::parallel_policy`.
+
+|hpx| also adds the ability to access the execution policy that was used to
+create a given ``task_block``.
+
+Using executors to run tasks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Often, users want to be able to not only define an execution policy to use by
+default for all spawned tasks inside the task block, but also to
+customize the execution context for one of the tasks executed by
+``task_block::run``. Adding an optionally passed executor instance to that
+function enables this use case::
+
+    template <typename Func>
+    int traverse(node *n, Func&& compute)
+    {
+        int left = 0, right = 0;
+
+        define_task_block(
+            execution::par,                // execution::parallel_policy
+            [&](auto& tb) {
+                if (n->left)
+                {
+                    // use explicitly specified executor to run this task
+                    tb.run(my_executor(), [&] { left = traverse(n->left, compute); });
+                }
+                if (n->right)
+                {
+                    // use the executor associated with the par execution policy
+                    tb.run([&] { right = traverse(n->right, compute); });
+                }
+            });
+
+        return compute(n) + left + right;
+    }
+
+|hpx| still supports calling :cpp:func:`hpx::experimental::task_block::run`
+without an explicit executor object. In this case the task will be run using the
+executor associated with the execution policy that was used to call
+:cpp:func:`hpx::experimental::define_task_block`.
+
+.. _task_group:
+
+Task groups
+-----------
+
+A :ref:`task group <public_api_header_hpx_task_group>` in |hpx| represents concurrent
+execution of a group of tasks. Tasks can be dynamically added to the group while it is executing.
+
+TODO: refer to oneTBB, explain difference from task block
+
+.. _thread:
+
+Threads
+-------
+
+A :ref:`Thread <public_api_header_hpx_task_thread>` in |hpx| refers to a sequence of instructions
+that can be executed concurrently with other such sequences in multithreading environments, while
+sharing a same address space. These threads can communicate with each other through various means,
+such as futures or shared data structures.
+
+TODO: expand
 
 .. _parallel:
 
@@ -1001,167 +1215,3 @@ parameter types will naturally specialize all operations for maximum efficiency.
   parameter defines the minimum block size. The default minimal chunk size is 1.
   This executor parameter type is equivalent to OpenMP's GUIDED scheduling
   directive.
-
-.. _using_task_block:
-
-Using task blocks
-=================
-
-The ``define_task_block``, ``run`` and the ``wait`` functions implemented based
-on |cpp17_n4755|_ are based on the ``task_block`` concept that is a part of the
-common subset of the |ppl|_ and the |tbb|_ libraries.
-
-These implementations adopt a simpler syntax than exposed by those libraries---
-one that is influenced by language-based concepts, such as spawn and sync from
-|cilk_pp|_ and async and finish from |x10|_. They improve on existing practice in
-the following ways:
-
-* The exception handling model is simplified and more consistent with normal C++
-  exceptions.
-* Most violations of strict fork-join parallelism can be enforced at compile
-  time (with compiler assistance, in some cases).
-* The syntax allows scheduling approaches other than child stealing.
-
-Consider an example of a parallel traversal of a tree, where a user-provided
-function compute is applied to each node of the tree, returning the sum of the
-results::
-
-    template <typename Func>
-    int traverse(node& n, Func && compute)
-    {
-        int left = 0, right = 0;
-        define_task_block(
-            [&](task_block<>& tr) {
-                if (n.left)
-                    tr.run([&] { left = traverse(*n.left, compute); });
-                if (n.right)
-                    tr.run([&] { right = traverse(*n.right, compute); });
-            });
-
-        return compute(n) + left + right;
-    }
-
-The example above demonstrates the use of two of the functions,
-:cpp:func:`hpx::experimental::define_task_block` and the
-:cpp:member:`hpx::experimental::task_block::run` member function of a
-:cpp:class:`hpx::experimental::task_block`.
-
-The ``task_block`` function delineates a region in a program code potentially
-containing invocations of threads spawned by the ``run`` member function of the
-``task_block`` class. The ``run`` function spawns an |hpx| thread, a unit of
-work that is allowed to execute in parallel with respect to the caller. Any
-parallel tasks spawned by ``run`` within the task block are joined back to a
-single thread of execution at the end of the ``define_task_block``. ``run``
-takes a user-provided function object ``f`` and starts it asynchronously---i.e.,
-it may return before the execution of ``f`` completes. The |hpx| scheduler may
-choose to run ``f`` immediately or delay running ``f`` until compute resources
-become available.
-
-A ``task_block`` can be constructed only by ``define_task_block`` because it has
-no public constructors. Thus, ``run`` can be invoked directly or indirectly
-only from a user-provided function passed to ``define_task_block``::
-
-    void g();
-
-    void f(task_block<>& tr)
-    {
-        tr.run(g);          // OK, invoked from within task_block in h
-    }
-
-    void h()
-    {
-        define_task_block(f);
-    }
-
-    int main()
-    {
-        task_block<> tr;    // Error: no public constructor
-        tr.run(g);          // No way to call run outside of a define_task_block
-        return 0;
-    }
-
-.. _task_block_extensions:
-
-Extensions for task blocks
---------------------------
-
-Using execution policies with task blocks
-.........................................
-
-|hpx| implements some extensions for ``task_block`` beyond the actual
-standards proposal |cpp17_n4755|_. The main addition is that a ``task_block``
-can be invoked with an execution policy as its first argument, very similar to
-the parallel algorithms.
-
-An execution policy is an object that expresses the requirements on the
-ordering of functions invoked as a consequence of the invocation of a
-task block. Enabling passing an execution policy to ``define_task_block``
-gives the user control over the amount of parallelism employed by the
-created ``task_block``. In the following example the use of an explicit
-``par`` execution policy makes the user's intent explicit::
-
-    template <typename Func>
-    int traverse(node *n, Func&& compute)
-    {
-        int left = 0, right = 0;
-
-        define_task_block(
-            execution::par,                // execution::parallel_policy
-            [&](task_block<>& tb) {
-                if (n->left)
-                    tb.run([&] { left = traverse(n->left, compute); });
-                if (n->right)
-                    tb.run([&] { right = traverse(n->right, compute); });
-            });
-
-        return compute(n) + left + right;
-    }
-
-This also causes the :cpp:class:`hpx::experimental::task_block` object to be a
-template in our implementation. The template argument is the type of the
-execution policy used to create the task block. The template argument defaults
-to :cpp:class:`hpx::execution::parallel_policy`.
-
-|hpx| still supports calling :cpp:func:`hpx::experimental::define_task_block`
-without an explicit execution policy. In this case the task block will run using
-the :cpp:class:`hpx::execution::parallel_policy`.
-
-|hpx| also adds the ability to access the execution policy that was used to
-create a given ``task_block``.
-
-Using executors to run tasks
-............................
-
-Often, users want to be able to not only define an execution policy to use by
-default for all spawned tasks inside the task block, but also to
-customize the execution context for one of the tasks executed by
-``task_block::run``. Adding an optionally passed executor instance to that
-function enables this use case::
-
-    template <typename Func>
-    int traverse(node *n, Func&& compute)
-    {
-        int left = 0, right = 0;
-
-        define_task_block(
-            execution::par,                // execution::parallel_policy
-            [&](auto& tb) {
-                if (n->left)
-                {
-                    // use explicitly specified executor to run this task
-                    tb.run(my_executor(), [&] { left = traverse(n->left, compute); });
-                }
-                if (n->right)
-                {
-                    // use the executor associated with the par execution policy
-                    tb.run([&] { right = traverse(n->right, compute); });
-                }
-            });
-
-        return compute(n) + left + right;
-    }
-
-|hpx| still supports calling :cpp:func:`hpx::experimental::task_block::run`
-without an explicit executor object. In this case the task will be run using the
-executor associated with the execution policy that was used to call
-:cpp:func:`hpx::experimental::define_task_block`.
