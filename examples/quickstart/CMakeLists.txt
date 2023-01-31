@@ -6,31 +6,31 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
-  barrier_docs
-  composable_guard
-  customize_async
-  enumerate_threads
-  event_synchronization
-  fibonacci_await
-  fibonacci_dataflow
-  fibonacci_futures
-  fibonacci_local
-  file_serialization
-  hello_world_3
-  latch_local
-  local_channel_docs
-  local_channel
-  matrix_multiplication
-  pipeline1
-  safe_object
-  shared_mutex
-  simple_future_continuation
-  timed_futures
-  timed_wake
-  use_main_thread
-  vector_counting_dotproduct
-  vector_zip_dotproduct
-  wait_composition
+    barrier_docs
+    composable_guard
+    customize_async
+    enumerate_threads
+    event_synchronization
+    fibonacci_await
+    fibonacci_dataflow
+    fibonacci_futures
+    fibonacci_local
+    file_serialization
+    hello_world_3
+    latch_local
+    local_channel_docs
+    local_channel
+    matrix_multiplication
+    pipeline1
+    safe_object
+    shared_mutex
+    simple_future_continuation
+    timed_futures
+    timed_wake
+    use_main_thread
+    vector_counting_dotproduct
+    vector_zip_dotproduct
+    wait_composition
 )
 
 if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" AND NOT HPX_WITH_STATIC_LINKING)
@@ -39,38 +39,38 @@ endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(example_programs
-    ${example_programs}
-    1d_wave_equation
-    allow_unknown_options
-    channel_docs
-    command_line_handling
-    component_ctors
-    component_in_executable
-    component_inheritance
-    component_with_custom_heap
-    component_with_executor
-    custom_serialization
-    data_actions
-    error_handling
-    factorial
-    fibonacci
-    fibonacci_futures_distributed
-    fibonacci_one
-    hello_world_1
-    hello_world_2
-    hello_world_distributed
-    interest_calculator
-    interval_timer
-    invoke_function
-    latch_remote
-    partitioned_vector_spmd_foreach
-    pingpong
-    potpourri
-    print_to_console
-    receive_buffer
-    sierpinski
-    simple_master_slave
-    zerocopy_rdma
+      ${example_programs}
+      1d_wave_equation
+      allow_unknown_options
+      channel_docs
+      command_line_handling
+      component_ctors
+      component_in_executable
+      component_inheritance
+      component_with_custom_heap
+      component_with_executor
+      custom_serialization
+      data_actions
+      error_handling
+      factorial
+      fibonacci
+      fibonacci_futures_distributed
+      fibonacci_one
+      hello_world_1
+      hello_world_2
+      hello_world_distributed
+      interest_calculator
+      interval_timer
+      invoke_function
+      latch_remote
+      partitioned_vector_spmd_foreach
+      pingpong
+      potpourri
+      print_to_console
+      receive_buffer
+      sierpinski
+      simple_master_slave
+      zerocopy_rdma
   )
 endif()
 
@@ -92,7 +92,7 @@ set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams
-    DEPENDENCIES compress_snappy
+                                    DEPENDENCIES compress_snappy
   )
 else()
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
@@ -101,13 +101,13 @@ endif()
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
-  partitioned_vector
+                                          partitioned_vector
 )
 set(pingpong_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(potpourri_FLAGS COMPONENT_DEPENDENCIES iostreams)
 
 set(1d_wave_equation_PARAMETERS THREADS_PER_LOCALITY 4
-  "-Ihpx.stacks.use_guard_pages!=0"
+                                "-Ihpx.stacks.use_guard_pages!=0"
 )
 set(allow_unknown_options_PARAMETERS THREADS_PER_LOCALITY 4)
 set(command_line_handling_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -134,7 +134,7 @@ set(vector_zip_dotproduct_PARAMETERS THREADS_PER_LOCALITY 4)
 set(custom_serialization_PARAMETERS LOCALITIES 2)
 
 # the following example fails compiling on someversions of MSVC
-if(HPX_WITH_TUPLE_RVALUE_SWAP AND(NOT MSVC))
+if(HPX_WITH_TUPLE_RVALUE_SWAP AND (NOT MSVC))
   list(APPEND example_programs sort_by_key_demo)
 endif()
 
@@ -156,8 +156,8 @@ foreach(example_program ${example_programs})
   add_hpx_example_target_dependencies("quickstart" ${example_program})
 
   if(HPX_WITH_TESTS
-    AND HPX_WITH_TESTS_EXAMPLES
-    AND NOT("${example_program}" IN_LIST disabled_tests)
+     AND HPX_WITH_TESTS_EXAMPLES
+     AND NOT ("${example_program}" IN_LIST disabled_tests)
   )
     add_hpx_example_test(
       "quickstart" ${example_program} ${${example_program}_PARAMETERS}
