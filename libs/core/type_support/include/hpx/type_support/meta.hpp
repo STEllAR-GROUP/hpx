@@ -506,4 +506,13 @@ namespace hpx::meta {
     template <typename T>
     using get_id_t = hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>;
 
+    template <typename T, typename... As>
+    inline constexpr bool is_constructible_from_v =
+        std::is_destructible_v<T>&& std::is_constructible_v<T, As...>;
+
+    template <typename T, typename... As>
+    inline constexpr bool is_nothrow_constructible_from_v =
+        is_constructible_from_v<T, As...>&&
+            std::is_nothrow_constructible_v<T, As...>;
+
 }    // namespace hpx::meta

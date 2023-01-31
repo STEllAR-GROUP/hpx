@@ -1030,26 +1030,45 @@ namespace hpx::execution::experimental {
     inline constexpr struct as_awaitable_t
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
-        // static to call this function without creating an object
         template <typename T, typename Promise>
-        static constexpr bool is_noexcept() noexcept
+        static constexpr auto select_impl() noexcept
         {
-            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t, T,
+                              Promise&>)
             {
-                using Sender = detail::sender_awaitable_t<Promise, T>;
-                return std::is_nothrow_constructible_v<Sender, T,
-                    hpx::coro::coroutine_handle<Promise>>;
+                using Result =
+                    hpx::functional::tag_invoke_result_t<as_awaitable_t, T,
+                        Promise&>;
+                constexpr bool Nothrow =
+                    hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
+                        T, Promise&>;
+                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
+            }
+            else if constexpr (is_awaitable_v<T>)
+            {    // NOT is_awaitable_v<T, Promise> !!
+                return static_cast < T && (*) () noexcept > (nullptr);
+            }
+            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            {
+                using Result = detail::sender_awaitable_t<Promise, T>;
+                constexpr bool Nothrow =
+                    hpx::meta::is_nothrow_constructible_from_v<Result, T,
+                        hpx::coro::coroutine_handle<Promise>>;
+                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
             }
             else
             {
-                return true;
+                return static_cast < T && (*) () noexcept > (nullptr);
             }
         }
 
         template <typename T, typename Promise>
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            as_awaitable_t, T&& t,
-            Promise& promise) noexcept(is_noexcept<T, Promise>())
+        using select_impl_t = decltype(select_impl<T, Promise>());
+
+        template <typename T, typename Promise>
+        friend HPX_FORCEINLINE decltype(auto)
+        tag_fallback_invoke(as_awaitable_t, T&& t, Promise& promise) noexcept(
+            std::is_nothrow_invocable_v<select_impl_t<T, Promise>>)
         {
             if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
@@ -1057,10 +1076,6 @@ namespace hpx::execution::experimental {
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
                 return detail::sender_awaitable_t<Promise, T>{
                     HPX_FORWARD(T, t), hcoro};
-            }
-            else if constexpr (is_awaitable_v<T>)
-            {
-                return HPX_FORWARD(T, t);
             }
             else
             {
