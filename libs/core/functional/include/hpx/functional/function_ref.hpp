@@ -68,19 +68,19 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename F>
-        constexpr bool is_empty_function_ptr(F* fp) noexcept
+        [[nodiscard]] constexpr bool is_empty_function_ptr(F* fp) noexcept
         {
             return fp == nullptr;
         }
 
         template <typename T, typename C>
-        constexpr bool is_empty_function_ptr(T C::*mp) noexcept
+        [[nodiscard]] constexpr bool is_empty_function_ptr(T C::*mp) noexcept
         {
             return mp == nullptr;
         }
 
         template <typename F>
-        constexpr bool is_empty_function_ptr(F const&) noexcept
+        [[nodiscard]] constexpr bool is_empty_function_ptr(F const&) noexcept
         {
             return false;
         }
@@ -178,7 +178,7 @@ namespace hpx {
 #endif
         }
 
-        std::size_t get_function_address() const
+        [[nodiscard]] std::size_t get_function_address() const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_address(object);
@@ -187,7 +187,7 @@ namespace hpx {
 #endif
         }
 
-        char const* get_function_annotation() const
+        [[nodiscard]] char const* get_function_annotation() const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return vptr->get_function_annotation(object);
@@ -196,7 +196,8 @@ namespace hpx {
 #endif
         }
 
-        util::itt::string_handle get_function_annotation_itt() const
+        [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+            const
         {
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
             return vptr->get_function_annotation_itt(object);
@@ -208,7 +209,7 @@ namespace hpx {
 
     private:
         template <typename T>
-        static constexpr VTable const* get_vtable() noexcept
+        [[nodiscard]] static constexpr VTable const* get_vtable() noexcept
         {
             return util::detail::get_vtable<VTable, T>();
         }
@@ -238,7 +239,7 @@ namespace hpx::traits {
     template <typename Sig>
     struct get_function_address<hpx::function_ref<Sig>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_address();
@@ -248,7 +249,7 @@ namespace hpx::traits {
     template <typename Sig>
     struct get_function_annotation<hpx::function_ref<Sig>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -259,7 +260,7 @@ namespace hpx::traits {
     template <typename Sig>
     struct get_function_annotation_itt<hpx::function_ref<Sig>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::function_ref<Sig> const& f) noexcept
         {
             return f.get_function_annotation_itt();

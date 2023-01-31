@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
-#include <type_traits>
 
 namespace hpx::serialization {
 
@@ -246,20 +245,20 @@ namespace hpx::serialization {
         }
 
         // accessors enabling data access
-        T* data() noexcept
+        [[nodiscard]] T* data() noexcept
         {
             return data_.get();
         }
-        T const* data() const noexcept
+        [[nodiscard]] T const* data() const noexcept
         {
             return data_.get();
         }
 
-        T* begin() noexcept
+        [[nodiscard]] T* begin() noexcept
         {
             return data();
         }
-        T* end() noexcept
+        [[nodiscard]] T* end() noexcept
         {
             return data() + size_;
         }
@@ -273,12 +272,12 @@ namespace hpx::serialization {
             return data_[idx];
         }
 
-        constexpr buffer_type data_array() const noexcept
+        [[nodiscard]] constexpr buffer_type data_array() const noexcept
         {
             return data_;
         }
 
-        constexpr std::size_t size() const noexcept
+        [[nodiscard]] constexpr std::size_t size() const noexcept
         {
             return size_;
         }

@@ -22,17 +22,17 @@ namespace hpx::serialization::detail {
         {
         }
 
-        constexpr T* get() const noexcept
+        [[nodiscard]] constexpr T* get() const noexcept
         {
             return t;
         }
 
-        constexpr T& operator*() const noexcept
+        [[nodiscard]] constexpr T& operator*() const noexcept
         {
             return *t;
         }
 
-        explicit constexpr operator bool() const noexcept
+        [[nodiscard]] explicit constexpr operator bool() const noexcept
         {
             return t != nullptr;
         }

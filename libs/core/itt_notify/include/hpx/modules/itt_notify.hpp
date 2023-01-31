@@ -98,7 +98,7 @@ HPX_CORE_EXPORT void itt_sync_releasing(void* addr) noexcept;
 HPX_CORE_EXPORT void itt_sync_released(void* addr) noexcept;
 HPX_CORE_EXPORT void itt_sync_destroy(void* addr) noexcept;
 
-HPX_CORE_EXPORT ___itt_caller* itt_stack_create() noexcept;
+[[nodiscard]] HPX_CORE_EXPORT ___itt_caller* itt_stack_create() noexcept;
 HPX_CORE_EXPORT void itt_stack_enter(___itt_caller* ctx) noexcept;
 HPX_CORE_EXPORT void itt_stack_leave(___itt_caller* ctx) noexcept;
 HPX_CORE_EXPORT void itt_stack_destroy(___itt_caller* ctx) noexcept;
@@ -108,7 +108,7 @@ HPX_CORE_EXPORT void itt_frame_begin(
 HPX_CORE_EXPORT void itt_frame_end(
     ___itt_domain const* frame, ___itt_id* id) noexcept;
 
-HPX_CORE_EXPORT int itt_mark_create(char const*) noexcept;
+[[nodiscard]] HPX_CORE_EXPORT int itt_mark_create(char const*) noexcept;
 HPX_CORE_EXPORT void itt_mark_off(int mark) noexcept;
 HPX_CORE_EXPORT void itt_mark(int mark, char const*) noexcept;
 
@@ -125,12 +125,12 @@ HPX_CORE_EXPORT ___itt_domain* itt_domain_create(char const*) noexcept;
 HPX_CORE_EXPORT ___itt_string_handle* itt_string_handle_create(
     char const*) noexcept;
 
-HPX_CORE_EXPORT ___itt_id* itt_make_id(void*, std::size_t);
+[[nodiscard]] HPX_CORE_EXPORT ___itt_id* itt_make_id(void*, std::size_t);
 HPX_CORE_EXPORT void itt_id_create(
     ___itt_domain const*, ___itt_id* id) noexcept;
 HPX_CORE_EXPORT void itt_id_destroy(___itt_id* id) noexcept;
 
-HPX_CORE_EXPORT __itt_heap_function itt_heap_function_create(
+[[nodiscard]] HPX_CORE_EXPORT __itt_heap_function itt_heap_function_create(
     char const*, char const*) noexcept;
 HPX_CORE_EXPORT void itt_heap_allocate_begin(
     __itt_heap_function, std::size_t, int) noexcept;
@@ -145,14 +145,15 @@ HPX_CORE_EXPORT void itt_heap_reallocate_end(
 HPX_CORE_EXPORT void itt_heap_internal_access_begin() noexcept;
 HPX_CORE_EXPORT void itt_heap_internal_access_end() noexcept;
 
-HPX_CORE_EXPORT ___itt_counter* itt_counter_create(
+[[nodiscard]] HPX_CORE_EXPORT ___itt_counter* itt_counter_create(
     char const*, char const*) noexcept;
-HPX_CORE_EXPORT ___itt_counter* itt_counter_create_typed(
+[[nodiscard]] HPX_CORE_EXPORT ___itt_counter* itt_counter_create_typed(
     char const*, char const*, int) noexcept;
 HPX_CORE_EXPORT void itt_counter_destroy(___itt_counter*) noexcept;
 HPX_CORE_EXPORT void itt_counter_set_value(___itt_counter*, void*) noexcept;
 
-HPX_CORE_EXPORT int itt_event_create(char const* name, int namelen) noexcept;
+[[nodiscard]] HPX_CORE_EXPORT int itt_event_create(
+    char const* name, int namelen) noexcept;
 HPX_CORE_EXPORT int itt_event_start(int evnt) noexcept;
 HPX_CORE_EXPORT int itt_event_end(int evnt) noexcept;
 
@@ -507,138 +508,128 @@ namespace hpx::util::itt {
 
 #else
 
-inline constexpr void itt_sync_create(void*, char const*, char const*) noexcept
-{
-}
-inline constexpr void itt_sync_rename(void*, char const*) noexcept {}
-inline constexpr void itt_sync_prepare(void*) noexcept {}
-inline constexpr void itt_sync_acquired(void*) noexcept {}
-inline constexpr void itt_sync_cancel(void*) noexcept {}
-inline constexpr void itt_sync_releasing(void*) noexcept {}
-inline constexpr void itt_sync_released(void*) noexcept {}
-inline constexpr void itt_sync_destroy(void*) noexcept {}
+constexpr void itt_sync_create(void*, char const*, char const*) noexcept {}
+constexpr void itt_sync_rename(void*, char const*) noexcept {}
+constexpr void itt_sync_prepare(void*) noexcept {}
+constexpr void itt_sync_acquired(void*) noexcept {}
+constexpr void itt_sync_cancel(void*) noexcept {}
+constexpr void itt_sync_releasing(void*) noexcept {}
+constexpr void itt_sync_released(void*) noexcept {}
+constexpr void itt_sync_destroy(void*) noexcept {}
 
-inline constexpr ___itt_caller* itt_stack_create() noexcept
+[[nodiscard]] constexpr ___itt_caller* itt_stack_create() noexcept
 {
     return nullptr;
 }
-inline constexpr void itt_stack_enter(___itt_caller*) noexcept {}
-inline constexpr void itt_stack_leave(___itt_caller*) noexcept {}
-inline constexpr void itt_stack_destroy(___itt_caller*) noexcept {}
+constexpr void itt_stack_enter(___itt_caller*) noexcept {}
+constexpr void itt_stack_leave(___itt_caller*) noexcept {}
+constexpr void itt_stack_destroy(___itt_caller*) noexcept {}
 
-inline constexpr void itt_frame_begin(___itt_domain const*, ___itt_id*) noexcept
-{
-}
-inline constexpr void itt_frame_end(___itt_domain const*, ___itt_id*) noexcept
-{
-}
+constexpr void itt_frame_begin(___itt_domain const*, ___itt_id*) noexcept {}
+constexpr void itt_frame_end(___itt_domain const*, ___itt_id*) noexcept {}
 
-inline constexpr int itt_mark_create(char const*) noexcept
+[[nodiscard]] constexpr int itt_mark_create(char const*) noexcept
 {
     return 0;
 }
-inline constexpr void itt_mark_off(int) noexcept {}
-inline constexpr void itt_mark(int, char const*) noexcept {}
+constexpr void itt_mark_off(int) noexcept {}
+constexpr void itt_mark(int, char const*) noexcept {}
 
-inline constexpr void itt_thread_set_name(char const*) noexcept {}
-inline constexpr void itt_thread_ignore() noexcept {}
+constexpr void itt_thread_set_name(char const*) noexcept {}
+constexpr void itt_thread_ignore() noexcept {}
 
-inline constexpr void itt_task_begin(
+constexpr void itt_task_begin(
     ___itt_domain const*, ___itt_string_handle*) noexcept
 {
 }
-inline constexpr void itt_task_begin(
+constexpr void itt_task_begin(
     ___itt_domain const*, ___itt_id*, ___itt_string_handle*) noexcept
 {
 }
-inline constexpr void itt_task_end(___itt_domain const*) noexcept {}
+constexpr void itt_task_end(___itt_domain const*) noexcept {}
 
-inline constexpr ___itt_domain* itt_domain_create(char const*) noexcept
+[[nodiscard]] constexpr ___itt_domain* itt_domain_create(char const*) noexcept
 {
     return nullptr;
 }
-inline constexpr ___itt_string_handle* itt_string_handle_create(
+[[nodiscard]] constexpr ___itt_string_handle* itt_string_handle_create(
     char const*) noexcept
 {
     return nullptr;
 }
 
-inline constexpr ___itt_id* itt_make_id(void*, unsigned long)
+[[nodiscard]] constexpr ___itt_id* itt_make_id(void*, unsigned long)
 {
     return nullptr;
 }
-inline constexpr void itt_id_create(___itt_domain const*, ___itt_id*) noexcept
-{
-}
-inline constexpr void itt_id_destroy(___itt_id*) noexcept {}
+constexpr void itt_id_create(___itt_domain const*, ___itt_id*) noexcept {}
+constexpr void itt_id_destroy(___itt_id*) noexcept {}
 
-inline constexpr __itt_heap_function itt_heap_function_create(
+[[nodiscard]] constexpr __itt_heap_function itt_heap_function_create(
     char const*, char const*) noexcept
 {
     return nullptr;
 }
-inline constexpr void itt_heap_allocate_begin(
+constexpr void itt_heap_allocate_begin(
     __itt_heap_function, std::size_t, int) noexcept
 {
 }
-inline constexpr void itt_heap_allocate_end(
+constexpr void itt_heap_allocate_end(
     __itt_heap_function, void**, std::size_t, int) noexcept
 {
 }
-inline constexpr void itt_heap_free_begin(__itt_heap_function, void*) noexcept
-{
-}
-inline constexpr void itt_heap_free_end(__itt_heap_function, void*) noexcept {}
-inline constexpr void itt_heap_reallocate_begin(
+constexpr void itt_heap_free_begin(__itt_heap_function, void*) noexcept {}
+constexpr void itt_heap_free_end(__itt_heap_function, void*) noexcept {}
+constexpr void itt_heap_reallocate_begin(
     __itt_heap_function, void*, std::size_t, int) noexcept
 {
 }
-inline constexpr void itt_heap_reallocate_end(
+constexpr void itt_heap_reallocate_end(
     __itt_heap_function, void*, void**, std::size_t, int) noexcept
 {
 }
-inline constexpr void itt_heap_internal_access_begin() noexcept {}
-inline constexpr void itt_heap_internal_access_end() noexcept {}
+constexpr void itt_heap_internal_access_begin() noexcept {}
+constexpr void itt_heap_internal_access_end() noexcept {}
 
-inline constexpr ___itt_counter* itt_counter_create(
+[[nodiscard]] constexpr ___itt_counter* itt_counter_create(
     char const*, char const*) noexcept
 {
     return nullptr;
 }
-inline constexpr ___itt_counter* itt_counter_create_typed(
+[[nodiscard]] constexpr ___itt_counter* itt_counter_create_typed(
     char const*, char const*, int) noexcept
 {
     return nullptr;
 }
-inline constexpr void itt_counter_destroy(___itt_counter*) noexcept {}
-inline constexpr void itt_counter_set_value(___itt_counter*, void*) noexcept {}
+constexpr void itt_counter_destroy(___itt_counter*) noexcept {}
+constexpr void itt_counter_set_value(___itt_counter*, void*) noexcept {}
 
-inline constexpr int itt_event_create(char const*, int) noexcept
+[[nodiscard]] constexpr int itt_event_create(char const*, int) noexcept
 {
     return 0;
 }
-inline constexpr int itt_event_start(int) noexcept
+constexpr int itt_event_start(int) noexcept
 {
     return 0;
 }
-inline constexpr int itt_event_end(int) noexcept
+constexpr int itt_event_end(int) noexcept
 {
     return 0;
 }
 
-inline constexpr void itt_metadata_add(
+constexpr void itt_metadata_add(
     ___itt_domain*, ___itt_id*, ___itt_string_handle*, std::uint64_t) noexcept
 {
 }
-inline constexpr void itt_metadata_add(
+constexpr void itt_metadata_add(
     ___itt_domain*, ___itt_id*, ___itt_string_handle*, double) noexcept
 {
 }
-inline constexpr void itt_metadata_add(
+constexpr void itt_metadata_add(
     ___itt_domain*, ___itt_id*, ___itt_string_handle*, char const*) noexcept
 {
 }
-inline constexpr void itt_metadata_add(
+constexpr void itt_metadata_add(
     ___itt_domain*, ___itt_id*, ___itt_string_handle*, void const*) noexcept
 {
 }
@@ -670,6 +661,7 @@ namespace hpx::util::itt {
 
         constexpr explicit domain(char const*) noexcept {}
         domain() = default;
+        ~domain() = default;
     };
 
     struct thread_domain : domain
@@ -677,6 +669,7 @@ namespace hpx::util::itt {
         HPX_NON_COPYABLE(thread_domain);
 
         thread_domain() = default;
+        ~thread_domain() = default;
     };
 
     struct id
@@ -779,7 +772,7 @@ namespace hpx::util::itt {
         ~mark_event() = default;
     };
 
-    inline constexpr void event_tick(event const&) noexcept {}
+    constexpr void event_tick(event const&) noexcept {}
 }    // namespace hpx::util::itt
 
 #endif    // HPX_HAVE_ITTNOTIFY

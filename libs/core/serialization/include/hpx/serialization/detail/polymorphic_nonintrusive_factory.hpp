@@ -1,7 +1,7 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2015 Andreas Schaefer
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -40,7 +40,7 @@ namespace hpx::serialization::detail {
         ;
 #else
     {
-        char const* operator()() const noexcept
+        [[nodiscard]] char const* operator()() const noexcept
         {
             // If you encounter this assert while compiling code, that means
             // that you have a HPX_REGISTER_ACTION macro somewhere in a source
@@ -68,7 +68,7 @@ namespace hpx::serialization::detail {
     class constructor_selector_ptr
     {
     public:
-        static T* create(input_archive& ar)
+        [[nodiscard]] static T* create(input_archive& ar)
         {
             std::unique_ptr<T> t;
 
@@ -128,8 +128,8 @@ namespace hpx::serialization::detail {
                     "polymorphic_nonintrusive_factory::register_class",
                     "Cannot register a factory with an empty name");
             }
-            auto it = map_.find(class_name);
-            auto jt = typeinfo_map_.find(typeinfo.name());
+            auto const it = map_.find(class_name);
+            auto const jt = typeinfo_map_.find(typeinfo.name());
 
             if (it == map_.end())
                 map_[class_name] = bunch;
@@ -144,10 +144,10 @@ namespace hpx::serialization::detail {
         template <typename T>
         void load(input_archive& ar, T& t);
 
-        // use raw pointer to construct either
-        // shared_ptr or intrusive_ptr from it
+        // use raw pointer to construct either shared_ptr or intrusive_ptr from
+        // it
         template <typename T>
-        T* load(input_archive& ar);
+        [[nodiscard]] T* load(input_archive& ar);
 
     private:
         polymorphic_nonintrusive_factory() = default;
@@ -172,19 +172,19 @@ namespace hpx::serialization::detail {
         }
 
         // this function is needed for pointer type serialization
-        static void* create(input_archive& ar)
+        [[nodiscard]] static void* create(input_archive& ar)
         {
             return constructor_selector_ptr<Derived>::create(ar);
         }
 
         register_class()
         {
-            function_bunch_type bunch = {&register_class<Derived>::save,
-                &register_class<Derived>::load,
+            static constexpr function_bunch_type bunch = {
+                &register_class<Derived>::save, &register_class<Derived>::load,
                 &register_class<Derived>::create};
 
-            // It's safe to call typeid here. The typeid(t) return value is
-            // only used for local lookup to the portable string that goes over the
+            // It's safe to call typeid here. The typeid(t) return value is only
+            // used for local lookup to the portable string that goes over the
             // wire
             polymorphic_nonintrusive_factory::instance().register_class(
                 typeid(Derived), get_serialization_name<Derived>()(), bunch);

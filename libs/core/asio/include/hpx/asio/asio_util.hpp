@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,10 +12,9 @@
 #include <cstdint>
 #include <string>
 
-#include <hpx/config/asio.hpp>
-
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
+
 /* The asio support includes termios.h.
  * The termios.h file on ppc64le defines these macros, which
  * are also used by blaze, blaze_tensor as Template names.
@@ -41,15 +40,16 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // return the public IP address of the local node
-    HPX_CORE_EXPORT std::string resolve_public_ip_address();
+    [[nodiscard]] HPX_CORE_EXPORT std::string resolve_public_ip_address();
 
     ///////////////////////////////////////////////////////////////////////
     // Take an ip v4 or v6 address and "standardize" it for comparison checks
-    HPX_CORE_EXPORT std::string cleanup_ip_address(std::string const& addr);
+    [[nodiscard]] HPX_CORE_EXPORT std::string cleanup_ip_address(
+        std::string const& addr);
 
     using endpoint_iterator_type = asio::ip::tcp::resolver::iterator;
 
-    endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
+    [[nodiscard]] endpoint_iterator_type HPX_CORE_EXPORT connect_begin(
         std::string const& address, std::uint16_t port,
         asio::io_context& io_service);
 
@@ -57,18 +57,18 @@ namespace hpx::util {
     ///        endpoint suitable for a call to connect() related to this
     ///        locality
     template <typename Locality>
-    endpoint_iterator_type connect_begin(
+    [[nodiscard]] endpoint_iterator_type connect_begin(
         Locality const& loc, asio::io_context& io_service)
     {
         return connect_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type HPX_CORE_EXPORT connect_end()
+    [[nodiscard]] inline endpoint_iterator_type connect_end()
     {
-        return endpoint_iterator_type();
+        return {};
     }
 
-    endpoint_iterator_type HPX_CORE_EXPORT accept_begin(
+    [[nodiscard]] endpoint_iterator_type HPX_CORE_EXPORT accept_begin(
         std::string const& address, std::uint16_t port,
         asio::io_context& io_service);
 
@@ -77,15 +77,15 @@ namespace hpx::util {
     ///        endpoint suitable for a call to accept() related to this
     ///        locality
     template <typename Locality>
-    endpoint_iterator_type accept_begin(
+    [[nodiscard]] endpoint_iterator_type accept_begin(
         Locality const& loc, asio::io_context& io_service)
     {
         return accept_begin(loc.address(), loc.port(), io_service);
     }
 
-    inline endpoint_iterator_type accept_end()    //-V524
+    [[nodiscard]] inline endpoint_iterator_type accept_end()    //-V524
     {
-        return endpoint_iterator_type();
+        return {};
     }
 }    // namespace hpx::util
 

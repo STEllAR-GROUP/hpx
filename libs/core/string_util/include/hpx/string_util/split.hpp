@@ -10,7 +10,6 @@
 #include <hpx/config/forward.hpp>
 
 #include <algorithm>
-#include <cctype>
 #include <cstddef>
 #include <string>
 #include <utility>
@@ -62,7 +61,8 @@ namespace hpx::string_util {
             if (compress_mode == token_compress_mode::on)
             {
                 // Skip contiguous separators
-                while (token_begin != std::end(str) && pred(int(*token_begin)))
+                while (token_begin != std::end(str) &&
+                    pred(static_cast<int>(*token_begin)))
                 {
                     ++token_begin;
                 }

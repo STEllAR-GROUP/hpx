@@ -42,7 +42,7 @@ namespace hpx::util::logging {
     If debug level is enabled, messages that have levels debug,
     error, fatal will be logged.
 
-*/
+    */
     enum class level : unsigned int
     {
         disable_all = static_cast<unsigned int>(-1),

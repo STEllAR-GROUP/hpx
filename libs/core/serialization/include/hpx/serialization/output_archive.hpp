@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,10 +21,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <list>
 #include <memory>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -34,7 +32,7 @@ namespace hpx::serialization {
     namespace detail {
 
         template <typename Container>
-        inline std::unique_ptr<erased_output_container> create_output_container(
+        std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
             std::size_t zero_copy_serialization_threshold, std::false_type)
@@ -72,7 +70,7 @@ namespace hpx::serialization {
         }
 
         template <typename Container>
-        inline std::unique_ptr<erased_output_container> create_output_container(
+        std::unique_ptr<erased_output_container> create_output_container(
             Container& buffer, std::vector<serialization_chunk>* chunks,
             binary_filter* filter,
             std::size_t zero_copy_serialization_threshold, std::true_type)
@@ -98,10 +96,11 @@ namespace hpx::serialization {
     {
     private:
         static constexpr std::uint32_t make_flags(std::uint32_t flags,
-            std::vector<serialization_chunk>* chunks) noexcept
+            std::vector<serialization_chunk> const* chunks) noexcept
         {
-            return flags | std::uint32_t(archive_flags::archive_is_saving) |
-                std::uint32_t(chunks == nullptr ?
+            return flags |
+                static_cast<std::uint32_t>(archive_flags::archive_is_saving) |
+                static_cast<std::uint32_t>(chunks == nullptr ?
                         archive_flags::disable_data_chunking :
                         archive_flags::no_archive_flags);
         }
@@ -110,7 +109,7 @@ namespace hpx::serialization {
         using base_type = basic_archive<output_archive>;
 
         template <typename Container>
-        output_archive(Container& buffer, std::uint32_t flags = 0U,
+        explicit output_archive(Container& buffer, std::uint32_t flags = 0U,
             std::vector<serialization_chunk>* chunks = nullptr,
             binary_filter* filter = nullptr,
             std::size_t zero_copy_serialization_threshold = 0)
@@ -125,7 +124,8 @@ namespace hpx::serialization {
             if (buffer_->is_preprocessing())
             {
                 flags_ = flags_ |
-                    std::uint32_t(archive_flags::archive_is_preprocessing);
+                    static_cast<std::uint32_t>(
+                        archive_flags::archive_is_preprocessing);
             }
 
             // endianness needs to be saved separately as it is needed to
@@ -142,7 +142,7 @@ namespace hpx::serialization {
             // send the zero-copy limit
             save(static_cast<std::uint64_t>(zero_copy_serialization_threshold));
 
-            bool has_filter = filter != nullptr;
+            bool const has_filter = filter != nullptr;
             save(has_filter);
 
             if (has_filter && enable_compression())
@@ -157,23 +157,23 @@ namespace hpx::serialization {
             std::vector<serialization_chunk>* chunks = nullptr,
             binary_filter* filter = nullptr,
             std::size_t zero_copy_serialization_threshold = 0)
-          : output_archive(buffer, std::uint32_t(flags), chunks, filter,
-                zero_copy_serialization_threshold)
+          : output_archive(buffer, static_cast<std::uint32_t>(flags), chunks,
+                filter, zero_copy_serialization_threshold)
         {
         }
 
-        constexpr std::size_t bytes_written() const noexcept
+        [[nodiscard]] constexpr std::size_t bytes_written() const noexcept
         {
             return size_;
         }
 
-        std::size_t get_num_chunks() const noexcept
+        [[nodiscard]] std::size_t get_num_chunks() const noexcept
         {
             return buffer_->get_num_chunks();
         }
 
         // this function is needed to avoid a MSVC linker error
-        constexpr std::size_t current_pos() const noexcept
+        [[nodiscard]] constexpr std::size_t current_pos() const noexcept
         {
             return base_type::current_pos();
         }
@@ -184,7 +184,7 @@ namespace hpx::serialization {
             base_type::reset();
         }
 
-        void flush()
+        void flush() const
         {
             buffer_->flush();
         }
@@ -263,7 +263,7 @@ namespace hpx::serialization {
                 static_assert(sizeof(T) <= sizeof(std::uint64_t),
                     "integral type is larger than supported");
 
-                auto val = static_cast<std::uint64_t>(t);
+                auto const val = static_cast<std::uint64_t>(t);
                 save_binary(&val, sizeof(std::uint64_t));
             }
             else
@@ -271,7 +271,7 @@ namespace hpx::serialization {
                 static_assert(sizeof(T) <= sizeof(std::int64_t),
                     "integral type is larger than supported");
 
-                auto val = static_cast<std::int64_t>(t);
+                auto const val = static_cast<std::int64_t>(t);
                 save_binary(&val, sizeof(std::int64_t));
             }
 #endif

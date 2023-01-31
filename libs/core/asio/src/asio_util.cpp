@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -27,7 +27,6 @@
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
 
-#include <ctime>
 #include <exception>
 #include <system_error>
 
@@ -56,7 +55,8 @@ namespace hpx::util {
     {
         using namespace asio::ip;
         std::error_code ec;
-        address_v4 addr4 = address_v4::from_string(addr.c_str(), ec);    //-V821
+        address_v4 const addr4 =
+            address_v4::from_string(addr.c_str(), ec);    //-V821
         if (!ec)
         {    // it's an IPV4 address
             ep = tcp::endpoint(address(addr4), port);
@@ -65,7 +65,7 @@ namespace hpx::util {
 
         if (!force_ipv4)
         {
-            address_v6 addr6 =    //-V821
+            address_v6 const addr6 =    //-V821
                 address_v6::from_string(addr.c_str(), ec);
             if (!ec)
             {    // it's an IPV6 address
@@ -135,7 +135,6 @@ namespace hpx::util {
         HPX_THROW_EXCEPTION(hpx::error::network_error, "util::resolve_hostname",
             "{} (while trying to resolve: {}:{})", errors.get_message(),
             hostname, port);
-        return tcp::endpoint();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -166,7 +165,6 @@ namespace hpx::util {
             "util::resolve_public_ip_address",
             "{} (while trying to resolve public ip address)",
             errors.get_message());
-        return "";
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -180,19 +178,19 @@ namespace hpx::util {
         char str[INET6_ADDRSTRLEN];
 
 #if defined(HPX_WINDOWS)
-        unsigned long scope_id;
+        unsigned long scope_id = 0;
         std::error_code ec;
 #endif
 
-        for (i = 0; i < 2; ++i)
+        for (/**/; i < 2; ++i)
         {
 #if defined(HPX_WINDOWS)
-            int s = asio::detail::socket_ops::inet_pton(
-                domain[i], &addr[0], buf, &scope_id, ec);
+            int const s = asio::detail::socket_ops::inet_pton(
+                domain[i], addr.data(), buf, &scope_id, ec);
             if (s > 0 && !ec)
                 break;
 #else
-            int s = inet_pton(domain[i], &addr[0], buf);
+            int const s = inet_pton(domain[i], addr.data(), buf);
             if (s > 0)
                 break;
 #endif
@@ -214,7 +212,7 @@ namespace hpx::util {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "cleanup_ip_address",
                 "inet_ntop failure");
         }
-        return std::string(str);
+        return {str};
     }
 
     endpoint_iterator_type connect_begin(std::string const& address,
@@ -233,8 +231,8 @@ namespace hpx::util {
             tcp::endpoint ep;
             if (util::get_endpoint(address, port, ep))
             {
-                return endpoint_iterator_type(
-                    tcp::resolver::results_type::create(ep, address, port_str));
+                return {
+                    tcp::resolver::results_type::create(ep, address, port_str)};
             }
         }
         catch (std::system_error const&)
@@ -250,7 +248,7 @@ namespace hpx::util {
             tcp::resolver::query query(
                 !address.empty() ? address : asio::ip::host_name(), port_str);
 
-            return endpoint_iterator_type(resolver.resolve(query));
+            return {resolver.resolve(query)};
         }
         catch (std::system_error const&)
         {
@@ -261,8 +259,6 @@ namespace hpx::util {
         HPX_THROW_EXCEPTION(hpx::error::network_error, "connect_begin",
             "{} (while trying to connect to: {}:{})", errors.get_message(),
             address, port);
-
-        return endpoint_iterator_type();
     }
 
     endpoint_iterator_type accept_begin(std::string const& address,
@@ -281,8 +277,8 @@ namespace hpx::util {
             tcp::endpoint ep;
             if (util::get_endpoint(address, port, ep))
             {
-                return endpoint_iterator_type(
-                    tcp::resolver::results_type::create(ep, address, port_str));
+                return {
+                    tcp::resolver::results_type::create(ep, address, port_str)};
             }
         }
         catch (std::system_error const&)
@@ -297,7 +293,7 @@ namespace hpx::util {
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(address, port_str);
 
-            return endpoint_iterator_type(resolver.resolve(query));
+            return {resolver.resolve(query)};
         }
         catch (std::system_error const&)
         {
@@ -313,7 +309,7 @@ namespace hpx::util {
             tcp::resolver resolver(io_service);
             tcp::resolver::query query(asio::ip::host_name(), port_str);
 
-            return endpoint_iterator_type(resolver.resolve(query));
+            return {resolver.resolve(query)};
         }
         catch (std::system_error const&)
         {
@@ -324,7 +320,6 @@ namespace hpx::util {
         HPX_THROW_EXCEPTION(hpx::error::network_error, "accept_begin",
             "{} (while trying to resolve: {}:{}))", errors.get_message(),
             address, port);
-        return endpoint_iterator_type();
     }
 }    // namespace hpx::util
 
@@ -336,24 +331,24 @@ namespace hpx::util {
     bool split_ip_address(
         std::string const& v, std::string& host, std::uint16_t& port)
     {
-        std::string::size_type p = v.find_last_of(':');
-
-        std::string tmp_host;
-        std::uint16_t tmp_port = 0;
+        std::string::size_type const p = v.find_last_of(':');
 
         try
         {
+            std::string tmp_host;
+            std::uint16_t tmp_port = 0;
+
             if (p != std::string::npos)
             {
                 if (v.find_first_of(':') != p)
                 {
                     // IPv6
-                    std::string::size_type begin_of_address =
+                    std::string::size_type const begin_of_address =
                         v.find_first_of('[');
                     if (begin_of_address != std::string::npos)
                     {
                         // IPv6 with a port has to be written as: [address]:port
-                        std::string::size_type end_of_address =
+                        std::string::size_type const end_of_address =
                             v.find_last_of(']');
                         if (end_of_address == std::string::npos)
                             return false;

@@ -21,9 +21,6 @@ namespace hpx::util::detail {
     /// Lockable spinlock class
     struct spinlock
     {
-    public:
-        HPX_NON_COPYABLE(spinlock);
-
     private:
         std::atomic<bool> m;
 
@@ -34,6 +31,10 @@ namespace hpx::util::detail {
           : m(false)
         {
         }
+
+        HPX_NON_COPYABLE(spinlock);
+
+        ~spinlock() = default;
 
         HPX_FORCEINLINE bool try_lock() noexcept
         {

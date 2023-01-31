@@ -25,26 +25,26 @@
 namespace hpx::util::logging::formatter {
 
     /**
-@brief prefixes each message with an index.
+    @brief prefixes each message with an index.
 
-Example:
-@code
-L_ << "my message";
-L_ << "my 2nd message";
-@endcode
+    Example:
+    @code
+    L_ << "my message";
+    L_ << "my 2nd message";
+    @endcode
 
-This will output something similar to:
+    This will output something similar to:
 
-@code
-[1] my message
-[2] my 2nd message
-@endcode
-*/
+    @code
+    [1] my message
+    [2] my 2nd message
+    @endcode
+    */
     struct idx : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<idx> make();
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<idx> make();
 
-        HPX_CORE_EXPORT ~idx();
+        HPX_CORE_EXPORT ~idx() override;
 
     protected:
         idx() = default;
@@ -84,10 +84,11 @@ This will output something similar to:
     */
     struct high_precision_time : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<high_precision_time> make(
-            std::string const& format);
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<
+            high_precision_time>
+        make(std::string const& format);
 
-        HPX_CORE_EXPORT ~high_precision_time();
+        HPX_CORE_EXPORT ~high_precision_time() override;
 
     protected:
         explicit high_precision_time(std::string const& format)
@@ -104,9 +105,9 @@ This will output something similar to:
     */
     struct thread_id : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<thread_id> make();
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<thread_id> make();
 
-        HPX_CORE_EXPORT ~thread_id();
+        HPX_CORE_EXPORT ~thread_id() override;
 
     protected:
         thread_id() = default;

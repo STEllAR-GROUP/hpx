@@ -1,6 +1,6 @@
 //  Copyright (c) 2002 Peter Dimov and Multi Media Ltd.
 //  Copyright (c) 2009 Steven Watanabe
-//  Copyright (c) 2011-2013 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -49,7 +49,10 @@ namespace hpx::util {
             }
 #endif
 
-            protected_bind& operator=(protected_bind const&) = delete;
+            protected_bind& operator=(protected_bind const&) = default;
+            protected_bind& operator=(protected_bind&&) = default;
+
+            ~protected_bind() = default;
         };
     }    // namespace detail
 

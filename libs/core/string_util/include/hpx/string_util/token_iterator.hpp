@@ -19,7 +19,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/iterator_support/detail/minimum_category.hpp>
-#include <hpx/iterator_support/iterator_adaptor.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/string_util/token_functions.hpp>
 
@@ -60,7 +59,7 @@ namespace hpx::string_util {
         }
 
         template <typename Other>
-        bool equal(Other const& a) const noexcept
+        [[nodiscard]] bool equal(Other const& a) const noexcept
         {
             return (a.valid_ && valid_) ?
                 ((a.begin_ == begin_) && (a.end_ == end_)) :
@@ -111,27 +110,27 @@ namespace hpx::string_util {
         {
         }
 
-        Iterator base() const
+        [[nodiscard]] Iterator base() const
         {
             return begin_;
         }
 
-        Iterator end() const
+        [[nodiscard]] Iterator end() const
         {
             return end_;
         }
 
-        TokenizerFunc const& tokenizer_function() const noexcept
+        [[nodiscard]] TokenizerFunc const& tokenizer_function() const noexcept
         {
             return f_;
         }
 
-        Type current_token() const
+        [[nodiscard]] Type current_token() const
         {
             return tok_;
         }
 
-        bool at_end() const noexcept
+        [[nodiscard]] bool at_end() const noexcept
         {
             return !valid_;
         }

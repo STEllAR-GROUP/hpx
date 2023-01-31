@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,9 +17,7 @@
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
-#include <algorithm>
 #include <iterator>
-#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -93,15 +91,15 @@ namespace hpx::util {
 
     // Iterator adaptor
     //
-    // The idea is that when the user needs
-    // to fiddle with the reference type it is highly likely that the
-    // iterator category has to be adjusted as well.  Any of the
-    // following four template arguments may be omitted or explicitly
+    // The idea is that when the user needs to fiddle with the reference type it
+    // is highly likely that the iterator category has to be adjusted as well.
+    // Any of the following four template arguments may be omitted or explicitly
     // replaced by void.
     //
     //   Value - if supplied, the value_type of the resulting iterator, unless
-    //      const. If const, a conforming compiler strips const-ness for the
-    //      value_type. If not supplied, iterator_traits<Base>::value_type is used
+    //      const. If const, a conforming compiler strips constness for the
+    //      value_type. If not supplied, iterator_traits<Base>::value_type is
+    //      used
     //
     //   Category - the traversal category of the resulting iterator. If not
     //      supplied, iterator_traversal<Base>::type is used.
@@ -147,9 +145,8 @@ namespace hpx::util {
 
     protected:
         // for convenience in derived classes
-        typedef iterator_adaptor<Derived, Base, Value, Category, Reference,
-            Difference, Pointer>
-            iterator_adaptor_;
+        using iterator_adaptor_ = iterator_adaptor<Derived, Base, Value,
+            Category, Reference, Difference, Pointer>;
 
         // lvalue access to the Base object for Derived
         HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Base const& base_reference()

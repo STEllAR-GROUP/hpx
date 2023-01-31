@@ -17,8 +17,8 @@ namespace hpx::util::plugin {
 
         struct dll_handle_holder
         {
-            explicit dll_handle_holder(dll_handle const& dll) noexcept
-              : m_dll(dll)
+            explicit dll_handle_holder(dll_handle dll) noexcept
+              : m_dll(HPX_MOVE(dll))
             {
             }
 
@@ -35,8 +35,8 @@ namespace hpx::util::plugin {
       : public detail::dll_handle_holder
       , public Wrapped
     {
-        explicit plugin_wrapper(dll_handle const& dll, Parameters... parameters)
-          : detail::dll_handle_holder(dll)
+        explicit plugin_wrapper(dll_handle dll, Parameters... parameters)
+          : detail::dll_handle_holder(HPX_MOVE(dll))
           , Wrapped(parameters...)
         {
         }

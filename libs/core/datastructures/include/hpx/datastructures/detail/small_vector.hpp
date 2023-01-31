@@ -213,7 +213,7 @@ namespace hpx::detail {
     {
         return cx_min(
             (size_of_small_vector<T>(min_inline_capacity) - 1U) / sizeof(T),
-            std::size_t(127));
+            static_cast<std::size_t>(127));
     }
 
     // note: Allocator is currently unused
@@ -636,8 +636,8 @@ namespace hpx::detail {
             auto const is_dir = is_direct();
             if constexpr (!std::is_trivially_destructible_v<T>)
             {
-                T* ptr = nullptr;
-                std::size_t s = 0;
+                T* ptr;
+                std::size_t s;
                 if (is_dir)
                 {
                     ptr = data<direction::direct>();
@@ -659,7 +659,7 @@ namespace hpx::detail {
 
         // performs a const_cast so we don't need this implementation twice
         template <direction D>
-        auto at(std::size_t idx) const -> T&
+        [[nodiscard]] auto at(std::size_t idx) const -> T&
         {
             if (idx >= size<D>())
             {
@@ -836,8 +836,8 @@ namespace hpx::detail {
 
         auto reserve(std::size_t s)
         {
-            auto old_capacity = capacity();
-            auto new_capacity = calculate_new_capacity(s, old_capacity);
+            auto const old_capacity = capacity();
+            auto const new_capacity = calculate_new_capacity(s, old_capacity);
             if (new_capacity > old_capacity)
             {
                 realloc(new_capacity);
@@ -929,7 +929,7 @@ namespace hpx::detail {
             return *(data() + idx);
         }
 
-        auto at(std::size_t idx) const -> T const&
+        [[nodiscard]] auto at(std::size_t idx) const -> T const&
         {
             if (is_direct())
             {

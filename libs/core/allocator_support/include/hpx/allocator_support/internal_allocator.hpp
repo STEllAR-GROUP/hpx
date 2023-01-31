@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,8 +18,8 @@
 #include <utility>
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
-// this is currently used only for jemalloc and if a special API prefix is
-// used for its APIs
+// this is currently used only for jemalloc and if a special API prefix is used
+// for its APIs
 #include <jemalloc/jemalloc.h>
 #endif
 
@@ -34,7 +34,7 @@ namespace hpx::util {
     {
         using value_type = T;
         using pointer = T*;
-        using const_pointer = const T*;
+        using const_pointer = T const*;
         using reference = T&;
         using const_reference = T const&;
         using size_type = std::size_t;
@@ -57,24 +57,25 @@ namespace hpx::util {
         {
         }
 
-        pointer address(reference x) const noexcept
+        [[nodiscard]] static pointer address(reference x) noexcept
         {
             return &x;
         }
 
-        const_pointer address(const_reference x) const noexcept
+        [[nodiscard]] static const_pointer address(const_reference x) noexcept
         {
             return &x;
         }
 
-        [[nodiscard]] pointer allocate(size_type n, void const* hint = nullptr)
+        [[nodiscard]] static pointer allocate(
+            size_type n, void const* hint = nullptr)
         {
             if (max_size() < n)
             {
                 throw std::bad_array_new_length();
             }
 
-            pointer p = reinterpret_cast<pointer>(
+            auto p = reinterpret_cast<pointer>(
                 HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
             if (p == nullptr)
             {
@@ -83,38 +84,38 @@ namespace hpx::util {
             return p;
         }
 
-        void deallocate(pointer p, size_type n) noexcept
+        static void deallocate(pointer p, size_type n) noexcept
         {
             HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, free)(p);
         }
 
-        constexpr size_type max_size() const noexcept
+        [[nodiscard]] static constexpr size_type max_size() noexcept
         {
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
 
         template <typename U, typename... Args>
-        void construct(U* p, Args&&... args)
+        static void construct(U* p, Args&&... args)
         {
             hpx::construct_at(p, HPX_FORWARD(Args, args)...);
         }
 
         template <typename U>
-        void destroy(U* p) noexcept
+        static void destroy(U* p) noexcept
         {
             std::destroy_at(p);
         }
     };
 
     template <typename T>
-    constexpr bool operator==(
+    [[nodiscard]] constexpr bool operator==(
         internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
         return true;
     }
 
     template <typename T>
-    constexpr bool operator!=(
+    [[nodiscard]] constexpr bool operator!=(
         internal_allocator<T> const&, internal_allocator<T> const&) noexcept
     {
         return false;

@@ -131,7 +131,7 @@ namespace hpx::util {
         }
 
         template <std::size_t I>
-        constexpr decltype(auto) get() const& noexcept
+        [[nodiscard]] constexpr decltype(auto) get() const& noexcept
         {
             return detail::member_get<I>(*this);
         }
@@ -144,7 +144,7 @@ namespace hpx::util {
         }
 
         template <std::size_t I>
-        constexpr decltype(auto) get() const&& noexcept
+        [[nodiscard]] constexpr decltype(auto) get() const&& noexcept
         {
             using T = decltype(detail::member_type<I>(*this));
             return static_cast<T&&>(detail::member_get<I>(*this));

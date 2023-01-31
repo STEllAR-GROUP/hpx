@@ -37,14 +37,15 @@ namespace hpx::util::detail {
     // enabled, so we explicitly use the fallback.
 #if !defined(HPX_HAVE_CUDA)
     template <typename Sig>
-    constexpr function_vtable<Sig, true> const*
+    [[nodiscard]] constexpr function_vtable<Sig, true> const*
     get_empty_function_vtable() noexcept
     {
         return &vtables<function_vtable<Sig, true>, empty_function>::instance;
     }
 #else
     template <typename Sig>
-    function_vtable<Sig, true> const* get_empty_function_vtable() noexcept
+    [[nodiscard]] function_vtable<Sig, true> const*
+    get_empty_function_vtable() noexcept
     {
         static function_vtable<Sig, true> const empty_vtable =
             function_vtable<Sig, true>(

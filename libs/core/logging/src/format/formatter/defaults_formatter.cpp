@@ -27,7 +27,7 @@ namespace hpx::util::logging::formatter {
 
     idx::~idx() = default;
 
-    struct idx_impl : idx
+    struct idx_impl final : idx
     {
         idx_impl()
           : value(0ull)

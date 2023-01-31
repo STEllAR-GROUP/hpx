@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/functional/function.hpp>
 
 #include <cstdint>
-#include <map>
 #include <string>
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
@@ -53,7 +52,8 @@ namespace hpx::util {
             ipv4_ = f;
         }
 
-        std::string map(std::string host_name, std::uint16_t port) const;
+        [[nodiscard]] std::string map(
+            std::string host_name, std::uint16_t port) const;
 
     private:
         transform_function_type transform_;

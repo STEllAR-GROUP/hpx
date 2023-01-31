@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2022 Hartmut Kaiser
+// Copyright (c) 2018-2023 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,8 +14,6 @@
 #include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
-#include <type_traits>
-#include <utility>
 
 namespace hpx::util {
 
@@ -31,7 +29,7 @@ namespace hpx::util {
     /// \tparam Container    Container used to store the check-pointed data.
     /// \tparam Ts           Types of variables to checkpoint
     ///
-    /// \param cont          Container instance used to store the checkpoint
+    /// \param data          Container instance used to store the checkpoint
     ///                      data
     /// \param ts            Variable instances to be inserted into the
     ///                      checkpoint.

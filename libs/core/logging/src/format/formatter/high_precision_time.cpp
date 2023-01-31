@@ -36,11 +36,11 @@ namespace hpx::util::logging::formatter {
 
     high_precision_time::~high_precision_time() = default;
 
-    struct high_precision_time_impl : high_precision_time
+    struct high_precision_time_impl final : high_precision_time
     {
         /**
-        constructs a high_precision_time object
-    */
+            constructs a high_precision_time object
+        */
         explicit high_precision_time_impl(std::string const& format)
           : high_precision_time(format)
         {
@@ -68,13 +68,13 @@ namespace hpx::util::logging::formatter {
             }
 #endif
 
-            std::chrono::nanoseconds const nanosecs =
+            auto const nanosecs =
                 std::chrono::duration_cast<std::chrono::nanoseconds>(
                     val.time_since_epoch());
-            std::chrono::microseconds const microsecs =
+            auto const microsecs =
                 std::chrono::duration_cast<std::chrono::microseconds>(
                     val.time_since_epoch());
-            std::chrono::milliseconds const millisecs =
+            auto const millisecs =
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     val.time_since_epoch());
 
@@ -87,8 +87,8 @@ namespace hpx::util::logging::formatter {
 
         /** @brief configure through script
 
-        the string = the time format
-    */
+            the string = the time format
+        */
         void configure(std::string const& str) override
         {
             m_format = str;
@@ -107,7 +107,7 @@ namespace hpx::util::logging::formatter {
     private:
         bool replace_format(char const* from, char const* to)
         {
-            size_t start_pos = m_format.find(from);
+            size_t const start_pos = m_format.find(from);
             if (start_pos == std::string::npos)
                 return false;
 

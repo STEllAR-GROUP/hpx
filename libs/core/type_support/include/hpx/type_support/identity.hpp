@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <functional>
 #include <type_traits>
 
 namespace hpx {

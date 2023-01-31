@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -39,19 +39,19 @@ namespace hpx::detail {
         exception const& e, std::string const& func);
 
     template <typename Exception>
-    HPX_CORE_EXPORT std::exception_ptr get_exception(Exception const& e,
+    [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
+        Exception const& e, std::string const& func = "<unknown>",
+        std::string const& file = "<unknown>", long line = -1,
+        std::string const& auxinfo = "");
+
+    [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
+        error errcode, std::string const& msg, throwmode mode,
         std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");
 
-    HPX_CORE_EXPORT std::exception_ptr get_exception(error errcode,
-        std::string const& msg, throwmode mode,
-        std::string const& func = "<unknown>",
-        std::string const& file = "<unknown>", long line = -1,
-        std::string const& auxinfo = "");
-
-    HPX_CORE_EXPORT std::exception_ptr get_exception(std::error_code const& ec,
-        std::string const& msg, throwmode mode,
+    [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
+        std::error_code const& ec, std::string const& msg, throwmode mode,
         std::string const& func = "<unknown>",
         std::string const& file = "<unknown>", long line = -1,
         std::string const& auxinfo = "");

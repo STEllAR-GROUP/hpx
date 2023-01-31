@@ -11,7 +11,6 @@
 #include <hpx/errors/error_code.hpp>
 #include <hpx/errors/exception_info.hpp>
 
-#include <cstddef>
 #include <exception>
 #include <memory>
 #include <type_traits>
@@ -66,7 +65,8 @@ namespace hpx {
         {
         public:
             virtual ~exception_info_node_base() = default;
-            virtual void const* lookup(
+
+            [[nodiscard]] virtual void const* lookup(
                 std::type_info const& tag) const noexcept = 0;
 
             std::shared_ptr<exception_info_node_base> next;
@@ -84,7 +84,7 @@ namespace hpx {
             {
             }
 
-            void const* lookup(
+            [[nodiscard]] void const* lookup(
                 std::type_info const& tag) const noexcept override
             {
                 using entry_type =
@@ -111,7 +111,7 @@ namespace hpx {
         using node_ptr = std::shared_ptr<detail::exception_info_node_base>;
 
     public:
-        exception_info() noexcept
+        constexpr exception_info() noexcept
           : _data(nullptr)
         {
         }
@@ -138,7 +138,7 @@ namespace hpx {
         }
 
         template <typename Tag>
-        typename Tag::type const* get() const noexcept
+        [[nodiscard]] typename Tag::type const* get() const noexcept
         {
             auto const* data = _data.get();
             return static_cast<typename Tag::type const*>(
@@ -204,13 +204,13 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename E>
-    exception_info* get_exception_info(E& e) noexcept
+    [[nodiscard]] exception_info* get_exception_info(E& e) noexcept
     {
         return dynamic_cast<exception_info*>(std::addressof(e));
     }
 
     template <typename E>
-    exception_info const* get_exception_info(E const& e) noexcept
+    [[nodiscard]] exception_info const* get_exception_info(E const& e) noexcept
     {
         return dynamic_cast<exception_info const*>(std::addressof(e));
     }

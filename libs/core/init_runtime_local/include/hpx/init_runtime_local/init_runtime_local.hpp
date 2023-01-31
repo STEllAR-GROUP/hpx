@@ -79,10 +79,10 @@ namespace hpx {
             };
 
             // Default params to initialize the init_params struct
-            HPX_MAYBE_UNUSED static int dummy_argc = 1;
-            HPX_MAYBE_UNUSED static char app_name[256] = HPX_APPLICATION_STRING;
+            [[maybe_unused]] static int dummy_argc = 1;
+            [[maybe_unused]] static char app_name[256] = HPX_APPLICATION_STRING;
             static char* default_argv[2] = {app_name, nullptr};
-            HPX_MAYBE_UNUSED static char** dummy_argv = default_argv;
+            [[maybe_unused]] static char** dummy_argv = default_argv;
 
             // HPX_APPLICATION_STRING is specific to an application and therefore
             // cannot be in the source file

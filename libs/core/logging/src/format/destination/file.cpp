@@ -40,12 +40,12 @@ namespace hpx::util::logging::destination {
         return flags;
     }
 
-    struct file_impl : file
+    struct file_impl final : file
     {
         typedef hpx::util::detail::spinlock mutex_type;
 
-        explicit file_impl(std::string const& file_name, file_settings set)
-          : file(file_name, set)
+        explicit file_impl(std::string file_name, file_settings set)
+          : file(HPX_MOVE(file_name), set)
         {
         }
 
@@ -60,8 +60,8 @@ namespace hpx::util::logging::destination {
         }
 
         /** configure through script
-        right now, you can only specify the file name
-    */
+            right now, you can only specify the file name
+        */
         void configure(std::string const& str) override
         {
             // configure - the file name, for now

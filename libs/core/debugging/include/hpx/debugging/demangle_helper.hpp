@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 John Biddiscombe
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
 #include <cstdlib>
 #include <string>
 #include <type_traits>
@@ -21,7 +22,7 @@ namespace hpx::util::debug {
     template <typename T>
     struct demangle_helper
     {
-        char const* type_id() const noexcept
+        [[nodiscard]] static char const* type_id() noexcept
         {
             return typeid(T).name();
         }
@@ -51,7 +52,7 @@ namespace hpx::util::debug {
         {
         }
 
-        char const* type_id() const noexcept
+        [[nodiscard]] char const* type_id() const noexcept
         {
             return demangled_ ? demangled_.get() : typeid(T).name();
         }
@@ -104,22 +105,22 @@ namespace hpx::util::debug {
     // separator is appended if the number of types > 1
     // --------------------------------------------------------------------
     template <typename T = void>
-    inline std::string print_type(const char* = "")
+    std::string print_type(char const* = "")
     {
         return std::string(cxx_type_id<T>::typeid_.type_id());
     }
 
     template <>
-    inline std::string print_type<>(const char*)
+    inline std::string print_type<>(char const*)
     {
         return "void";
     }
 
     template <typename T, typename... Args>
-    inline std::enable_if_t<sizeof...(Args) != 0, std::string> print_type(
-        const char* delim = "")
+    std::enable_if_t<sizeof...(Args) != 0, std::string> print_type(
+        char const* delim = "")
     {
-        std::string temp(cxx_type_id<T>::typeid_.type_id());
+        std::string const temp(cxx_type_id<T>::typeid_.type_id());
         return temp + delim + print_type<Args...>(delim);
     }
 }    // namespace hpx::util::debug

@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,11 @@
 
 #pragma once
 
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/type_support/detected.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <type_traits>
-#include <utility>
 
 namespace hpx::meta {
 

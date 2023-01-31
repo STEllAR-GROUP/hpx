@@ -37,7 +37,7 @@ namespace hpx::util {
         ios_flags_saver(ios_flags_saver const&) = delete;
         ios_flags_saver& operator=(ios_flags_saver const&) = delete;
 
-        void restore()
+        void restore() const
         {
             s_save_.flags(a_save_);
         }

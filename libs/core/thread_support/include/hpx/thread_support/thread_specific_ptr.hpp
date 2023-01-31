@@ -31,17 +31,17 @@ namespace hpx::util {
     {
         using element_type = T;
 
-        T* get() const noexcept
+        [[nodiscard]] T* get() const noexcept
         {
             return ptr_;
         }
 
-        T* operator->() const noexcept
+        [[nodiscard]] T* operator->() const noexcept
         {
             return ptr_;
         }
 
-        T& operator*() const noexcept
+        [[nodiscard]] T& operator*() const noexcept
         {
             HPX_ASSERT(nullptr != ptr_);
             return *ptr_;
@@ -87,7 +87,7 @@ namespace hpx::util {
     {
         using element_type = T;
 
-        static pthread_key_t get_key()
+        [[nodiscard]] static pthread_key_t get_key()
         {
             static_<detail::thread_specific_ptr_key,
                 thread_specific_ptr<T, Tag>>
@@ -96,19 +96,19 @@ namespace hpx::util {
             return key_holder.get().key;
         }
 
-        T* get() const
+        [[nodiscard]] T* get() const
         {
             return reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
         }
 
-        T* operator->() const
+        [[nodiscard]] T* operator->() const
         {
             return reinterpret_cast<T*>(
                 pthread_getspecific(thread_specific_ptr<T, Tag>::get_key()));
         }
 
-        T& operator*() const
+        [[nodiscard]] T& operator*() const
         {
             T* ptr = nullptr;
 

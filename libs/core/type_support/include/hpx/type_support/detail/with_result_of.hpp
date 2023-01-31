@@ -39,7 +39,7 @@ namespace hpx::util::detail {
     };
 
     template <typename F>
-    inline with_result_of_t<F> with_result_of(F&& f) noexcept
+    with_result_of_t<F> with_result_of(F&& f) noexcept
     {
         return with_result_of_t<F>(HPX_FORWARD(F, f));
     }

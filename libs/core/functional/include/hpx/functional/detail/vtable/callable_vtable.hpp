@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,14 +32,14 @@ namespace hpx::util::detail {
         {
             return traits::get_function_address<T>::call(vtable::get<T>(f));
         }
-        std::size_t (*get_function_address)(void*);
+        std::size_t (*get_function_address)(void*) = nullptr;
 
         template <typename T>
         HPX_FORCEINLINE static char const* _get_function_annotation(void* f)
         {
             return traits::get_function_annotation<T>::call(vtable::get<T>(f));
         }
-        char const* (*get_function_annotation)(void*);
+        char const* (*get_function_annotation)(void*) = nullptr;
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         template <typename T>
@@ -49,7 +49,8 @@ namespace hpx::util::detail {
             return traits::get_function_annotation_itt<T>::call(
                 vtable::get<T>(f));
         }
-        util::itt::string_handle (*get_function_annotation_itt)(void*);
+        util::itt::string_handle (*get_function_annotation_itt)(
+            void*) = nullptr;
 #endif
 #endif
 
@@ -57,12 +58,12 @@ namespace hpx::util::detail {
         explicit constexpr callable_info_vtable(construct_vtable<T>) noexcept
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
           : get_function_address(
-                &callable_info_vtable::template _get_function_address<T>)
+                &callable_info_vtable::_get_function_address<T>)
           , get_function_annotation(
-                &callable_info_vtable::template _get_function_annotation<T>)
+                &callable_info_vtable::_get_function_annotation<T>)
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
           , get_function_annotation_itt(
-                &callable_info_vtable::template _get_function_annotation_itt<T>)
+                &callable_info_vtable::_get_function_annotation_itt<T>)
 #endif
 #endif
         {
@@ -70,13 +71,6 @@ namespace hpx::util::detail {
 
         explicit constexpr callable_info_vtable(
             construct_vtable<empty_function>) noexcept
-#if defined(HPX_HAVE_THREAD_DESCRIPTION)
-          : get_function_address(nullptr)
-          , get_function_annotation(nullptr)
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-          , get_function_annotation_itt(nullptr)
-#endif
-#endif
         {
         }
     };
@@ -97,7 +91,7 @@ namespace hpx::util::detail {
 
         template <typename T>
         explicit constexpr callable_vtable(construct_vtable<T>) noexcept
-          : invoke(&callable_vtable::template _invoke<T>)
+          : invoke(&callable_vtable::_invoke<T>)
         {
         }
 

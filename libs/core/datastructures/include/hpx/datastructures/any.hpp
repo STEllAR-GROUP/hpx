@@ -22,7 +22,6 @@
 #include <hpx/datastructures/traits/supports_streaming_with_any.hpp>
 
 #include <algorithm>
-#include <cstddef>
 #include <initializer_list>
 #include <iosfwd>
 #include <memory>
@@ -39,13 +38,15 @@
 #pragma warning(disable : 4127)    // conditional expression is constant
 #endif
 
+#include <hpx/config/warnings_prefix.hpp>
+
 ////////////////////////////////////////////////////////////////////////////////
 namespace hpx {
 
     ////////////////////////////////////////////////////////////////////////////
     /// Defines a type of object to be thrown by the value-returning forms of
     /// hpx::any_cast on failure.
-    struct bad_any_cast : std::bad_cast
+    struct HPX_ALWAYS_EXPORT bad_any_cast : std::bad_cast
     {
         /// Constructs a new bad_any_cast object with an implementation-defined
         /// null-terminated byte string which is accessible through what().
@@ -56,14 +57,16 @@ namespace hpx {
         }
 
         /// Returns the explanatory string.
-        /// \returns Pointer to a null-terminated string with explanatory information.
-        ///          The string is suitable for conversion and display as a std::wstring.
-        ///          The pointer is guaranteed to be valid at least until the exception
-        ///          object from which it is obtained is destroyed, or until a non-const
-        ///          member function (e.g. copy assignment operator) on the exception
-        ///          object is called.
-        /// \note Implementations are allowed but not required to override what().
-        char const* what() const noexcept override
+        /// \returns Pointer to a null-terminated string with explanatory
+        ///          information. The string is suitable for conversion and
+        ///          display as a std::wstring. The pointer is guaranteed to be
+        ///          valid at least until the exception object from which it is
+        ///          obtained is destroyed, or until a non-const member function
+        ///          (e.g. copy assignment operator) on the exception object is
+        ///          called.
+        /// \note Implementations are allowed but not required to override
+        ///       what().
+        [[nodiscard]] char const* what() const noexcept override
         {
             return "bad any cast";
         }
@@ -86,8 +89,16 @@ namespace hpx::util::detail::any {
     template <>
     struct fxn_ptr_table<void, void, void, std::true_type>
     {
+        fxn_ptr_table() = default;
+
         virtual ~fxn_ptr_table() = default;
         virtual fxn_ptr_table* get_ptr() = 0;
+
+        fxn_ptr_table(fxn_ptr_table const&) = delete;
+        fxn_ptr_table(fxn_ptr_table&&) = delete;
+
+        fxn_ptr_table& operator=(fxn_ptr_table const&) = delete;
+        fxn_ptr_table& operator=(fxn_ptr_table&&) = delete;
 
         std::type_info const& (*get_type)() = nullptr;
         void (*static_delete)(void**) = nullptr;
@@ -100,8 +111,16 @@ namespace hpx::util::detail::any {
     template <>
     struct fxn_ptr_table<void, void, void, std::false_type>
     {
+        fxn_ptr_table() = default;
+
         virtual ~fxn_ptr_table() = default;
         virtual fxn_ptr_table* get_ptr() = 0;
+
+        fxn_ptr_table(fxn_ptr_table const&) = delete;
+        fxn_ptr_table(fxn_ptr_table&&) = delete;
+
+        fxn_ptr_table& operator=(fxn_ptr_table const&) = delete;
+        fxn_ptr_table& operator=(fxn_ptr_table&&) = delete;
 
         std::type_info const& (*get_type)() = nullptr;
         void (*static_delete)(void**) = nullptr;
@@ -114,8 +133,16 @@ namespace hpx::util::detail::any {
     struct fxn_ptr_table<void, void, Char, Copyable>
       : fxn_ptr_table<void, void, void, Copyable>
     {
-        virtual ~fxn_ptr_table() = default;
+        fxn_ptr_table() = default;
+
+        ~fxn_ptr_table() override = default;
         fxn_ptr_table* get_ptr() override = 0;
+
+        fxn_ptr_table(fxn_ptr_table const&) = delete;
+        fxn_ptr_table(fxn_ptr_table&&) = delete;
+
+        fxn_ptr_table& operator=(fxn_ptr_table const&) = delete;
+        fxn_ptr_table& operator=(fxn_ptr_table&&) = delete;
 
         std::basic_istream<Char>& (*stream_in)(
             std::basic_istream<Char>&, void**) = nullptr;
@@ -218,13 +245,15 @@ namespace hpx::util::detail::any {
         template <typename T, typename IArch, typename OArch, typename Char>
         struct type : public streaming_base<T, std::true_type, Char>
         {
-            static fxn_ptr_table<IArch, OArch, Char, std::true_type>* get_ptr()
+            [[nodiscard]] static fxn_ptr_table<IArch, OArch, Char,
+                std::true_type>*
+            get_ptr()
             {
                 return detail::any::get_table<T>::template get<IArch, OArch,
                     Char, std::true_type>();
             }
 
-            static std::type_info const& get_type()
+            [[nodiscard]] static std::type_info const& get_type()
             {
                 return typeid(T);
             }
@@ -273,12 +302,14 @@ namespace hpx::util::detail::any {
         template <typename T, typename IArch, typename OArch, typename Char>
         struct type : public streaming_base<T, std::false_type, Char>
         {
-            static fxn_ptr_table<IArch, OArch, Char, std::true_type>* get_ptr()
+            [[nodiscard]] static fxn_ptr_table<IArch, OArch, Char,
+                std::true_type>*
+            get_ptr()
             {
                 return detail::any::get_table<T>::template get<IArch, OArch,
                     Char, std::true_type>();
             }
-            static std::type_info const& get_type()
+            [[nodiscard]] static std::type_info const& get_type()
             {
                 return typeid(T);
             }
@@ -329,13 +360,15 @@ namespace hpx::util::detail::any {
         template <typename T, typename IArch, typename OArch, typename Char>
         struct type : public streaming_base<T, std::true_type, Char>
         {
-            static fxn_ptr_table<IArch, OArch, Char, std::false_type>* get_ptr()
+            [[nodiscard]] static fxn_ptr_table<IArch, OArch, Char,
+                std::false_type>*
+            get_ptr()
             {
                 return detail::any::get_table<T>::template get<IArch, OArch,
                     Char, std::false_type>();
             }
 
-            static std::type_info const& get_type()
+            [[nodiscard]] static std::type_info const& get_type()
             {
                 return typeid(T);
             }
@@ -376,12 +409,14 @@ namespace hpx::util::detail::any {
         template <typename T, typename IArch, typename OArch, typename Char>
         struct type : public streaming_base<T, std::false_type, Char>
         {
-            static fxn_ptr_table<IArch, OArch, Char, std::false_type>* get_ptr()
+            [[nodiscard]] static fxn_ptr_table<IArch, OArch, Char,
+                std::false_type>*
+            get_ptr()
             {
                 return detail::any::get_table<T>::template get<IArch, OArch,
                     Char, std::false_type>();
             }
-            static std::type_info const& get_type()
+            [[nodiscard]] static std::type_info const& get_type()
             {
                 return typeid(T);
             }
@@ -438,7 +473,7 @@ namespace hpx::util::detail::any {
             base_type::equal_to = Vtable::equal_to;
         }
 
-        base_type* get_ptr() override
+        [[nodiscard]] base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
@@ -464,7 +499,7 @@ namespace hpx::util::detail::any {
             base_type::stream_out = Vtable::stream_out;
         }
 
-        base_type* get_ptr() override
+        [[nodiscard]] base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
@@ -486,7 +521,7 @@ namespace hpx::util::detail::any {
             base_type::equal_to = Vtable::equal_to;
         }
 
-        base_type* get_ptr() override
+        [[nodiscard]] base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
@@ -510,7 +545,7 @@ namespace hpx::util::detail::any {
             base_type::stream_out = Vtable::stream_out;
         }
 
-        base_type* get_ptr() override
+        [[nodiscard]] base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
@@ -523,7 +558,7 @@ namespace hpx::util::detail::any {
         static_assert(
             !std::is_reference_v<T>, "T shall have no ref-qualifiers");
 
-        static Vtable* call()
+        [[nodiscard]] static Vtable* call()
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
@@ -544,7 +579,9 @@ namespace hpx::util::detail::any {
 
         template <typename IArch, typename OArch, typename Char,
             typename Copyable>
-        static constexpr fxn_ptr_table<IArch, OArch, Char, Copyable>* get()
+        [[nodiscard]] static constexpr fxn_ptr_table<IArch, OArch, Char,
+            Copyable>*
+        get()
         {
             using fxn_type = typename fxns<is_small, Copyable>::template type<T,
                 IArch, OArch, Char>;
@@ -558,19 +595,18 @@ namespace hpx::util::detail::any {
     ////////////////////////////////////////////////////////////////////////
     struct empty
     {
-        constexpr bool operator==(empty) const noexcept
+        [[nodiscard]] constexpr bool operator==(empty) const noexcept
         {
             return false;    // undefined
         }
-        constexpr bool operator!=(empty) const noexcept
+        [[nodiscard]] constexpr bool operator!=(empty) const noexcept
         {
             return false;    // undefined
         }
     };
 
     template <typename Char>
-    inline std::basic_istream<Char>& operator>>(
-        std::basic_istream<Char>& i, empty&)
+    std::basic_istream<Char>& operator>>(std::basic_istream<Char>& i, empty&)
     {
         // If this assertion fires you tried to insert from a std istream
         // into an empty any instance. This simply can't work, because
@@ -587,8 +623,7 @@ namespace hpx::util::detail::any {
     }
 
     template <typename Char>
-    inline std::basic_ostream<Char>& operator<<(
-        std::basic_ostream<Char>& o, empty)
+    std::basic_ostream<Char>& operator<<(std::basic_ostream<Char>& o, empty)
     {
         return o;
     }
@@ -614,15 +649,15 @@ namespace hpx::util {
     public:
         // constructors
         constexpr basic_any() noexcept
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, void, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                void, std::true_type>())
           , object(nullptr)
         {
         }
 
         basic_any(basic_any const& x)
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, void, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                void, std::true_type>())
           , object(nullptr)
         {
             assign(x);
@@ -634,9 +669,8 @@ namespace hpx::util {
           , object(x.object)
         {
             x.object = nullptr;
-            x.table =
-                detail::any::get_table<detail::any::empty>::template get<void,
-                    void, void, std::true_type>();
+            x.table = detail::any::get_table<detail::any::empty>::get<void,
+                void, void, std::true_type>();
         }
 
         // Perfect forwarding of T
@@ -762,7 +796,7 @@ namespace hpx::util {
             return *this;
         }
 
-        std::type_info const& type() const
+        [[nodiscard]] std::type_info const& type() const
         {
             return table->get_type();
         }
@@ -775,10 +809,10 @@ namespace hpx::util {
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
-                *reinterpret_cast<T const*>(object);
+                *static_cast<T const*>(object);
         }
 
-        bool has_value() const noexcept
+        [[nodiscard]] bool has_value() const noexcept
         {
             return type() != typeid(detail::any::empty);
         }
@@ -788,15 +822,14 @@ namespace hpx::util {
             if (has_value())
             {
                 table->static_delete(&object);
-                table =
-                    detail::any::get_table<detail::any::empty>::template get<
-                        void, void, void, std::true_type>();
+                table = detail::any::get_table<detail::any::empty>::get<void,
+                    void, void, std::true_type>();
                 object = nullptr;
             }
         }
 
         // equality operator
-        bool equal_to(basic_any const& rhs) const noexcept
+        [[nodiscard]] bool equal_to(basic_any const& rhs) const noexcept
         {
             if (this == &rhs)    // same object
             {
@@ -827,15 +860,15 @@ namespace hpx::util {
     public:
         // constructors
         constexpr basic_any() noexcept
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, Char, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                Char, std::true_type>())
           , object(nullptr)
         {
         }
 
         basic_any(basic_any const& x)
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, Char, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                Char, std::true_type>())
           , object(nullptr)
         {
             assign(x);
@@ -847,9 +880,8 @@ namespace hpx::util {
           , object(x.object)
         {
             x.object = nullptr;
-            x.table =
-                detail::any::get_table<detail::any::empty>::template get<void,
-                    void, Char, std::true_type>();
+            x.table = detail::any::get_table<detail::any::empty>::get<void,
+                void, Char, std::true_type>();
         }
 
         // Perfect forwarding of T
@@ -990,7 +1022,7 @@ namespace hpx::util {
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
-                *reinterpret_cast<T const*>(object);
+                *static_cast<T const*>(object);
         }
 
         bool has_value() const noexcept
@@ -1003,9 +1035,8 @@ namespace hpx::util {
             if (has_value())
             {
                 table->static_delete(&object);
-                table =
-                    detail::any::get_table<detail::any::empty>::template get<
-                        void, void, Char, std::true_type>();
+                table = detail::any::get_table<detail::any::empty>::get<void,
+                    void, Char, std::true_type>();
                 object = nullptr;
             }
         }
@@ -1044,8 +1075,8 @@ namespace hpx::util {
     public:
         // constructors
         constexpr basic_any() noexcept
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, void, std::false_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                void, std::false_type>())
           , object(nullptr)
         {
         }
@@ -1056,9 +1087,8 @@ namespace hpx::util {
           , object(x.object)
         {
             x.object = nullptr;
-            x.table =
-                detail::any::get_table<detail::any::empty>::template get<void,
-                    void, void, std::false_type>();
+            x.table = detail::any::get_table<detail::any::empty>::get<void,
+                void, void, std::false_type>();
         }
 
         // Perfect forwarding of T
@@ -1173,7 +1203,7 @@ namespace hpx::util {
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
-                *reinterpret_cast<T const*>(object);
+                *static_cast<T const*>(object);
         }
 
         bool has_value() const noexcept
@@ -1186,9 +1216,8 @@ namespace hpx::util {
             if (has_value())
             {
                 table->static_delete(&object);
-                table =
-                    detail::any::get_table<detail::any::empty>::template get<
-                        void, void, void, std::false_type>();
+                table = detail::any::get_table<detail::any::empty>::get<void,
+                    void, void, std::false_type>();
                 object = nullptr;
             }
         }
@@ -1224,8 +1253,8 @@ namespace hpx::util {
     public:
         // constructors
         constexpr basic_any() noexcept
-          : table(detail::any::get_table<detail::any::empty>::template get<void,
-                void, Char, std::false_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<void, void,
+                Char, std::false_type>())
           , object(nullptr)
         {
         }
@@ -1236,9 +1265,8 @@ namespace hpx::util {
           , object(x.object)
         {
             x.object = nullptr;
-            x.table =
-                detail::any::get_table<detail::any::empty>::template get<void,
-                    void, Char, std::false_type>();
+            x.table = detail::any::get_table<detail::any::empty>::get<void,
+                void, Char, std::false_type>();
         }
 
         // Perfect forwarding of T
@@ -1353,7 +1381,7 @@ namespace hpx::util {
 
             return hpx::util::detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
-                *reinterpret_cast<T const*>(object);
+                *static_cast<T const*>(object);
         }
 
         bool has_value() const noexcept
@@ -1366,9 +1394,8 @@ namespace hpx::util {
             if (has_value())
             {
                 table->static_delete(&object);
-                table =
-                    detail::any::get_table<detail::any::empty>::template get<
-                        void, void, Char, std::false_type>();
+                table = detail::any::get_table<detail::any::empty>::get<void,
+                    void, Char, std::false_type>();
                 object = nullptr;
             }
         }
@@ -1409,10 +1436,8 @@ namespace hpx::util {
                 basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
             {
                 return get_table<T>::is_small::value ?
-                    reinterpret_cast<T*>(
-                        reinterpret_cast<void*>(&operand->object)) :
-                    reinterpret_cast<T*>(
-                        reinterpret_cast<void*>(operand->object));
+                    static_cast<T*>(reinterpret_cast<void*>(&operand->object)) :
+                    static_cast<T*>(reinterpret_cast<void*>(operand->object));
             }
         };
 
@@ -1525,13 +1550,11 @@ namespace hpx {
     ///           contained by \a operand, otherwise a null pointer.
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    inline T* any_cast(
-        util::basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
+    T* any_cast(util::basic_any<IArch, OArch, Char, Copyable>* operand) noexcept
     {
         if (operand && operand->type() == typeid(T))
         {
-            return util::detail::any::any_cast_support::template call<T>(
-                operand);
+            return util::detail::any::any_cast_support::call<T>(operand);
         }
         return nullptr;
     }
@@ -1539,7 +1562,7 @@ namespace hpx {
     /// \copydoc any_cast(util::basic_any<IArch, OArch, Char, Copyable>* operand)
     template <typename T, typename IArch, typename OArch, typename Char,
         typename Copyable>
-    inline T const* any_cast(
+    T const* any_cast(
         util::basic_any<IArch, OArch, Char, Copyable> const* operand) noexcept
     {
         return hpx::any_cast<T>(
@@ -1650,6 +1673,8 @@ namespace hpx::util {
     using streamable_unique_wany_nonser =
         basic_any<void, void, wchar_t, std::false_type>;
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_suffix.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_MSVC) && HPX_MSVC >= 1400

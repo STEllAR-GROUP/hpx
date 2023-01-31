@@ -25,7 +25,7 @@ namespace hpx::serialization::detail {
         {
         }
 
-        constexpr std::size_t size() const noexcept
+        [[nodiscard]] constexpr std::size_t size() const noexcept
         {
             return size_;
         }
@@ -59,12 +59,12 @@ namespace hpx::traits {
     {
         using preprocessing_only = std::true_type;
 
-        static constexpr bool is_preprocessing() noexcept
+        [[nodiscard]] static constexpr bool is_preprocessing() noexcept
         {
             return true;
         }
 
-        static constexpr std::size_t size(
+        [[nodiscard]] static constexpr std::size_t size(
             serialization::detail::preprocess_container const& cont) noexcept
         {
             return cont.size();

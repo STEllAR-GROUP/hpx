@@ -468,7 +468,8 @@ namespace hpx::parallel::execution::detail {
 
                 // Schedule task for this worker thread
                 do_work_task(desc, pool, false,
-                    task_function<index_queue_bulk_state>{this, size,
+                    task_function<index_queue_bulk_state>{
+                        hpx::intrusive_ptr<index_queue_bulk_state>(this), size,
                         chunk_size, worker_thread, reverse_placement,
                         allow_stealing});
 
@@ -484,7 +485,8 @@ namespace hpx::parallel::execution::detail {
             {
                 // Handle the queue for the local thread.
                 do_work_task(desc, pool, true,
-                    task_function<index_queue_bulk_state>{this, size,
+                    task_function<index_queue_bulk_state>{
+                        hpx::intrusive_ptr<index_queue_bulk_state>(this), size,
                         chunk_size, local_worker_thread, reverse_placement,
                         allow_stealing});
             }

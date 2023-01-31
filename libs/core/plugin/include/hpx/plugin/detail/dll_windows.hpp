@@ -1,5 +1,5 @@
 //  Copyright Vladimir Prus 2004.
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,6 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/format.hpp>
 
-#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -39,7 +38,7 @@ namespace hpx::util::plugin {
             {
             }
 
-            void operator()(T)
+            void operator()(T) const
             {
                 if (nullptr != h)
                     FreeLibrary(h);
@@ -52,27 +51,15 @@ namespace hpx::util::plugin {
     class dll
     {
     public:
-        dll()
-          : dll_handle(nullptr)
-        {
-        }
+        dll() = default;
 
-        dll(dll const& rhs)
-          : dll_name(rhs.dll_name)
-          , map_name(rhs.map_name)
-          , dll_handle(nullptr)
-        {
-        }
-
-        dll(std::string const& libname)
-          : dll_name(libname)
-          , map_name()
-          , dll_handle(nullptr)
+        explicit dll(std::string libname)
+          : dll_name(HPX_MOVE(libname))
         {
             // map_name defaults to dll base name
             namespace fs = filesystem;
 
-            fs::path dll_path(dll_name);
+            fs::path const dll_path(dll_name);
             map_name = fs::basename(dll_path);
         }
 
@@ -81,11 +68,17 @@ namespace hpx::util::plugin {
             LoadLibrary(ec);
         }
 
-        dll(std::string const& libname, std::string const& mapname)
-          : dll_name(libname)
-          , map_name(mapname)
-          , dll_handle(nullptr)
+        dll(std::string libname, std::string mapname)
+          : dll_name(HPX_MOVE(libname))
+          , map_name(HPX_MOVE(mapname))
         {
+        }
+
+        dll(dll const& rhs)
+          : dll_name(rhs.dll_name)
+          , map_name(rhs.map_name)
+        {
+            LoadLibrary();
         }
 
         dll(dll&& rhs) noexcept
@@ -128,7 +121,7 @@ namespace hpx::util::plugin {
             FreeLibrary();
         }
 
-        std::string const& get_name() const noexcept
+        [[nodiscard]] std::string const& get_name() const noexcept
         {
             return dll_name;
         }
@@ -138,7 +131,7 @@ namespace hpx::util::plugin {
         }
 
         template <typename SymbolType, typename Deleter>
-        std::pair<SymbolType, Deleter> get(
+        [[nodiscard]] std::pair<SymbolType, Deleter> get(
             std::string const& symbol_name, error_code& ec = throws) const
         {
             // make sure everything is initialized
@@ -150,11 +143,11 @@ namespace hpx::util::plugin {
                 std::is_pointer_v<SymbolType>, "std::is_pointer_v<SymbolType>");
 
             // Cast the to right type.
-            SymbolType address =
+            auto address =
                 (SymbolType) GetProcAddress(dll_handle, symbol_name.c_str());
             if (nullptr == address)
             {
-                std::string str = hpx::util::format(
+                std::string const str = hpx::util::format(
                     "Hpx.Plugin: Unable to locate the exported symbol name "
                     "'{}' in the shared library '{}'",
                     symbol_name, dll_name);
@@ -171,7 +164,7 @@ namespace hpx::util::plugin {
             HMODULE handle = ::LoadLibraryA(dll_name.c_str());
             if (!handle)
             {
-                std::string str = hpx::util::format(
+                std::string const str = hpx::util::format(
                     "Hpx.Plugin: Could not open shared library '{}'", dll_name);
 
                 // report error
@@ -206,7 +199,7 @@ namespace hpx::util::plugin {
                 dll_handle = ::LoadLibraryA(dll_name.c_str());
                 if (!dll_handle)
                 {
-                    std::string str = hpx::util::format(
+                    std::string const str = hpx::util::format(
                         "Hpx.Plugin: Could not open shared library '{}'",
                         dll_name);
 
@@ -221,7 +214,7 @@ namespace hpx::util::plugin {
         }
 
     public:
-        std::string get_directory(error_code& ec = throws) const
+        [[nodiscard]] std::string get_directory(error_code& ec = throws) const
         {
             char buffer[_MAX_PATH] = {'\0'};
 
@@ -230,12 +223,12 @@ namespace hpx::util::plugin {
             if (ec)
                 return buffer;
 
-            DWORD name_length =
+            DWORD const name_length =
                 GetModuleFileNameA(dll_handle, buffer, sizeof(buffer));
 
             if (name_length <= 0)
             {
-                std::string str = hpx::util::format(
+                std::string const str = hpx::util::format(
                     "Hpx.Plugin: Could not extract path the shared library "
                     "'{}' has been loaded from.",
                     dll_name);
@@ -255,15 +248,15 @@ namespace hpx::util::plugin {
         }
 
     protected:
-        void FreeLibrary()
+        void FreeLibrary() const
         {
-            if (nullptr != dll_handle)
+            if (dll_handle != nullptr)
                 ::FreeLibrary(dll_handle);
         }
 
     private:
         std::string dll_name;
         std::string map_name;
-        HMODULE dll_handle;
+        HMODULE dll_handle = nullptr;
     };
 }    // namespace hpx::util::plugin

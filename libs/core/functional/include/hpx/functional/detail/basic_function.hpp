@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -47,17 +47,18 @@ namespace hpx::util::detail {
 
         function_base(function_base const& other, vtable const* empty_vtable);
         function_base(function_base&& other, vtable const* empty_vptr) noexcept;
+
         ~function_base();
 
         void op_assign(function_base const& other, vtable const* empty_vtable);
         void op_assign(
             function_base&& other, vtable const* empty_vtable) noexcept;
 
-        void destroy() noexcept;
+        void destroy() const noexcept;
         void reset(vtable const* empty_vptr) noexcept;
         void swap(function_base& f) noexcept;
 
-        constexpr bool empty() const noexcept
+        [[nodiscard]] constexpr bool empty() const noexcept
         {
             return object == nullptr;
         }
@@ -67,9 +68,10 @@ namespace hpx::util::detail {
             return !empty();
         }
 
-        std::size_t get_function_address() const;
-        char const* get_function_annotation() const;
-        util::itt::string_handle get_function_annotation_itt() const;
+        [[nodiscard]] std::size_t get_function_address() const;
+        [[nodiscard]] char const* get_function_annotation() const;
+        [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+            const;
 
     protected:
         vtable const* vptr;
@@ -83,30 +85,30 @@ namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename F>
-    constexpr bool is_empty_function(F* fp) noexcept
+    [[nodiscard]] constexpr bool is_empty_function(F* fp) noexcept
     {
         return fp == nullptr;
     }
 
     template <typename T, typename C>
-    constexpr bool is_empty_function(T C::*mp) noexcept
+    [[nodiscard]] constexpr bool is_empty_function(T C::*mp) noexcept
     {
         return mp == nullptr;
     }
 
-    inline constexpr bool is_empty_function_impl(
+    [[nodiscard]] constexpr bool is_empty_function_impl(
         function_base const* f) noexcept
     {
         return f->empty();
     }
 
-    inline constexpr bool is_empty_function_impl(...) noexcept
+    [[nodiscard]] constexpr bool is_empty_function_impl(...) noexcept
     {
         return false;
     }
 
     template <typename F>
-    constexpr bool is_empty_function(F const& f) noexcept
+    [[nodiscard]] constexpr bool is_empty_function(F const& f) noexcept
     {
         return detail::is_empty_function_impl(&f);
     }
@@ -149,6 +151,8 @@ namespace hpx::util::detail {
             base_type::op_assign(HPX_MOVE(other), get_empty_vtable());
             return *this;
         }
+
+        ~basic_function() = default;
 
         void assign(std::nullptr_t) noexcept
         {
@@ -201,7 +205,7 @@ namespace hpx::util::detail {
         using base_type::operator bool;
 
         template <typename T>
-        T* target() noexcept
+        [[nodiscard]] T* target() noexcept
         {
             using TD = std::remove_cv_t<T>;
             static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
@@ -215,7 +219,7 @@ namespace hpx::util::detail {
         }
 
         template <typename T>
-        T const* target() const noexcept
+        [[nodiscard]] T const* target() const noexcept
         {
             using TD = std::remove_cv_t<T>;
             static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
@@ -239,13 +243,13 @@ namespace hpx::util::detail {
         using base_type::get_function_annotation_itt;
 
     private:
-        static constexpr vtable const* get_empty_vtable() noexcept
+        [[nodiscard]] static constexpr vtable const* get_empty_vtable() noexcept
         {
             return detail::get_empty_function_vtable<R(Ts...)>();
         }
 
         template <typename T>
-        static constexpr vtable const* get_vtable() noexcept
+        [[nodiscard]] static constexpr vtable const* get_vtable() noexcept
         {
             return detail::get_vtable<vtable, T>();
         }

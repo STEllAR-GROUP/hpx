@@ -61,7 +61,7 @@ namespace hpx::serialization {
         using element_type =
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
-        constexpr bool use_optimized =
+        static constexpr bool use_optimized =
             std::is_default_constructible_v<element_type> &&
             (hpx::traits::is_bitwise_serializable_v<element_type> ||
                 !hpx::traits::is_not_bitwise_serializable_v<element_type>);
@@ -97,9 +97,9 @@ namespace hpx::serialization {
     void serialize(
         output_archive& ar, std::vector<bool, Allocator> const& v, unsigned)
     {
-        std::uint64_t size = v.size();
+        std::uint64_t const size = v.size();
         ar << size;
-        if (v.empty())
+        if (size == 0)
         {
             return;
         }
@@ -118,7 +118,7 @@ namespace hpx::serialization {
     {
         std::uint64_t size = v.size();
         ar << size;
-        if (v.empty())
+        if (size == 0)
         {
             return;
         }
@@ -126,7 +126,7 @@ namespace hpx::serialization {
         using element_type =
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
-        constexpr bool use_optimized =
+        static constexpr bool use_optimized =
             std::is_default_constructible_v<element_type> &&
             (hpx::traits::is_bitwise_serializable_v<element_type> ||
                 !hpx::traits::is_not_bitwise_serializable_v<element_type>);

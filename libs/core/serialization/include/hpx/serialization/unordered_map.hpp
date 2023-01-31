@@ -12,6 +12,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 
+#include <cstdint>
 #include <unordered_map>
 #include <utility>
 
@@ -43,10 +44,14 @@ namespace hpx::serialization {
     template <typename Key, typename Value, typename Hash, typename KeyEqual,
         typename Alloc>
     void serialize(output_archive& ar,
-        const std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>& t,
+        std::unordered_map<Key, Value, Hash, KeyEqual, Alloc> const& t,
         unsigned)
     {
-        ar << t.size();    //-V128
+        std::uint64_t const size = t.size();
+        ar << size;
+        if (size == 0)
+            return;
+
         for (auto const& val : t)
         {
             ar << val;

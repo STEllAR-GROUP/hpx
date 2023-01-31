@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,24 +43,24 @@ namespace hpx::util::cache::statistics {
     public:
         /// \brief  The function \a got_hit will be called by a cache instance
         ///         whenever a entry got touched.
-        constexpr void got_hit() const noexcept {}
+        static constexpr void got_hit() noexcept {}
 
         /// \brief  The function \a got_miss will be called by a cache instance
         ///         whenever a requested entry has not been found in the cache.
-        constexpr void got_miss() const noexcept {}
+        static constexpr void got_miss() noexcept {}
 
         /// \brief  The function \a got_insertion will be called by a cache
         ///         instance whenever a new entry has been inserted.
-        constexpr void got_insertion() const noexcept {}
+        static constexpr void got_insertion() noexcept {}
 
         /// \brief  The function \a got_eviction will be called by a cache
         ///         instance whenever an entry has been removed from the cache
         ///         because a new inserted entry let the cache grow beyond its
         ///         capacity.
-        constexpr void got_eviction() const noexcept {}
+        static constexpr void got_eviction() noexcept {}
 
         /// \brief Reset all statistics
-        constexpr void clear() const noexcept {}
+        static constexpr void clear() noexcept {}
 
         /// Helper class to update timings and counts on function exit
         struct update_on_exit
@@ -70,56 +70,64 @@ namespace hpx::util::cache::statistics {
 
         /// The function \a get_get_entry_count returns the number of
         /// invocations of the get_entry() API function of the cache.
-        constexpr std::int64_t get_get_entry_count(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_get_entry_count(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_insert_entry_count returns the number of
         /// invocations of the insert_entry() API function of the cache.
-        constexpr std::int64_t get_insert_entry_count(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_insert_entry_count(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_update_entry_count returns the number of
         /// invocations of the update_entry() API function of the cache.
-        constexpr std::int64_t get_update_entry_count(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_update_entry_count(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_erase_entry_count returns the number of
         /// invocations of the erase() API function of the cache.
-        constexpr std::int64_t get_erase_entry_count(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_erase_entry_count(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_get_entry_time returns the overall time spent
         /// executing of the get_entry() API function of the cache.
-        constexpr std::int64_t get_get_entry_time(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_get_entry_time(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_insert_entry_time returns the overall time
         /// spent executing of the insert_entry() API function of the cache.
-        constexpr std::int64_t get_insert_entry_time(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_insert_entry_time(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_update_entry_time returns the overall time
         /// spent executing of the update_entry() API function of the cache.
-        constexpr std::int64_t get_update_entry_time(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_update_entry_time(
+            bool) noexcept
         {
             return 0;
         }
 
         /// The function \a get_erase_entry_time returns the overall time spent
         /// executing of the erase() API function of the cache.
-        constexpr std::int64_t get_erase_entry_time(bool) const noexcept
+        [[nodiscard]] static constexpr std::int64_t get_erase_entry_time(
+            bool) noexcept
         {
             return 0;
         }
