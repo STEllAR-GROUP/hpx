@@ -18,9 +18,11 @@ namespace hpx { namespace sycl { namespace experimental { namespace detail {
     {
         return get_future(hpx::util::internal_allocator<>{}, command_event);
     }
-    hpx::future<void> get_future(cl::sycl::event command_event, cl::sycl::queue &command_queue)
+    hpx::future<void> get_future_with_host_task(cl::sycl::event command_event,
+        cl::sycl::queue& command_queue)
     {
-        return get_future(hpx::util::internal_allocator<>{}, command_event, command_queue);
+        return get_future(hpx::util::internal_allocator<>{}, command_event,
+            command_queue);
     }
 }}}}    // namespace hpx::sycl::experimental::detail
 #endif
