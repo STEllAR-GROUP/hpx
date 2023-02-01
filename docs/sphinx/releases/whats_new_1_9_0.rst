@@ -13,11 +13,31 @@
 
 General changes
 ===============
-- LCI parcelport was optimized.
-- HPX namespaces collapsed under `hpx::*`. `hpx::parallel` and `hpx::util` are now just `hpx`.
-- Codebase was modernized.
-- Additional facilities on senders/receivers (P2300) integration were added.
-- Further improvement were made on the documentation.
+- Added RISC-V 64bit support. HPX is now compatible with RISC-V architectures which have revolutionized the HPC world.
+- LCI parcelport has been optimized to transfer parcels with fewer messages and use the HPX resource partitioner for 
+  its progress thread allocation. It should generally provide better performance than before. It also removes its 
+  dependency on the MPI library.
+- HPX dependency on Boost was further relaxed by replacing headers from Boost.Range, Boost.Tokenizer and Boost.Lockfree.
+- Improvements took place on our parallel algorithms implementation.
+- Our Senders/Receivers (P2300) integration was extended:
+
+  - Coroutines were integrated with senders/receivers. ``get_completion_signatures`` now works with awaitable senders.
+  - ``with_awaitable_senders`` allows the passed senders to retrieve the value i.e. senders are transparently
+    awaitable from within a coroutine.
+  - ``when_all_vector`` was added.
+
+- ``sync_wait`` and ``sync_wait_with_variant`` sender consumers were added. The user can now initiate the execution of
+  their asynchronous pipeline by blocking the current thread that executes the main() function until the result
+  is retrieved.
+- The combinators for futures (a.k.a. async_combinators) ``when_*``, ``wait_*``, ``wait_*_nothrow`` were turned into CPOs 
+  allowing for end-user customization. For more information on the async_combinators refer to the documentation,
+  https://hpx-docs.stellar-group.org/latest/html/libs/core/async_combinators/docs/index.html?highlight=combinators.
+- The new datapar backend SVE allows simd and par_simd execution policies to exploit dataparalleism in the processors that 
+  have SVE vector registers like A64FX and Neoverse V1.
+- The documentation for parallel algorithms, container algorithms was further improved. The Public API page was vastly enriched. 
+- Copy button shortkey was added at the top-right of code-blocks.
+- Pragma directive that reports warnings as errors on MSVC was fixed. 
+- Command line argument ``--hpx:loopback_network`` was added to facilitie debugging with networks.
 
 Breaking changes
 ================
@@ -25,7 +45,25 @@ Breaking changes
 - Stopped supporting Clang V8, the minimal version supported is now Clang V10.
 - Stopped supporting gcc V8, the minimal version supported is now gcc V9.
 - Stopped supporting Visual Studio 2015, the minimal version supported is
-  now Visual Studion 2019.
+  now Visual Studio 2019.
+- ``tag_policy_tag`` et.al. were re-added after HPX V1.8.1 depracation.
+- ``get_chunk_size`` and ``processing_units_count`` API is now expecting the time for one iteration as an argument.
+- ``hpx::parallel::reduce_by_key`` is deprecated in favor of ``hpx::experimental::reduce_by_key``.
+- ``hpx::parallel::task_block`` is deprecated in favor of ``hpx::experimental::task_block``.
+- ``hpx::util::mem_fn`` is deprecated in favor of ``hpx::mem_fn``.
+- ``hpx::util::invoke``                           is deprecated in favor of ``hpx::invoke``.
+- ``hpx::util::invoke_r``                         is deprecated in favor of ``hpx::invoke_r``.
+- ``hpx::util::invoke_fused``                     is deprecated in favor of ``hpx::invoke_fused``.
+- ``hpx::util::invoke_fused_r``                   is deprecated in favor of ``hpx::invoke_fused_r``.
+- ``hpx::util::unlock_guard``                     is deprecated in favor of ``hpx::unlock_guard``.
+- ``hpx::parallel::v1::reduce_by_key``            is deprecated in favor of ``hpx::experimental::reduce_by_key``.
+- ``hpx::parallel::v1::sort_by_key``              is deprecated in favor of ``hpx::experimental::sort_by_key``.
+- ``hpx::parallel::task_canceled_exception``      is deprecated in favor of ``hpx::experimental::task_canceled_exception``.
+- ``hpx::parallel::task_block``                   is deprecated in favor of ``hpx::experimental::task_block``.
+- ``hpx::parallel::define_task_block``            is deprecated in favor of ``hpx::experimental::define_task_block``.  
+- ``hpx::parallel::define_task_block_restore_thread`` is deprecated in favor of ``hpx::experimental::define_task_block_restore_thread``.
+- ``hpx::execution::experimental::task_group`` is deprecated in favor of        ``hpx::experimental::task_group``.
+
 
 Closed issues 
 =============
@@ -176,7 +214,6 @@ Closed pull requests
 * :hpx-pr:`5965` - Fixing inspect problems, adding missing header file
 * :hpx-pr:`5962` - Changes in html page of documentation
 * :hpx-pr:`5961` - Prevent stalling during shutdown when running hello_world_distributed
-* :hpx-pr:`5956` - Adding sync_wait_with_variant
 * :hpx-pr:`5955` - Fix documentation for container algorithms
 * :hpx-pr:`5952` - docs: fix & improve parallel algorithms documentation 3
 * :hpx-pr:`5950` - Change executors to directly implement the executor CPOs
