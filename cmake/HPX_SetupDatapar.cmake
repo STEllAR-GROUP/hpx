@@ -52,16 +52,12 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_EVE_TAG STRING "Eve repository tag or branch" "v2022.03.0"
+    HPX_WITH_EVE_TAG STRING "Eve repository tag or branch" "hpx-v1.9.0"
     CATEGORY "Build Targets"
     ADVANCED
   )
 
-  if(HPX_WITH_FETCH_EVE)
-    include(HPX_SetupEve)
-  else()
-    find_package(Eve)
-  endif()
+  include(HPX_SetupEve)
   hpx_option(
     HPX_WITH_DATAPAR BOOL
     "Enable data parallel algorithm support using Eve library (default: ON)" ON
