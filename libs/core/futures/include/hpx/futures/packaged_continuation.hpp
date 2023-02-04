@@ -51,12 +51,12 @@ namespace hpx::lcos::detail {
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont)
     {
-        constexpr bool is_void =
-            std::is_void_v<util::invoke_result_t<Func, Future&&>>;
-
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
+                static constexpr bool is_void =
+                    std::is_void_v<util::invoke_result_t<Func, Future&&>>;
+
                 if constexpr (is_void)
                 {
                     func(HPX_FORWARD(Future, future));
