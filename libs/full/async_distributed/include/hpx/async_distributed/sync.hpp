@@ -32,7 +32,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     template <typename Action>
     struct sync_result
@@ -87,8 +87,7 @@ namespace hpx { namespace detail {
             using component_type = typename components::client_base<Client,
                 Stub>::server_component_type;
 
-            using is_valid = traits::is_valid_action<Action, component_type>;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             // invoke directly if client is ready
@@ -152,9 +151,10 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Policy, launch_policy), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
+
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto sync(F&& f, Ts&&... ts)
         -> decltype(detail::sync_action_dispatch<Action, std::decay_t<F>>::call(
@@ -166,7 +166,8 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // any action
     template <typename Action>
@@ -190,8 +191,7 @@ namespace hpx { namespace detail {
             using component_type = typename components::client_base<Client,
                 Stub>::server_component_type;
 
-            using is_valid = traits::is_valid_action<Derived, component_type>;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             return sync<Derived>(
@@ -226,17 +226,13 @@ namespace hpx { namespace detail {
             using component_type = typename components::client_base<Client,
                 Stub>::server_component_type;
 
-            using is_valid = traits::is_valid_action<Derived, component_type>;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
             return sync<Derived>(HPX_FORWARD(Policy_, launch_policy),
                 c.get_id(), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
-
-namespace hpx { namespace detail {
 
     // bound action
     template <typename Bound>
@@ -250,4 +246,4 @@ namespace hpx { namespace detail {
             return bound(HPX_FORWARD(Us, vs)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

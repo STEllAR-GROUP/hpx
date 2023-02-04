@@ -57,7 +57,7 @@ namespace hpx::execution::experimental::detail {
     // of items n. Returns a power-of-2 chunk size that produces at most 8 and
     // at least 4 chunks per worker thread.
     static constexpr std::uint32_t get_bulk_scheduler_chunk_size(
-        std::uint32_t const num_threads, std::size_t const n)
+        std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
         while (chunk_size * num_threads * 8 < n)
@@ -122,7 +122,7 @@ namespace hpx::execution::experimental::detail {
         OperationState* const op_state;
         task_function<OperationState> const* const task_f;
 
-        [[noreturn]] void operator()(hpx::monostate const&) const noexcept
+        [[noreturn]] void operator()(hpx::monostate) const noexcept
         {
             HPX_UNREACHABLE;
         }
@@ -220,7 +220,7 @@ namespace hpx::execution::experimental::detail {
     {
         OperationState* const op_state;
 
-        void operator()(hpx::monostate&&) const
+        [[noreturn]] void operator()(hpx::monostate) const noexcept
         {
             HPX_UNREACHABLE;
         }

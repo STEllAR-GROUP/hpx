@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -38,12 +38,15 @@ namespace hpx::execution::experimental {
         {
         };
 
+        // clang-format off
         template <typename Scheduler>
         struct exposes_get_policy<Scheduler,
-            std::enable_if_t<hpx::is_execution_policy_v<decltype(
-                std::declval<Scheduler>().get_policy())>>> : std::true_type
+            std::enable_if_t<hpx::is_execution_policy_v<
+                decltype(std::declval<Scheduler>().get_policy())>>>
+          : std::true_type
         {
         };
+        // clang-format on
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -60,7 +63,7 @@ namespace hpx::execution::experimental {
         {
         }
 
-        policy_type const& get_policy() const
+        constexpr policy_type const& get_policy() const noexcept
         {
             return policy;
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // Define post() overloads for plain local functions and function objects.
     // dispatching trait for hpx::post
@@ -28,7 +29,7 @@ namespace hpx { namespace detail {
     {
         template <typename F, typename... Ts>
         HPX_FORCEINLINE static std::enable_if_t<
-            traits::detail::is_deferred_invocable<F, Ts...>::value, bool>
+            traits::detail::is_deferred_invocable_v<F, Ts...>, bool>
         call(F&& f, Ts&&... ts)
         {
             execution::parallel_executor exec;
@@ -40,13 +41,10 @@ namespace hpx { namespace detail {
 
     // The overload for hpx::post taking an executor simply forwards to the
     // corresponding executor customization point.
-    //
-    // parallel::execution::executor
-    // threads::executor
     template <typename Executor>
     struct post_dispatch<Executor,
-        std::enable_if_t<traits::is_one_way_executor<Executor>::value ||
-            traits::is_two_way_executor<Executor>::value>>
+        std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
+            traits::is_two_way_executor_v<Executor>>>
     {
         template <typename Executor_, typename F, typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
@@ -57,4 +55,4 @@ namespace hpx { namespace detail {
             return false;
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

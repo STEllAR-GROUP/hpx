@@ -40,7 +40,6 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -174,7 +173,8 @@ namespace hpx::execution {
         {
         }
 
-        void set_hierarchical_threshold(std::size_t threshold)
+        constexpr void set_hierarchical_threshold(
+            std::size_t threshold) noexcept
         {
             hierarchical_threshold_ = threshold;
         }
@@ -295,14 +295,14 @@ namespace hpx::execution {
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_execute_t,
-            parallel_policy_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] parallel_policy_executor const& exec, F&& f,
+            Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::scoped_annotation annotate(exec.annotation_ ?
                     exec.annotation_ :
                     "parallel_policy_executor::sync_execute");
 #endif
-            HPX_UNUSED(exec);
             return hpx::detail::sync_launch_policy_dispatch<
                 launch::sync_policy>::call(exec.policy_, HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
@@ -490,7 +490,7 @@ namespace hpx::execution {
             }
         }
 
-        std::size_t get_first_core() const
+        std::size_t get_first_core() const noexcept
         {
             if (policy_.hint().mode !=
                     hpx::threads::thread_schedule_hint_mode::none &&
@@ -561,6 +561,7 @@ namespace hpx::execution {
 }    // namespace hpx::execution
 
 namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <typename Policy>
     struct is_one_way_executor<hpx::execution::parallel_policy_executor<Policy>>

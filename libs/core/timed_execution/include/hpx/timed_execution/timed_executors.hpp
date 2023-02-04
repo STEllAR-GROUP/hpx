@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,7 +28,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     namespace detail {
         /// \cond NOINTERNAL
 
@@ -498,17 +499,17 @@ namespace hpx { namespace parallel { namespace execution {
         }
 
         /// \cond NOINTERNAL
-        bool operator==(timed_executor const& rhs) const noexcept
+        constexpr bool operator==(timed_executor const& rhs) const noexcept
         {
             return exec_ == rhs.exec_ && execute_at_ == rhs.execute_at_;
         }
 
-        bool operator!=(timed_executor const& rhs) const noexcept
+        constexpr bool operator!=(timed_executor const& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        timed_executor const& context() const noexcept
+        constexpr timed_executor const& context() const noexcept
         {
             return *this;
         }
@@ -582,9 +583,9 @@ namespace hpx { namespace parallel { namespace execution {
 
     using parallel_timed_executor =
         timed_executor<hpx::execution::parallel_executor>;
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -622,4 +623,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
