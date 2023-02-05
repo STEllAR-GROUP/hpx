@@ -7,7 +7,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/preprocessor/cat.hpp>
+
+
+#ifdef HPX_CXX_MODULES
+import cat;
+#else
+
+#endif
+
 #include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
