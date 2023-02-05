@@ -8,11 +8,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
 #include <cstddef>
 #include <cstdint>
+#include <ostream>
 
 namespace hpx::threads {
 
@@ -50,7 +50,7 @@ namespace hpx::threads {
         return get_thread_state_name(state.state());
     }
 
-    std::ostream& operator<<(std::ostream& os, thread_schedule_state const t)
+    std::ostream& operator<<(std::ostream& os, thread_schedule_state t)
     {
         os << get_thread_state_name(t) << " (" << static_cast<std::uint32_t>(t)
            << ")";
@@ -83,7 +83,7 @@ namespace hpx::threads {
             state_ex)];
     }
 
-    std::ostream& operator<<(std::ostream& os, thread_restart_state const t)
+    std::ostream& operator<<(std::ostream& os, thread_restart_state t)
     {
         os << get_thread_state_ex_name(t) << " ("
            << static_cast<std::uint32_t>(t) << ")";
@@ -117,7 +117,7 @@ namespace hpx::threads {
             priority)];
     }
 
-    std::ostream& operator<<(std::ostream& os, thread_priority const t)
+    std::ostream& operator<<(std::ostream& os, thread_priority t)
     {
         os << get_thread_priority_name(t) << " ("
            << static_cast<std::uint32_t>(t) << ")";
@@ -149,7 +149,7 @@ namespace hpx::threads {
         return strings::stack_size_names[static_cast<std::size_t>(size) - 1];
     }
 
-    std::ostream& operator<<(std::ostream& os, thread_stacksize const t)
+    std::ostream& operator<<(std::ostream& os, thread_stacksize t)
     {
         os << get_stack_size_enum_name(t) << " ("
            << static_cast<std::uint32_t>(t) << ")";

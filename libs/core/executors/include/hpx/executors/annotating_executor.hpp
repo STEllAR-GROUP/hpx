@@ -4,7 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/annotating_executor.hpp
+/// \file hpx/executors/annotating_executor.hpp
 
 #pragma once
 
@@ -13,7 +13,6 @@
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
@@ -66,13 +65,17 @@ namespace hpx::execution::experimental {
             return exec_ != rhs.exec_;
         }
 
-        constexpr auto const& context() const noexcept
+        [[nodiscard]] constexpr auto const& context() const noexcept
         {
             return exec_.context();
         }
-        /// \endcond
 
-        /// \cond NOINTERNAL
+        [[nodiscard]] constexpr std::decay_t<BaseExecutor> const& get_executor()
+            const noexcept
+        {
+            return exec_;
+        }
+
         using execution_category =
             hpx::traits::executor_execution_category_t<BaseExecutor>;
 
@@ -209,7 +212,7 @@ namespace hpx::execution::experimental {
     template <typename Tag, typename BaseExecutor,typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+            )>
     // clang-format on
     auto tag_invoke(
         Tag tag, annotating_executor<BaseExecutor> const& exec, Property&& prop)
@@ -217,19 +220,19 @@ namespace hpx::execution::experimental {
             std::declval<BaseExecutor>(), std::declval<Property>())))
     {
         return annotating_executor<BaseExecutor>(
-            tag(exec.exec_, HPX_FORWARD(Property, prop)));
+            tag(exec.get_executor(), HPX_FORWARD(Property, prop)));
     }
 
     // clang-format off
     template <typename Tag, typename BaseExecutor,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-        )>
+            )>
     // clang-format on
     auto tag_invoke(Tag tag, annotating_executor<BaseExecutor> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
     {
-        return tag(exec.exec_);
+        return tag(exec.get_executor());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -256,7 +259,7 @@ namespace hpx::execution::experimental {
     template <typename Executor,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_executor_any_v<Executor>
-        )>
+            )>
     // clang-format on
     constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
@@ -269,7 +272,7 @@ namespace hpx::execution::experimental {
     template <typename Executor,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_executor_any_v<Executor>
-         )>
+            )>
     // clang-format on
     auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)

@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2021-2022 Chuanqiu He
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-/// \file parallel/algorithms/rotate.hpp
+
+/// \file hpx/parallel/algorithms/rotate.hpp
 
 #pragma once
 
@@ -182,6 +183,7 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/when_all.hpp>
@@ -189,9 +191,7 @@ namespace hpx {
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/modules/execution.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
-#include <hpx/execution/executors/num_cores.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/execution_policy_parameters.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
@@ -206,234 +206,256 @@ namespace hpx {
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <limits>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // rotate
-    namespace detail {
+    //
+    inline namespace v1 {
 
-        /// \cond NOINTERNAL
-        template <typename ExPolicy, typename FwdIter, typename Sent>
-        decltype(auto) rotate_helper(
-            ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
-        {
-            std::ptrdiff_t size_left = detail::distance(first, new_first);
-            std::ptrdiff_t size_right = detail::distance(new_first, last);
+        ///////////////////////////////////////////////////////////////////////////
+        // rotate
+        namespace detail {
 
-            // get number of cores currently used
-            std::size_t cores = parallel::execution::processing_units_count(
-                policy.parameters(), policy.executor(),
-                hpx::chrono::null_duration, size_left + size_right);
-
-            // calculate number of cores to be used for left and right section
-            // proportional to the ratio of their sizes
-            std::size_t cores_left = 1;
-            if (size_right > 0)
-            {
-                double partition_size_ratio =
-                    double(size_left) / double(size_left + size_right);
-
-                // avoid cores_left = 0 after integer rounding
-                cores_left = (std::max)(
-                    std::size_t(1), std::size_t(partition_size_ratio * cores));
-            }
-
-            // cores_right should be at least 1.
-            std::size_t cores_right =
-                (std::max)(std::size_t(1), cores - cores_left);
-
-            // invoke the reverse operations on the left and right sections
-            // concurrently
-            auto p = policy(hpx::execution::task);
-            auto left_policy =
-                execution::with_processing_units_count(p, cores_left);
-            auto right_policy =
-                execution::with_processing_units_count(p, cores_right);
-
-            detail::reverse<FwdIter> r;
-
-            return hpx::dataflow(
-                hpx::launch::sync,
-                [=](auto&& f1, auto&& f2) mutable {
-                    // propagate exceptions, if appropriate
-                    if constexpr (hpx::traits::is_future_v<decltype((f1))> &&
-                        hpx::traits::is_future_v<decltype((f2))>)
-                    {
-                        f1.get();
-                        f2.get();
-                    }
-
-                    r.call(p(hpx::execution::non_task), first, last);
-
-                    std::advance(first, size_right);
-                    return util::in_out_result<FwdIter, Sent>{first, last};
-                },
-                r.call(left_policy, first, new_first),
-                r.call(right_policy, new_first, last));
-        }
-
-        template <typename IterPair>
-        struct rotate : public detail::algorithm<rotate<IterPair>, IterPair>
-        {
-            constexpr rotate() noexcept
-              : rotate::algorithm("rotate")
-            {
-            }
-
-            template <typename ExPolicy, typename InIter, typename Sent>
-            static constexpr IterPair sequential(
-                ExPolicy, InIter first, InIter new_first, Sent last)
-            {
-                return detail::sequential_rotate(first, new_first, last);
-            }
-
+            /// \cond NOINTERNAL
             template <typename ExPolicy, typename FwdIter, typename Sent>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, FwdIter first, FwdIter new_first, Sent last)
+            decltype(auto) rotate_helper(
+                ExPolicy policy, FwdIter first, FwdIter new_first, Sent last)
             {
-                return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_helper(
-                        HPX_FORWARD(ExPolicy, policy), first, new_first, last));
-            }
-        };
-        /// \endcond
-    }    // namespace detail
+                std::ptrdiff_t const size_left =
+                    detail::distance(first, new_first);
+                std::ptrdiff_t size_right = detail::distance(new_first, last);
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(
-        1, 8, "hpx::parallel::rotate is deprecated, use hpx::rotate instead ")
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter, FwdIter>>::type
-        rotate(
-            ExPolicy&& policy, FwdIter first, FwdIter new_first, FwdIter last)
-    {
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
-            "Requires at least forward iterator.");
+                // get number of cores currently used
+                std::size_t const cores =
+                    parallel::execution::processing_units_count(
+                        policy.parameters(), policy.executor(),
+                        hpx::chrono::null_duration, size_left + size_right);
 
-        using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+                // get currently used first core
+                std::size_t first_core =
+                    hpx::execution::experimental::get_first_core(policy);
 
-        return detail::rotate<util::in_out_result<FwdIter, FwdIter>>().call2(
-            HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first, last);
-    }
+                // calculate number of cores to be used for left and right section
+                // proportional to the ratio of their sizes
+                std::size_t cores_left = 1;
+                if (size_right > 0)
+                {
+                    double const partition_size_ratio =
+                        static_cast<double>(size_left) /
+                        static_cast<double>(size_left + size_right);
 
-    ///////////////////////////////////////////////////////////////////////////
-    // rotate_copy
-    namespace detail {
-        /// \cond NOINTERNAL
+                    // avoid cores_left == 0 after integer rounding
+                    cores_left = (std::max)(static_cast<std::size_t>(1),
+                        static_cast<std::size_t>(
+                            partition_size_ratio * static_cast<double>(cores)));
+                }
 
-        // sequential rotate_copy
-        template <typename InIter, typename Sent, typename OutIter>
-        inline util::in_out_result<InIter, OutIter> sequential_rotate_copy(
-            InIter first, InIter new_first, Sent last, OutIter dest_first)
-        {
-            util::in_out_result<InIter, OutIter> p1 =
-                util::copy(new_first, last, dest_first);
-            util::in_out_result<InIter, OutIter> p2 =
-                util::copy(first, new_first, HPX_MOVE(p1.out));
-            return util::in_out_result<InIter, OutIter>{
-                HPX_MOVE(p1.in), HPX_MOVE(p2.out)};
-        }
+                // cores_right should be at least 1.
+                std::size_t cores_right =
+                    (std::max)(static_cast<std::size_t>(1), cores - cores_left);
 
-        template <typename ExPolicy, typename FwdIter1, typename Sent,
-            typename FwdIter2>
-        hpx::future<util::in_out_result<FwdIter1, FwdIter2>> rotate_copy_helper(
-            ExPolicy policy, FwdIter1 first, FwdIter1 new_first, Sent last,
-            FwdIter2 dest_first)
-        {
-            using non_seq = std::false_type;
+                // invoke the reverse operations on the left and right sections
+                // concurrently
+                auto p = policy(hpx::execution::task);
 
-            auto p = hpx::execution::parallel_task_policy()
-                         .on(policy.executor())
-                         .with(policy.parameters());
+                auto left_policy =
+                    execution::with_processing_units_count(p, cores_left);
+                auto right_policy = execution::with_processing_units_count(
+                    hpx::execution::experimental::with_first_core(
+                        p, cores == 1 ? first_core : first_core + cores_left),
+                    cores_right);
 
-            using copy_return_type = util::in_out_result<FwdIter1, FwdIter2>;
+                detail::reverse<FwdIter> r;
 
-            hpx::future<copy_return_type> f =
-                detail::copy<copy_return_type>().call2(
-                    p, non_seq(), new_first, last, dest_first);
+                return hpx::dataflow(
+                    hpx::launch::sync,
+                    [=](auto&& f1, auto&& f2) mutable {
+                        // propagate exceptions, if appropriate
+                        static constexpr bool handle_futures =
+                            hpx::traits::is_future_v<decltype((f1))> &&
+                            hpx::traits::is_future_v<decltype((f2))>;
 
-            return f.then([=](hpx::future<copy_return_type>&& result)
-                              -> hpx::future<copy_return_type> {
-                copy_return_type p1 = result.get();
-                return detail::copy<copy_return_type>().call2(
-                    p, non_seq(), first, new_first, p1.out);
-            });
-        }
+                        if constexpr (handle_futures)
+                        {
+                            f1.get();
+                            f2.get();
+                        }
 
-        template <typename IterPair>
-        struct rotate_copy
-          : public detail::algorithm<rotate_copy<IterPair>, IterPair>
-        {
-            rotate_copy()
-              : rotate_copy::algorithm("rotate_copy")
-            {
+                        r.call(p(hpx::execution::non_task), first, last);
+
+                        std::advance(first, size_right);
+                        return util::in_out_result<FwdIter, Sent>{first, last};
+                    },
+                    r.call(left_policy, first, new_first),
+                    r.call(right_policy, new_first, last));
             }
 
-            template <typename ExPolicy, typename InIter, typename Sent,
-                typename OutIter>
-            static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
+            template <typename IterPair>
+            struct rotate : algorithm<rotate<IterPair>, IterPair>
+            {
+                constexpr rotate() noexcept
+                  : algorithm<rotate, IterPair>("rotate")
+                {
+                }
+
+                template <typename ExPolicy, typename InIter, typename Sent>
+                static constexpr IterPair sequential(
+                    ExPolicy, InIter first, InIter new_first, Sent last)
+                {
+                    return detail::sequential_rotate(first, new_first, last);
+                }
+
+                template <typename ExPolicy, typename FwdIter, typename Sent>
+                static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                    FwdIter new_first, Sent last)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        IterPair>::get(rotate_helper(HPX_FORWARD(ExPolicy,
+                                                         policy),
+                        first, new_first, last));
+                }
+            };
+            /// \endcond
+        }    // namespace detail
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
+            )>
+        // clang-format on
+        HPX_DEPRECATED_V(1, 8,
+            "hpx::parallel::rotate is deprecated, use hpx::rotate instead ")
+            typename util::detail::algorithm_result<ExPolicy,
+                util::in_out_result<FwdIter, FwdIter>>::type
+            rotate(ExPolicy&& policy, FwdIter first, FwdIter new_first,
+                FwdIter last)
+        {
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter>),
+                "Requires at least forward iterator.");
+
+            using is_seq = std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                    !hpx::traits::is_bidirectional_iterator_v<FwdIter>>;
+
+            return detail::rotate<util::in_out_result<FwdIter, FwdIter>>()
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
+                    new_first, last);
+        }
+
+        ///////////////////////////////////////////////////////////////////////////
+        // rotate_copy
+        namespace detail {
+            /// \cond NOINTERNAL
+
+            // sequential rotate_copy
+            template <typename InIter, typename Sent, typename OutIter>
+            inline util::in_out_result<InIter, OutIter> sequential_rotate_copy(
                 InIter first, InIter new_first, Sent last, OutIter dest_first)
             {
-                return sequential_rotate_copy(
-                    first, new_first, last, dest_first);
+                util::in_out_result<InIter, OutIter> p1 =
+                    util::copy(new_first, last, dest_first);
+                util::in_out_result<InIter, OutIter> p2 =
+                    util::copy(first, new_first, HPX_MOVE(p1.out));
+                return util::in_out_result<InIter, OutIter>{
+                    HPX_MOVE(p1.in), HPX_MOVE(p2.out)};
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<FwdIter1, FwdIter2>>::type
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
-                Sent last, FwdIter2 dest_first)
+            hpx::future<util::in_out_result<FwdIter1, FwdIter2>>
+            rotate_copy_helper(ExPolicy policy, FwdIter1 first,
+                FwdIter1 new_first, Sent last, FwdIter2 dest_first)
             {
-                return util::detail::algorithm_result<ExPolicy, IterPair>::get(
-                    rotate_copy_helper(HPX_FORWARD(ExPolicy, policy), first,
-                        new_first, last, dest_first));
+                using non_seq = std::false_type;
+
+                auto p = hpx::execution::parallel_task_policy()
+                             .on(policy.executor())
+                             .with(policy.parameters());
+
+                using copy_return_type =
+                    util::in_out_result<FwdIter1, FwdIter2>;
+
+                hpx::future<copy_return_type> f =
+                    detail::copy<copy_return_type>().call2(
+                        p, non_seq(), new_first, last, dest_first);
+
+                return f.then([=](hpx::future<copy_return_type>&& result)
+                                  -> hpx::future<copy_return_type> {
+                    copy_return_type p1 = result.get();
+                    return detail::copy<copy_return_type>().call2(
+                        p, non_seq(), first, new_first, p1.out);
+                });
             }
-        };
-        /// \endcond
-    }    // namespace detail
 
-    // clang-format off
-    template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_iterator_v<FwdIter1> &&
-            hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_iterator_v<FwdIter2>
-        )>
-    // clang-format on
-    HPX_DEPRECATED_V(1, 8,
-        "hpx::parallel::rotate_copy is deprecated, use hpx::rotate_copy "
-        "instead ") typename util::detail::algorithm_result<ExPolicy,
-        util::in_out_result<FwdIter1, FwdIter2>>::type
-        rotate_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
-            FwdIter1 last, FwdIter2 dest_first)
-    {
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
-            "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
-            "Requires at least forward iterator.");
+            template <typename IterPair>
+            struct rotate_copy : algorithm<rotate_copy<IterPair>, IterPair>
+            {
+                constexpr rotate_copy() noexcept
+                  : algorithm<rotate_copy, IterPair>("rotate_copy")
+                {
+                }
 
-        using is_seq = std::integral_constant<bool,
-            hpx::is_sequenced_execution_policy_v<ExPolicy> ||
-                !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
+                template <typename ExPolicy, typename InIter, typename Sent,
+                    typename OutIter>
+                static util::in_out_result<InIter, OutIter> sequential(ExPolicy,
+                    InIter first, InIter new_first, Sent last,
+                    OutIter dest_first)
+                {
+                    return sequential_rotate_copy(
+                        first, new_first, last, dest_first);
+                }
 
-        return detail::rotate_copy<util::in_out_result<FwdIter1, FwdIter2>>()
-            .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first, new_first,
-                last, dest_first);
-    }
-}}}    // namespace hpx::parallel::v1
+                template <typename ExPolicy, typename FwdIter1, typename Sent,
+                    typename FwdIter2>
+                static typename util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<FwdIter1, FwdIter2>>::type
+                parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
+                    Sent last, FwdIter2 dest_first)
+                {
+                    return util::detail::algorithm_result<ExPolicy,
+                        IterPair>::get(rotate_copy_helper(HPX_FORWARD(ExPolicy,
+                                                              policy),
+                        first, new_first, last, dest_first));
+                }
+            };
+            /// \endcond
+        }    // namespace detail
+
+        // clang-format off
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter2>
+            )>
+        // clang-format on
+        HPX_DEPRECATED_V(1, 8,
+            "hpx::parallel::rotate_copy is deprecated, use hpx::rotate_copy "
+            "instead ") typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<FwdIter1, FwdIter2>>::type
+            rotate_copy(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
+                FwdIter1 last, FwdIter2 dest_first)
+        {
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+                "Requires at least forward iterator.");
+            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+                "Requires at least forward iterator.");
+
+            using is_seq = std::integral_constant<bool,
+                hpx::is_sequenced_execution_policy_v<ExPolicy> ||
+                    !hpx::traits::is_bidirectional_iterator_v<FwdIter1>>;
+
+            return detail::rotate_copy<
+                util::in_out_result<FwdIter1, FwdIter2>>()
+                .call2(HPX_FORWARD(ExPolicy, policy), is_seq(), first,
+                    new_first, last, dest_first);
+        }
+    }    // namespace v1
+}    // namespace hpx::parallel
 
 // create new APIs, tag_fallback_invoke overloads.
 namespace hpx {

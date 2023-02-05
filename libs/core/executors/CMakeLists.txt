@@ -18,10 +18,10 @@ set(executors_headers
     hpx/executors/execute_on.hpp
     hpx/executors/exception_list.hpp
     hpx/executors/execution_policy_annotation.hpp
-    hpx/executors/execution_policy_hint.hpp
     hpx/executors/execution_policy_fwd.hpp
     hpx/executors/execution_policy_mappings.hpp
     hpx/executors/execution_policy_parameters.hpp
+    hpx/executors/execution_policy_scheduling_property.hpp
     hpx/executors/execution_policy.hpp
     hpx/executors/explicit_scheduler_executor.hpp
     hpx/executors/fork_join_executor.hpp

@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/detail/post_policy_dispatch.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -94,7 +92,8 @@ namespace hpx::execution::experimental {
             return !(lhs == rhs);
         }
 
-        hpx::threads::thread_pool_base* get_thread_pool() noexcept
+        [[nodiscard]] hpx::threads::thread_pool_base* get_thread_pool()
+            const noexcept
         {
             HPX_ASSERT(pool_);
             return pool_;
@@ -103,7 +102,7 @@ namespace hpx::execution::experimental {
         friend constexpr thread_pool_policy_scheduler tag_invoke(
             hpx::parallel::execution::with_processing_units_count_t,
             thread_pool_policy_scheduler const& scheduler,
-            std::size_t num_cores)
+            std::size_t num_cores) noexcept
         {
             auto scheduler_with_num_cores = scheduler;
             scheduler_with_num_cores.num_cores_ = num_cores;
@@ -117,6 +116,23 @@ namespace hpx::execution::experimental {
             std::size_t = 0)
         {
             return scheduler.get_num_cores();
+        }
+
+        friend constexpr thread_pool_policy_scheduler tag_invoke(
+            hpx::execution::experimental::with_first_core_t,
+            thread_pool_policy_scheduler const& exec,
+            std::size_t first_core) noexcept
+        {
+            auto exec_with_first_core = exec;
+            exec_with_first_core.first_core_ = first_core;
+            return exec_with_first_core;
+        }
+
+        friend constexpr std::size_t tag_invoke(
+            hpx::execution::experimental::get_first_core_t,
+            thread_pool_policy_scheduler const& exec) noexcept
+        {
+            return exec.get_first_core();
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -208,6 +224,8 @@ namespace hpx::execution::experimental {
             operation_state(operation_state const&) = delete;
             operation_state& operator=(operation_state&&) = delete;
             operation_state& operator=(operation_state const&) = delete;
+
+            ~operation_state() = default;
 
             friend void tag_invoke(start_t, operation_state& os) noexcept
             {
@@ -318,14 +336,33 @@ namespace hpx::execution::experimental {
 
     private:
         /// \cond NOINTERNAL
-        std::size_t get_num_cores() const
+        [[nodiscard]] std::size_t get_num_cores() const
         {
             if (num_cores_ != 0)
+            {
                 return num_cores_;
+            }
 
-            auto pool =
-                pool_ ? pool_ : threads::detail::get_self_or_default_pool();
-            return pool->get_os_thread_count();
+            if constexpr (std::is_same_v<Policy, launch::sync_policy>)
+            {
+                return 1;
+            }
+            else
+            {
+                if (policy_.get_policy() == hpx::detail::launch_policy::sync)
+                {
+                    return 1;
+                }
+
+                auto const* pool =
+                    pool_ ? pool_ : threads::detail::get_self_or_default_pool();
+                return pool->get_os_thread_count();
+            }
+        }
+
+        [[nodiscard]] constexpr std::size_t get_first_core() const noexcept
+        {
+            return first_core_;
         }
         /// \endcond
 
@@ -334,6 +371,7 @@ namespace hpx::execution::experimental {
         hpx::threads::thread_pool_base* pool_ =
             hpx::threads::detail::get_self_or_default_pool();
         Policy policy_;
+        std::size_t first_core_ = 0;
         std::size_t num_cores_ = 0;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         char const* annotation_ = nullptr;
@@ -343,7 +381,7 @@ namespace hpx::execution::experimental {
 
     // support all properties exposed by the embedded policy
     // clang-format off
-    template <typename Tag,  typename Policy,typename Property,
+    template <typename Tag, typename Policy, typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
         )>

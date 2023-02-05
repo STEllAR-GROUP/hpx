@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,16 +14,14 @@
 #endif
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/type_support/empty_function.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
@@ -39,7 +37,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -194,27 +192,32 @@ namespace hpx { namespace parallel { namespace util {
             using parameters_type = typename ExPolicy::executor_parameters_type;
             using executor_type = typename ExPolicy::executor_type;
 
-            using scoped_executor_parameters =
-                detail::scoped_executor_parameters_ref<parameters_type,
-                    executor_type>;
-
             using handle_local_exceptions =
                 detail::handle_local_exceptions<ExPolicy>;
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2>
-            static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
+            static decltype(auto) call(ExPolicy_&& orgpolicy, FwdIter first,
                 std::size_t count, F1&& f1, F2&& f2)
             {
+                // this is a fork-join invocation, prevent tasks from being
+                // stolen, if possible
+                auto policy = parallel::util::adapt_thread_priority(
+                    HPX_FORWARD(ExPolicy_, orgpolicy),
+                    hpx::threads::thread_priority::bound);
+
                 // inform parameter traits
+                using scoped_executor_parameters =
+                    detail::scoped_executor_parameters_ref<parameters_type,
+                        typename decltype(policy)::executor_type>;
+
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 try
                 {
                     auto&& items = detail::partition<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        HPX_FORWARD(F1, f1));
+                        policy, first, count, HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
 
@@ -228,19 +231,28 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename ExPolicy_, typename FwdIter, typename Stride,
                 typename F1, typename F2>
-            static decltype(auto) call_with_index(ExPolicy_&& policy,
+            static decltype(auto) call_with_index(ExPolicy_&& orgpolicy,
                 FwdIter first, std::size_t count, Stride stride, F1&& f1,
                 F2&& f2)
             {
+                // this is a fork-join invocation, prevent tasks from being
+                // stolen, if possible
+                auto policy = parallel::util::adapt_thread_priority(
+                    HPX_FORWARD(ExPolicy_, orgpolicy),
+                    hpx::threads::thread_priority::bound);
+
                 // inform parameter traits
+                using scoped_executor_parameters =
+                    detail::scoped_executor_parameters_ref<parameters_type,
+                        typename decltype(policy)::executor_type>;
+
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 try
                 {
                     auto&& items = detail::partition_with_index<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count, stride,
-                        HPX_FORWARD(F1, f1));
+                        policy, first, count, stride, HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
 
@@ -255,19 +267,28 @@ namespace hpx { namespace parallel { namespace util {
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Data>
             // requires is_container<Data>
-            static decltype(auto) call_with_data(ExPolicy_&& policy,
+            static decltype(auto) call_with_data(ExPolicy_&& orgpolicy,
                 FwdIter first, std::size_t count, F1&& f1, F2&& f2,
                 std::vector<std::size_t> const& chunk_sizes, Data&& data)
             {
+                // this is a fork-join invocation, prevent tasks from being
+                // stolen, if possible
+                auto policy = parallel::util::adapt_thread_priority(
+                    HPX_FORWARD(ExPolicy_, orgpolicy),
+                    hpx::threads::thread_priority::bound);
+
                 // inform parameter traits
+                using scoped_executor_parameters =
+                    detail::scoped_executor_parameters_ref<parameters_type,
+                        typename decltype(policy)::executor_type>;
+
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
 
                 try
                 {
-                    auto&& items = detail::partition_with_data<Result>(
-                        HPX_FORWARD(ExPolicy_, policy), first, count,
-                        chunk_sizes, HPX_FORWARD(Data, data),
+                    auto&& items = detail::partition_with_data<Result>(policy,
+                        first, count, chunk_sizes, HPX_FORWARD(Data, data),
                         HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
@@ -502,9 +523,11 @@ namespace hpx { namespace parallel { namespace util {
     // Result:   intermediate result type of first step
     template <typename ExPolicy, typename R = void, typename Result = R>
     struct partitioner
-      : detail::select_partitioner<typename std::decay<ExPolicy>::type,
+      : detail::select_partitioner<std::decay_t<ExPolicy>,
             detail::static_partitioner,
             detail::task_static_partitioner>::template apply<R, Result>
     {
     };
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util
+
+// namespace hpx::parallel::util
