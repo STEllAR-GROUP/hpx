@@ -13,10 +13,10 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // Base name used to register AGAS service instances
-    static constexpr char const* const performance_counter_basename = "/agas/";
+    inline constexpr char const* const performance_counter_basename = "/agas/";
 
     enum namespace_action_code
     {
@@ -65,9 +65,9 @@ namespace hpx { namespace agas {
         symbol_ns_on_event = 0b0010110,
         symbol_ns_statistics_counter = 0b0010111
     };
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     enum counter_target
     {
@@ -86,99 +86,87 @@ namespace hpx { namespace agas { namespace detail {
     };
 
     // counter description data for component namespace components
-    static constexpr counter_service_data const component_namespace_services[] =
-        {
-            // counters exposing overall API invocation count and timings
-            {"component/count", "", counter_target_count,
-                component_ns_statistics_counter,
-                component_ns_statistics_counter},
-            {"component/time", "ns", counter_target_time,
-                component_ns_statistics_counter,
-                component_ns_statistics_counter},
-            // counters exposing API invocation counts
-            {"count/bind_prefix", "", counter_target_count,
-                component_ns_bind_prefix, component_ns_statistics_counter},
-            {"count/bind_name", "", counter_target_count,
-                component_ns_bind_name, component_ns_statistics_counter},
-            {"count/resolve_id", "", counter_target_count,
-                component_ns_resolve_id, component_ns_statistics_counter},
-            {"count/unbind_name", "", counter_target_count,
-                component_ns_unbind_name, component_ns_statistics_counter},
-            {"count/iterate_types", "", counter_target_count,
-                component_ns_iterate_types, component_ns_statistics_counter},
-            {"count/get_component_typename", "", counter_target_count,
-                component_ns_get_component_type_name,
-                component_ns_statistics_counter},
-            {"count/num_localities_type", "", counter_target_time,
-                component_ns_num_localities, component_ns_statistics_counter},
-            // counters exposing API timings
-            {"time/bind_prefix", "ns", counter_target_time,
-                component_ns_bind_prefix, component_ns_statistics_counter},
-            {"time/bind_name", "ns", counter_target_time,
-                component_ns_bind_name, component_ns_statistics_counter},
-            {"time/resolve_id", "ns", counter_target_time,
-                component_ns_resolve_id, component_ns_statistics_counter},
-            {"time/unbind_name", "ns", counter_target_time,
-                component_ns_unbind_name, component_ns_statistics_counter},
-            {"time/iterate_types", "ns", counter_target_time,
-                component_ns_iterate_types, component_ns_statistics_counter},
-            {"time/get_component_typename", "ns", counter_target_time,
-                component_ns_get_component_type_name,
-                component_ns_statistics_counter},
-            {"time/num_localities_type", "ns", counter_target_time,
-                component_ns_num_localities, component_ns_statistics_counter}};
-
-    static constexpr std::size_t const num_component_namespace_services =
-        sizeof(component_namespace_services) /
-        sizeof(component_namespace_services[0]);
+    inline constexpr counter_service_data component_namespace_services[] = {
+        // counters exposing overall API invocation count and timings
+        {"component/count", "", counter_target_count,
+            component_ns_statistics_counter, component_ns_statistics_counter},
+        {"component/time", "ns", counter_target_time,
+            component_ns_statistics_counter, component_ns_statistics_counter},
+        // counters exposing API invocation counts
+        {"count/bind_prefix", "", counter_target_count,
+            component_ns_bind_prefix, component_ns_statistics_counter},
+        {"count/bind_name", "", counter_target_count, component_ns_bind_name,
+            component_ns_statistics_counter},
+        {"count/resolve_id", "", counter_target_count, component_ns_resolve_id,
+            component_ns_statistics_counter},
+        {"count/unbind_name", "", counter_target_count,
+            component_ns_unbind_name, component_ns_statistics_counter},
+        {"count/iterate_types", "", counter_target_count,
+            component_ns_iterate_types, component_ns_statistics_counter},
+        {"count/get_component_typename", "", counter_target_count,
+            component_ns_get_component_type_name,
+            component_ns_statistics_counter},
+        {"count/num_localities_type", "", counter_target_time,
+            component_ns_num_localities, component_ns_statistics_counter},
+        // counters exposing API timings
+        {"time/bind_prefix", "ns", counter_target_time,
+            component_ns_bind_prefix, component_ns_statistics_counter},
+        {"time/bind_name", "ns", counter_target_time, component_ns_bind_name,
+            component_ns_statistics_counter},
+        {"time/resolve_id", "ns", counter_target_time, component_ns_resolve_id,
+            component_ns_statistics_counter},
+        {"time/unbind_name", "ns", counter_target_time,
+            component_ns_unbind_name, component_ns_statistics_counter},
+        {"time/iterate_types", "ns", counter_target_time,
+            component_ns_iterate_types, component_ns_statistics_counter},
+        {"time/get_component_typename", "ns", counter_target_time,
+            component_ns_get_component_type_name,
+            component_ns_statistics_counter},
+        {"time/num_localities_type", "ns", counter_target_time,
+            component_ns_num_localities, component_ns_statistics_counter}};
 
     // counter description data for localities namespace components
-    static constexpr counter_service_data const locality_namespace_services[] =
-        {
-            // counters exposing overall API invocation count and timings
-            {"locality/count", "", counter_target_count,
-                locality_ns_statistics_counter, locality_ns_statistics_counter},
-            {"locality/time", "ns", counter_target_time,
-                locality_ns_statistics_counter, locality_ns_statistics_counter},
-            // counters exposing API invocation counts
-            {"count/free", "", counter_target_count, locality_ns_free,
-                locality_ns_statistics_counter},
-            {"count/localities", "", counter_target_count,
-                locality_ns_localities, locality_ns_statistics_counter},
-            {"count/num_localities", "", counter_target_count,
-                locality_ns_num_localities, locality_ns_statistics_counter},
-            {"count/num_threads", "", counter_target_count,
-                locality_ns_num_threads, locality_ns_statistics_counter},
-            {"count/resolve_locality", "", counter_target_count,
-                locality_ns_resolve_locality, locality_ns_statistics_counter},
-            // counters exposing API timings
-            {"time/free", "ns", counter_target_time, locality_ns_free,
-                locality_ns_statistics_counter},
-            {"time/localities", "ns", counter_target_time,
-                locality_ns_localities, locality_ns_statistics_counter},
-            {"time/num_localities", "ns", counter_target_time,
-                locality_ns_num_localities, locality_ns_statistics_counter},
-            {"time/num_threads", "ns", counter_target_time,
-                locality_ns_num_threads, locality_ns_statistics_counter},
-            {"time/resolve_locality", "ns", counter_target_time,
-                locality_ns_resolve_locality, locality_ns_statistics_counter}};
+    inline constexpr counter_service_data locality_namespace_services[] = {
+        // counters exposing overall API invocation count and timings
+        {"locality/count", "", counter_target_count,
+            locality_ns_statistics_counter, locality_ns_statistics_counter},
+        {"locality/time", "ns", counter_target_time,
+            locality_ns_statistics_counter, locality_ns_statistics_counter},
+        // counters exposing API invocation counts
+        {"count/free", "", counter_target_count, locality_ns_free,
+            locality_ns_statistics_counter},
+        {"count/localities", "", counter_target_count, locality_ns_localities,
+            locality_ns_statistics_counter},
+        {"count/num_localities", "", counter_target_count,
+            locality_ns_num_localities, locality_ns_statistics_counter},
+        {"count/num_threads", "", counter_target_count, locality_ns_num_threads,
+            locality_ns_statistics_counter},
+        {"count/resolve_locality", "", counter_target_count,
+            locality_ns_resolve_locality, locality_ns_statistics_counter},
+        // counters exposing API timings
+        {"time/free", "ns", counter_target_time, locality_ns_free,
+            locality_ns_statistics_counter},
+        {"time/localities", "ns", counter_target_time, locality_ns_localities,
+            locality_ns_statistics_counter},
+        {"time/num_localities", "ns", counter_target_time,
+            locality_ns_num_localities, locality_ns_statistics_counter},
+        {"time/num_threads", "ns", counter_target_time, locality_ns_num_threads,
+            locality_ns_statistics_counter},
+        {"time/resolve_locality", "ns", counter_target_time,
+            locality_ns_resolve_locality, locality_ns_statistics_counter}};
 
-    static constexpr std::size_t const num_locality_namespace_services =
+    inline constexpr std::size_t num_locality_namespace_services =
         sizeof(locality_namespace_services) /
         sizeof(locality_namespace_services[0]);
 
     // counter description data for primary namespace components
-    static constexpr counter_service_data const primary_namespace_services[] = {
+    inline constexpr counter_service_data primary_namespace_services[] = {
         // counters exposing overall API invocation count and timings
         {"primary/count", "", counter_target_count,
             primary_ns_statistics_counter, primary_ns_statistics_counter},
         {"primary/time", "ns", counter_target_time,
             primary_ns_statistics_counter, primary_ns_statistics_counter},
-    // counters exposing API invocation counts
-#if defined(HPX_HAVE_NETWORKING)
-        {"count/route", "", counter_target_count, primary_ns_route,
-            primary_ns_statistics_counter},
-#endif
+        // counters exposing API invocation counts
         {"count/bind_gid", "", counter_target_count, primary_ns_bind_gid,
             primary_ns_statistics_counter},
         {"count/resolve_gid", "", counter_target_count, primary_ns_resolve_gid,
@@ -195,11 +183,11 @@ namespace hpx { namespace agas { namespace detail {
             primary_ns_begin_migration, primary_ns_statistics_counter},
         {"count/end_migration", "", counter_target_count,
             primary_ns_end_migration, primary_ns_statistics_counter},
-    // counters exposing API timings
 #if defined(HPX_HAVE_NETWORKING)
-        {"time/route", "ns", counter_target_time, primary_ns_route,
+        {"count/route", "", counter_target_count, primary_ns_route,
             primary_ns_statistics_counter},
 #endif
+        // counters exposing API timings
         {"time/bind_gid", "ns", counter_target_time, primary_ns_bind_gid,
             primary_ns_statistics_counter},
         {"time/resolve_gid", "ns", counter_target_time, primary_ns_resolve_gid,
@@ -215,14 +203,19 @@ namespace hpx { namespace agas { namespace detail {
         {"time/begin_migration", "ns", counter_target_time,
             primary_ns_begin_migration, primary_ns_statistics_counter},
         {"time/end_migration", "ns", counter_target_time,
-            primary_ns_end_migration, primary_ns_statistics_counter}};
+            primary_ns_end_migration, primary_ns_statistics_counter},
+#if defined(HPX_HAVE_NETWORKING)
+        {"time/route", "ns", counter_target_time, primary_ns_route,
+            primary_ns_statistics_counter}
+#endif
+    };
 
-    static constexpr std::size_t const num_primary_namespace_services =
+    inline constexpr std::size_t num_primary_namespace_services =
         sizeof(primary_namespace_services) /
         sizeof(primary_namespace_services[0]);
 
     // counter description data for symbol namespace components
-    static constexpr counter_service_data const symbol_namespace_services[] = {
+    inline constexpr counter_service_data const symbol_namespace_services[] = {
         // counters exposing overall API invocation count and timings
         {"symbol/count", "", counter_target_count, symbol_ns_statistics_counter,
             symbol_ns_statistics_counter},
@@ -251,10 +244,6 @@ namespace hpx { namespace agas { namespace detail {
         {"time/on_symbol_namespace_event", "ns", counter_target_time,
             symbol_ns_on_event, symbol_ns_statistics_counter}};
 
-    static constexpr std::size_t const num_symbol_namespace_services =
-        sizeof(symbol_namespace_services) /
-        sizeof(symbol_namespace_services[0]);
-
     ///////////////////////////////////////////////////////////////////////////
     // get action code from counter type
     HPX_EXPORT namespace_action_code retrieve_action_code(
@@ -263,4 +252,4 @@ namespace hpx { namespace agas { namespace detail {
     // get service action code from counter type
     HPX_EXPORT namespace_action_code retrieve_action_service_code(
         std::string const& name, error_code& ec = throws);
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail

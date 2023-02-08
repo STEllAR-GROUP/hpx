@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,16 @@
 #include <hpx/components/components_fwd.hpp>
 #include <hpx/components/make_client.hpp>
 #include <hpx/futures/future_fwd.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace hpx {
 
     /// \cond NOINTERNAL
-
     namespace detail {
 
         HPX_EXPORT std::string name_from_basename(
@@ -121,6 +120,11 @@ namespace hpx {
     HPX_EXPORT hpx::future<bool> register_with_basename(std::string base_name,
         hpx::id_type id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
+
+    HPX_EXPORT bool register_with_basename(hpx::launch::sync_policy,
+        std::string base_name, hpx::id_type id,
+        std::size_t sequence_nr = ~static_cast<std::size_t>(0),
+        error_code& ec = throws);
 
     /// Register the id wrapped in the given future using the given base name.
     ///
@@ -266,9 +270,9 @@ namespace hpx {
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    template <typename Client, typename Stub>
+    template <typename Client, typename Stub, typename Data>
     hpx::future<bool> register_with_basename(std::string base_name,
-        components::client_base<Client, Stub>& client,
+        components::client_base<Client, Stub, Data>& client,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     /// Unregister the given base name.

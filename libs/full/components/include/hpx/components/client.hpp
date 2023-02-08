@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,12 +12,12 @@
 
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
-    template <typename Component>
-    class client : public client_base<client<Component>, Component>
+    template <typename Component, typename Data = void>
+    class client : public client_base<client<Component, Data>, Component, Data>
     {
-        using base_type = client_base<client<Component>, Component>;
+        using base_type = client_base<client, Component, Data>;
         using future_type = typename base_type::future_type;
 
     public:
@@ -50,14 +50,10 @@ namespace hpx { namespace components {
         {
         }
 
-        client(client const& rhs) noexcept
-          : base_type(rhs.shared_state_)
-        {
-        }
-        client(client&& rhs) noexcept
-          : base_type(HPX_MOVE(rhs.shared_state_))
-        {
-        }
+        client(client const& rhs) noexcept = default;
+        client(client&& rhs) noexcept = default;
+
+        ~client() = default;
 
         // copy assignment and move assignment
         client& operator=(hpx::id_type const& id)
@@ -87,15 +83,7 @@ namespace hpx { namespace components {
             return *this;
         }
 
-        client& operator=(client const& rhs) noexcept
-        {
-            base_type::operator=(rhs);
-            return *this;
-        }
-        client& operator=(client&& rhs) noexcept
-        {
-            base_type::operator=(HPX_MOVE(rhs));
-            return *this;
-        }
+        client& operator=(client const& rhs) noexcept = default;
+        client& operator=(client&& rhs) noexcept = default;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

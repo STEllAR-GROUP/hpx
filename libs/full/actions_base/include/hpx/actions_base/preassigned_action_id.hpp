@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -12,7 +12,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
@@ -183,4 +183,4 @@ namespace hpx { namespace actions {
     };
 
     /// \endcond
-}}    // namespace hpx::actions
+}    // namespace hpx::actions

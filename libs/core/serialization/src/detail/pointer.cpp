@@ -7,41 +7,42 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/detail/pointer.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstdint>
 #include <map>
 #include <utility>
 
+namespace hpx::util {
+
+    // This is explicitly instantiated to ensure that the id is stable
+    // across shared libraries.
+    extra_data_id_type extra_data_helper<
+        serialization::detail::input_pointer_tracker>::id() noexcept
+    {
+        static std::uint8_t id = 0;
+        return &id;
+    }
+
+    extra_data_id_type extra_data_helper<
+        serialization::detail::output_pointer_tracker>::id() noexcept
+    {
+        static std::uint8_t id = 0;
+        return &id;
+    }
+
+    void
+    extra_data_helper<serialization::detail::output_pointer_tracker>::reset(
+        serialization::detail::output_pointer_tracker* data)
+    {
+        data->clear();
+    }
+}    // namespace hpx::util
+
 namespace hpx::serialization {
-
-    namespace detail {
-
-        // This is explicitly instantiated to ensure that the id is stable
-        // across shared libraries.
-        extra_archive_data_id_type
-        extra_archive_data_helper<input_pointer_tracker>::id() noexcept
-        {
-            static std::uint8_t id = 0;
-            return &id;
-        }
-
-        extra_archive_data_id_type
-        extra_archive_data_helper<output_pointer_tracker>::id() noexcept
-        {
-            static std::uint8_t id = 0;
-            return &id;
-        }
-
-        void extra_archive_data_helper<output_pointer_tracker>::reset(
-            output_pointer_tracker* data)
-        {
-            data->clear();
-        }
-    }    // namespace detail
 
     void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper)

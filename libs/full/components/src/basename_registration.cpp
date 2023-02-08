@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2021 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -72,7 +72,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     std::vector<hpx::future<hpx::id_type>> find_all_from_basename(
         std::string basename, std::size_t num_ids)
-    {    // -V813
+    {
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -91,7 +91,7 @@ namespace hpx {
 
     std::vector<hpx::future<hpx::id_type>> find_from_basename(
         std::string basename, std::vector<std::size_t> const& ids)
-    {    // -V813
+    {
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -99,7 +99,7 @@ namespace hpx {
         }
 
         std::vector<hpx::future<hpx::id_type>> results;
-        for (std::size_t i : ids)
+        for (std::size_t const i : ids)
         {
             std::string name =
                 detail::name_from_basename(basename, i);    //-V106
@@ -109,8 +109,8 @@ namespace hpx {
         return results;
     }
 
-    hpx::future<hpx::id_type> find_from_basename(std::string basename,
-        std::size_t sequence_nr)    // -V813
+    hpx::future<hpx::id_type> find_from_basename(
+        std::string basename, std::size_t sequence_nr)
     {
         if (basename.empty())
         {
@@ -128,8 +128,8 @@ namespace hpx {
         return agas::on_symbol_namespace_event(HPX_MOVE(name), true);
     }
 
-    hpx::future<bool> register_with_basename(std::string basename,
-        hpx::id_type id, std::size_t sequence_nr)    // -V813
+    hpx::future<bool> register_with_basename(
+        std::string basename, hpx::id_type id, std::size_t sequence_nr)
     {
         if (basename.empty())
         {
@@ -147,6 +147,25 @@ namespace hpx {
         return agas::register_name(HPX_MOVE(name), id);
     }
 
+    bool register_with_basename(hpx::launch::sync_policy, std::string basename,
+        hpx::id_type id, std::size_t sequence_nr, error_code& ec)
+    {
+        if (basename.empty())
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::register_with_basename", "no basename specified");
+        }
+
+        if (sequence_nr == ~static_cast<std::size_t>(0))
+        {
+            sequence_nr = static_cast<std::size_t>(agas::get_locality_id());
+        }
+
+        std::string name =
+            detail::name_from_basename(HPX_MOVE(basename), sequence_nr);
+        return agas::register_name(hpx::launch::sync, HPX_MOVE(name), id, ec);
+    }
+
     hpx::future<bool> register_with_basename(std::string base_name,
         hpx::future<hpx::id_type> f, std::size_t sequence_nr)
     {
@@ -160,7 +179,7 @@ namespace hpx {
 
     hpx::future<hpx::id_type> unregister_with_basename(
         std::string basename, std::size_t sequence_nr)
-    {    // -V813
+    {
         if (basename.empty())
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,

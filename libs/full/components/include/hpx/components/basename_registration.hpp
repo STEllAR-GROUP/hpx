@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 #include <hpx/components/basename_registration_fwd.hpp>
 #include <hpx/components/make_client.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/naming_base/id_type.hpp>
 
 #include <cstddef>
 #include <string>
@@ -130,13 +129,14 @@ namespace hpx {
     /// \note    The operation will fail if the given sequence number is not
     ///          unique.
     ///
-    template <typename Client, typename Stub>
+    template <typename Client, typename Stub, typename Data>
     hpx::future<bool> register_with_basename(std::string base_name,
-        components::client_base<Client, Stub>& client, std::size_t sequence_nr)
+        components::client_base<Client, Stub, Data>& client,
+        std::size_t sequence_nr)
     {
         return client.then(
             [sequence_nr, base_name = HPX_MOVE(base_name)](
-                components::client_base<Client, Stub>&& c) mutable
+                components::client_base<Client, Stub, Data>&& c) mutable
             -> hpx::future<bool> {
                 return register_with_basename(
                     HPX_MOVE(base_name), c.get_id(), sequence_nr);

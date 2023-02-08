@@ -27,32 +27,32 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // register all performance counter types exposed by this component
     void component_namespace_register_counter_types(error_code& ec)
     {
-        performance_counters::create_counter_func creator(
+        performance_counters::create_counter_func const creator(
             hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::component_namespace_service_name));
 
-        for (std::size_t i = 0; i != detail::num_component_namespace_services;
-             ++i)
+        for (auto const& component_namespace_service :
+            detail::component_namespace_services)
         {
             // global counters are handled elsewhere
-            if (detail::component_namespace_services[i].code_ ==
+            if (component_namespace_service.code_ ==
                 component_ns_statistics_counter)
             {
                 continue;
             }
 
-            std::string name(detail::component_namespace_services[i].name_);
+            std::string name(component_namespace_service.name_);
             std::string help;
             performance_counters::counter_type type;
-            std::string::size_type p = name.find_last_of('/');
+            std::string::size_type const p = name.find_last_of('/');
             HPX_ASSERT(p != std::string::npos);
 
-            if (detail::component_namespace_services[i].target_ ==
+            if (component_namespace_service.target_ ==
                 detail::counter_target_count)
             {
                 help = hpx::util::format("returns the number of invocations "
@@ -72,8 +72,8 @@ namespace hpx { namespace agas { namespace server {
             performance_counters::install_counter_type(
                 agas::performance_counter_basename + name, type, help, creator,
                 &performance_counters::locality0_counter_discoverer,
-                HPX_PERFORMANCE_COUNTER_V1,
-                detail::component_namespace_services[i].uom_, ec);
+                HPX_PERFORMANCE_COUNTER_V1, component_namespace_service.uom_,
+                ec);
             if (ec)
             {
                 return;
@@ -83,15 +83,15 @@ namespace hpx { namespace agas { namespace server {
 
     void component_namespace_register_global_counter_types(error_code& ec)
     {
-        performance_counters::create_counter_func creator(
+        performance_counters::create_counter_func const creator(
             hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::component_namespace_service_name));
 
-        for (std::size_t i = 0; i != detail::num_component_namespace_services;
-             ++i)
+        for (auto const& component_namespace_service :
+            detail::component_namespace_services)
         {
             // local counters are handled elsewhere
-            if (detail::component_namespace_services[i].code_ !=
+            if (component_namespace_service.code_ !=
                 component_ns_statistics_counter)
             {
                 continue;
@@ -99,7 +99,7 @@ namespace hpx { namespace agas { namespace server {
 
             std::string help;
             performance_counters::counter_type type;
-            if (detail::component_namespace_services[i].target_ ==
+            if (component_namespace_service.target_ ==
                 detail::counter_target_count)
             {
                 help = "returns the overall number of invocations of all "
@@ -116,11 +116,11 @@ namespace hpx { namespace agas { namespace server {
 
             performance_counters::install_counter_type(
                 std::string(agas::performance_counter_basename) +
-                    detail::component_namespace_services[i].name_,
+                    component_namespace_service.name_,
                 type, help, creator,
                 &performance_counters::locality0_counter_discoverer,
-                HPX_PERFORMANCE_COUNTER_V1,
-                detail::component_namespace_services[i].uom_, ec);
+                HPX_PERFORMANCE_COUNTER_V1, component_namespace_service.uom_,
+                ec);
             if (ec)
             {
                 return;
@@ -148,18 +148,17 @@ namespace hpx { namespace agas { namespace server {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "component_namespace::statistics_counter",
                 "unknown performance counter (unrelated to AGAS)");
-            return naming::invalid_gid;
         }
 
         namespace_action_code code = invalid_request;
         detail::counter_target target = detail::counter_target_invalid;
-        for (std::size_t i = 0; i != detail::num_component_namespace_services;
-             ++i)
+        for (auto const& component_namespace_service :
+            detail::component_namespace_services)
         {
-            if (p.countername_ == detail::component_namespace_services[i].name_)
+            if (p.countername_ == component_namespace_service.name_)
             {
-                code = detail::component_namespace_services[i].code_;
-                target = detail::component_namespace_services[i].target_;
+                code = component_namespace_service.code_;
+                target = component_namespace_service.target_;
                 break;
             }
         }
@@ -169,10 +168,9 @@ namespace hpx { namespace agas { namespace server {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "component_namespace::statistics_counter",
                 "unknown performance counter (unrelated to AGAS)");
-            return naming::invalid_gid;
         }
 
-        typedef component_namespace::counter_data cd;
+        using cd = component_namespace::counter_data;
 
         hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
@@ -223,7 +221,6 @@ namespace hpx { namespace agas { namespace server {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "component_namespace::statistics",
                     "bad action code while querying statistics");
-                return naming::invalid_gid;
             }
         }
         else
@@ -275,7 +272,6 @@ namespace hpx { namespace agas { namespace server {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "component_namespace::statistics",
                     "bad action code while querying statistics");
-                return naming::invalid_gid;
             }
         }
 
@@ -298,9 +294,9 @@ namespace hpx { namespace agas { namespace server {
         }
         return naming::detail::strip_credits_from_gid(gid);
     }
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // register performance counters for component_namespace service
     void component_namespace_register_counter_types(error_code& ec)
@@ -325,7 +321,7 @@ namespace hpx { namespace agas {
         }
         return naming::invalid_gid;
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 HPX_REGISTER_ACTION_ID(hpx::agas::component_namespace_statistics_counter_action,
     component_namespace_statistics_counter_action,

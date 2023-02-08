@@ -49,14 +49,14 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<traits::is_component<Component>::value &&
+    inline std::enable_if_t<traits::is_component<Component>::value &&
             traits::is_distribution_policy<DistPolicy>::value,
-        future<hpx::id_type>>::type
+        future<hpx::id_type>>
 #endif
     migrate(hpx::id_type const& to_migrate, DistPolicy const& policy)
     {
-        typedef server::perform_migrate_component_action<Component, DistPolicy>
-            action_type;
+        using action_type =
+            server::perform_migrate_component_action<Component, DistPolicy>;
         return hpx::detail::async_colocated<action_type>(
             to_migrate, to_migrate, policy);
     }
@@ -81,33 +81,32 @@ namespace hpx { namespace components {
     /// \returns A future representing the global id of the migrated
     ///          component instance. This should be the same as \a migrate_to.
     ///
-    template <typename Derived, typename Stub, typename DistPolicy>
+    template <typename Derived, typename Stub, typename Data,
+        typename DistPolicy>
 #if defined(DOXYGEN)
     Derived
 #else
-    inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, Derived>::type
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, Derived>
 #endif
-    migrate(
-        client_base<Derived, Stub> const& to_migrate, DistPolicy const& policy)
+    migrate(client_base<Derived, Stub, Data> const& to_migrate,
+        DistPolicy const& policy)
     {
-        typedef typename client_base<Derived, Stub>::server_component_type
-            component_type;
+        using component_type =
+            typename client_base<Derived, Stub, Data>::server_component_type;
         return Derived(migrate<component_type>(to_migrate.get_id(), policy));
     }
 
     /// \cond NODETAIL
     // overload to be used for polymorphic objects
     template <typename Component, typename Derived, typename Stub,
-        typename DistPolicy>
+        typename Data, typename DistPolicy>
 #if defined(DOXYGEN)
     Derived
 #else
-    inline typename std::enable_if<
-        traits::is_distribution_policy<DistPolicy>::value, Derived>::type
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, Derived>
 #endif
-    migrate(
-        client_base<Derived, Stub> const& to_migrate, DistPolicy const& policy)
+    migrate(client_base<Derived, Stub, Data> const& to_migrate,
+        DistPolicy const& policy)
     {
         return Derived(migrate<Component>(to_migrate.get_id(), policy));
     }
@@ -134,8 +133,8 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline typename std::enable_if<traits::is_component<Component>::value,
-        future<hpx::id_type>>::type
+    inline std::enable_if_t<traits::is_component<Component>::value,
+        future<hpx::id_type>>
 #endif
     migrate(hpx::id_type const& to_migrate, hpx::id_type const& target_locality)
     {
@@ -160,20 +159,21 @@ namespace hpx { namespace components {
     /// \returns A client side representation of representing of the migrated
     ///          component instance. This should be the same as \a migrate_to.
     ///
-    template <typename Derived, typename Stub>
-    inline Derived migrate(client_base<Derived, Stub> const& to_migrate,
+    template <typename Derived, typename Stub, typename Data>
+    Derived migrate(client_base<Derived, Stub, Data> const& to_migrate,
         hpx::id_type const& target_locality)
     {
-        typedef typename client_base<Derived, Stub>::server_component_type
-            component_type;
+        using component_type =
+            typename client_base<Derived, Stub, Data>::server_component_type;
         return Derived(
             migrate<component_type>(to_migrate.get_id(), target_locality));
     }
 
     /// \cond NODETAIL
     // overload to be used for polymorphic objects
-    template <typename Component, typename Derived, typename Stub>
-    inline Derived migrate(client_base<Derived, Stub> const& to_migrate,
+    template <typename Component, typename Derived, typename Stub,
+        typename Data>
+    Derived migrate(client_base<Derived, Stub, Data> const& to_migrate,
         hpx::id_type const& target_locality)
     {
         return Derived(

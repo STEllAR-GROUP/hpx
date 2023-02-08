@@ -13,27 +13,27 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     using component_type = std::int32_t;
-}}    // namespace hpx::components
+}
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     ////////////////////////////////////////////////////////////////////////
     // Base name used to register AGAS service instances
-    static constexpr char const* const service_name = "/0/agas/";
+    inline constexpr char const* const service_name = "/0/agas/";
 
     // Fixed addresses of AGAS components
-    static constexpr std::uint64_t const booststrap_prefix = 0ULL;
-    static constexpr std::uint64_t const primary_ns_msb = 0x100000001ULL;
-    static constexpr std::uint64_t const primary_ns_lsb = 0x000000001ULL;
-    static constexpr std::uint64_t const component_ns_msb = 0x100000001ULL;
-    static constexpr std::uint64_t const component_ns_lsb = 0x000000002ULL;
-    static constexpr std::uint64_t const symbol_ns_msb = 0x100000001ULL;
-    static constexpr std::uint64_t const symbol_ns_lsb = 0x000000003ULL;
-    static constexpr std::uint64_t const locality_ns_msb = 0x100000001ULL;
-    static constexpr std::uint64_t const locality_ns_lsb = 0x000000004ULL;
+    inline constexpr std::uint64_t booststrap_prefix = 0ULL;
+    inline constexpr std::uint64_t primary_ns_msb = 0x100000001ULL;
+    inline constexpr std::uint64_t primary_ns_lsb = 0x000000001ULL;
+    inline constexpr std::uint64_t component_ns_msb = 0x100000001ULL;
+    inline constexpr std::uint64_t component_ns_lsb = 0x000000002ULL;
+    inline constexpr std::uint64_t symbol_ns_msb = 0x100000001ULL;
+    inline constexpr std::uint64_t symbol_ns_lsb = 0x000000003ULL;
+    inline constexpr std::uint64_t locality_ns_msb = 0x100000001ULL;
+    inline constexpr std::uint64_t locality_ns_lsb = 0x000000004ULL;
 
     using iterate_types_function_type =
         hpx::function<void(std::string const&, components::component_type),
@@ -51,4 +51,4 @@ namespace hpx { namespace agas {
         struct HPX_EXPORT primary_namespace;
         struct HPX_EXPORT symbol_namespace;
     }    // namespace server
-}}       // namespace hpx::agas
+}    // namespace hpx::agas

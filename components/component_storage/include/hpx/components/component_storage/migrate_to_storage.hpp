@@ -70,13 +70,13 @@ namespace hpx { namespace components
     /// \returns A client side representation of representing of the migrated
     ///          component instance. This should be the same as \a migrate_to.
     ///
-    template <typename Derived, typename Stub>
+    template <typename Derived, typename Stub, typename Data>
     inline Derived
-    migrate_to_storage(client_base<Derived, Stub> const& to_migrate,
+    migrate_to_storage(client_base<Derived, Stub, Data> const& to_migrate,
         hpx::components::component_storage const& target_storage)
     {
-        typedef typename client_base<Derived, Stub>::server_component_type
-            component_type;
+        using component_type =
+            typename client_base<Derived, Stub, Data>::server_component_type;
         return Derived(migrate_to_storage<component_type>(
             to_migrate.get_id(), target_storage.get_id()));
     }
