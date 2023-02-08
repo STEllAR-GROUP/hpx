@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
@@ -126,8 +125,8 @@ namespace hpx::execution::experimental {
 
         template <typename Signature, typename Tag,
             typename MetaF = meta::func<meta::pack>>
-        using signature_arg_apply =
-            decltype(test_signature<Tag, MetaF>((Signature*) nullptr));
+        using signature_arg_apply = decltype(test_signature<Tag, MetaF>(
+            static_cast<Signature*>(nullptr)));
 
         template <typename Signature, typename Enable = void>
         struct is_completion_signature : std::false_type
@@ -136,8 +135,8 @@ namespace hpx::execution::experimental {
 
         template <typename Signature>
         struct is_completion_signature<Signature,
-            std::void_t<decltype(test_signature((Signature*) nullptr))>>
-          : std::true_type
+            std::void_t<decltype(test_signature(
+                static_cast<Signature*>(nullptr)))>> : std::true_type
         {
         };
 
@@ -220,7 +219,7 @@ namespace hpx::execution::experimental {
     // in ValueFns.
     // Then, given two variadic templates Tuple and Variant, the type
     // completion_signatures<Fns...>::value_types<Tuple, Variant> names the type
-    // Variant<Tuple<Values0...>, Tuple<Values1...>, ... Tuple<Valuesm-1...>>,
+    // Variant<Tuple<Values0...>, Tuple<Values1...>, ... Tuple<Valuesn-1...>>,
     // where m is the size of the parameter pack ValueFns.
     //
     // Let ErrorFns be a template parameter pack of the function types in Fns
@@ -228,7 +227,7 @@ namespace hpx::execution::experimental {
     // function argument type in the n-th type in ErrorFns.
     // Then, given a variadic template Variant, the type
     // completion_signatures<Fns...>::error_types<Variant> names the type
-    // Variant<Error0, Error1, ... Errorm-1>, where m is the size of the
+    // Variant<Error0, Error1, ... Errorn-1>, where m is the size of the
     // parameter pack ErrorFns.
     //
     // completion_signatures<Fns...>::sends_stopped is true if at least one of

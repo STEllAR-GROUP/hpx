@@ -13,12 +13,10 @@
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
@@ -105,12 +103,15 @@ namespace hpx { namespace lcos { namespace detail {
     std::size_t calculate_num_connected(
         std::size_t num_sites, std::size_t site, std::size_t arity)
     {
-        std::size_t num_children =
-            hpx::ranges::count(hpx::util::counting_iterator(site + 1),
-                hpx::util::counting_iterator(num_sites), site,
-                [&](std::size_t node) {
-                    return calculate_connected_node(node, arity);
-                });
+        std::size_t num_children = 0;
+
+        for (std::size_t node = site + 1; node != num_sites; ++node)
+        {
+            if (site == calculate_connected_node(node, arity))
+            {
+                ++num_children;
+            }
+        }
         return num_children + 1;
     }
 
