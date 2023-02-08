@@ -18,6 +18,7 @@
 #include <hpx/type_support/lazy_conditional.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <iterator>
 #include <type_traits>
 
