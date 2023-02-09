@@ -123,10 +123,12 @@ namespace hpx::execution::experimental {
         template <typename, typename = void>
         meta::pack<> test_signature(...);
 
+        // clang-format off
         template <typename Signature, typename Tag,
             typename MetaF = meta::func<meta::pack>>
-        using signature_arg_apply = decltype(test_signature<Tag, MetaF>(
-            static_cast<Signature*>(nullptr)));
+        using signature_arg_apply = decltype(
+            test_signature<Tag, MetaF>(static_cast<Signature*>(nullptr)));
+        // clang-format on
 
         template <typename Signature, typename Enable = void>
         struct is_completion_signature : std::false_type
