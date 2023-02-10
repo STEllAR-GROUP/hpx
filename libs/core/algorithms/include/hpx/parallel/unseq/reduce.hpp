@@ -7,24 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
-#include <hpx/functional/tag_invoke.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/reduce.hpp>
-#include <hpx/parallel/unseq.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-
-#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/unseq/reduce_helpers.hpp>
-#include <hpx/parallel/util/result_types.hpp>
-#include <hpx/parallel/util/zip_iterator.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -198,5 +190,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         return unseq_reduce<ExPolicy>::call(first1, last1, first2, init,
             HPX_FORWARD(Reduce, r), HPX_FORWARD(Convert, conv));
     }
-
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail
