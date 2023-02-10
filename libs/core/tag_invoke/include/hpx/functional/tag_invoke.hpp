@@ -98,6 +98,7 @@ namespace hpx::functional {
     template <typename Tag>
     struct tag_noexcept;
 }    // namespace hpx::functional
+
 #else
 
 #include <hpx/config.hpp>
@@ -185,7 +186,7 @@ namespace hpx::functional {
         };
     }    // namespace detail
 
-    // CUDA versions less than 11.2 have a template instantiation bug which
+    // CUDA versions less than 11.2 have a template instantiation bug that
     // leaves out certain template arguments and leads to us not being able to
     // correctly check this condition. We default to the more relaxed
     // noexcept(true) to not falsely exclude correct overloads. However, this

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -37,7 +37,7 @@ namespace hpx::chrono {
         {
         }
 
-        constexpr value_type const& value() const noexcept
+        [[nodiscard]] constexpr value_type const& value() const noexcept
         {
             return _abs_time;
         }
@@ -71,12 +71,12 @@ namespace hpx::chrono {
                 ++_rel_time;
         }
 
-        constexpr value_type const& value() const noexcept
+        [[nodiscard]] constexpr value_type const& value() const noexcept
         {
             return _rel_time;
         }
 
-        steady_clock::time_point from_now() const noexcept
+        [[nodiscard]] steady_clock::time_point from_now() const noexcept
         {
             return steady_clock::now() + _rel_time;
         }

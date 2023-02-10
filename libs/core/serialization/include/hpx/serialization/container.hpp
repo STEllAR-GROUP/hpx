@@ -19,7 +19,7 @@ namespace hpx::serialization {
     {
         virtual ~erased_output_container() = default;
 
-        virtual bool is_preprocessing() const noexcept
+        [[nodiscard]] virtual bool is_preprocessing() const noexcept
         {
             return false;
         }
@@ -36,7 +36,7 @@ namespace hpx::serialization {
     {
         virtual ~erased_input_container() = default;
 
-        virtual bool is_preprocessing() const noexcept
+        [[nodiscard]] virtual bool is_preprocessing() const noexcept
         {
             return false;
         }

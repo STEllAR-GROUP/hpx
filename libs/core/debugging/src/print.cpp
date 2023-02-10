@@ -100,7 +100,7 @@ namespace hpx::debug {
             std::ostream&, unsigned long, int);
         template HPX_CORE_EXPORT void print_hex(std::ostream&, int, int);
 
-        void print_ptr(std::ostream& os, void* v, int N)
+        void print_ptr(std::ostream& os, void const* v, int N)
         {
             os << std::right << std::setw(N) << std::noshowbase << std::hex
                << v;
@@ -151,7 +151,7 @@ namespace hpx::debug {
     // format as ip address
     // ------------------------------------------------------------------
     ipaddr::ipaddr(void const* a) noexcept
-      : data_(reinterpret_cast<std::uint8_t const*>(a))
+      : data_(static_cast<std::uint8_t const*>(a))
       , ipdata_(0)
     {
     }
@@ -164,8 +164,10 @@ namespace hpx::debug {
 
     std::ostream& operator<<(std::ostream& os, ipaddr const& p)
     {
-        os << std::dec << int(p.data_[0]) << "." << int(p.data_[1]) << "."
-           << int(p.data_[2]) << "." << int(p.data_[3]);
+        os << std::dec << static_cast<int>(p.data_[0]) << "."
+           << static_cast<int>(p.data_[1]) << "."
+           << static_cast<int>(p.data_[2]) << "."
+           << static_cast<int>(p.data_[3]);
         return os;
     }
 
@@ -179,10 +181,11 @@ namespace hpx::debug {
             static std::chrono::steady_clock::time_point log_t_start =
                 std::chrono::steady_clock::now();
 
-            auto now = std::chrono::steady_clock::now();    //-V656
-            auto nowt = std::chrono::duration_cast<std::chrono::microseconds>(
-                now - log_t_start)
-                            .count();
+            auto const now = std::chrono::steady_clock::now();    //-V656
+            auto const nowt =
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    now - log_t_start)
+                    .count();
 
             os << debug::dec<10>(nowt) << " ";
             return os;
@@ -217,7 +220,7 @@ namespace hpx::debug {
     // ------------------------------------------------------------------
     mem_crc32::mem_crc32(
         void const* a, std::size_t len, char const* txt) noexcept
-      : addr_(reinterpret_cast<std::uint64_t const*>(a))    //-V206
+      : addr_(static_cast<std::uint64_t const*>(a))    //-V206
       , len_(len)
       , txt_(txt)
     {
@@ -225,15 +228,16 @@ namespace hpx::debug {
 
     std::ostream& operator<<(std::ostream& os, mem_crc32 const& p)
     {
-        std::uint64_t const* uintBuf =
-            static_cast<std::uint64_t const*>(p.addr_);
+        auto uintBuf = static_cast<std::uint64_t const*>(p.addr_);
         os << "Memory:";
         os << " address " << hpx::debug::ptr(p.addr_) << " length "
            << hpx::debug::hex<6>(p.len_)
            << " CRC32:" << hpx::debug::hex<8>(crc32(p.addr_, p.len_)) << "\n";
 
-        auto max_value = (std::min)(
-            std::size_t(std::ceil(double(p.len_) / 8.0)), std::size_t(128));
+        auto const max_value =
+            (std::min)(static_cast<std::size_t>(
+                           std::ceil(static_cast<double>(p.len_) / 8.0)),
+                static_cast<std::size_t>(128));
         for (std::size_t i = 0; i < max_value; i++)
         {
             os << hpx::debug::hex<16>(*uintBuf++) << " ";
@@ -247,7 +251,7 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         // helper class for printing time since start
         // ------------------------------------------------------------------
-        char const* hostname_print_helper::get_hostname() const
+        [[nodiscard]] char const* hostname_print_helper::get_hostname() const
         {
             static bool initialized = false;
             static char hostname_[20] = {'\0'};
@@ -255,36 +259,36 @@ namespace hpx::debug {
             {
                 initialized = true;
 #if !defined(__FreeBSD__)
-                gethostname(hostname_, std::size_t(12));
+                gethostname(hostname_, static_cast<std::size_t>(12));
 #endif
-                int rank = guess_rank();
+                int const rank = guess_rank();
                 if (rank != -1)
                 {
-                    std::string temp = "(" + std::to_string(guess_rank()) + ")";
+                    std::string const temp =
+                        "(" + std::to_string(guess_rank()) + ")";
                     std::strcat(hostname_, temp.c_str());
                 }
             }
             return hostname_;
         }
 
-        int hostname_print_helper::guess_rank() const
+        [[nodiscard]] int hostname_print_helper::guess_rank() const
         {
 #if defined(__FreeBSD__)
             char** env = freebsd_environ;
 #else
             char** env = environ;
 #endif
-            std::vector<std::string> env_strings{
+            std::vector<std::string> const env_strings{
                 "_RANK=", "_NODEID="};    //-V826
             for (char** current = env; *current; ++current)
             {
                 auto e = std::string(*current);
-                for (auto s : env_strings)
+                for (auto const& s : env_strings)
                 {
-                    auto pos = e.find(s);
+                    auto const pos = e.find(s);
                     if (pos != std::string::npos)
                     {
-                        //std::cout << "Got a rank string : " << e << std::endl;
                         return std::stoi(e.substr(pos + s.size(), 5));
                     }
                 }

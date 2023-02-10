@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -132,7 +132,7 @@ namespace hpx::util::cache {
         ///                   constructed instance of the type as defined by
         ///                   the \a InsertPolicy template parameter.
         ///
-        local_cache(size_type max_size = 0,
+        explicit local_cache(size_type max_size = 0,
             update_policy_type const& up = update_policy_type(),
             insert_policy_type const& ip = insert_policy_type())
           : max_size_(max_size)
@@ -142,13 +142,18 @@ namespace hpx::util::cache {
         {
         }
 
+        local_cache(local_cache const& other) = default;
         local_cache(local_cache&& other) = default;
+        local_cache& operator=(local_cache const& other) = default;
+        local_cache& operator=(local_cache&& other) = default;
+
+        ~local_cache() = default;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return current size of the cache.
         ///
         /// \returns The current size of this cache instance.
-        constexpr size_type size() const noexcept
+        [[nodiscard]] constexpr size_type size() const noexcept
         {
             return current_size_;
         }
@@ -163,7 +168,7 @@ namespace hpx::util::cache {
         /// \returns    The maximum size this cache instance is currently
         ///             allowed to reach. If this number is zero the cache has
         ///             no limitation with regard to a maximum size.
-        constexpr size_type capacity() const noexcept
+        [[nodiscard]] constexpr size_type capacity() const noexcept
         {
             return max_size_;
         }
@@ -184,7 +189,7 @@ namespace hpx::util::cache {
             // the old one
             bool retval = true;
             if (max_size && max_size < max_size_ &&
-                !free_space(long(max_size_ - max_size)))
+                !free_space(static_cast<long>(max_size_ - max_size)))
             {
                 retval = false;    // not able to shrink cache
             }
@@ -206,7 +211,7 @@ namespace hpx::util::cache {
         ///
         /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
-        bool holds_key(key_type const& k) const
+        [[nodiscard]] bool holds_key(key_type const& k) const
         {
             return store_.find(k) != store_.end();
         }
@@ -216,6 +221,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the entry which should be retrieved
         ///               from the cache.
+        /// \param realkey[out] Return the full real key found in the cache
         /// \param val    [out] If the entry indexed by the key is found in the
         ///               cache this value on successful return will be a copy
         ///               of the corresponding entry.
@@ -347,7 +353,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the entry which should be added to
         ///               the cache.
-        /// \param value  [in] The value which should be added to the cache.
+        /// \param val    [in] The value which should be added to the cache.
         ///
         /// \note         This function invokes both, the insert policy as
         ///               provided to the constructor and the function
@@ -380,7 +386,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the entry which should be added to
         ///               the cache.
-        /// \param value  [in] The entry which should be added to the cache.
+        /// \param e      [in] The entry which should be added to the cache.
         ///
         /// \note         This function invokes both, the insert policy as
         ///               provided to the constructor and the function
@@ -414,7 +420,8 @@ namespace hpx::util::cache {
             // make sure cache doesn't get too large
             size_type entry_size = e.get_size();
             if (0 != max_size_ && current_size_ + entry_size > max_size_ &&
-                !free_space(long(current_size_ - max_size_ + entry_size)))
+                !free_space(
+                    static_cast<long>(current_size_ - max_size_ + entry_size)))
             {
                 return false;
             }
@@ -443,7 +450,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the value which should be updated in
         ///               the cache.
-        /// \param value  [in] The value which should be used as a replacement
+        /// \param val    [in] The value which should be used as a replacement
         ///               for the existing value in the cache. Any existing
         ///               cache entry is not changed except for its value.
         ///
@@ -500,7 +507,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the value which should be updated in
         ///               the cache.
-        /// \param value  [in] The value which should be used as a replacement
+        /// \param val    [in] The value which should be used as a replacement
         ///               for the existing value in the cache. Any existing
         ///               cache entry is not changed except for its value.
         /// \param f      [in] A callable taking two arguments, \a k and the
@@ -562,7 +569,7 @@ namespace hpx::util::cache {
         ///
         /// \param k      [in] The key for the entry which should be updated in
         ///               the cache.
-        /// \param value  [in] The entry which should be used as a replacement
+        /// \param e      [in] The entry which should be used as a replacement
         ///               for the existing entry in the cache. Any existing
         ///               entry is first removed and then this entry is added.
         ///
@@ -720,12 +727,13 @@ namespace hpx::util::cache {
         ///
         /// \returns      This function returns a reference to the statistics
         ///               instance embedded inside this cache
-        constexpr statistics_type const& get_statistics() const noexcept
+        [[nodiscard]] constexpr statistics_type const& get_statistics()
+            const noexcept
         {
             return statistics_;
         }
 
-        statistics_type& get_statistics() noexcept
+        [[nodiscard]] statistics_type& get_statistics() noexcept
         {
             return statistics_;
         }

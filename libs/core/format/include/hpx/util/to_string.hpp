@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/util/bad_lexical_cast.hpp>
 
@@ -20,7 +19,7 @@ namespace hpx::util {
         template <typename T, typename Enable = void>
         struct to_string
         {
-            static std::string call(T const& value)
+            [[nodiscard]] static std::string call(T const& value)
             {
                 return util::format("{}", value);
             }
@@ -31,7 +30,7 @@ namespace hpx::util {
             std::enable_if_t<std::is_integral_v<T> ||
                 std::is_floating_point_v<T>>>
         {
-            static std::string call(T const& value)
+            [[nodiscard]] static std::string call(T const& value)
             {
                 return std::to_string(value);
             }
@@ -39,7 +38,7 @@ namespace hpx::util {
     }    // namespace detail
 
     template <typename T>
-    std::string to_string(T const& v)
+    [[nodiscard]] std::string to_string(T const& v)
     {
         try
         {

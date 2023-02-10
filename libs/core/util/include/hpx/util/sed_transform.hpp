@@ -25,7 +25,7 @@ namespace hpx::util {
     /// \param input    [in] The content to parse.
     /// \param search   [out] If the parsing is successful, this string is set to
     ///                 the search expression.
-    /// \param search   [out] If the parsing is successful, this string is set to
+    /// \param replace  [out] If the parsing is successful, this string is set to
     ///                 the replace expression.
     ///
     /// \returns \a true if the parsing was successful, false otherwise.
@@ -46,21 +46,21 @@ namespace hpx::util {
         std::shared_ptr<command> command_;
 
     public:
-        sed_transform(std::string const& search, std::string const& replace);
+        sed_transform(std::string const& search, std::string replace);
 
-        sed_transform(std::string const& expression);
+        explicit sed_transform(std::string const& expression);
 
         std::string operator()(std::string const& input) const;
 
         explicit operator bool() const noexcept
         {
             // avoid compiler warning about conversion to bool
-            return command_.get() ? true : false;
+            return command_ ? true : false;
         }
 
-        bool operator!() const noexcept
+        [[nodiscard]] bool operator!() const noexcept
         {
-            return !command_.get();
+            return !command_;
         }
     };
 }    // namespace hpx::util

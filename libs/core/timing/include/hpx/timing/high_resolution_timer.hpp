@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,9 +41,9 @@ namespace hpx::chrono {
         }
 
         /// \brief returns the current time
-        static double now() noexcept
+        [[nodiscard]] static double now() noexcept
         {
-            return take_time_stamp() * 1e-9;
+            return static_cast<double>(take_time_stamp()) * 1e-9;
         }
 
         /// \brief restarts the timer
@@ -53,37 +53,38 @@ namespace hpx::chrono {
         }
 
         /// \brief returns the elapsed time in seconds
-        double elapsed() const noexcept
+        [[nodiscard]] double elapsed() const noexcept
         {
-            return double(take_time_stamp() - start_time_) * 1e-9;
+            return static_cast<double>(take_time_stamp() - start_time_) * 1e-9;
         }
 
         /// \brief returns the elapsed time in microseconds
-        std::int64_t elapsed_microseconds() const noexcept
+        [[nodiscard]] std::int64_t elapsed_microseconds() const noexcept
         {
-            return std::int64_t(double(take_time_stamp() - start_time_) * 1e-3);
+            return static_cast<std::int64_t>(
+                static_cast<double>(take_time_stamp() - start_time_) * 1e-3);
         }
 
         /// \brief returns the elapsed time in nanoseconds
-        std::int64_t elapsed_nanoseconds() const noexcept
+        [[nodiscard]] std::int64_t elapsed_nanoseconds() const noexcept
         {
-            return std::int64_t(take_time_stamp() - start_time_);
+            return static_cast<std::int64_t>(take_time_stamp() - start_time_);
         }
 
         /// \brief returns the estimated maximum value for \c elapsed()
-        static constexpr double elapsed_max() noexcept
+        [[nodiscard]] static constexpr double elapsed_max() noexcept
         {
             return (hpx::chrono::high_resolution_clock::max)() * 1e-9;
         }
 
         /// \brief returns the estimated minimum value for \c elapsed()
-        static constexpr double elapsed_min() noexcept
+        [[nodiscard]] static constexpr double elapsed_min() noexcept
         {
             return (hpx::chrono::high_resolution_clock::min)() * 1e-9;
         }
 
     protected:
-        static std::uint64_t take_time_stamp() noexcept
+        [[nodiscard]] static std::uint64_t take_time_stamp() noexcept
         {
             return hpx::chrono::high_resolution_clock::now();
         }

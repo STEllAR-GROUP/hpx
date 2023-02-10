@@ -82,10 +82,10 @@ namespace hpx::util::logging {
         HPX_NON_COPYABLE(logger);
 
         struct gather_holder : message
-        {    //-V690
+        {
             HPX_NON_COPYABLE(gather_holder);
 
-            gather_holder(logger& p_this)
+            explicit gather_holder(logger& p_this)
               : m_this(p_this)
             {
             }
@@ -93,7 +93,9 @@ namespace hpx::util::logging {
             ~gather_holder()
             {
                 if (!empty())
-                    m_this.write(HPX_MOVE(*this));
+                {
+                    m_this.write(HPX_MOVE(static_cast<message&&>(*this)));
+                }
             }
 
         private:
@@ -122,19 +124,19 @@ namespace hpx::util::logging {
         */
         gather_holder gather()
         {
-            return {*this};
+            return gather_holder{*this};
         }
 
-        writer::named_write& writer() noexcept
+        [[nodiscard]] writer::named_write& writer() noexcept
         {
             return m_writer;
         }
-        writer::named_write const& writer() const noexcept
+        [[nodiscard]] writer::named_write const& writer() const noexcept
         {
             return m_writer;
         }
 
-        bool is_enabled(level level) const noexcept
+        [[nodiscard]] bool is_enabled(level level) const noexcept
         {
             return level >= m_level;
         }
@@ -169,12 +171,16 @@ namespace hpx::util::logging {
         HPX_CORE_EXPORT void turn_cache_off();
 
         // called after all data has been gathered
-        void write(message msg)
+        void write(message msg) const
         {
             if (m_is_caching_off)
+            {
                 m_writer(msg);
+            }
             else
+            {
                 m_cache.push_back(HPX_MOVE(msg));
+            }
         }
 
     private:

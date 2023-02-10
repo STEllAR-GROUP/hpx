@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -35,7 +35,7 @@ namespace hpx {
     /// provides a better alternative.
     /// \a source_location meets the \a DefaultConstructible, \a CopyConstructible,
     /// \a CopyAssignable and \a Destructible requirements. Lvalue of \a
-    /// source_locationmeets the Swappable requirement. Additionally, the following
+    /// source_location meets the Swappable requirement. Additionally, the following
     /// conditions are true:
     /// - \code std::is_nothrow_move_constructible_v<std::source_location> \endcode
     /// - \code std::is_nothrow_move_assignable_v<std::source_location> \endcode
@@ -46,31 +46,31 @@ namespace hpx {
     /// assignment operators of \a source_location are trivial and/or constexpr.
     struct source_location
     {
-        const char* filename;
+        char const* filename;
         std::uint_least32_t line_number;
-        const char* functionname;
+        char const* functionname;
 
         // compatibility with C++20 std::source_location
         /// return the line number represented by this object
-        constexpr std::uint_least32_t line() const noexcept
+        [[nodiscard]] constexpr std::uint_least32_t line() const noexcept
         {
             return line_number;
         }
 
         /// return the column number represented by this object
-        constexpr std::uint_least32_t column() const noexcept
+        [[nodiscard]] static constexpr std::uint_least32_t column() noexcept
         {
             return 0;
         }
 
         /// return the file name represented by this object
-        constexpr const char* file_name() const noexcept
+        [[nodiscard]] constexpr char const* file_name() const noexcept
         {
             return filename;
         }
 
         /// return the name of the function represented by this object, if any
-        constexpr const char* function_name() const noexcept
+        [[nodiscard]] constexpr char const* function_name() const noexcept
         {
             return functionname;
         }

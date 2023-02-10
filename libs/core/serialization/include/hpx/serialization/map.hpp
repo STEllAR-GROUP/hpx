@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,7 +45,7 @@ namespace hpx::serialization {
     {
         using pair_type = std::pair<Key, Value>;
 
-        constexpr bool optimized =
+        static constexpr bool optimized =
             hpx::traits::is_bitwise_serializable_v<pair_type> ||
             !hpx::traits::is_not_bitwise_serializable_v<pair_type>;
 
@@ -81,7 +81,7 @@ namespace hpx::serialization {
     {
         using pair_type = std::pair<Key, Value>;
 
-        constexpr bool optimized =
+        static constexpr bool optimized =
             hpx::traits::is_bitwise_serializable_v<pair_type> ||
             !hpx::traits::is_not_bitwise_serializable_v<pair_type>;
 
@@ -131,8 +131,11 @@ namespace hpx::serialization {
         using value_type =
             typename std::map<Key, Value, Comp, Alloc>::value_type;
 
-        std::uint64_t size = t.size();
+        std::uint64_t const size = t.size();
         ar << size;
+        if (size == 0)
+            return;
+
         for (value_type const& val : t)
         {
             ar << val;

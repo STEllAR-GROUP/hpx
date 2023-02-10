@@ -27,7 +27,7 @@ namespace hpx::util {
         template <typename Arg0, typename... Args>
         struct tuple_first_argument<hpx::tuple<Arg0, Args...>>
         {
-            using type = typename std::decay<Arg0>::type;
+            using type = std::decay_t<Arg0>;
         };
 
         ///////////////////////////////////////////////////////////////////////

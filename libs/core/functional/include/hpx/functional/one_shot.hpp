@@ -48,6 +48,21 @@ namespace hpx::util {
 #endif
             }
 
+            one_shot_wrapper& operator=(one_shot_wrapper&& other) noexcept
+            {
+                _f = HPX_MOVE(other._f);
+#if defined(HPX_DEBUG)
+                _called = other._called;
+                other._called = true;
+#endif
+                return *this;
+            }
+
+            one_shot_wrapper(one_shot_wrapper const& other) = delete;
+            one_shot_wrapper& operator=(one_shot_wrapper const&) = delete;
+
+            ~one_shot_wrapper() = default;
+
             void check_call() noexcept
             {
 #if defined(HPX_DEBUG)
@@ -73,12 +88,14 @@ namespace hpx::util {
                 // clang-format on
             }
 
-            constexpr std::size_t get_function_address() const noexcept
+            [[nodiscard]] constexpr std::size_t get_function_address()
+                const noexcept
             {
                 return traits::get_function_address<F>::call(_f);
             }
 
-            constexpr char const* get_function_annotation() const noexcept
+            [[nodiscard]] constexpr char const* get_function_annotation()
+                const noexcept
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation<F>::call(_f);
@@ -88,7 +105,8 @@ namespace hpx::util {
             }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            util::itt::string_handle get_function_annotation_itt() const
+            [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+                const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<F>::call(_f);
@@ -123,7 +141,7 @@ namespace hpx::traits {
     template <typename F>
     struct get_function_address<util::detail::one_shot_wrapper<F>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_address();
@@ -134,7 +152,7 @@ namespace hpx::traits {
     template <typename F>
     struct get_function_annotation<util::detail::one_shot_wrapper<F>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -145,7 +163,7 @@ namespace hpx::traits {
     template <typename F>
     struct get_function_annotation_itt<util::detail::one_shot_wrapper<F>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             util::detail::one_shot_wrapper<F> const& f) noexcept
         {
             return f.get_function_annotation_itt();

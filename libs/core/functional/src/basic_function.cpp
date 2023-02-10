@@ -71,8 +71,8 @@ namespace hpx::util::detail {
                 HPX_ASSERT(other.object != nullptr);
 
                 // reuse object storage
-                object = vptr->copy(
-                    object, std::size_t(-1), other.object, /*destroy*/ true);
+                object = vptr->copy(object, static_cast<std::size_t>(-1),
+                    other.object, /*destroy*/ true);
             }
         }
         else
@@ -101,7 +101,7 @@ namespace hpx::util::detail {
         }
     }
 
-    void function_base::destroy() noexcept
+    void function_base::destroy() const noexcept
     {
         if (object != nullptr)
         {

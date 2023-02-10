@@ -32,7 +32,7 @@ namespace hpx::serialization::detail {
                 "Cannot register a factory with an empty name");
         }
 
-        auto it = map_.find(name);
+        auto const it = map_.find(name);
         if (it == map_.end())
         {
             map_.emplace(name, fun);

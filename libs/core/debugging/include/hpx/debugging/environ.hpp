@@ -18,13 +18,13 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #elif defined(__APPLE__)
-// It appears that on Mac OS X the 'environ' variable is not
-// available to dynamically linked libraries.
-// See: http://article.gmane.org/gmane.comp.lib.boost.devel/103843
-// See: http://lists.gnu.org/archive/html/bug-guile/2004-01/msg00013.html
+// It appears that on Mac OS X the 'environ' variable is not available to
+// dynamically linked libraries. See:
+// http://article.gmane.org/gmane.comp.lib.boost.devel/103843 See:
+// http://lists.gnu.org/archive/html/bug-guile/2004-01/msg00013.html
 #include <unistd.h>
-// The proper include for this is crt_externs.h, however it's not
-// available on iOS. The right replacement is not known. See
+// The proper include for this is crt_externs.h, however it's not available on
+// iOS. The right replacement is not known. See
 // https://svn.boost.org/trac/boost/ticket/5053
 extern "C" {
 extern char*** _NSGetEnviron(void);

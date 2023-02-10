@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/functional/detail/empty_function.hpp>
 #include <hpx/functional/detail/function_registration.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>
@@ -81,8 +80,8 @@ namespace hpx::util::detail {
     };
 
     template <typename VTable>
-    serializable_function_vtable<VTable> const* get_serializable_vtable(
-        std::string const& name)
+    [[nodiscard]] serializable_function_vtable<VTable> const*
+    get_serializable_vtable(std::string const& name)
     {
         using serializable_vtable = serializable_function_vtable<VTable>;
         return hpx::serialization::detail::polymorphic_intrusive_factory::

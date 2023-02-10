@@ -11,7 +11,8 @@
 #include <exception>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     /// Helper function for a try-catch block where what would normally go in
     /// the catch block should be called after the catch block. This is useful
     /// for situations where the catch-block may yield, since the catch block
@@ -41,4 +42,5 @@ namespace hpx { namespace detail {
         }
         return c(HPX_MOVE(ep));
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
+// namespace hpx::detail

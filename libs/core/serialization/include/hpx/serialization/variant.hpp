@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
@@ -80,7 +81,7 @@ namespace hpx::serialization {
     template <typename... Ts>
     void save(output_archive& ar, std::variant<Ts...> const& v, unsigned)
     {
-        auto which = static_cast<std::uint64_t>(v.index());
+        auto const which = static_cast<std::uint64_t>(v.index());
         ar << which;
         detail::std_variant_save_visitor visitor(ar);
         std::visit(visitor, v);

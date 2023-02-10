@@ -83,9 +83,11 @@ namespace hpx::util {
               , bin_size_(boost::numeric::average(
                     args[histogram_max_range] - args[histogram_min_range],
                     args[histogram_num_bins]))
-              , samples_in_bin_(std::size_t(args[histogram_num_bins] + 2), 0.)
+              , samples_in_bin_(
+                    static_cast<std::size_t>(args[histogram_num_bins] + 2), 0.)
               , bin_positions_(args[histogram_num_bins] + 2)
-              , histogram_(std::size_t(args[histogram_num_bins] + 2),
+              , histogram_(
+                    static_cast<std::size_t>(args[histogram_num_bins] + 2),
                     std::make_pair(0, 1))
               , is_dirty_(true)
             {
@@ -120,7 +122,7 @@ namespace hpx::util {
                             bin_positions_.end(),
                             args[boost::accumulators::sample]);
 
-                        std::size_t d =
+                        std::size_t const d =
                             std::distance(bin_positions_.begin(), it);
                         ++samples_in_bin_[d - 1];
                     }

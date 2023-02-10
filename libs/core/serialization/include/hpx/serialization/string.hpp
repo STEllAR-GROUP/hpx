@@ -34,7 +34,7 @@ namespace hpx::serialization {
     void serialize(output_archive& ar,
         std::basic_string<Char, CharTraits, Allocator> const& s, unsigned)
     {
-        std::uint64_t size = s.size();
+        std::uint64_t const size = s.size();
         ar << size;
         save_binary(ar, s.data(), s.size() * sizeof(Char));
     }

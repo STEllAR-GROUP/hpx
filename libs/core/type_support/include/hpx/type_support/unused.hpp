@@ -8,21 +8,21 @@
 ==============================================================================*/
 #pragma once
 
-// clang-format off
 #include <hpx/config.hpp>
+
 #if defined(HPX_MSVC)
-# pragma warning(push)
-# pragma warning(disable: 4522) // multiple assignment operators specified warning
+#pragma warning(push)
+#pragma warning(                                                               \
+    disable : 4522)    // multiple assignment operators specified warning
 #endif
-// clang-format on
 
 namespace hpx::util {
 
-    ///////////////////////////////////////////////////////////////////////////
-    // We do not import fusion::unused_type anymore to avoid boost::fusion
-    // being turned into an associate namespace, as this interferes with ADL
-    // in unexpected ways. We rather copy the full unused_type implementation.
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    // We do not import fusion::unused_type anymore to avoid boost::fusion being
+    // turned into an associate namespace, as this interferes with ADL in
+    // unexpected ways. We rather copy the full unused_type implementation.
+    ////////////////////////////////////////////////////////////////////////////
     struct unused_type
     {
         constexpr HPX_HOST_DEVICE HPX_FORCEINLINE unused_type() noexcept =
@@ -94,10 +94,6 @@ namespace hpx::util {
 #else
 #define HPX_UNUSED(x) ::hpx::util::unused = (x)
 #endif
-
-/////////////////////////////////////////////////////////////
-// use this to silence compiler warnings for global variables
-#define HPX_MAYBE_UNUSED [[maybe_unused]]
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

@@ -19,6 +19,7 @@
 namespace hpx::serialization {
 
     namespace detail {
+
         // This is explicitly instantiated to ensure that the id is stable
         // across shared libraries.
         extra_archive_data_id_type
@@ -55,7 +56,7 @@ namespace hpx::serialization {
     {
         auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
 
-        auto it = tracker.find(pos);
+        auto const it = tracker.find(pos);
         HPX_ASSERT(it != tracker.end());
 
         return *it->second;
@@ -65,11 +66,11 @@ namespace hpx::serialization {
     {
         auto& tracker = ar.get_extra_data<detail::output_pointer_tracker>();
 
-        auto it = tracker.find(pos);
+        auto const it = tracker.find(pos);
         if (it == tracker.end())
         {
             tracker.insert(std::make_pair(pos, ar.bytes_written()));
-            return std::uint64_t(-1);
+            return static_cast<std::uint64_t>(-1);
         }
         return it->second;
     }

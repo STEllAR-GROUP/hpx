@@ -19,13 +19,13 @@ namespace hpx::util {
     };
 
     template <typename T>
-    struct unwrap_reference<std::reference_wrapper<T>>
+    struct unwrap_reference<::std::reference_wrapper<T>>
     {
         using type = T;
     };
 
     template <typename T>
-    struct unwrap_reference<std::reference_wrapper<T> const>
+    struct unwrap_reference<::std::reference_wrapper<T> const>
     {
         using type = T;
     };

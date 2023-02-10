@@ -7,23 +7,27 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/execution_base/operation_state.hpp>
 #include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
-#include <exception>
-#include <system_error>
 #include <type_traits>
 #include <utility>
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+#include <hpx/assert.hpp>
+#include <hpx/execution_base/operation_state.hpp>
+
+#include <exception>
+#include <system_error>
+#endif
 
 namespace hpx::execution::experimental {
 

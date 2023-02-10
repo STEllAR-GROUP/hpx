@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,10 +7,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/cache/statistics/no_statistics.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <list>
 #include <map>
@@ -62,18 +60,23 @@ namespace hpx::util::cache {
         ///                   determined by the unit of the values returned by
         ///                   the entry's \a get_size function.
         ///
-        lru_cache(size_type max_size = 0)
+        explicit lru_cache(size_type max_size = 0)
           : max_size_(max_size)
         {
         }
 
+        lru_cache(lru_cache const& other) = default;
         lru_cache(lru_cache&& other) = default;
+        lru_cache& operator=(lru_cache const& other) = default;
+        lru_cache& operator=(lru_cache&& other) = default;
+
+        ~lru_cache() = default;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Return current size of the cache.
         ///
         /// \returns The current size of this cache instance.
-        constexpr size_type size() const noexcept
+        [[nodiscard]] constexpr size_type size() const noexcept
         {
             return current_size_;
         }
@@ -88,7 +91,7 @@ namespace hpx::util::cache {
         /// \returns    The maximum size this cache instance is currently
         ///             allowed to reach. If this number is zero the cache has
         ///             no limitation with regard to a maximum size.
-        constexpr size_type capacity() const noexcept
+        [[nodiscard]] constexpr size_type capacity() const noexcept
         {
             return max_size_;
         }
@@ -118,7 +121,7 @@ namespace hpx::util::cache {
         /// \brief Check whether the cache currently holds an entry identified
         ///        by the given key
         ///
-        /// \param k      [in] The key for the entry which should be looked up
+        /// \param key    [in] The key for the entry which should be looked up
         ///               in the cache.
         ///
         /// \note         This function does not call the entry's function
@@ -127,7 +130,7 @@ namespace hpx::util::cache {
         ///
         /// \returns      This function returns \a true if the cache holds the
         ///               referenced entry, otherwise it returns \a false.
-        bool holds_key(key_type const& key) const
+        [[nodiscard]] bool holds_key(key_type const& key) const
         {
             return map_.find(key) != map_.end();
         }
@@ -137,6 +140,7 @@ namespace hpx::util::cache {
         ///
         /// \param key     [in] The key for the entry which should be retrieved
         ///               from the cache.
+        /// \param realkey[out] Return the full real key found in the cache
         /// \param entry  [out] If the entry indexed by the key is found in the
         ///               cache this value on successful return will be a copy
         ///               of the corresponding entry.
@@ -390,7 +394,7 @@ namespace hpx::util::cache {
         ///               entries).
         size_type erase()
         {
-            std::size_t current_size = current_size_;
+            std::size_t const current_size = current_size_;
             clear();
             return current_size;
         }
@@ -400,7 +404,7 @@ namespace hpx::util::cache {
         /// Unconditionally removes all stored entries from the cache.
         size_type clear()
         {
-            size_type erased = current_size_;
+            size_type const erased = current_size_;
             current_size_ = 0;
             map_.clear();
             storage_.clear();
@@ -412,12 +416,13 @@ namespace hpx::util::cache {
         ///
         /// \returns      This function returns a reference to the statistics
         ///               instance embedded inside this cache
-        constexpr statistics_type const& get_statistics() const noexcept
+        [[nodiscard]] constexpr statistics_type const& get_statistics()
+            const noexcept
         {
             return statistics_;
         }
 
-        statistics_type& get_statistics() noexcept
+        [[nodiscard]] statistics_type& get_statistics() noexcept
         {
             return statistics_;
         }

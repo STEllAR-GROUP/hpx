@@ -64,10 +64,10 @@ namespace hpx::serialization {
     HPX_CORE_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
-    HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
+    [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
         input_archive& ar, std::uint64_t pos);
 
-    HPX_CORE_EXPORT std::uint64_t track_pointer(
+    [[nodiscard]] HPX_CORE_EXPORT std::uint64_t track_pointer(
         output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ namespace hpx::serialization {
                     ar << id;
                     ar << *ptr;
 #else
-                    std::string const name(access::get_name(ptr.get()));
+                    std::string const name = access::get_name(ptr.get());
                     std::uint32_t const id =
                         polymorphic_id_factory::get_id(name);
                     ar << name;
@@ -230,14 +230,14 @@ namespace hpx::serialization {
         HPX_FORCEINLINE void serialize_pointer_tracked(
             output_archive& ar, Pointer const& ptr)
         {
-            bool valid = static_cast<bool>(ptr);
+            bool const valid = static_cast<bool>(ptr);
             ar << valid;
             if (valid)
             {
-                std::uint64_t cur_pos = current_pos(ar);
-                std::uint64_t pos = track_pointer(ar, ptr.get());
+                std::uint64_t const cur_pos = current_pos(ar);
+                std::uint64_t const pos = track_pointer(ar, ptr.get());
                 ar << pos;
-                if (pos == std::uint64_t(-1))
+                if (pos == static_cast<std::uint64_t>(-1))
                 {
                     ar << cur_pos;
                     detail::pointer_output_dispatcher<Pointer>::type::call(
@@ -256,7 +256,7 @@ namespace hpx::serialization {
             {
                 std::uint64_t pos = 0;
                 ar >> pos;
-                if (pos == std::uint64_t(-1))
+                if (pos == static_cast<std::uint64_t>(-1))
                 {
                     pos = 0;
                     ar >> pos;
@@ -282,7 +282,7 @@ namespace hpx::serialization {
         HPX_FORCEINLINE void serialize_pointer_untracked(
             output_archive& ar, Pointer const& ptr)
         {
-            bool valid = static_cast<bool>(ptr);
+            bool const valid = static_cast<bool>(ptr);
             ar << valid;
             if (valid)
             {
@@ -301,6 +301,5 @@ namespace hpx::serialization {
                 ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar);
             }
         }
-
     }    // namespace detail
 }    // namespace hpx::serialization

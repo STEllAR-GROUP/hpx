@@ -9,12 +9,7 @@
 
 #include <hpx/config/defines.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-// On Windows, make sure winsock.h is not included even if windows.h is
-// included before winsock2.h
-#define _WINSOCKAPI_
-#include <winsock2.h>
-#endif
+#include <hpx/config/asio.hpp>
 
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/branch_hints.hpp>
@@ -47,12 +42,6 @@
 #include <hpx/preprocessor/stringize.hpp>
 
 #include <cstddef>
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-// On Windows, make sure winsock.h is not included even if windows.h is
-// included before winsock2.h
-#define _WINSOCKAPI_
-#endif
 
 // clang-format off
 
@@ -276,14 +265,14 @@
 #    define HPX_MAKE_DLL_STRING(n)  "lib" + (n) + HPX_SHARED_LIB_EXTENSION
 #  endif
 #elif defined(HPX_DEBUG)
-#  define HPX_MAKE_DLL_STRING(n)   (n) + "d" + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   ((n) + "d" + HPX_SHARED_LIB_EXTENSION)
 #else
-#  define HPX_MAKE_DLL_STRING(n)   (n) + HPX_SHARED_LIB_EXTENSION
+#  define HPX_MAKE_DLL_STRING(n)   ((n) + HPX_SHARED_LIB_EXTENSION)
 #endif
 
 #if defined(HPX_DEBUG)
 #  define HPX_MANGLE_NAME(n)     HPX_PP_CAT(n, d)
-#  define HPX_MANGLE_STRING(n)   (n) + "d"
+#  define HPX_MANGLE_STRING(n)   ((n) + "d")
 #else
 #  define HPX_MANGLE_NAME(n)     n
 #  define HPX_MANGLE_STRING(n)   n

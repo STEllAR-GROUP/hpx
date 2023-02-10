@@ -1,7 +1,7 @@
 //  (C) Copyright 2005 Matthias Troyer and Dave Abrahams
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2015 Andreas Schaefer
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,12 +39,12 @@ namespace hpx::serialization {
         {
         }
 
-        constexpr value_type* address() const noexcept
+        [[nodiscard]] constexpr value_type* address() const noexcept
         {
             return m_t;
         }
 
-        constexpr std::size_t count() const noexcept
+        [[nodiscard]] constexpr std::size_t count() const noexcept
         {
             return m_element_count;
         }
@@ -56,7 +56,7 @@ namespace hpx::serialization {
             // NOLINTNEXTLINE(bugprone-branch-clone)
             if (ar.disable_array_optimization() || ar.endianess_differs())
             {
-                // normal serializtion
+                // normal serialization
                 for (std::size_t i = 0; i != m_element_count; ++i)
                 {
                     // clang-format off
@@ -71,7 +71,7 @@ namespace hpx::serialization {
 #endif
             using element_type = std::remove_const_t<T>;
 
-            constexpr bool use_optimized =
+            static constexpr bool use_optimized =
                 std::is_default_constructible_v<element_type> &&
                 (hpx::traits::is_bitwise_serializable_v<element_type> ||
                     !hpx::traits::is_not_bitwise_serializable_v<element_type>);
@@ -123,9 +123,8 @@ namespace hpx::serialization {
         // clang-format on
     }
 
-    // allow our array to be serialized as prvalue
-    // compiler should support good ADL implementation
-    // but it is rather for all hpx serialization library
+    // allow our array to be serialized as prvalue compiler should support good
+    // ADL implementation but it is rather for all hpx serialization library
     template <typename T>
     HPX_FORCEINLINE output_archive& operator<<(output_archive& ar, array<T> t)
     {

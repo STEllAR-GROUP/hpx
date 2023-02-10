@@ -22,11 +22,11 @@ namespace hpx::serialization::detail {
     {
         // this is intentionally left unimplemented, will lead to linker errors
         // if used with unknown data type
-        static extra_archive_data_id_type id() noexcept;
+        static extra_archive_data_id_type id() noexcept = delete;
 
         // this is a function that should be implemented in order to reset the
         // extra archive data item
-        static void reset(T* data) noexcept;
+        static void reset(T* data) noexcept = delete;
     };
 
     template <typename T>
@@ -48,24 +48,22 @@ namespace hpx::serialization::detail {
 
     struct extra_archive_data_node
     {
-        constexpr extra_archive_data_node() noexcept
-          : ptr_()
-          , id_(nullptr)
-        {
-        }
+        constexpr extra_archive_data_node() noexcept = default;
 
         template <typename T>
         extra_archive_data_node(T* t, extra_archive_data_node&& next);
 
-        extra_archive_data_node(extra_archive_data_node&&) noexcept = default;
+        extra_archive_data_node(extra_archive_data_node const&) = delete;
+        extra_archive_data_node(extra_archive_data_node&&) = default;
         extra_archive_data_node& operator=(
-            extra_archive_data_node&&) noexcept = default;
+            extra_archive_data_node const&) = delete;
+        extra_archive_data_node& operator=(extra_archive_data_node&&) = default;
 
         template <typename T>
-        inline T* get() const noexcept;
+        [[nodiscard]] T* get() const noexcept;
 
         std::unique_ptr<extra_archive_data_member_base> ptr_;
-        extra_archive_data_id_type id_;
+        extra_archive_data_id_type id_ = nullptr;
     };
 
     struct extra_archive_data_member_base
@@ -95,7 +93,7 @@ namespace hpx::serialization::detail {
         extra_archive_data_member& operator=(
             extra_archive_data_member const&) = delete;
 
-        constexpr T* value() const noexcept
+        [[nodiscard]] constexpr T* value() const noexcept
         {
             return std::addressof(const_cast<T&>(t_));
         }
@@ -141,7 +139,7 @@ namespace hpx::serialization::detail {
         extra_archive_data() noexcept = default;
 
         template <typename T>
-        T& get()
+        [[nodiscard]] T& get()
         {
             if (T* t = try_get<T>())
             {
@@ -154,13 +152,13 @@ namespace hpx::serialization::detail {
         }
 
         template <typename T>
-        T* try_get() const noexcept
+        [[nodiscard]] T* try_get() const noexcept
         {
             return head_.get<T>();
         }
 
         // reset all extra archive data
-        void reset()
+        void reset() const
         {
             auto* ptr = head_.ptr_.get();
             while (ptr != nullptr)

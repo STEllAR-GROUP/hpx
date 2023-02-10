@@ -42,14 +42,14 @@ namespace hpx::traits {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename T, std::size_t... I>
-        inline constexpr auto is_brace_constructible(std::index_sequence<I...>,
+        constexpr auto is_brace_constructible(std::index_sequence<I...>,
             T*) noexcept -> decltype(T{_wildcard<I>...}, std::true_type{})
         {
             return {};
         }
 
         template <std::size_t... I>
-        inline constexpr std::false_type is_brace_constructible(
+        constexpr std::false_type is_brace_constructible(
             std::index_sequence<I...>, ...) noexcept
         {
             return {};

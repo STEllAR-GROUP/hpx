@@ -1,13 +1,12 @@
-//
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2022 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
-//
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -22,11 +21,12 @@ namespace hpx::util {
 
     namespace stack_trace {
 
-        HPX_CORE_EXPORT std::size_t trace(void** addresses, std::size_t size);
+        [[nodiscard]] HPX_CORE_EXPORT std::size_t trace(
+            void** addresses, std::size_t size);
         HPX_CORE_EXPORT void write_symbols(
             void* const* addresses, std::size_t size, std::ostream&);
-        HPX_CORE_EXPORT std::string get_symbol(void* address);
-        HPX_CORE_EXPORT std::string get_symbols(
+        [[nodiscard]] HPX_CORE_EXPORT std::string get_symbol(void* address);
+        [[nodiscard]] HPX_CORE_EXPORT std::string get_symbols(
             void* const* address, std::size_t size);
     }    // namespace stack_trace
 
@@ -40,19 +40,26 @@ namespace hpx::util {
                 return;
             frames_no += 2;    // we omit two frames from printing
             frames_.resize(frames_no, nullptr);
-            std::size_t size = stack_trace::trace(&frames_.front(), frames_no);
+
+            std::size_t const size =
+                stack_trace::trace(&frames_.front(), frames_no);
             if (size != 0)
                 frames_.resize(size);
         }
 
+        backtrace(backtrace const&) = default;
+        backtrace(backtrace&&) = default;
+        backtrace& operator=(backtrace const&) = default;
+        backtrace& operator=(backtrace&&) = default;
+
         virtual ~backtrace() = default;
 
-        std::size_t stack_size() const noexcept
+        [[nodiscard]] std::size_t stack_size() const noexcept
         {
             return frames_.size();
         }
 
-        void* return_address(std::size_t frame_no) const noexcept
+        [[nodiscard]] void* return_address(std::size_t frame_no) const noexcept
         {
             if (frame_no < stack_size())
                 return frames_[frame_no];
@@ -65,17 +72,17 @@ namespace hpx::util {
                 stack_trace::write_symbols(&frames_[frame_no], 1, out);
         }
 
-        std::string trace_line(std::size_t frame_no) const
+        [[nodiscard]] std::string trace_line(std::size_t frame_no) const
         {
             if (frame_no < frames_.size())
                 return stack_trace::get_symbol(frames_[frame_no]);
-            return std::string();
+            return {};
         }
 
-        std::string trace() const
+        [[nodiscard]] std::string trace() const
         {
             if (frames_.empty())
-                return std::string();
+                return {};
             return stack_trace::get_symbols(&frames_.front(), frames_.size());
         }
 
@@ -118,13 +125,13 @@ namespace hpx::util {
     }    // namespace details
 
     template <typename E>
-    inline details::trace_manip trace(E const& e)
+    [[nodiscard]] details::trace_manip trace(E const& e)
     {
-        backtrace const* tr = dynamic_cast<backtrace const*>(&e);
+        auto const* tr = dynamic_cast<backtrace const*>(&e);
         return details::trace_manip(tr);
     }
 
-    inline std::string trace(
+    [[nodiscard]] inline std::string trace(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)    //-V659
     {
         return backtrace(frames_no).trace();

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,7 +12,6 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/errors/exception_info.hpp>
 #include <hpx/errors/exception_list.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 
 #if defined(HPX_WINDOWS)
@@ -22,8 +21,6 @@
 #endif
 
 #include <algorithm>
-#include <atomic>
-#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <memory>
@@ -31,9 +28,9 @@
 #include <string>
 #include <system_error>
 #include <utility>
-#include <vector>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Construct a hpx::exception from a \a hpx::error.
     ///
@@ -47,7 +44,7 @@ namespace hpx {
         if (e != hpx::error::success)
         {
             LERR_(error).format(    //-V1067
-                "created exception: {}", this->what());
+                "created exception: {}", this->exception::what());
         }
     }
 
@@ -55,7 +52,8 @@ namespace hpx {
     exception::exception(std::system_error const& e)
       : std::system_error(e)
     {
-        LERR_(error).format("created exception: {}", this->what());    //-V1067
+        LERR_(error).format(
+            "created exception: {}", this->exception::what());    //-V1067
     }
 
     /// Construct a hpx::exception from a boost#system#error_code (this is
@@ -63,7 +61,8 @@ namespace hpx {
     exception::exception(std::error_code const& e)
       : std::system_error(e)
     {
-        LERR_(error).format("created exception: {}", this->what());    //-V1067
+        LERR_(error).format(
+            "created exception: {}", this->exception::what());    //-V1067
     }
 
     /// Construct a hpx::exception from a \a hpx::error and an error message.
@@ -74,8 +73,8 @@ namespace hpx {
     ///               exception should encapsulate.
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
-    ///               default) or to the category \a hpx_category_rethrow
+    ///               \a hpx_category (if mode is \a throwmode::plain, this
+    ///               is the default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a throwmode::rethrow).
     exception::exception(hpx::error e, char const* msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
@@ -85,7 +84,7 @@ namespace hpx {
         if (e != hpx::error::success)
         {
             LERR_(error).format(    //-V1067
-                "created exception: {}", this->what());
+                "created exception: {}", this->exception::what());
         }
     }
 
@@ -97,8 +96,8 @@ namespace hpx {
     ///               exception should encapsulate.
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
-    ///               default) or to the category \a hpx_category_rethrow
+    ///               \a hpx_category (if mode is \a throwmode::plain, this is
+    ///               the default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a throwmode::rethrow).
     exception::exception(hpx::error e, std::string const& msg, throwmode mode)
       : std::system_error(make_system_error_code(e, mode), msg)
@@ -108,7 +107,7 @@ namespace hpx {
         if (e != hpx::error::success)
         {
             LERR_(error).format(    //-V1067
-                "created exception: {}", this->what());
+                "created exception: {}", this->exception::what());
         }
     }
 
@@ -117,10 +116,9 @@ namespace hpx {
     /// \throws nothing
     exception::~exception() = default;
 
-    /// The function \a get_error() returns the hpx::error code stored
-    /// in the referenced instance of a hpx::exception. It returns
-    /// the hpx::error code this exception instance was constructed
-    /// from.
+    /// The function \a get_error() returns the hpx::error code stored in the
+    /// referenced instance of a hpx::exception. It returns the hpx::error code
+    /// this exception instance was constructed from.
     ///
     /// \throws nothing
     error exception::get_error() const noexcept
@@ -133,13 +131,13 @@ namespace hpx {
     ///
     /// \param mode   The parameter \p mode specifies whether the returned
     ///               hpx::error_code belongs to the error category
-    ///               \a hpx_category (if mode is \a throwmode::plain, this is the
-    ///               default) or to the category \a hpx_category_rethrow
+    ///               \a hpx_category (if mode is \a throwmode::plain, this is
+    ///               the default) or to the category \a hpx_category_rethrow
     ///               (if mode is \a throwmode::rethrow).
     error_code exception::get_error_code(throwmode mode) const noexcept
     {
         (void) mode;
-        return error_code(this->std::system_error::code().value(), *this);
+        return {this->std::system_error::code().value(), *this};
     }
 
     static custom_exception_info_handler_type custom_exception_info_handler;
@@ -381,7 +379,7 @@ namespace hpx {
     {
         // Try a cast to std::exception - this should handle boost.system
         // error codes in addition to the standard library exceptions.
-        std::exception const* se = dynamic_cast<std::exception const*>(&xi);
+        auto const* se = dynamic_cast<std::exception const*>(&xi);
         return se ? se->what() : std::string("<unknown>");
     }
 
@@ -395,9 +393,9 @@ namespace hpx {
         {
             return "thread_interrupted";
         }
-        catch (std::exception const& e)
+        catch (std::exception const& ex)
         {
-            return get_error_what(e);
+            return get_error_what(ex);
         }
         catch (...)
         {

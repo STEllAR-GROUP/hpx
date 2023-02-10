@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //  Copyright (c) 2014      Anuj R. Sharma
 //
@@ -13,7 +13,6 @@
 #include <hpx/config.hpp>
 
 #include <cstdint>
-#include <string>
 #include <system_error>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -329,83 +328,22 @@ namespace hpx {
 
 #undef HPX_ERROR_UNSCOPED_ENUM_DEPRECATION_MSG
 
-    /// \cond NOINTERNAL
-    char const* const error_names[] = {
-        /*  0 */ "success",
-        /*  1 */ "no_success",
-        /*  2 */ "not_implemented",
-        /*  3 */ "out_of_memory",
-        /*  4 */ "bad_action_code",
-        /*  5 */ "bad_component_type",
-        /*  6 */ "network_error",
-        /*  7 */ "version_too_new",
-        /*  8 */ "version_too_old",
-        /*  9 */ "version_unknown",
-        /* 10 */ "unknown_component_address",
-        /* 11 */ "duplicate_component_address",
-        /* 12 */ "invalid_status",
-        /* 13 */ "bad_parameter",
-        /* 14 */ "internal_server_error",
-        /* 15 */ "service_unavailable",
-        /* 16 */ "bad_request",
-        /* 17 */ "repeated_request",
-        /* 18 */ "lock_error",
-        /* 19 */ "duplicate_console",
-        /* 20 */ "no_registered_console",
-        /* 21 */ "startup_timed_out",
-        /* 22 */ "uninitialized_value",
-        /* 23 */ "bad_response_type",
-        /* 24 */ "deadlock",
-        /* 25 */ "assertion_failure",
-        /* 26 */ "null_thread_id",
-        /* 27 */ "invalid_data",
-        /* 28 */ "yield_aborted",
-        /* 29 */ "dynamic_link_failure",
-        /* 30 */ "commandline_option_error",
-        /* 31 */ "serialization_error",
-        /* 32 */ "unhandled_exception",
-        /* 33 */ "kernel_error",
-        /* 34 */ "broken_task",
-        /* 35 */ "task_moved",
-        /* 36 */ "task_already_started",
-        /* 37 */ "future_already_retrieved",
-        /* 38 */ "promise_already_satisfied",
-        /* 39 */ "future_does_not_support_cancellation",
-        /* 40 */ "future_can_not_be_cancelled",
-        /* 41 */ "no_state",
-        /* 42 */ "broken_promise",
-        /* 43 */ "thread_resource_error",
-        /* 44 */ "future_cancelled",
-        /* 45 */ "thread_cancelled",
-        /* 46 */ "thread_not_interruptable",
-        /* 47 */ "duplicate_component_id",
-        /* 48 */ "unknown_error",
-        /* 49 */ "bad_plugin_type",
-        /* 50 */ "filesystem_error",
-        /* 51 */ "bad_function_call",
-        /* 52 */ "task_canceled_exception",
-        /* 53 */ "task_block_not_active",
-        /* 54 */ "out_of_range",
-        /* 55 */ "length_error",
-        /* 56 */ "migration_needs_retry",
-
-        /*    */ ""};
-    /// \endcond
 }    // namespace hpx
 
 /// \cond NOEXTERNAL
 namespace std {
+
     // make sure our errors get recognized by the Boost.System library
     template <>
     struct is_error_code_enum<hpx::error>
     {
-        static const bool value = true;
+        static constexpr bool value = true;
     };
 
     template <>
     struct is_error_condition_enum<hpx::error>
     {
-        static const bool value = true;
+        static constexpr bool value = true;
     };
 }    // namespace std
 /// \endcond

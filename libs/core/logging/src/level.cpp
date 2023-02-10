@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util::logging {
 
-    static std::string levelname(level value)
+    [[nodiscard]] static std::string levelname(level value)
     {
         switch (value)
         {

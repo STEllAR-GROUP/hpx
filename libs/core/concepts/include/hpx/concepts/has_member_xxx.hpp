@@ -13,10 +13,10 @@
 
 #include <type_traits>
 
-/// This macro creates a boolean unary meta-function which result is
-/// true if and only if its parameter type has member function with
-/// MEMBER name (no matter static it is or not). The generated trait
-/// ends up in a namespace where the macro itself has been placed.
+/// This macro creates a boolean unary meta-function which result is true if and
+/// only if its parameter type has member function with MEMBER name (no matter
+/// static it is or not). The generated trait ends up in a namespace where the
+/// macro itself has been placed.
 #define HPX_HAS_MEMBER_XXX_TRAIT_DEF(MEMBER)                                   \
     namespace HPX_PP_CAT(HPX_PP_CAT(has_, MEMBER), _detail)                    \
     {                                                                          \

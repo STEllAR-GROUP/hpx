@@ -15,8 +15,6 @@
 #include <hpx/errors/exception_fwd.hpp>
 #include <hpx/errors/exception_info.hpp>
 
-#include <cstddef>
-#include <cstdint>
 #include <exception>
 #include <functional>
 #include <string>
@@ -36,7 +34,7 @@ namespace hpx {
     /// are either of this type or of a type derived from it. This implies that
     /// it is always safe to use this type only in catch statements guarding
     /// HPX library calls.
-    class HPX_CORE_EXPORT exception : public std::system_error
+    class exception : public std::system_error
     {
     public:
         /// Construct a hpx::exception from a \a hpx::error.
@@ -84,7 +82,7 @@ namespace hpx {
         /// Destruct a hpx::exception
         ///
         /// \throws nothing
-        ~exception();
+        ~exception() override;
 
         /// The function \a get_error() returns the hpx::error code stored
         /// in the referenced instance of a hpx::exception. It returns
@@ -92,7 +90,7 @@ namespace hpx {
         /// from.
         ///
         /// \throws nothing
-        error get_error() const noexcept;
+        [[nodiscard]] error get_error() const noexcept;
 
         /// The function \a get_error_code() returns a hpx::error_code which
         /// represents the same error condition as this hpx::exception instance.
@@ -102,7 +100,7 @@ namespace hpx {
         ///               \a hpx_category (if mode is \a throwmode::plain, this is the
         ///               default) or to the category \a hpx_category_rethrow
         ///               (if mode is \a rethrow).
-        error_code get_error_code(
+        [[nodiscard]] error_code get_error_code(
             throwmode mode = throwmode::plain) const noexcept;
     };
 
@@ -184,12 +182,13 @@ namespace hpx {
     ///
     /// At any point, the interruption state for the current thread can be
     /// queried by calling \a hpx::this_thread::interruption_enabled().
-    struct HPX_CORE_EXPORT thread_interrupted : std::exception
+    struct thread_interrupted : std::exception
     {
     };
 
     /// \cond NODETAIL
     namespace detail {
+
         // Stores the information about the function name the exception has been
         // raised in. This information will show up in error messages under the
         // [function] tag.
@@ -205,109 +204,99 @@ namespace hpx {
         // under the [line] tag.
         HPX_DEFINE_ERROR_INFO(throw_line, long);    //-V835
 
-        struct HPX_CORE_EXPORT std_exception : std::exception
+        struct HPX_ALWAYS_EXPORT std_exception : std::exception
         {
         private:
             std::string what_;
 
         public:
-            explicit std_exception(std::string const& w)
-              : what_(w)
+            explicit std_exception(std::string w)
+              : what_(HPX_MOVE(w))
             {
             }
 
-            ~std_exception() = default;
-
-            char const* what() const noexcept override
+            [[nodiscard]] char const* what() const noexcept override
             {
                 return what_.c_str();
             }
         };
 
-        struct HPX_CORE_EXPORT bad_alloc : std::bad_alloc
+        struct HPX_ALWAYS_EXPORT bad_alloc : std::bad_alloc
         {
         private:
             std::string what_;
 
         public:
-            explicit bad_alloc(std::string const& w)
-              : what_(w)
+            explicit bad_alloc(std::string w)
+              : what_(HPX_MOVE(w))
             {
             }
 
-            ~bad_alloc() = default;
-
-            char const* what() const noexcept override
+            [[nodiscard]] char const* what() const noexcept override
             {
                 return what_.c_str();
             }
         };
 
-        struct HPX_CORE_EXPORT bad_exception : std::bad_exception
+        struct HPX_ALWAYS_EXPORT bad_exception : std::bad_exception
         {
         private:
             std::string what_;
 
         public:
-            explicit bad_exception(std::string const& w)
-              : what_(w)
+            explicit bad_exception(std::string w)
+              : what_(HPX_MOVE(w))
             {
             }
 
-            ~bad_exception() = default;
-
-            char const* what() const noexcept override
+            [[nodiscard]] char const* what() const noexcept override
             {
                 return what_.c_str();
             }
         };
 
-        struct HPX_CORE_EXPORT bad_cast : std::bad_cast
+        struct HPX_ALWAYS_EXPORT bad_cast : std::bad_cast
         {
         private:
             std::string what_;
 
         public:
-            explicit bad_cast(std::string const& w)
-              : what_(w)
+            explicit bad_cast(std::string w)
+              : what_(HPX_MOVE(w))
             {
             }
 
-            ~bad_cast() = default;
-
-            char const* what() const noexcept override
+            [[nodiscard]] char const* what() const noexcept override
             {
                 return what_.c_str();
             }
         };
 
-        struct HPX_CORE_EXPORT bad_typeid : std::bad_typeid
+        struct HPX_ALWAYS_EXPORT bad_typeid : std::bad_typeid
         {
         private:
             std::string what_;
 
         public:
-            explicit bad_typeid(std::string const& w)
-              : what_(w)
+            explicit bad_typeid(std::string w)
+              : what_(HPX_MOVE(w))
             {
             }
 
-            ~bad_typeid() = default;
-
-            char const* what() const noexcept override
+            [[nodiscard]] char const* what() const noexcept override
             {
                 return what_.c_str();
             }
         };
 
         template <typename Exception>
-        HPX_CORE_EXPORT std::exception_ptr get_exception(
+        [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr get_exception(
             hpx::exception const& e, std::string const& func,
             std::string const& file, long line, std::string const& auxinfo);
 
         template <typename Exception>
-        HPX_CORE_EXPORT std::exception_ptr construct_lightweight_exception(
-            Exception const& e);
+        [[nodiscard]] HPX_CORE_EXPORT std::exception_ptr
+        construct_lightweight_exception(Exception const& e);
     }    // namespace detail
     /// \endcond
 
@@ -342,20 +331,22 @@ namespace hpx {
     ///             \a hpx::get_error_backtrace(), \a hpx::get_error_env(),
     ///             \a hpx::get_error_config(), \a hpx::get_error_state()
     ///
-    HPX_CORE_EXPORT std::string get_error_what(exception_info const& xi);
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_error_what(
+        exception_info const& xi);
 
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT std::string get_error_what(std::exception_ptr const& e);
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_error_what(
+        std::exception_ptr const& e);
 
     template <typename E>
-    std::string get_error_what(E const& e)
+    [[nodiscard]] std::string get_error_what(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_what(*xi) : std::string("<unknown>");
         });
     }
 
-    inline std::string get_error_what(hpx::error_code const& e)
+    [[nodiscard]] inline std::string get_error_what(hpx::error_code const& e)
     {
         // if this is a lightweight error_code, return canned response
         if (e.category() == hpx::get_lightweight_hpx_category())
@@ -364,7 +355,7 @@ namespace hpx {
         return get_error_what<hpx::error_code>(e);
     }
 
-    inline std::string get_error_what(std::exception const& e)
+    [[nodiscard]] inline std::string get_error_what(std::exception const& e)
     {
         return e.what();
     }
@@ -398,13 +389,13 @@ namespace hpx {
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_CORE_EXPORT error get_error(hpx::exception const& e);
+    [[nodiscard]] HPX_CORE_EXPORT error get_error(hpx::exception const& e);
 
     /// \copydoc get_error(hpx::exception const& e)
-    HPX_CORE_EXPORT error get_error(hpx::error_code const& e);
+    [[nodiscard]] HPX_CORE_EXPORT error get_error(hpx::error_code const& e);
 
     /// \cond NOINTERNAL
-    HPX_CORE_EXPORT error get_error(std::exception_ptr const& e);
+    [[nodiscard]] HPX_CORE_EXPORT error get_error(std::exception_ptr const& e);
     /// \endcond
 
     /// \brief Return the function name from which the exception was thrown.
@@ -435,12 +426,12 @@ namespace hpx {
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_CORE_EXPORT std::string get_error_function_name(
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_error_function_name(
         hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::string get_error_function_name(E const& e)
+    [[nodiscard]] std::string get_error_function_name(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_function_name(*xi) : std::string("<unknown>");
@@ -478,12 +469,12 @@ namespace hpx {
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_CORE_EXPORT std::string get_error_file_name(
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_error_file_name(
         hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::string get_error_file_name(E const& e)
+    [[nodiscard]] std::string get_error_file_name(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_file_name(*xi) : std::string("<unknown>");
@@ -520,11 +511,12 @@ namespace hpx {
     ///             \a hpx::get_error_what(), \a hpx::get_error_config(),
     ///             \a hpx::get_error_state()
     ///
-    HPX_CORE_EXPORT long get_error_line_number(hpx::exception_info const& xi);
+    [[nodiscard]] HPX_CORE_EXPORT long get_error_line_number(
+        hpx::exception_info const& xi);
 
     /// \cond NOINTERNAL
     template <typename E>
-    long get_error_line_number(E const& e)
+    [[nodiscard]] long get_error_line_number(E const& e)
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_line_number(*xi) : -1;

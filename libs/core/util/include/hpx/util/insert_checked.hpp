@@ -22,25 +22,25 @@ namespace hpx::util {
     ///
     /// \returns  This function returns \b r.second.
     template <typename Iterator>
-    inline constexpr bool insert_checked(
-        std::pair<Iterator, bool> const& r) noexcept
+    constexpr bool insert_checked(std::pair<Iterator, bool> const& r) noexcept
     {
         return r.second;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief  Helper function for writing predicates that test whether an std::map
-    ///         insertion succeeded. This inline template function negates the need
-    ///         to explicitly write the sometimes lengthy std::pair<Iterator, bool>
-    ///         type.
+    /// Helper function for writing predicates that test whether an std::map
+    /// insertion succeeded. This inline template function negates the need to
+    /// explicitly write the sometimes lengthy std::pair<Iterator, bool> type.
     ///
     /// \param r  [in] The return value of a std::map insert operation.
     ///
     /// \param r  [out] A reference to an Iterator, which is set to \b r.first.
+    /// \param it [out] on exit, will hold the iterator referring to the
+    ///        inserted element
     ///
     /// \returns  This function returns \b r.second.
     template <typename Iterator>
-    inline bool insert_checked(std::pair<Iterator, bool> const& r, Iterator& it)
+    bool insert_checked(std::pair<Iterator, bool> const& r, Iterator& it)
     {
         it = r.first;
         return r.second;

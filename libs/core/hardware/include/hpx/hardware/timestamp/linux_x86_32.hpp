@@ -19,7 +19,7 @@
 namespace hpx::util::hardware {
 
     // clang-format off
-    HPX_HOST_DEVICE inline std::uint64_t timestamp()
+    [[nodiscard]] HPX_HOST_DEVICE inline std::uint64_t timestamp()
     {
 #if defined(HPX_HAVE_CUDA) && defined(HPX_COMPUTE_DEVICE_CODE)
         return timestamp_cuda();

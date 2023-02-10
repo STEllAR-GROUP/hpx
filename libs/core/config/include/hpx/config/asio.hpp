@@ -7,5 +7,8 @@
 #pragma once
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+// On Windows, make sure winsock.h is not included even if windows.h is included
+// before winsock2.h
+#define _WINSOCKAPI_
 #include <winsock2.h>
 #endif

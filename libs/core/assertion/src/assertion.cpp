@@ -4,15 +4,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
 #include <iostream>
 #include <string>
 
-namespace hpx { namespace assertion {
+namespace hpx::assertion {
+
     namespace detail {
-        assertion_handler& get_handler()
+
+        [[nodiscard]] assertion_handler& get_handler()
         {
             static assertion_handler handler = nullptr;
             return handler;
@@ -28,7 +29,8 @@ namespace hpx { namespace assertion {
     }
 
     namespace detail {
-        void handle_assert(hpx::source_location const& loc, const char* expr,
+
+        void handle_assert(hpx::source_location const& loc, char const* expr,
             std::string const& msg) noexcept
         {
             if (get_handler() == nullptr)
@@ -47,4 +49,4 @@ namespace hpx { namespace assertion {
             get_handler()(loc, expr, msg);
         }
     }    // namespace detail
-}}       // namespace hpx::assertion
+}    // namespace hpx::assertion

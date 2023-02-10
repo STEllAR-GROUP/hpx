@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //  Copyright (c)      2015 Anton Bikineev
 //
@@ -34,24 +34,25 @@ namespace hpx::serialization {
             {
             }
 
-            static constexpr std::size_t get_chunk_size() noexcept
+            [[nodiscard]] static constexpr std::size_t get_chunk_size() noexcept
             {
                 return 0;
             }
 
             static constexpr void set_chunk_size(std::size_t) noexcept {}
 
-            static constexpr chunk_type get_chunk_type() noexcept
+            [[nodiscard]] static constexpr chunk_type get_chunk_type() noexcept
             {
                 return chunk_type::chunk_type_index;
             }
 
-            static constexpr std::size_t get_chunk_data_index() noexcept
+            [[nodiscard]] static constexpr std::size_t
+            get_chunk_data_index() noexcept
             {
                 return 0;
             }
 
-            static constexpr std::size_t get_num_chunks() noexcept
+            [[nodiscard]] static constexpr std::size_t get_num_chunks() noexcept
             {
                 return 1;
             }
@@ -72,37 +73,37 @@ namespace hpx::serialization {
             {
             }
 
-            std::size_t get_chunk_size() const noexcept
+            [[nodiscard]] std::size_t get_chunk_size() const noexcept
             {
                 return chunks_->back().size_;
             }
 
-            void set_chunk_size(std::size_t size) noexcept
+            void set_chunk_size(std::size_t size) const noexcept
             {
                 chunks_->back().size_ = size;
             }
 
-            chunk_type get_chunk_type() const noexcept
+            [[nodiscard]] chunk_type get_chunk_type() const noexcept
             {
                 return chunks_->back().type_;
             }
 
-            std::size_t get_chunk_data_index() const noexcept
+            [[nodiscard]] std::size_t get_chunk_data_index() const noexcept
             {
                 return chunks_->back().data_.index_;
             }
 
-            std::size_t get_num_chunks() const noexcept
+            [[nodiscard]] std::size_t get_num_chunks() const noexcept
             {
                 return chunks_->size();
             }
 
-            void push_back(serialization_chunk&& chunk)
+            void push_back(serialization_chunk&& chunk) const
             {
                 chunks_->push_back(HPX_MOVE(chunk));
             }
 
-            void reset()
+            void reset() const
             {
                 chunks_->clear();
                 chunks_->push_back(create_index_chunk(0, 0));
@@ -120,7 +121,7 @@ namespace hpx::serialization {
             {
             }
 
-            constexpr std::size_t get_chunk_size() const noexcept
+            [[nodiscard]] constexpr std::size_t get_chunk_size() const noexcept
             {
                 return chunk_.size_;
             }
@@ -130,17 +131,18 @@ namespace hpx::serialization {
                 chunk_.size_ = size;
             }
 
-            constexpr chunk_type get_chunk_type() const noexcept
+            [[nodiscard]] constexpr chunk_type get_chunk_type() const noexcept
             {
                 return chunk_.type_;
             }
 
-            constexpr std::size_t get_chunk_data_index() const noexcept
+            [[nodiscard]] constexpr std::size_t get_chunk_data_index()
+                const noexcept
             {
                 return chunk_.data_.index_;
             }
 
-            constexpr std::size_t get_num_chunks() const noexcept
+            [[nodiscard]] constexpr std::size_t get_num_chunks() const noexcept
             {
                 return num_chunks_;
             }
@@ -185,8 +187,6 @@ namespace hpx::serialization {
             chunker_.reset();
         }
 
-        ~output_container() = default;
-
         void flush() override
         {
             HPX_ASSERT(
@@ -203,7 +203,7 @@ namespace hpx::serialization {
             }
         }
 
-        std::size_t get_num_chunks() const noexcept override
+        [[nodiscard]] std::size_t get_num_chunks() const noexcept override
         {
             return chunker_.get_num_chunks();
         }
@@ -279,7 +279,7 @@ namespace hpx::serialization {
             }
         }
 
-        bool is_preprocessing() const noexcept override
+        [[nodiscard]] bool is_preprocessing() const noexcept override
         {
             return access_traits::is_preprocessing();
         }
@@ -307,8 +307,6 @@ namespace hpx::serialization {
         {
         }
 
-        ~filtered_output_container() = default;
-
         void flush() override
         {
             std::size_t written = 0;
@@ -320,7 +318,7 @@ namespace hpx::serialization {
 
             do
             {
-                bool flushed = access_traits::flush(filter_, this->cont_,
+                bool const flushed = access_traits::flush(filter_, this->cont_,
                     this->current_,
                     access_traits::size(this->cont_) - this->current_, written);
 
@@ -329,7 +327,7 @@ namespace hpx::serialization {
                     break;
 
                 // resize container
-                std::size_t size = access_traits::size(this->cont_);
+                std::size_t const size = access_traits::size(this->cont_);
                 access_traits::resize(this->cont_, 2 * size);
 
             } while (true);

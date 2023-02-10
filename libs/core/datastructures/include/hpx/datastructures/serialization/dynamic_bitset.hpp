@@ -6,15 +6,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/serialization.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <vector>
 
 namespace hpx::detail {
 

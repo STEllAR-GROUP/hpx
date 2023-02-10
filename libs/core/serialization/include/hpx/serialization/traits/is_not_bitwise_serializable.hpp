@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/access.hpp>
 
 #include <type_traits>

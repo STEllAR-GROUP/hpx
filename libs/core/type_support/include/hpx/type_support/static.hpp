@@ -39,6 +39,8 @@ namespace hpx::util {
     public:
         HPX_NON_COPYABLE(static_);
 
+        ~static_() = default;
+
     public:
         using value_type = T;
         using reference = T&;
@@ -59,12 +61,12 @@ namespace hpx::util {
             return get();
         }
 
-        reference get()
+        [[nodiscard]] reference get()
         {
             return get_reference();
         }
 
-        const_reference get() const
+        [[nodiscard]] const_reference get() const
         {
             return get_reference();
         }
@@ -95,6 +97,8 @@ namespace hpx::util {
     {
     public:
         HPX_NON_COPYABLE(static_);
+
+        ~static_() = default;
 
     public:
         using value_type = T;
@@ -136,12 +140,12 @@ namespace hpx::util {
             return this->get();
         }
 
-        reference get() noexcept
+        [[nodiscard]] reference get() noexcept
         {
             return *this->get_address();
         }
 
-        const_reference get() const noexcept
+        [[nodiscard]] const_reference get() const noexcept
         {
             return *this->get_address();
         }
@@ -149,7 +153,7 @@ namespace hpx::util {
     private:
         using pointer = std::add_pointer_t<value_type>;
 
-        static pointer get_address() noexcept
+        [[nodiscard]] static pointer get_address() noexcept
         {
             return reinterpret_cast<pointer>(data_);
         }

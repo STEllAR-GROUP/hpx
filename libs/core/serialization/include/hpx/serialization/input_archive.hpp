@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,6 @@
 #include <cstdint>
 #include <memory>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -51,7 +50,7 @@ namespace hpx::serialization {
             load(endianness);
             if (endianness)
             {
-                flags_ = std::uint32_t(
+                flags_ = static_cast<std::uint32_t>(
                     hpx::serialization::archive_flags::endian_big);
             }
 
@@ -82,9 +81,9 @@ namespace hpx::serialization {
             bool has_filter = false;
             load(has_filter);
 
-            serialization::binary_filter* filter = nullptr;
             if (has_filter && enable_compression())
             {
+                serialization::binary_filter* filter = nullptr;
                 *this >> detail::raw_ptr(filter);
                 buffer_->set_filter(filter);
             }
@@ -228,13 +227,13 @@ namespace hpx::serialization {
         }
 #endif
 
-        constexpr std::size_t bytes_read() const noexcept
+        [[nodiscard]] constexpr std::size_t bytes_read() const noexcept
         {
             return current_pos();
         }
 
         // this function is needed to avoid a MSVC linker error
-        constexpr std::size_t current_pos() const noexcept
+        [[nodiscard]] constexpr std::size_t current_pos() const noexcept
         {
             return base_type::current_pos();
         }

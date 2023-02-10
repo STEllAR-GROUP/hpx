@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Agustin Berge
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -47,22 +47,22 @@ namespace hpx::util {
         {
         }
 
-        HPX_HOST_DEVICE constexpr Iterator begin() const
+        [[nodiscard]] HPX_HOST_DEVICE constexpr Iterator begin() const
         {
             return _iterator;
         }
 
-        HPX_HOST_DEVICE constexpr Iterator end() const
+        [[nodiscard]] HPX_HOST_DEVICE constexpr Iterator end() const
         {
             return _sentinel;
         }
 
-        HPX_HOST_DEVICE constexpr std::ptrdiff_t size() const
+        [[nodiscard]] HPX_HOST_DEVICE constexpr std::ptrdiff_t size() const
         {
             return std::distance(_iterator, _sentinel);
         }
 
-        HPX_HOST_DEVICE constexpr bool empty() const
+        [[nodiscard]] HPX_HOST_DEVICE constexpr bool empty() const
         {
             return _iterator == _sentinel;
         }
@@ -118,7 +118,9 @@ namespace hpx::util {
     }
 }    // namespace hpx::util
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     template <typename I, typename S = I>
     using subrange_t = hpx::util::iterator_range<I, S>;
-}}    // namespace hpx::ranges
+}
+// namespace hpx::ranges

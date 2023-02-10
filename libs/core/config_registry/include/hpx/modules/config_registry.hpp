@@ -30,19 +30,20 @@
 #endif
 
 namespace hpx::config_registry {
+
     struct module_config
     {
         std::string module_name;
         std::vector<std::string> config_entries;
     };
 
-    HPX_CONFIG_REGISTRY_EXPORT std::vector<module_config> const&
+    [[nodiscard]] HPX_CONFIG_REGISTRY_EXPORT std::vector<module_config> const&
     get_module_configs();
     HPX_CONFIG_REGISTRY_EXPORT void add_module_config(
         module_config const& config);
 
     struct HPX_CONFIG_REGISTRY_EXPORT add_module_config_helper
     {
-        add_module_config_helper(module_config const& config);
+        explicit add_module_config_helper(module_config const& config);
     };
 }    // namespace hpx::config_registry

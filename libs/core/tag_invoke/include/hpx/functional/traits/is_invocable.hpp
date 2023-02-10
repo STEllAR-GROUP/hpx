@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -57,28 +57,33 @@ namespace hpx {
         // clang-format on
     }    // namespace detail
 
-    /// \brief Determines whether \a F can be invoked with the arguments \a Ts....
-    ///        Formally, determines whether
-    ///        \code INVOKE(std::declval<F>(), std::declval<Ts>()...) \endcode
-    ///        is well formed when treated as an unevaluated operand, where \a INVOKE
-    ///        is the operation defined in \a Callable.
-    /// \details F, R and all types in the parameter pack Ts shall each be a complete
-    ///          type, (possibly cv-qualified) void, or an array of unknown bound.
-    ///          Otherwise, the behavior is undefined.
-    ///          If an instantiation of a template above depends, directly or indirectly,
-    ///          on an incomplete type, and that instantiation could yield a different
-    ///          result if that type were hypothetically completed, the behavior is
-    ///          undefined.
+    /// Determines whether \a F can be invoked with the arguments \a Ts....
+    /// Formally, determines whether
+    /// \code
+    ///     INVOKE(std::declval<F>(), std::declval<Ts>()...)
+    /// \endcode
+    /// is well formed when treated as an unevaluated operand, where \a INVOKE
+    /// is the operation defined in \a Callable.
+    ///
+    /// \details F, R and all types in the parameter pack Ts shall each be a
+    ///          complete type, (possibly cv-qualified) void, or an array of
+    ///          unknown bound. Otherwise, the behavior is undefined. If an
+    ///          instantiation of a template above depends, directly or
+    ///          indirectly, on an incomplete type, and that instantiation could
+    ///          yield a different result if that type were hypothetically
+    ///          completed, the behavior is undefined.
     template <typename F, typename... Ts>
     struct is_invocable : hpx::detail::is_invocable_impl<F && (Ts && ...)>
     {
     };
 
-    /// Determines whether \a F can be invoked with the arguments \a Ts...
-    /// to yield a result that is convertible to \a R and the implicit conversion
-    /// does not bind a reference to a temporary object (since C++23). If \a R is
-    /// \a cv void, the result can be any type. Formally, determines whether
-    /// \code INVOKE<R>(std::declval<F>(), std::declval<Ts>()...) \endcode
+    /// Determines whether \a F can be invoked with the arguments \a Ts... to
+    /// yield a result that is convertible to \a R and the implicit conversion
+    /// does not bind a reference to a temporary object (since C++23). If \a R
+    /// is \a cv void, the result can be any type. Formally, determines whether
+    /// \code
+    ///     INVOKE<R>(std::declval<F>(), std::declval<Ts>()...)
+    /// \endcode
     /// is well formed when treated as an unevaluated operand, where \a INVOKE
     /// is the operation defined in \a Callable.
     /// \copydetails is_invocable

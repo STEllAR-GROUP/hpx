@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2022 Hartmut Kaiser
+    Copyright (c) 2007-2023 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -48,29 +48,37 @@ namespace hpx::util::detail::any {
     template <typename IArch, typename OArch, typename Char>
     struct fxn_ptr_table<IArch, OArch, Char, std::true_type>
     {
+        fxn_ptr_table() = default;
+
         virtual ~fxn_ptr_table() = default;
         virtual fxn_ptr_table* get_ptr() = 0;
 
-        std::type_info const& (*get_type)();
-        void (*static_delete)(void**);
-        void (*destruct)(void**);
-        void (*clone)(void* const*, void**);
-        void (*copy)(void* const*, void**);
-        bool (*equal_to)(void* const*, void* const*);
+        fxn_ptr_table(fxn_ptr_table const&) = delete;
+        fxn_ptr_table(fxn_ptr_table&&) = delete;
+
+        fxn_ptr_table& operator=(fxn_ptr_table const&) = delete;
+        fxn_ptr_table& operator=(fxn_ptr_table&&) = delete;
+
+        std::type_info const& (*get_type)() = nullptr;
+        void (*static_delete)(void**) = nullptr;
+        void (*destruct)(void**) = nullptr;
+        void (*clone)(void* const*, void**) = nullptr;
+        void (*copy)(void* const*, void**) = nullptr;
+        bool (*equal_to)(void* const*, void* const*) = nullptr;
         std::basic_istream<Char>& (*stream_in)(
-            std::basic_istream<Char>&, void**);
+            std::basic_istream<Char>&, void**) = nullptr;
         std::basic_ostream<Char>& (*stream_out)(
-            std::basic_ostream<Char>&, void* const*);
+            std::basic_ostream<Char>&, void* const*) = nullptr;
 
         virtual void save_object(void* const*, OArch& ar, unsigned) = 0;
         virtual void load_object(void**, IArch& ar, unsigned) = 0;
 
         template <typename Arch>
-        void serialize(Arch&, unsigned)
+        static void serialize(Arch&, unsigned) noexcept
         {
         }
 
-        HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(fxn_ptr_table);
+        HPX_SERIALIZATION_POLYMORPHIC_ABSTRACT(fxn_ptr_table)
     };
 
     ////////////////////////////////////////////////////////////////////////////
@@ -92,7 +100,7 @@ namespace hpx::util::detail::any {
             base_type::stream_out = Vtable::stream_out;
         }
 
-        virtual base_type* get_ptr() override
+        base_type* get_ptr() override
         {
             return Vtable::get_ptr();
         }
@@ -117,11 +125,11 @@ namespace hpx::util::detail::any {
             ar & hpx::serialization::base_object<base_type>(*this);
             // clang-format on
         }
-        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr, override);
+        HPX_SERIALIZATION_POLYMORPHIC_TEMPLATE(fxn_ptr, override)
     };
 }    // namespace hpx::util::detail::any
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ////////////////////////////////////////////////////////////////////////////
     template <typename IArch, typename OArch, typename Char>
@@ -130,17 +138,15 @@ namespace hpx { namespace util {
     public:
         // constructors
         constexpr basic_any() noexcept
-          : table(
-                detail::any::get_table<detail::any::empty>::template get<IArch,
-                    OArch, Char, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<IArch, OArch,
+                Char, std::true_type>())
           , object(nullptr)
         {
         }
 
         basic_any(basic_any const& x)
-          : table(
-                detail::any::get_table<detail::any::empty>::template get<IArch,
-                    OArch, Char, std::true_type>())
+          : table(detail::any::get_table<detail::any::empty>::get<IArch, OArch,
+                Char, std::true_type>())
           , object(nullptr)
         {
             assign(x);
@@ -151,9 +157,8 @@ namespace hpx { namespace util {
           : table(x.table)
           , object(x.object)
         {
-            x.table =
-                detail::any::get_table<detail::any::empty>::template get<IArch,
-                    OArch, Char, std::true_type>();
+            x.table = detail::any::get_table<detail::any::empty>::get<IArch,
+                OArch, Char, std::true_type>();
             x.object = nullptr;
         }
 
@@ -235,7 +240,7 @@ namespace hpx { namespace util {
         template <typename T, typename... Ts>
         static void new_object(void*& object, std::true_type, Ts&&... ts)
         {
-            using value_type = typename std::decay<T>::type;
+            using value_type = std::decay_t<T>;
             new (&object) value_type(HPX_FORWARD(Ts, ts)...);
         }
 
@@ -283,7 +288,7 @@ namespace hpx { namespace util {
             return *this;
         }
 
-        std::type_info const& type() const
+        [[nodiscard]] std::type_info const& type() const
         {
             return table->get_type();
         }
@@ -296,10 +301,10 @@ namespace hpx { namespace util {
 
             return detail::any::get_table<T>::is_small::value ?
                 *reinterpret_cast<T const*>(&object) :
-                *reinterpret_cast<T const*>(object);
+                *static_cast<T const*>(object);
         }
 
-        bool has_value() const noexcept
+        [[nodiscard]] bool has_value() const noexcept
         {
             return type() != typeid(detail::any::empty);
         }
@@ -309,9 +314,8 @@ namespace hpx { namespace util {
             if (has_value())
             {
                 table->static_delete(&object);
-                table =
-                    detail::any::get_table<detail::any::empty>::template get<
-                        IArch, OArch, Char, std::true_type>();
+                table = detail::any::get_table<detail::any::empty>::get<IArch,
+                    OArch, Char, std::true_type>();
                 object = nullptr;
             }
         }
@@ -335,7 +339,7 @@ namespace hpx { namespace util {
     private:
         friend class hpx::serialization::access;
 
-        void load(IArch& ar, const unsigned version)
+        void load(IArch& ar, unsigned const version)
         {
             bool is_empty;
             // clang-format off
@@ -348,8 +352,8 @@ namespace hpx { namespace util {
             }
             else
             {
-                typename detail::any::fxn_ptr_table<IArch, OArch, Char,
-                    std::true_type>* p = nullptr;
+                detail::any::fxn_ptr_table<IArch, OArch, Char, std::true_type>*
+                    p = nullptr;
                 ar >> hpx::serialization::detail::raw_ptr(p);
                 table = p->get_ptr();    // -V522
                 delete p;
@@ -357,7 +361,7 @@ namespace hpx { namespace util {
             }
         }
 
-        void save(OArch& ar, const unsigned version) const
+        void save(OArch& ar, unsigned const version) const
         {
             bool is_empty = !has_value();
             // clang-format off
@@ -371,7 +375,7 @@ namespace hpx { namespace util {
             }
         }
 
-        HPX_SERIALIZATION_SPLIT_MEMBER();
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
     private:    // types
         friend struct detail::any::any_cast_support;
@@ -411,16 +415,21 @@ namespace hpx { namespace util {
     struct hash_any
     {
         template <typename Char>
-        HPX_CORE_EXPORT std::size_t
-        operator()(const basic_any<serialization::input_archive,
-            serialization::output_archive, Char, std::true_type>& elem) const;
+        HPX_CORE_EXPORT std::size_t operator()(
+            basic_any<serialization::input_archive,
+                serialization::output_archive, Char, std::true_type> const&
+                elem) const;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
+// namespace hpx::util
 
 namespace hpx {
+
     /// Constructs an any object containing an object of type \a T, passing the
-    /// provided arguments to T's constructor. Equivalent to: \code
-    /// return std::any(std::in_place_type<T>, std::forward<Args>(args)...); \endcode
+    /// provided arguments to T's constructor. Equivalent to:
+    /// \code
+    ///     return std::any(std::in_place_type<T>, std::forward<Args>(args)...);
+    /// \endcode
     template <typename T, typename Char>
     util::basic_any<serialization::input_archive, serialization::output_archive,
         Char>

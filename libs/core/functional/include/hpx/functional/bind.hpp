@@ -10,11 +10,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/functional/one_shot.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_action.hpp>
@@ -101,7 +99,8 @@ namespace hpx {
         struct bind_eval<T, NumUs, TD,
             std::enable_if_t<hpx::is_placeholder_v<TD> != 0 &&
                 (hpx::is_placeholder_v<TD> <= NumUs)>>
-          : bind_eval_placeholder<(std::size_t) hpx::is_placeholder_v<TD> - 1>
+          : bind_eval_placeholder<
+                static_cast<std::size_t>(hpx::is_placeholder_v<TD>) - 1>
         {
         };
 
@@ -169,6 +168,9 @@ namespace hpx {
 #endif
 
             bound& operator=(bound const&) = delete;
+            bound& operator=(bound&&) = delete;
+
+            ~bound() = default;
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -230,12 +232,14 @@ namespace hpx {
                 // clang-format on
             }
 
-            constexpr std::size_t get_function_address() const noexcept
+            [[nodiscard]] constexpr std::size_t get_function_address()
+                const noexcept
             {
                 return traits::get_function_address<F>::call(_f);
             }
 
-            constexpr char const* get_function_annotation() const noexcept
+            [[nodiscard]] constexpr char const* get_function_annotation()
+                const noexcept
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation<F>::call(_f);
@@ -245,7 +249,8 @@ namespace hpx {
             }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            util::itt::string_handle get_function_annotation_itt() const
+            [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+                const
             {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
                 return traits::get_function_annotation_itt<F>::call(_f);
@@ -364,7 +369,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound<F, Ts...>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
@@ -375,7 +380,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation<hpx::detail::bound<F, Ts...>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -386,7 +391,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation_itt<hpx::detail::bound<F, Ts...>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::detail::bound<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();

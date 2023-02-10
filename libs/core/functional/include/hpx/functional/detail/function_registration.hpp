@@ -39,7 +39,7 @@ namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename VTable, typename F>
-    char const* get_function_name()
+    [[nodiscard]] char const* get_function_name()
     {
         return get_function_name_impl<VTable, F>::call();
     }

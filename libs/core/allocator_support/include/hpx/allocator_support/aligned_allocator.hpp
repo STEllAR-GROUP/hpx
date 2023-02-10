@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +25,7 @@
 
 namespace hpx::util::detail {
 
-    inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, aligned_alloc)(
@@ -43,7 +44,7 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return std::aligned_alloc(alignment, size);
@@ -61,7 +62,7 @@ namespace hpx::util::detail {
 
 namespace hpx::util::detail {
 
-    inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         return aligned_alloc(alignment, size);
@@ -80,7 +81,7 @@ namespace hpx::util::detail {
 namespace hpx::util::detail {
 
     // provide our own (simple) implementation of aligned_alloc
-    inline void* __aligned_alloc(
+    [[nodiscard]] inline void* __aligned_alloc(
         std::size_t alignment, std::size_t size) noexcept
     {
         if (alignment < alignof(void*))
@@ -95,7 +96,7 @@ namespace hpx::util::detail {
             return nullptr;
         }
 
-        void* aligned_mem = static_cast<void*>(
+        auto aligned_mem = static_cast<void*>(
             static_cast<char*>(allocated_mem) + sizeof(void*));
 
         std::align(alignment, size, aligned_mem, space);
@@ -118,15 +119,15 @@ namespace hpx::util::detail {
 namespace hpx::util::detail {
 
     template <typename Allocator>
-    inline void* __aligned_alloc(Allocator const& alloc, std::size_t alignment,
-        std::size_t size) noexcept
+    [[nodiscard]] void* __aligned_alloc(Allocator const& alloc,
+        std::size_t alignment, std::size_t size) noexcept
     {
         using value_type =
             typename std::allocator_traits<Allocator>::value_type;
         using char_alloc = typename std::allocator_traits<
             Allocator>::template rebind_alloc<char>;
 
-        std::size_t s = size * sizeof(value_type);
+        std::size_t const s = size * sizeof(value_type);
         std::size_t space = s + alignment - 1;
 
         char_alloc a(alloc);
@@ -136,7 +137,7 @@ namespace hpx::util::detail {
             return nullptr;
         }
 
-        void* aligned_mem = static_cast<void*>(
+        auto aligned_mem = static_cast<void*>(
             static_cast<char*>(allocated_mem) + sizeof(void*));
 
         std::align(alignment, size, aligned_mem, space);
@@ -146,14 +147,14 @@ namespace hpx::util::detail {
     }
 
     template <typename T>
-    inline void* __aligned_alloc(std::allocator<T> const&,
+    [[nodiscard]] void* __aligned_alloc(std::allocator<T> const&,
         std::size_t alignment, std::size_t size) noexcept
     {
         return __aligned_alloc(alignment, size);
     }
 
     template <typename Allocator>
-    inline void __aligned_free(
+    void __aligned_free(
         Allocator const& alloc, void* p, std::size_t size) noexcept
     {
         if (nullptr != p)
@@ -217,12 +218,12 @@ namespace hpx::util {
         {
         }
 
-        pointer address(reference x) const noexcept
+        [[nodiscard]] static pointer address(reference x) noexcept
         {
             return &x;
         }
 
-        const_pointer address(const_reference x) const noexcept
+        [[nodiscard]] static const_pointer address(const_reference x) noexcept
         {
             return &x;
         }
@@ -234,7 +235,7 @@ namespace hpx::util {
                 throw std::bad_array_new_length();
             }
 
-            pointer p = reinterpret_cast<pointer>(
+            auto p = reinterpret_cast<pointer>(
                 detail::__aligned_alloc(alloc, alignof(T), n * sizeof(T)));
 
             if (p == nullptr)
@@ -250,33 +251,33 @@ namespace hpx::util {
             detail::__aligned_free(alloc, p, size);
         }
 
-        constexpr size_type max_size() const noexcept
+        [[nodiscard]] static constexpr size_type max_size() noexcept
         {
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
 
         template <typename U, typename... Args>
-        void construct(U* p, Args&&... args)
+        static void construct(U* p, Args&&... args)
         {
             hpx::construct_at(p, HPX_FORWARD(Args, args)...);
         }
 
         template <typename U>
-        void destroy(U* p) noexcept
+        static void destroy(U* p) noexcept
         {
             std::destroy_at(p);
         }
     };
 
     template <typename T>
-    constexpr bool operator==(
+    [[nodiscard]] constexpr bool operator==(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return true;
     }
 
     template <typename T>
-    constexpr bool operator!=(
+    [[nodiscard]] constexpr bool operator!=(
         aligned_allocator<T> const&, aligned_allocator<T> const&) noexcept
     {
         return false;

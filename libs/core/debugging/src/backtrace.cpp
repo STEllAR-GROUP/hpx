@@ -1,13 +1,11 @@
-//
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2022 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //  Copyright (c) 2010 Artyom Beilis (Tonkikh)
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
-//
 
 #include <hpx/config.hpp>
 
@@ -57,11 +55,9 @@
 #include <vector>
 
 #if defined(HPX_MSVC)
-#include <windows.h>
-
 #include <dbghelp.h>
-#include <stdlib.h>
 #include <winbase.h>
+#include <windows.h>
 #endif
 
 namespace hpx::util::stack_trace {
@@ -83,8 +79,8 @@ namespace hpx::util::stack_trace {
         std::size_t count_;
     };
 
-    _Unwind_Reason_Code trace_callback(_Unwind_Context* ctx, void* ptr);
-    _Unwind_Reason_Code trace_callback(_Unwind_Context* ctx, void* ptr)
+    [[nodiscard]] _Unwind_Reason_Code trace_callback(
+        _Unwind_Context* ctx, void* ptr)
     {
         if (!ptr)
             return _URC_NO_REASON;
@@ -117,7 +113,7 @@ namespace hpx::util::stack_trace {
         return _URC_NO_REASON;
     }
 
-    std::size_t trace(void** array, std::size_t n)
+    [[nodiscard]] std::size_t trace(void** array, std::size_t n)
     {
         trace_data d(array, n);
 
@@ -132,26 +128,27 @@ namespace hpx::util::stack_trace {
 
 #elif defined(HPX_HAVE_EXECINFO)
 
-    std::size_t trace(void** array, std::size_t n)
+    [[nodiscard]] std::size_t trace(void** array, std::size_t n)
     {
         return ::backtrace(array, n);
     }
 
 #elif defined(HPX_MSVC)
 
-    std::size_t trace(void** array, std::size_t n)
+    [[nodiscard]] std::size_t trace(void** array, std::size_t n)
     {
 #if _WIN32_WINNT < 0x0600
         // for Windows XP/Windows Server 2003
         if (n >= 63)
             n = 62;
 #endif
-        return RtlCaptureStackBackTrace(ULONG(0), ULONG(n), array, nullptr);
+        return RtlCaptureStackBackTrace(
+            static_cast<ULONG>(0), static_cast<ULONG>(n), array, nullptr);
     }
 
 #else
 
-    std::size_t trace(void** /*array*/, std::size_t /*n*/)
+    [[nodiscard]] std::size_t trace(void** /*array*/, std::size_t /*n*/)
     {
         return 0;
     }
@@ -159,7 +156,7 @@ namespace hpx::util::stack_trace {
 #endif
 
 #if defined(HPX_HAVE_EXECINFO)
-    std::string get_symbol_exec_info(void* address)
+    [[nodiscard]] std::string get_symbol_exec_info(void* address)
     {
         char** ptr = backtrace_symbols(&address, 1);
         try
@@ -180,10 +177,10 @@ namespace hpx::util::stack_trace {
 #endif
 
 #if defined(HPX_HAVE_DLFCN) && defined(HPX_HAVE_ABI_CXA_DEMANGLE)
-    std::string get_symbol(void* ptr)
+    [[nodiscard]] std::string get_symbol(void* ptr)
     {
         if (!ptr)
-            return std::string();
+            return {};
 
         bool need_offset = true;
         std::ostringstream res;
@@ -246,7 +243,8 @@ namespace hpx::util::stack_trace {
         return res.str();
     }
 
-    std::string get_symbols(void* const* addresses, std::size_t size)
+    [[nodiscard]] std::string get_symbols(
+        void* const* addresses, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -286,12 +284,13 @@ namespace hpx::util::stack_trace {
 
 #elif defined(HPX_HAVE_EXECINFO)
 
-    std::string get_symbol(void* address)
+    [[nodiscard]] std::string get_symbol(void* address)
     {
         return get_symbol_exec_info(address);
     }
 
-    std::string get_symbols(void* const* address, std::size_t size)
+    [[nodiscard]] std::string get_symbols(
+        void* const* address, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -304,7 +303,7 @@ namespace hpx::util::stack_trace {
         try
         {
             if (ptr == nullptr)
-                return std::string();
+                return {};
             std::string res =
                 std::to_string(size) + ((1 == size) ? " frame:" : " frames:");
             for (std::size_t i = 0; i < size; i++)
@@ -367,10 +366,11 @@ namespace hpx::util::stack_trace {
         }
     }    // namespace
 
-    std::string get_symbol(void* ptr)
+    [[nodiscard]] std::string get_symbol(void* ptr)
     {
         if (ptr == nullptr)
-            return std::string();
+            return {};
+
         init();
         std::ostringstream ss;
         ss << std::left << std::setw(sizeof(void*) * 2) << std::setfill(' ')
@@ -378,10 +378,11 @@ namespace hpx::util::stack_trace {
         if (syms_ready)
         {
             DWORD64 dwDisplacement = 0;
-            DWORD64 dwAddress = (DWORD64) ptr;
+            auto const dwAddress = reinterpret_cast<DWORD64>(ptr);
 
             std::vector<char> buffer(sizeof(SYMBOL_INFO) + MAX_SYM_NAME);
-            PSYMBOL_INFO pSymbol = (PSYMBOL_INFO) &buffer.front();
+            auto const pSymbol =
+                reinterpret_cast<PSYMBOL_INFO>(&buffer.front());
 
             pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
             pSymbol->MaxNameLen = MAX_SYM_NAME;
@@ -399,7 +400,8 @@ namespace hpx::util::stack_trace {
         return ss.str();
     }
 
-    std::string get_symbols(void* const* addresses, std::size_t size)
+    [[nodiscard]] std::string get_symbols(
+        void* const* addresses, std::size_t size)
     {
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
@@ -439,10 +441,10 @@ namespace hpx::util::stack_trace {
 
 #else
 
-    std::string get_symbol(void* ptr)
+    [[nodiscard]] std::string get_symbol(void* ptr)
     {
         if (!ptr)
-            return std::string();
+            return {};
         std::ostringstream res;
         res.imbue(std::locale::classic());
         res << std::left << std::setw(sizeof(void*) * 2) << std::setfill(' ')
@@ -453,7 +455,7 @@ namespace hpx::util::stack_trace {
     std::string get_symbols(void* const* ptrs, std::size_t size)
     {
         if (!ptrs)
-            return std::string();
+            return {};
 
         // the first two stack frames are from the back tracing facility itself
         if (size > 2)
