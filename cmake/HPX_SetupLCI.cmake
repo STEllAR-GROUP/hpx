@@ -78,8 +78,8 @@ macro(hpx_setup_lci)
               CACHE INTERNAL ""
           )
         endif()
-        if(NOT LCI_PM_BACKEND)
-          set(LCI_PM_BACKEND
+        if(NOT LCI_PM_BACKEND_DEFAULT)
+          set(LCI_PM_BACKEND_DEFAULT
               mpi
               CACHE INTERNAL ""
           )
@@ -96,7 +96,7 @@ macro(hpx_setup_lci)
       endif()
 
       install(
-        TARGETS LCI
+        TARGETS LCI lci-ucx
         EXPORT HPXLCITarget
         COMPONENT core
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -104,15 +104,7 @@ macro(hpx_setup_lci)
       )
 
       install(
-        DIRECTORY ${lci_SOURCE_DIR}/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        COMPONENT core
-        FILES_MATCHING
-        PATTERN "*.h"
-      )
-
-      install(
-        DIRECTORY ${lci_BINARY_DIR}/include/
+        DIRECTORY ${lci_SOURCE_DIR}/src/api/ ${lci_BINARY_DIR}/src/api/
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT core
         FILES_MATCHING
@@ -120,7 +112,7 @@ macro(hpx_setup_lci)
       )
 
       export(
-        TARGETS LCI
+        TARGETS LCI lci-ucx
         NAMESPACE LCI::
         FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXLCITarget.cmake"
       )

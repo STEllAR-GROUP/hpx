@@ -16,7 +16,6 @@
 
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/sender_connection.hpp>
-#include <hpx/parcelport_lci/tag_provider.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -30,9 +29,6 @@ namespace hpx::parcelset::policies::lci {
     {
         using connection_type = sender_connection;
         using connection_ptr = std::shared_ptr<connection_type>;
-        using connection_list = std::deque<connection_ptr>;
-
-        using mutex_type = hpx::spinlock;
 
         sender() noexcept {}
 
@@ -43,78 +39,22 @@ namespace hpx::parcelset::policies::lci {
             return std::make_shared<connection_type>(this, dest, pp);
         }
 
-        void add(connection_ptr const& ptr)
-        {
-            std::unique_lock<mutex_type> l(connections_mtx_);
-            connections_.push_back(ptr);
-        }
-
-        int acquire_tag() noexcept
-        {
-            return tag_provider_.acquire();
-        }
-
-        void send_messages(connection_ptr connection)
-        {
-            // Check if sending has been completed....
-            if (connection->send())
-            {
-                error_code ec(throwmode::lightweight);
-                hpx::move_only_function<void(error_code const&,
-                    parcelset::locality const&, connection_ptr)>
-                    postprocess_handler;
-                std::swap(
-                    postprocess_handler, connection->postprocess_handler_);
-                postprocess_handler(ec, connection->destination(), connection);
-            }
-            else
-            {
-                std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.push_back(HPX_MOVE(connection));
-            }
-        }
-
         bool background_work() noexcept
         {
-            connection_ptr connection;
-            {
-                std::unique_lock<mutex_type> l(
-                    connections_mtx_, std::try_to_lock);
-                if (l.owns_lock() && !connections_.empty())
-                {
-                    connection = HPX_MOVE(connections_.front());
-                    connections_.pop_front();
-                }
-            }
-
-            bool has_work = false;
-            if (connection)
-            {
-                send_messages(HPX_MOVE(connection));
-                has_work = true;
-            }
-            //            next_free_tag();
-            return has_work;
-        }
-
-    private:
-        tag_provider tag_provider_;
-
-        void next_free_tag() noexcept
-        {
+            // We first try to accept a new connection
             LCI_request_t request;
-            LCI_error_t ret =
-                LCI_queue_pop(util::lci_environment::rt_queue(), &request);
-            if (ret == LCI_OK)
-            {
-                int next_free = *(int*) &request.data.immediate;
-                HPX_ASSERT(next_free > 1);
-                tag_provider_.release(next_free);
-            }
-        }
+            request.flag = LCI_ERR_RETRY;
+            LCI_queue_pop(util::lci_environment::get_scq(), &request);
 
-        mutex_type connections_mtx_;
-        connection_list connections_;
+            if (request.flag == LCI_OK)
+            {
+                auto* sharedPtr_p = (connection_ptr*) request.user_context;
+                (*sharedPtr_p)->done();
+                delete sharedPtr_p;
+                return true;
+            }
+            return false;
+        }
     };
 
 }    // namespace hpx::parcelset::policies::lci

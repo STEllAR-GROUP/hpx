@@ -11,12 +11,9 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(parcelport_lci_headers
-    hpx/parcelport_lci/header.hpp
-    hpx/parcelport_lci/locality.hpp
-    hpx/parcelport_lci/receiver.hpp
-    hpx/parcelport_lci/sender.hpp
+    hpx/parcelport_lci/header.hpp hpx/parcelport_lci/locality.hpp
+    hpx/parcelport_lci/receiver.hpp hpx/parcelport_lci/sender.hpp
     hpx/parcelport_lci/sender_connection.hpp
-    hpx/parcelport_lci/tag_provider.hpp
 )
 
 # cmake-format: off
