@@ -504,7 +504,8 @@ namespace hpx::meta {
     };
 
     template <typename T>
-    using get_id_t = hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>;
+    using get_id_t = hpx::type_identity_t<
+        hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>>;
 
     template <typename T, typename... As>
     inline constexpr bool is_constructible_from_v =

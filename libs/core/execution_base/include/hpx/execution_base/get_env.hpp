@@ -77,11 +77,9 @@ namespace hpx::execution::experimental {
             using id = empty_env;
         };
 
-        template <typename Tag, typename Value, typename BaseEnvId = empty_env>
+        template <typename Tag, typename Value, typename BaseEnv = empty_env>
         struct env
         {
-            using BaseEnv = meta::type<BaseEnvId>;
-
             struct type
             {
                 using id = env;
@@ -114,9 +112,8 @@ namespace hpx::execution::experimental {
             };
         };
 
-        template <typename Tag, typename Value, typename BaseEnvId>
-        using env_t =
-            hpx::meta::type<env<Tag, Value, hpx::meta::get_id_t<BaseEnvId>>>;
+        template <typename Tag, typename Value, typename BaseEnv = empty_env>
+        using env_t = std::decay_t<hpx::meta::type<env<Tag, Value, BaseEnv>>>;
 
         template <typename Tag>
         struct make_env_t
@@ -125,17 +122,17 @@ namespace hpx::execution::experimental {
             constexpr auto operator()(Value&& value) const
                 noexcept(std::is_nothrow_copy_constructible_v<
                     util::unwrap_reference_t<std::decay_t<Value>>>)
-                    -> env<Tag, std::decay_t<Value>>
+                    -> env_t<Tag, std::decay_t<Value>>
             {
                 return {HPX_FORWARD(Value, value)};
             }
 
-            template <typename Value, typename BaseEnv>
-            constexpr auto operator()(Value&& value, BaseEnv&& base_env) const
-                -> env<Tag, std::decay_t<Value>, std::decay_t<BaseEnv>>
+            template <typename Value, typename BaseEnvId>
+            constexpr auto operator()(Value&& value, BaseEnvId&& base_env) const
+                -> env_t<Tag, std::decay_t<Value>, std::decay_t<BaseEnvId>>
             {
-                return {
-                    HPX_FORWARD(Value, value), HPX_FORWARD(BaseEnv, base_env)};
+                return {HPX_FORWARD(Value, value),
+                    HPX_FORWARD(BaseEnvId, base_env)};
             }
         };
 

@@ -70,7 +70,9 @@ namespace hpx::execution::experimental {
         template <typename Awaiter, typename Promise>
         struct is_awaiter_impl<true, Awaiter, Promise>
           : std::integral_constant<bool,
-                is_await_suspend_result_v<decltype(std::declval<Awaiter>().await_suspend())>>
+                is_await_suspend_result_v<
+                    decltype(std::declval<Awaiter>().await_suspend(
+                        hpx::coro::coroutine_handle<Promise>{}))>>
         // clang-format on
         {
         };
