@@ -814,11 +814,7 @@ namespace hpx::parcelset {
     void parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        write_handler_type f;
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            f = write_handler_;
-        }
+        write_handler_type f = write_handler_;
         f(ec, p);
     }
 
