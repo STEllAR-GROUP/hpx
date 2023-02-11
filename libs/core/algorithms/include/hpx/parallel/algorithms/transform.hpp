@@ -282,7 +282,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/unseq/transform_loop.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
@@ -333,7 +332,7 @@ namespace hpx::parallel {
         template <typename F>
         struct transform_projected<F, hpx::identity>
         {
-            std::decay_t<F> f_;
+            std::decay_t<F> f_{};
 
             template <typename F_>
             HPX_HOST_DEVICE constexpr transform_projected(

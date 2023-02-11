@@ -37,24 +37,24 @@ void for_each_zipiter_test(ExPolicy&& policy, IteratorTag)
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
         "hpx::is_execution_policy<ExPolicy>::value");
 
-    typedef std::vector<int>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<int> c(10007), d(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
     std::iota(std::begin(d), std::end(d), std::rand());
 
-    auto begin = hpx::util::make_zip_iterator(
+    auto begin = hpx::util::zip_iterator(
         iterator(std::begin(c)), iterator(std::begin(d)));
-    auto end = hpx::util::make_zip_iterator(
-        iterator(std::end(c)), iterator(std::end(d)));
+    auto end =
+        hpx::util::zip_iterator(iterator(std::end(c)), iterator(std::end(d)));
 
     hpx::for_each(std::forward<ExPolicy>(policy), begin, end, set_42());
 
     // verify values
     std::size_t count = 0;
     std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
-        HPX_TEST_EQ(v, int(42));
+        HPX_TEST_EQ(v, static_cast<int>(42));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -76,7 +76,7 @@ void for_each_zipiter_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

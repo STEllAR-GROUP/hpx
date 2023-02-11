@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 A Kishore Kumar
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,73 +8,88 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/functional/invoke_result.hpp>
+#include <hpx/type_support/construct_at.hpp>
+
+#include <cstddef>
 #include <cstdint>
+#include <memory>
+#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
-    ///////////////////////////////////////////////////////////////////////////
-    // TODO: Make it detect template even for implicit convertible operations
-    template <typename T, typename Operation>
-    using is_arithmetic_plus_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and std::is_same_v<Operation, std::plus<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_minus_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and std::is_same_v<Operation, std::minus<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_multiplies_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and
-            std::is_same_v<Operation, std::multiplies<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_bit_and_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and std::is_same_v<Operation, std::bit_and<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_bit_or_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and std::is_same_v<Operation, std::bit_or<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_bit_xor_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and std::is_same_v<Operation, std::bit_xor<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_logical_and_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and
-            std::is_same_v<Operation, std::logical_and<T>>>;
-
-    template <typename T, typename Operation>
-    using is_arithmetic_logical_or_reduction = std::integral_constant<bool,
-        std::is_arithmetic_v<T> and
-            std::is_same_v<Operation, std::logical_or<T>>>;
-
-    template <typename T, typename Operation>
-    using is_not_omp_reduction = std::integral_constant<bool,
-        !is_arithmetic_plus_reduction<T, Operation>::value and
-            !is_arithmetic_minus_reduction<T, Operation>::value and
-            !is_arithmetic_multiplies_reduction<T, Operation>::value and
-            !is_arithmetic_bit_and_reduction<T, Operation>::value and
-            !is_arithmetic_bit_or_reduction<T, Operation>::value and
-            !is_arithmetic_bit_xor_reduction<T, Operation>::value and
-            !is_arithmetic_logical_and_reduction<T, Operation>::value and
-            !is_arithmetic_logical_or_reduction<T, Operation>::value>;
+namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_VECTOR_REDUCTION)
+    // clang-format off
+    template <typename T, typename Operation,
+        template <typename = void> typename Op>
+    inline constexpr bool is_operation_v =
+        std::is_same_v<Operation, Op<T>> || std::is_same_v<Operation, Op<>>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_plus_reduction_v =
+        std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::plus>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_minus_reduction_v =
+        std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::minus>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_multiplies_reduction_v =
+        std::is_arithmetic_v<T> &&
+        is_operation_v<T, Operation, std::multiplies>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_bit_and_reduction_v =
+        std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_and>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_bit_or_reduction_v =
+        std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_or>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_bit_xor_reduction_v =
+        std::is_arithmetic_v<T> && is_operation_v<T, Operation, std::bit_xor>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_logical_and_reduction_v =
+        std::is_arithmetic_v<T> &&
+        is_operation_v<T, Operation, std::logical_and>;
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_arithmetic_logical_or_reduction_v =
+        std::is_arithmetic_v<T> &&
+        is_operation_v<T, Operation, std::logical_or>;
+    // clang-format on
+
+    template <typename T, typename Operation>
+    inline constexpr bool is_not_omp_reduction_v =
+        !is_arithmetic_plus_reduction_v<T, Operation> &&
+        !is_arithmetic_minus_reduction_v<T, Operation> &&
+        !is_arithmetic_multiplies_reduction_v<T, Operation> &&
+        !is_arithmetic_bit_and_reduction_v<T, Operation> &&
+        !is_arithmetic_bit_or_reduction_v<T, Operation> &&
+        !is_arithmetic_bit_xor_reduction_v<T, Operation> &&
+        !is_arithmetic_logical_and_reduction_v<T, Operation> &&
+        !is_arithmetic_logical_or_reduction_v<T, Operation>;
+#else
+    template <typename T, typename Operation>
+    inline constexpr bool is_not_omp_reduction_v = true;
+#endif
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Will only be called when the iterators are all random access
     struct unseq_reduce_n
     {
-        /* Will only be called when the iterators are all random access */
+#if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_plus_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_plus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init += HPX_INVOKE(conv, *it);
                 ++it;
@@ -82,13 +98,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_minus_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_minus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(- : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init -= HPX_INVOKE(conv, *it);
                 ++it;
@@ -97,13 +112,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_multiplies_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_multiplies_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(* : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init *= HPX_INVOKE(conv, *it);
                 ++it;
@@ -112,13 +126,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_and_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_bit_and_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(& : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init &= HPX_INVOKE(conv, *it);
                 ++it;
@@ -127,13 +140,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_or_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_bit_or_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(| : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init |= HPX_INVOKE(conv, *it);
                 ++it;
@@ -142,13 +154,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_xor_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_bit_xor_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(^ : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init ^= HPX_INVOKE(conv, *it);
                 ++it;
@@ -157,13 +168,12 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_logical_and_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_logical_and_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(&& : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init = HPX_INVOKE(conv, *it) && init;
                 ++it;
@@ -172,33 +182,30 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         }
 
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_logical_or_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it, std::size_t count, T init, Reduce /* */,
-            Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_logical_or_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(|| : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init = HPX_INVOKE(conv, *it) || init;
                 ++it;
             }
             return init;
         }
-
+#endif
         template <typename Iter1, typename T, typename Convert, typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename std::enable_if<is_not_omp_reduction<T, Reduce>::value,
-                T>::type
-            reduce(Iter1 it, std::size_t count, T init, Reduce r,
-                Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_not_omp_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it, std::size_t count, T init, Reduce r, Convert conv)
         {
-            const std::size_t block_size = HPX_LANE_SIZE / sizeof(T);
+            constexpr std::size_t block_size = HPX_LANE_SIZE / sizeof(T);
 
             // To small, just run sequential
-            if (count <= (block_size << 1))
+            if (count <= 2 * block_size)
             {
-                for (std::size_t i = 0; i < count; i++)
+                for (std::size_t i = 0; i != count; ++i)
                 {
                     init = HPX_INVOKE(r, init, HPX_INVOKE(conv, *it));
                     ++it;
@@ -206,45 +213,53 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
             else
             {
-                alignas(HPX_LANE_SIZE) std::uint8_t block[HPX_LANE_SIZE];
+                alignas(HPX_LANE_SIZE) std::uint8_t block[HPX_LANE_SIZE] = {};
                 T* tblock = reinterpret_cast<T*>(block);
-                /* Initialize block[i] = r(f(2*i), f(2*i + 1)) */
-                for (std::size_t i = 0; i < (block_size << 1); i += 2)
+
+                // Initialize block[i] = r(f(2*i), f(2*i + 1))
+                for (std::size_t i = 0; i != 2 * block_size; i += 2)
                 {
-                    ::new (tblock + i / 2) T(HPX_INVOKE(
-                        r, HPX_INVOKE(conv, *it), HPX_INVOKE(conv, *(it + 1))));
+                    hpx::construct_at(tblock + i / 2,
+                        HPX_INVOKE(r, HPX_INVOKE(conv, *it),
+                            HPX_INVOKE(conv, *(it + 1))));
                     it += 2;
                 }
-                /* Vectorized loop */
-                const std::size_t limit = block_size * (count / block_size);
-                for (std::size_t i = (block_size << 1); i < limit;
+
+                // Vectorized loop
+                std::size_t const limit = block_size * (count / block_size);
+                for (std::size_t i = 2 * block_size; i != limit;
                      i += block_size)
                 {
                     HPX_VECTORIZE
-                    for (std::size_t j = 0; j < block_size; j++)
+                    for (std::size_t j = 0; j != block_size; ++j)
                     {
                         tblock[j] = HPX_INVOKE(
                             r, tblock[j], HPX_INVOKE(conv, *(it + j)));
                     }
                     it += block_size;
                 }
-                /* Remainder */
+
+                // Remainder
+                count -= limit;
+
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i < count - limit; i++)
+                for (std::size_t i = 0; i != count; ++i)
                 {
                     tblock[i] = HPX_INVOKE(r, tblock[i], HPX_INVOKE(conv, *it));
                     ++it;
                 }
-                /* Merge */
-                for (std::size_t i = 0; i < block_size; i++)
+
+                // Merge
+                for (std::size_t i = 0; i != block_size; ++i)
                 {
                     init = HPX_INVOKE(r, init, tblock[i]);
                 }
-                /* Cleanup resources */
+
+                // Cleanup resources
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i < block_size; i++)
+                for (std::size_t i = 0; i < block_size; ++i)
                 {
-                    tblock[i].~T();
+                    std::destroy_at(std::addressof(tblock[i]));
                 }
             }
             return init;
@@ -252,18 +267,19 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // Will only be called when the iterators are all random access
     struct unseq_binary_reduce_n
     {
-        /* Will only be called when the iterators are all random access */
+#if defined(HPX_HAVE_VECTOR_REDUCTION)
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_plus_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_plus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init += HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -273,13 +289,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_minus_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_minus_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(- : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init -= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -289,13 +305,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_multiplies_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_multiplies_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(* : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init *= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -305,13 +321,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_and_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_bit_and_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(& : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init &= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -321,13 +337,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_or_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_bit_or_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(| : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init |= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -337,13 +353,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_bit_xor_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static std::enable_if_t<
+            is_arithmetic_bit_xor_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(^ : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init ^= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -353,13 +369,13 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_logical_and_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_logical_and_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(&& : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init = HPX_INVOKE(conv, *it1, *it2) && init;
                 ++it1, ++it2;
@@ -369,34 +385,33 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
 
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-            is_arithmetic_logical_or_reduction<T, Reduce>::value, T>::type
-        reduce(Iter1 it1, Iter2 it2,
-            std::size_t count, T init, Reduce /* */, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_arithmetic_logical_or_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce /* */,
+            Convert conv)
         {
             HPX_VECTOR_REDUCTION(|| : init)
-            for (std::size_t i = 0; i < count; i++)
+            for (std::size_t i = 0; i != count; ++i)
             {
                 init = HPX_INVOKE(conv, *it1, *it2) || init;
                 ++it1, ++it2;
             }
             return init;
         }
-
+#endif
         template <typename Iter1, typename Iter2, typename T, typename Convert,
             typename Reduce>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static
-            typename std::enable_if<is_not_omp_reduction<T, Reduce>::value,
-                T>::type
-            reduce(Iter1 it1, Iter2 it2,
-                std::size_t count, T init, Reduce r, Convert conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr std::enable_if_t<
+            is_not_omp_reduction_v<T, Reduce>, T>
+        reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce r,
+            Convert conv)
         {
-            const std::size_t block_size = HPX_LANE_SIZE / (sizeof(T) * 8);
+            constexpr std::size_t block_size = HPX_LANE_SIZE / (sizeof(T) * 8);
 
             // To small, just run sequential
-            if (count <= (block_size << 1))
+            if (count <= 2 * block_size)
             {
-                for (std::size_t i = 0; i < count; i++)
+                for (std::size_t i = 0; i != count; ++i)
                 {
                     init = HPX_INVOKE(r, init, HPX_INVOKE(conv, *it1, *it2));
                     ++it1, ++it2;
@@ -404,24 +419,27 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
             else
             {
-                alignas(HPX_LANE_SIZE) std::uint8_t block[HPX_LANE_SIZE];
+                alignas(HPX_LANE_SIZE) std::uint8_t block[HPX_LANE_SIZE] = {};
                 T* tblock = reinterpret_cast<T*>(block);
-                /* Initialize block[i] = r(f(2*i), f(2*i + 1)) */
-                for (std::size_t i = 0; i < block_size; i++)
+
+                // Initialize block[i] = r(f(2*i), f(2*i + 1))
+                for (std::size_t i = 0; i != block_size; ++i)
                 {
-                    ::new (tblock + i)
-                        T(HPX_INVOKE(r, HPX_INVOKE(conv, *it1, *it2),
+                    hpx::construct_at(tblock + i,
+                        HPX_INVOKE(r, HPX_INVOKE(conv, *it1, *it2),
                             HPX_INVOKE(conv, *(it1 + 1), *(it2 + 1))));
+
                     it1 += 2;
                     it2 += 2;
                 }
-                /* Vectorized loop */
-                const std::size_t limit = block_size * (count / block_size);
-                for (std::size_t i = (block_size << 1); i < limit;
+
+                // Vectorized loop
+                std::size_t const limit = block_size * (count / block_size);
+                for (std::size_t i = 2 * block_size; i != limit;
                      i += block_size)
                 {
                     HPX_VECTORIZE
-                    for (std::size_t j = 0; j < block_size; j++)
+                    for (std::size_t j = 0; j != block_size; ++j)
                     {
                         tblock[j] = HPX_INVOKE(r, tblock[j],
                             HPX_INVOKE(conv, *(it1 + j), *(it2 + j)));
@@ -429,28 +447,32 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                     it1 += block_size;
                     it2 += block_size;
                 }
-                /* Remainder */
+
+                // Remainder
+                count -= limit;
+
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i < count - limit; i++)
+                for (std::size_t i = 0; i != count; ++i)
                 {
                     tblock[i] =
                         HPX_INVOKE(r, tblock[i], HPX_INVOKE(conv, *it1, *it2));
                     ++it1, ++it2;
                 }
-                /* Merge */
-                for (std::size_t i = 0; i < block_size; i++)
+
+                // Merge
+                for (std::size_t i = 0; i != block_size; ++i)
                 {
                     init = HPX_INVOKE(r, init, tblock[i]);
                 }
-                /* Cleanup resources */
+
+                // Cleanup resources
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i < block_size; i++)
+                for (std::size_t i = 0; i != block_size; ++i)
                 {
-                    tblock[i].~T();
+                    std::destroy_at(std::addressof(tblock[i]));
                 }
             }
             return init;
         }
     };
-
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

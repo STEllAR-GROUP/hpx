@@ -6,10 +6,9 @@
 
 #include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
+#include <hpx/local/numeric.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
-#include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <numeric>
@@ -35,13 +34,13 @@ void test_transform_reduce(ExPolicy&& policy, IteratorTag)
 
     auto convert_op = [](auto val) { return val * val; };
 
-    int const init = int(1);
+    constexpr int init = static_cast<int>(1);
 
-    int r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
+    int const r1 = hpx::transform_reduce(policy, iterator(std::begin(c)),
         iterator(std::end(c)), init, reduce_op, convert_op);
 
     // verify values
-    int r2 = std::accumulate(std::begin(c), std::end(c), init,
+    int const r2 = std::accumulate(std::begin(c), std::end(c), init,
         [&reduce_op, &convert_op](
             auto res, auto val) { return reduce_op(res, convert_op(val)); });
 
@@ -66,7 +65,7 @@ void test_transform_reduce_async(ExPolicy&& p, IteratorTag)
     f.wait();
 
     // verify values
-    int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
+    int const r2 = std::accumulate(std::begin(c), std::end(c), val, op);
     HPX_TEST_EQ(f.get(), r2);
 }
 
@@ -90,7 +89,7 @@ void transform_reduce_test()
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 A Kishore Kumar
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,26 +21,38 @@
 #define HPX_UNROLL
 #else
 
-#ifdef _MSC_VER
+#if defined(HPX_MSVC)
 #define HPX_PRAGMA(x) __pragma(x)
 #else
 #define HPX_PRAGMA(x) _Pragma(#x)
 #endif
 
-/* Use OpenMP backend for compilers which support OpenMP */
+// Use OpenMP backend for compilers that support OpenMP
 #if (_OPENMP >= 201307) || (__INTEL_COMPILER >= 1600) ||                       \
     (defined(__clang__) && HPX_CLANG_VERSION >= 30700)
-#define HPX_IVDEP 
+#define HPX_IVDEP
 #define HPX_VECTORIZE HPX_PRAGMA(omp simd)
 #define HPX_VECTOR_REDUCTION(CLAUSE) HPX_PRAGMA(omp simd reduction(CLAUSE))
 #define HPX_DECLARE_SIMD _PSTL_PRAGMA(omp declare simd)
 
-/* Fallback to compiler-specific backends */
+#define HPX_RESTRICT
+#define HPX_UNROLL HPX_PRAGMA(omp simd)
+#define HPX_UNROLL_N(N)
+
+#define HPX_HAVE_VECTOR_REDUCTION
+
+// Fallback to compiler-specific back-ends
 #elif defined(HPX_INTEL_VERSION)
 #define HPX_IVDEP HPX_PRAGMA(ivdep)
 #define HPX_VECTORIZE HPX_PRAGMA(vector always dynamic_align novecremainder)
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
+
+#define HPX_RESTRICT __restrict
+#define HPX_UNROLL HPX_PRAGMA(unroll)
+#define HPX_UNROLL_N(N) HPX_PRAGMA(unroll(N))
+
+#undef HPX_HAVE_VECTOR_REDUCTION
 
 #elif defined(HPX_CLANG_VERSION)
 #define HPX_IVDEP HPX_PRAGMA(clang loop vectorize(enable))
@@ -47,47 +60,56 @@
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
 
+#define HPX_RESTRICT __restrict
+#define HPX_UNROLL HPX_PRAGMA(clang loop unroll(enable))
+#define HPX_UNROLL_N(N) HPX_PRAGMA(clang loop unroll_count(N))
+
+#undef HPX_HAVE_VECTOR_REDUCTION
+
 #elif defined(HPX_GCC_VERSION)
 #define HPX_IVDEP HPX_PRAGMA(GCC ivdep)
 #define HPX_VECTORIZE
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
 
+#define HPX_RESTRICT __restrict__
+// GCC does not have an auto unroll constant picker
+#define HPX_UNROLL HPX_PRAGMA(GCC unroll 8)
+#define HPX_UNROLL_N(N) HPX_PRAGMA(GCC unroll N)
+
+#undef HPX_HAVE_VECTOR_REDUCTION
+
+#elif defined(HPX_MSVC)
+#define HPX_IVDEP HPX_PRAGMA(loop(ivdep))
+#define HPX_VECTORIZE
+#define HPX_VECTOR_REDUCTION(CLAUSE)
+#define HPX_DECLARE_SIMD
+
+#define HPX_RESTRICT
+#define HPX_UNROLL
+#define HPX_UNROLL_N(N)
+
+#undef HPX_HAVE_VECTOR_REDUCTION
+
 #else
+
 #define HPX_IVDEP
 #define HPX_VECTORIZE
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
-#endif
 
-#if defined(HPX_INTEL_VERSION)
-#define HPX_RESTRICT __restrict
-#define HPX_UNROLL HPX_PRAGMA(unroll)
-#define HPX_UNROLL_N(N) HPX_PRAGMA(unroll(N))
-
-#elif defined(HPX_CLANG_VERSION)
-#define HPX_RESTRICT __restrict
-#define HPX_UNROLL HPX_PRAGMA(clang loop unroll(enable))
-#define HPX_UNROLL_N(N) HPX_PRAGMA(clang loop unroll_count(N))
-
-#elif defined(HPX_GCC_VERSION)
-#define HPX_RESTRICT __restrict__
-#define HPX_UNROLL                                                             \
-    HPX_PRAGMA(                                                                \
-        GCC unroll 8)    // GCC does not have an auto unroll constant picker
-#define HPX_UNROLL_N(N) HPX_PRAGMA(GCC unroll N)
-
-#else
 #define HPX_RESTRICT
 #define HPX_UNROLL
 #define HPX_UNROLL_N(N)
+
+#undef HPX_HAVE_VECTOR_REDUCTION
 #endif
 
-#ifdef __AVX512F__
+#if defined(__AVX512F__)
 #define HPX_LANE_SIZE 64
-#elifdef __AVX2__
+#elif defined(__AVX2__)
 #define HPX_LANE_SIZE 32
-#elifdef __SSE3__
+#elif defined(__SSE3__)
 #define HPX_LANE_SIZE 16
 #else
 #define HPX_LANE_SIZE 64

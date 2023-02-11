@@ -21,7 +21,6 @@ void test_transform_binary2()
     test_transform_binary2(IteratorTag());
     test_transform_binary2(seq, IteratorTag());
     test_transform_binary2(par, IteratorTag());
-    test_transform_binary2(par_unseq, IteratorTag());
 
     test_transform_binary2_async(seq(task), IteratorTag());
     test_transform_binary2_async(par(task), IteratorTag());
