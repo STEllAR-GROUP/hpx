@@ -51,7 +51,7 @@ namespace hpx::traits {
             typename shared_state_ptr_result<Future>::type;
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename R>
+        template <typename R, typename Enable = void>
         struct shared_state_ptr
         {
             using result_type = shared_state_ptr_result_t<R>;

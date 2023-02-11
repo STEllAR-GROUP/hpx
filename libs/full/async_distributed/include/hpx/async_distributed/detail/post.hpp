@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -242,13 +242,14 @@ namespace hpx {
             id, priority, HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool post_p(components::client_base<Client, Stub> const& c,
+    template <typename Action, typename Client, typename Stub, typename Data,
+        typename... Ts>
+    inline bool post_p(components::client_base<Client, Stub, Data> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
         static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
@@ -284,14 +285,15 @@ namespace hpx {
             }
 
             template <typename Component, typename Signature, typename Derived,
-                typename Client, typename Stub, typename... Ts>
+                typename Client, typename Stub, typename Data, typename... Ts>
             HPX_FORCEINLINE static bool call(
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                components::client_base<Client, Stub> const& c, Ts&&... ts)
+                components::client_base<Client, Stub, Data> const& c,
+                Ts&&... ts)
             {
                 // make sure the action is compatible with the component type
-                typedef typename components::client_base<Client,
-                    Stub>::server_component_type component_type;
+                typedef typename components::client_base<Client, Stub,
+                    Data>::server_component_type component_type;
 
                 static_assert(
                     traits::is_valid_action_v<Derived, component_type>,
@@ -323,12 +325,14 @@ namespace hpx {
             id, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool post(components::client_base<Client, Stub> const& c, Ts&&... vs)
+    template <typename Action, typename Client, typename Stub, typename Data,
+        typename... Ts>
+    inline bool post(
+        components::client_base<Client, Stub, Data> const& c, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
         static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
@@ -458,14 +462,15 @@ namespace hpx {
     }
 
     template <typename Action, typename Continuation, typename Client,
-        typename Stub, typename... Ts>
+        typename Stub, typename Data, typename... Ts>
     inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post_p(Continuation&& cont, components::client_base<Client, Stub> const& c,
+    post_p(Continuation&& cont,
+        components::client_base<Client, Stub, Data> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
         static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
@@ -505,14 +510,15 @@ namespace hpx {
 
             template <typename Continuation_, typename Component,
                 typename Signature, typename Derived, typename Client,
-                typename Stub, typename... Ts>
+                typename Stub, typename Data, typename... Ts>
             HPX_FORCEINLINE static bool call(Continuation_&& cont,
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                components::client_base<Client, Stub> const& c, Ts&&... ts)
+                components::client_base<Client, Stub, Data> const& c,
+                Ts&&... ts)
             {
                 // make sure the action is compatible with the component type
-                typedef typename components::client_base<Client,
-                    Stub>::server_component_type component_type;
+                typedef typename components::client_base<Client, Stub,
+                    Data>::server_component_type component_type;
 
                 static_assert(
                     traits::is_valid_action_v<Derived, component_type>,
@@ -547,14 +553,14 @@ namespace hpx {
     }
 
     template <typename Action, typename Continuation, typename Client,
-        typename Stub, typename... Ts>
+        typename Stub, typename Data, typename... Ts>
     inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post(Continuation&& cont, components::client_base<Client, Stub> const& c,
-        Ts&&... vs)
+    post(Continuation&& cont,
+        components::client_base<Client, Stub, Data> const& c, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
         static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");

@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/basic_archive.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
@@ -19,6 +18,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
+#include <hpx/type_support/extra_data.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
@@ -29,36 +29,42 @@
 #include <type_traits>
 #include <utility>
 
+namespace hpx::serialization::detail {
+
+    struct ptr_helper;
+
+    // we need top use shared_ptr as util::any requires for the held type
+    // to be copy-constructible
+    using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
+
+    using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
+    using output_pointer_tracker = std::map<void const*, std::uint64_t>;
+}    // namespace hpx::serialization::detail
+
+namespace hpx::util {
+
+    // This is explicitly instantiated to ensure that the id is stable across
+    // shared libraries.
+    template <>
+    struct extra_data_helper<serialization::detail::input_pointer_tracker>
+    {
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
+        static constexpr void reset(
+            serialization::detail::input_pointer_tracker*) noexcept
+        {
+        }
+    };
+
+    template <>
+    struct extra_data_helper<serialization::detail::output_pointer_tracker>
+    {
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
+        HPX_CORE_EXPORT static void reset(
+            serialization::detail::output_pointer_tracker* data);
+    };
+}    // namespace hpx::util
+
 namespace hpx::serialization {
-
-    ////////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        struct ptr_helper;
-
-        // we need top use shared_ptr as util::any requires for the held type
-        // to be copy-constructible
-        using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
-
-        using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
-        using output_pointer_tracker = std::map<void const*, std::uint64_t>;
-
-        // This is explicitly instantiated to ensure that the id is stable across
-        // shared libraries.
-        template <>
-        struct extra_archive_data_helper<input_pointer_tracker>
-        {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-            static constexpr void reset(input_pointer_tracker*) noexcept {}
-        };
-
-        template <>
-        struct extra_archive_data_helper<output_pointer_tracker>
-        {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-            HPX_CORE_EXPORT static void reset(output_pointer_tracker* data);
-        };
-    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT void register_pointer(

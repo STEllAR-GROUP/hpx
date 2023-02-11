@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,10 +49,10 @@ namespace hpx::detail {
     struct sync_action_client_dispatch
     {
         template <typename Policy, typename Client, typename Stub,
-            typename... Ts>
+            typename Data, typename... Ts>
         HPX_FORCEINLINE std::enable_if_t<traits::is_launch_policy_v<Policy>,
             sync_result_t<Action>>
-        operator()(components::client_base<Client, Stub> const& c,
+        operator()(components::client_base<Client, Stub, Data> const& c,
             Policy const& launch_policy, Ts&&... ts) const
         {
             HPX_ASSERT(c.is_ready());
@@ -78,14 +78,14 @@ namespace hpx::detail {
         }
 
         template <typename Policy_, typename Client, typename Stub,
-            typename... Ts>
+            typename Data, typename... Ts>
         HPX_FORCEINLINE static sync_result_t<Action> call(
-            Policy_&& launch_policy, components::client_base<Client, Stub> c,
-            Ts&&... ts)
+            Policy_&& launch_policy,
+            components::client_base<Client, Stub, Data> c, Ts&&... ts)
         {
             // make sure the action is compatible with the component type
             using component_type = typename components::client_base<Client,
-                Stub>::server_component_type;
+                Stub, Data>::server_component_type;
 
             static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
@@ -126,9 +126,10 @@ namespace hpx::detail {
     struct sync_action_dispatch<Action, Client,
         std::enable_if_t<traits::is_client_v<Client>>>
     {
-        template <typename Client_, typename Stub, typename... Ts>
+        template <typename Client_, typename Stub, typename Data,
+            typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
-            components::client_base<Client_, Stub> const& c, Ts&&... ts)
+            components::client_base<Client_, Stub, Data> const& c, Ts&&... ts)
         {
             return sync_action_dispatch<Action, hpx::detail::sync_policy>::call(
                 launch::sync, c, HPX_FORWARD(Ts, ts)...);
@@ -183,13 +184,13 @@ namespace hpx::detail {
         }
 
         template <typename Component, typename Signature, typename Derived,
-            typename Client, typename Stub, typename... Ts>
+            typename Client, typename Stub, typename Data, typename... Ts>
         HPX_FORCEINLINE static decltype(auto) call(
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            components::client_base<Client, Stub> const& c, Ts&&... vs)
+            components::client_base<Client, Stub, Data> const& c, Ts&&... vs)
         {
             using component_type = typename components::client_base<Client,
-                Stub>::server_component_type;
+                Stub, Data>::server_component_type;
 
             static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
@@ -217,14 +218,15 @@ namespace hpx::detail {
         }
 
         template <typename Policy_, typename Component, typename Signature,
-            typename Derived, typename Client, typename Stub, typename... Ts>
+            typename Derived, typename Client, typename Stub, typename Data,
+            typename... Ts>
         HPX_FORCEINLINE static sync_result_t<Derived> call(
             Policy_&& launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            components::client_base<Client, Stub> const& c, Ts&&... ts)
+            components::client_base<Client, Stub, Data> const& c, Ts&&... ts)
         {
             using component_type = typename components::client_base<Client,
-                Stub>::server_component_type;
+                Stub, Data>::server_component_type;
 
             static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");

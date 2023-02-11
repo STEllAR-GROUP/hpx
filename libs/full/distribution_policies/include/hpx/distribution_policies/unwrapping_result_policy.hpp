@@ -36,9 +36,9 @@ namespace hpx { namespace components {
         {
         }
 
-        template <typename Client, typename Stub>
+        template <typename Client, typename Stub, typename Data>
         explicit unwrapping_result_policy(
-            client_base<Client, Stub> const& client)
+            client_base<Client, Stub, Data> const& client)
           : id_(client.get_id())
         {
         }

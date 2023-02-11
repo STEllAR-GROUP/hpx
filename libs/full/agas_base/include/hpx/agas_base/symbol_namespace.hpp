@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +13,6 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/agas_base/server/symbol_namespace.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
@@ -21,11 +21,10 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     struct symbol_namespace
     {
@@ -59,34 +58,34 @@ namespace hpx { namespace agas {
         naming::address addr() const;
         hpx::id_type gid() const;
 
-        hpx::future<bool> bind_async(std::string key, naming::gid_type gid);
-        bool bind(std::string key, naming::gid_type gid);
+        hpx::future<bool> bind_async(
+            std::string const& key, naming::gid_type const& gid) const;
+        bool bind(std::string const& key, naming::gid_type const& gid) const;
 
-        hpx::future<hpx::id_type> resolve_async(std::string key) const;
-        hpx::id_type resolve(std::string key) const;
+        hpx::future<hpx::id_type> resolve_async(std::string const& key) const;
+        hpx::id_type resolve(std::string const& key) const;
 
-        hpx::future<hpx::id_type> unbind_async(std::string key);
-        hpx::id_type unbind(std::string key);
+        hpx::future<hpx::id_type> unbind_async(std::string key) const;
+        hpx::id_type unbind(std::string key) const;
 
         hpx::future<bool> on_event(std::string const& name,
-            bool call_for_past_events, hpx::id_type lco);
+            bool call_for_past_events, hpx::id_type lco) const;
 
         hpx::future<iterate_names_return_type> iterate_async(
             std::string const& pattern) const;
         iterate_names_return_type iterate(std::string const& pattern) const;
 
-        void register_server_instance(std::uint32_t locality_id);
-        void unregister_server_instance(error_code& ec);
+        void register_server_instance(std::uint32_t locality_id) const;
+        void unregister_server_instance(error_code& ec) const;
 
-        server::symbol_namespace& get_service()
+        server::symbol_namespace& get_service() const
         {
             return *server_;
         }
 
     private:
-        std::unique_ptr<server_type> server_;
+        std::unique_ptr<server_type> server_{};
     };
-
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,136 +13,48 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
-    struct num_sites_arg
-    {
-        explicit constexpr num_sites_arg(
-            std::size_t num_sites = std::size_t(-1)) noexcept
-          : num_sites_(num_sites)
+    namespace detail {
+
+        template <typename Tag,
+            std::size_t Default = static_cast<std::size_t>(-1)>
+        struct argument_type
         {
-        }
+            explicit constexpr argument_type(
+                std::size_t argument = Default) noexcept
+              : argument_(argument)
+            {
+            }
 
-        constexpr num_sites_arg& operator=(std::size_t num_sites) noexcept
-        {
-            num_sites_ = num_sites;
-            return *this;
-        }
+            constexpr argument_type& operator=(std::size_t argument) noexcept
+            {
+                argument_ = argument;
+                return *this;
+            }
 
-        constexpr operator std::size_t() const noexcept
-        {
-            return num_sites_;
-        }
+            constexpr operator std::size_t() const noexcept
+            {
+                return argument_;
+            }
 
-        std::size_t num_sites_;
-    };
+            std::size_t argument_;
+        };
 
-    struct this_site_arg
-    {
-        explicit constexpr this_site_arg(
-            std::size_t this_site = std::size_t(-1)) noexcept
-          : this_site_(this_site)
-        {
-        }
+        struct num_sites_tag;
+        struct this_site_tag;
+        struct that_site_tag;
+        struct generation_tag;
+        struct root_site_tag;
+        struct tag_tag;
+        struct arity_tag;
+    }    // namespace detail
 
-        constexpr this_site_arg& operator=(std::size_t this_site) noexcept
-        {
-            this_site_ = this_site;
-            return *this;
-        }
-
-        constexpr operator std::size_t() const noexcept
-        {
-            return this_site_;
-        }
-
-        std::size_t this_site_;
-    };
-
-    struct that_site_arg
-    {
-        explicit constexpr that_site_arg(
-            std::size_t that_site = std::size_t(-1)) noexcept
-          : that_site_(that_site)
-        {
-        }
-
-        constexpr that_site_arg& operator=(std::size_t that_site) noexcept
-        {
-            that_site_ = that_site;
-            return *this;
-        }
-
-        constexpr operator std::size_t() const noexcept
-        {
-            return that_site_;
-        }
-
-        std::size_t that_site_;
-    };
-
-    struct generation_arg
-    {
-        explicit constexpr generation_arg(
-            std::size_t generation = std::size_t(-1)) noexcept
-          : generation_(generation)
-        {
-        }
-
-        constexpr generation_arg& operator=(std::size_t generation) noexcept
-        {
-            generation_ = generation;
-            return *this;
-        }
-
-        constexpr operator std::size_t() const noexcept
-        {
-            return generation_;
-        }
-
-        std::size_t generation_;
-    };
-
-    struct root_site_arg
-    {
-        explicit constexpr root_site_arg(
-            std::size_t root_site = std::size_t(0)) noexcept
-          : root_site_(root_site)
-        {
-        }
-
-        constexpr root_site_arg& operator=(std::size_t root_site) noexcept
-        {
-            root_site_ = root_site;
-            return *this;
-        }
-
-        constexpr operator std::size_t() const noexcept
-        {
-            return root_site_;
-        }
-
-        std::size_t root_site_;
-    };
-
-    struct tag_arg
-    {
-        explicit constexpr tag_arg(std::size_t tag = std::size_t(0)) noexcept
-          : tag_(tag)
-        {
-        }
-
-        constexpr tag_arg& operator=(std::size_t tag) noexcept
-        {
-            tag_ = tag;
-            return *this;
-        }
-
-        constexpr operator std::size_t() const noexcept
-        {
-            return tag_;
-        }
-
-        std::size_t tag_;
-    };
-}}    // namespace hpx::collectives
+    using num_sites_arg = detail::argument_type<detail::num_sites_tag>;
+    using this_site_arg = detail::argument_type<detail::this_site_tag>;
+    using that_site_arg = detail::argument_type<detail::that_site_tag>;
+    using generation_arg = detail::argument_type<detail::generation_tag>;
+    using root_site_arg = detail::argument_type<detail::root_site_tag, 0>;
+    using tag_arg = detail::argument_type<detail::tag_tag, 0>;
+    using arity_arg = detail::argument_type<detail::arity_tag>;
+}    // namespace hpx::collectives

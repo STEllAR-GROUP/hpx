@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT bool (*is_console)();
@@ -244,4 +244,4 @@ namespace hpx { namespace agas { namespace detail {
     extern HPX_EXPORT naming::address_type (*get_primary_ns_lva)();
     extern HPX_EXPORT naming::address_type (*get_symbol_ns_lva)();
     extern HPX_EXPORT naming::address_type (*get_runtime_support_lva)();
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail

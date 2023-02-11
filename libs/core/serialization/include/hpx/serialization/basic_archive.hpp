@@ -11,8 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/serialization/config/defines.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -177,7 +176,7 @@ namespace hpx::serialization {
     protected:
         std::uint32_t flags_;
         std::size_t size_;
-        detail::extra_archive_data extra_data_;
+        util::extra_data extra_data_;
     };
 
     template <typename Archive>
