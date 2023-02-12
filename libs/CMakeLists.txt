@@ -313,10 +313,8 @@ foreach(lib ${HPX_LIBS})
   if(NOT ${lib} STREQUAL "full")
     string(TOUPPER ${lib} uppercase_lib)
     # include(HPX_CXX_Modules.cmake)
-    generate_module(cat core/preprocessor/include/hpx/preprocessor/cat.hpp)
 
     add_library(hpx_${lib} ${hpx_library_link_mode} src/empty.cpp)
-    target_link_libraries(hpx_${lib} PRIVATE cat)
 
     target_compile_definitions(hpx_${lib} PRIVATE HPX_${uppercase_lib}_EXPORTS)
 

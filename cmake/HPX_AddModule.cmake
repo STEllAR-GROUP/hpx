@@ -283,7 +283,7 @@ function(add_hpx_module libname modulename)
     hpx_${modulename}
     PUBLIC hpx_public_flags
     PRIVATE hpx_private_flags
-    PUBLIC hpx_base_libraries
+    PUBLIC hpx_base_libraries preprocessor
   )
 
   if(HPX_WITH_PRECOMPILED_HEADERS)
@@ -454,6 +454,9 @@ function(add_hpx_module libname modulename)
     )
   else()
     target_link_libraries(hpx_${libname} PUBLIC hpx_${modulename})
+    target_link_libraries(hpx_${libname} PUBLIC preprocessor)
+    target_link_libraries(hpx_${libname} PUBLIC cat)
+
     target_link_libraries(hpx_${libname} PRIVATE ${${modulename}_OBJECTS})
   endif()
 

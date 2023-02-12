@@ -9,11 +9,7 @@
 #include <hpx/config.hpp>
 
 
-#ifdef HPX_CXX_MODULES
-import cat;
-#else
-
-#endif
+import preprocessor;
 
 #include <hpx/type_support/construct_at.hpp>
 

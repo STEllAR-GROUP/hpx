@@ -16,6 +16,36 @@
 
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
+set(CMAKE_CXX_COMPILER "/home/hhn/makes/gcc-modules-install/usr/local/bin/g++")
+message(STATUS "${CMAKE_CXX_COMPILER}")
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API "2182bf5c-ef0d-489a-91da-49dbc3090d2a")
+
+
+if(HPX_CXX_MODULES)
+    # MESSAGE(WARNING "C++ modules is experimental, make sure the requirements are met")
+    # MESSAGE(WARNING "Patches for GCC to implementing module dependency scanning 
+    #                 haven't landed yet. Make sure you have the right build of GCC.")
+    # MESSAGE(WARNING "GCC Build : https://github.com/mathstuf/gcc/tree/p1689r5")
+    # MESSAGE(WARNING "GNU-Make does not support fully support modules yet,
+    #                 use Ninja(>1.12) as your generator")
+    # MESSAGE(WARNING "Set the CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API to the correct value")
+    # MESSAGE(WARNING "set(CMAKE_EXPERIMENTAL_CXX_MODULE_CMAKE_API \"2182bf5c-ef0d-489a-91da-49dbc3090d2a\")")
+endif()
+
+
+
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_DYNDEP 1)
+string(CONCAT CMAKE_EXPERIMENTAL_CXX_SCANDEP_SOURCE
+  "<CMAKE_CXX_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -E -x c++ <SOURCE>"
+  " -MT <DYNDEP_FILE> -MD -MF <DEP_FILE>"
+  " -fmodules-ts -fdep-file=<DYNDEP_FILE> -fdep-output=<OBJECT> -fdep-format=trtbd"
+  " -o <PREPROCESSED_SOURCE>")
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_MAP_FORMAT "gcc")
+set(CMAKE_EXPERIMENTAL_CXX_MODULE_MAP_FLAG "-fmodules-ts -fmodule-mapper=<MODULE_MAP_FILE> -fdep-format=trtbd -x c++")
+
+
+
+
 # Overrides must go before the project() statement, otherwise they are ignored.
 
 # ##############################################################################
