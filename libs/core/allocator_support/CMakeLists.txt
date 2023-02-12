@@ -21,6 +21,8 @@ set(allocator_support_compat_headers
 )
 # cmake-format: on
 
+generate_module(preprocessor preprocessor.hpp)
+
 set(allocator_support_sources)
 
 include(HPX_AddModule)
