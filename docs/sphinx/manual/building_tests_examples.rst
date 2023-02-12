@@ -28,7 +28,7 @@ To control which tests to run use ``ctest``:
 
 .. code-block:: shell-session
 
-    $ ctest --output-on-failure -R tests.unit.modules.algorithms.for_loop
+    $ ctest --output-on-failure -R tests.unit.modules.algorithms.algorithms.for_loop
 
 * To run a whole group of tests:
 
