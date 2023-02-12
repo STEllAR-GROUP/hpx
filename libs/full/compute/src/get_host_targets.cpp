@@ -35,9 +35,9 @@ namespace hpx::compute::host::distributed {
         {
             std::vector<host::distributed::target> remote_targets;
             remote_targets.reserve(targets.size());
-            for (auto&& t : targets)
+            for (auto const& t : targets)
             {
-                remote_targets.push_back(host::distributed::target(t));
+                remote_targets.emplace_back(t);
             }
             return remote_targets;
         }

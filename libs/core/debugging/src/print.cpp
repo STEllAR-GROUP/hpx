@@ -279,8 +279,8 @@ namespace hpx::debug {
 #else
             char** env = environ;
 #endif
-            std::vector<std::string> const env_strings{
-                "_RANK=", "_NODEID="};    //-V826
+            std::vector<std::string> const env_strings{//-V826
+                "_RANK=", "_NODEID="};
             for (char** current = env; *current; ++current)
             {
                 auto e = std::string(*current);

@@ -614,7 +614,7 @@ namespace hpx::experimental {
             // a previous state we set the next state so that the value can be
             // passed from the previous state to the next state. When there is
             // no previous state we need to move the value to the first state.
-            if (HPX_LIKELY(prev_state))
+            if (HPX_LIKELY(prev_state))    //-V1051
             {
                 prev_state->set_next_state(state);
             }

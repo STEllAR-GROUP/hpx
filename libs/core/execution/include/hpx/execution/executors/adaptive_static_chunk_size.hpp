@@ -89,7 +89,7 @@ namespace hpx::execution::experimental {
             }
             else if (input_size >= (1ull << 19))
             {
-                coeff = 4;
+                coeff = 4;    //-V112
             }
             while (chunk_size * coeff * cores < input_size)
             {

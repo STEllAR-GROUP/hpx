@@ -361,7 +361,7 @@ namespace hpx::components::detail {
 #endif
                 << ".";
 
-            if (size() > 0
+            if (wrapper_heap::size() > 0
 #if defined(HPX_DEBUG)
                 || alloc_count_ != free_count_
 #endif
@@ -370,7 +370,7 @@ namespace hpx::components::detail {
                 LOSH_(warning).format("wrapper_heap ({}): releasing heap ({}) "
                                       "with {} allocated object(s)!",
                     !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
-                    static_cast<void*>(pool_), size());
+                    static_cast<void*>(pool_), wrapper_heap::size());
             }
 
             std::size_t const total_num_bytes =

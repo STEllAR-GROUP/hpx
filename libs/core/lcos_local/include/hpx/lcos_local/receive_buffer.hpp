@@ -124,15 +124,16 @@ namespace hpx::lcos::local {
 
             // if the value was already set we delete the entry after retrieving
             // the future
-            if (it->second->can_be_deleted_)
+            auto& elem = it->second;
+            if (elem->can_be_deleted_)
             {
                 erase_on_exit t(buffer_map_, it);
                 return it->second->get_future();
             }
 
             // otherwise mark the entry as to be deleted once the value was set
-            it->second->can_be_deleted_ = true;
-            return it->second->get_future();
+            elem->can_be_deleted_ = true;
+            return elem->get_future();
         }
 
         bool try_receive(std::size_t step, hpx::future<T>* f = nullptr)
@@ -145,12 +146,13 @@ namespace hpx::lcos::local {
 
             // if the value was already set we delete the entry after
             // retrieving the future
-            if (it->second->can_be_deleted_)
+            auto& elem = it->second;
+            if (elem->can_be_deleted_)
             {
                 if (f != nullptr)
                 {
                     erase_on_exit t(buffer_map_, it);
-                    *f = it->second->get_future();
+                    *f = elem->get_future();
                 }
                 return true;
             }
@@ -158,8 +160,8 @@ namespace hpx::lcos::local {
             // otherwise mark the entry as to be deleted once the value was set
             if (f != nullptr)
             {
-                it->second->can_be_deleted_ = true;
-                *f = it->second->get_future();
+                elem->can_be_deleted_ = true;
+                *f = elem->get_future();
             }
             return true;
         }
@@ -344,15 +346,16 @@ namespace hpx::lcos::local {
 
             // if the value was already set we delete the entry after
             // retrieving the future
-            if (it->second->can_be_deleted_)
+            auto& elem = it->second;
+            if (elem->can_be_deleted_)
             {
                 erase_on_exit t(buffer_map_, it);
-                return it->second->get_future();
+                return elem->get_future();
             }
 
             // otherwise mark the entry as to be deleted once the value was set
-            it->second->can_be_deleted_ = true;
-            return it->second->get_future();
+            elem->can_be_deleted_ = true;
+            return elem->get_future();
         }
 
         bool try_receive(std::size_t step, hpx::future<void>* f = nullptr)
@@ -365,12 +368,13 @@ namespace hpx::lcos::local {
 
             // if the value was already set we delete the entry after
             // retrieving the future
-            if (it->second->can_be_deleted_)
+            auto& elem = it->second;
+            if (elem->can_be_deleted_)
             {
                 if (f != nullptr)
                 {
                     erase_on_exit t(buffer_map_, it);
-                    *f = it->second->get_future();
+                    *f = elem->get_future();
                 }
                 return true;
             }
@@ -378,8 +382,8 @@ namespace hpx::lcos::local {
             // otherwise mark the entry as to be deleted once the value was set
             if (f != nullptr)
             {
-                it->second->can_be_deleted_ = true;
-                *f = it->second->get_future();
+                elem->can_be_deleted_ = true;
+                *f = elem->get_future();
             }
             return true;
         }
@@ -449,8 +453,8 @@ namespace hpx::lcos::local {
             iterator it = buffer_map_.find(step);
             if (it == buffer_map_.end())
             {
-                std::pair<iterator, bool> res = buffer_map_.insert(
-                    std::make_pair(step, std::make_shared<entry_data>()));
+                std::pair<iterator, bool> res =
+                    buffer_map_.emplace(step, std::make_shared<entry_data>());
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,

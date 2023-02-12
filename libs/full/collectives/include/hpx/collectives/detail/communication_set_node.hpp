@@ -53,7 +53,7 @@ namespace hpx::collectives::detail {
         v |= v >> 4;
         v |= v >> 8;
         v |= v >> 16;
-        v |= v >> 32;
+        v |= v >> 32;    //-V112
         return ++v;
     }
 

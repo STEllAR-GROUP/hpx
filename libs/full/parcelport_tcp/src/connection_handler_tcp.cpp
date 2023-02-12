@@ -97,8 +97,8 @@ namespace hpx::parcelset::policies::tcp {
         {
             try
             {
-                std::shared_ptr<receiver> receiver_conn(new receiver(
-                    io_service, get_max_inbound_message_size(), *this));
+                auto receiver_conn = std::make_shared<receiver>(
+                    io_service, get_max_inbound_message_size(), *this);
 
                 tcp::endpoint ep = *it;
                 acceptor_->open(ep.protocol());
@@ -157,8 +157,7 @@ namespace hpx::parcelset::policies::tcp {
 
         // The parcel gets serialized inside the connection constructor, no
         // need to keep the original parcel alive after this call returned.
-        std::shared_ptr<sender> sender_connection(
-            new sender(io_service, l, this));
+        auto sender_connection = std::make_shared<sender>(io_service, l, this);
 
         // Connect to the target locality, retry if needed
         std::error_code error = asio::error::try_again;
@@ -205,7 +204,7 @@ namespace hpx::parcelset::policies::tcp {
 
                 HPX_THROWS_IF(ec, hpx::error::network_error,
                     "tcp::connection_handler::get_connection", e.what());
-                return sender_connection;
+                return sender_connection;    //-V614
             }
         }
 

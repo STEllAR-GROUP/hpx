@@ -156,7 +156,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++first, ++dest, i += 4)
+                     (void) ++first, ++dest, i += 4)    //-V112
                 {
                     *dest = *first;
                     *++dest = *++first;
@@ -300,7 +300,7 @@ namespace hpx::parallel::util {
                 std::size_t count(
                     num & static_cast<std::size_t>(-4));    // -V112
                 for (std::size_t i = 0; i < count;
-                     (void) ++first, ++dest, i += 4)
+                     (void) ++first, ++dest, i += 4)    //-V112
                 {
                     *dest = HPX_MOVE(*first);
                     // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)

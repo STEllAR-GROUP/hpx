@@ -39,7 +39,7 @@ namespace hpx { namespace performance_counters {
             create_counter_func create_counter_;
             discover_counters_func discover_counters_;
         };
-        typedef std::map<std::string, counter_data> counter_type_map_type;
+        using counter_type_map_type = std::map<std::string, counter_data>;
 
     public:
         registry() = default;

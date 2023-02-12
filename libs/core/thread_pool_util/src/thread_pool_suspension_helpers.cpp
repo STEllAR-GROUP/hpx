@@ -188,7 +188,7 @@ namespace hpx::threads {
                 "instead");
             return hpx::make_ready_future();
         }
-        if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
+        if (hpx::this_thread::get_pool() == &pool)
         {
             return hpx::make_exceptional_future<void>(
                 HPX_GET_EXCEPTION(hpx::error::bad_parameter, "suspend_pool",

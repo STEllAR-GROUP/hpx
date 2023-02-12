@@ -18,15 +18,15 @@
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     struct action_serialization_data
     {
         action_serialization_data()
-          : parent_locality_(naming::invalid_locality_id)
-          , parent_id_(static_cast<std::uint64_t>(0))
+          : parent_id_(static_cast<std::uint64_t>(0))
           , parent_phase_(0)
+          , parent_locality_(naming::invalid_locality_id)
           , priority_(static_cast<threads::thread_priority>(0))
           , stacksize_(static_cast<threads::thread_stacksize>(0))
         {
@@ -36,17 +36,17 @@ namespace hpx { namespace actions { namespace detail {
             threads::thread_id_type parent_id, std::uint64_t parent_phase,
             threads::thread_priority priority,
             threads::thread_stacksize stacksize)
-          : parent_locality_(parent_locality)
-          , parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
+          : parent_id_(reinterpret_cast<std::uint64_t>(parent_id.get()))
           , parent_phase_(parent_phase)
+          , parent_locality_(parent_locality)
           , priority_(priority)
           , stacksize_(stacksize)
         {
         }
 
-        std::uint32_t parent_locality_;
         std::uint64_t parent_id_;
         std::uint64_t parent_phase_;
+        std::uint32_t parent_locality_;
         threads::thread_priority priority_;
         threads::thread_stacksize stacksize_;
 
@@ -59,12 +59,13 @@ namespace hpx { namespace actions { namespace detail {
             // clang-format on
         }
     };
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 HPX_IS_BITWISE_SERIALIZABLE(hpx::actions::detail::action_serialization_data)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions {
+namespace hpx::actions {
+
     ///////////////////////////////////////////////////////////////////////////
     base_action::~base_action() {}
 
@@ -124,7 +125,7 @@ namespace hpx { namespace actions {
         return hpx::get_locality_id(ec);
     }
 
-    ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
     /// Return the locality of the parent thread
     std::uint32_t base_action_data::get_parent_locality_id() const
@@ -174,6 +175,6 @@ namespace hpx { namespace actions {
     {
         return stacksize_;
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
 #endif

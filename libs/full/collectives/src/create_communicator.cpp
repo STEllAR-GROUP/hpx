@@ -105,7 +105,7 @@ namespace hpx::collectives {
         if (this_site == static_cast<std::size_t>(-1))
         {
             this_site = agas::get_locality_id();
-            if (root_site == static_cast<std::size_t>(-1))
+            if (root_site == static_cast<std::size_t>(-1))    //-V1051
             {
                 root_site = this_site;
             }

@@ -102,7 +102,7 @@ namespace hpx { namespace util {
         void print_name_csv_short(Stream& out, std::string const& name);
 
     private:
-        typedef hpx::mutex mutex_type;
+        using mutex_type = hpx::mutex;
         mutex_type mtx_;
 
         std::vector<std::string> names_;

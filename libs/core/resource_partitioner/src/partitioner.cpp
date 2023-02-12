@@ -89,7 +89,7 @@ namespace hpx::resource {
             if (HPX_UNLIKELY(!part))
             {
                 std::lock_guard<std::recursive_mutex> l(partitioner_mtx());
-                if (!part)
+                if (!part)    //-V1036
                 {
                     part.reset(new detail::partitioner);
                 }

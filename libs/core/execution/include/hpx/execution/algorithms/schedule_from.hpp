@@ -219,8 +219,7 @@ namespace hpx::execution::experimental {
                             HPX_MOVE(scheduler)),
                         scheduler_sender_receiver{*this});
 #endif
-                    hpx::execution::experimental::start(
-                        scheduler_op_state.value());
+                    hpx::execution::experimental::start(*scheduler_op_state);
                 }
 
                 struct scheduler_sender_receiver

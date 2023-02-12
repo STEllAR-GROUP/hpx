@@ -84,8 +84,8 @@ namespace hpx::parcelset {
             }
 
             // store the request for later
-            get_message_handler_registrations().push_back(
-                hpx::make_tuple(message_handler_type, action));
+            get_message_handler_registrations().emplace_back(
+                message_handler_type, action);
         }
 
         parcelset::policies::message_handler* create_message_handler(

@@ -57,7 +57,7 @@ namespace hpx { namespace distributed { namespace detail {
       , rank_(rank)
       , num_(num)
       , arity_(hpx::util::from_string<std::size_t>(
-            get_config_entry("hpx.lcos.collectives.arity", 32)))
+            get_config_entry("hpx.lcos.collectives.arity", 32)))    //-V112
       , cut_off_(hpx::util::from_string<std::size_t>(
             get_config_entry("hpx.lcos.collectives.cut_off", std::size_t(-1))))
       , local_barrier_(num)
@@ -86,7 +86,6 @@ namespace hpx { namespace distributed { namespace detail {
 
         if (rank_ != 0)
         {
-            HPX_ASSERT(num_ < cut_off_);
             children_.push_back(hpx::find_from_basename(base_name_, 0).get());
         }
     }

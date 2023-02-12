@@ -72,9 +72,9 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
-                bulk_sender const& sender)
+                bulk_sender const& s)
             {
-                return tag(sender.sender);
+                return tag(s.sender);
             }
 
             template <typename Receiver>

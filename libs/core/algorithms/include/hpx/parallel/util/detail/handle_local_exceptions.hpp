@@ -56,7 +56,7 @@ namespace hpx::parallel::util::detail {
         }
 
         static void call([[maybe_unused]] std::exception_ptr const& e,
-            [[maybe_unused]] std::list<std::exception_ptr>& errors)
+            [[maybe_unused]] std::list<std::exception_ptr>& errors)    //-V826
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
             HPX_ASSERT(false);
@@ -76,7 +76,7 @@ namespace hpx::parallel::util::detail {
 #endif
         }
 
-        static void call(std::list<std::exception_ptr>& errors)
+        static void call(std::list<std::exception_ptr>& errors)    //-V826
         {
             if (!errors.empty())
             {
@@ -87,7 +87,7 @@ namespace hpx::parallel::util::detail {
     private:
         template <typename Future>
         static void call_helper_single([[maybe_unused]] Future const& f,
-            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,    //-V826
             [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -116,7 +116,7 @@ namespace hpx::parallel::util::detail {
             // extract exception from future and handle as needed
             if (f.has_exception())
             {
-                std::list<std::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;    //-V826
                 call(f.get_exception_ptr(), errors);
                 if (throw_errors && !errors.empty())
                 {
@@ -157,7 +157,7 @@ namespace hpx::parallel::util::detail {
     private:
         template <typename Cont>
         static void call_helper([[maybe_unused]] Cont const& workitems,
-            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,    //-V826
             [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -215,7 +215,7 @@ namespace hpx::parallel::util::detail {
             }
 
             // now extract exception from all futures
-            std::list<std::exception_ptr> errors;
+            std::list<std::exception_ptr> errors;    //-V826
             for (auto const& f : workitems)
             {
                 if (f.has_exception())
@@ -293,7 +293,7 @@ namespace hpx::parallel::util::detail {
         template <typename Future>
         static void call_with_cleanup_helper_single(
             [[maybe_unused]] Future const& f,
-            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,    //-V826
             [[maybe_unused]] bool throw_errors)
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -321,7 +321,7 @@ namespace hpx::parallel::util::detail {
 #else
             if (f.has_exception())
             {
-                std::list<std::exception_ptr> errors;
+                std::list<std::exception_ptr> errors;    //-V826
                 call(f.get_exception_ptr(), errors);
                 if (throw_errors && !errors.empty())
                 {
@@ -352,7 +352,7 @@ namespace hpx::parallel::util::detail {
     private:
         template <typename Cont, typename Cleanup>
         static void call_with_cleanup_helper([[maybe_unused]] Cont& workitems,
-            [[maybe_unused]] std::list<std::exception_ptr>& errors,
+            [[maybe_unused]] std::list<std::exception_ptr>& errors,    //-V826
             [[maybe_unused]] Cleanup&& cleanup,
             [[maybe_unused]] bool throw_errors)
         {
@@ -444,7 +444,7 @@ namespace hpx::parallel::util::detail {
             }
 
             // now, handle exceptions and cleanup partitions
-            std::list<std::exception_ptr> errors;
+            std::list<std::exception_ptr> errors;    //-V826
             std::exception_ptr bad_alloc_exception;
             for (auto& f : workitems)
             {
@@ -559,7 +559,7 @@ namespace hpx::parallel::util::detail {
 #endif
         }
 
-        static void call(std::list<std::exception_ptr> const& errors)
+        static void call(std::list<std::exception_ptr> const& errors)    //-V826
         {
             if (!errors.empty())
             {

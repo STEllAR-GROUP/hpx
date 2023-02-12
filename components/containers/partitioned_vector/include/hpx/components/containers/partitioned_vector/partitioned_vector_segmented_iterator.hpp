@@ -288,13 +288,15 @@ namespace hpx { namespace segmented {
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
-            return local_raw_iterator(data_->begin() + local_index_, data_);
+            return local_raw_iterator(
+                data_->begin() + local_index_, data_);    //-V522
         }
         local_raw_const_iterator local() const
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
-            return local_raw_iterator(data_->cbegin() + local_index_, data_);
+            return local_raw_iterator(
+                data_->cbegin() + local_index_, data_);    //-V522
         }
 
     private:
@@ -446,14 +448,15 @@ namespace hpx { namespace segmented {
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
-            return local_raw_iterator(data_->cbegin() + local_index_, data_);
+            return local_raw_iterator(
+                data_->cbegin() + local_index_, data_);    //-V522
         }
         local_raw_const_iterator local() const
         {
             if (partition_ && !data_)
                 data_ = partition_.get_ptr();
             return local_raw_const_iterator(
-                data_->cbegin() + local_index_, data_);
+                data_->cbegin() + local_index_, data_);    //-V522
         }
 
     private:

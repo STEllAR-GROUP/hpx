@@ -34,24 +34,24 @@ namespace hpx { namespace parallel { namespace util {
     template <typename T, typename Executors>
     class numa_allocator
     {
-        typedef typename Executors::value_type executor_type;
+        using executor_type = typename Executors::value_type;
 
     public:
         // typedefs
-        typedef T value_type;
-        typedef value_type* pointer;
-        typedef value_type const* const_pointer;
-        typedef value_type& reference;
-        typedef value_type const& const_reference;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
+        using value_type = T;
+        using pointer = value_type*;
+        using const_pointer = value_type const*;
+        using reference = value_type&;
+        using const_reference = value_type const&;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
 
     public:
         // convert an allocator<T> to allocator<U>
         template <typename U>
         struct rebind
         {
-            typedef numa_allocator<U, Executors> other;
+            using other = numa_allocator<U, Executors>;
         };
 
     public:
@@ -67,6 +67,8 @@ namespace hpx { namespace parallel { namespace util {
         {
         }
 
+        numa_allocator& operator=(numa_allocator const& rhs) = delete;
+
         template <typename U>
         numa_allocator(numa_allocator<U, Executors> const& rhs)
           : executors_(rhs.executors_)
@@ -75,21 +77,20 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         // address
-        pointer address(reference r)
+        static pointer address(reference r)
         {
             return &r;
         }
-        const_pointer address(const_reference r)
+        static const_pointer address(const_reference r)
         {
             return &r;
         }
 
         // memory allocation
-        pointer allocate(size_type cnt, const void* = nullptr)
+        pointer allocate(size_type cnt, void const* = nullptr)
         {
             // allocate memory
-            pointer p =
-                reinterpret_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
+            pointer p = static_cast<pointer>(topo_.allocate(cnt * sizeof(T)));
 
             // first touch policy, distribute evenly onto executors
             std::size_t part_size = cnt / executors_.size();
@@ -117,7 +118,7 @@ namespace hpx { namespace parallel { namespace util {
 
 #if defined(HPX_DEBUG)
                         // make sure memory was placed appropriately
-                        hpx::threads::mask_type mem_mask =
+                        hpx::threads::mask_type const mem_mask =
                             topo_.get_thread_affinity_mask_from_lva(&val);
 
                         std::size_t thread_num = hpx::get_worker_thread_num();
@@ -151,27 +152,29 @@ namespace hpx { namespace parallel { namespace util {
         }
 
         // size
-        size_type max_size() const
+        static size_type max_size() noexcept
         {
             return (std::numeric_limits<size_type>::max)() / sizeof(T);
         }
 
         // construction/destruction
-        void construct(pointer p, T const& t)
+        static void construct(pointer p, T const& t)
         {
             hpx::construct_at(p, t);
         }
-        void destroy(pointer p)
+        static void destroy(pointer p) noexcept
         {
             p->~T();
         }
 
-        friend bool operator==(numa_allocator const&, numa_allocator const&)
+        friend constexpr bool operator==(
+            numa_allocator const&, numa_allocator const&) noexcept
         {
             return true;
         }
 
-        friend bool operator!=(numa_allocator const& l, numa_allocator const& r)
+        friend constexpr bool operator!=(
+            numa_allocator const& l, numa_allocator const& r) noexcept
         {
             return !(l == r);
         }

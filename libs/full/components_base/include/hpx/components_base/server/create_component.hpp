@@ -157,7 +157,7 @@ namespace hpx { namespace components { namespace server {
                     HPX_THROW_EXCEPTION(hpx::error::unknown_component_address,
                         "bulk_create<Component>", "can't assign global id");
                 }
-                gids.push_back(HPX_MOVE(gid));
+                gids.emplace_back(HPX_MOVE(gid));
                 ++instance_count(type);
                 ++succeeded;
             }

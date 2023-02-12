@@ -197,7 +197,7 @@ namespace hpx::parallel::util {
                     handle_local_exceptions::call(std::current_exception());
                 }
 
-                HPX_UNREACHABLE;
+                HPX_UNREACHABLE;    //-V779
 #endif
             }
         };

@@ -269,7 +269,7 @@ namespace hpx::parallel::util::detail {
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min) (chunk_size, count);
 
-            shape.push_back(hpx::make_tuple(first, chunk));
+            shape.emplace_back(first, chunk);
 
             // modifies 'chunk'
             first = parallel::detail::next(first, count, chunk);
@@ -485,7 +485,7 @@ namespace hpx::parallel::util::detail {
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min) (chunk_size, count);
 
-            shape.push_back(hpx::make_tuple(first, chunk, base_idx));
+            shape.emplace_back(first, chunk, base_idx);
 
             // modifies 'chunk'
             first = parallel::detail::next(first, count, chunk);

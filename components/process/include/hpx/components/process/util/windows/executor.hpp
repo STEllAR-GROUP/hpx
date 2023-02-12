@@ -37,6 +37,7 @@ namespace hpx { namespace components { namespace process { namespace windows {
 #if (_WIN32_WINNT >= 0x0600)
           , startup_info(startup_info_ex.StartupInfo)
 #endif
+          , proc_info{}
         {
 #if (_WIN32_WINNT >= 0x0600)
             ZeroMemory(&startup_info_ex, sizeof(STARTUPINFOEX));

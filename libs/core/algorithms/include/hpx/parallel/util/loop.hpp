@@ -318,15 +318,15 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 Iter it, std::size_t num, F&& f, std::true_type)
             {
-                while (num >= 4)
+                while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, it);
                     HPX_INVOKE(f, it + 1);
                     HPX_INVOKE(f, it + 2);
                     HPX_INVOKE(f, it + 3);
 
-                    it += 4;
-                    num -= 4;
+                    it += 4;     //-V112
+                    num -= 4;    //-V112
                 }
 
                 switch (num)
@@ -456,15 +456,15 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 Iter it, std::size_t num, F&& f, std::true_type)
             {
-                while (num >= 4)
+                while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, *it);
                     HPX_INVOKE(f, *(it + 1));
                     HPX_INVOKE(f, *(it + 2));
                     HPX_INVOKE(f, *(it + 3));
 
-                    it += 4;
-                    num -= 4;
+                    it += 4;     //-V112
+                    num -= 4;    //-V112
                 }
 
                 switch (num)
@@ -829,15 +829,15 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Iter call(
                 std::size_t base_idx, Iter it, std::size_t num, F&& f)
             {
-                while (num >= 4)
+                while (num >= 4)    //-V112
                 {
                     HPX_INVOKE(f, *it, base_idx++);
                     HPX_INVOKE(f, *(it + 1), base_idx++);
                     HPX_INVOKE(f, *(it + 2), base_idx++);
                     HPX_INVOKE(f, *(it + 3), base_idx++);
 
-                    it += 4;
-                    num -= 4;
+                    it += 4;     //-V112
+                    num -= 4;    //-V112
                 }
 
                 switch (num)

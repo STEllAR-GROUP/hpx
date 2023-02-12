@@ -451,7 +451,7 @@ namespace hpx::parcelset {
         locality_ids.reserve(ids.size());
         for (auto id : ids)
         {
-            locality_ids.push_back(naming::get_gid_from_locality_id(id));
+            locality_ids.emplace_back(naming::get_gid_from_locality_id(id));
         }
 
         return !locality_ids.empty();
@@ -775,8 +775,8 @@ namespace hpx::parcelset {
                     }
                 }
 
-                resolved_parcels.push_back(HPX_MOVE(p));
-                resolved_handlers.push_back(HPX_MOVE(f));
+                resolved_parcels.emplace_back(HPX_MOVE(p));
+                resolved_handlers.emplace_back(HPX_MOVE(f));
                 if (!resolved_dest.second)
                 {
                     resolved_dest = dest;
@@ -788,8 +788,8 @@ namespace hpx::parcelset {
             }
             else
             {
-                nonresolved_parcels.push_back(HPX_MOVE(p));
-                nonresolved_handlers.push_back(HPX_MOVE(f));
+                nonresolved_parcels.emplace_back(HPX_MOVE(p));
+                nonresolved_handlers.emplace_back(HPX_MOVE(f));
             }
         }
 
@@ -918,8 +918,8 @@ namespace hpx::parcelset {
                 // insert an empty entry into the map to avoid trying to
                 // create this handler again
                 p.reset();
-                std::pair<message_handler_map::iterator, bool> r =
-                    handlers_.insert(message_handler_map::value_type(key, p));
+                std::pair<message_handler_map::iterator, bool> const r =
+                    handlers_.emplace(key, p);
 
                 l.unlock();
                 if (!r.second)
@@ -932,8 +932,8 @@ namespace hpx::parcelset {
                 return nullptr;    // no message handler available
             }
 
-            std::pair<message_handler_map::iterator, bool> r =
-                handlers_.insert(message_handler_map::value_type(key, p));
+            std::pair<message_handler_map::iterator, bool> const r =
+                handlers_.emplace(key, p);
 
             l.unlock();
             if (!r.second)

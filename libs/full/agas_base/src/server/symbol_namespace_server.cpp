@@ -135,8 +135,8 @@ namespace hpx::agas::server {
             return false;
         }
 
-        if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
-                std::make_pair(key, std::make_shared<naming::gid_type>(gid))))))
+        if (HPX_UNLIKELY(!util::insert_checked(
+                gids_.emplace(key, std::make_shared<naming::gid_type>(gid)))))
         {
             l.unlock();
 
@@ -369,8 +369,7 @@ namespace hpx::agas::server {
 
         if (!handled)
         {
-            [[maybe_unused]] auto const it = on_event_data_.insert(
-                on_event_data_map_type::value_type(name, lco));
+            [[maybe_unused]] auto const it = on_event_data_.emplace(name, lco);
 
             // This overload of insert always returns the iterator pointing
             // to the inserted value. It should never point to end

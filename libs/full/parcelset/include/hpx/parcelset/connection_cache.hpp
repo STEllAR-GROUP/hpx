@@ -322,9 +322,9 @@ namespace hpx { namespace util {
             typename key_tracker_type::iterator kt =
                 key_tracker_.insert(key_tracker_.end(), l);
 
-            cache_.insert(std::make_pair(l,
+            cache_.emplace(l,
                 hpx::make_tuple(
-                    value_type(), 1, max_connections_per_locality_, kt)));
+                    value_type(), 1, max_connections_per_locality_, kt));
 
             // Make sure the input connection shared_ptr doesn't hold anything.
             conn.reset();
@@ -405,8 +405,10 @@ namespace hpx { namespace util {
             if (!cache_.count(l))
                 return false || (connections_ >= max_connections_);
 
-            typename cache_type::const_iterator ct = cache_.find(l);
-            HPX_ASSERT(ct != cache_.end());
+            auto ct = cache_.find(l);
+            if (ct == cache_.end())
+                return false;
+
             return (num_existing_connections(ct->second) >=
                        max_num_connections(ct->second)) ||
                 (connections_ >= max_connections_);
@@ -575,13 +577,13 @@ namespace hpx { namespace util {
                 return true;
 
             // Find the least recently used key.
-            typename key_tracker_type::iterator kt = key_tracker_.begin();
-
+            auto kt = key_tracker_.begin();
             while (connections_ >= max_connections_)
             {
                 // Find the least recently used keys data.
-                typename cache_type::iterator ct = cache_.find(*kt);
-                HPX_ASSERT(ct != cache_.end());
+                auto ct = cache_.find(*kt);
+                if (ct == cache_.end())
+                    break;
 
                 // If the entry is empty, ignore it and try the next least
                 // recently used entry.

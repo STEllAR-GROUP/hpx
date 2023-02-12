@@ -153,7 +153,7 @@ namespace hpx { namespace components {
                 objs.reserve(localities_->size());
                 for (hpx::id_type const& loc : *localities_)
                 {
-                    objs.push_back(bulk_create_async<Component>(
+                    objs.emplace_back(bulk_create_async<Component>(
                         loc, get_num_items(count, loc), vs...));
                 }
 
