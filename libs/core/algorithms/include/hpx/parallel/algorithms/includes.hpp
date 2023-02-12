@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -85,8 +85,8 @@ namespace hpx {
     ///           Also returns true if [\a first2, \a last2) is empty.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-        typename Pred = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type>::type
+        typename Pred = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>::type>
     includes(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
@@ -142,7 +142,7 @@ namespace hpx {
     ///           Also returns true if [\a first2, \a last2) is empty.
     ///
     template <typename FwdIter1, typename FwdIter2,
-        typename Pred = hpx::parallel::v1::detail::less>
+        typename Pred = hpx::parallel::detail::less>
     bool includes(FwdIter1 first1, FwdIter1 last1,
             FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred());
 
@@ -153,19 +153,18 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/upper_lower_bound.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -174,7 +173,8 @@ namespace hpx {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // includes
     namespace detail {
@@ -182,8 +182,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Iter1, typename Sent1, typename Iter2,
             typename Sent2, typename F, typename Proj1, typename Proj2,
             typename CancelToken>
-        bool sequential_includes(Iter1 first1, Sent1 last1, Iter2 first2,
-            Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2, CancelToken& tok)
+        constexpr bool sequential_includes(Iter1 first1, Sent1 last1,
+            Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2,
+            CancelToken& tok)
         {
             while (first2 != last2)
             {
@@ -246,18 +247,19 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        struct includes : public detail::algorithm<includes, bool>
+        struct includes : public algorithm<includes, bool>
         {
-            includes()
-              : includes::algorithm("includes")
+            constexpr includes() noexcept
+              : algorithm("includes")
             {
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static bool sequential(ExPolicy, Iter1 first1, Sent1 last1,
-                Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            static constexpr bool sequential(ExPolicy, Iter1 first1,
+                Sent1 last1, Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
+                Proj2&& proj2)
             {
                 return sequential_includes(first1, last1, first2, last2,
                     HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
@@ -267,8 +269,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
+            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+                ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
                 Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
                 if (first1 == last1)
@@ -358,7 +360,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -370,11 +372,11 @@ namespace hpx {
     private:
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
@@ -386,24 +388,22 @@ namespace hpx {
         tag_fallback_invoke(includes_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::includes().call(
+            return hpx::parallel::detail::includes().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter1>::value_type,
                     typename std::iterator_traits<FwdIter2>::value_type
@@ -413,16 +413,14 @@ namespace hpx {
         friend bool tag_fallback_invoke(includes_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op = Pred())
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::includes().call(
-                hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op),
-                hpx::parallel::util::projection_identity(),
-                hpx::parallel::util::projection_identity());
+            return hpx::parallel::detail::includes().call(hpx::execution::seq,
+                first1, last1, first2, last2, HPX_FORWARD(Pred, op),
+                hpx::identity_v, hpx::identity_v);
         }
     } includes{};
 }    // namespace hpx

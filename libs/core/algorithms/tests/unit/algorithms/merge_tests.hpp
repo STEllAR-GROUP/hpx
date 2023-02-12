@@ -489,7 +489,7 @@ void test_merge_etc(IteratorTag, DataType, int rand_base)
         typedef test::test_iterator<base_iterator, std::output_iterator_tag>
             output_iterator;
 
-        auto result = hpx::parallel::v1::detail::sequential_merge(
+        auto result = hpx::parallel::detail::sequential_merge(
             input_iterator(std::begin(src1)), input_iterator(std::end(src1)),
             input_iterator(std::begin(src2)), input_iterator(std::end(src2)),
             output_iterator(std::begin(dest_res)),
@@ -546,7 +546,7 @@ void test_merge_etc(ExPolicy&& policy, IteratorTag, DataType, int rand_base)
         typedef test::test_iterator<base_iterator, std::output_iterator_tag>
             output_iterator;
 
-        auto result = hpx::parallel::v1::detail::sequential_merge(
+        auto result = hpx::parallel::detail::sequential_merge(
             input_iterator(std::begin(src1)), input_iterator(std::end(src1)),
             input_iterator(std::begin(src2)), input_iterator(std::end(src2)),
             output_iterator(std::begin(dest_res)),

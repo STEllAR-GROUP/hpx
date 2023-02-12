@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2019 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
 
     unsigned int major_version()
     {
@@ -39,4 +39,4 @@ namespace hpx { namespace resiliency { namespace experimental {
             std::to_string(HPX_RESILIENCY_VERSION_MINOR) + "." +
             std::to_string(HPX_RESILIENCY_VERSION_SUBMINOR);
     }
-}}}    // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental

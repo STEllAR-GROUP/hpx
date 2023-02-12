@@ -268,9 +268,9 @@ void test_search4_sentinel(IteratorTag)
 
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
-    iterator index =
-        hpx::ranges::search(iterator(std::begin(c)), sentinel(std::end(c)),
-            iterator(std::begin(h)), sentinel(std::end(h)), op);
+    iterator index = hpx::ranges::search(iterator(std::begin(c)),
+        sentinel(iterator(std::end(c))), iterator(std::begin(h)),
+        sentinel(iterator(std::end(h))), op);
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -300,8 +300,8 @@ void test_search4_sentinel(ExPolicy policy, IteratorTag)
     auto op = [](std::size_t a, std::size_t b) { return !(a != b); };
 
     iterator index = hpx::ranges::search(policy, iterator(std::begin(c)),
-        sentinel(std::end(c)), iterator(std::begin(h)), sentinel(std::end(h)),
-        op);
+        sentinel(iterator(std::end(c))), iterator(std::begin(h)),
+        sentinel(iterator(std::end(h))), op);
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 

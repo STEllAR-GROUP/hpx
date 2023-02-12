@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,12 +9,10 @@
 #include <hpx/config.hpp>
 #include <hpx/type_support/identity.hpp>
 
-#include <type_traits>
-#include <utility>
+namespace hpx::parallel::util {
 
-namespace hpx { namespace parallel { namespace util {
     ///////////////////////////////////////////////////////////////////////////
-    /// \struct projection_identity
-    /// \brief this represents the projection identity
-    using projection_identity = hpx::identity;
-}}}    // namespace hpx::parallel::util
+    using projection_identity HPX_DEPRECATED_V(1, 9,
+        "hpx::identity is deprecated, use "
+        "hpx::identity instead") = hpx::identity;
+}    // namespace hpx::parallel::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     template <typename Iterator, typename Enable = void>
     struct chunk_size_iterator_category;
@@ -59,7 +59,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE static constexpr std::size_t get_last_chunk_size(
             std::size_t count, std::size_t chunk_size) noexcept
         {
-            std::ptrdiff_t remainder = count % chunk_size;
+            std::ptrdiff_t const remainder =
+                static_cast<std::ptrdiff_t>(count % chunk_size);
             if (remainder != 0)
             {
                 return remainder;
@@ -127,23 +128,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             if (current_ >= count_)
             {
                 // reached the end of the sequence
-                iterator() = parallel::v1::detail::next(
+                iterator() = parallel::detail::next(
                     iterator(), offset + last_chunk_size_);
                 chunk() = 0;
             }
             else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk
-                iterator() = parallel::v1::detail::next(
-                    iterator(), offset + chunk_size_);
+                iterator() =
+                    parallel::detail::next(iterator(), offset + chunk_size_);
                 chunk() = last_chunk_size_;
             }
             else
             {
                 // normal chunk
                 HPX_ASSERT(current_ < count_ - last_chunk_size_);
-                iterator() = parallel::v1::detail::next(
-                    iterator(), offset + chunk_size_);
+                iterator() =
+                    parallel::detail::next(iterator(), offset + chunk_size_);
                 chunk() = chunk_size_;
             }
         }
@@ -174,7 +175,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 chunk() = chunk_size_;
             }
 
-            iterator() = parallel::v1::detail::next(
+            iterator() = parallel::detail::next(
                 iterator(), -static_cast<std::ptrdiff_t>(offset + chunk()));
         }
 
@@ -212,8 +213,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             chunk_size_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
-                ((rhs.iterator() - iterator()) + chunk_size_ - 1) /
-                chunk_size_);
+                (rhs.iterator() - iterator() + chunk_size_ - 1) / chunk_size_);
         }
 
     private:
@@ -240,7 +240,8 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         HPX_HOST_DEVICE static constexpr std::size_t get_last_chunk_size(
             std::size_t count, std::size_t chunk_size) noexcept
         {
-            std::ptrdiff_t remainder = count % chunk_size;
+            std::ptrdiff_t const remainder =
+                static_cast<std::ptrdiff_t>(count % chunk_size);
             if (remainder != 0)
             {
                 return remainder;
@@ -320,23 +321,23 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             if (current_ >= count_)
             {
                 // reached the end of the sequence
-                iterator() = parallel::v1::detail::next(
+                iterator() = parallel::detail::next(
                     iterator(), offset + last_chunk_size_);
                 chunk() = 0;
             }
             else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk
-                iterator() = parallel::v1::detail::next(
-                    iterator(), offset + chunk_size_);
+                iterator() =
+                    parallel::detail::next(iterator(), offset + chunk_size_);
                 chunk() = last_chunk_size_;
             }
             else
             {
                 // normal chunk
                 HPX_ASSERT(current_ < count_ - last_chunk_size_);
-                iterator() = parallel::v1::detail::next(
-                    iterator(), offset + chunk_size_);
+                iterator() =
+                    parallel::detail::next(iterator(), offset + chunk_size_);
                 chunk() = chunk_size_;
             }
         }
@@ -369,7 +370,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
                 chunk() = chunk_size_;
             }
 
-            iterator() = parallel::v1::detail::next(
+            iterator() = parallel::detail::next(
                 iterator(), -static_cast<std::ptrdiff_t>(offset + chunk()));
         }
 
@@ -407,8 +408,7 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             chunk_size_idx_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
-                ((rhs.iterator() - iterator()) + chunk_size_ - 1) /
-                chunk_size_);
+                (rhs.iterator() - iterator() + chunk_size_ - 1) / chunk_size_);
         }
 
     private:
@@ -418,4 +418,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         std::size_t count_ = 0;
         std::size_t current_ = 0;
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

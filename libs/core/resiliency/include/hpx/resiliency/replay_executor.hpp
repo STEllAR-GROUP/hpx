@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Validate>
@@ -61,7 +61,7 @@ namespace hpx { namespace resiliency { namespace experimental {
             return !(*this == rhs);
         }
 
-        replay_executor const& context() const noexcept
+        constexpr replay_executor const& context() const noexcept
         {
             return *this;
         }
@@ -162,11 +162,10 @@ namespace hpx { namespace resiliency { namespace experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Validate>
-    replay_executor<BaseExecutor, typename std::decay<Validate>::type>
-    make_replay_executor(BaseExecutor& exec, std::size_t n, Validate&& validate)
+    replay_executor<BaseExecutor, std::decay_t<Validate>> make_replay_executor(
+        BaseExecutor& exec, std::size_t n, Validate&& validate)
     {
-        return replay_executor<BaseExecutor,
-            typename std::decay<Validate>::type>(
+        return replay_executor<BaseExecutor, std::decay_t<Validate>>(
             exec, n, HPX_FORWARD(Validate, validate));
     }
 
@@ -177,9 +176,9 @@ namespace hpx { namespace resiliency { namespace experimental {
         return replay_executor<BaseExecutor, detail::replay_validator>(
             exec, n, detail::replay_validator());
     }
-}}}    // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     template <typename BaseExecutor, typename Validator>
     struct is_two_way_executor<
@@ -194,4 +193,4 @@ namespace hpx { namespace parallel { namespace execution {
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

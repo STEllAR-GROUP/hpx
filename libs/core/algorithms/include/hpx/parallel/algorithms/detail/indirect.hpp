@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     /// \class less_ptr_no_null
     ///
@@ -31,12 +31,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         Comp comp;
 
-        inline less_ptr_no_null(Comp C1 = Comp())
+        explicit less_ptr_no_null(Comp C1 = Comp())
           : comp(HPX_MOVE(C1))
         {
         }
 
-        inline bool operator()(Iter T1, Sent T2) const
+        bool operator()(Iter T1, Sent T2) const
         {
             return comp(*T1, *T2);
         }
@@ -50,8 +50,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename Iter, typename Sent>
     void create_index(Iter first, Sent last, std::vector<Iter>& v_iter)
     {
-        auto nelem = detail::distance(first, last);
+        auto const nelem = detail::distance(first, last);
         HPX_ASSERT(nelem >= 0);
+
         v_iter.clear();
         v_iter.reserve(nelem);
         for (/**/; first != last; ++first)
@@ -71,13 +72,13 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         using value_type = typename std::iterator_traits<Iter>::value_type;
 
         std::size_t pos_dest = 0, pos_src = 0, pos_in_vector = 0;
-        std::size_t nelem = v_iter.size();
+        std::size_t const nelem = v_iter.size();
 
         while (pos_in_vector < nelem)
         {
             while (pos_in_vector < nelem &&
-                std::size_t(detail::distance(first, v_iter[pos_in_vector])) ==
-                    pos_in_vector)
+                static_cast<std::size_t>(detail::distance(
+                    first, v_iter[pos_in_vector])) == pos_in_vector)
             {
                 ++pos_in_vector;
             }
@@ -91,7 +92,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             Iter it_dest = std::next(first, pos_dest);
             value_type Aux = HPX_MOVE(*it_dest);
 
-            while ((pos_src = std::size_t(detail::distance(
+            while ((pos_src = static_cast<std::size_t>(detail::distance(
                         first, v_iter[pos_dest]))) != pos_in_vector)
             {
                 v_iter[pos_dest] = it_dest;
@@ -106,4 +107,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             ++pos_in_vector;
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

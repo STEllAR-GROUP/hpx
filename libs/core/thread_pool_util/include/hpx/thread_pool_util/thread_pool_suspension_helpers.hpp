@@ -13,7 +13,8 @@
 
 #include <cstddef>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     /// Resumes the given processing unit. When the processing unit has been
     /// resumed the returned future will be ready.
     ///
@@ -131,4 +132,4 @@ namespace hpx { namespace threads {
     ///         on the pool itself.
     HPX_CORE_EXPORT void suspend_pool_cb(thread_pool_base& pool,
         hpx::function<void(void)> callback, error_code& ec = throws);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

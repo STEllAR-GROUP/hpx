@@ -22,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_fill
@@ -55,7 +55,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
     }    // namespace detail
          /// \endcond
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 namespace hpx { namespace segmented {
 
@@ -79,12 +79,12 @@ namespace hpx { namespace segmented {
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
         using value_type = typename std::iterator_traits<SegIter>::value_type;
 
-        return hpx::parallel::v1::detail::segmented_for_each(
-            hpx::parallel::v1::detail::for_each<
+        return hpx::parallel::detail::segmented_for_each(
+            hpx::parallel::detail::for_each<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last,
-            hpx::parallel::v1::detail::fill_function<value_type>(value),
-            hpx::parallel::util::projection_identity{}, std::true_type{});
+            hpx::parallel::detail::fill_function<value_type>(value),
+            hpx::identity_v, std::true_type{});
     }
 
     // clang-format off
@@ -117,10 +117,10 @@ namespace hpx { namespace segmented {
         using value_type = typename std::iterator_traits<SegIter>::value_type;
 
         return segmented_for_each(
-            hpx::parallel::v1::detail::for_each<
+            hpx::parallel::detail::for_each<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last,
-            hpx::parallel::v1::detail::fill_function<value_type>(value),
-            hpx::parallel::util::projection_identity{}, is_seq());
+            hpx::parallel::detail::fill_function<value_type>(value),
+            hpx::identity_v, is_seq());
     }
 }}    // namespace hpx::segmented

@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Minh-Khanh Do
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/type_support/void_guard.hpp>
 
@@ -33,7 +34,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented scan
     namespace detail {
@@ -789,4 +790,4 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel

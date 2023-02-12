@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,13 +6,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename Enable = void>
@@ -75,4 +74,4 @@ namespace hpx { namespace traits {
       : segmented_local_iterator_traits<Iterator>::is_segmented_local_iterator
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

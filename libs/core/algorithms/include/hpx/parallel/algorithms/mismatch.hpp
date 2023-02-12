@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 Bhumit Attarde
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -78,7 +78,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -145,7 +145,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -227,7 +227,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -297,7 +297,7 @@ namespace hpx {
     /// within each thread.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -364,7 +364,7 @@ namespace hpx {
     ///                     \a Type1 and \a Type2 respectively
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -409,7 +409,7 @@ namespace hpx {
     ///                     the second range the algorithm will be applied to.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -469,7 +469,7 @@ namespace hpx {
     ///                     \a Type1 and \a Type2 respectively
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -517,7 +517,7 @@ namespace hpx {
     ///                     of the second range the algorithm will be applied to.
     ///
     /// \note     The two ranges are considered mismatch if, for every iterator
-    ///           i in the range [first1,last1), *i mismatchs *(first2 + (i - first1)).
+    ///           i in the range [first1,last1), *i mismatches *(first2 + (i - first1)).
     ///           This overload of mismatch uses operator== to determine if two
     ///           elements are mismatch.
     ///
@@ -540,7 +540,6 @@ namespace hpx {
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -561,9 +560,8 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
     ///////////////////////////////////////////////////////////////////////////
     // mismatch (binary)
     namespace detail {
@@ -571,10 +569,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         template <typename IterPair>
         struct mismatch_binary
-          : public detail::algorithm<mismatch_binary<IterPair>, IterPair>
+          : public algorithm<mismatch_binary<IterPair>, IterPair>
         {
             constexpr mismatch_binary() noexcept
-              : mismatch_binary::algorithm("mismatch_binary")
+              : algorithm<mismatch_binary, IterPair>("mismatch_binary")
             {
             }
 
@@ -679,14 +677,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename I1, typename I2>
-        std::pair<I1, I2> get_pair(util::in_in_result<I1, I2>&& p)
+        constexpr std::pair<I1, I2> get_pair(
+            util::in_in_result<I1, I2>&& p) noexcept
         {
-            return {p.in1, p.in2};
+            return {HPX_MOVE(p.in1), HPX_MOVE(p.in2)};
         }
 
         template <typename I1, typename I2>
         hpx::future<std::pair<I1, I2>> get_pair(
-            hpx::future<util::in_in_result<I1, I2>>&& f)
+            hpx::future<util::in_in_result<I1, I2>>&& f) noexcept
         {
             return hpx::make_future<std::pair<I1, I2>>(HPX_MOVE(f),
                 [](util::in_in_result<I1, I2>&& p) -> std::pair<I1, I2> {
@@ -700,10 +699,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
 
         template <typename IterPair>
-        struct mismatch : public detail::algorithm<mismatch<IterPair>, IterPair>
+        struct mismatch : public algorithm<mismatch<IterPair>, IterPair>
         {
             constexpr mismatch() noexcept
-              : mismatch::algorithm("mismatch")
+              : algorithm<mismatch, IterPair>("mismatch")
             {
             }
 
@@ -775,7 +774,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -803,18 +802,17 @@ namespace hpx {
         tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::get_pair(
-                hpx::parallel::v1::detail::mismatch_binary<
+            return hpx::parallel::detail::get_pair(
+                hpx::parallel::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
                     .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                        last2, HPX_FORWARD(Pred, op),
-                        hpx::parallel::util::projection_identity{},
-                        hpx::parallel::util::projection_identity{}));
+                        last2, HPX_FORWARD(Pred, op), hpx::identity_v,
+                        hpx::identity_v));
         }
 
         // clang-format off
@@ -830,18 +828,17 @@ namespace hpx {
         tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::get_pair(
-                hpx::parallel::v1::detail::mismatch_binary<
+            return hpx::parallel::detail::get_pair(
+                hpx::parallel::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
                     .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                        last2, hpx::parallel::v1::detail::equal_to{},
-                        hpx::parallel::util::projection_identity{},
-                        hpx::parallel::util::projection_identity{}));
+                        last2, hpx::parallel::detail::equal_to{},
+                        hpx::identity_v, hpx::identity_v));
         }
 
         // clang-format off
@@ -862,12 +859,12 @@ namespace hpx {
         tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::mismatch<
+            return hpx::parallel::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
                     HPX_FORWARD(Pred, op));
@@ -886,15 +883,15 @@ namespace hpx {
         tag_fallback_invoke(mismatch_t, ExPolicy&& policy, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::mismatch<
+            return hpx::parallel::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
                 .call(HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                    hpx::parallel::v1::detail::equal_to{});
+                    hpx::parallel::detail::equal_to{});
         }
 
         // clang-format off
@@ -913,18 +910,17 @@ namespace hpx {
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
             Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::get_pair(
-                hpx::parallel::v1::detail::mismatch_binary<
+            return hpx::parallel::detail::get_pair(
+                hpx::parallel::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
                     .call(hpx::execution::seq, first1, last1, first2, last2,
-                        HPX_FORWARD(Pred, op),
-                        hpx::parallel::util::projection_identity{},
-                        hpx::parallel::util::projection_identity{}));
+                        HPX_FORWARD(Pred, op), hpx::identity_v,
+                        hpx::identity_v));
         }
 
         // clang-format off
@@ -937,18 +933,17 @@ namespace hpx {
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::get_pair(
-                hpx::parallel::v1::detail::mismatch_binary<
+            return hpx::parallel::detail::get_pair(
+                hpx::parallel::detail::mismatch_binary<
                     hpx::parallel::util::in_in_result<FwdIter1, FwdIter2>>()
                     .call(hpx::execution::seq, first1, last1, first2, last2,
-                        hpx::parallel::v1::detail::equal_to{},
-                        hpx::parallel::util::projection_identity{},
-                        hpx::parallel::util::projection_identity{}));
+                        hpx::parallel::detail::equal_to{}, hpx::identity_v,
+                        hpx::identity_v));
         }
 
         // clang-format off
@@ -966,12 +961,12 @@ namespace hpx {
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(mismatch_t,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred&& op)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::mismatch<
+            return hpx::parallel::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
                 .call(hpx::execution::seq, first1, last1, first2,
                     HPX_FORWARD(Pred, op));
@@ -987,17 +982,16 @@ namespace hpx {
         friend std::pair<FwdIter1, FwdIter2> tag_fallback_invoke(
             mismatch_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::mismatch<
+            return hpx::parallel::detail::mismatch<
                 std::pair<FwdIter1, FwdIter2>>()
                 .call(hpx::execution::seq, first1, last1, first2,
-                    hpx::parallel::v1::detail::equal_to{});
+                    hpx::parallel::detail::equal_to{});
         }
-
     } mismatch{};
 }    // namespace hpx
 

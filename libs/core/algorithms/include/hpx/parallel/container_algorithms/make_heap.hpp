@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -31,7 +31,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -76,8 +76,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter, typename Sent,
         typename Comp,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
     make_heap(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
         Proj&& proj = Proj{});
 
@@ -96,7 +96,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -138,7 +138,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng, typename Comp,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     make_heap(ExPolicy&& policy, Rng&& rng, Comp&& comp, Proj&& proj = Proj{});
@@ -159,7 +159,7 @@ namespace hpx { namespace ranges {
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -191,8 +191,8 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Iter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, Iter>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
     make_heap(ExPolicy&& policy, Iter first, Sent last, Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
@@ -208,7 +208,7 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -238,7 +238,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_iterator<Rng>::type>::type
     make_heap(ExPolicy&& policy, Rng&& rng, Proj&& proj = Proj{});
@@ -257,7 +257,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -285,7 +285,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename Iter, typename Sent, typename Comp,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     Iter make_heap(Iter first, Sent last, Comp&& comp, Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
@@ -299,7 +299,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -324,7 +324,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename Rng, typename Comp,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::traits::range_iterator<Rng>::type
     make_heap(Rng&& rng, Comp&& comp, Proj&& proj = Proj{});
 
@@ -340,7 +340,7 @@ namespace hpx { namespace ranges {
     ///                     This iterator type must meet the requirements of an
     ///                     sentinel for Iter1.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -355,7 +355,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename Iter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     Iter make_heap(Iter first, Sent last, Proj&& proj = Proj{});
 
     /// Constructs a \a max \a heap in the range [first, last).
@@ -367,7 +367,7 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an input iterator.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -380,7 +380,7 @@ namespace hpx { namespace ranges {
     ///           It returns \a last.
     ///
     template <typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename hpx::traits::range_iterator<Rng>::type
     make_heap(Rng&& rng, Proj&& proj = Proj{});
     // clang-format on
@@ -389,24 +389,22 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/make_heap.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/result_types.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::make_heap
@@ -417,9 +415,9 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
@@ -432,19 +430,19 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, Iter first,
             Sent last, Comp&& comp, Proj&& proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires random access iterator.");
 
-            return hpx::parallel::v1::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename Comp,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -461,10 +459,10 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires random access iterator.");
 
-            return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
+            return hpx::parallel::detail::make_heap<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_FORWARD(Comp, comp),
                 HPX_FORWARD(Proj, proj));
@@ -472,9 +470,9 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     std::less<typename std::iterator_traits<Iter>::value_type>,
@@ -488,21 +486,21 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, Iter first,
             Sent last, Proj&& proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires random access iterator.");
 
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
-            return hpx::parallel::v1::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<Iter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last,
                 std::less<value_type>(), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy,
                     std::less<typename std::iterator_traits<
@@ -522,13 +520,13 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires random access iterator.");
 
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
 
-            return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
+            return hpx::parallel::detail::make_heap<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), std::less<value_type>(),
                 HPX_FORWARD(Proj, proj));
@@ -536,7 +534,7 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Iter, typename Sent, typename Comp,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -549,17 +547,17 @@ namespace hpx { namespace ranges {
         friend Iter tag_fallback_invoke(make_heap_t, Iter first, Sent last,
             Comp&& comp, Proj&& proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires random access iterator.");
 
-            return hpx::parallel::v1::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<Iter>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng, typename Comp,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -577,17 +575,17 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires random access iterator.");
 
-            return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
+            return hpx::parallel::detail::make_heap<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -601,19 +599,19 @@ namespace hpx { namespace ranges {
         friend Iter tag_fallback_invoke(
             make_heap_t, Iter first, Sent last, Proj&& proj = Proj{})
         {
-            static_assert(hpx::traits::is_random_access_iterator<Iter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires random access iterator.");
 
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
-            return hpx::parallel::v1::detail::make_heap<Iter>().call(
+            return hpx::parallel::detail::make_heap<Iter>().call(
                 hpx::execution::seq, first, last, std::less<value_type>(),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -633,17 +631,17 @@ namespace hpx { namespace ranges {
                 typename hpx::traits::range_iterator<Rng>::type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires random access iterator.");
 
             using value_type =
                 typename std::iterator_traits<iterator_type>::value_type;
 
-            return hpx::parallel::v1::detail::make_heap<iterator_type>().call(
+            return hpx::parallel::detail::make_heap<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
                 std::less<value_type>(), HPX_FORWARD(Proj, proj));
         }
     } make_heap{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

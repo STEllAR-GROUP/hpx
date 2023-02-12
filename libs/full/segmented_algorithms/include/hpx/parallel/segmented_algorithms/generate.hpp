@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_generate
     namespace detail {
@@ -177,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 namespace hpx { namespace segmented {
 
@@ -200,8 +200,8 @@ namespace hpx { namespace segmented {
 
         typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
 
-        return hpx::parallel::v1::detail::segmented_generate(
-            hpx::parallel::v1::detail::generate<
+        return hpx::parallel::detail::segmented_generate(
+            hpx::parallel::detail::generate<
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(F, f),
             std::true_type{});
@@ -232,8 +232,8 @@ namespace hpx { namespace segmented {
 
         typedef hpx::traits::segmented_iterator_traits<SegIter> iterator_traits;
 
-        return hpx::parallel::v1::detail::segmented_generate(
-            hpx::parallel::v1::detail::generate<
+        return hpx::parallel::detail::segmented_generate(
+            hpx::parallel::detail::generate<
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
             is_seq());

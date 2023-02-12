@@ -78,7 +78,7 @@ namespace hpx {
     ///           and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename RndIter, typename Comp>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type make_heap(
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy> make_heap(
         ExPolicy&& policy, RndIter first, RndIter last, Comp&& comp);
 
     /// Constructs a \a max \a heap in the range [first, last). Uses the
@@ -116,7 +116,7 @@ namespace hpx {
     ///           and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename RndIter>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
     make_heap(ExPolicy&& policy, RndIter first, RndIter last);
 
     /// Constructs a \a max \a heap in the range [first, last).
@@ -192,26 +192,21 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/futures/future.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -220,12 +215,11 @@ namespace hpx {
 #include <functional>
 #include <iterator>
 #include <list>
-#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
 
     //////////////////////////////////////////////////////////////////////
     // make_heap
@@ -235,7 +229,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         // sift_down_range will take a range from [start,start-count) and
         // apply sift_down to each element in the range
         template <typename RndIter, typename Comp, typename Proj>
-        void sift_down(RndIter first, Comp&& comp, Proj&& proj,
+        constexpr void sift_down(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
             RndIter start)
         {
@@ -248,7 +242,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             child = 2 * child + 1;
             RndIter child_i = first + child;
 
-            if ((child + 1) < len &&
+            if (child + 1 < len &&
                 HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
                     HPX_INVOKE(proj, *(child_i + 1))))
             {
@@ -258,10 +252,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             if (HPX_INVOKE(
                     comp, HPX_INVOKE(proj, *child_i), HPX_INVOKE(proj, *start)))
+            {
                 return;
+            }
 
             typename std::iterator_traits<RndIter>::value_type top = *start;
-
             do
             {
                 *start = *child_i;
@@ -273,7 +268,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 child = 2 * child + 1;
                 child_i = first + child;
 
-                if ((child + 1) < len &&
+                if (child + 1 < len &&
                     HPX_INVOKE(comp, HPX_INVOKE(proj, *child_i),
                         HPX_INVOKE(proj, *(child_i + 1))))
                 {
@@ -288,7 +283,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         template <typename RndIter, typename Comp, typename Proj>
-        void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
+        constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
             RndIter start, std::size_t count)
         {
@@ -299,7 +294,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        Iter sequential_make_heap(
+        constexpr Iter sequential_make_heap(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
             using difference_type =
@@ -319,16 +314,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         //////////////////////////////////////////////////////////////////////
         template <typename Iter>
-        struct make_heap : public detail::algorithm<make_heap<Iter>, Iter>
+        struct make_heap : public algorithm<make_heap<Iter>, Iter>
         {
-            make_heap()
-              : make_heap::algorithm("make_heap")
+            constexpr make_heap() noexcept
+              : algorithm<make_heap, Iter>("make_heap")
             {
             }
 
             template <typename ExPolicy, typename RndIter, typename Sent,
                 typename Comp, typename Proj>
-            static RndIter sequential(
+            static constexpr RndIter sequential(
                 ExPolicy, RndIter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_make_heap(first, last,
@@ -337,10 +332,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RndIter, typename Sent,
                 typename Comp, typename Proj>
-            static
-                typename util::detail::algorithm_result<ExPolicy, RndIter>::type
-                make_heap_thread(ExPolicy&& policy, RndIter first, Sent last,
-                    Comp&& comp, Proj&& proj)
+            static util::detail::algorithm_result_t<ExPolicy, RndIter>
+            make_heap_thread(ExPolicy&& policy, RndIter first, Sent last,
+                Comp&& comp, Proj&& proj)
             {
                 typename std::iterator_traits<RndIter>::difference_type n =
                     last - first;
@@ -350,7 +344,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         RndIter>::get(HPX_MOVE(first));
                 }
 
-                using execution_policy = typename std::decay<ExPolicy>::type;
+                using execution_policy = std::decay_t<ExPolicy>;
                 using parameters_type =
                     typename execution_policy::executor_parameters_type;
                 using executor_type = typename execution_policy::executor_type;
@@ -367,8 +361,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using tuple_type = hpx::tuple<RndIter, std::size_t>;
 
                 auto op = [=](tuple_type const& t) {
-                    sift_down_range(first, comp, proj, (std::size_t) n,
-                        hpx::get<0>(t), hpx::get<1>(t));
+                    sift_down_range(first, comp, proj,
+                        static_cast<std::size_t>(n), hpx::get<0>(t),
+                        hpx::get<1>(t));
                 };
 
                 std::size_t const cores =
@@ -378,9 +373,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 // Take a standard chunk size (amount of work / cores), and only
                 // take a quarter of that. If our chunk size is too large a LOT
                 // of the work will be done sequentially due to the level
-                // barrier of heap parallelism.
-                // 1/4 of the standard chunk size is an estimate to lower the
-                // average number of levels done sequentially
+                // barrier of heap parallelism. 1/4 of the standard chunk size
+                // is an estimate to lower the average number of levels done
+                // sequentially
                 std::size_t chunk_size = execution::get_chunk_size(
                     policy.parameters(), policy.executor(),
                     hpx::chrono::null_duration, cores, n);
@@ -399,14 +394,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     while (start > 0)
                     {
                         // Index of start of level, and amount of items in level
-                        std::size_t end_exclusive =
-                            (std::size_t) std::pow(
-                                2, std::floor(std::log2(start))) -
+                        std::size_t const end_exclusive =
+                            static_cast<std::size_t>(
+                                std::pow(2, std::floor(std::log2(start)))) -
                             2;
-                        std::size_t level_items = (start - end_exclusive);
+                        std::size_t level_items = start - end_exclusive;
 
                         // If we can't at least run two chunks in parallel,
-                        // don't bother parallelizing and simply run sequentially
+                        // don't bother parallelizing and simply run
+                        // sequentially
                         if (chunk_size * 2 > level_items)
                         {
                             op(hpx::make_tuple(first + start, level_items));
@@ -456,10 +452,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                         // Perform sift down for the head node
                         sift_down(first, comp = HPX_FORWARD(Comp, comp),
-                            proj = HPX_FORWARD(Proj, proj), n, first);
+                            HPX_FORWARD(Proj, proj), n, first);
                     }
                 }
-                catch (std::bad_alloc const& e)
+                catch ([[maybe_unused]] std::bad_alloc const& e)
                 {
                     if constexpr (hpx::is_async_execution_policy_v<ExPolicy>)
                     {
@@ -467,7 +463,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     }
                     else
                     {
-                        HPX_UNUSED(e);
                         throw;
                     }
                 }
@@ -499,10 +494,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename RndIter, typename Sent,
                 typename Comp, typename Proj>
-            static
-                typename util::detail::algorithm_result<ExPolicy, RndIter>::type
-                parallel(ExPolicy&& policy, RndIter first, Sent last,
-                    Comp&& comp, Proj&& proj)
+            static util::detail::algorithm_result_t<ExPolicy, RndIter> parallel(
+                ExPolicy&& policy, RndIter first, Sent last, Comp&& comp,
+                Proj&& proj)
             {
                 return make_heap_thread(HPX_FORWARD(ExPolicy, policy), first,
                     last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
@@ -524,7 +518,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -537,60 +531,54 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename RndIter, typename Comp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RndIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RndIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
                     typename std::iterator_traits<RndIter>::value_type
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
             RndIter last, Comp&& comp)
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RndIter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::make_heap<RndIter>().call(
+                hpx::parallel::detail::make_heap<RndIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Comp, comp),
-                    hpx::parallel::util::projection_identity{}));
+                    HPX_FORWARD(Comp, comp), hpx::identity_v));
         }
 
         // clang-format off
         template <typename ExPolicy, typename RndIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RndIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RndIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(
             make_heap_t, ExPolicy&& policy, RndIter first, RndIter last)
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RndIter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
             using value_type =
                 typename std::iterator_traits<RndIter>::value_type;
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::make_heap<RndIter>().call(
+                hpx::parallel::detail::make_heap<RndIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last,
-                    std::less<value_type>(),
-                    hpx::parallel::util::projection_identity{}));
+                    std::less<value_type>(), hpx::identity_v));
         }
 
         // clang-format off
         template <typename RndIter, typename Comp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RndIter>::value &&
+                hpx::traits::is_iterator_v<RndIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RndIter>::value_type,
                     typename std::iterator_traits<RndIter>::value_type
@@ -600,34 +588,32 @@ namespace hpx {
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last, Comp&& comp)
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RndIter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
-            hpx::parallel::v1::detail::make_heap<RndIter>().call(
+            hpx::parallel::detail::make_heap<RndIter>().call(
                 hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename RndIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RndIter>::value
+                hpx::traits::is_iterator_v<RndIter>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
             make_heap_t, RndIter first, RndIter last)
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RndIter>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
             using value_type =
                 typename std::iterator_traits<RndIter>::value_type;
 
-            hpx::parallel::v1::detail::make_heap<RndIter>().call(
+            hpx::parallel::detail::make_heap<RndIter>().call(
                 hpx::execution::seq, first, last, std::less<value_type>(),
-                hpx::parallel::util::projection_identity{});
+                hpx::identity_v);
         }
     } make_heap{};
 }    // namespace hpx

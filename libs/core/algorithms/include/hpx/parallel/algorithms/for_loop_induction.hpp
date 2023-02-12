@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,18 +13,17 @@
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 
 #include <cstddef>
-#include <cstdlib>
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel { inline namespace v2 { namespace detail {
+namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////
     template <typename T>
     struct induction_helper
     {
-        constexpr induction_helper(T var) noexcept
+        explicit constexpr induction_helper(T var) noexcept
           : var_(var)
           , curr_(var)
         {
@@ -33,7 +32,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void init_iteration(std::size_t index) noexcept
         {
-            curr_ = parallel::v1::detail::next(var_, index);
+            curr_ = parallel::detail::next(var_, index);
         }
 
         HPX_HOST_DEVICE
@@ -49,17 +48,17 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         }
 
         HPX_HOST_DEVICE
-        constexpr void exit_iteration(std::size_t /*index*/) noexcept {}
+        static constexpr void exit_iteration(std::size_t /*index*/) noexcept {}
 
     private:
-        typename std::decay<T>::type var_;
+        std::decay_t<T> var_;
         T curr_;
     };
 
     template <typename T>
     struct induction_helper<T&>
     {
-        constexpr induction_helper(T& var) noexcept
+        explicit constexpr induction_helper(T& var) noexcept
           : live_out_var_(var)
           , var_(var)
           , curr_(var)
@@ -69,7 +68,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void init_iteration(std::size_t index) noexcept
         {
-            curr_ = parallel::v1::detail::next(var_, index);
+            curr_ = parallel::detail::next(var_, index);
         }
 
         HPX_HOST_DEVICE
@@ -87,7 +86,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void exit_iteration(std::size_t index) noexcept
         {
-            live_out_var_ = parallel::v1::detail::next(live_out_var_, index);
+            live_out_var_ = parallel::detail::next(live_out_var_, index);
         }
 
     private:
@@ -110,7 +109,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void init_iteration(std::size_t index) noexcept
         {
-            curr_ = parallel::v1::detail::next(var_, stride_ * index);
+            curr_ = parallel::detail::next(var_, stride_ * index);
         }
 
         HPX_HOST_DEVICE
@@ -122,14 +121,14 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void next_iteration() noexcept
         {
-            curr_ = parallel::v1::detail::next(curr_, stride_);
+            curr_ = parallel::detail::next(curr_, stride_);
         }
 
         HPX_HOST_DEVICE
-        constexpr void exit_iteration(std::size_t /*index*/) noexcept {}
+        static constexpr void exit_iteration(std::size_t /*index*/) noexcept {}
 
     private:
-        typename std::decay<T>::type var_;
+        std::decay_t<T> var_;
         T curr_;
         std::size_t stride_;
     };
@@ -148,7 +147,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void init_iteration(std::size_t index) noexcept
         {
-            curr_ = parallel::v1::detail::next(var_, stride_ * index);
+            curr_ = parallel::detail::next(var_, stride_ * index);
         }
 
         HPX_HOST_DEVICE
@@ -160,14 +159,14 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
         HPX_HOST_DEVICE
         constexpr void next_iteration() noexcept
         {
-            curr_ = parallel::v1::detail::next(curr_, stride_);
+            curr_ = parallel::detail::next(curr_, stride_);
         }
 
         HPX_HOST_DEVICE
         constexpr void exit_iteration(std::size_t index) noexcept
         {
             live_out_var_ =
-                parallel::v1::detail::next(live_out_var_, stride_ * index);
+                parallel::detail::next(live_out_var_, stride_ * index);
         }
 
     private:
@@ -178,7 +177,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
     };
 
     /// \endcond
-}}}    // namespace hpx::parallel::v2::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx::experimental {
 
@@ -187,10 +186,10 @@ namespace hpx::experimental {
     /// type and, optionally, a stride.
     ///
     /// For each element in the input range, a looping algorithm over input
-    /// sequence \a S computes an induction value from an induction variable
-    /// and ordinal position \a p within \a S by the formula
-    /// i + p * stride if a stride was specified or i + p otherwise.
-    /// This induction value is passed to the element access function.
+    /// sequence \a S computes an induction value from an induction variable and
+    /// ordinal position \a p within \a S by the formula i + p * stride if a
+    /// stride was specified or i + p otherwise. This induction value is passed
+    /// to the element access function.
     ///
     /// If the \a value argument to \a induction is a non-const lvalue, then
     /// that lvalue becomes the live-out object for the returned induction
@@ -206,32 +205,31 @@ namespace hpx::experimental {
     ///                 object (default: 1)
     ///
     /// \returns This returns an induction object with value type \a T, initial
-    ///          value \a value, and (if specified) stride \a stride. If \a T
-    ///          is an lvalue of non-const type, \a value is used as the live-out
+    ///          value \a value, and (if specified) stride \a stride. If \a T is
+    ///          an lvalue of non-const type, \a value is used as the live-out
     ///          object for the induction object; otherwise there is no live-out
     ///          object.
     ///
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::
-        induction_stride_helper<T>
-        induction(T&& value, std::size_t stride)
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_stride_helper<T>
+    induction(T&& value, std::size_t stride)
     {
-        return hpx::parallel::v2::detail::induction_stride_helper<T>(
+        return hpx::parallel::detail::induction_stride_helper<T>(
             HPX_FORWARD(T, value), stride);
     }
 
     /// \cond NOINTERNAL
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::induction_helper<T>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::induction_helper<T>
     induction(T&& value)
     {
-        return hpx::parallel::v2::detail::induction_helper<T>(
+        return hpx::parallel::detail::induction_helper<T>(
             HPX_FORWARD(T, value));
     }
     /// \endcond
 }    // namespace hpx::experimental
 
-namespace hpx::parallel { inline namespace v2 {
+namespace hpx::parallel {
     /// \cond IGNORE_DEPRECATED
 
     template <typename T>
@@ -252,4 +250,4 @@ namespace hpx::parallel { inline namespace v2 {
         return hpx::experimental::induction(HPX_FORWARD(T, value));
     }
     /// \endcond
-}}    // namespace hpx::parallel::v2
+}    // namespace hpx::parallel

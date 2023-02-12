@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <vector>
 
-struct iota : public hpx::parallel::v1::detail::algorithm<iota>
+struct iota : public hpx::parallel::detail::algorithm<iota>
 {
     iota()
       : iota::algorithm("iota")
@@ -57,7 +57,7 @@ void iota_vector(hpx::partitioned_vector<T>& v, T val)
         local_iterator_type beg = traits::begin(sit);
         local_iterator_type end = traits::end(sit);
 
-        hpx::parallel::v1::detail::dispatch(traits::get_id(sit), iota(),
+        hpx::parallel::detail::dispatch(traits::get_id(sit), iota(),
             hpx::execution::seq, std::true_type(), beg, end, temp_val);
 
         temp_val = T(temp_val + std::distance(beg, end));
@@ -65,8 +65,7 @@ void iota_vector(hpx::partitioned_vector<T>& v, T val)
 }
 
 template <typename Value>
-struct verify_
-  : public hpx::parallel::v1::detail::algorithm<verify_<Value>, Value>
+struct verify_ : public hpx::parallel::detail::algorithm<verify_<Value>, Value>
 {
     verify_()
       : verify_::algorithm("verify")
@@ -112,9 +111,9 @@ void verify_values(hpx::partitioned_vector<T> v1, std::vector<T> v2)
         std::vector<T> test(std::distance(beg, end));
         std::copy_n(beg2, test.size(), test.begin());
 
-        results.push_back(hpx::parallel::v1::detail::dispatch(
-            traits::get_id(sit), verify_<bool>(), hpx::execution::seq,
-            std::true_type(), beg, end, test));
+        results.push_back(hpx::parallel::detail::dispatch(traits::get_id(sit),
+            verify_<bool>(), hpx::execution::seq, std::true_type(), beg, end,
+            test));
 
         beg2 += std::distance(beg, end);
     }

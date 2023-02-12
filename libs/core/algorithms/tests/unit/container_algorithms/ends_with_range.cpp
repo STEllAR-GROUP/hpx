@@ -39,13 +39,15 @@ void test_ends_with_sent(IteratorTag)
     std::iota(some_wrong_ints.begin(), some_wrong_ints.end(), -2);
 
     auto result1 = hpx::ranges::ends_with(iterator(std::begin(some_ints)),
-        sentinel(std::end(some_ints)), iterator(std::begin(some_more_ints)),
-        sentinel(std::end(some_more_ints)));
+        sentinel(iterator(std::end(some_ints))),
+        iterator(std::begin(some_more_ints)),
+        sentinel(iterator(std::end(some_more_ints))));
     HPX_TEST_EQ(result1, true);
 
     auto result2 = hpx::ranges::ends_with(iterator(std::begin(some_ints)),
-        sentinel(std::end(some_ints)), iterator(std::begin(some_wrong_ints)),
-        sentinel(std::end(some_wrong_ints)));
+        sentinel(iterator(std::end(some_ints))),
+        iterator(std::begin(some_wrong_ints)),
+        sentinel(iterator(std::end(some_wrong_ints))));
     HPX_TEST_EQ(result2, false);
 }
 
@@ -72,14 +74,16 @@ void test_ends_with_sent(ExPolicy policy, IteratorTag)
 
     auto result1 =
         hpx::ranges::ends_with(policy, iterator(std::begin(some_ints)),
-            sentinel(std::end(some_ints)), iterator(std::begin(some_more_ints)),
-            sentinel(std::end(some_more_ints)));
+            sentinel(iterator(std::end(some_ints))),
+            iterator(std::begin(some_more_ints)),
+            sentinel(iterator(std::end(some_more_ints))));
     HPX_TEST_EQ(result1, true);
 
-    auto result2 = hpx::ranges::ends_with(policy,
-        iterator(std::begin(some_ints)), sentinel(std::end(some_ints)),
-        iterator(std::begin(some_wrong_ints)),
-        sentinel(std::end(some_wrong_ints)));
+    auto result2 =
+        hpx::ranges::ends_with(policy, iterator(std::begin(some_ints)),
+            sentinel(iterator(std::end(some_ints))),
+            iterator(std::begin(some_wrong_ints)),
+            sentinel(iterator(std::end(some_wrong_ints))));
     HPX_TEST_EQ(result2, false);
 }
 

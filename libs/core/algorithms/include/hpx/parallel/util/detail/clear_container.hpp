@@ -19,27 +19,25 @@ namespace hpx::parallel::util::detail {
     // make sure iterators embedded in function object that is attached to
     // futures are invalidated
     template <typename Cont>
-    inline constexpr void clear_container(Cont&&) noexcept
+    constexpr void clear_container(Cont&&) noexcept
     {
     }
 
     template <typename T>
-    inline constexpr void clear_container(
-        std::vector<hpx::future<T>>& v) noexcept
+    constexpr void clear_container(std::vector<hpx::future<T>>& v) noexcept
     {
         v.clear();
     }
 
     template <typename T>
-    inline constexpr void clear_container(
+    constexpr void clear_container(
         std::vector<hpx::shared_future<T>>& v) noexcept
     {
         v.clear();
     }
 
     template <typename T, std::size_t N>
-    inline constexpr void clear_container(
-        std::array<hpx::future<T>, N>& arr) noexcept
+    constexpr void clear_container(std::array<hpx::future<T>, N>& arr) noexcept
     {
         for (auto& f : arr)
         {
@@ -48,7 +46,7 @@ namespace hpx::parallel::util::detail {
     }
 
     template <typename T, std::size_t N>
-    inline constexpr void clear_container(
+    constexpr void clear_container(
         std::array<hpx::shared_future<T>, N>& arr) noexcept
     {
         for (auto& f : arr)

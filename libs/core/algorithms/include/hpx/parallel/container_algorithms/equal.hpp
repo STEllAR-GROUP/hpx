@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,10 +41,10 @@ namespace hpx { namespace ranges {
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -107,9 +107,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Iter1, typename Sent1,
         typename Iter2, typename Sent2, typename Pred = equal_to,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     equal(ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -136,10 +136,10 @@ namespace hpx { namespace ranges {
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -196,9 +196,9 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2,
         typename Pred = equal_to,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     equal(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -227,10 +227,10 @@ namespace hpx { namespace ranges {
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -276,8 +276,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename Iter1, typename Sent1,
         typename Iter2, typename Sent2, typename Pred = equal_to,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     bool equal(Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
         Pred&& op = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -300,10 +300,10 @@ namespace hpx { namespace ranges {
     ///                     to std::equal_to<>
     /// \tparam Proj1       The type of an optional projection function applied
     ///                     to the first range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function applied
     ///                     to the second range. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng1         Refers to the first sequence of elements the
     ///                     algorithm will be applied to.
@@ -342,8 +342,8 @@ namespace hpx { namespace ranges {
     ///           two ranges are equal, otherwise it returns false.
     ///
     template <typename Rng1, typename Rng2, typename Pred = equal_to,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity>
     bool equal(Rng1&& rng1, Rng2&& rng2, Pred&& op = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -353,22 +353,20 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_range.hpp>
-
 #include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/algorithms/traits/projected_range.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/parallel/algorithms/equal.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/invoke_projected.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::equal
@@ -379,10 +377,10 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
@@ -397,12 +395,12 @@ namespace hpx { namespace ranges {
             Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
+            return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
                 HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -411,10 +409,10 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
             typename Pred = equal_to,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
@@ -432,15 +430,15 @@ namespace hpx { namespace ranges {
             Proj2&& proj2 = Proj2())
         {
             static_assert(
-                (hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value),
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng1>::iterator_type>::value,
                 "Requires at least forward iterator.");
             static_assert(
-                (hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value),
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng2>::iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
+            return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), HPX_FORWARD(Pred, op),
@@ -450,8 +448,8 @@ namespace hpx { namespace ranges {
         // clang-format off
         template < typename Iter1, typename Sent1,
             typename Iter2, typename Sent2, typename Pred = equal_to,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
                 hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
@@ -466,12 +464,12 @@ namespace hpx { namespace ranges {
             Iter2 first2, Sent2 last2, Pred&& op = Pred(),
             Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
         {
-            static_assert((hpx::traits::is_forward_iterator<Iter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
                 "Requires at least forward iterator.");
-            static_assert((hpx::traits::is_forward_iterator<Iter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<Iter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
+            return hpx::parallel::detail::equal_binary().call(
                 hpx::execution::seq, first1, last1, first2, last2,
                 HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
@@ -479,8 +477,8 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename Rng1, typename Rng2, typename Pred = equal_to,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
+            typename Proj1 = hpx::identity,
+            typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
                 hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
@@ -498,15 +496,15 @@ namespace hpx { namespace ranges {
             Proj2&& proj2 = Proj2())
         {
             static_assert(
-                (hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng1>::iterator_type>::value),
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng1>::iterator_type>::value,
                 "Requires at least forward iterator.");
             static_assert(
-                (hpx::traits::is_forward_iterator<typename hpx::traits::
-                        range_traits<Rng2>::iterator_type>::value),
+                hpx::traits::is_forward_iterator<typename hpx::traits::
+                        range_traits<Rng2>::iterator_type>::value,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::equal_binary().call(
+            return hpx::parallel::detail::equal_binary().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
                 hpx::util::end(rng2), HPX_FORWARD(Pred, op),
@@ -514,6 +512,6 @@ namespace hpx { namespace ranges {
         }
 
     } equal{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

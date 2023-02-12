@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy, typename T, typename Enable = void>
@@ -287,4 +287,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         return hpx::make_future<result_type>(
             HPX_MOVE(f), HPX_FORWARD(Conv, conv));
     }
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

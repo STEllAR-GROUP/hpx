@@ -20,7 +20,6 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 #if defined(HPX_HAVE_MM_PREFETCH)
 #if defined(HPX_MSVC)
@@ -31,7 +30,7 @@
 #endif
 #endif
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
     namespace prefetching {
 
@@ -80,24 +79,24 @@ namespace hpx { namespace parallel { namespace util {
             {
                 return base_;
             }
-            std::size_t chunk_size() const
+            [[nodiscard]] std::size_t chunk_size() const
             {
                 return chunk_size_;
             }
-            std::size_t range_size() const
+            [[nodiscard]] std::size_t range_size() const
             {
                 return range_size_;
             }
-            std::size_t index() const
+            [[nodiscard]] std::size_t index() const
             {
                 return idx_;
             }
 
-            inline prefetching_iterator& operator+=(difference_type rhs)
+            prefetching_iterator& operator+=(difference_type rhs)
             {
                 // different versions of clang-format do different things
                 // clang-format off
-                std::size_t last =
+                std::size_t const last =
                     (std::min) (idx_ + rhs * chunk_size_, range_size_);
                 // clang-format on
 
@@ -105,7 +104,7 @@ namespace hpx { namespace parallel { namespace util {
                 idx_ = last;
                 return *this;
             }
-            inline prefetching_iterator& operator-=(difference_type rhs)
+            prefetching_iterator& operator-=(difference_type rhs)
             {
                 std::size_t first = 0;
                 if (idx_ > rhs * chunk_size_)
@@ -115,44 +114,43 @@ namespace hpx { namespace parallel { namespace util {
                 idx_ = first;
                 return *this;
             }
-            inline prefetching_iterator& operator++()
+            prefetching_iterator& operator++()
             {
                 *this += 1;
                 return *this;
             }
-            inline prefetching_iterator& operator--()
+            prefetching_iterator& operator--()
             {
                 *this -= 1;
                 return *this;
             }
-            inline prefetching_iterator operator++(int)
+            prefetching_iterator operator++(int)
             {
                 prefetching_iterator tmp(*this);
                 operator++();
                 return tmp;
             }
-            inline prefetching_iterator operator--(int)
+            prefetching_iterator operator--(int)
             {
                 prefetching_iterator tmp(*this);
                 operator--();
                 return tmp;
             }
 
-            inline difference_type operator-(
-                const prefetching_iterator& rhs) const
+            difference_type operator-(prefetching_iterator const& rhs) const
             {
                 // round up distance to cover all of underlying range
                 return (idx_ - rhs.idx_ + chunk_size_ - 1) / chunk_size_;
             }
 
-            friend inline prefetching_iterator operator+(
+            friend prefetching_iterator operator+(
                 prefetching_iterator const& lhs, difference_type rhs)
             {
                 prefetching_iterator tmp(lhs);
                 tmp += rhs;
                 return tmp;
             }
-            friend inline prefetching_iterator operator-(
+            friend prefetching_iterator operator-(
                 prefetching_iterator const& lhs, difference_type rhs)
             {
                 prefetching_iterator tmp(lhs);
@@ -161,43 +159,43 @@ namespace hpx { namespace parallel { namespace util {
             }
 
             // FIXME: should other members be compared too?
-            inline bool operator==(const prefetching_iterator& rhs) const
+            bool operator==(prefetching_iterator const& rhs) const
             {
                 return idx_ == rhs.idx_ && base_ == rhs.base_;
             }
 
             // FIXME: should the base iterators be compared too?
-            inline bool operator!=(const prefetching_iterator& rhs) const
+            bool operator!=(prefetching_iterator const& rhs) const
             {
                 return idx_ != rhs.idx_;
             }
-            inline bool operator>(const prefetching_iterator& rhs) const
+            bool operator>(prefetching_iterator const& rhs) const
             {
                 return idx_ > rhs.idx_;
             }
-            inline bool operator<(const prefetching_iterator& rhs) const
+            bool operator<(prefetching_iterator const& rhs) const
             {
                 return idx_ < rhs.idx_;
             }
-            inline bool operator>=(const prefetching_iterator& rhs) const
+            bool operator>=(prefetching_iterator const& rhs) const
             {
                 return idx_ >= rhs.idx_;
             }
-            inline bool operator<=(const prefetching_iterator& rhs) const
+            bool operator<=(prefetching_iterator const& rhs) const
             {
                 return idx_ <= rhs.idx_;
             }
 
             // FIXME: This looks wrong, it should dispatch to the base iterator
             //        instead.
-            inline std::size_t& operator[](std::size_t)
+            std::size_t& operator[](std::size_t)
             {
                 return idx_;
             }
 
             // FIXME: This looks wrong, it should dispatch to the base iterator
             //        instead.
-            inline std::size_t operator*() const
+            std::size_t operator*() const
             {
                 return idx_;
             }
@@ -209,7 +207,7 @@ namespace hpx { namespace parallel { namespace util {
         struct prefetcher_context
         {
         private:
-            typedef hpx::tuple<std::reference_wrapper<Ts>...> ranges_type;
+            using ranges_type = hpx::tuple<std::reference_wrapper<Ts>...>;
 
             Itr it_begin_;
             Itr it_end_;
@@ -226,7 +224,7 @@ namespace hpx { namespace parallel { namespace util {
               : it_begin_(begin)
               , it_end_(end)
               , rngs_(rngs)
-              , chunk_size_((p_factor * threads::get_cache_line_size()) /
+              , chunk_size_(p_factor * threads::get_cache_line_size() /
                     sizeof_first_value_type)
               , range_size_(std::distance(begin, end))
             {
@@ -250,7 +248,8 @@ namespace hpx { namespace parallel { namespace util {
         template <typename... T>
         HPX_FORCEINLINE void prefetch_addresses(T const&... ts)
         {
-            (_mm_prefetch(const_cast<char*>((char const*) &ts), _MM_HINT_T0),
+            (_mm_prefetch(const_cast<char*>(reinterpret_cast<char const*>(&ts)),
+                 _MM_HINT_T0),
                 ...);
         }
 
@@ -258,7 +257,7 @@ namespace hpx { namespace parallel { namespace util {
         HPX_FORCEINLINE void prefetch_containers(hpx::tuple<Ts...> const& t,
             hpx::util::index_pack<Is...>, std::size_t idx)
         {
-            prefetch_addresses((hpx::get<Is>(t).get())[idx]...);
+            prefetch_addresses(hpx::get<Is>(t).get()[idx]...);
         }
 #else
         template <typename... Ts, std::size_t... Is>
@@ -287,8 +286,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -323,8 +322,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -370,8 +369,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -406,8 +405,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -442,7 +441,7 @@ namespace hpx { namespace parallel { namespace util {
     prefetching::prefetcher_context<Itr, Ts const...> make_prefetcher_context(
         Itr base_begin, Itr base_end, std::size_t p_factor, Ts const&... rngs)
     {
-        static_assert(hpx::traits::is_random_access_iterator<Itr>::value,
+        static_assert(hpx::traits::is_random_access_iterator_v<Itr>,
             "Iterators have to be of random access iterator category");
         static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
             "All variadic parameters have to represent ranges");
@@ -459,10 +458,10 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Itr, typename... Ts>
         struct loop<prefetching::prefetching_iterator<Itr, Ts...>>
         {
-            typedef prefetching::prefetching_iterator<Itr, Ts...> iterator_type;
-            typedef typename iterator_type::base_iterator type;
-            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
-                index_pack_type;
+            using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;
+            using type = typename iterator_type::base_iterator;
+            using index_pack_type =
+                typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
 
             template <typename End, typename F>
             static iterator_type call(iterator_type it, End end, F&& f)
@@ -474,8 +473,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -501,8 +500,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -519,10 +518,10 @@ namespace hpx { namespace parallel { namespace util {
         template <typename Itr, typename... Ts>
         struct loop_ind<prefetching::prefetching_iterator<Itr, Ts...>>
         {
-            typedef prefetching::prefetching_iterator<Itr, Ts...> iterator_type;
-            typedef typename iterator_type::base_iterator type;
-            typedef typename hpx::util::make_index_pack<sizeof...(Ts)>::type
-                index_pack_type;
+            using iterator_type = prefetching::prefetching_iterator<Itr, Ts...>;
+            using type = typename iterator_type::base_iterator;
+            using index_pack_type =
+                typename hpx::util::make_index_pack<sizeof...(Ts)>::type;
 
             template <typename End, typename F>
             static iterator_type call(iterator_type it, End end, F&& f)
@@ -534,8 +533,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -561,8 +560,8 @@ namespace hpx { namespace parallel { namespace util {
 
                     // different versions of clang-format do different things
                     // clang-format off
-                    std::size_t last = (std::min) (it.index() + it.chunk_size(),
-                        it.range_size());
+                    std::size_t const last = (std::min) (
+                        it.index() + it.chunk_size(), it.range_size());
                     // clang-format on
 
                     for (/**/; j != last; (void) ++j, ++base)
@@ -575,4 +574,4 @@ namespace hpx { namespace parallel { namespace util {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util

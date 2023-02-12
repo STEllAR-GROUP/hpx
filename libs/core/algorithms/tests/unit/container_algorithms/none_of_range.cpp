@@ -8,7 +8,7 @@
 #include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -19,8 +19,7 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+template <typename IteratorTag, typename Proj = hpx::identity>
 void test_none_of_seq(IteratorTag, Proj proj = Proj())
 {
     std::size_t iseq[] = {0, 1, 3};
@@ -40,7 +39,7 @@ void test_none_of_seq(IteratorTag, Proj proj = Proj())
 }
 
 template <typename ExPolicy, typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+    typename Proj = hpx::identity>
 void test_none_of(ExPolicy&& policy, IteratorTag, Proj proj = Proj())
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
@@ -63,7 +62,7 @@ void test_none_of(ExPolicy&& policy, IteratorTag, Proj proj = Proj())
 }
 
 template <typename ExPolicy, typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+    typename Proj = hpx::identity>
 void test_none_of_async(ExPolicy p, IteratorTag, Proj proj = Proj())
 {
     std::size_t iseq[] = {0, 23, 10007};

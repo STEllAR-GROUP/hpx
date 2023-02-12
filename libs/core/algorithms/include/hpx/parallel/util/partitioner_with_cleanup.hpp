@@ -7,11 +7,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
-#else
-#include <hpx/assert.hpp>
 #endif
 #include <hpx/type_support/unused.hpp>
 
@@ -30,7 +29,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
-
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
@@ -81,6 +79,8 @@ namespace hpx::parallel::util {
                 {
                     handle_local_exceptions::call(std::current_exception());
                 }
+
+                HPX_UNREACHABLE;
             }
 
         private:
@@ -224,5 +224,3 @@ namespace hpx::parallel::util {
     {
     };
 }    // namespace hpx::parallel::util
-
-// namespace hpx::parallel::util

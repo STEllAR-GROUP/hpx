@@ -10,20 +10,17 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke.hpp>
-#include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
+#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
-#include <cstddef>
-#include <iostream>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -32,7 +29,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
     private:
         template <typename InIter, typename T1, typename T2, typename Proj>
-        friend inline constexpr auto tag_fallback_invoke(sequential_replace_t,
+        friend constexpr auto tag_fallback_invoke(sequential_replace_t,
             ExPolicy&& policy, InIter first, InIter last, T1 const& old_value,
             T2 const& new_value, Proj&& proj)
         {
@@ -48,7 +45,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
             else
             {
-                typedef typename std::iterator_traits<InIter>::value_type type;
+                using type = typename std::iterator_traits<InIter>::value_type;
 
                 return for_each_n<InIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first,
@@ -60,7 +57,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                             t = new_value;
                         }
                     },
-                    util::projection_identity());
+                    hpx::identity_v);
             }
         }
     };
@@ -85,9 +82,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     private:
         template <typename InIter, typename Sent, typename F, typename T,
             typename Proj>
-        friend inline constexpr auto tag_fallback_invoke(
-            sequential_replace_if_t, ExPolicy&& policy, InIter first, Sent last,
-            F&& f, T const& new_value, Proj&& proj)
+        friend constexpr auto tag_fallback_invoke(sequential_replace_if_t,
+            ExPolicy&& policy, InIter first, Sent last, F&& f,
+            T const& new_value, Proj&& proj)
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
@@ -101,7 +98,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
             else
             {
-                typedef typename std::iterator_traits<InIter>::value_type type;
+                using type = typename std::iterator_traits<InIter>::value_type;
 
                 return for_each_n<InIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first,
@@ -114,7 +111,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                             t = new_value;
                         }
                     },
-                    util::projection_identity());
+                    hpx::identity_v);
             }
         }
     };
@@ -140,10 +137,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     private:
         template <typename InIter, typename Sent, typename OutIter, typename T,
             typename Proj>
-        friend inline constexpr auto tag_fallback_invoke(
-            sequential_replace_copy_t, ExPolicy&& policy, InIter first,
-            Sent sent, OutIter dest, T const& old_value, T const& new_value,
-            Proj&& proj)
+        friend constexpr auto tag_fallback_invoke(sequential_replace_copy_t,
+            ExPolicy&& policy, InIter first, Sent sent, OutIter dest,
+            T const& old_value, T const& new_value, Proj&& proj)
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
@@ -158,8 +154,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
             else
             {
-                typedef hpx::util::zip_iterator<InIter, OutIter> zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
+                using reference = typename zip_iterator::reference;
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
@@ -174,7 +170,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                             else
                                 get<1>(t) = get<0>(t);    //-V573
                         },
-                        util::projection_identity()));
+                        hpx::identity_v));
             }
         }
     };
@@ -201,9 +197,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     private:
         template <typename InIter, typename Sent, typename OutIter, typename F,
             typename T, typename Proj>
-        friend inline constexpr auto tag_fallback_invoke(
-            sequential_replace_copy_if_t, ExPolicy&& policy, InIter first,
-            Sent sent, OutIter dest, F&& f, T const& new_value, Proj&& proj)
+        friend constexpr auto tag_fallback_invoke(sequential_replace_copy_if_t,
+            ExPolicy&& policy, InIter first, Sent sent, OutIter dest, F&& f,
+            T const& new_value, Proj&& proj)
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
@@ -222,8 +218,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             }
             else
             {
-                typedef hpx::util::zip_iterator<InIter, OutIter> zip_iterator;
-                typedef typename zip_iterator::reference reference;
+                using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
+                using reference = typename zip_iterator::reference;
 
                 return util::detail::get_in_out_result(
                     for_each_n<zip_iterator>().call(
@@ -243,7 +239,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                                 get<1>(t) = get<0>(t);    //-V573
                             }
                         },
-                        util::projection_identity()));
+                        hpx::identity_v));
             }
         }
     };
@@ -262,4 +258,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 #endif
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

@@ -130,7 +130,7 @@ namespace hpx {
         bad_function_call = 51,
         ///< equivalent of std::bad_function_call
         task_canceled_exception = 52,
-        ///< parallel::v2::task_canceled_exception
+        ///< parallel::task_canceled_exception
         task_block_not_active = 53,
         ///< task_region is not active
         out_of_range = 54,

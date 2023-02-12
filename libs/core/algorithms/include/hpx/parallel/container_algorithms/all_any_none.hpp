@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Bruno Pitrus
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Dimitra Karatza
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -33,7 +33,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -78,8 +78,8 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     none_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj());
 
     ///  Checks if unary predicate \a f returns true for no elements in the
@@ -101,7 +101,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -148,8 +148,8 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     none_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     ///  Checks if unary predicate \a f returns true for no elements in the
@@ -166,7 +166,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -193,7 +193,7 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool none_of(Rng&& rng, F&& f, Proj&& proj = Proj());
 
     ///  Checks if unary predicate \a f returns true for no elements in the
@@ -211,7 +211,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the range the algorithm will be applied to.
@@ -240,7 +240,7 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool none_of(Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for at least one element
@@ -261,7 +261,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -306,8 +306,8 @@ namespace hpx { namespace ranges {
     ///           false otherwise. It returns false if the range is empty.
     ///
     template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     any_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for at least one element
@@ -329,7 +329,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -376,8 +376,8 @@ namespace hpx { namespace ranges {
     ///           false otherwise. It returns false if the range is empty.
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     any_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for at least one element
@@ -394,7 +394,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -421,7 +421,7 @@ namespace hpx { namespace ranges {
     ///           false otherwise. It returns false if the range is empty.
     ///
     template <typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool any_of(Rng&& rng, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for at least one element
@@ -439,7 +439,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the range the algorithm will be applied to.
@@ -468,7 +468,7 @@ namespace hpx { namespace ranges {
     ///           false otherwise. It returns false if the range is empty.
     ///
     template <typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool any_of(Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for all elements in the
@@ -489,7 +489,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -534,8 +534,8 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename ExPolicy, typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     all_of(ExPolicy&& policy, Rng&& rng, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for all elements in the
@@ -557,7 +557,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -604,8 +604,8 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename ExPolicy, typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     all_of(ExPolicy&& policy, Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for all elements in the
@@ -622,7 +622,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -649,7 +649,7 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename Rng, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool all_of(Rng&& rng, F&& f, Proj&& proj = Proj());
 
     /// Checks if unary predicate \a f returns true for all elements in the
@@ -667,7 +667,7 @@ namespace hpx { namespace ranges {
     ///                     overload of \a none_of requires \a F to meet the
     ///                     requirements of \a CopyConstructible.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     of the range the algorithm will be applied to.
@@ -696,7 +696,7 @@ namespace hpx { namespace ranges {
     ///           otherwise. It returns true if the range is empty.
     ///
     template <typename Iter, typename Sent, typename F,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     bool all_of(Iter first, Sent last, F&& f, Proj&& proj = Proj());
 
     // clang-format on
@@ -705,20 +705,19 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::none_of
@@ -728,9 +727,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -746,11 +745,10 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
+            return hpx::parallel::detail::none_of().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
@@ -758,10 +756,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -774,17 +772,17 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(none_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
+            return hpx::parallel::detail::none_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -800,19 +798,19 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
-                hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::none_of().call(hpx::execution::seq,
+                hpx::util::begin(rng), hpx::util::end(rng), HPX_FORWARD(F, f),
+                HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -824,12 +822,11 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(
             none_of_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::none_of().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::none_of().call(hpx::execution::seq,
+                first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
     } none_of{};
 
@@ -841,9 +838,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -859,11 +856,10 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(
+            return hpx::parallel::detail::any_of().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
@@ -871,10 +867,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -887,17 +883,17 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(any_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(
+            return hpx::parallel::detail::any_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value&&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value&&
@@ -913,19 +909,19 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(hpx::execution::seq,
+            return hpx::parallel::detail::any_of().call(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -937,10 +933,10 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(
             any_of_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::any_of().call(hpx::execution::seq,
+            return hpx::parallel::detail::any_of().call(hpx::execution::seq,
                 first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
     } any_of{};
@@ -953,9 +949,9 @@ namespace hpx { namespace ranges {
     private:
         // clang-format off
         template <typename ExPolicy, typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -971,11 +967,10 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(
+            return hpx::parallel::detail::all_of().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
                 hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
@@ -983,10 +978,10 @@ namespace hpx { namespace ranges {
 
         // clang-format off
         template <typename ExPolicy, typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<ExPolicy, F,
@@ -999,17 +994,17 @@ namespace hpx { namespace ranges {
         tag_fallback_invoke(all_of_t, ExPolicy&& policy, Iter first, Sent last,
             F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_forward_iterator<Iter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(
+            return hpx::parallel::detail::all_of().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Rng, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range<Rng>::value &&
                 hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
@@ -1025,19 +1020,19 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_iterator<Rng>::type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(hpx::execution::seq,
+            return hpx::parallel::detail::all_of().call(hpx::execution::seq,
                 hpx::util::begin(rng), hpx::util::end(rng), HPX_FORWARD(F, f),
                 HPX_FORWARD(Proj, proj));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename F,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<Iter>::value &&
+                hpx::traits::is_iterator_v<Iter> &&
                 hpx::traits::is_sentinel_for<Sent, Iter>::value &&
                 hpx::parallel::traits::is_projected<Proj, Iter>::value &&
                 hpx::parallel::traits::is_indirect_callable<
@@ -1049,14 +1044,14 @@ namespace hpx { namespace ranges {
         friend bool tag_fallback_invoke(
             all_of_t, Iter first, Sent last, F&& f, Proj&& proj = Proj())
         {
-            static_assert(hpx::traits::is_input_iterator<Iter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::v1::detail::all_of().call(hpx::execution::seq,
+            return hpx::parallel::detail::all_of().call(hpx::execution::seq,
                 first, last, HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
         }
     } all_of{};
 
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

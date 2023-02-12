@@ -396,7 +396,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
         typedef test::test_iterator<base_iterator, std::output_iterator_tag>
             output_iterator;
 
-        auto result = hpx::parallel::v1::detail::sequential_unique_copy(
+        auto result = hpx::parallel::detail::sequential_unique_copy(
             input_iterator(std::begin(c)), input_iterator(std::end(c)),
             output_iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },

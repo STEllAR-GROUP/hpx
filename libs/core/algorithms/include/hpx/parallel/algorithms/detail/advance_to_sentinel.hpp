@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,17 +6,16 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     // Generic implementation for advancing a given iterator to its sentinel
     template <typename Iter, typename Sent>
-    constexpr inline Iter advance_to_sentinel(Iter first, Sent last)
+    constexpr Iter advance_to_sentinel(Iter first, Sent last)
     {
         if constexpr (std::is_same_v<Iter, Sent>)
         {
@@ -36,5 +35,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return first;
         }
     }
-
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

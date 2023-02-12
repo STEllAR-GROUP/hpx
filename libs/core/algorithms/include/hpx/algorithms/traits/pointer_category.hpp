@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //  Copyright (c) 2016 John Biddiscombe
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,16 +7,14 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <type_traits>
 
-// Select a copy tag type to enable optimization
-// of copy/move operations if the iterators are
-// pointers and if the value_type is layout compatible.
+// Select a copy tag type to enable optimization of copy/move operations if the
+// iterators are pointers and if the value_type is layout compatible.
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     struct general_pointer_tag
     {
@@ -29,7 +27,7 @@ namespace hpx { namespace traits {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T, bool is_enum = std::is_enum<T>::value>
+        template <typename T, bool is_enum = std::is_enum_v<T>>
         struct unwrap_enum
         {
             using type = std::underlying_type_t<T>;
@@ -41,31 +39,33 @@ namespace hpx { namespace traits {
             using type = T;
         };
 
+        template <typename T>
+        using unwrap_enum_t = typename unwrap_enum<T>::type;
+
         template <typename Source, typename Dest>
         struct pointer_category_helper
         {
-            using source = typename unwrap_enum<Source>::type;
-            using dest = typename unwrap_enum<Dest>::type;
+            using source = unwrap_enum_t<Source>;
+            using dest = unwrap_enum_t<Dest>;
 
-            using type =
-                std::conditional_t<std::integral_constant<bool,
-                                       sizeof(source) == sizeof(dest)>::value &&
-                        std::is_integral<source>::value &&
-                        std::is_integral<dest>::value &&
-                        !std::is_volatile<source>::value &&
-                        !std::is_volatile<dest>::value &&
-                        (std::is_same<bool, source>::value ==
-                            std::is_same<bool, dest>::value),
-                    trivially_copyable_pointer_tag, general_pointer_tag>;
+            // clang-format off
+            static constexpr bool compatible_types =
+                sizeof(source) == sizeof(dest) &&
+                std::is_integral_v<source> && std::is_integral_v<dest> &&
+               !std::is_volatile_v<source> && !std::is_volatile_v<dest> &&
+                std::is_same_v<bool, source> == std::is_same_v<bool, dest>;
+            // clang-format on
+
+            using type = std::conditional_t<compatible_types,
+                trivially_copyable_pointer_tag, general_pointer_tag>;
         };
 
         // every type is layout-compatible with itself
         template <typename T>
         struct pointer_category_helper<T, T>
         {
-            using type =
-                std::conditional_t<std::is_trivially_copyable<T>::value,
-                    trivially_copyable_pointer_tag, general_pointer_tag>;
+            using type = std::conditional_t<std::is_trivially_copyable_v<T>,
+                trivially_copyable_pointer_tag, general_pointer_tag>;
         };
 
         // pointers are layout compatible
@@ -87,13 +87,19 @@ namespace hpx { namespace traits {
             using type = trivially_copyable_pointer_tag;
         };
 
+        template <typename Source, typename Dest>
+        using pointer_category_helper_t =
+            typename pointer_category_helper<Source, Dest>::type;
+
         ///////////////////////////////////////////////////////////////////////
+        // clang-format off
         template <typename Iter1, typename Iter2>
         inline constexpr bool iterators_are_contiguous_v =
-            is_contiguous_iterator_v<Iter1>&& is_contiguous_iterator_v<Iter2>;
+            is_contiguous_iterator_v<Iter1> && is_contiguous_iterator_v<Iter2>;
+        // clang-format on
 
         template <typename Source, typename Dest,
-            bool non_contiguous = !iterators_are_contiguous_v<Source, Dest>>
+            bool NonContiguous = !iterators_are_contiguous_v<Source, Dest>>
         struct pointer_move_category
         {
             using type = general_pointer_tag;
@@ -103,15 +109,15 @@ namespace hpx { namespace traits {
         struct pointer_move_category<Source, Dest, false>
         {
             using type = std::conditional_t<
-                std::is_trivially_assignable<iter_reference_t<Dest>,
-                    std::remove_reference_t<iter_reference_t<Source>>>::value,
-                typename pointer_category_helper<iter_value_t<Source>,
-                    iter_value_t<Dest>>::type,
+                std::is_trivially_assignable_v<iter_reference_t<Dest>,
+                    std::remove_reference_t<iter_reference_t<Source>>>,
+                pointer_category_helper_t<iter_value_t<Source>,
+                    iter_value_t<Dest>>,
                 general_pointer_tag>;
         };
 
         template <typename Source, typename Dest,
-            bool non_contiguous = !iterators_are_contiguous_v<Source, Dest>>
+            bool NonContiguous = !iterators_are_contiguous_v<Source, Dest>>
         struct pointer_copy_category
         {
             using type = general_pointer_tag;
@@ -121,10 +127,10 @@ namespace hpx { namespace traits {
         struct pointer_copy_category<Source, Dest, false>
         {
             using type = std::conditional_t<
-                std::is_trivially_assignable<iter_reference_t<Dest>,
-                    iter_reference_t<Source>>::value,
-                typename pointer_category_helper<iter_value_t<Source>,
-                    iter_value_t<Dest>>::type,
+                std::is_trivially_assignable_v<iter_reference_t<Dest>,
+                    iter_reference_t<Source>>,
+                pointer_category_helper_t<iter_value_t<Source>,
+                    iter_value_t<Dest>>,
                 general_pointer_tag>;
         };
     }    // namespace detail
@@ -162,4 +168,4 @@ namespace hpx { namespace traits {
     template <typename Iterator>
     using remove_const_iterator_value_type_t =
         typename remove_const_iterator_value_type<Iterator>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
