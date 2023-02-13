@@ -442,6 +442,7 @@ namespace hpx::parallel {
     ///////////////////////////////////////////////////////////////////////////
     // for_each
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Iter>
         struct for_each : public algorithm<for_each<Iter>, Iter>
@@ -453,12 +454,12 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename F, typename Proj>
-            static constexpr InIterB sequential(ExPolicy&& policy,
-                InIterB first, InIterE last, F&& f, Proj&& proj)
+            static constexpr InIterB sequential(
+                [[maybe_unused]] ExPolicy&& policy, InIterB first, InIterE last,
+                F&& f, Proj&& proj)
             {
                 if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
                 {
-                    HPX_UNUSED(policy);
                     return util::loop_n<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
                         util::invoke_projected_ind<F, std::decay_t<Proj>>{
@@ -475,12 +476,12 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename F>
-            static constexpr InIterB sequential(ExPolicy&& policy,
-                InIterB first, InIterE last, F&& f, hpx::identity)
+            static constexpr InIterB sequential(
+                [[maybe_unused]] ExPolicy&& policy, InIterB first, InIterE last,
+                F&& f, hpx::identity)
             {
                 if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
                 {
-                    HPX_UNUSED(policy);
                     return util::loop_n_ind<std::decay_t<ExPolicy>>(first,
                         static_cast<std::size_t>(detail::distance(first, last)),
                         HPX_FORWARD(F, f));

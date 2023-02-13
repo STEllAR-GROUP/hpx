@@ -332,7 +332,7 @@ namespace hpx::parallel {
         template <typename F>
         struct transform_projected<F, hpx::identity>
         {
-            std::decay_t<F> f_;
+            std::decay_t<F> f_{};
 
             template <typename F_>
             HPX_HOST_DEVICE constexpr transform_projected(

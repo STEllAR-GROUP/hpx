@@ -1,9 +1,10 @@
-//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2022 Srinivas Yadav
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 
 #include <cstddef>
@@ -11,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "reduce_tests.hpp"
+#include "../algorithms/reduce_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -19,12 +20,11 @@ void test_reduce1()
 {
     using namespace hpx::execution;
 
-    test_reduce1(IteratorTag());
-    test_reduce1(seq, IteratorTag());
-    test_reduce1(par, IteratorTag());
+    test_reduce1(unseq, IteratorTag());
+    test_reduce1(par_unseq, IteratorTag());
 
-    test_reduce1_async(seq(task), IteratorTag());
-    test_reduce1_async(par(task), IteratorTag());
+    test_reduce1_async(unseq(task), IteratorTag());
+    test_reduce1_async(par_unseq(task), IteratorTag());
 }
 
 void reduce_test1()
@@ -39,12 +39,11 @@ void test_reduce2()
 {
     using namespace hpx::execution;
 
-    test_reduce2(IteratorTag());
-    test_reduce2(seq, IteratorTag());
-    test_reduce2(par, IteratorTag());
+    test_reduce2(unseq, IteratorTag());
+    test_reduce2(par_unseq, IteratorTag());
 
-    test_reduce2_async(seq(task), IteratorTag());
-    test_reduce2_async(par(task), IteratorTag());
+    test_reduce2_async(unseq(task), IteratorTag());
+    test_reduce2_async(par_unseq(task), IteratorTag());
 }
 
 void reduce_test2()
@@ -59,12 +58,11 @@ void test_reduce3()
 {
     using namespace hpx::execution;
 
-    test_reduce3(IteratorTag());
-    test_reduce3(seq, IteratorTag());
-    test_reduce3(par, IteratorTag());
+    test_reduce3(unseq, IteratorTag());
+    test_reduce3(par_unseq, IteratorTag());
 
-    test_reduce3_async(seq(task), IteratorTag());
-    test_reduce3_async(par(task), IteratorTag());
+    test_reduce3_async(unseq(task), IteratorTag());
+    test_reduce3_async(par_unseq(task), IteratorTag());
 }
 
 void reduce_test3()
@@ -73,54 +71,10 @@ void reduce_test3()
     test_reduce3<std::forward_iterator_tag>();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_reduce_exception()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_reduce_exception(seq, IteratorTag());
-    test_reduce_exception(par, IteratorTag());
-
-    test_reduce_exception_async(seq(task), IteratorTag());
-    test_reduce_exception_async(par(task), IteratorTag());
-}
-
-void reduce_exception_test()
-{
-    test_reduce_exception<std::random_access_iterator_tag>();
-    test_reduce_exception<std::forward_iterator_tag>();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename IteratorTag>
-void test_reduce_bad_alloc()
-{
-    using namespace hpx::execution;
-
-    // If the execution policy object is of type vector_execution_policy,
-    // std::terminate shall be called. therefore we do not test exceptions
-    // with a vector execution policy
-    test_reduce_bad_alloc(seq, IteratorTag());
-    test_reduce_bad_alloc(par, IteratorTag());
-
-    test_reduce_bad_alloc_async(seq(task), IteratorTag());
-    test_reduce_bad_alloc_async(par(task), IteratorTag());
-}
-
-void reduce_bad_alloc_test()
-{
-    test_reduce_bad_alloc<std::random_access_iterator_tag>();
-    test_reduce_bad_alloc<std::forward_iterator_tag>();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -130,9 +84,6 @@ int hpx_main(hpx::program_options::variables_map& vm)
     reduce_test1();
     reduce_test2();
     reduce_test3();
-
-    reduce_exception_test();
-    reduce_bad_alloc_test();
     return hpx::local::finalize();
 }
 

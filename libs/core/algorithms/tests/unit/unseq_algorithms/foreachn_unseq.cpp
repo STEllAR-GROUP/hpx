@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 
 #include <cstddef>
@@ -11,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "foreach_tests.hpp"
+#include "../algorithms/foreach_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
@@ -19,13 +20,11 @@ void test_for_each_n()
 {
     using namespace hpx::execution;
 
-    test_for_each_n_seq(IteratorTag());
+    test_for_each_n(unseq, IteratorTag());
+    test_for_each_n(par_unseq, IteratorTag());
 
-    test_for_each_n(seq, IteratorTag());
-    test_for_each_n(par, IteratorTag());
-
-    test_for_each_n_async(seq(task), IteratorTag());
-    test_for_each_n_async(par(task), IteratorTag());
+    test_for_each_n_async(unseq(task), IteratorTag());
+    test_for_each_n_async(par_unseq(task), IteratorTag());
 }
 
 void for_each_n_test()
@@ -37,7 +36,7 @@ void for_each_n_test()
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

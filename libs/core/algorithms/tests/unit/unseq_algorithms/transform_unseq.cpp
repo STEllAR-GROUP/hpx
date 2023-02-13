@@ -1,50 +1,50 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/local/algorithm.hpp>
 #include <hpx/local/init.hpp>
 
-#include <cstddef>
 #include <iostream>
 #include <string>
 #include <vector>
 
-#include "foreach_tests.hpp"
+#include "../algorithms/transform_tests.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_for_each_n()
+void test_transform()
 {
     using namespace hpx::execution;
 
-    test_for_each_n_seq(IteratorTag());
+    test_transform(unseq, IteratorTag());
+    test_transform(par_unseq, IteratorTag());
 
-    test_for_each_n(seq, IteratorTag());
-    test_for_each_n(par, IteratorTag());
-
-    test_for_each_n_async(seq(task), IteratorTag());
-    test_for_each_n_async(par(task), IteratorTag());
+    test_transform_async(unseq(task), IteratorTag());
+    test_transform_async(par_unseq(task), IteratorTag());
 }
 
-void for_each_n_test()
+void transform_test()
 {
-    test_for_each_n<std::random_access_iterator_tag>();
-    test_for_each_n<std::forward_iterator_tag>();
+    test_transform<std::random_access_iterator_tag>();
+    test_transform<std::forward_iterator_tag>();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_each_n_test();
+    transform_test();
+    // Bad alloc and exceptions should trigger a call to std::terminate.
+    // Hence, no tests for them.
     return hpx::local::finalize();
 }
 
