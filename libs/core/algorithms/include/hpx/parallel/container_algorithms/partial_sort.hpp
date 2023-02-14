@@ -177,7 +177,7 @@ namespace hpx { namespace ranges {
     /// calling thread.
     ///
     /// \returns  The \a partial_sort algorithm returns \a
-    ///           typename hpx::traits::range_iterator_t<Rng>.
+    ///           hpx::traits::range_iterator_t<Rng>.
     ///           It returns \a last.
     template <typename Rng,
         typename Comp = ranges::less,
@@ -244,11 +244,11 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a partial_sort algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_iterator_t<Rng>
+    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           typename hpx::traits::range_iterator_t<Rng>
+    ///           hpx::traits::range_iterator_t<Rng>
     ///           otherwise.
     ///           It returns \a last.
     ///
@@ -302,15 +302,15 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend RandomIt tag_fallback_invoke(hpx::ranges::partial_sort_t,
-            RandomIt first, RandomIt middle, Sent last, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt middle, Sent last, Comp comp = Comp(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::partial_sort<RandomIt>().call(
-                hpx::execution::seq, first, middle, last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, middle, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -328,18 +328,17 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            RandomIt>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
         tag_fallback_invoke(hpx::ranges::partial_sort_t, ExPolicy&& policy,
-            RandomIt first, RandomIt middle, Sent last, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt middle, Sent last, Comp comp = Comp(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::partial_sort<RandomIt>().call(
                 HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -358,8 +357,8 @@ namespace hpx::ranges {
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::partial_sort_t, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> middle, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            hpx::traits::range_iterator_t<Rng> middle, Comp comp = Comp(),
+            Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -369,8 +368,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::partial_sort<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), middle,
-                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -391,7 +389,7 @@ namespace hpx::ranges {
             hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::partial_sort_t, ExPolicy&& policy,
             Rng&& rng, hpx::traits::range_iterator_t<Rng> middle,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -401,8 +399,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::partial_sort<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng), middle,
-                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
     } partial_sort{};
 }    // namespace hpx::ranges

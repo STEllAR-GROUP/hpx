@@ -915,7 +915,7 @@ namespace hpx::ranges {
             typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -929,25 +929,23 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
-            Sent last, T init, Reduce&& red_op, Convert&& conv_op)
+            Sent last, T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::is_invocable_v<Convert,
                    typename std::iterator_traits<Iter>::value_type
                 > &&
@@ -962,14 +960,14 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
-            T init, Reduce&& red_op, Convert&& conv_op)
+            T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
@@ -977,12 +975,11 @@ namespace hpx::ranges {
             typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
             Sent last, Iter2 first2, T init)
         {
@@ -1000,7 +997,7 @@ namespace hpx::ranges {
         // clang-format off
         template <typename Iter, typename Sent, typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2>
             )>
         // clang-format on
@@ -1023,7 +1020,7 @@ namespace hpx::ranges {
             typename Iter2, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
@@ -1041,10 +1038,9 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Iter first,
-            Sent last, Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+            Sent last, Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter>,
                 "Requires at least forward iterator.");
@@ -1053,15 +1049,14 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, first2,
-                HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
         template <typename Iter, typename Sent, typename Iter2, typename T,
             typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename std::iterator_traits<Iter>::value_type,
@@ -1080,7 +1075,7 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Iter first, Sent last,
-            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+            Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Requires at least input iterator.");
@@ -1089,7 +1084,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 hpx::execution::seq, first, last, first2, HPX_MOVE(init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // range based versions
@@ -1098,7 +1093,7 @@ namespace hpx::ranges {
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1112,27 +1107,25 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
-            T init, Reduce&& red_op, Convert&& conv_op)
+            T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(T, init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                hpx::util::end(rng), HPX_MOVE(init), HPX_MOVE(red_op),
+                HPX_MOVE(conv_op));
         }
 
         // clang-format off
         template <typename Rng, typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type
                 > &&
@@ -1147,35 +1140,31 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng, T init,
-            Reduce&& red_op, Convert&& conv_op)
+            Reduce red_op, Convert conv_op)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng, typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
             Iter2 first2, T init)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
@@ -1192,15 +1181,14 @@ namespace hpx::ranges {
         // clang-format off
         template <typename Rng, typename Iter2, typename T,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2>
             )>
         // clang-format on
         friend T tag_fallback_invoke(
             transform_reduce_t, Rng&& rng, Iter2 first2, T init)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Requires at least input iterator.");
@@ -1218,7 +1206,7 @@ namespace hpx::ranges {
             typename T, typename Reduce, typename Convert,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -1236,13 +1224,11 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy, Rng&& rng,
-            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+            Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
@@ -1251,15 +1237,15 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), first2, HPX_MOVE(init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                hpx::util::end(rng), first2, HPX_MOVE(init), HPX_MOVE(red_op),
+                HPX_MOVE(conv_op));
         }
 
         // clang-format off
         template <typename Rng, typename Iter2, typename T, typename Reduce,
             typename Convert,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::traits::is_iterator_v<Iter2> &&
                 hpx::is_invocable_v<Convert,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -1278,10 +1264,9 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, Rng&& rng,
-            Iter2 first2, T init, Reduce&& red_op, Convert&& conv_op)
+            Iter2 first2, T init, Reduce red_op, Convert conv_op)
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(hpx::traits::is_input_iterator_v<iterator_type>,
                 "Requires at least input iterator.");
@@ -1290,8 +1275,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                first2, HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                first2, HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
     } transform_reduce{};
 }    // namespace hpx::ranges

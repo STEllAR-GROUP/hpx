@@ -246,6 +246,7 @@ namespace hpx::parallel {
 }    // namespace hpx::parallel
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::swap_ranges
     inline constexpr struct swap_ranges_t final

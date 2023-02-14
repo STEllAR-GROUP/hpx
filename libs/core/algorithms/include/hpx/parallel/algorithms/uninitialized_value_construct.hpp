@@ -365,6 +365,7 @@ namespace hpx::parallel {
 }    // namespace hpx::parallel
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::uninitialized_value_construct
     inline constexpr struct uninitialized_value_construct_t final
@@ -420,7 +421,8 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
@@ -437,14 +439,16 @@ namespace hpx {
 
             return hpx::parallel::detail::uninitialized_value_construct_n<
                 FwdIter>()
-                .call(hpx::execution::seq, first, std::size_t(count));
+                .call(hpx::execution::seq, first,
+                    static_cast<std::size_t>(count));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -464,7 +468,8 @@ namespace hpx {
 
             return hpx::parallel::detail::uninitialized_value_construct_n<
                 FwdIter>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
+                .call(HPX_FORWARD(ExPolicy, policy), first,
+                    static_cast<std::size_t>(count));
         }
 
     } uninitialized_value_construct_n{};

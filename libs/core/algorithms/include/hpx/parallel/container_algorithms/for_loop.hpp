@@ -785,7 +785,7 @@ namespace hpx::ranges::experimental {
         template <typename ExPolicy, typename R, typename... Args,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<R>::value
+                hpx::traits::is_range_v<R>
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>

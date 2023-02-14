@@ -385,14 +385,14 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
-            hpx::remove_if_t, FwdIter first, FwdIter last, Pred&& pred)
+            hpx::remove_if_t, FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
-                hpx::execution::sequenced_policy{}, first, last,
-                HPX_FORWARD(Pred, pred), hpx::identity_v);
+                hpx::execution::sequenced_policy{}, first, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -407,14 +407,14 @@ namespace hpx {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::remove_if_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred)
+            FwdIter last, Pred pred)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::remove_if<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred), hpx::identity_v);
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
     } remove_if{};
 

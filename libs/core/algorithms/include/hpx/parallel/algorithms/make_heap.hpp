@@ -541,15 +541,15 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(make_heap_t, ExPolicy&& policy, RndIter first,
-            RndIter last, Comp&& comp)
+            RndIter last, Comp comp)
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::detail::make_heap<RndIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v));
+                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                    hpx::identity_v));
         }
 
         // clang-format off
@@ -586,13 +586,13 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(
-            make_heap_t, RndIter first, RndIter last, Comp&& comp)
+            make_heap_t, RndIter first, RndIter last, Comp comp)
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RndIter>,
                 "Requires random access iterator.");
 
             hpx::parallel::detail::make_heap<RndIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
                 hpx::identity_v);
         }
 

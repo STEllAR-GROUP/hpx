@@ -245,10 +245,10 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred&& pred)
+            hpx::is_partitioned_t, FwdIter first, FwdIter last, Pred pred)
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
                     hpx::identity_v);
         }
 
@@ -263,11 +263,11 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred&& pred)
+            FwdIter first, FwdIter last, Pred pred)
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), hpx::identity_v);
+                    HPX_MOVE(pred), hpx::identity_v);
         }
     } is_partitioned{};
 }    // namespace hpx

@@ -320,16 +320,16 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter>
         tag_fallback_invoke(
-            generate_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            generate_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::generate<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f));
         }
 
         // clang-format off
@@ -339,13 +339,13 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
-            generate_t, FwdIter first, FwdIter last, F&& f)
+            generate_t, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::generate<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f));
+                hpx::execution::seq, first, last, HPX_MOVE(f));
         }
     } generate{};
 
@@ -359,13 +359,14 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter>
         tag_fallback_invoke(
-            generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F&& f)
+            generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -378,13 +379,14 @@ namespace hpx {
 
             return hpx::parallel::detail::generate_n<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first,
-                static_cast<std::size_t>(count), HPX_FORWARD(F, f));
+                static_cast<std::size_t>(count), HPX_MOVE(f));
         }
 
         // clang-format off
         template <typename FwdIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(

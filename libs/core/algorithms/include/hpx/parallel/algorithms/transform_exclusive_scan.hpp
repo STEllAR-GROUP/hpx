@@ -343,9 +343,9 @@ namespace hpx::parallel {
             hpx::is_invocable_v<Conv,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
             hpx::is_invocable_v<Op,
-                    typename hpx::util::invoke_result_t<Conv,
+                    hpx::util::invoke_result_t<Conv,
                         typename std::iterator_traits<FwdIter1>::value_type>,
-                    typename hpx::util::invoke_result_t<Conv,
+                    hpx::util::invoke_result_t<Conv,
                         typename std::iterator_traits<FwdIter1>::value_type>
             >
         )>
@@ -404,8 +404,8 @@ namespace hpx {
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::transform_exclusive_scan_t,
-            InIter first, InIter last, OutIter dest, T init, BinOp&& binary_op,
-            UnOp&& unary_op)
+            InIter first, InIter last, OutIter dest, T init, BinOp binary_op,
+            UnOp unary_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -417,8 +417,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::detail::transform_exclusive_scan<result_type>()
                     .call(hpx::execution::seq, first, last, dest,
-                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                        HPX_FORWARD(BinOp, binary_op)));
+                        HPX_MOVE(unary_op), HPX_MOVE(init),
+                        HPX_MOVE(binary_op)));
         }
 
         // clang-format off
@@ -432,9 +432,9 @@ namespace hpx {
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>
                 >
             )>
@@ -442,7 +442,7 @@ namespace hpx {
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::transform_exclusive_scan_t, ExPolicy&& policy,
             FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init,
-            BinOp&& binary_op, UnOp&& unary_op)
+            BinOp binary_op, UnOp unary_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -455,8 +455,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::detail::transform_exclusive_scan<result_type>()
                     .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                        HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                        HPX_FORWARD(BinOp, binary_op)));
+                        HPX_MOVE(unary_op), HPX_MOVE(init),
+                        HPX_MOVE(binary_op)));
         }
     } transform_exclusive_scan{};
 }    // namespace hpx

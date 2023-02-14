@@ -137,7 +137,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
+        subrange_t<hpx::traits::range_iterator_t<Rng>>>
     partition(ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -404,7 +404,7 @@ namespace hpx { namespace ranges {
     template <typename ExPolicy, typename Rng, typename Pred,
         typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
+        subrange_t<hpx::traits::range_iterator_t<Rng>>>
     stable_partition(ExPolicy&& policy, Rng&& rng, Pred&& pred,
         Proj&& proj = Proj());
 
@@ -932,18 +932,17 @@ namespace hpx::parallel {
         typename Proj = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
+            hpx::traits::is_range_v<Rng> &&
+            traits::is_projected_range_v<Proj, Rng> &&
             traits::is_indirect_callable<ExPolicy, Pred,
                 traits::projected_range<Proj, Rng>>::value
         )>
     // clang-format on
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::partition is deprecated, use hpx::partition instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
-        partition(
-            ExPolicy&& policy, Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+        util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>> partition(ExPolicy&& policy,
+            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
     {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
@@ -963,10 +962,10 @@ namespace hpx::parallel {
         typename Proj = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::traits::is_range<Rng>::value &&
+            hpx::traits::is_range_v<Rng> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
             hpx::traits::is_iterator_v<FwdIter3> &&
-            traits::is_projected_range<Proj, Rng>::value &&
+            traits::is_projected_range_v<Proj, Rng> &&
             traits::is_indirect_callable<ExPolicy, Pred,
                 traits::projected_range<Proj, Rng>>::value
         )>
@@ -1013,16 +1012,17 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>
+                    parallel::traits::projected_range<Proj, Rng>
+                >
         )>
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>>
-        tag_fallback_invoke(hpx::ranges::partition_t, Rng&& rng, Pred&& pred,
-            Proj&& proj = Proj())
+        tag_fallback_invoke(
+            hpx::ranges::partition_t, Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
@@ -1030,12 +1030,11 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<
-                typename hpx::traits::range_iterator<Rng>::type,
+                hpx::traits::range_iterator_t<Rng>,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::detail::partition<iterator>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj)),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
         }
 
@@ -1047,13 +1046,14 @@ namespace hpx::ranges {
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>
+                    parallel::traits::projected_range<Proj, Rng>
+                >
         )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            subrange_t<hpx::traits::range_iterator_t<Rng>>>
         tag_fallback_invoke(hpx::ranges::partition_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+            Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
@@ -1061,12 +1061,11 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<
-                typename hpx::traits::range_iterator<Rng>::type,
+                hpx::traits::range_iterator_t<Rng>,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::detail::partition<iterator>().call(
                     HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj)),
+                    hpx::util::end(rng), HPX_MOVE(pred), HPX_MOVE(proj)),
                 hpx::util::end(rng));
         }
 
@@ -1078,19 +1077,20 @@ namespace hpx::ranges {
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>>
+                    parallel::traits::projected<Proj, FwdIter>
+                >
         )>
         // clang-format on
         friend subrange_t<FwdIter> tag_fallback_invoke(hpx::ranges::partition_t,
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
                 hpx::parallel::detail::partition<FwdIter>().call(
-                    hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj)),
+                    hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
         }
 
@@ -1103,21 +1103,22 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>>
+                    parallel::traits::projected<Proj, FwdIter>
+                >
         )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             subrange_t<FwdIter>>::type
         tag_fallback_invoke(hpx::ranges::partition_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::util::make_subrange<FwdIter, FwdIter>(
                 hpx::parallel::detail::partition<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
+                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                    HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
         }
     } partition{};
@@ -1130,16 +1131,17 @@ namespace hpx::ranges {
         template <typename Rng, typename Pred,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>
+                    parallel::traits::projected_range<Proj, Rng>
+                >
             )>
         // clang-format on
         friend subrange_t<hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::stable_partition_t, Rng&& rng,
-            Pred&& pred, Proj&& proj = Proj())
+            Pred pred, Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
@@ -1147,12 +1149,12 @@ namespace hpx::ranges {
                 "Requires at least bidirectional iterator.");
 
             return hpx::parallel::util::make_subrange<
-                typename hpx::traits::range_iterator<Rng>::type,
+                hpx::traits::range_iterator_t<Rng>,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::detail::stable_partition<iterator>().call2(
                     hpx::execution::seq, std::true_type{},
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
+                    hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(pred),
+                    HPX_MOVE(proj)),
                 hpx::util::end(rng));
         }
 
@@ -1163,14 +1165,15 @@ namespace hpx::ranges {
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
-                parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>::value
+                parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
+                    parallel::traits::projected_range<Proj, Rng>
+                >
         )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<hpx::traits::range_iterator_t<Rng>>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            subrange_t<hpx::traits::range_iterator_t<Rng>>>
         tag_fallback_invoke(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+            Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
 
@@ -1182,12 +1185,12 @@ namespace hpx::ranges {
                     !hpx::traits::is_random_access_iterator_v<iterator>>;
 
             return hpx::parallel::util::make_subrange<
-                typename hpx::traits::range_iterator<Rng>::type,
+                hpx::traits::range_iterator_t<Rng>,
                 typename hpx::traits::range_sentinel<Rng>::type>(
                 hpx::parallel::detail::stable_partition<iterator>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(),
-                    hpx::util::begin(rng), hpx::util::end(rng),
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
+                    hpx::util::begin(rng), hpx::util::end(rng), HPX_MOVE(pred),
+                    HPX_MOVE(proj)),
                 hpx::util::end(rng));
         }
 
@@ -1199,12 +1202,13 @@ namespace hpx::ranges {
                 hpx::traits::is_sentinel_for_v<Sent, BidirIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, BidirIter>>
+                    parallel::traits::projected<Proj, BidirIter>
+                >
         )>
         // clang-format on
         friend subrange_t<BidirIter> tag_fallback_invoke(
             hpx::ranges::stable_partition_t, BidirIter first, Sent last,
-            Pred&& pred, Proj&& proj = Proj())
+            Pred pred, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -1212,7 +1216,7 @@ namespace hpx::ranges {
             return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
                 hpx::parallel::detail::stable_partition<BidirIter>().call2(
                     hpx::execution::seq, std::true_type{}, first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
+                    HPX_MOVE(pred), HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
         }
 
@@ -1225,13 +1229,14 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<BidirIter> &&
                 hpx::traits::is_sentinel_for_v<Sent, BidirIter> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, BidirIter>>
+                    parallel::traits::projected<Proj, BidirIter>
+                >
         )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            subrange_t<BidirIter>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            subrange_t<BidirIter>>
         tag_fallback_invoke(hpx::ranges::stable_partition_t, ExPolicy&& policy,
-            BidirIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            BidirIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
                 "Requires at least bidirectional iterator.");
@@ -1242,7 +1247,7 @@ namespace hpx::ranges {
             return hpx::parallel::util::make_subrange<BidirIter, BidirIter>(
                 hpx::parallel::detail::stable_partition<BidirIter>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)),
+                    HPX_MOVE(pred), HPX_MOVE(proj)),
                 parallel::detail::advance_to_sentinel(first, last));
         }
     } stable_partition{};
@@ -1262,14 +1267,15 @@ namespace hpx::ranges {
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>
+                    parallel::traits::projected_range<Proj, Rng>
+                >
             )>
         // clang-format on
         friend partition_copy_result<hpx::traits::range_iterator_t<Rng>,
             OutIter2, OutIter3>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, Rng&& rng,
-            OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
-            Proj&& proj = Proj())
+            OutIter2 dest_true, OutIter3 dest_false, Pred pred,
+            Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
             using result_type = hpx::tuple<iterator, OutIter2, OutIter3>;
@@ -1280,8 +1286,8 @@ namespace hpx::ranges {
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, hpx::util::begin(rng),
-                    hpx::util::end(rng), dest_true, dest_false,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+                    hpx::util::end(rng), dest_true, dest_false, HPX_MOVE(pred),
+                    HPX_MOVE(proj)));
         }
 
         // clang-format off
@@ -1295,15 +1301,16 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter3> &&
                 parallel::traits::is_projected_range_v<Proj, Rng> &&
                 parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
-                    parallel::traits::projected_range<Proj, Rng>>
+                    parallel::traits::projected_range<Proj, Rng>
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
             partition_copy_result<hpx::traits::range_iterator_t<Rng>, FwdIter2,
-                FwdIter3>>::type
+                FwdIter3>>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false, Pred&& pred,
-            Proj&& proj = Proj())
+            Rng&& rng, FwdIter2 dest_true, FwdIter3 dest_false, Pred pred,
+            Proj proj = Proj())
         {
             using iterator = hpx::traits::range_iterator_t<Rng>;
             using result_type = hpx::tuple<iterator, FwdIter2, FwdIter3>;
@@ -1314,8 +1321,8 @@ namespace hpx::ranges {
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                    hpx::util::end(rng), dest_true, dest_false,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+                    hpx::util::end(rng), dest_true, dest_false, HPX_MOVE(pred),
+                    HPX_MOVE(proj)));
         }
 
         // clang-format off
@@ -1324,19 +1331,20 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for<Sent, InIter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter2> &&
                 hpx::traits::is_iterator_v<OutIter3> &&
                 parallel::traits::is_projected_v<Proj, InIter> &&
                 parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, InIter>>
+                    parallel::traits::projected<Proj, InIter>
+                >
             )>
         // clang-format on
         friend partition_copy_result<InIter, OutIter2, OutIter3>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, InIter first,
-            Sent last, OutIter2 dest_true, OutIter3 dest_false, Pred&& pred,
-            Proj&& proj = Proj())
+            Sent last, OutIter2 dest_true, OutIter3 dest_false, Pred pred,
+            Proj proj = Proj())
         {
             using result_type = hpx::tuple<InIter, OutIter2, OutIter3>;
 
@@ -1346,7 +1354,7 @@ namespace hpx::ranges {
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
                     hpx::execution::seq, first, last, dest_true, dest_false,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+                    HPX_MOVE(pred), HPX_MOVE(proj)));
         }
 
         // clang-format off
@@ -1362,14 +1370,15 @@ namespace hpx::ranges {
                 parallel::traits::is_projected_v<Proj, FwdIter> &&
                 parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>>
+                    parallel::traits::projected<Proj, FwdIter>
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            partition_copy_result<FwdIter, OutIter2, OutIter3>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            partition_copy_result<FwdIter, OutIter2, OutIter3>>
         tag_fallback_invoke(hpx::ranges::partition_copy_t, ExPolicy&& policy,
             FwdIter first, Sent last, OutIter2 dest_true, OutIter3 dest_false,
-            Pred&& pred, Proj&& proj = Proj())
+            Pred pred, Proj proj = Proj())
         {
             using result_type = hpx::tuple<FwdIter, OutIter2, OutIter3>;
 
@@ -1379,8 +1388,7 @@ namespace hpx::ranges {
             return parallel::util::make_in_out_out_result(
                 parallel::detail::partition_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest_true,
-                    dest_false, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj)));
+                    dest_false, HPX_MOVE(pred), HPX_MOVE(proj)));
         }
     } partition_copy{};
 }    // namespace hpx::ranges

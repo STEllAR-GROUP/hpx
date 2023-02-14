@@ -479,7 +479,7 @@ namespace hpx::parallel {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter> &&
-            traits::is_projected<Proj, FwdIter>::value &&
+            traits::is_projected_v<Proj, FwdIter> &&
             traits::is_indirect_callable<ExPolicy, Pred,
                     traits::projected<Proj, FwdIter>,
                     traits::projected<Proj, FwdIter>>::value
@@ -716,7 +716,7 @@ namespace hpx::parallel {
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<FwdIter1> &&
             hpx::traits::is_iterator_v<FwdIter2> &&
-            traits::is_projected<Proj, FwdIter1>::value &&
+            traits::is_projected_v<Proj, FwdIter1> &&
             traits::is_indirect_callable<ExPolicy, Pred,
                 traits::projected<Proj, FwdIter1>,
                 traits::projected<Proj, FwdIter1>>::value
@@ -760,51 +760,48 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<FwdIter> &&
-                parallel::traits::is_projected<Proj, FwdIter>::value &&
-                parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>,
-                    parallel::traits::projected<Proj, FwdIter>>::value
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<FwdIter>,
+                    hpx::traits::iter_value_t<FwdIter>
+                >
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(hpx::unique_t, FwdIter first,
-            FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
+        friend FwdIter tag_fallback_invoke(
+            hpx::unique_t, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename Pred = hpx::parallel::detail::equal_to,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
-                parallel::traits::is_projected<Proj, FwdIter>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter>,
-                    parallel::traits::projected<Proj, FwdIter>>::value
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<FwdIter>,
+                    hpx::traits::iter_value_t<FwdIter>
+                >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_fallback_invoke(hpx::unique_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred(), Proj&& proj = Proj())
+            FwdIter last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::unique<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
     } unique{};
 
@@ -816,19 +813,17 @@ namespace hpx {
         // clang-format off
         template <typename InIter, typename OutIter,
             typename Pred = hpx::parallel::detail::equal_to,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
-                parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Pred,
-                    parallel::traits::projected<Proj, InIter>,
-                    parallel::traits::projected<Proj, InIter>>::value
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<InIter>,
+                    hpx::traits::iter_value_t<OutIter>
+                >
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::unique_copy_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            InIter last, OutIter dest, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -837,28 +832,27 @@ namespace hpx {
 
             return parallel::util::get_second_element<InIter, OutIter>(
                 hpx::parallel::detail::unique_copy<result_type>().call(
-                    hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+                    hpx::execution::seq, first, last, dest, HPX_MOVE(pred),
+                    hpx::identity_v));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Pred = hpx::parallel::detail::equal_to,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                parallel::traits::is_indirect_callable<ExPolicy, Pred,
-                    parallel::traits::projected<Proj, FwdIter1>,
-                    parallel::traits::projected<Proj, FwdIter1>>::value
+                hpx::is_invocable_v<Pred,
+                    hpx::traits::iter_value_t<FwdIter1>,
+                    hpx::traits::iter_value_t<FwdIter2>
+                >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::unique_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -869,7 +863,7 @@ namespace hpx {
             return parallel::util::get_second_element<FwdIter1, FwdIter2>(
                 hpx::parallel::detail::unique_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj)));
+                    HPX_MOVE(pred), hpx::identity_v));
         }
     } unique_copy{};
 }    // namespace hpx

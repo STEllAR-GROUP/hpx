@@ -819,7 +819,7 @@ namespace hpx {
             RandIter3>
         tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");
@@ -834,8 +834,7 @@ namespace hpx {
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::merge<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                    dest, HPX_FORWARD(Comp, comp), hpx::identity_v,
-                    hpx::identity_v));
+                    dest, HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
 
         // clang-format off
@@ -853,7 +852,7 @@ namespace hpx {
         // clang-format on
         friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");
@@ -868,7 +867,7 @@ namespace hpx {
             return hpx::parallel::util::get_third_element(
                 hpx::parallel::detail::merge<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v, hpx::identity_v));
+                    HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
     } merge{};
 
@@ -892,7 +891,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+            RandIter middle, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Required at least random access iterator.");
@@ -900,7 +899,7 @@ namespace hpx {
             return hpx::parallel::detail::get_void_result(
                 hpx::parallel::detail::inplace_merge<RandIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v));
+                    HPX_MOVE(comp), hpx::identity_v));
         }
 
         // clang-format off
@@ -915,15 +914,15 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+            RandIter middle, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Required at least random access iterator.");
 
             return hpx::parallel::detail::get_void_result(
                 hpx::parallel::detail::inplace_merge<RandIter>().call(
-                    hpx::execution::seq, first, middle, last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v));
+                    hpx::execution::seq, first, middle, last, HPX_MOVE(comp),
+                    hpx::identity_v));
         }
     } inplace_merge{};
 }    // namespace hpx

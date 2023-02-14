@@ -146,8 +146,8 @@ namespace hpx { namespace ranges {
     ///           element exchanged in the range beginning with \a first2.
     ///
     template <typename Rng1, typename Rng2>
-    swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
-        typename hpx::traits::range_iterator_t<Rng2>>
+    swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
+        hpx::traits::range_iterator_t<Rng2>>
     swap_ranges(Rng1&& rng1, Rng2&& rng2);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -202,8 +202,8 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename Rng1, typename Rng2>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        swap_ranges_result<typename hpx::traits::range_iterator_t<Rng1>,
-            typename hpx::traits::range_iterator_t<Rng2>>>::type
+        swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
+            hpx::traits::range_iterator_t<Rng2>>>
     swap_ranges(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2);
 
     // clang-format on
@@ -238,9 +238,9 @@ namespace hpx::ranges {
             typename Sent2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter1> &&
-                hpx::traits::is_sentinel_for<Sent1, InIter1>::value &&
+                hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
                 hpx::traits::is_iterator_v<InIter2> &&
-                hpx::traits::is_sentinel_for<Sent2, InIter2>::value
+                hpx::traits::is_sentinel_for_v<Sent2, InIter2>
             )>
         // clang-format on
         friend swap_ranges_result<InIter1, InIter2> tag_fallback_invoke(
@@ -263,13 +263,13 @@ namespace hpx::ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
+                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for<Sent2, FwdIter2>::value
+                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            swap_ranges_result<FwdIter1, FwdIter2>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            swap_ranges_result<FwdIter1, FwdIter2>>
         tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2)
         {
@@ -287,8 +287,8 @@ namespace hpx::ranges {
         // clang-format off
         template <typename Rng1, typename Rng2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng1>::value &&
-                hpx::traits::is_range<Rng2>::value
+                hpx::traits::is_range_v<Rng1> &&
+                hpx::traits::is_range_v<Rng2>
             )>
         // clang-format on
         friend swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
@@ -314,13 +314,13 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng1, typename Rng2,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng1>::value &&
-                hpx::traits::is_range<Rng2>::value
+                hpx::traits::is_range_v<Rng1> &&
+                hpx::traits::is_range_v<Rng2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
             swap_ranges_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>>>::type
+                hpx::traits::range_iterator_t<Rng2>>>
         tag_fallback_invoke(hpx::ranges::swap_ranges_t, ExPolicy&& policy,
             Rng1&& rng1, Rng2&& rng2)
         {

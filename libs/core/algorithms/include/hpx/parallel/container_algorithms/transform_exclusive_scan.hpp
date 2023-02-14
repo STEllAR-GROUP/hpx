@@ -454,7 +454,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for<Sent, InIter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<InIter>::value_type> &&
@@ -468,8 +468,8 @@ namespace hpx::ranges {
         // clang-format on
         friend transform_exclusive_scan_result<InIter, OutIter>
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
-            InIter first, Sent last, OutIter dest, T init, BinOp&& binary_op,
-            UnOp&& unary_op)
+            InIter first, Sent last, OutIter dest, T init, BinOp binary_op,
+            UnOp unary_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -482,8 +482,7 @@ namespace hpx::ranges {
             return hpx::parallel::detail::transform_exclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -493,7 +492,7 @@ namespace hpx::ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
@@ -505,11 +504,11 @@ namespace hpx::ranges {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            transform_exclusive_scan_result<FwdIter1, FwdIter2>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            transform_exclusive_scan_result<FwdIter1, FwdIter2>>
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest, T init,
-            BinOp&& binary_op, UnOp&& unary_op)
+            BinOp binary_op, UnOp unary_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -522,8 +521,7 @@ namespace hpx::ranges {
             return hpx::parallel::detail::transform_exclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -531,7 +529,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
@@ -545,7 +543,7 @@ namespace hpx::ranges {
         friend transform_exclusive_scan_result<
             hpx::traits::range_iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t, Rng&& rng,
-            O dest, T init, BinOp&& binary_op, UnOp&& unary_op)
+            O dest, T init, BinOp binary_op, UnOp unary_op)
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -558,8 +556,7 @@ namespace hpx::ranges {
             return hpx::parallel::detail::transform_exclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -569,7 +566,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
@@ -584,8 +581,8 @@ namespace hpx::ranges {
             transform_exclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
                 O>>::type
         tag_fallback_invoke(hpx::ranges::transform_exclusive_scan_t,
-            ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp&& binary_op,
-            UnOp&& unary_op)
+            ExPolicy&& policy, Rng&& rng, O dest, T init, BinOp binary_op,
+            UnOp unary_op)
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -598,8 +595,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::transform_exclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), dest, HPX_FORWARD(UnOp, unary_op),
-                    HPX_MOVE(init), HPX_FORWARD(BinOp, binary_op));
+                    std::end(rng), dest, HPX_MOVE(unary_op), HPX_MOVE(init),
+                    HPX_MOVE(binary_op));
         }
     } transform_exclusive_scan{};
 }    // namespace hpx::ranges

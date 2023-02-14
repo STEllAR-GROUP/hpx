@@ -605,16 +605,14 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, T init, Reduce&& red_op,
-            Convert&& conv_op)
+            FwdIter first, FwdIter last, T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
@@ -635,14 +633,14 @@ namespace hpx {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, InIter first,
-            InIter last, T init, Reduce&& red_op, Convert&& conv_op)
+            InIter last, T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::transform_reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
@@ -716,7 +714,7 @@ namespace hpx {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
-            Reduce&& red_op, Convert&& conv_op)
+            Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -725,8 +723,7 @@ namespace hpx {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                HPX_MOVE(init), HPX_FORWARD(Reduce, red_op),
-                HPX_FORWARD(Convert, conv_op));
+                HPX_MOVE(init), HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
 
         // clang-format off
@@ -752,8 +749,8 @@ namespace hpx {
             )>
         // clang-format on
         friend T tag_fallback_invoke(transform_reduce_t, InIter1 first1,
-            InIter1 last1, InIter2 first2, T init, Reduce&& red_op,
-            Convert&& conv_op)
+            InIter1 last1, InIter2 first2, T init, Reduce red_op,
+            Convert conv_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter1>,
                 "Requires at least input iterator.");
@@ -762,7 +759,7 @@ namespace hpx {
 
             return hpx::parallel::detail::transform_reduce_binary<T>().call(
                 hpx::execution::seq, first1, last1, first2, HPX_MOVE(init),
-                HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op));
+                HPX_MOVE(red_op), HPX_MOVE(conv_op));
         }
     } transform_reduce{};
 }    // namespace hpx

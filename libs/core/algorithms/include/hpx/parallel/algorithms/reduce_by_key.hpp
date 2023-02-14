@@ -507,10 +507,7 @@ namespace hpx::experimental {
     // clang-format off
     template <typename ExPolicy, typename RanIter, typename RanIter2,
         typename FwdIter1, typename FwdIter2,
-        typename Compare =
-            std::equal_to<typename std::iterator_traits<RanIter>::value_type>,
-        typename Func =
-            std::plus<typename std::iterator_traits<RanIter2>::value_type>,
+        typename Compare = std::equal_to<>, typename Func = std::plus<>,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<RanIter> &&
@@ -523,7 +520,7 @@ namespace hpx::experimental {
         hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>
     reduce_by_key(ExPolicy&& policy, RanIter key_first, RanIter key_last,
         RanIter2 values_first, FwdIter1 keys_output, FwdIter2 values_output,
-        Compare&& comp = Compare(), Func&& func = Func())
+        Compare comp = Compare(), Func func = Func())
     {
         using result = hpx::parallel::util::detail::algorithm_result<ExPolicy,
             hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>;
@@ -548,8 +545,7 @@ namespace hpx::experimental {
 
         return hpx::parallel::detail::reduce_by_key<FwdIter1, FwdIter2>().call(
             HPX_FORWARD(ExPolicy, policy), key_first, key_last, values_first,
-            keys_output, values_output, HPX_FORWARD(Compare, comp),
-            HPX_FORWARD(Func, func));
+            keys_output, values_output, HPX_MOVE(comp), HPX_MOVE(func));
     }
 }    // namespace hpx::experimental
 
