@@ -411,8 +411,8 @@ int hpx_main(variables_map& vm)
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
         {
-            std::uint64_t gcd = std::gcd(
-                tasks_per_feeder, suspended_tasks_per_feeder);
+            std::uint64_t gcd =
+                std::gcd(tasks_per_feeder, suspended_tasks_per_feeder);
 
             suspend_step = suspended_tasks_per_feeder / gcd;
             // We check earlier to make sure that there are never more
