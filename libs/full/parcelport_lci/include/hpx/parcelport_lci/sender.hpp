@@ -23,6 +23,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 namespace hpx::parcelset::policies::lci {
     struct sender
@@ -36,7 +37,7 @@ namespace hpx::parcelset::policies::lci {
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)
         {
-            return std::make_shared<connection_type>(this, dest, pp);
+            return std::make_shared<connection_type>(dest, pp);
         }
 
         bool background_work() noexcept
@@ -54,6 +55,25 @@ namespace hpx::parcelset::policies::lci {
                 return true;
             }
             return false;
+        }
+
+        // connectionless interface
+        using buffer_type = std::vector<char>;
+        using chunk_type = serialization::serialization_chunk;
+        using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
+        using callback_fn_type =
+            hpx::move_only_function<void(error_code const&)>;
+
+        static bool send(parcelset::parcelport* pp,
+            parcelset::locality const& dest, parcel_buffer_type buffer,
+            callback_fn_type&& callbackFn)
+        {
+            int dest_rank = dest.get<locality>().rank();
+            auto connection =
+                std::make_shared<sender_connection>(dest_rank, pp);
+            connection->buffer_ = HPX_MOVE(buffer);
+            connection->async_write(HPX_MOVE(callbackFn), nullptr);
+            return true;
         }
     };
 

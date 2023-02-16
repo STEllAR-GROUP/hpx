@@ -33,6 +33,7 @@ namespace hpx::parcelset {
         using send_early_parcel = HPX_PARCELPORT_LIBFABRIC_HAVE_BOOTSTRAPPING;
         using do_background_work = std::true_type;
         using send_immediate_parcels = std::true_type;
+        using is_connectionless = std::false_type;
 
         static constexpr const char* type() noexcept
         {

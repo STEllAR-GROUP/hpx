@@ -46,6 +46,7 @@ namespace hpx::parcelset {
         using send_early_parcel = std::true_type;
         using do_background_work = std::false_type;
         using send_immediate_parcels = std::false_type;
+        using is_connectionless = std::false_type;
 
         static constexpr const char* type() noexcept
         {
