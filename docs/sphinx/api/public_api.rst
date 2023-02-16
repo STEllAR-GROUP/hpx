@@ -560,13 +560,6 @@ Functions
    :cpp:func:`hpx::wait_each`
    ========================================  =====================================
 
-Examples
---------
-
-.. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
-   :language: c++
-   :lines: 7-
-
 .. _public_api_header_hpx_init:
 
 ``hpx/init.hpp``

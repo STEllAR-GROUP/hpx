@@ -71,7 +71,7 @@ A :ref:`condition variable <public_api_header_hpx_condition_variable>` is a sync
 in |hpx| that allows a thread to wait for a specific condition to be satisfied before continuing
 execution. It is typically used in conjunction with a mutex or a lock to protect shared data that is
 being modified by multiple threads. Hence, it blocks one or more threads until another thread both
-modifies a shared variable (the condition) and notifies the `condition_variable`.
+modifies a shared variable (the condition) and notifies the ``condition_variable``.
 
 TODO: add example
 
@@ -112,9 +112,14 @@ A :ref:`mutex <public_api_header_hpx_mutex>` (short for "mutual exclusion") is a
 |hpx| used to control access to a shared resource, ensuring that only one thread can access it at a time. A
 mutex is used to protect data structures from race conditions and other synchronization-related issues. When
 a thread acquires a mutex, other threads that try to access the same resource will be blocked until the mutex
-is released.
+is released. The code below shows the basic use of mutexes:
 
-TODO: add example
+.. literalinclude:: ../../examples/quickstart/mutex_docs.cpp
+   :language: c++
+
+In this example, two |hpx| threads created using ``hpx::async`` are acquiring a ``hpx::mutex m``. The ``m.lock()``
+function is called before accessing the shared resource, and ``m.unlock()`` is called after the access is complete.
+This ensures that only one thread can access the shared resource at a time.
 
 .. _shared_mutex:
 
@@ -168,12 +173,23 @@ access to a shared resource. The two types of semaphores are:
 * counting semaphore: it has a counter that is bigger than zero. The counter is initialized in the constructor.
   Acquiring the semaphore decreases the counter and releasing the semaphore increases the counter. If a thread
   tries to acquire the semaphore when the counter is zero, the thread will block until another thread increments
-  the counter by releasing the semaphore. Unlike ``hpx::mutex``, a ``hpx::counting_semaphore`` is not bound to a
+  the counter by releasing the semaphore. Unlike ``hpx::mutex``, an ``hpx::counting_semaphore`` is not bound to a
   thread, which means that the acquire and release call of a semaphore can happen on different threads.
 * binary semaphore: it is an alias for a ``hpx::counting_semaphore<1>``. In this case, the least maximal value
   is 1. ``hpx::binary_semaphores`` can be used to implement locks.
 
-TODO: add example
+.. literalinclude:: ../../examples/quickstart/counting_semaphore_docs.cpp
+   :language: c++
+
+In this example, the counting semaphore is initialized to the value of 3. This means that up to 3 threads can
+access the critical section (the section of code inside ``the worker()`` function) at the same time. When a thread
+enters the critical section, it acquires the semaphore, which decrements the count, while when it exits the
+critical section, it releases the semaphore, incrementing thus the count. The ``worker()`` function simulates a
+critical section by acquiring the semaphore, sleeping for 1 second and then releasing the semaphore.
+
+In the main function, 5 worker threads are created and started, each trying to enter the critical section.
+If the count of the semaphore is already 0, a worker will wait until another worker releases the semaphore
+(increasing its value).
 
 .. _guards:
 
@@ -231,6 +247,10 @@ are used in |hpx| to write asynchronous and parallel code.
 
 TODO: expand
 
+.. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
+   :language: c++
+   :lines: 7-
+
 .. _extend_futures:
 
 Extended facilities for futures
@@ -240,9 +260,9 @@ Concurrency is about both decomposing and composing the program from the parts
 that work well individually and together. It is in the composition of connected
 and multicore components where today's C++ libraries are still lacking.
 
-The functionality of ``std::future`` offers a partial solution. It allows for
-the separation of the initiation of an operation and the act of waiting for its
-result; however, the act of waiting is synchronous. In communication-intensive
+The functionality of :cppreference-generic:`thread,future` offers a partial solution.
+It allows for the separation of the initiation of an operation and the act of waiting
+for its result; however, the act of waiting is synchronous. In communication-intensive
 code this act of waiting can be unpredictable, inefficient and simply
 frustrating. The example below illustrates a possible synchronous wait using
 futures::
@@ -255,16 +275,18 @@ futures::
         int result = f.get(); // might block
     }
 
-For this reason, |hpx| implements a set of extensions to ``std::future`` (as
-proposed by __cpp11_n4107__). This proposal introduces the following key
-asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
-``hpx::async``, which enhance and enrich these facilities.
+For this reason, |hpx| implements a set of extensions to
+:cppreference-generic:`thread,future` (as proposed by |cpp11_n4107|_). This
+proposal introduces the following key asynchronous operations to
+:cpp:func:`hpx::future`, :cpp:func:`hpx::shared_future` and :cpp:func:`hpx::async`,
+which enhance and enrich these facilities.
 
 .. list-table:: Facilities extending ``std::future``
+   :widths: 20 80
 
    * * Facility
      * Description
-   * * ``hpx::future::then``
+   * * :cpp:func:`hpx::future::then`
      * In asynchronous programming, it is very common for one asynchronous
        operation, on completion, to invoke a second operation and pass data to
        it. The current C++ standard does not allow one to register a
@@ -273,7 +295,7 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
        invoked when the result is ready. Continuations registered using then
        function will help to avoid blocking waits or wasting threads on polling,
        greatly improving the responsiveness and scalability of an application.
-   * * unwrapping constructor for ``hpx::future``
+   * * unwrapping constructor for :cpp:func:`hpx::future`
      * In some scenarios, you might want to create a future that returns another
        future, resulting in nested futures. Although it is possible to write
        code to unwrap the outer future and retrieve the nested future and its
@@ -281,13 +303,13 @@ asynchronous operations to ``hpx::future``, ``hpx::shared_future`` and
        and it may cause a blocking call. Unwrapping can allow users to mitigate
        this problem by doing an asynchronous call to unwrap the outermost
        future.
-   * * ``hpx::future::is_ready``
+   * * :cpp:func:`hpx::future::is_ready`
      * There are often situations where a ``get()`` call on a future may not be
        a blocking call, or is only a blocking call under certain circumstances.
        This function gives the ability to test for early completion and allows
        us to avoid associating a continuation, which needs to be scheduled with
        some non-trivial overhead and near-certain loss of cache efficiency.
-   * * ``hpx::make_ready_future``
+   * * :cpp:func:`hpx::make_ready_future`
      * Some functions may know the value at the point of construction. In these
        cases the value is immediately available, but needs to be returned as a
        future. By using ``hpx::make_ready_future`` a future can be created that
@@ -309,39 +331,30 @@ allowing users to compose several futures in a more flexible way.
 
    * * Facility
      * Description
-     * Comment
    * * :cpp:func:`hpx::when_any`, :cpp:func:`hpx::when_any_n`
      * Asynchronously wait for at least one of multiple future or shared_future
        objects to finish.
-     * |cpp11_n4107|_, ``..._n`` versions are |hpx| only
    * * :cpp:func:`hpx::wait_any`, :cpp:func:`hpx::wait_any_n`
      * Synchronously wait for at least one of multiple future or shared_future
        objects to finish.
-     * |hpx| only
    * * :cpp:func:`hpx::when_all`, :cpp:func:`hpx::when_all_n`
      * Asynchronously wait for all future and shared_future objects to finish.
-     * |cpp11_n4107|_, ``..._n`` versions are |hpx| only
    * * :cpp:func:`hpx::wait_all`, :cpp:func:`hpx::wait_all_n`
      * Synchronously wait for all future and shared_future objects to finish.
-     * |hpx| only
    * * :cpp:func:`hpx::when_some`, :cpp:func:`hpx::when_some_n`
      * Asynchronously wait for multiple future and shared_future objects to
        finish.
-     * |hpx| only
    * * :cpp:func:`hpx::wait_some`, :cpp:func:`hpx::wait_some_n`
      * Synchronously wait for multiple future and shared_future objects to
        finish.
-     * |hpx| only
    * * :cpp:func:`hpx::when_each`
      * Asynchronously wait for multiple future and shared_future objects to
        finish and call a function for each of the future objects as soon as it
        becomes ready.
-     * |hpx| only
    * * :cpp:func:`hpx::wait_each`, :cpp:func:`hpx::wait_each_n`
      * Synchronously wait for multiple future and shared_future objects to
        finish and call a function for each of the future objects as soon as it
        becomes ready.
-     * |hpx| only
 
 .. _channel:
 
@@ -569,7 +582,7 @@ TODO: refer to oneTBB, explain difference from task block
 Threads
 -------
 
-A :ref:`Thread <public_api_header_hpx_task_thread>` in |hpx| refers to a sequence of instructions
+A :ref:`thread <public_api_header_hpx_task_thread>` in |hpx| refers to a sequence of instructions
 that can be executed concurrently with other such sequences in multithreading environments, while
 sharing a same address space. These threads can communicate with each other through various means,
 such as futures or shared data structures.
