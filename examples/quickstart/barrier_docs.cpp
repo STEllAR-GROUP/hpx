@@ -8,12 +8,10 @@
 
 #include <hpx/barrier.hpp>
 #include <hpx/future.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <iostream>
 
-///////////////////////////////////////////////////////////////////////////////
-//[barrier_main
-int main()
+int hpx_main()
 {
     hpx::barrier b(2);
 
@@ -35,6 +33,11 @@ int main()
 
     f1.get();
     f2.get();
-    return 0;
+
+    return hpx::local::finalize();
 }
-//]
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
+}

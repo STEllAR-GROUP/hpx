@@ -54,8 +54,6 @@ The code below shows how barriers can be used to synchronize two threads:
 
 .. literalinclude:: ../../examples/quickstart/barrier_docs.cpp
    :language: c++
-   :start-after: //[barrier_main
-   :end-before: //]
 
 In this example, two ``hpx::future`` objects are created, each representing a separate thread of
 execution. The ``wait`` function of the ``hpx::barrier`` object is called by each thread. The

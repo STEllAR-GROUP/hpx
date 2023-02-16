@@ -7,11 +7,11 @@
 // This example is meant for inclusion in the documentation.
 
 #include <hpx/future.hpp>
-#include <hpx/hpx_main.hpp>
+#include <hpx/local/init.hpp>
 #include <hpx/mutex.hpp>
 #include <iostream>
 
-int main()
+int hpx_main()
 {
     hpx::mutex m;
 
@@ -29,5 +29,10 @@ int main()
 
     hpx::wait_all(f1, f2);
 
-    return 0;
+    return hpx::local::finalize();
+}
+
+int main(int argc, char* argv[])
+{
+    return hpx::local::init(hpx_main, argc, argv);
 }
