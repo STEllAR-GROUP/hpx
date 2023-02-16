@@ -28,7 +28,7 @@ Synchronization objects
 The following objects are providing synchronization for |hpx| applications:
 
 #. :ref:`barrier`
-#. :ref:`condition_variable`
+#. :ref:`lkriable`
 #. :ref:`latch`
 #. :ref:`mutex`
 #. :ref:`shared_mutex`
@@ -69,9 +69,25 @@ A :ref:`condition variable <public_api_header_hpx_condition_variable>` is a sync
 in |hpx| that allows a thread to wait for a specific condition to be satisfied before continuing
 execution. It is typically used in conjunction with a mutex or a lock to protect shared data that is
 being modified by multiple threads. Hence, it blocks one or more threads until another thread both
-modifies a shared variable (the condition) and notifies the ``condition_variable``.
+modifies a shared variable (the condition) and notifies the ``condition_variable``. The code below
+shows how two threads modifying the shared variable ``data`` can be synchronized using the
+``condition_variable``:
 
-TODO: add example
+.. literalinclude:: ../../examples/quickstart/condition_variable_docs.cpp
+   :language: c++
+
+The main thread of the code above starts by creating a worker thread and preparing the shared variable ``data``.
+Once the data is ready, the main thread acquires a lock on the mutex ``m`` using ``std::lock_guard<hpx::mutex> lk(m)``
+and sets the ready flag to true, then signals the worker thread to start processing by calling ``cv.notify_one()``.
+The ``cv.wait()`` call in the main thread then blocks until the worker thread signals that processing is
+complete by setting the ``processed`` flag.
+
+The worker thread starts by acquiring a lock on the mutex ``m`` to ensure exclusive access to the shared data.
+The ``cv.wait()`` call blocks the thread until the ``ready`` flag is set by the main thread. Once this is
+true, the worker thread accesses the shared data resource, processes it, and sets the ``processed`` flag
+to indicate completion. The mutex is then unlocked using ``lk.unlock()`` and the ``cv.notify_one()`` call
+signals the main thread to resume execution. Finally, the new ``data`` is printed by the main thread to the
+console.
 
 .. _latch:
 
