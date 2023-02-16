@@ -5,6 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/exception_ptr.hpp>
@@ -25,16 +26,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::serialization {
+
     namespace detail {
         ///////////////////////////////////////////////////////////////////////////
         // TODO: This is not scalable, and painful to update.
         void save(output_archive& ar, std::exception_ptr const& ep,
             unsigned int /* version */)
         {
-            hpx::util::exception_type type =
-                hpx::util::exception_type::unknown_exception;
+            auto type = hpx::util::exception_type::unknown_exception;
             std::string what;
-            hpx::error err_value = hpx::error::success;
+            auto err_value = hpx::error::success;
             std::string err_message;
 
             std::string throw_function_;
@@ -48,18 +49,21 @@ namespace hpx::serialization {
             }
             catch (exception_info const& xi)
             {
-                std::string const* function =
-                    xi.get<hpx::detail::throw_function>();
-                if (function)
+                if (std::string const* function =
+                        xi.get<hpx::detail::throw_function>())
+                {
                     throw_function_ = *function;
+                }
 
-                std::string const* file = xi.get<hpx::detail::throw_file>();
-                if (file)
+                if (std::string const* file = xi.get<hpx::detail::throw_file>())
+                {
                     throw_file_ = *file;
+                }
 
-                long const* line = xi.get<hpx::detail::throw_line>();
-                if (line)
+                if (long const* line = xi.get<hpx::detail::throw_line>())
+                {
                     throw_line_ = *line;
+                }
             }
 
             // figure out concrete underlying exception type
@@ -132,7 +136,7 @@ namespace hpx::serialization {
                 type = hpx::util::exception_type::std_exception;
                 what = e.what();
             }
-#if BOOST_ASIO_HAS_BOOST_THROW_EXCEPTION != 0
+#if ASIO_HAS_BOOST_THROW_EXCEPTION != 0
             catch (boost::exception const& e)
             {
                 type = hpx::util::boost_exception;
@@ -169,10 +173,9 @@ namespace hpx::serialization {
         void load(input_archive& ar, std::exception_ptr& e,
             unsigned int /* version */)
         {
-            hpx::util::exception_type type =
-                hpx::util::exception_type::unknown_exception;
+            auto type = hpx::util::exception_type::unknown_exception;
             std::string what;
-            hpx::error err_value = hpx::error::success;
+            auto err_value = hpx::error::success;
             std::string err_message;
 
             std::string throw_function_;
@@ -201,7 +204,6 @@ namespace hpx::serialization {
 
             switch (type)
             {
-            default:
             case hpx::util::exception_type::std_exception:
                 [[fallthrough]];
 

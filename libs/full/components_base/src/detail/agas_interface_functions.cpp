@@ -1,19 +1,17 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/detail/agas_interface_functions.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/modules/coroutines.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
-
-#include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/detail/agas_interface_functions.hpp>
-#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -26,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     bool (*is_console)() = nullptr;
@@ -238,5 +236,4 @@ namespace hpx { namespace agas { namespace detail {
     naming::address_type (*get_primary_ns_lva)() = nullptr;
     naming::address_type (*get_symbol_ns_lva)() = nullptr;
     naming::address_type (*get_runtime_support_lva)() = nullptr;
-
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail

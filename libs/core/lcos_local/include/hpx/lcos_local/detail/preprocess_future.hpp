@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,8 +9,8 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/modules/futures.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -183,13 +183,19 @@ namespace hpx::serialization::detail {
         std::size_t triggered_futures_;
         hpx::promise<void> promise_;
     };
+}    // namespace hpx::serialization::detail
+
+namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
     template <>
-    struct extra_archive_data_helper<preprocess_futures>
+    struct extra_data_helper<serialization::detail::preprocess_futures>
     {
-        HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-        static constexpr void reset(preprocess_futures*) noexcept {}
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
+        static constexpr void reset(
+            serialization::detail::preprocess_futures*) noexcept
+        {
+        }
     };
-}    // namespace hpx::serialization::detail
+}    // namespace hpx::util

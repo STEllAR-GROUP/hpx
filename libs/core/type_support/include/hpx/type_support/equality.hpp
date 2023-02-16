@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <type_traits>
 #include <utility>
 

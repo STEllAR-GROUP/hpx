@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <type_traits>
-#include <utility>
 
 namespace hpx::util {
 
@@ -20,7 +17,9 @@ namespace hpx::util {
         nonesuch() = delete;
         ~nonesuch() = delete;
         nonesuch(nonesuch const&) = delete;
+        nonesuch(nonesuch&&) = delete;
         void operator=(nonesuch const&) = delete;
+        void operator=(nonesuch&&) = delete;
     };
 
     ///////////////////////////////////////////////////////////////////////////

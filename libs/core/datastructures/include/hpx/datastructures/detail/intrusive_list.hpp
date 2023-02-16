@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 
 #include <cstddef>
@@ -27,6 +26,8 @@ namespace hpx::detail {
 
         intrusive_list(intrusive_list&&) = default;
         intrusive_list& operator=(intrusive_list&&) = default;
+
+        ~intrusive_list() = default;
 
         void push_back(Entry& e) noexcept
         {
@@ -133,30 +134,30 @@ namespace hpx::detail {
             last_entry = nullptr;
         }
 
-        Entry* front() noexcept
+        [[nodiscard]] Entry* front() noexcept
         {
             return root;
         }
-        constexpr Entry const* front() const noexcept
+        [[nodiscard]] constexpr Entry const* front() const noexcept
         {
             return root;
         }
 
-        Entry* back() noexcept
+        [[nodiscard]] Entry* back() noexcept
         {
             return last_entry;
         }
-        constexpr Entry const* back() const noexcept
+        [[nodiscard]] constexpr Entry const* back() const noexcept
         {
             return last_entry;
         }
 
-        constexpr std::size_t size() const noexcept
+        [[nodiscard]] constexpr std::size_t size() const noexcept
         {
             return num_entries;
         }
 
-        constexpr bool empty() const noexcept
+        [[nodiscard]] constexpr bool empty() const noexcept
         {
             return num_entries == 0;
         }

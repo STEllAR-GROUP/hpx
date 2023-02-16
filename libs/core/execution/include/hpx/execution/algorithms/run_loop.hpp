@@ -285,7 +285,7 @@ namespace hpx::execution::experimental {
     public:
         // [exec.run_loop.ctor] construct/copy/destroy
         run_loop() noexcept
-          : head(&head)
+          : head(&head)    //-V546
         {
         }
 

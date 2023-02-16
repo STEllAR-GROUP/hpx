@@ -12,16 +12,14 @@
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
 #endif
 
-#include <hpx/algorithms/traits/projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
-#include <algorithm>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // transfer
     namespace detail {
@@ -111,21 +109,21 @@ namespace hpx { namespace parallel { inline namespace v1 {
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename Sent1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value
+                hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<FwdIter1, FwdIter2>>::type
         transfer(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter1>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value ||
-                    (hpx::is_sequenced_execution_policy<ExPolicy>::value &&
-                        hpx::traits::is_output_iterator<FwdIter2>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2> ||
+                    (hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                        hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -139,4 +137,4 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #endif
         }
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel

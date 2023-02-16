@@ -36,6 +36,9 @@ namespace hpx::serialization {
     {
         auto const sz = static_cast<std::uint64_t>(arr.size());
         ar << sz;
+        if (sz == 0)
+            return;
+
         for (auto const& v : arr)
             ar << v;
     }

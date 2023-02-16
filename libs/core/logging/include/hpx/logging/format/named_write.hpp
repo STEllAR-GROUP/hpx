@@ -399,7 +399,7 @@ namespace hpx::util::logging::writer {
             m_format(out, msg);
 
 #if defined(HPX_COMPUTE_HOST_CODE)
-            message formatted(HPX_MOVE(out));
+            message const formatted(HPX_MOVE(out));
             m_destination(formatted);
 #endif
         }

@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@ namespace hpx::serialization {
 
         template <typename T>
         HPX_FORCEINLINE void serialize_force_adl(
-            output_archive& ar, const T& t, unsigned)
+            output_archive& ar, T const& t, unsigned)
         {
             serialize(ar, const_cast<T&>(t), 0);
         }
@@ -175,7 +175,7 @@ namespace hpx::serialization {
         }
 
         template <typename T>
-        HPX_FORCEINLINE static std::string get_name(T const* t)
+        [[nodiscard]] HPX_FORCEINLINE static std::string get_name(T const* t)
         {
             return t->hpx_serialization_get_name();
         }

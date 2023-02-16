@@ -62,6 +62,8 @@ namespace hpx {
         move_only_function& operator=(move_only_function const&) = delete;
         move_only_function& operator=(move_only_function&&) noexcept = default;
 
+        ~move_only_function() = default;
+
         // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = std::decay_t<F>,
             typename Enable1 =
@@ -122,7 +124,7 @@ namespace hpx::traits {
     template <typename Sig, bool Serializable>
     struct get_function_address<hpx::move_only_function<Sig, Serializable>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
@@ -132,7 +134,7 @@ namespace hpx::traits {
     template <typename Sig, bool Serializable>
     struct get_function_annotation<hpx::move_only_function<Sig, Serializable>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -144,7 +146,7 @@ namespace hpx::traits {
     struct get_function_annotation_itt<
         hpx::move_only_function<Sig, Serializable>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::move_only_function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();

@@ -48,7 +48,7 @@ namespace hpx { namespace components {
 #endif
     copy(hpx::id_type const& to_copy)
     {
-        typedef server::copy_component_action_here<Component> action_type;
+        using action_type = server::copy_component_action_here<Component>;
         return hpx::detail::async_colocated<action_type>(to_copy, to_copy);
     }
 
@@ -78,7 +78,7 @@ namespace hpx { namespace components {
 #endif
     copy(hpx::id_type const& to_copy, hpx::id_type const& target_locality)
     {
-        typedef server::copy_component_action<Component> action_type;
+        using action_type = server::copy_component_action<Component>;
         return hpx::detail::async_colocated<action_type>(
             to_copy, to_copy, target_locality);
     }
@@ -107,13 +107,13 @@ namespace hpx { namespace components {
     ///       new component instance is created on the locality of the
     ///       component instance which is to be copied.
     ///
-    template <typename Derived, typename Stub>
-    Derived copy(client_base<Derived, Stub> const& to_copy,
+    template <typename Derived, typename Stub, typename Data>
+    Derived copy(client_base<Derived, Stub, Data> const& to_copy,
         hpx::id_type const& target_locality = hpx::invalid_id)
     {
-        typedef typename client_base<Derived, Stub>::server_component_type
-            component_type;
-        typedef server::copy_component_action<component_type> action_type;
+        using component_type =
+            typename client_base<Derived, Stub, Data>::server_component_type;
+        using action_type = server::copy_component_action<component_type>;
 
         id_type id = to_copy.get_id();
         return Derived(hpx::detail::async_colocated<action_type>(

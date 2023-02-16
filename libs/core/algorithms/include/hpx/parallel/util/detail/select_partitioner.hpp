@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2019 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,15 +7,12 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/futures/future.hpp>
-
 #include <hpx/execution/traits/is_execution_policy.hpp>
 
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     template <typename ExPolicy, template <typename...> class Partitioner,
         template <typename...> class TaskPartitioner, typename Enable = void>
@@ -34,4 +31,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         template <typename... Args>
         using apply = TaskPartitioner<ExPolicy, Args...>;
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

@@ -12,7 +12,6 @@
 #include <hpx/config.hpp>
 
 #include <cstdint>
-#include <cstdlib>
 
 namespace hpx::util {
 

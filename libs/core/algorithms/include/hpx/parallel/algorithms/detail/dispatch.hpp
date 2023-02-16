@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,27 +9,23 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/result_types.hpp>
-#include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
 #include <execution>
 #endif
-#include <string>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Result>
@@ -87,7 +83,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     struct algorithm
     {
     private:
-        constexpr Derived const& derived() const noexcept
+        [[nodiscard]] constexpr Derived const& derived() const noexcept
         {
             return static_cast<Derived const&>(*this);
         }
@@ -130,7 +126,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 using policy_type =
                     decltype(hpx::execution::experimental::to_non_task(
                         std::declval<ExPolicy&&>()));
-                return hpx::parallel::v1::detail::handle_exception<policy_type,
+
+                return hpx::parallel::detail::handle_exception<policy_type,
                     std::conditional_t<std::is_void_v<local_result_type>,
                         hpx::util::unused_type, local_result_type>>::call();
             }
@@ -140,7 +137,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     public:
         ///////////////////////////////////////////////////////////////////////
         // main sequential dispatch entry points
-
         template <typename ExPolicy, typename... Args>
         constexpr decltype(auto) call2(
             ExPolicy&& policy, std::true_type, Args&&... args) const
@@ -180,10 +176,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             using result_handler =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     local_result_type>;
-            using result_type = decltype(Derived::parallel(
+
+            using result = decltype(Derived::parallel(
                 HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...));
 
-            if constexpr (std::is_void_v<result_type>)
+            if constexpr (std::is_void_v<result>)
             {
                 Derived::parallel(
                     HPX_FORWARD(ExPolicy, policy), HPX_FORWARD(Args, args)...);
@@ -198,7 +195,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename ExPolicy, typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
-            ExPolicy&& policy, Args&&... args) const
+            ExPolicy&& policy, Args&&... args)
         {
             using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
             return call2(HPX_FORWARD(ExPolicy, policy), is_seq(),
@@ -209,7 +206,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         // main dispatch entry points for std execution policies
         template <typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
-            std::execution::sequenced_policy, Args&&... args) const
+            std::execution::sequenced_policy, Args&&... args)
         {
             return call2(hpx::execution::seq, std::true_type(),
                 HPX_FORWARD(Args, args)...);
@@ -217,7 +214,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
-            std::execution::parallel_policy, Args&&... args) const
+            std::execution::parallel_policy, Args&&... args)
         {
             return call2(hpx::execution::par, std::false_type(),
                 HPX_FORWARD(Args, args)...);
@@ -225,7 +222,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         template <typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
-            std::execution::parallel_unsequenced_policy, Args&&... args) const
+            std::execution::parallel_unsequenced_policy, Args&&... args)
         {
             return call2(hpx::execution::par_unseq, std::false_type(),
                 HPX_FORWARD(Args, args)...);
@@ -234,7 +231,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 #if defined(HPX_HAVE_CXX20_STD_EXECUTION_POLICES)
         template <typename... Args>
         HPX_FORCEINLINE constexpr decltype(auto) call(
-            std::execution::unsequenced_policy, Args&&... args) const
+            std::execution::unsequenced_policy, Args&&... args)
         {
             return call2(hpx::execution::unseq, std::false_type(),
                 HPX_FORWARD(Args, args)...);
@@ -248,10 +245,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         friend class hpx::serialization::access;
 
         template <typename Archive>
-        void serialize(Archive&, unsigned int)
+        static constexpr void serialize(Archive&, unsigned int) noexcept
         {
             // no need to serialize 'name_' as it is always initialized by the
-            // constructor
+            // default constructor of the derived class
         }
     };
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

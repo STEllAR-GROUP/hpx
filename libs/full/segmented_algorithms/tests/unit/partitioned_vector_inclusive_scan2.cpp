@@ -244,7 +244,7 @@ void inclusive_scan_tests_with_policy(
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     //sync
@@ -274,7 +274,7 @@ void inclusive_scan_tests_segmented_out_with_policy(
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     //sync
@@ -301,7 +301,7 @@ void inclusive_scan_tests_inplace_with_policy(
     std::iota(ver.begin(), ver.end(), T(1));
     T val(0);
 
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         ver.begin(), ver.end(), ver.begin(), val, opt<T>());
 
     // sync

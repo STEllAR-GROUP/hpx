@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/explicit_scheduler_executor.hpp>
@@ -38,12 +36,15 @@ namespace hpx::execution::experimental {
         {
         };
 
+        // clang-format off
         template <typename Scheduler>
         struct exposes_get_policy<Scheduler,
-            std::enable_if_t<hpx::is_execution_policy_v<decltype(
-                std::declval<Scheduler>().get_policy())>>> : std::true_type
+            std::enable_if_t<hpx::is_execution_policy_v<
+                decltype(std::declval<Scheduler>().get_policy())>>>
+          : std::true_type
         {
         };
+        // clang-format on
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -60,9 +61,14 @@ namespace hpx::execution::experimental {
         {
         }
 
-        policy_type const& get_policy() const
+        constexpr policy_type const& get_policy() const noexcept
         {
             return policy;
+        }
+
+        constexpr base_scheduler_type const& get_scheduler() const noexcept
+        {
+            return static_cast<base_scheduler_type const&>(*this);
         }
 
         policy_type policy;
@@ -75,6 +81,41 @@ namespace hpx::execution::experimental {
         -> scheduler_and_policy<std::decay_t<Scheduler>,
             std::decay_t<ExPolicy>>;
     // clang-format on
+
+    ////////////////////////////////////////////////////////////////////////////
+    // support all scheduling properties exposed by the embedded scheduler
+    // clang-format off
+    template <typename Tag, typename Scheduler, typename ExPolicy,
+        typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    auto tag_invoke(Tag tag,
+        scheduler_and_policy<Scheduler, ExPolicy> const& scheduler,
+        Property&& prop)
+        -> decltype(scheduler_and_policy<Scheduler, ExPolicy>(
+                std::declval<Tag>()(
+                    std::declval<Scheduler>(), std::declval<Property>()),
+                std::declval<ExPolicy>()))
+    // clang-format on
+    {
+        return scheduler_and_policy<Scheduler, ExPolicy>(
+            tag(scheduler.get_scheduler(), HPX_FORWARD(Property, prop)),
+            scheduler.get_policy());
+    }
+
+    // clang-format off
+    template <typename Tag, typename Scheduler, typename ExPolicy,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, scheduler_and_policy<Scheduler, ExPolicy> const& scheduler)
+        -> decltype(std::declval<Tag>()(std::declval<Scheduler>()))
+    {
+        return tag(scheduler.get_scheduler());
+    }
 
     // Experimental support for facilities from p2500 (wg21.link/p2500)
     inline namespace p2500 {

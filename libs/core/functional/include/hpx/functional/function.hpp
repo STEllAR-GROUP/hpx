@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -53,6 +53,8 @@ namespace hpx {
         function(function&&) noexcept = default;
         function& operator=(function const&) = default;
         function& operator=(function&&) noexcept = default;
+
+        ~function() = default;
 
         // the split SFINAE prevents MSVC from eagerly instantiating things
         template <typename F, typename FD = std::decay_t<F>,
@@ -110,7 +112,7 @@ namespace hpx::traits {
     template <typename Sig, bool Serializable>
     struct get_function_address<hpx::function<Sig, Serializable>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_address();
@@ -120,7 +122,7 @@ namespace hpx::traits {
     template <typename Sig, bool Serializable>
     struct get_function_annotation<hpx::function<Sig, Serializable>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -131,7 +133,7 @@ namespace hpx::traits {
     template <typename Sig, bool Serializable>
     struct get_function_annotation_itt<hpx::function<Sig, Serializable>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::function<Sig, Serializable> const& f) noexcept
         {
             return f.get_function_annotation_itt();

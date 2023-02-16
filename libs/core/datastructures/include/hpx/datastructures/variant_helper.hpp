@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 // we shouldn't implement hpx::get for variant if hpx::variant is an alias for
 // std::variant
-#if defined(HPX_DATASTRUCTURESHAVE_ADAPT_STD_VARIANT)
+#if defined(HPX_DATASTRUCTURES_HAVE_ADAPT_STD_VARIANT)
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>    // for size_t

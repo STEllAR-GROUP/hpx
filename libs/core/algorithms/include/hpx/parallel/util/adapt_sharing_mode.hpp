@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,8 +10,7 @@
 #include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/executors/execution_policy_hint.hpp>
-#include <hpx/properties/property.hpp>
+#include <hpx/executors/execution_policy_scheduling_property.hpp>
 
 namespace hpx::parallel::util {
 
@@ -24,7 +23,7 @@ namespace hpx::parallel::util {
     decltype(auto) adapt_sharing_mode(
         ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
     {
-        constexpr bool supports_sharing_hint =
+        static constexpr bool supports_sharing_hint =
             hpx::functional::is_tag_invocable_v<
                 hpx::execution::experimental::with_hint_t,
                 std::decay_t<ExPolicy>, hpx::threads::thread_schedule_hint>;

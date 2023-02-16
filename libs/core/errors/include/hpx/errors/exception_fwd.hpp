@@ -20,9 +20,9 @@ namespace hpx {
     // forward declaration
     class error_code;
 
-    class HPX_CORE_EXPORT exception;
+    class HPX_ALWAYS_EXPORT exception;
 
-    struct HPX_CORE_EXPORT thread_interrupted;
+    struct HPX_ALWAYS_EXPORT thread_interrupted;
     /// \endcond
 
     ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ namespace hpx {
         /// \endcond
     };
 
-    inline constexpr bool operator&(throwmode lhs, throwmode rhs) noexcept
+    constexpr bool operator&(throwmode lhs, throwmode rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
     }
@@ -64,8 +64,8 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Predefined error_code object used as "throw on error" tag.
     ///
-    /// The predefined hpx::error_code object \a hpx::throws is supplied for use as
-    /// a "throw on error" tag.
+    /// The predefined hpx::error_code object \a hpx::throws is supplied for use
+    /// as a "throw on error" tag.
     ///
     /// Functions that specify an argument in the form 'error_code& ec=throws'
     /// (with appropriate namespace qualifiers), have the following error

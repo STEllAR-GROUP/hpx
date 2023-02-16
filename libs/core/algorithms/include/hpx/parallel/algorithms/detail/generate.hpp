@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Sent, typename F>
@@ -84,4 +84,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 #endif
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

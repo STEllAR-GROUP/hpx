@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -132,9 +132,8 @@ namespace hpx { namespace collectives {
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace communication {
         struct all_reduce_tag;
@@ -169,9 +168,9 @@ namespace hpx { namespace traits {
                 });
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // all_reduce plain values
@@ -182,9 +181,9 @@ namespace hpx { namespace collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
         if (generation == 0)
         {
@@ -198,8 +197,8 @@ namespace hpx { namespace collectives {
                 op = HPX_FORWARD(F, op), generation,
                 this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
+            using action_type =
+                detail::communicator_server::communication_get_action<
                     traits::communication::all_reduce_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
 
@@ -240,7 +239,7 @@ namespace hpx { namespace collectives {
                               generation, root_site),
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site);
     }
-}}    // namespace hpx::collectives
+}    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLREDUCE_DECLARATION(...) /**/

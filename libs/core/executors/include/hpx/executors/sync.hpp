@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     template <typename Func, typename Enable = void>
     struct sync_dispatch_launch_policy_helper;
 
@@ -42,13 +43,14 @@ namespace hpx { namespace detail {
     struct sync_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
+        // clang-format off
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
-            -> decltype(
-                sync_dispatch_launch_policy_helper<std::decay_t<F>>::call(
-                    HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...))
+            -> decltype(sync_dispatch_launch_policy_helper<
+                std::decay_t<F>>::call(HPX_FORWARD(Policy_, launch_policy),
+                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+        // clang-format on
         {
             return sync_dispatch_launch_policy_helper<std::decay_t<F>>::call(
                 HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
@@ -61,10 +63,13 @@ namespace hpx { namespace detail {
     template <typename Func, typename Enable>
     struct sync_dispatch
     {
+        // clang-format off
         template <typename F, typename... Ts>
-        HPX_FORCEINLINE static auto call(F&& f, Ts&&... ts) -> decltype(
-            parallel::execution::sync_execute(execution::parallel_executor(),
-                HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+        HPX_FORCEINLINE static auto call(F&& f, Ts&&... ts)
+            -> decltype(parallel::execution::sync_execute(
+                execution::parallel_executor(), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
+        // clang-format on
         {
             execution::parallel_executor exec;
             return parallel::execution::sync_execute(
@@ -74,23 +79,22 @@ namespace hpx { namespace detail {
 
     // The overload for hpx::sync taking an executor simply forwards to the
     // corresponding executor customization point.
-    //
-    // parallel::execution::executor
-    // threads::executor
     template <typename Executor>
     struct sync_dispatch<Executor,
         std::enable_if_t<traits::is_one_way_executor_v<Executor> ||
             traits::is_two_way_executor_v<Executor>>>
     {
+        // clang-format off
         template <typename Executor_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(Executor_&& exec, F&& f, Ts&&... ts)
-            -> decltype(
-                parallel::execution::sync_execute(HPX_FORWARD(Executor_, exec),
-                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+            -> decltype(parallel::execution::sync_execute(
+                HPX_FORWARD(Executor_, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Ts, ts)...))
+        // clang-format on
         {
             return parallel::execution::sync_execute(
                 HPX_FORWARD(Executor_, exec), HPX_FORWARD(F, f),
                 HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

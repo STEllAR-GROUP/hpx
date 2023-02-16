@@ -77,12 +77,14 @@ namespace hpx::util {
     namespace detail {
 
         template <typename T>
-        struct is_true : std::integral_constant<bool, (bool) T::value>
+        struct is_true
+          : std::integral_constant<bool, static_cast<bool>(T::value)>
         {
         };
 
         template <typename T>
-        struct is_false : std::integral_constant<bool, !(bool) T::value>
+        struct is_false
+          : std::integral_constant<bool, !static_cast<bool>(T::value)>
         {
         };
     }    // namespace detail
@@ -247,9 +249,9 @@ namespace hpx::util {
         template <template <typename...> class Pack, typename... Ts, typename U,
             typename... Us>
         struct unique_helper<Pack<Ts...>, Pack<U, Us...>>
-          : std::conditional<contains<U, Ts...>::value,
+          : std::conditional_t<contains<U, Ts...>::value,
                 unique_helper<Pack<Ts...>, Pack<Us...>>,
-                unique_helper<Pack<Ts..., U>, Pack<Us...>>>::type
+                unique_helper<Pack<Ts..., U>, Pack<Us...>>>
         {
         };
 

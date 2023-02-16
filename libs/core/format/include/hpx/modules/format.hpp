@@ -18,7 +18,6 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 namespace hpx::util {
@@ -69,8 +68,7 @@ namespace hpx::util {
 #undef DECL_TYPE_SPECIFIER
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename T,
-            bool IsFundamental = std::is_fundamental<T>::value>
+        template <typename T, bool IsFundamental = std::is_fundamental_v<T>>
         struct formatter
         {
             static void call(
@@ -83,8 +81,8 @@ namespace hpx::util {
 
                 // copy spec to a null terminated buffer
                 char format[16];
-                std::sprintf(format, "%%%.*s%s", (int) spec.size(), spec.data(),
-                    conv_spec);
+                std::sprintf(format, "%%%.*s%s", static_cast<int>(spec.size()),
+                    spec.data(), conv_spec);
 
                 T const& value = *static_cast<T const*>(ptr);    //-V206
                 std::size_t length = std::snprintf(nullptr, 0, format, value);
@@ -92,7 +90,7 @@ namespace hpx::util {
                 length =
                     std::snprintf(buffer.data(), length + 1, format, value);
 
-                os.write(buffer.data(), length);
+                os.write(buffer.data(), static_cast<std::streamsize>(length));
             }
         };
 
@@ -129,7 +127,7 @@ namespace hpx::util {
             static void call(
                 std::ostream& os, std::string_view spec, void const* ptr)
             {
-                char const* value = static_cast<char const*>(ptr);
+                auto const value = static_cast<char const*>(ptr);
 
                 // conversion specifier
                 if (spec.empty() || spec == "s")
@@ -140,8 +138,8 @@ namespace hpx::util {
                 {
                     // copy spec to a null terminated buffer
                     char format[16];
-                    std::sprintf(
-                        format, "%%%.*ss", (int) spec.size(), spec.data());
+                    std::sprintf(format, "%%%.*ss",
+                        static_cast<int>(spec.size()), spec.data());
 
                     std::size_t length =
                         std::snprintf(nullptr, 0, format, value);
@@ -149,7 +147,8 @@ namespace hpx::util {
                     length =
                         std::snprintf(buffer.data(), length + 1, format, value);
 
-                    os.write(buffer.data(), length);
+                    os.write(
+                        buffer.data(), static_cast<std::streamsize>(length));
                 }
             }
         };
@@ -165,9 +164,13 @@ namespace hpx::util {
                     *static_cast<std::string const*>(ptr);
 
                 if (spec.empty() || spec == "s")
+                {
                     os.write(value.data(), value.size());
+                }
                 else
+                {
                     formatter<char const*>::call(os, spec, value.c_str());
+                }
             }
         };
 
@@ -184,7 +187,7 @@ namespace hpx::util {
                     spec = "%c";    // standard date and time string
 
                 // copy spec to a null terminated buffer
-                std::string format(spec);
+                std::string const format(spec);
 
                 std::size_t length = 0;
                 std::vector<char> buffer(1);
@@ -197,7 +200,7 @@ namespace hpx::util {
                         buffer.resize(buffer.capacity() * 2);
                 } while (length == 0);
 
-                os.write(buffer.data(), length);
+                os.write(buffer.data(), static_cast<std::streamsize>(length));
             }
         };
 

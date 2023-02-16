@@ -30,7 +30,7 @@ namespace hpx::util::logging::destination {
 
     cout::~cout() = default;
 
-    struct cout_impl : cout
+    struct cout_impl final : cout
     {
         void operator()(message const& msg) override
         {
@@ -45,7 +45,7 @@ namespace hpx::util::logging::destination {
 
     cerr::~cerr() = default;
 
-    struct cerr_impl : cerr
+    struct cerr_impl final : cerr
     {
         void operator()(message const& msg) override
         {
@@ -60,7 +60,7 @@ namespace hpx::util::logging::destination {
 
     stream::~stream() = default;
 
-    struct stream_impl : stream
+    struct stream_impl final : stream
     {
         explicit stream_impl(std::ostream* stream_ptr)
           : stream(stream_ptr)
@@ -81,7 +81,7 @@ namespace hpx::util::logging::destination {
 
     dbg_window::~dbg_window() = default;
 
-    struct dbg_window_impl : dbg_window
+    struct dbg_window_impl final : dbg_window
     {
         void operator()(message const& msg) override
         {

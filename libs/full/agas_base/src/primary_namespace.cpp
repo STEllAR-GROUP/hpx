@@ -123,7 +123,7 @@ namespace hpx { namespace agas {
     {
         return gid.get_lsb() == agas::primary_ns_lsb &&
             (gid.get_msb() & ~naming::gid_type::locality_id_mask) ==
-            agas::primary_ns_msb;
+            (agas::primary_ns_msb & ~naming::gid_type::locality_id_mask);
     }
 
     primary_namespace::primary_namespace()
@@ -131,7 +131,7 @@ namespace hpx { namespace agas {
     {
     }
 
-    primary_namespace::~primary_namespace() {}
+    primary_namespace::~primary_namespace() = default;
 
     naming::address::address_type primary_namespace::ptr() const
     {

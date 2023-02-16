@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     /// This class specifies the parameters for a distribution policy to use
     /// for creating a given number of items on the locality where a given
@@ -61,9 +61,9 @@ namespace hpx { namespace components {
         /// \param client  [in] The client side representation of the object
         ///                with which the new instances should be colocated on
         ///
-        template <typename Client, typename Stub>
+        template <typename Client, typename Stub, typename Data>
         colocating_distribution_policy operator()(
-            client_base<Client, Stub> const& client) const
+            client_base<Client, Stub, Data> const& client) const
         {
             return colocating_distribution_policy(client.get_id());
         }
@@ -294,7 +294,7 @@ namespace hpx { namespace components {
     /// will represent the local locality and will place all items to create
     /// here.
     static colocating_distribution_policy const colocated{};
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,12 +29,12 @@
 #include <vector>
 
 // FIXME: this is pulled from the main library
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     HPX_EXPORT naming::gid_type get_next_id(std::size_t count = 1);
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     ///////////////////////////////////////////////////////////////////////////
     HPX_EXPORT bool is_console();
@@ -297,5 +297,4 @@ namespace hpx { namespace agas {
     ///////////////////////////////////////////////////////////////////////////
     // initialize AGAS interface function wrappers
     struct agas_interface_functions& agas_init();
-
-}}    // namespace hpx::agas
+}    // namespace hpx::agas

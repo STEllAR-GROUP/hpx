@@ -283,6 +283,36 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
                 num_tasks);
         }
+
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            processing_units_count_t, Executor&& exec,
+            hpx::chrono::steady_duration const& iteration_duration,
+            std::size_t num_tasks)
+        {
+            return detail::processing_units_count_fn_helper<void,
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                iteration_duration, num_tasks);
+        }
+
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            processing_units_count_t tag, Executor&& exec,
+            std::size_t num_tasks = 0)
+        {
+            return tag(HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
+                num_tasks);
+        }
     } processing_units_count{};
 
     /// Generate a policy that supports setting the number of cores for

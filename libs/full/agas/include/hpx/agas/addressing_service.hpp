@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2021 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -125,7 +125,7 @@ namespace hpx { namespace agas {
         void initialize(std::uint64_t rts_lva);
 
         /// \brief Adjust the size of the local AGAS Address resolution cache
-        void adjust_local_cache_size(std::size_t);
+        void adjust_local_cache_size(std::size_t) const;
 
         state get_status() const
         {
@@ -166,7 +166,7 @@ namespace hpx { namespace agas {
         }
 
         bool resolve_locally_known_addresses(
-            naming::gid_type const& id, naming::address& addr);
+            naming::gid_type const& id, naming::address& addr) const;
 
         void register_server_instances();
 
@@ -246,21 +246,21 @@ namespace hpx { namespace agas {
 
     public:
         // Helper functions to access the current cache statistics
-        std::uint64_t get_cache_entries(bool);
-        std::uint64_t get_cache_hits(bool);
-        std::uint64_t get_cache_misses(bool);
-        std::uint64_t get_cache_evictions(bool);
-        std::uint64_t get_cache_insertions(bool);
+        std::uint64_t get_cache_entries(bool) const;
+        std::uint64_t get_cache_hits(bool) const;
+        std::uint64_t get_cache_misses(bool) const;
+        std::uint64_t get_cache_evictions(bool) const;
+        std::uint64_t get_cache_insertions(bool) const;
 
-        std::uint64_t get_cache_get_entry_count(bool reset);
-        std::uint64_t get_cache_insertion_entry_count(bool reset);
-        std::uint64_t get_cache_update_entry_count(bool reset);
-        std::uint64_t get_cache_erase_entry_count(bool reset);
+        std::uint64_t get_cache_get_entry_count(bool reset) const;
+        std::uint64_t get_cache_insertion_entry_count(bool reset) const;
+        std::uint64_t get_cache_update_entry_count(bool reset) const;
+        std::uint64_t get_cache_erase_entry_count(bool reset) const;
 
-        std::uint64_t get_cache_get_entry_time(bool reset);
-        std::uint64_t get_cache_insertion_entry_time(bool reset);
-        std::uint64_t get_cache_update_entry_time(bool reset);
-        std::uint64_t get_cache_erase_entry_time(bool reset);
+        std::uint64_t get_cache_get_entry_time(bool reset) const;
+        std::uint64_t get_cache_insertion_entry_time(bool reset) const;
+        std::uint64_t get_cache_update_entry_time(bool reset) const;
+        std::uint64_t get_cache_erase_entry_time(bool reset) const;
 
     public:
         /// \brief Add a locality to the runtime.
@@ -333,7 +333,7 @@ namespace hpx { namespace agas {
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
         bool get_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type, error_code& ec = throws);
+            components::component_type type, error_code& ec = throws) const;
 
         bool get_localities(std::vector<naming::gid_type>& locality_ids,
             error_code& ec = throws)
@@ -405,13 +405,13 @@ namespace hpx { namespace agas {
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
         components::component_type get_component_id(
-            std::string const& name, error_code& ec = throws);
+            std::string const& name, error_code& ec = throws) const;
 
-        void iterate_types(
-            iterate_types_function_type const& f, error_code& ec = throws);
+        void iterate_types(iterate_types_function_type const& f,
+            error_code& ec = throws) const;
 
         std::string get_component_type_name(
-            components::component_type id, error_code& ec = throws);
+            components::component_type id, error_code& ec = throws) const;
 
         /// \brief Register a factory for a specific component type
         ///
@@ -448,7 +448,7 @@ namespace hpx { namespace agas {
         }
 
         components::component_type register_factory(std::uint32_t locality_id,
-            std::string const& name, error_code& ec = throws);
+            std::string const& name, error_code& ec = throws) const;
 
         /// \brief Get unique range of freely assignable global ids.
         ///
@@ -782,7 +782,7 @@ namespace hpx { namespace agas {
         bool is_local_address_cached(naming::gid_type const& id,
             naming::address& addr, error_code& ec = throws);
 
-        bool is_local_lva_encoded_address(std::uint64_t msb);
+        bool is_local_lva_encoded_address(std::uint64_t msb) const;
 
         /// \brief Resolve a given global address (\a id) to its associated local
         ///        address.
@@ -1020,7 +1020,7 @@ namespace hpx { namespace agas {
         ///                   all existing entries against
         ///
         hpx::future<iterate_names_return_type> iterate_ids(
-            std::string const& pattern);
+            std::string const& pattern) const;
 
         /// \brief Register a global name with a global address (id)
         ///
@@ -1046,13 +1046,13 @@ namespace hpx { namespace agas {
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
         bool register_name(std::string const& name, naming::gid_type const& id,
-            error_code& ec = throws);
+            error_code& ec = throws) const;
 
         hpx::future<bool> register_name_async(
-            std::string const& name, hpx::id_type const& id);
+            std::string const& name, hpx::id_type const& id) const;
 
         bool register_name(std::string const& name, hpx::id_type const& id,
-            error_code& ec = throws);
+            error_code& ec = throws) const;
 
         /// \brief Unregister a global name (release any existing association)
         ///
@@ -1077,10 +1077,10 @@ namespace hpx { namespace agas {
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
         hpx::future<hpx::id_type> unregister_name_async(
-            std::string const& name);
+            std::string const& name) const;
 
         hpx::id_type unregister_name(
-            std::string const& name, error_code& ec = throws);
+            std::string const& name, error_code& ec = throws) const;
 
         /// \brief Query for the global address associated with a given global name.
         ///
@@ -1107,10 +1107,11 @@ namespace hpx { namespace agas {
         ///                   throw but returns the result code using the
         ///                   parameter \a ec. Otherwise it throws an instance
         ///                   of hpx#exception.
-        hpx::future<hpx::id_type> resolve_name_async(std::string const& name);
+        hpx::future<hpx::id_type> resolve_name_async(
+            std::string const& name) const;
 
         hpx::id_type resolve_name(
-            std::string const& name, error_code& ec = throws);
+            std::string const& name, error_code& ec = throws) const;
 
         /// \brief Install a listener for a given symbol namespace event.
         ///
@@ -1134,7 +1135,7 @@ namespace hpx { namespace agas {
         ///          global id is registered with the given name.
         ///
         future<hpx::id_type> on_symbol_namespace_event(
-            std::string const& name, bool call_for_past_events = false);
+            std::string const& name, bool call_for_past_events = false) const;
 
         /// \warning This function is for internal use only. It is dangerous and
         ///          may break your code if you use it.
@@ -1155,16 +1156,16 @@ namespace hpx { namespace agas {
         /// \warning This function is for internal use only. It is dangerous and
         ///          may break your code if you use it.
         bool get_cache_entry(naming::gid_type const& gid, gva& gva,
-            naming::gid_type& idbase, error_code& ec = throws);
+            naming::gid_type& idbase, error_code& ec = throws) const;
 
         /// \warning This function is for internal use only. It is dangerous and
         ///          may break your code if you use it.
         void remove_cache_entry(
-            naming::gid_type const& id, error_code& ec = throws);
+            naming::gid_type const& id, error_code& ec = throws) const;
 
         /// \warning This function is for internal use only. It is dangerous and
         ///          may break your code if you use it.
-        void clear_cache(error_code& ec = throws);
+        void clear_cache(error_code& ec = throws) const;
 
         // Disable refcnt caching during shutdown
         void start_shutdown(error_code& ec = throws);

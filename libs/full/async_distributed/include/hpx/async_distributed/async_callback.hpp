@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,11 +24,12 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // launch
     template <typename Action, typename Policy>
     struct async_cb_action_dispatch<Action, Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         // id_type
         template <typename Policy_, typename Callback, typename... Ts>
@@ -44,19 +45,18 @@ namespace hpx { namespace detail {
         }
 
         template <typename Policy_, typename Client, typename Stub,
-            typename Callback, typename... Ts>
+            typename Data, typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
         call(Policy_&& launch_policy,
-            components::client_base<Client, Stub> const& c, Callback&& cb,
+            components::client_base<Client, Stub, Data> const& c, Callback&& cb,
             Ts&&... ts)
         {
-            typedef typename components::client_base<Client,
-                Stub>::server_component_type component_type;
+            typedef typename components::client_base<Client, Stub,
+                Data>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Action, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             return hpx::detail::async_cb_impl<Action>(
@@ -101,19 +101,18 @@ namespace hpx { namespace detail {
     struct async_cb_action_dispatch<Action, Client,
         typename std::enable_if<traits::is_client<Client>::value>::type>
     {
-        template <typename Client_, typename Stub, typename Callback,
-            typename... Ts>
+        template <typename Client_, typename Stub, typename Data,
+            typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Action>::remote_result_type>::type>
-        call(components::client_base<Client_, Stub> const& c, Callback&& cb,
-            Ts&&... ts)
+        call(components::client_base<Client_, Stub, Data> const& c,
+            Callback&& cb, Ts&&... ts)
         {
-            typedef typename components::client_base<Client_,
-                Stub>::server_component_type component_type;
+            typedef typename components::client_base<Client_, Stub,
+                Data>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Action, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             return async_cb_action_dispatch<Action,
@@ -139,9 +138,10 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
+
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts)
         -> decltype(detail::async_cb_action_dispatch<Action,
@@ -155,7 +155,8 @@ namespace hpx {
 }    // namespace hpx
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // any action
     template <typename Action>
     struct async_cb_dispatch<Action,
@@ -174,19 +175,19 @@ namespace hpx { namespace detail {
         }
 
         template <typename Component, typename Signature, typename Derived,
-            typename Client, typename Stub, typename Callback, typename... Ts>
+            typename Client, typename Stub, typename Data, typename Callback,
+            typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
-            components::client_base<Client, Stub> const& c, Callback&& cb,
+            components::client_base<Client, Stub, Data> const& c, Callback&& cb,
             Ts&&... ts)
         {
-            typedef typename components::client_base<Client,
-                Stub>::server_component_type component_type;
+            typedef typename components::client_base<Client, Stub,
+                Data>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Derived, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Action, component_type>,
                 "The action to invoke is not supported by the target");
 
             return async_cb<Derived>(
@@ -224,21 +225,20 @@ namespace hpx { namespace detail {
         }
 
         template <typename Policy_, typename Component, typename Signature,
-            typename Derived, typename Client, typename Stub, typename Callback,
-            typename... Ts>
+            typename Derived, typename Client, typename Stub, typename Data,
+            typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
             typename traits::promise_local_result<typename traits::
                     extract_action<Derived>::remote_result_type>::type>
         call(Policy_&& launch_policy,
             hpx::actions::basic_action<Component, Signature, Derived> const&,
-            components::client_base<Client, Stub> const& c, Callback&& cb,
+            components::client_base<Client, Stub, Data> const& c, Callback&& cb,
             Ts&&... ts)
         {
-            typedef typename components::client_base<Client,
-                Stub>::server_component_type component_type;
+            typedef typename components::client_base<Client, Stub,
+                Data>::server_component_type component_type;
 
-            typedef traits::is_valid_action<Derived, component_type> is_valid;
-            static_assert(is_valid::value,
+            static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
             return async_cb<Derived>(HPX_FORWARD(Policy_, launch_policy),
@@ -259,15 +259,19 @@ namespace hpx { namespace detail {
                 policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
+
+    // different versions of clang-format disagree
+    // clang-format off
     template <typename F, typename... Ts>
     HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts) -> decltype(
-        detail::async_cb_dispatch<typename std::decay<F>::type>::call(
+        detail::async_cb_dispatch< std::decay_t<F>>::call(
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
     {
-        return detail::async_cb_dispatch<typename std::decay<F>::type>::call(
+        return detail::async_cb_dispatch<std::decay_t<F>>::call(
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx

@@ -22,7 +22,6 @@ void test_reduce1()
     test_reduce1(IteratorTag());
     test_reduce1(seq, IteratorTag());
     test_reduce1(par, IteratorTag());
-    test_reduce1(par_unseq, IteratorTag());
 
     test_reduce1_async(seq(task), IteratorTag());
     test_reduce1_async(par(task), IteratorTag());
@@ -43,7 +42,6 @@ void test_reduce2()
     test_reduce2(IteratorTag());
     test_reduce2(seq, IteratorTag());
     test_reduce2(par, IteratorTag());
-    test_reduce2(par_unseq, IteratorTag());
 
     test_reduce2_async(seq(task), IteratorTag());
     test_reduce2_async(par(task), IteratorTag());
@@ -64,7 +62,6 @@ void test_reduce3()
     test_reduce3(IteratorTag());
     test_reduce3(seq, IteratorTag());
     test_reduce3(par, IteratorTag());
-    test_reduce3(par_unseq, IteratorTag());
 
     test_reduce3_async(seq(task), IteratorTag());
     test_reduce3_async(par(task), IteratorTag());

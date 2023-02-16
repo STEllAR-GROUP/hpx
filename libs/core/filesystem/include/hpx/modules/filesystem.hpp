@@ -28,18 +28,18 @@ namespace hpx::filesystem {
     using namespace std::filesystem;
     using std::filesystem::canonical;
 
-    inline path initial_path()
+    [[nodiscard]] inline path initial_path()
     {
         static path ip = current_path();
         return ip;
     }
 
-    inline std::string basename(path const& p)
+    [[nodiscard]] inline std::string basename(path const& p)
     {
         return p.stem().string();
     }
 
-    inline path canonical(path const& p, path const& base)
+    [[nodiscard]] inline path canonical(path const& p, path const& base)
     {
         if (p.is_relative())
         {
@@ -51,7 +51,8 @@ namespace hpx::filesystem {
         }
     }
 
-    inline path canonical(path const& p, path const& base, std::error_code& ec)
+    [[nodiscard]] inline path canonical(
+        path const& p, path const& base, std::error_code& ec)
     {
         if (p.is_relative())
         {
@@ -79,19 +80,25 @@ namespace hpx::filesystem {
     using namespace boost::filesystem;
 
     using boost::filesystem::canonical;
-    inline path canonical(path const& p, path const& base, std::error_code& ec)
+
+    [[nodiscard]] inline path canonical(
+        path const& p, path const& base, std::error_code& ec)
     {
         return canonical(p, base, compat_error_code(ec));
     }
 
     using boost::filesystem::exists;
-    inline bool exists(path const& p, std::error_code& ec) noexcept
+
+    [[nodiscard]] inline bool exists(
+        path const& p, std::error_code& ec) noexcept
     {
         return exists(p, compat_error_code(ec));
     }
 
     using boost::filesystem::is_regular_file;
-    inline bool is_regular_file(path const& p, std::error_code& ec) noexcept
+
+    [[nodiscard]] inline bool is_regular_file(
+        path const& p, std::error_code& ec) noexcept
     {
         return is_regular_file(p, compat_error_code(ec));
     }

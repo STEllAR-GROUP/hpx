@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //  Copyright (c) 2014      Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -27,13 +27,18 @@ namespace hpx::util {
         {
         }
 
+        tick_counter(tick_counter const&) = delete;
+        tick_counter(tick_counter&) = delete;
+        tick_counter& operator=(tick_counter const&) = delete;
+        tick_counter& operator=(tick_counter&&) = delete;
+
         ~tick_counter()
         {
             output_ += take_time_stamp() - start_time_;
         }
 
     protected:
-        static std::uint64_t take_time_stamp()
+        [[nodiscard]] static std::uint64_t take_time_stamp()
         {
             return hpx::util::hardware::timestamp();
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,7 +16,8 @@
 
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <int N, typename R, typename ZipIter>
     constexpr R get_iter(ZipIter&& zipiter)
@@ -27,8 +28,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <int N, typename R, typename ZipIter>
     R get_iter(hpx::future<ZipIter>&& zipiter)
     {
-        typedef typename hpx::tuple_element<N,
-            typename ZipIter::iterator_tuple_type>::type result_type;
+        using result_type = typename hpx::tuple_element<N,
+            typename ZipIter::iterator_tuple_type>::type;
 
         return hpx::make_future<result_type>(
             HPX_MOVE(zipiter), [](ZipIter zipiter) {
@@ -48,7 +49,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     hpx::future<typename ZipIter::iterator_tuple_type> get_iter_tuple(
         hpx::future<ZipIter>&& zipiter)
     {
-        typedef typename ZipIter::iterator_tuple_type result_type;
+        using result_type = typename ZipIter::iterator_tuple_type;
         return hpx::make_future<result_type>(HPX_MOVE(zipiter),
             [](ZipIter zipiter) { return get_iter_tuple(HPX_MOVE(zipiter)); });
     }
@@ -61,7 +62,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename ZipIter::iterator_tuple_type>::type>
     get_iter_pair(ZipIter&& zipiter)
     {
-        typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
 
         iterator_tuple_type t = zipiter.get_iterator_tuple();
         return std::make_pair(hpx::get<0>(t), hpx::get<1>(t));
@@ -74,12 +75,11 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename ZipIter::iterator_tuple_type>::type>>
     get_iter_pair(hpx::future<ZipIter>&& zipiter)
     {
-        typedef typename ZipIter::iterator_tuple_type iterator_tuple_type;
+        using iterator_tuple_type = typename ZipIter::iterator_tuple_type;
 
-        typedef std::pair<
-            typename hpx::tuple_element<0, iterator_tuple_type>::type,
-            typename hpx::tuple_element<1, iterator_tuple_type>::type>
-            result_type;
+        using result_type =
+            std::pair<typename hpx::tuple_element<0, iterator_tuple_type>::type,
+                typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
         return hpx::make_future<result_type>(HPX_MOVE(zipiter),
             [](ZipIter zipiter) { return get_iter_pair(HPX_MOVE(zipiter)); });
@@ -118,9 +118,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             typename hpx::tuple_element<0, iterator_tuple_type>::type,
             typename hpx::tuple_element<1, iterator_tuple_type>::type>;
 
-        return hpx::make_future<result_type>(
-            HPX_MOVE(zipiter), [](ZipIter zipiter) {
-                return get_iter_in_in_result(HPX_MOVE(zipiter));
-            });
+        return hpx::make_future<result_type>(HPX_MOVE(zipiter),
+            [](ZipIter iter) { return get_iter_in_in_result(HPX_MOVE(iter)); });
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

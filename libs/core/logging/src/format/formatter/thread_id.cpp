@@ -32,7 +32,7 @@ namespace hpx::util::logging::formatter {
 
     thread_id::~thread_id() = default;
 
-    struct thread_id_impl : thread_id
+    struct thread_id_impl final : thread_id
     {
         void operator()(std::ostream& to) const override
         {

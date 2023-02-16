@@ -11,9 +11,7 @@
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <cstddef>
 
-#include <eve/function/all.hpp>
-#include <eve/function/any.hpp>
-#include <eve/function/none.hpp>
+#include <eve/module/core.hpp>
 
 namespace hpx::parallel::traits {
 

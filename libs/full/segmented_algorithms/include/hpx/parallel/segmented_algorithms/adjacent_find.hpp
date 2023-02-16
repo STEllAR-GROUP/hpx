@@ -8,26 +8,25 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/functional/invoke.hpp>
-
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <exception>
 #include <iterator>
 #include <list>
-#include <numeric>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_adjacent_find
     namespace detail {
@@ -277,7 +276,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -303,12 +302,12 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<InIter>;
 
-        return hpx::parallel::v1::detail::segmented_adjacent_find(
-            hpx::parallel::v1::detail::adjacent_find<
+        return hpx::parallel::detail::segmented_adjacent_find(
+            hpx::parallel::detail::adjacent_find<
                 typename iterator_traits::local_iterator,
                 typename iterator_traits::local_iterator>(),
             hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-            hpx::parallel::util::projection_identity(), std::true_type());
+            hpx::identity_v, std::true_type());
     }
 
     // clang-format off
@@ -340,11 +339,11 @@ namespace hpx { namespace segmented {
 
         using iterator_traits = hpx::traits::segmented_iterator_traits<SegIter>;
 
-        return hpx::parallel::v1::detail::segmented_adjacent_find(
-            hpx::parallel::v1::detail::adjacent_find<
+        return hpx::parallel::detail::segmented_adjacent_find(
+            hpx::parallel::detail::adjacent_find<
                 typename iterator_traits::local_iterator,
                 typename iterator_traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(Pred, pred),
-            hpx::parallel::util::projection_identity(), is_seq());
+            hpx::identity_v, is_seq());
     }
 }}    // namespace hpx::segmented

@@ -712,7 +712,7 @@ namespace hpx {
                 &hpx::detail::get_pu_mask);
             hpx::parallel::execution::detail::set_get_os_thread_count(
                 []() { return hpx::get_os_thread_count(); });
-            hpx::parallel::v1::detail::set_exception_list_termination_handler(
+            hpx::parallel::detail::set_exception_list_termination_handler(
                 &hpx::terminate);
             hpx::parallel::util::detail::
                 set_parallel_exception_termination_handler(&hpx::terminate);

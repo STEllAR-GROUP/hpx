@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 #include <hpx/serialization/detail/pointer.hpp>

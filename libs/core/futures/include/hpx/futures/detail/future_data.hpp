@@ -316,25 +316,6 @@ namespace hpx::lcos::detail {
 
         virtual std::exception_ptr get_exception_ptr() const = 0;
 
-        virtual std::string const& get_registered_name() const
-        {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "future_data_base::get_registered_name",
-                "this future does not support name registration");
-        }
-        virtual void set_registered_name(std::string /*name*/)
-        {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "future_data_base::set_registered_name",
-                "this future does not support name registration");
-        }
-        virtual bool register_as(std::string /*name*/, bool /*manage_lifetime*/)
-        {
-            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                "future_data_base::register_as",
-                "this future does not support name registration");
-        }
-
     protected:
         mutable mutex_type mtx_;
         std::atomic<state> state_;    // current state

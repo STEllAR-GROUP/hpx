@@ -17,7 +17,7 @@ namespace hpx::util {
     template <typename T>
     struct scoped_timer
     {
-        explicit scoped_timer(T& t, bool enabled = true)
+        explicit scoped_timer(T& t, bool enabled = true) noexcept
           : started_at_(enabled ? hpx::chrono::high_resolution_clock::now() : 0)
           , t_(enabled ? &t : nullptr)
         {
@@ -49,7 +49,7 @@ namespace hpx::util {
             return *this;
         }
 
-        constexpr bool enabled() const noexcept
+        [[nodiscard]] constexpr bool enabled() const noexcept
         {
             return t_ != nullptr;
         }

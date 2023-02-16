@@ -1,6 +1,6 @@
 //  Copyright (c) 2015 Anton Bikineev
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -36,10 +36,10 @@ namespace hpx::serialization::detail {
         HPX_NON_COPYABLE(id_registry);
 
     public:
-        typedef void* (*ctor_t)();
-        typedef std::map<std::string, ctor_t> typename_to_ctor_t;
-        typedef std::map<std::string, std::uint32_t> typename_to_id_t;
-        typedef std::vector<ctor_t> cache_t;
+        using ctor_t = void* (*) ();
+        using typename_to_ctor_t = std::map<std::string, ctor_t>;
+        using typename_to_id_t = std::map<std::string, std::uint32_t>;
+        using cache_t = std::vector<ctor_t>;
 
         static constexpr std::uint32_t invalid_id = ~0u;
 
@@ -51,16 +51,16 @@ namespace hpx::serialization::detail {
 
         HPX_CORE_EXPORT void fill_missing_typenames();
 
-        HPX_CORE_EXPORT std::uint32_t try_get_id(
+        [[nodiscard]] HPX_CORE_EXPORT std::uint32_t try_get_id(
             std::string const& type_name) const;
 
-        std::uint32_t get_max_registered_id() const
+        [[nodiscard]] std::uint32_t get_max_registered_id() const noexcept
         {
             return max_id;
         }
 
-        HPX_CORE_EXPORT std::vector<std::string> get_unassigned_typenames()
-            const;
+        [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string>
+        get_unassigned_typenames() const;
 
         HPX_CORE_EXPORT static id_registry& instance();
 
@@ -87,14 +87,15 @@ namespace hpx::serialization::detail {
         HPX_NON_COPYABLE(polymorphic_id_factory);
 
     private:
-        typedef id_registry::ctor_t ctor_t;
-        typedef id_registry::typename_to_ctor_t typename_to_ctor_t;
-        typedef id_registry::typename_to_id_t typename_to_id_t;
-        typedef id_registry::cache_t cache_t;
+        using ctor_t = id_registry::ctor_t;
+        using typename_to_ctor_t = id_registry::typename_to_ctor_t;
+        using typename_to_id_t = id_registry::typename_to_id_t;
+        using cache_t = id_registry::cache_t;
 
     public:
         template <class T>
-        static T* create(std::uint32_t id, std::string const* name = nullptr)
+        [[nodiscard]] static T* create(
+            std::uint32_t id, std::string const* name = nullptr)
         {
             cache_t const& vec = id_registry::instance().cache;
 
@@ -115,26 +116,28 @@ namespace hpx::serialization::detail {
                     "polymorphic_id_factory::create", msg);
             }
 
-            ctor_t ctor = vec[static_cast<std::size_t>(id)];
+            ctor_t const ctor = vec[static_cast<std::size_t>(id)];
             HPX_ASSERT(ctor != nullptr);    //-V108
             return static_cast<T*>(ctor());
         }
 
-        HPX_CORE_EXPORT static std::uint32_t get_id(
+        [[nodiscard]] HPX_CORE_EXPORT static std::uint32_t get_id(
             std::string const& type_name);
 
     private:
         polymorphic_id_factory() = default;
 
         HPX_CORE_EXPORT static polymorphic_id_factory& instance();
-        HPX_CORE_EXPORT static std::string collect_registered_typenames();
+
+        [[nodiscard]] HPX_CORE_EXPORT static std::string
+        collect_registered_typenames();
 
         friend struct hpx::util::static_<polymorphic_id_factory>;
     };
 
-    template <class T>
+    template <typename T>
     struct register_class_name<T,
-        typename std::enable_if<traits::is_serialized_with_id<T>::value>::type>
+        std::enable_if_t<traits::is_serialized_with_id_v<T>>>
     {
         register_class_name()
         {
@@ -142,7 +145,7 @@ namespace hpx::serialization::detail {
                 T::hpx_serialization_get_name_impl(), &factory_function);
         }
 
-        static void* factory_function()
+        [[nodiscard]] static void* factory_function()
         {
             return new T;
         }
@@ -156,14 +159,12 @@ namespace hpx::serialization::detail {
     };
 
     template <class T>
-    register_class_name<T,
-        std::enable_if_t<traits::is_serialized_with_id<T>::value>>
+    register_class_name<T, std::enable_if_t<traits::is_serialized_with_id_v<T>>>
         register_class_name<T,
-            std::enable_if_t<traits::is_serialized_with_id<T>::value>>::
-            instance;
+            std::enable_if_t<traits::is_serialized_with_id_v<T>>>::instance;
 
     template <std::uint32_t desc>
-    std::string get_constant_entry_name();
+    [[nodiscard]] std::string get_constant_entry_name();
 
     template <std::uint32_t Id>
     struct add_constant_entry

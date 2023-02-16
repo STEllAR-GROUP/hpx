@@ -74,6 +74,9 @@ namespace hpx::detail {
 #endif
 
         bound_back& operator=(bound_back const&) = delete;
+        bound_back& operator=(bound_back&&) = delete;
+
+        ~bound_back() = default;
 
         template <typename... Us>
         constexpr HPX_HOST_DEVICE
@@ -120,12 +123,14 @@ namespace hpx::detail {
             // clang-format on
         }
 
-        constexpr std::size_t get_function_address() const noexcept
+        [[nodiscard]] constexpr std::size_t get_function_address()
+            const noexcept
         {
             return traits::get_function_address<F>::call(_f);
         }
 
-        constexpr char const* get_function_annotation() const noexcept
+        [[nodiscard]] constexpr char const* get_function_annotation()
+            const noexcept
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return traits::get_function_annotation<F>::call(_f);
@@ -135,7 +140,8 @@ namespace hpx::detail {
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        util::itt::string_handle get_function_annotation_itt() const
+        [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+            const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             return traits::get_function_annotation_itt<F>::call(_f);
@@ -205,7 +211,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
@@ -216,7 +222,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation<hpx::detail::bound_back<F, Ts...>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -227,7 +233,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation_itt<hpx::detail::bound_back<F, Ts...>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();

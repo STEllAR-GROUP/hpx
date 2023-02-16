@@ -20,7 +20,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     template <typename InputIterator, typename Distance>
     HPX_HOST_DEVICE constexpr void advance_impl(
@@ -151,7 +151,7 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
             Iter iter, Stride offset)
         {
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-            hpx::parallel::v1::detail::advance(iter, offset);
+            hpx::parallel::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
 #endif
@@ -187,7 +187,7 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
             Iter iter, Stride offset)
         {
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-            hpx::parallel::v1::detail::advance(iter, offset);
+            hpx::parallel::detail::advance(iter, offset);
 #else
             std::advance(iter, offset);
 #endif
@@ -207,7 +207,7 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
                     offset = Stride(
                         max_count < std::size_t(offset) ? max_count : offset);
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-                    hpx::parallel::v1::detail::advance(iter, offset);
+                    hpx::parallel::detail::advance(iter, offset);
 #else
                     std::advance(iter, offset);
 #endif
@@ -219,7 +219,7 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
                         max_count < negate(offset) ? max_count :
                                                      negate(offset)));
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-                    hpx::parallel::v1::detail::advance(iter, offset);
+                    hpx::parallel::detail::advance(iter, offset);
 #else
                     std::advance(iter, offset);
 #endif
@@ -232,7 +232,7 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
                 offset = Stride(
                     max_count < std::size_t(offset) ? max_count : offset);
 #if (defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP)
-                hpx::parallel::v1::detail::advance(iter, offset);
+                hpx::parallel::detail::advance(iter, offset);
 #else
                 std::advance(iter, offset);
 #endif
@@ -419,15 +419,15 @@ namespace hpx::parallel { inline namespace v1 { namespace detail {
             return t1 / t2;
         }
     };
-}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx::ranges {
 
     ///////////////////////////////////////////////////////////////////////////
-    using equal_to = hpx::parallel::v1::detail::equal_to;
-    using not_equal_to = hpx::parallel::v1::detail::not_equal_to;
-    using less = hpx::parallel::v1::detail::less;
-    using greater = hpx::parallel::v1::detail::greater;
-    using greater_equal = hpx::parallel::v1::detail::greater_equal;
-    using less_equal = hpx::parallel::v1::detail::less_equal;
+    using equal_to = hpx::parallel::detail::equal_to;
+    using not_equal_to = hpx::parallel::detail::not_equal_to;
+    using less = hpx::parallel::detail::less;
+    using greater = hpx::parallel::detail::greater;
+    using greater_equal = hpx::parallel::detail::greater_equal;
+    using less_equal = hpx::parallel::detail::less_equal;
 }    // namespace hpx::ranges

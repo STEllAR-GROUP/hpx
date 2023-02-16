@@ -357,7 +357,7 @@ namespace hpx::parallel::execution {
         {
             // default implementation
             template <typename Target>
-            HPX_FORCEINLINE static std::size_t processing_units_count(Target,
+            HPX_FORCEINLINE static std::size_t processing_units_count(Target&&,
                 hpx::chrono::steady_duration const& =
                     hpx::chrono::null_duration,
                 std::size_t = 0)
@@ -404,6 +404,20 @@ namespace hpx::parallel::execution {
                 std::size_t num_tasks)
             {
                 return call(static_cast<Parameters&>(params),
+                    HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
+            }
+        };
+
+        template <typename Executor_>
+        struct processing_units_count_fn_helper<void, Executor_,
+            std::enable_if_t<hpx::traits::is_executor_any_v<Executor_>>>
+        {
+            template <typename Executor>
+            HPX_FORCEINLINE static constexpr std::size_t call(Executor&& exec,
+                hpx::chrono::steady_duration const& iteration_duration,
+                std::size_t num_tasks)
+            {
+                return processing_units_count_property::processing_units_count(
                     HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
             }
         };

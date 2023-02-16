@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -133,9 +133,10 @@ namespace hpx { namespace collectives {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace communication {
+
         struct inclusive_scan_tag;
     }    // namespace communication
 
@@ -172,9 +173,9 @@ namespace hpx { namespace traits {
                 });
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     ////////////////////////////////////////////////////////////////////////////
     // inclusive_scan plain values
@@ -185,9 +186,9 @@ namespace hpx { namespace collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
         if (generation == 0)
         {
@@ -243,7 +244,7 @@ namespace hpx { namespace collectives {
                                   this_site, generation, root_site),
             HPX_FORWARD(T, local_result), HPX_FORWARD(F, op), this_site);
     }
-}}    // namespace hpx::collectives
+}    // namespace hpx::collectives
 
 #endif    // !HPX_COMPUTE_DEVICE_CODE
 #endif    // DOXYGEN

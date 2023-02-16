@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,7 +13,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <new>
 
 namespace hpx::util::detail {
 
@@ -31,16 +30,13 @@ namespace hpx::util::detail {
             void* buffer = vtable::allocate<T>(storage, storage_size);
             return ::new (buffer) T(vtable::get<T>(src));
         }
-        void* (*copy)(void*, std::size_t, void const*, bool);
+        void* (*copy)(void*, std::size_t, void const*, bool) = nullptr;
 
-        explicit constexpr copyable_vtable(std::nullptr_t) noexcept
-          : copy(nullptr)
-        {
-        }
+        explicit constexpr copyable_vtable(std::nullptr_t) noexcept {}
 
         template <typename T>
         explicit constexpr copyable_vtable(construct_vtable<T>) noexcept
-          : copy(&copyable_vtable::template _copy<T>)
+          : copy(&copyable_vtable::_copy<T>)
         {
         }
     };

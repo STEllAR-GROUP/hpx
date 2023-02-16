@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -227,11 +227,12 @@ namespace hpx { namespace collectives {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // support for gather
     namespace communication {
+
         struct gather_tag;
     }    // namespace communication
 
@@ -262,9 +263,9 @@ namespace hpx { namespace traits {
                 nullptr);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     // gather plain values
@@ -275,9 +276,9 @@ namespace hpx { namespace collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
         if (generation == 0)
         {
@@ -291,8 +292,8 @@ namespace hpx { namespace collectives {
                                     this_site,
                                     generation](communicator&& c) mutable
             -> hpx::future<std::vector<arg_type>> {
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
+            using action_type =
+                detail::communicator_server::communication_get_action<
                     traits::communication::gather_tag,
                     hpx::future<std::vector<arg_type>>, arg_type>;
 
@@ -329,7 +330,7 @@ namespace hpx { namespace collectives {
         generation_arg generation = generation_arg())
     {
         return gather_here(create_communicator(basename, num_sites, this_site,
-                               generation, root_site_arg(this_site.this_site_)),
+                               generation, root_site_arg(this_site.argument_)),
             HPX_FORWARD(T, result), this_site);
     }
 
@@ -340,9 +341,9 @@ namespace hpx { namespace collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg())
     {
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
         if (generation == 0)
         {
@@ -354,8 +355,8 @@ namespace hpx { namespace collectives {
         auto gather_there_data =
             [local_result = HPX_FORWARD(T, local_result), this_site,
                 generation](communicator&& c) mutable -> hpx::future<void> {
-            using action_type = typename detail::communicator_server::
-                template communication_set_action<
+            using action_type =
+                detail::communicator_server::communication_set_action<
                     traits::communication::gather_tag, hpx::future<void>,
                     std::decay_t<T>>;
 
@@ -395,7 +396,7 @@ namespace hpx { namespace collectives {
                                 this_site, generation, root_site),
             HPX_FORWARD(T, local_result), this_site);
     }
-}}    // namespace hpx::collectives
+}    // namespace hpx::collectives
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_GATHER_DECLARATION(...) /**/

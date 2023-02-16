@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 
-namespace hpx { namespace execution { namespace detail {
+namespace hpx::execution::detail {
 
     // forward declarations, see execution_policy.hpp
     template <typename Executor, typename Parameters = void>
@@ -34,4 +34,4 @@ namespace hpx { namespace execution { namespace detail {
 
     template <typename Executor, typename Parameters = void>
     struct parallel_unsequenced_policy_shim;
-}}}    // namespace hpx::execution::detail
+}    // namespace hpx::execution::detail

@@ -12,7 +12,6 @@
 #include <climits>
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 
 #if CHAR_BIT != 8
 #error This code assumes an eight-bit byte.

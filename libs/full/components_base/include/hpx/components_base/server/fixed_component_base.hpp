@@ -21,18 +21,17 @@
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
-#include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     class fixed_component_base : public traits::detail::fixed_component_tag
     {
     private:
-        using this_component_type = typename std::conditional<
-            std::is_same<Component, detail::this_type>::value,
-            fixed_component_base, Component>::type;
+        using this_component_type =
+            std::conditional_t<std::is_same_v<Component, detail::this_type>,
+                fixed_component_base, Component>;
 
         constexpr Component& derived() noexcept
         {
@@ -60,7 +59,7 @@ namespace hpx { namespace components {
 
         /// \brief finalize() will be called just before the instance gets
         ///        destructed
-        void finalize()
+        void finalize() const
         {
             /// Unbind the GID if it's not this instantiations fixed gid and is
             /// is not invalid.
@@ -82,12 +81,11 @@ namespace hpx { namespace components {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "fixed_component_base::get_base_gid",
                     "fixed_components must be assigned new gids on creation");
-                return naming::invalid_gid;
             }
 
             if (!gid_)
             {
-                naming::address addr(
+                naming::address const addr(
                     naming::get_gid_from_locality_id(agas::get_locality_id()),
                     components::get_component_type<wrapped_type>(),
                     const_cast<this_component_type*>(
@@ -98,7 +96,7 @@ namespace hpx { namespace components {
                 // Try to bind the preset GID first
                 if (!agas::bind_gid_local(gid_, addr))
                 {
-                    naming::gid_type g = gid_;
+                    naming::gid_type const g = gid_;
                     gid_ = naming::gid_type();    // invalidate GID
 
                     HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
@@ -144,17 +142,17 @@ namespace hpx { namespace components {
 
         static void mark_as_migrated() noexcept
         {
-            // If this assertion is triggered then this component instance is being
-            // migrated even if the component type has not been enabled to support
-            // migration.
+            // If this assertion is triggered then this component instance is
+            // being migrated even if the component type has not been enabled to
+            // support migration.
             HPX_ASSERT(false);
         }
 
         static void on_migrated() noexcept
         {
-            // If this assertion is triggered then this component instance is being
-            // migrated even if the component type has not been enabled to support
-            // migration.
+            // If this assertion is triggered then this component instance is
+            // being migrated even if the component type has not been enabled to
+            // support migration.
             HPX_ASSERT(false);
         }
 
@@ -207,4 +205,4 @@ namespace hpx { namespace components {
             HPX_ASSERT(false);    // this shouldn't ever be called
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

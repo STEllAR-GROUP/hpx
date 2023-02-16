@@ -9,7 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Parameters, typename Executor>
     struct scoped_executor_parameters
@@ -65,4 +66,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
         Parameters const& params_;
         Executor const& exec_;
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

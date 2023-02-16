@@ -70,17 +70,6 @@ namespace hpx::parcelset {
     };
 
     namespace policies::lci {
-        int acquire_tag(sender* s) noexcept
-        {
-            return s->acquire_tag();
-        }
-
-        void add_connection(
-            sender* s, std::shared_ptr<sender_connection> const& ptr)
-        {
-            s->add(ptr);
-        }
-
         class HPX_EXPORT parcelport : public parcelport_impl<parcelport>
         {
             using base_type = parcelport_impl<parcelport>;

@@ -44,7 +44,8 @@ void test_nth_element_sent(IteratorTag)
     auto rand_index = std::rand() % SIZE;
 
     auto result = hpx::ranges::nth_element(iterator(std::begin(c)),
-        iterator(std::begin(c) + rand_index), sentinel{std::end(c) - 1});
+        iterator(std::begin(c) + rand_index),
+        sentinel(iterator(std::end(c) - 1)));
 
     HPX_TEST(result == iterator(std::end(c) - 1));
 
@@ -82,7 +83,8 @@ void test_nth_element_sent(ExPolicy policy, IteratorTag)
     auto rand_index = std::rand() % SIZE;
 
     auto result = hpx::ranges::nth_element(policy, iterator(std::begin(c)),
-        iterator(std::begin(c) + rand_index), sentinel{std::end(c) - 1});
+        iterator(std::begin(c) + rand_index),
+        sentinel(iterator(std::end(c) - 1)));
 
     HPX_TEST(result == iterator(std::end(c) - 1));
 

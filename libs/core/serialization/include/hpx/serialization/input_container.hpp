@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -29,22 +29,25 @@ namespace hpx::serialization {
     private:
         using access_traits = traits::serialization_access_data<Container>;
 
-        std::size_t get_chunk_size(std::size_t chunk) const noexcept
+        [[nodiscard]] std::size_t get_chunk_size(
+            std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].size_;
         }
 
-        chunk_type get_chunk_type(std::size_t chunk) const noexcept
+        [[nodiscard]] chunk_type get_chunk_type(
+            std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].type_;
         }
 
-        chunk_data get_chunk_data(std::size_t chunk) const noexcept
+        [[nodiscard]] chunk_data get_chunk_data(
+            std::size_t chunk) const noexcept
         {
             return (*chunks_)[chunk].data_;
         }
 
-        std::size_t get_num_chunks() const noexcept
+        [[nodiscard]] std::size_t get_num_chunks() const noexcept
         {
             return chunks_->size();
         }
@@ -54,12 +57,11 @@ namespace hpx::serialization {
             Container const& cont, std::size_t inbound_data_size) noexcept
           : cont_(cont)
           , current_(0)
-          , filter_()
           , decompressed_size_(inbound_data_size)
           , zero_copy_serialization_threshold_(
                 HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
-          , current_chunk_(std::size_t(-1))
+          , current_chunk_(static_cast<std::size_t>(-1))
           , current_chunk_size_(0)
         {
         }
@@ -69,12 +71,11 @@ namespace hpx::serialization {
             std::size_t inbound_data_size) noexcept
           : cont_(cont)
           , current_(0)
-          , filter_()
           , decompressed_size_(inbound_data_size)
           , zero_copy_serialization_threshold_(
                 HPX_ZERO_COPY_SERIALIZATION_THRESHOLD)
           , chunks_(nullptr)
-          , current_chunk_(std::size_t(-1))
+          , current_chunk_(static_cast<std::size_t>(-1))
           , current_chunk_size_(0)
         {
             if (chunks && chunks->size() != 0)
@@ -97,7 +98,6 @@ namespace hpx::serialization {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::set_filter",
                         "archive data bstream is too short");
-                    return;
                 }
             }
         }
@@ -128,7 +128,6 @@ namespace hpx::serialization {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary",
                         "archive data bstream is too short");
-                    return;
                 }
 
                 access_traits::read(cont_, count, current_, address);
@@ -141,7 +140,7 @@ namespace hpx::serialization {
 
                     // make sure we switch to the next serialization_chunk if
                     // necessary
-                    std::size_t current_chunk_size =
+                    std::size_t const current_chunk_size =
                         get_chunk_size(current_chunk_);
                     if (current_chunk_size != 0 &&
                         current_chunk_size_ >= current_chunk_size)
@@ -152,7 +151,6 @@ namespace hpx::serialization {
                             HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                                 "input_container::load_binary",
                                 "archive data bstream structure mismatch");
-                            return;
                         }
                         ++current_chunk_;
                         current_chunk_size_ = 0;
@@ -163,7 +161,7 @@ namespace hpx::serialization {
 
         void load_binary_chunk(void* address, std::size_t count) override
         {
-            HPX_ASSERT((std::int64_t) count >= 0);
+            HPX_ASSERT(static_cast<std::int64_t>(count) >= 0);
 
             if (chunks_ == nullptr ||
                 count < zero_copy_serialization_threshold_ ||
@@ -174,7 +172,7 @@ namespace hpx::serialization {
             }
             else
             {
-                HPX_ASSERT(current_chunk_ != std::size_t(-1));
+                HPX_ASSERT(current_chunk_ != static_cast<std::size_t>(-1));
                 HPX_ASSERT(get_chunk_type(current_chunk_) ==
                     chunk_type::chunk_type_pointer);
 
@@ -183,7 +181,6 @@ namespace hpx::serialization {
                     HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                         "input_container::load_binary_chunk",
                         "archive data bstream data chunk size mismatch");
-                    return;
                 }
 
                 // unfortunately we can't implement a zero copy policy on the

@@ -23,7 +23,7 @@ namespace hpx::traits {
     {
         using preprocessing_only = std::false_type;
 
-        static constexpr bool is_preprocessing() noexcept
+        [[nodiscard]] static constexpr bool is_preprocessing() noexcept
         {
             return false;
         }
@@ -65,7 +65,7 @@ namespace hpx::traits {
     struct serialization_access_data
       : default_serialization_access_data<Container>
     {
-        static std::size_t size(Container const& cont) noexcept
+        [[nodiscard]] static std::size_t size(Container const& cont) noexcept
         {
             return cont.size();
         }

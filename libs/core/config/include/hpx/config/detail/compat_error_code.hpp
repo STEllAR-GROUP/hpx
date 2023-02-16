@@ -14,7 +14,6 @@
 #include <boost/system/error_code.hpp>
 
 #include <system_error>
-#include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NODETAIL
@@ -25,7 +24,6 @@ namespace hpx {
     public:
         explicit compat_error_code(std::error_code& ec)
           : _ec(ec)
-          , _compat()
         {
         }
 

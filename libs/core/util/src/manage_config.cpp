@@ -17,11 +17,11 @@ namespace hpx::util {
     {
         typedef std::string::size_type size_type;
 
-        size_type first = s.find_first_not_of(" \t");
+        size_type const first = s.find_first_not_of(" \t");
         if (std::string::npos == first)
-            return std::string();
+            return {};
 
-        size_type last = s.find_last_not_of(" \t");
+        size_type const last = s.find_last_not_of(" \t");
         return s.substr(first, last - first + 1);
     }
 
@@ -35,7 +35,7 @@ namespace hpx::util {
     {
         for (std::string const& s : cfg)
         {
-            std::string::size_type p = s.find_first_of('=');
+            std::string::size_type const p = s.find_first_of('=');
             std::string key(trim_whitespace(s.substr(0, p)));
             if (key[key.size() - 1] == '!')
                 key.erase(key.size() - 1);

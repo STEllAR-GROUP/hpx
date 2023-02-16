@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
@@ -32,11 +31,8 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
-#include <hpx/threading/thread.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
-#include <hpx/threading_base/register_thread.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/topology/topology.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <algorithm>
@@ -57,7 +53,7 @@ namespace hpx::execution::experimental::detail {
     // of items n. Returns a power-of-2 chunk size that produces at most 8 and
     // at least 4 chunks per worker thread.
     static constexpr std::uint32_t get_bulk_scheduler_chunk_size(
-        std::uint32_t const num_threads, std::size_t const n)
+        std::uint32_t const num_threads, std::size_t const n) noexcept
     {
         std::uint64_t chunk_size = 1;
         while (chunk_size * num_threads * 8 < n)
@@ -74,16 +70,18 @@ namespace hpx::execution::experimental::detail {
         HPX_INVOKE(HPX_FORWARD(F, f), HPX_FORWARD(T, t), hpx::get<Is>(ts)...);
     }
 
-    inline hpx::threads::mask_type full_mask(std::size_t num_threads)
+    inline hpx::threads::mask_type full_mask(
+        std::size_t first_thread, std::size_t num_threads)
     {
-        auto& rp = hpx::resource::get_partitioner();
+        auto const& rp = hpx::resource::get_partitioner();
 
-        std::size_t overall_threads = hpx::threads::hardware_concurrency();
+        std::size_t const overall_threads =
+            hpx::threads::hardware_concurrency();
         auto mask = hpx::threads::mask_type();
         hpx::threads::resize(mask, overall_threads);
         for (std::size_t i = 0; i != num_threads; ++i)
         {
-            auto thread_mask = rp.get_pu_mask(i);
+            auto thread_mask = rp.get_pu_mask(i + first_thread);
             for (std::size_t j = 0; j != overall_threads; ++j)
             {
                 if (threads::test(thread_mask, j))
@@ -98,7 +96,7 @@ namespace hpx::execution::experimental::detail {
     inline hpx::threads::mask_type limit_mask(
         hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
     {
-        std::size_t num_cores = hpx::threads::hardware_concurrency();
+        std::size_t const num_cores = hpx::threads::hardware_concurrency();
 
         auto mask = hpx::threads::mask_type();
         hpx::threads::resize(mask, num_cores);
@@ -122,7 +120,7 @@ namespace hpx::execution::experimental::detail {
         OperationState* const op_state;
         task_function<OperationState> const* const task_f;
 
-        [[noreturn]] void operator()(hpx::monostate const&) const noexcept
+        [[noreturn]] void operator()(hpx::monostate) const noexcept
         {
             HPX_UNREACHABLE;
         }
@@ -220,14 +218,14 @@ namespace hpx::execution::experimental::detail {
     {
         OperationState* const op_state;
 
-        void operator()(hpx::monostate&&) const
+        [[noreturn]] void operator()(hpx::monostate) const noexcept
         {
             HPX_UNREACHABLE;
         }
 
         // Visit the values sent from the predecessor sender. This function is
         // called once all worker threads have processed their chunks and the
-        // connected receiver should be signalled.
+        // connected receiver should be signaled.
         //
         // clang-format off
         template <typename Ts,
@@ -319,7 +317,7 @@ namespace hpx::execution::experimental::detail {
             {
                 do_work();
             }
-            catch (std::bad_alloc const& e)
+            catch (std::bad_alloc const&)
             {
                 op_state->bad_alloc_thrown = true;
             }
@@ -396,16 +394,17 @@ namespace hpx::execution::experimental::detail {
                 return;
             }
 
-            // apply hint if none was given.
             auto hint =
                 hpx::execution::experimental::get_hint(op_state->scheduler);
-            if (hint == hpx::threads::thread_schedule_hint())
+            if (hint.mode == hpx::threads::thread_schedule_hint_mode::none &&
+                hint.hint == -1)
             {
+                // apply hint if none was given
+                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
+                hint.hint = worker_thread + op_state->first_thread;
+
                 auto policy = hpx::execution::experimental::with_hint(
-                    op_state->scheduler.policy(),
-                    hpx::threads::thread_schedule_hint(
-                        hpx::threads::thread_schedule_hint_mode::thread,
-                        worker_thread));
+                    op_state->scheduler.policy(), hint);
 
                 op_state->scheduler.execute(HPX_FORWARD(Task, task_f), policy);
             }
@@ -422,10 +421,9 @@ namespace hpx::execution::experimental::detail {
         void do_work_local(Task&& task_f) const
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-            char const* scheduler_annotation =
-                hpx::execution::experimental::get_annotation(
-                    op_state->scheduler);
-            if (scheduler_annotation)
+            if (char const* scheduler_annotation =
+                    hpx::execution::experimental::get_annotation(
+                        op_state->scheduler))
             {
                 hpx::scoped_annotation ann(scheduler_annotation);
                 task_f();
@@ -445,7 +443,8 @@ namespace hpx::execution::experimental::detail {
         void execute(Ts&&... ts)
         {
             // Don't spawn tasks if there is no work to be done
-            auto const size = std::uint32_t(hpx::util::size(op_state->shape));
+            auto const size =
+                static_cast<std::uint32_t>(hpx::util::size(op_state->shape));
             if (size == 0)
             {
                 hpx::execution::experimental::set_value(
@@ -459,8 +458,9 @@ namespace hpx::execution::experimental::detail {
             std::uint32_t num_chunks = (size + chunk_size - 1) / chunk_size;
 
             // launch only as many tasks as we have chunks
-            std::size_t num_pus = op_state->num_worker_threads;
-            if (num_chunks < std::uint32_t(op_state->num_worker_threads))
+            std::size_t const num_pus = op_state->num_worker_threads;
+            if (num_chunks <
+                static_cast<std::uint32_t>(op_state->num_worker_threads))
             {
                 op_state->num_worker_threads = num_chunks;
                 op_state->tasks_remaining.data_ = num_chunks;
@@ -476,7 +476,7 @@ namespace hpx::execution::experimental::detail {
                 HPX_FORWARD(Ts, ts)...);
 
             // thread placement
-            hpx::threads::thread_schedule_hint hint =
+            hpx::threads::thread_schedule_hint const hint =
                 hpx::execution::experimental::get_hint(op_state->scheduler);
 
             using placement = hpx::threads::thread_placement_hint;
@@ -501,10 +501,10 @@ namespace hpx::execution::experimental::detail {
             }
 
             // Spawn the worker threads for all except the local queue.
-            auto& rp = hpx::resource::get_partitioner();
+            auto const& rp = hpx::resource::get_partitioner();
 
             auto local_worker_thread =
-                std::uint32_t(hpx::get_local_worker_thread_num());
+                static_cast<std::uint32_t>(hpx::get_local_worker_thread_num());
 
             std::uint32_t worker_thread = 0;
             bool main_thread_ok = false;
@@ -514,7 +514,8 @@ namespace hpx::execution::experimental::detail {
             {
                 main_thread_ok = true;
                 local_worker_thread = worker_thread++;
-                main_pu_num = rp.get_pu_num(local_worker_thread);
+                main_pu_num =
+                    rp.get_pu_num(local_worker_thread + op_state->first_thread);
             }
 
             bool reverse_placement =
@@ -527,7 +528,7 @@ namespace hpx::execution::experimental::detail {
                  worker_thread != op_state->num_worker_threads && pu != num_pus;
                  ++pu)
             {
-                std::size_t pu_num = rp.get_pu_num(pu);
+                std::size_t pu_num = rp.get_pu_num(pu + op_state->first_thread);
 
                 // The queue for the local thread is handled later inline.
                 if (!main_thread_ok && pu == local_worker_thread)
@@ -537,7 +538,8 @@ namespace hpx::execution::experimental::detail {
                     HPX_ASSERT(hpx::threads::test(op_state->pu_mask, pu_num));
                     main_thread_ok = true;
                     local_worker_thread = worker_thread++;
-                    main_pu_num = rp.get_pu_num(local_worker_thread);
+                    main_pu_num = rp.get_pu_num(
+                        local_worker_thread + op_state->first_thread);
                     continue;
                 }
 
@@ -561,17 +563,17 @@ namespace hpx::execution::experimental::detail {
                 ++worker_thread;
             }
 
-            // the main thread should have been associated with a queue
-            HPX_ASSERT(main_thread_ok);
-
             // there have to be as many HPX threads as there are set bits in
             // the PU-mask
             HPX_ASSERT(worker_thread == op_state->num_worker_threads);
 
             // Handle the queue for the local thread.
-            do_work_local(
-                task_function<OperationState>{this->op_state, size, chunk_size,
-                    local_worker_thread, reverse_placement, allow_stealing});
+            if (main_thread_ok)
+            {
+                do_work_local(task_function<OperationState>{this->op_state,
+                    size, chunk_size, local_worker_thread, reverse_placement,
+                    allow_stealing});
+            }
         }
 
         // clang-format off
@@ -623,25 +625,25 @@ namespace hpx::execution::experimental::detail {
         template <typename Sender_, typename Shape_, typename F_>
         thread_pool_bulk_sender(
             thread_pool_policy_scheduler<Policy>&& scheduler, Sender_&& sender,
-            Shape_&& shape, F_&& f, hpx::threads::mask_cref_type pu_mask)
+            Shape_&& shape, F_&& f, hpx::threads::mask_rvref_type pu_mask)
           : scheduler(HPX_MOVE(scheduler))
           , sender(HPX_FORWARD(Sender_, sender))
           , shape(HPX_FORWARD(Shape_, shape))
           , f(HPX_FORWARD(F_, f))
-          , pu_mask(pu_mask)
+          , pu_mask(HPX_MOVE(pu_mask))
         {
         }
 
         template <typename Sender_, typename Shape_, typename F_>
-        thread_pool_bulk_sender(
-            thread_pool_policy_scheduler<Policy>&& scheduler, Sender_&& sender,
-            Shape_&& shape, F_&& f)
-          : thread_pool_bulk_sender(HPX_MOVE(scheduler),
-                HPX_FORWARD(Sender_, sender), HPX_FORWARD(Shape_, shape),
-                HPX_FORWARD(F_, f),
-                detail::full_mask(
-                    hpx::parallel::execution::processing_units_count(
-                        scheduler)))
+        thread_pool_bulk_sender(thread_pool_policy_scheduler<Policy>&& sched,
+            Sender_&& sender, Shape_&& shape, F_&& f)
+          : scheduler(HPX_MOVE(sched))
+          , sender(HPX_FORWARD(Sender_, sender))
+          , shape(HPX_FORWARD(Shape_, shape))
+          , f(HPX_FORWARD(F_, f))
+          , pu_mask(detail::full_mask(
+                hpx::execution::experimental::get_first_core(scheduler),
+                hpx::parallel::execution::processing_units_count(scheduler)))
         {
         }
 
@@ -685,17 +687,17 @@ namespace hpx::execution::experimental::detail {
         // clang-format on
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
-            thread_pool_bulk_sender const& sender)
+            thread_pool_bulk_sender const& s)
         {
-            return tag(sender);
+            return tag(s);
         }
 
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_completion_scheduler_t<
                 hpx::execution::experimental::set_value_t>,
-            thread_pool_bulk_sender const& sender)
+            thread_pool_bulk_sender const& s)
         {
-            return sender.scheduler;
+            return s.scheduler;
         }
 
     private:
@@ -708,6 +710,7 @@ namespace hpx::execution::experimental::detail {
 
             thread_pool_policy_scheduler<Policy> scheduler;
             operation_state_type op_state;
+            std::size_t first_thread;
             std::size_t num_worker_threads;
             hpx::threads::mask_type pu_mask;
             std::vector<hpx::util::cache_aligned_data<
@@ -728,15 +731,17 @@ namespace hpx::execution::experimental::detail {
             template <typename Scheduler_, typename Sender_, typename Shape_,
                 typename F_, typename Receiver_>
             operation_state(Scheduler_&& scheduler, Sender_&& sender,
-                Shape_&& shape, F_&& f, hpx::threads::mask_cref_type pumask,
+                Shape_&& shape, F_&& f, hpx::threads::mask_type pumask,
                 Receiver_&& receiver)
               : scheduler(HPX_FORWARD(Scheduler_, scheduler))
               , op_state(hpx::execution::experimental::connect(
                     HPX_FORWARD(Sender_, sender),
                     bulk_receiver<operation_state, F, Shape>{this}))
+              , first_thread(
+                    hpx::execution::experimental::get_first_core(scheduler))
               , num_worker_threads(
                     hpx::parallel::execution::processing_units_count(scheduler))
-              , pu_mask(pumask)
+              , pu_mask(HPX_MOVE(pumask))
               , queues(num_worker_threads)
               , shape(HPX_FORWARD(Shape_, shape))
               , f(HPX_FORWARD(F_, f))

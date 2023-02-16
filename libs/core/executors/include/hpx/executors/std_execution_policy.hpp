@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <execution>
 #include <type_traits>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     // Specialize our is_execution_policy traits for the corresponding std
     // versions
@@ -71,6 +71,6 @@ namespace hpx { namespace detail {
     };
 #endif
     /// \endcond
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #endif

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -81,7 +81,8 @@ namespace hpx::util::cache::entries {
         }
 
         /// \brief Returns the last access time of the entry.
-        constexpr time_point const& get_access_time() const noexcept
+        [[nodiscard]] constexpr time_point const& get_access_time()
+            const noexcept
         {
             return access_time_;
         }

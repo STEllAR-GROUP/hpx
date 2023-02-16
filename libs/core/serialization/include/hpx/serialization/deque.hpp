@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +33,7 @@ namespace hpx::serialization {
         unsigned)
     {
         // normal save ...
-        std::uint64_t size = d.size();
+        std::uint64_t const size = d.size();
         ar << size;
         if (d.empty())
             return;

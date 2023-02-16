@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------
 //
 // --------------------------------------------------------------------
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
 
     // by convention the title is 7 chars (for alignment)
     using print_on = hpx::debug::enable_print<false>;
@@ -48,7 +48,7 @@ namespace hpx { namespace execution { namespace experimental {
         // --------------------------------------------------------------------
         struct on_exit
         {
-            on_exit(limiting_executor const& this_e)
+            explicit on_exit(limiting_executor const& this_e) noexcept
               : executor_(this_e)
             {
             }
@@ -57,6 +57,7 @@ namespace hpx { namespace execution { namespace experimental {
                 lim_debug.debug(hpx::debug::str<>("Count Down"));
                 executor_.count_down();
             }
+
             limiting_executor const& executor_;
         };
 
@@ -95,12 +96,12 @@ namespace hpx { namespace execution { namespace experimental {
 
             // returns true if too many tasks would be in flight
             // NB. we use ">" because we count up right before testing
-            bool exceeds_upper() const
+            bool exceeds_upper() const noexcept
             {
                 return (limiting_.count_ > limiting_.upper_threshold_);
             }
             // returns true if we have not yet reached the lower threshold
-            bool exceeds_lower() const
+            bool exceeds_lower() const noexcept
             {
                 return (limiting_.count_ > limiting_.lower_threshold_);
             }
@@ -145,12 +146,12 @@ namespace hpx { namespace execution { namespace experimental {
 
             // NB. use ">=" because counting is external
             // (after invocation probably)
-            bool exceeds_upper(BaseExecutor const& base) const
+            bool exceeds_upper(BaseExecutor const& base) const noexcept
             {
                 return (
                     base.in_flight_estimate() >= limiting_.upper_threshold_);
             }
-            bool exceeds_lower(BaseExecutor const& base) const
+            bool exceeds_lower(BaseExecutor const& base) const noexcept
             {
                 return (base.in_flight_estimate() > limiting_.lower_threshold_);
             }
@@ -195,7 +196,7 @@ namespace hpx { namespace execution { namespace experimental {
         }
 
         // --------------------------------------------------------------------
-        limiting_executor const& context() const noexcept
+        constexpr limiting_executor const& context() const noexcept
         {
             return *this;
         }
@@ -293,19 +294,19 @@ namespace hpx { namespace execution { namespace experimental {
             hpx::util::yield_while([&]() { return (count_ > 0); });
         }
 
-        void set_threshold(std::size_t lower, std::size_t upper)
+        void set_threshold(std::size_t lower, std::size_t upper) noexcept
         {
             lower_threshold_ = lower;
             upper_threshold_ = upper;
         }
 
     private:
-        void count_up()
+        void count_up() noexcept
         {
             ++count_;
         }
 
-        void count_down() const
+        void count_down() const noexcept
         {
             --count_;
         }
@@ -324,9 +325,9 @@ namespace hpx { namespace execution { namespace experimental {
         mutable std::size_t upper_threshold_;
         bool block_;
     };
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     // --------------------------------------------------------------------
     // simple forwarding implementations of executor traits
@@ -372,6 +373,6 @@ namespace hpx { namespace parallel { namespace execution {
       : is_scheduler_executor<std::decay_t<BaseExecutor>>
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 #include <hpx/config/warnings_suffix.hpp>

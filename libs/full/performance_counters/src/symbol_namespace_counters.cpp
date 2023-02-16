@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,6 @@
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/naming/credit_handling.hpp>
 #include <hpx/performance_counters/agas_namespace_action_code.hpp>
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -23,33 +22,34 @@
 #include <hpx/performance_counters/server/symbol_namespace_counters.hpp>
 #include <hpx/performance_counters/symbol_namespace_counters.hpp>
 
-#include <cstddef>
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // register all performance counter types exposed by this component
     void symbol_namespace_register_counter_types(error_code& ec)
     {
-        performance_counters::create_counter_func creator(
+        performance_counters::create_counter_func const creator(
             hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::symbol_namespace_service_name));
 
-        for (std::size_t i = 0; i != detail::num_symbol_namespace_services; ++i)
+        for (auto const& symbol_namespace_service :
+            detail::symbol_namespace_services)
         {
             // global counters are handled elsewhere
-            if (detail::symbol_namespace_services[i].code_ ==
-                symbol_ns_statistics_counter)
+            if (symbol_namespace_service.code_ == symbol_ns_statistics_counter)
+            {
                 continue;
+            }
 
-            std::string name(detail::symbol_namespace_services[i].name_);
+            std::string name(symbol_namespace_service.name_);
             std::string help;
             performance_counters::counter_type type;
-            std::string::size_type p = name.find_last_of('/');
+            std::string::size_type const p = name.find_last_of('/');
             HPX_ASSERT(p != std::string::npos);
 
-            if (detail::symbol_namespace_services[i].target_ ==
+            if (symbol_namespace_service.target_ ==
                 detail::counter_target_count)
             {
                 help = hpx::util::format("returns the number of invocations "
@@ -69,8 +69,7 @@ namespace hpx { namespace agas { namespace server {
             performance_counters::install_counter_type(
                 agas::performance_counter_basename + name, type, help, creator,
                 &performance_counters::locality_counter_discoverer,
-                HPX_PERFORMANCE_COUNTER_V1,
-                detail::symbol_namespace_services[i].uom_, ec);
+                HPX_PERFORMANCE_COUNTER_V1, symbol_namespace_service.uom_, ec);
             if (ec)
                 return;
         }
@@ -78,22 +77,22 @@ namespace hpx { namespace agas { namespace server {
 
     void symbol_namespace_register_global_counter_types(error_code& ec)
     {
-        performance_counters::create_counter_func creator(
+        performance_counters::create_counter_func const creator(
             hpx::bind_back(&performance_counters::agas_raw_counter_creator,
                 agas::server::symbol_namespace_service_name));
 
-        for (std::size_t i = 0; i != detail::num_symbol_namespace_services; ++i)
+        for (auto const& symbol_namespace_service :
+            detail::symbol_namespace_services)
         {
             // local counters are handled elsewhere
-            if (detail::symbol_namespace_services[i].code_ !=
-                symbol_ns_statistics_counter)
+            if (symbol_namespace_service.code_ != symbol_ns_statistics_counter)
             {
                 continue;
             }
 
             std::string help;
             performance_counters::counter_type type;
-            if (detail::symbol_namespace_services[i].target_ ==
+            if (symbol_namespace_service.target_ ==
                 detail::counter_target_count)
             {
                 help = "returns the overall number of invocations of all "
@@ -110,11 +109,10 @@ namespace hpx { namespace agas { namespace server {
 
             performance_counters::install_counter_type(
                 std::string(agas::performance_counter_basename) +
-                    detail::symbol_namespace_services[i].name_,
+                    symbol_namespace_service.name_,
                 type, help, creator,
                 &performance_counters::locality_counter_discoverer,
-                HPX_PERFORMANCE_COUNTER_V1,
-                detail::symbol_namespace_services[i].uom_, ec);
+                HPX_PERFORMANCE_COUNTER_V1, symbol_namespace_service.uom_, ec);
             if (ec)
             {
                 return;
@@ -146,12 +144,13 @@ namespace hpx { namespace agas { namespace server {
 
         namespace_action_code code = invalid_request;
         detail::counter_target target = detail::counter_target_invalid;
-        for (std::size_t i = 0; i != detail::num_symbol_namespace_services; ++i)
+        for (auto const& symbol_namespace_service :
+            detail::symbol_namespace_services)
         {
-            if (p.countername_ == detail::symbol_namespace_services[i].name_)
+            if (p.countername_ == name)
             {
-                code = detail::symbol_namespace_services[i].code_;
-                target = detail::symbol_namespace_services[i].target_;
+                code = symbol_namespace_service.code_;
+                target = symbol_namespace_service.target_;
                 break;
             }
         }
@@ -163,7 +162,7 @@ namespace hpx { namespace agas { namespace server {
                 "unknown performance counter (unrelated to AGAS)");
         }
 
-        typedef symbol_namespace::counter_data cd;
+        using cd = symbol_namespace::counter_data;
 
         hpx::function<std::int64_t(bool)> get_data_func;
         if (target == detail::counter_target_count)
@@ -267,9 +266,9 @@ namespace hpx { namespace agas { namespace server {
         }
         return naming::detail::strip_credits_from_gid(gid);
     }
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // register performance counters for symbol_namespace service
     void symbol_namespace_register_counter_types(error_code& ec)
@@ -289,7 +288,7 @@ namespace hpx { namespace agas {
             naming::get_agas_client().get_local_symbol_namespace_service(),
             name);
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 HPX_REGISTER_ACTION_ID(hpx::agas::symbol_namespace_statistics_counter_action,
     symbol_namespace_statistics_counter_action,

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/executors/execution_policy_fwd.hpp>
 
 // TODO: Should this be experimental?
-namespace hpx { namespace execution { namespace detail {
+namespace hpx::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Executor, typename Parameters = void>
@@ -26,6 +26,6 @@ namespace hpx { namespace execution { namespace detail {
 
     template <typename Executor, typename Parameters = void>
     struct par_simd_task_policy_shim;
-}}}    // namespace hpx::execution::detail
+}    // namespace hpx::execution::detail
 
 #endif

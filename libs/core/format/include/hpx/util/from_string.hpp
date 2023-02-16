@@ -36,7 +36,7 @@ namespace hpx::util {
         };
 
         template <typename T, typename U>
-        T check_out_of_range(U const& value)
+        [[nodiscard]] T check_out_of_range(U const& value)
         {
             U const min = (std::numeric_limits<T>::min)();
             U const max = (std::numeric_limits<T>::max)();
@@ -69,8 +69,7 @@ namespace hpx::util {
         }
 
         template <typename T>
-        struct from_string<T,
-            typename std::enable_if<std::is_integral<T>::value>::type>
+        struct from_string<T, std::enable_if_t<std::is_integral_v<T>>>
         {
             template <typename Char>
             static void call(std::basic_string<Char> const& value, int& target)
@@ -138,8 +137,7 @@ namespace hpx::util {
         };
 
         template <typename T>
-        struct from_string<T,
-            typename std::enable_if<std::is_floating_point<T>::value>::type>
+        struct from_string<T, std::enable_if_t<std::is_floating_point_v<T>>>
         {
             template <typename Char>
             static void call(
@@ -171,26 +169,27 @@ namespace hpx::util {
     }    // namespace detail
 
     template <typename T, typename Char>
-    T from_string(std::basic_string<Char> const& v)
+    [[nodiscard]] T from_string(std::basic_string<Char> const& v)
     {
-        T target;
         try
         {
+            T target;
             detail::from_string<T>::call(v, target);
+            return target;
         }
         catch (...)
         {
             return detail::throw_bad_lexical_cast<std::basic_string<Char>, T>();
         }
-        return target;
     }
 
     template <typename T, typename U, typename Char>
-    T from_string(std::basic_string<Char> const& v, U&& default_value)
+    [[nodiscard]] T from_string(
+        std::basic_string<Char> const& v, U&& default_value)
     {
-        T target;
         try
         {
+            T target;
             detail::from_string<T>::call(v, target);
             return target;
         }
@@ -201,26 +200,26 @@ namespace hpx::util {
     }
 
     template <typename T>
-    T from_string(std::string const& v)
+    [[nodiscard]] T from_string(std::string const& v)
     {
-        T target;
         try
         {
+            T target;
             detail::from_string<T>::call(v, target);
+            return target;
         }
         catch (...)
         {
             return detail::throw_bad_lexical_cast<std::string, T>();
         }
-        return target;
     }
 
     template <typename T, typename U>
-    T from_string(std::string const& v, U&& default_value)
+    [[nodiscard]] T from_string(std::string const& v, U&& default_value)
     {
-        T target;
         try
         {
+            T target;
             detail::from_string<T>::call(v, target);
             return target;
         }

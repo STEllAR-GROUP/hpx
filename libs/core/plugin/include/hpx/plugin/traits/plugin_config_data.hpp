@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@ namespace hpx::traits {
     struct plugin_config_data
     {
         // by default no additional config data is injected into the factory
-        static constexpr char const* call() noexcept
+        [[nodiscard]] static constexpr char const* call() noexcept
         {
             return nullptr;
         }

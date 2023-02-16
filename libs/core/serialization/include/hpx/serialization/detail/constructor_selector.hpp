@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -12,9 +12,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#include <memory>
 #include <type_traits>
-#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 

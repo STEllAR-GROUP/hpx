@@ -14,11 +14,9 @@
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
-#include <vector>
 
 namespace hpx::traits::detail {
 

@@ -1,5 +1,5 @@
 //  Copyright (c) ETH Zurich 2021
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -57,8 +57,8 @@ namespace hpx::detail {
 
     // Helper function for use in creating overloads of parallel algorithms that
     // take senders. Takes an execution policy, a predecessor sender, and an
-    // "algorithm" (i.e. a tag) and applies then with the predecessor
-    // sender and the execution policy bound to the algorithm.
+    // "algorithm" (i.e. a tag) and applies then with the predecessor sender and
+    // the execution policy bound to the algorithm.
     template <typename Tag, typename ExPolicy, typename Predecessor>
     decltype(auto) then_with_bound_algorithm(
         Predecessor&& predecessor, ExPolicy&& policy)
@@ -101,8 +101,8 @@ namespace hpx::detail {
 
     // Helper base class for implementing parallel algorithm CPOs. See
     // tag_fallback documentation for details. Compared to tag_fallback this
-    // adds two tag_fallback_invoke overloads that are generic for all parallel
-    // algorithms:
+    // adds several tag_fallback_invoke overloads that are generic for all
+    // parallel algorithms:
     //
     //   1. An overload taking a predecessor sender which sends all arguments
     //      for the regular parallel algorithm overload, except an execution
@@ -114,10 +114,10 @@ namespace hpx::detail {
     //      predecessor can also be supplied  using the operator| overload:
     //      predecessor | partially_applied_parallel_algorithm.
     //   3. In the context of the experimental support for p2500
-    //      (wg21.link/p2500) this also adds two overloads that take a either
+    //      (wg21.link/p2500) this also adds two overloads that take either a
     //      scheduler or a policy_aware_scheduler as its first argument (instead
     //      of the usual execution policy). These overloads use an scheduler
-    //      based executor that is rewrapped into an execution policy which is
+    //      based executor that is re-wrapped into an execution policy that is
     //      then passed on to the underlying algorithm APIs.
     template <typename Tag>
     struct tag_parallel_algorithm : hpx::functional::detail::tag_fallback<Tag>
@@ -152,7 +152,7 @@ namespace hpx::detail {
         //
         // Wrap the given scheduler in an explicit_scheduler_executor and a
         // matching execution policy. Forward call to algorithm by passing the
-        // resulting rewrapped execution policy.
+        // resulting re-wrapped execution policy.
         //
         // clang-format off
         template <typename Scheduler, typename... Ts,
@@ -173,7 +173,7 @@ namespace hpx::detail {
         }
 
         // Extract the scheduler and the execution policy from the given
-        // policy_aware_scheduler, rewrap those and forward the resulting
+        // policy_aware_scheduler, re-wrap those and forward the resulting
         // execution policy to the underlying algorithm.
         //
         // clang-format off

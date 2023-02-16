@@ -19,7 +19,7 @@
 namespace hpx::serialization::detail {
 
     template <typename T>
-    void polymorphic_nonintrusive_factory::save(output_archive& ar, const T& t)
+    void polymorphic_nonintrusive_factory::save(output_archive& ar, T const& t)
     {
         // It's safe to call typeid here. The typeid(t) return value is
         // only used for local lookup to the portable string that goes over the
@@ -45,7 +45,7 @@ namespace hpx::serialization::detail {
         std::string class_name;
         ar >> class_name;
 
-        const function_bunch_type& bunch = map_.at(class_name);
+        function_bunch_type const& bunch = map_.at(class_name);
         T* t = static_cast<T*>(bunch.create_function(ar));
 
         return t;

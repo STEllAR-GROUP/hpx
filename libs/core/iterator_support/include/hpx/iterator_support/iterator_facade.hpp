@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,11 +103,13 @@ namespace hpx::util {
                   : ref_(x)
                 {
                 }
+
                 HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Reference*
                 operator->() noexcept
                 {
                     return std::addressof(ref_);
                 }
+
                 Reference ref_;
             };
 
@@ -163,16 +165,16 @@ namespace hpx::util {
             }
 
         public:
-            HPX_HOST_DEVICE constexpr reference operator*() const noexcept(
-                noexcept(iterator_core_access::template dereference<reference>(
+            HPX_HOST_DEVICE constexpr reference operator*() const
+                noexcept(noexcept(iterator_core_access::dereference<reference>(
                     std::declval<Derived>())))
             {
-                return iterator_core_access::template dereference<reference>(
+                return iterator_core_access::dereference<reference>(
                     this->derived());
             }
 
-            HPX_HOST_DEVICE constexpr pointer operator->() const noexcept(
-                noexcept(iterator_core_access::template dereference<reference>(
+            HPX_HOST_DEVICE constexpr pointer operator->() const
+                noexcept(noexcept(iterator_core_access::dereference<reference>(
                     std::declval<Derived>())))
             {
                 return arrow_dispatch<Reference>::call(*this->derived());
@@ -229,9 +231,9 @@ namespace hpx::util {
         ////////////////////////////////////////////////////////////////////////
         // Implementation for random access iterators
 
-        // A proxy return type for operator[], needed to deal with
-        // iterators that may invalidate referents upon destruction.
-        // Consider the temporary iterator in *(a + n)
+        // A proxy return type for operator[], needed to deal with iterators
+        // that may invalidate referents upon destruction. Consider the
+        // temporary iterator in *(a + n)
         template <typename Iterator>
         class operator_brackets_proxy
         {
@@ -391,10 +393,11 @@ namespace hpx::util {
     };
 
     namespace detail {
+
         // Iterators whose dereference operators reference the same value for
-        // all iterators into the same sequence (like many input iterators)
-        // need help with their postfix ++: the referenced value must be read
-        // and stored away before the increment occurs so that *a++ yields the
+        // all iterators into the same sequence (like many input iterators) need
+        // help with their postfix ++: the referenced value must be read and
+        // stored away before the increment occurs so that *a++ yields the
         // originally referenced element and not the next one.
         template <typename Iterator>
         class postfix_increment_proxy
@@ -408,10 +411,10 @@ namespace hpx::util {
             {
             }
 
-            // Returning a mutable reference allows nonsense like (*r++).mutate(),
-            // but it imposes fewer assumptions about the behavior of the
-            // value_type. In particular, recall that (*r).mutate() is legal if
-            // operator* returns by value.
+            // Returning a mutable reference allows nonsense like
+            // (*r++).mutate(), but it imposes fewer assumptions about the
+            // behavior of the value_type. In particular, recall that
+            // (*r).mutate() is legal if operator* returns by value.
             HPX_HOST_DEVICE value_type& operator*() const
             {
                 return this->stored_value;
@@ -468,12 +471,13 @@ namespace hpx::util {
                 *this->stored_iterator = x;
                 return x;
             }
-
+            // clang-format off
             // Provides X(r++)
-            HPX_HOST_DEVICE operator Iterator const &() const
+            HPX_HOST_DEVICE operator Iterator const&() const
             {
                 return stored_iterator;
             }
+            // clang-format on
 
         private:
             mutable std::remove_const_t<value_type> stored_value;
@@ -492,9 +496,9 @@ namespace hpx::util {
         inline constexpr bool is_non_proxy_reference_v =
             is_non_proxy_reference<Reference, Value>::value;
 
-        // Because the C++98 input iterator requirements say that *r++ has
-        // type T (value_type), implementations of some standard algorithms
-        // like lexicographical_compare may use constructions like:
+        // Because the C++98 input iterator requirements say that *r++ has type
+        // T (value_type), implementations of some standard algorithms like
+        // lexicographical_compare may use constructions like:
         //
         //          *r++ < *s++
         //
@@ -502,8 +506,8 @@ namespace hpx::util {
         // multi-pass), this sort of expression will fail unless the proxy
         // supports the operator<.  Since there are any number of such
         // operations, we're not going to try to support them.  Therefore,
-        // even if r++ returns a proxy, *r++ will only return a proxy if *r
-        // also returns a proxy.
+        // even if r++ returns a proxy, *r++ will only return a proxy if *r also
+        // returns a proxy.
         template <typename Iterator, typename Value, typename Reference,
             typename Enable = void>
         struct postfix_increment_result
@@ -624,7 +628,7 @@ namespace hpx::util {
     }    // namespace detail
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline constexpr, <, bool, detail::enable_random_access_operations)
+        constexpr, <, bool, detail::enable_random_access_operations)
     {
         return 0 <
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -632,7 +636,7 @@ namespace hpx::util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline constexpr, >, bool, detail::enable_random_access_operations)
+        constexpr, >, bool, detail::enable_random_access_operations)
     {
         return 0 >
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -640,7 +644,7 @@ namespace hpx::util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline constexpr, <=, bool, detail::enable_random_access_operations)
+        constexpr, <=, bool, detail::enable_random_access_operations)
     {
         return 0 <=
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
@@ -648,14 +652,14 @@ namespace hpx::util {
     }
 
     HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(
-        inline constexpr, >=, bool, detail::enable_random_access_operations)
+        constexpr, >=, bool, detail::enable_random_access_operations)
     {
         return 0 >=
             iterator_core_access::distance_to(static_cast<Derived1 const&>(lhs),
                 static_cast<Derived2 const&>(rhs));
     }
 
-    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(inline constexpr, -,
+    HPX_UTIL_ITERATOR_FACADE_INTEROP_HEAD_EX(constexpr, -,
         typename std::iterator_traits<Derived2>::difference_type,
         detail::enable_random_access_operations)
     {
@@ -669,7 +673,7 @@ namespace hpx::util {
 
     template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
-    HPX_HOST_DEVICE inline constexpr std::enable_if_t<
+    HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
         Derived>
@@ -685,7 +689,7 @@ namespace hpx::util {
 
     template <typename Derived, typename T, typename Category,
         typename Reference, typename Distance, typename Pointer>
-    HPX_HOST_DEVICE inline constexpr std::enable_if_t<
+    HPX_HOST_DEVICE constexpr std::enable_if_t<
         std::is_same_v<typename Derived::iterator_category,
             std::random_access_iterator_tag>,
         Derived>

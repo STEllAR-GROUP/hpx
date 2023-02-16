@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,9 +11,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 
 #include <hpx/actions_base/component_action.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/components/client.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
 #include <hpx/futures/future.hpp>
@@ -28,14 +26,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // This type can be specialized for a particular collective operation
     template <typename Communicator, typename Operation>
     struct communication_operation;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives { namespace detail {
+namespace hpx::collectives::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     class communicator_server
@@ -44,23 +42,9 @@ namespace hpx { namespace collectives { namespace detail {
         using mutex_type = hpx::spinlock;
 
     public:
-        communicator_server() noexcept    //-V730
-          : num_sites_(0)
-          , needs_initialization_(false)
-          , data_available_(false)
-        {
-            HPX_ASSERT(false);    // shouldn't ever be called
-        }
+        HPX_EXPORT communicator_server() noexcept;
 
-        explicit communicator_server(std::size_t num_sites) noexcept
-          : data_()
-          , gate_(num_sites)
-          , num_sites_(num_sites)
-          , needs_initialization_(true)
-          , data_available_(false)
-        {
-            HPX_ASSERT(num_sites != 0);
-        }
+        HPX_EXPORT explicit communicator_server(std::size_t num_sites) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         // generic get action, dispatches to proper operation
@@ -79,8 +63,7 @@ namespace hpx { namespace collectives { namespace detail {
         struct communication_get_action
           : hpx::actions::make_action<Result (communicator_server::*)(
                                           std::size_t, std::size_t, Args...),
-                &communicator_server::template get_result<Operation, Result,
-                    Args...>,
+                &communicator_server::get_result<Operation, Result, Args...>,
                 communication_get_action<Operation, Result, Args...>>::type
         {
         };
@@ -100,8 +83,7 @@ namespace hpx { namespace collectives { namespace detail {
         struct communication_set_action
           : hpx::actions::make_action<Result (communicator_server::*)(
                                           std::size_t, std::size_t, Args...),
-                &communicator_server::template set_result<Operation, Result,
-                    Args...>,
+                &communicator_server::set_result<Operation, Result, Args...>,
                 communication_set_action<Operation, Result, Args...>>::type
         {
         };
@@ -117,13 +99,14 @@ namespace hpx { namespace collectives { namespace detail {
                 needs_initialization_ = false;
                 data_available_ = false;
                 data_ = std::vector<T>(
-                    num_values == std::size_t(-1) ? num_sites_ : num_values);
+                    num_values == static_cast<std::size_t>(-1) ? num_sites_ :
+                                                                 num_values);
             }
         }
 
         template <typename T, typename Lock>
         std::vector<T>& access_data(
-            Lock& l, std::size_t num_values = std::size_t(-1))
+            Lock& l, std::size_t num_values = static_cast<std::size_t>(-1))
         {
             HPX_ASSERT_OWNS_LOCK(l);
             reinitialize_data<T>(l, num_values);
@@ -152,7 +135,7 @@ namespace hpx { namespace collectives { namespace detail {
             if (gate_.set(which, HPX_MOVE(l)))
             {
                 l = Lock(mtx_);
-                if (generation != std::size_t(-1))
+                if (generation != static_cast<std::size_t>(-1))
                 {
                     gate_.next_generation(l, generation);
                 }
@@ -167,7 +150,7 @@ namespace hpx { namespace collectives { namespace detail {
             auto fut = gate_.get_shared_future(l).then(
                 hpx::launch::sync, HPX_FORWARD(F, f));
 
-            gate_.synchronize(generation == std::size_t(-1) ?
+            gate_.synchronize(generation == static_cast<std::size_t>(-1) ?
                     gate_.generation(l) :
                     generation,
                 l);
@@ -180,8 +163,9 @@ namespace hpx { namespace collectives { namespace detail {
         //
         // Finalizer will be invoked under lock after all sites have checked in.
         template <typename Data, typename Step, typename Finalizer>
-        auto handle_data(std::size_t which, std::size_t generation, Step&& step,
-            Finalizer&& finalizer, std::size_t num_values = std::size_t(-1))
+        auto handle_data(std::size_t which, std::size_t generation,
+            [[maybe_unused]] Step&& step, Finalizer&& finalizer,
+            std::size_t num_values = static_cast<std::size_t>(-1))
         {
             auto on_ready = [this, num_values,
                                 finalizer = HPX_FORWARD(Finalizer, finalizer)](
@@ -192,8 +176,7 @@ namespace hpx { namespace collectives { namespace detail {
                                   std::decay_t<Finalizer>>)
                 {
                     std::unique_lock l(mtx_);
-                    util::ignore_while_checking il(&l);
-                    HPX_UNUSED(il);
+                    [[maybe_unused]] util::ignore_while_checking il(&l);
 
                     // call provided finalizer
                     return HPX_FORWARD(Finalizer, finalizer)(
@@ -208,8 +191,7 @@ namespace hpx { namespace collectives { namespace detail {
             };
 
             std::unique_lock l(mtx_);
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
 
             auto f =
                 get_future_and_synchronize(generation, HPX_MOVE(on_ready), l);
@@ -218,10 +200,6 @@ namespace hpx { namespace collectives { namespace detail {
             {
                 // call provided step function for each invocation site
                 HPX_FORWARD(Step, step)(access_data<Data>(l, num_values));
-            }
-            else
-            {
-                HPX_UNUSED(step);
             }
 
             set_and_invalidate_data(which, generation, HPX_MOVE(l));
@@ -235,7 +213,7 @@ namespace hpx { namespace collectives { namespace detail {
         {
             if constexpr (std::is_same_v<ValueType, bool>)
             {
-                return bool(data);
+                return static_cast<bool>(data);
             }
             else
             {
@@ -243,11 +221,9 @@ namespace hpx { namespace collectives { namespace detail {
             }
         }
 
-    private:
         template <typename Communicator, typename Operation>
         friend struct hpx::traits::communication_operation;
 
-    private:
         mutex_type mtx_;
         hpx::unique_any_nonser data_;
         lcos::local::and_gate gate_;
@@ -255,6 +231,6 @@ namespace hpx { namespace collectives { namespace detail {
         bool needs_initialization_;
         bool data_available_;
     };
-}}}    // namespace hpx::collectives::detail
+}    // namespace hpx::collectives::detail
 
 #endif    // COMPUTE_HOST_CODE

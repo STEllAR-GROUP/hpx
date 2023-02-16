@@ -24,7 +24,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx { namespace parallel { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -56,15 +56,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                             HPX_INVOKE(proj, v) == var_type(old_value), v,
                             var_type(new_value));
                     },
-                    util::projection_identity());
+                    hpx::identity_v);
             }
         }
     };
 
     template <typename ExPolicy, typename InIter, typename T1, typename T2,
         typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_t<ExPolicy>, ExPolicy&& policy, InIter first,
         InIter last, T1 const& old_value, T2 const& new_value, Proj&& proj)
@@ -118,15 +117,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                             HPX_INVOKE(f, (HPX_INVOKE(proj, v))), v,
                             var_type(new_value));
                     },
-                    util::projection_identity());
+                    hpx::identity_v);
             }
         }
     };
 
     template <typename ExPolicy, typename InIter, typename Sent, typename F,
         typename T, typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_if_t<ExPolicy>, ExPolicy&& policy, InIter first,
         Sent last, F&& f, T const& new_value, Proj&& proj)
@@ -192,15 +190,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                                         var_type(old_value),
                                     var_type(new_value), get<0>(v));
                         },
-                        util::projection_identity()));
+                        hpx::identity_v));
             }
         }
     };
 
     template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename T, typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_copy_t<ExPolicy>, ExPolicy&& policy, InIter first,
         Sent sent, OutIter dest, T const& old_value, T const& new_value,
@@ -268,15 +265,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                                 HPX_INVOKE(f, HPX_INVOKE(proj, get<0>(v))),
                                 var_type(new_value), get<0>(v));
                         },
-                        util::projection_identity()));
+                        hpx::identity_v));
             }
         }
     };
 
     template <typename ExPolicy, typename InIter, typename Sent,
         typename OutIter, typename F, typename T, typename Proj,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto tag_invoke(
         sequential_replace_copy_if_t<ExPolicy>, ExPolicy&& policy, InIter first,
         Sent last, OutIter dest, F&& f, T const& new_value, Proj&& proj)
@@ -298,5 +294,5 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 dest, HPX_FORWARD(F, f), new_value, HPX_FORWARD(Proj, proj));
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::detail
 #endif

@@ -14,7 +14,7 @@
 
 namespace hpx::util {
 
-    class HPX_CORE_EXPORT bad_lexical_cast : public std::bad_cast
+    class HPX_ALWAYS_EXPORT bad_lexical_cast : public std::bad_cast
     {
     public:
         bad_lexical_cast() noexcept
@@ -23,9 +23,9 @@ namespace hpx::util {
         {
         }
 
-        const char* what() const noexcept override;
+        [[nodiscard]] char const* what() const noexcept override;
 
-        virtual ~bad_lexical_cast() noexcept;
+        ~bad_lexical_cast() noexcept override;
 
         bad_lexical_cast(std::type_info const& source_type_arg,
             std::type_info const& target_type_arg) noexcept
@@ -34,12 +34,12 @@ namespace hpx::util {
         {
         }
 
-        std::type_info const& source_type() const noexcept
+        [[nodiscard]] std::type_info const& source_type() const noexcept
         {
             return *source;
         }
 
-        std::type_info const& target_type() const noexcept
+        [[nodiscard]] std::type_info const& target_type() const noexcept
         {
             return *target;
         }
@@ -56,7 +56,7 @@ namespace hpx::util {
             std::type_info const& target_type);
 
         template <typename Source, typename Target>
-        [[noreturn]] inline Target throw_bad_lexical_cast()
+        [[noreturn]] Target throw_bad_lexical_cast()
         {
             detail::throw_bad_lexical_cast(typeid(Source), typeid(Target));
         }

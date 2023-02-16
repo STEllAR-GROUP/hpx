@@ -11,7 +11,8 @@
 #if defined(DOXYGEN)
 namespace hpx::functional::detail {
     inline namespace unspecified {
-        /// The `hpx::functional::detail::tag_override_invoke` name defines a constexpr object
+        /// The `hpx::functional::detail::tag_override_invoke` name defines
+        /// a constexpr object
         /// that is invocable with one or more arguments. The first argument
         /// is a 'tag' (typically a CPO). It is only invocable if an overload
         /// of tag_override_invoke() that accepts the same arguments could be
@@ -22,7 +23,8 @@ namespace hpx::functional::detail {
         /// equivalent to evaluating the unqualified call to
         /// `tag_override_invoke(decay-copy(tag), HPX_FORWARD(Args, args)...)`.
         ///
-        /// `hpx::functional::detail::tag_override_invoke` is implemented against P1895.
+        /// `hpx::functional::detail::tag_override_invoke` is implemented
+        /// against P1895.
         ///
         /// Example:
         /// Defining a new customization point `foo`:
@@ -102,6 +104,7 @@ namespace hpx::functional::detail {
     template <typename Tag>
     struct tag_override_noexcept;
 }    // namespace hpx::functional::detail
+
 #else
 
 #include <hpx/config.hpp>
@@ -187,7 +190,7 @@ namespace hpx::functional::detail {
     {
     };
 
-    // CUDA versions less than 11.2 have a template instantiation bug which
+    // CUDA versions less than 11.2 have a template instantiation bug that
     // leaves out certain template arguments and leads to us not being able to
     // correctly check this condition. We default to the more relaxed
     // noexcept(true) to not falsely exclude correct overloads. However, this
@@ -230,7 +233,7 @@ namespace hpx::functional::detail {
         // use this tag type to enable the tag_override_invoke function overloads
         struct enable_tag_override_invoke_t;
 
-        ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
         /// Helper base class implementing the tag_invoke logic for CPOs that
         /// allow overriding user-defined tag_invoke overloads with
         /// tag_override_invoke, and that allow setting a fallback with

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -112,7 +112,7 @@ namespace hpx::util::cache::entries {
         ///           update it's internal heap. Usually this is needed if the
         ///           entry has been changed by touch() in a way influencing
         ///           the sort order as mandated by the cache's UpdatePolicy
-        constexpr bool touch() const noexcept
+        static constexpr bool touch() noexcept
         {
             return false;
         }
@@ -125,7 +125,7 @@ namespace hpx::util::cache::entries {
         /// \returns  This function should return \a true if the entry should
         ///           be added to the cache, otherwise it should return
         ///           \a false.
-        constexpr bool insert() const noexcept
+        static constexpr bool insert() noexcept
         {
             return true;
         }
@@ -140,7 +140,7 @@ namespace hpx::util::cache::entries {
         ///           instance from the cache. If the value is \a true it is
         ///           ok to remove the entry, other wise it will stay in the
         ///           cache.
-        constexpr bool remove() const noexcept
+        static constexpr bool remove() noexcept
         {
             return true;
         }
@@ -149,7 +149,7 @@ namespace hpx::util::cache::entries {
         ///           each entry is just one (1), which is sensible if the
         ///           cache has a limit (capacity) measured in number of
         ///           entries.
-        constexpr std::size_t get_size() const noexcept
+        static constexpr std::size_t get_size() noexcept
         {
             return 1;
         }
@@ -166,11 +166,12 @@ namespace hpx::util::cache::entries {
         /// \brief Get a reference to the stored data value
         ///
         /// \note This function is part of the CacheEntry concept
-        value_type& get() noexcept
+        [[nodiscard]] value_type& get() noexcept
         {
             return value_;
         }
-        constexpr value_type const& get() const noexcept
+
+        [[nodiscard]] constexpr value_type const& get() const noexcept
         {
             return value_;
         }

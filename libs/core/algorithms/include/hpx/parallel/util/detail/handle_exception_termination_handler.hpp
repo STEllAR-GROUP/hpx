@@ -9,11 +9,12 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
 
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
+
     using parallel_exception_termination_handler_type = hpx::function<void()>;
 
     HPX_CORE_EXPORT void set_parallel_exception_termination_handler(
         parallel_exception_termination_handler_type f);
 
     [[noreturn]] HPX_CORE_EXPORT void parallel_exception_termination_handler();
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

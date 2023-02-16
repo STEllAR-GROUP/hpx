@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -101,7 +101,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
         typename Size>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     shift_left(ExPolicy&& policy, FwdIter first, Sent last, Size n);
 
     ///////////////////////////////////////////////////////////////////////////
@@ -195,17 +195,14 @@ namespace hpx { namespace ranges {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-
-#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/shift_left.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct shift_left_t final
       : hpx::functional::detail::tag_fallback<shift_left_t>
     {
@@ -223,7 +220,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+            return hpx::parallel::detail::shift_left<FwdIter>().call(
                 hpx::execution::seq, first, last, n);
         }
 
@@ -231,7 +228,7 @@ namespace hpx { namespace ranges {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter>::value
             )>
@@ -244,7 +241,7 @@ namespace hpx { namespace ranges {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+            return hpx::parallel::detail::shift_left<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
 
@@ -261,7 +258,7 @@ namespace hpx { namespace ranges {
                               hpx::traits::range_iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<
+            return hpx::parallel::detail::shift_left<
                 hpx::traits::range_iterator_t<Rng>>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), n);
         }
@@ -269,7 +266,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,  typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value
             )>
         // clang-format on
@@ -282,12 +279,12 @@ namespace hpx { namespace ranges {
                               hpx::traits::range_iterator_t<Rng>>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<
+            return hpx::parallel::detail::shift_left<
                 hpx::traits::range_iterator_t<Rng>>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng), n);
         }
     } shift_left{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

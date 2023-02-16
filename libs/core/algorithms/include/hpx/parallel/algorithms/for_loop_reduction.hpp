@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,12 +22,11 @@
 #endif
 
 #include <cstddef>
-#include <cstdlib>
 #include <functional>
 #include <type_traits>
 #include <utility>
 
-namespace hpx::parallel { inline namespace v2 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
@@ -39,14 +38,14 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
           : var_(var)
           , op_(HPX_FORWARD(Op_, op))
         {
-            std::size_t cores =
+            std::size_t const cores =
                 hpx::parallel::execution::detail::get_os_thread_count();
             data_.reset(new hpx::util::cache_line_data<T>[cores]);
             for (std::size_t i = 0; i != cores; ++i)
                 data_[i].data_ = identity;
         }
 
-        constexpr void init_iteration(std::size_t)
+        static constexpr void init_iteration(std::size_t)
         {
             HPX_ASSERT(hpx::get_worker_thread_num() <
                 hpx::parallel::execution::detail::get_os_thread_count());
@@ -57,11 +56,11 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
             return data_[hpx::get_worker_thread_num()].data_;
         }
 
-        constexpr void next_iteration() noexcept {}
+        static constexpr void next_iteration() noexcept {}
 
         void exit_iteration(std::size_t /*index*/)
         {
-            std::size_t cores =
+            std::size_t const cores =
                 hpx::parallel::execution::detail::get_os_thread_count();
             for (std::size_t i = 0; i != cores; ++i)
                 var_ = op_(var_, data_[i].data_);
@@ -77,7 +76,7 @@ namespace hpx::parallel { inline namespace v2 { namespace detail {
 #endif
     };
     /// \endcond
-}}}    // namespace hpx::parallel::v2::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx::experimental {
 
@@ -133,18 +132,17 @@ namespace hpx::experimental {
     ///          it the two views to be combined.
     ///
     template <typename T, typename Op>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::decay_t<Op>>
     reduction(T& var, T const& identity, Op&& combiner)
     {
-        return hpx::parallel::v2::detail::reduction_helper<T,
-            typename std::decay<Op>::type>(
+        return hpx::parallel::detail::reduction_helper<T, std::decay_t<Op>>(
             var, identity, HPX_FORWARD(Op, combiner));
     }
 
     /// \cond NOINTERNAL
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::plus<T>>
     reduction_plus(T& var)
     {
@@ -152,7 +150,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::plus<T>>
     reduction_plus(T& var, T const& identity)
     {
@@ -160,7 +158,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::multiplies<T>>
     reduction_multiplies(T& var)
     {
@@ -168,7 +166,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::multiplies<T>>
     reduction_multiplies(T& var, T const& identity)
     {
@@ -176,15 +174,15 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_and<T>>
     reduction_bit_and(T& var)
     {
-        return reduction(var, ~(T()), std::bit_and<T>());
+        return reduction(var, ~T(), std::bit_and<T>());
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_and<T>>
     reduction_bit_and(T& var, T const& identity)
     {
@@ -192,7 +190,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_or<T>>
     reduction_bit_or(T& var)
     {
@@ -200,7 +198,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_or<T>>
     reduction_bit_or(T& var, T const& identity)
     {
@@ -208,7 +206,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_xor<T>>
     reduction_bit_xor(T& var)
     {
@@ -216,7 +214,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
         std::bit_xor<T>>
     reduction_bit_xor(T& var, T const& identity)
     {
@@ -224,40 +222,40 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
-        hpx::parallel::v1::detail::min_of<T>>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        hpx::parallel::detail::min_of<T>>
     reduction_min(T& var)
     {
-        return reduction(var, var, hpx::parallel::v1::detail::min_of<T>());
+        return reduction(var, var, hpx::parallel::detail::min_of<T>());
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
-        hpx::parallel::v1::detail::min_of<T>>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        hpx::parallel::detail::min_of<T>>
     reduction_min(T& var, T const& identity)
     {
-        return reduction(var, identity, hpx::parallel::v1::detail::min_of<T>());
+        return reduction(var, identity, hpx::parallel::detail::min_of<T>());
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
-        hpx::parallel::v1::detail::max_of<T>>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        hpx::parallel::detail::max_of<T>>
     reduction_max(T& var)
     {
-        return reduction(var, var, hpx::parallel::v1::detail::max_of<T>());
+        return reduction(var, var, hpx::parallel::detail::max_of<T>());
     }
 
     template <typename T>
-    HPX_FORCEINLINE constexpr hpx::parallel::v2::detail::reduction_helper<T,
-        hpx::parallel::v1::detail::max_of<T>>
+    HPX_FORCEINLINE constexpr hpx::parallel::detail::reduction_helper<T,
+        hpx::parallel::detail::max_of<T>>
     reduction_max(T& var, T const& identity)
     {
-        return reduction(var, identity, hpx::parallel::v1::detail::max_of<T>());
+        return reduction(var, identity, hpx::parallel::detail::max_of<T>());
     }
     /// \endcond
 }    // namespace hpx::experimental
 
-namespace hpx::parallel { inline namespace v2 {
+namespace hpx::parallel {
     /// \cond IGNORE_DEPRECATED
 
     template <typename T, typename Op>
@@ -396,4 +394,4 @@ namespace hpx::parallel { inline namespace v2 {
         return hpx::experimental::reduction_max(var, identity);
     }
     /// \endcond
-}}    // namespace hpx::parallel::v2
+}    // namespace hpx::parallel

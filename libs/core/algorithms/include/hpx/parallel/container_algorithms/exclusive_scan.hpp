@@ -325,8 +325,6 @@ namespace hpx { namespace ranges {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
@@ -334,16 +332,15 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     template <typename I, typename O>
     using exclusive_scan_result = parallel::util::in_out_result<I, O>;
@@ -377,9 +374,9 @@ namespace hpx { namespace ranges {
 
             using result_type = exclusive_scan_result<InIter, OutIter>;
 
-            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
-                .call(hpx::execution::seq, first, last, dest, HPX_MOVE(init),
-                    HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::exclusive_scan<result_type>().call(
+                hpx::execution::seq, first, last, dest, HPX_MOVE(init),
+                HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -388,7 +385,7 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<FwdIter1>::value_type,
             typename Op = std::plus<T>,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
@@ -410,9 +407,9 @@ namespace hpx { namespace ranges {
 
             using result_type = exclusive_scan_result<FwdIter1, FwdIter2>;
 
-            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_MOVE(init), HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::exclusive_scan<result_type>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -439,9 +436,9 @@ namespace hpx { namespace ranges {
             using result_type =
                 exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 
-            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
-                .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    HPX_MOVE(init), HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::exclusive_scan<result_type>().call(
+                hpx::execution::seq, std::begin(rng), std::end(rng), dest,
+                HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -450,7 +447,7 @@ namespace hpx { namespace ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             typename Op = std::plus<T>,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range<Rng>::value &&
                 hpx::is_invocable_v<Op,
                     typename hpx::traits::range_traits<Rng>::value_type,
@@ -470,11 +467,11 @@ namespace hpx { namespace ranges {
             using result_type =
                 exclusive_scan_result<traits::range_iterator_t<Rng>, O>;
 
-            return hpx::parallel::v1::detail::exclusive_scan<result_type>()
-                .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), dest, HPX_MOVE(init), HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::exclusive_scan<result_type>().call(
+                HPX_FORWARD(ExPolicy, policy), std::begin(rng), std::end(rng),
+                dest, HPX_MOVE(init), HPX_FORWARD(Op, op));
         }
     } exclusive_scan{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif    // DOXYGEN

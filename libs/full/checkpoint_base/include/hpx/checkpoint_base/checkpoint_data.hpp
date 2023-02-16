@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2022 Hartmut Kaiser
+// Copyright (c) 2018-2023 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,13 +9,11 @@
 
 #pragma once
 
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/detail/preprocess_container.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
-#include <type_traits>
-#include <utility>
 
 namespace hpx::util {
 
@@ -31,7 +29,7 @@ namespace hpx::util {
     /// \tparam Container    Container used to store the check-pointed data.
     /// \tparam Ts           Types of variables to checkpoint
     ///
-    /// \param cont          Container instance used to store the checkpoint
+    /// \param data          Container instance used to store the checkpoint
     ///                      data
     /// \param ts            Variable instances to be inserted into the
     ///                      checkpoint.
@@ -120,14 +118,14 @@ namespace hpx::util {
     /// \endcond
 }    // namespace hpx::util
 
-namespace hpx::serialization::detail {
+namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
     template <>
-    struct extra_archive_data_helper<hpx::util::checkpointing_tag>
+    struct extra_data_helper<checkpointing_tag>
     {
-        HPX_EXPORT static extra_archive_data_id_type id() noexcept;
-        static constexpr void reset(hpx::util::checkpointing_tag*) noexcept {}
+        HPX_EXPORT static extra_data_id_type id() noexcept;
+        static constexpr void reset(checkpointing_tag*) noexcept {}
     };
-}    // namespace hpx::serialization::detail
+}    // namespace hpx::util

@@ -99,13 +99,10 @@ namespace hpx { namespace util {
 
     lci_environment::mutex_type lci_environment::mtx_;
     bool lci_environment::enabled_ = false;
-    LCI_endpoint_t lci_environment::ep_;
-    LCI_endpoint_t lci_environment::rt_ep_;
-    LCI_comp_t lci_environment::rt_cq_r_;
-    LCI_endpoint_t lci_environment::h_ep_;
-    LCI_comp_t lci_environment::h_cq_r_;
-    // We need this progress thread to send early parcels
-    std::unique_ptr<std::thread> lci_environment::prg_thread_p = nullptr;
+    LCI_endpoint_t lci_environment::ep;
+    LCI_comp_t lci_environment::scq;
+    LCI_comp_t lci_environment::rcq;
+    std::unique_ptr<std::thread> lci_environment::prg_thread_p;
     std::atomic<bool> lci_environment::prg_thread_flag = false;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -120,30 +117,18 @@ namespace hpx { namespace util {
                 return lci_retval;
         }
 
-        // create main endpoint for pt2pt msgs
+        // create ep, scq, rcq
+        LCI_queue_create(LCI_UR_DEVICE, &scq);
+        LCI_queue_create(LCI_UR_DEVICE, &rcq);
         LCI_plist_t plist_;
         LCI_plist_create(&plist_);
-        LCI_plist_set_comp_type(plist_, LCI_PORT_COMMAND, LCI_COMPLETION_SYNC);
-        LCI_plist_set_comp_type(plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
-        LCI_endpoint_init(&ep_, LCI_UR_DEVICE, plist_);
+        LCI_plist_set_default_comp(plist_, rcq);
+        LCI_plist_set_comp_type(plist_, LCI_PORT_COMMAND, LCI_COMPLETION_QUEUE);
+        LCI_plist_set_comp_type(plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+        LCI_endpoint_init(&ep, LCI_UR_DEVICE, plist_);
         LCI_plist_free(&plist_);
 
-        // set endpoint for release tag msgs
-        rt_ep_ = LCI_UR_ENDPOINT;
-        rt_cq_r_ = LCI_UR_CQ;
-
-        // create endpoint for header msgs
-        LCI_plist_t h_plist_;
-        LCI_plist_create(&h_plist_);
-        LCI_queue_create(LCI_UR_DEVICE, &h_cq_r_);
-        LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
-        LCI_plist_set_comp_type(
-            h_plist_, LCI_PORT_COMMAND, LCI_COMPLETION_SYNC);
-        LCI_plist_set_default_comp(h_plist_, h_cq_r_);
-        LCI_endpoint_init(&h_ep_, LCI_UR_DEVICE, h_plist_);
-        LCI_plist_free(&h_plist_);
-        // DEBUG("Rank %d: Init lci env", LCI_RANK);
+        // create progress thread
         HPX_ASSERT(prg_thread_flag == false);
         HPX_ASSERT(prg_thread_p == nullptr);
         prg_thread_flag = true;
@@ -215,6 +200,10 @@ namespace hpx { namespace util {
             if (lci_init)
             {
                 join_prg_thread_if_running();
+                // create ep, scq, rcq
+                LCI_endpoint_free(&ep);
+                LCI_queue_free(&scq);
+                LCI_queue_free(&rcq);
                 LCI_finalize();
             }
         }
@@ -266,29 +255,19 @@ namespace hpx { namespace util {
         return res;
     }
 
-    LCI_endpoint_t& lci_environment::lci_endpoint()
+    LCI_endpoint_t& lci_environment::get_endpoint()
     {
-        return ep_;
+        return ep;
     }
 
-    LCI_endpoint_t& lci_environment::rt_endpoint()
+    LCI_comp_t& lci_environment::get_scq()
     {
-        return rt_ep_;
+        return scq;
     }
 
-    LCI_comp_t& lci_environment::rt_queue()
+    LCI_comp_t& lci_environment::get_rcq()
     {
-        return rt_cq_r_;
-    }
-
-    LCI_endpoint_t& lci_environment::h_endpoint()
-    {
-        return h_ep_;
-    }
-
-    LCI_comp_t& lci_environment::h_queue()
-    {
-        return h_cq_r_;
+        return rcq;
     }
 
     lci_environment::scoped_lock::scoped_lock()

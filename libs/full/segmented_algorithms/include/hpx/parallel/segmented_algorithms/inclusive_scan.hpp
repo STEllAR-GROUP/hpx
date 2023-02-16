@@ -21,12 +21,13 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented inclusive_scan
     namespace detail {
@@ -244,7 +245,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -273,10 +274,9 @@ namespace hpx { namespace segmented {
 
         using value_type = typename std::iterator_traits<InIter>::value_type;
 
-        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+        return hpx::parallel::detail::segmented_inclusive_scan(
             hpx::execution::seq, first, last, dest, value_type{},
-            HPX_FORWARD(Op, op), std::true_type{},
-            parallel::util::projection_identity{});
+            HPX_FORWARD(Op, op), std::true_type{}, hpx::identity_v);
     }
 
     // clang-format off
@@ -307,10 +307,9 @@ namespace hpx { namespace segmented {
         using value_type = typename std::iterator_traits<FwdIter1>::value_type;
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+        return hpx::parallel::detail::segmented_inclusive_scan(
             HPX_FORWARD(ExPolicy, policy), first, last, dest, value_type{},
-            HPX_FORWARD(Op, op), is_seq(),
-            parallel::util::projection_identity{});
+            HPX_FORWARD(Op, op), is_seq(), hpx::identity_v);
     }
 
     // clang-format off
@@ -335,10 +334,9 @@ namespace hpx { namespace segmented {
         if (first == last)
             return dest;
 
-        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+        return hpx::parallel::detail::segmented_inclusive_scan(
             hpx::execution::seq, first, last, dest, HPX_FORWARD(T, init),
-            HPX_FORWARD(Op, op), std::true_type{},
-            parallel::util::projection_identity{});
+            HPX_FORWARD(Op, op), std::true_type{}, hpx::identity_v);
     }
 
     // clang-format off
@@ -368,9 +366,9 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_inclusive_scan(
+        return hpx::parallel::detail::segmented_inclusive_scan(
             HPX_FORWARD(ExPolicy, policy), first, last, dest,
             HPX_FORWARD(T, init), HPX_FORWARD(Op, op), is_seq(),
-            parallel::util::projection_identity{});
+            hpx::identity_v);
     }
 }}    // namespace hpx::segmented

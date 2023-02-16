@@ -17,47 +17,49 @@ namespace hpx::util::cache::statistics {
     ///////////////////////////////////////////////////////////////////////////
     class local_statistics : public no_statistics
     {
-    public:
-        local_statistics() = default;
-
-        std::size_t get_and_reset(std::size_t& value, bool reset) noexcept
+    private:
+        [[nodiscard]] static std::size_t get_and_reset(
+            std::size_t& value, bool reset) noexcept
         {
-            std::size_t result = value;
+            std::size_t const result = value;
             if (reset)
                 value = 0;
             return result;
         }
 
-        constexpr std::size_t hits() const noexcept
+    public:
+        local_statistics() = default;
+
+        [[nodiscard]] constexpr std::size_t hits() const noexcept
         {
             return hits_;
         }
-        constexpr std::size_t misses() const noexcept
+        [[nodiscard]] constexpr std::size_t misses() const noexcept
         {
             return misses_;
         }
-        constexpr std::size_t insertions() const noexcept
+        [[nodiscard]] constexpr std::size_t insertions() const noexcept
         {
             return insertions_;
         }
-        constexpr std::size_t evictions() const noexcept
+        [[nodiscard]] constexpr std::size_t evictions() const noexcept
         {
             return evictions_;
         }
 
-        std::size_t hits(bool reset) noexcept
+        [[nodiscard]] std::size_t hits(bool reset) noexcept
         {
             return get_and_reset(hits_, reset);
         }
-        std::size_t misses(bool reset) noexcept
+        [[nodiscard]] std::size_t misses(bool reset) noexcept
         {
             return get_and_reset(misses_, reset);
         }
-        std::size_t insertions(bool reset) noexcept
+        [[nodiscard]] std::size_t insertions(bool reset) noexcept
         {
             return get_and_reset(insertions_, reset);
         }
-        std::size_t evictions(bool reset) noexcept
+        [[nodiscard]] std::size_t evictions(bool reset) noexcept
         {
             return get_and_reset(evictions_, reset);
         }

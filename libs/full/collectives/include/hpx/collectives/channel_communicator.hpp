@@ -179,7 +179,7 @@ namespace hpx { namespace collectives {
     hpx::future<T> get(
         channel_communicator comm, that_site_arg site, tag_arg tag)
     {
-        return comm.comm_->template get<T>(site.that_site_, tag.tag_);
+        return comm.comm_->template get<T>(site.argument_, tag.argument_);
     }
 
     template <typename T>
@@ -187,7 +187,7 @@ namespace hpx { namespace collectives {
         channel_communicator comm, that_site_arg site, T&& value, tag_arg tag)
     {
         return comm.comm_->set(
-            site.that_site_, HPX_FORWARD(T, value), tag.tag_);
+            site.argument_, HPX_FORWARD(T, value), tag.argument_);
     }
 }}    // namespace hpx::collectives
 

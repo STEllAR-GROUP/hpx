@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <functional>
 #include <type_traits>
 
 namespace hpx {
@@ -23,6 +22,8 @@ namespace hpx {
             return HPX_FORWARD(T, t);
         }
     };
+
+    inline constexpr identity identity_v = identity();
 
     template <typename T>
     struct type_identity

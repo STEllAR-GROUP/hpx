@@ -17,7 +17,6 @@
 #include <hpx/parallel/segmented_algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_remote_exceptions.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -29,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented_transform
     namespace detail {
@@ -668,7 +667,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -699,12 +698,12 @@ namespace hpx { namespace segmented {
         using iterator_traits2 =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform<hpx::parallel::util::
-                    in_out_result<typename iterator_traits1::local_iterator,
-                        typename iterator_traits2::local_iterator>>(),
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform<hpx::parallel::util::in_out_result<
+                typename iterator_traits1::local_iterator,
+                typename iterator_traits2::local_iterator>>(),
             hpx::execution::seq, first, last, dest, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, std::true_type{});
+            hpx::identity_v, std::true_type{});
     }
 
     // clang-format off
@@ -742,12 +741,12 @@ namespace hpx { namespace segmented {
         using iterator_traits2 =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform<hpx::parallel::util::
-                    in_out_result<typename iterator_traits1::local_iterator,
-                        typename iterator_traits2::local_iterator>>(),
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform<hpx::parallel::util::in_out_result<
+                typename iterator_traits1::local_iterator,
+                typename iterator_traits2::local_iterator>>(),
             HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_FORWARD(F, f),
-            hpx::parallel::util::projection_identity{}, is_seq());
+            hpx::identity_v, is_seq());
     }
 
     // clang-format off
@@ -771,7 +770,7 @@ namespace hpx { namespace segmented {
             "Requires at least input iterator.");
 
         auto last2 = first2;
-        hpx::parallel::v1::detail::advance(last2, std::distance(first1, last1));
+        hpx::parallel::detail::advance(last2, std::distance(first1, last1));
 
         if (first1 == last1)
         {
@@ -786,10 +785,10 @@ namespace hpx { namespace segmented {
         using iterator3_traits =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        using proj_id = hpx::parallel::util::projection_identity;
+        using proj_id = hpx::identity;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform_binary<hpx::parallel::util::
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform_binary<hpx::parallel::util::
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
@@ -824,7 +823,7 @@ namespace hpx { namespace segmented {
             hpx::parallel::util::in_in_out_result<InIter1, InIter2, OutIter>>;
 
         auto last2 = first2;
-        hpx::parallel::v1::detail::advance(last2, std::distance(first1, last1));
+        hpx::parallel::detail::advance(last2, std::distance(first1, last1));
 
         if (first1 == last1)
         {
@@ -840,10 +839,10 @@ namespace hpx { namespace segmented {
         using iterator3_traits =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        using proj_id = hpx::parallel::util::projection_identity;
+        using proj_id = hpx::identity;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform_binary<hpx::parallel::util::
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform_binary<hpx::parallel::util::
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
@@ -884,10 +883,10 @@ namespace hpx { namespace segmented {
         using iterator3_traits =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        using proj_id = hpx::parallel::util::projection_identity;
+        using proj_id = hpx::identity;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform_binary2<hpx::parallel::util::
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform_binary2<hpx::parallel::util::
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),
@@ -935,10 +934,10 @@ namespace hpx { namespace segmented {
         using iterator3_traits =
             hpx::traits::segmented_iterator_traits<OutIter>;
 
-        using proj_id = hpx::parallel::util::projection_identity;
+        using proj_id = hpx::identity;
 
-        return hpx::parallel::v1::detail::segmented_transform(
-            hpx::parallel::v1::detail::transform_binary2<hpx::parallel::util::
+        return hpx::parallel::detail::segmented_transform(
+            hpx::parallel::detail::transform_binary2<hpx::parallel::util::
                     in_in_out_result<typename iterator1_traits::local_iterator,
                         typename iterator2_traits::local_iterator,
                         typename iterator3_traits::local_iterator>>(),

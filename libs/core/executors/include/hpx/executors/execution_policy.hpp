@@ -29,10 +29,11 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution {
+namespace hpx::execution {
 
     namespace detail {
-        // forward declate only
+
+        // forward declare only
         template <template <class, class> typename Derived, typename Executor,
             typename Parameters = void, typename Category = void>
         struct execution_policy;
@@ -67,6 +68,7 @@ namespace hpx { namespace execution {
     inline constexpr non_task_policy_tag non_task{};
 
     namespace experimental {
+
         template <>
         struct is_execution_policy_mapping<task_policy_tag> : std::true_type
         {
@@ -79,6 +81,7 @@ namespace hpx { namespace execution {
     }    // namespace experimental
 
     namespace detail {
+
         template <typename T, typename Enable = void>
         struct has_async_execution_policy : std::false_type
         {
@@ -241,7 +244,7 @@ namespace hpx { namespace execution {
             friend class hpx::serialization::access;
 
             template <typename Archive>
-            constexpr void serialize(Archive& ar, unsigned int const) noexcept
+            void serialize(Archive& ar, unsigned int const)
             {
                 // clang-format off
                 ar & exec_ & params_;
@@ -837,9 +840,9 @@ namespace hpx { namespace execution {
             return tag(derived());
         }
     }    // namespace detail
-}}       // namespace hpx::execution
+}    // namespace hpx::execution
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // Allow to detect execution policies which were created as a result of a
@@ -1076,4 +1079,4 @@ namespace hpx { namespace detail {
     {
     };
     /// \endcond
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

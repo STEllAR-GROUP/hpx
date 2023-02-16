@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
-#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/functional/move_only_function.hpp>
@@ -23,7 +22,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail { namespace impl {
+namespace hpx::agas::detail::impl {
 
     ///////////////////////////////////////////////////////////////////////////
     bool is_console()
@@ -289,7 +288,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     /// \brief Return an id_type referring to the console locality.
     hpx::id_type get_console_locality(error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
+        runtime const* rt = get_runtime_ptr();
         if (rt == nullptr || rt->get_state() == state::invalid)
         {
             return hpx::invalid_id;
@@ -307,13 +306,14 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
 
     std::uint32_t get_locality_id(error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
+        runtime const* rt = get_runtime_ptr();
         if (rt == nullptr || rt->get_state() == state::invalid)
         {
             return naming::invalid_locality_id;
         }
 
-        naming::gid_type l = naming::get_agas_client().get_local_locality(ec);
+        naming::gid_type const l =
+            naming::get_agas_client().get_local_locality(ec);
         return l ? naming::get_locality_id_from_gid(l) :
                    naming::invalid_locality_id;
     }
@@ -354,7 +354,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     ///////////////////////////////////////////////////////////////////////////
     naming::gid_type get_next_id(std::size_t count, error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
+        runtime const* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
             HPX_THROWS_IF(ec, hpx::error::invalid_status, "get_next_id",
@@ -396,7 +396,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         if (keep_alive_)
             return resolver.incref_async(gid, credits, keep_alive_);
 
-        hpx::id_type keep_alive =
+        hpx::id_type const keep_alive =
             hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
         return resolver.incref_async(gid, credits, keep_alive);
     }
@@ -412,7 +412,7 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
         {
             return resolver.incref_async(gid, credits, keep_alive_).get();
         }
-        hpx::id_type keep_alive =
+        hpx::id_type const keep_alive =
             hpx::id_type(gid, hpx::id_type::management_type::unmanaged);
         return resolver.incref_async(gid, credits, keep_alive).get();
     }
@@ -520,9 +520,9 @@ namespace hpx { namespace agas { namespace detail { namespace impl {
     {
         return naming::get_agas_client().get_runtime_support_lva();
     }
-}}}}    // namespace hpx::agas::detail::impl
+}    // namespace hpx::agas::detail::impl
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // initialize AGAS interface function pointers in components_base module
     struct HPX_EXPORT agas_interface_functions
@@ -640,4 +640,4 @@ namespace hpx { namespace agas {
         static agas_interface_functions agas_init_;
         return agas_init_;
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas

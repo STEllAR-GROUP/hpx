@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,7 +9,8 @@
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/executors/current_executor.hpp>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     hpx::execution::parallel_executor get_executor(
         thread_id_type const& id, error_code& ec)
     {
@@ -26,11 +27,12 @@ namespace hpx { namespace threads {
         return hpx::execution::parallel_executor(
             get_thread_id_data(id)->get_scheduler_base()->get_parent_pool());
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
-namespace hpx { namespace this_thread {
+namespace hpx::this_thread {
+
     hpx::execution::parallel_executor get_executor(error_code& ec)
     {
         return threads::get_executor(threads::get_self_id(), ec);
     }
-}}    // namespace hpx::this_thread
+}    // namespace hpx::this_thread

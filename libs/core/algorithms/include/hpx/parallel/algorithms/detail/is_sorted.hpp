@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,24 +8,22 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/type_support/identity.hpp>
 
-#include <iterator>
-#include <type_traits>
-
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     template <typename Iter, typename Sent, typename Compare,
-        typename Proj = hpx::parallel::util::projection_identity>
-    inline constexpr bool is_sorted_sequential(
+        typename Proj = hpx::identity>
+    constexpr bool is_sorted_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
     {
         bool sorted = true;
         if (first != last)
         {
             for (Iter it1 = first, it2 = ++first; it2 != last &&
-                 (sorted = !HPX_INVOKE(
-                      comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1)));
+                 ((sorted = !HPX_INVOKE(
+                       comp, HPX_INVOKE(proj, *it2), HPX_INVOKE(proj, *it1))));
                  it1 = it2++)
             {
                 /**/
@@ -35,8 +33,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename Iter, typename Sent, typename Compare,
-        typename Proj = hpx::parallel::util::projection_identity>
-    inline constexpr Iter is_sorted_until_sequential(
+        typename Proj = hpx::identity>
+    constexpr Iter is_sorted_until_sequential(
         Iter first, Sent last, Compare&& comp, Proj&& proj = Proj())
     {
         if (first != last)
@@ -53,10 +51,6 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             return it2;
         }
-        else
-        {
-            return first;
-        }
+        return first;
     }
-
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

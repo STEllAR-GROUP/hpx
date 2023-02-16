@@ -15,11 +15,11 @@ namespace hpx::util {
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
-        inline std::string regex_from_character_set(
-            std::string::const_iterator& it, std::string::const_iterator end,
-            error_code& ec)
+        [[nodiscard]] inline std::string regex_from_character_set(
+            std::string::const_iterator& it,
+            std::string::const_iterator const& end, error_code& ec)
         {
-            std::string::const_iterator start = it;
+            std::string::const_iterator const start = it;
             std::string result(1, *it);    // copy '['
             if (++it != end)
             {
@@ -65,11 +65,10 @@ namespace hpx::util {
     std::string regex_from_pattern(std::string const& pattern, error_code& ec)
     {
         std::string result;
-        std::string::const_iterator end = pattern.end();
-        for (std::string::const_iterator it = pattern.begin(); it != end; ++it)
+        auto const end = pattern.end();
+        for (auto it = pattern.begin(); it != end; ++it)
         {
-            char c = *it;
-            switch (c)
+            switch (char const c = *it)
             {
             case '*':
                 result.append(".*");

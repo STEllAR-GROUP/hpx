@@ -16,7 +16,8 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     hpx::future<void> resume_processing_unit(
         thread_pool_base& pool, std::size_t virt_core)
     {
@@ -222,5 +223,4 @@ namespace hpx { namespace threads {
             std::thread(HPX_MOVE(suspend_direct_wrapper)).detach();
         }
     }
-
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

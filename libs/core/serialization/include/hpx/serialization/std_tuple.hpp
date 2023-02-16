@@ -22,8 +22,8 @@ namespace hpx::traits {
 
     template <typename... Ts>
     struct is_bitwise_serializable<std::tuple<Ts...>>
-      : ::hpx::util::all_of<hpx::traits::is_bitwise_serializable<
-            typename std::remove_const<Ts>::type>...>
+      : ::hpx::util::all_of<
+            hpx::traits::is_bitwise_serializable<std::remove_const_t<Ts>>...>
     {
     };
 
@@ -57,8 +57,8 @@ namespace hpx::serialization {
                     ...);
 #endif
             }
-        };    // namespace detail
-    }         // namespace detail
+        };
+    }    // namespace detail
 
     template <typename Archive, typename... Ts>
     void serialize(Archive& ar, std::tuple<Ts...>& t, unsigned int version)

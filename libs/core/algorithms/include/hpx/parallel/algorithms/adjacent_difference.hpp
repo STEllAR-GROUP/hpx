@@ -219,12 +219,11 @@ namespace hpx {
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/modules/executors.hpp>
-
-#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/parallel/algorithms/detail/adjacent_difference.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -233,27 +232,25 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <numeric>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // adjacent_difference
     namespace detail {
         /// \cond NOINTERNAL
         template <typename Iter>
         struct adjacent_difference
-          : public detail::algorithm<adjacent_difference<Iter>, Iter>
+          : public algorithm<adjacent_difference<Iter>, Iter>
         {
             constexpr adjacent_difference() noexcept
-              : adjacent_difference::algorithm("adjacent_difference")
+              : algorithm<adjacent_difference, Iter>("adjacent_difference")
             {
             }
 
@@ -351,7 +348,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>().call(
+        return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
             HPX_FORWARD(ExPolicy, policy), first, last, dest, std::minus<>());
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
@@ -372,7 +369,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             HPX_FORWARD(ExPolicy, policy), first, last, dest,
             HPX_FORWARD(Op, op));
     }
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -397,9 +394,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                    std::minus<>());
+            return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
+                hpx::execution::sequenced_policy{}, first, last, dest,
+                std::minus<>());
         }
 
         // clang-format off
@@ -418,9 +415,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    std::minus<>());
+            return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                std::minus<>());
         }
 
         // clang-format off
@@ -438,9 +435,9 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                    HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
+                hpx::execution::sequenced_policy{}, first, last, dest,
+                HPX_FORWARD(Op, op));
         }
 
         // clang-format off
@@ -460,10 +457,11 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_difference<FwdIter2>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(Op, op));
+            return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
+                HPX_FORWARD(Op, op));
         }
     } adjacent_difference{};
 }    // namespace hpx
+
 #endif

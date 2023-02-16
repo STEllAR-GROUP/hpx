@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -84,7 +84,7 @@ namespace hpx::util::cache::entries {
         }
 
         /// \brief    Return the 'size' of this entry.
-        constexpr std::size_t get_size() const noexcept
+        [[nodiscard]] constexpr std::size_t get_size() const noexcept
         {
             return size_;
         }

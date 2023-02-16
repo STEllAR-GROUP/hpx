@@ -47,7 +47,7 @@ namespace hpx::util::plugin {
             auto it = e.find(clsname);
             if (it != e.end())
             {
-                abstract_factory<BasePlugin>** xw =
+                auto** xw =
                     hpx::any_cast<abstract_factory<BasePlugin>*>(&(*it).second);
 
                 if (!xw)
@@ -79,7 +79,7 @@ namespace hpx::util::plugin {
                     str << " Existing classes: ";
 
                     bool first = true;
-                    typename exported_plugins_type::iterator end = e.end();
+                    auto const end = e.end();
                     for (auto jt = e.begin(); jt != end; ++jt)
                     {
                         if (first)
@@ -110,15 +110,15 @@ namespace hpx::util::plugin {
         get_abstract_factory(dll const& d, std::string const& class_name,
             std::string const& base_name, error_code& ec = throws)
         {
-            using DeleterType = hpx::function<void(get_plugins_list_type)>;
+            using deleter_type = hpx::function<void(get_plugins_list_type)>;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
-            std::pair<get_plugins_list_type, DeleterType> f =
-                d.get<get_plugins_list_type, DeleterType>(plugin_entry, ec);
+            std::pair<get_plugins_list_type, deleter_type> const f =
+                d.get<get_plugins_list_type, deleter_type>(plugin_entry, ec);
             if (ec)
                 return std::pair<abstract_factory<BasePlugin>*, dll_handle>();
 
@@ -132,7 +132,7 @@ namespace hpx::util::plugin {
         {
             exported_plugins_type& e = *f();
 
-            auto end = e.end();
+            auto const end = e.end();
             for (auto it = e.begin(); it != end; ++it)
             {
                 names.push_back((*it).first);
@@ -143,15 +143,15 @@ namespace hpx::util::plugin {
             std::string const& base_name, std::vector<std::string>& names,
             error_code& ec = throws)
         {
-            using DeleterType = hpx::function<void(get_plugins_list_type)>;
+            using deleter_type = hpx::function<void(get_plugins_list_type)>;
 
             std::string plugin_entry(HPX_PLUGIN_SYMBOLS_PREFIX_DYNAMIC_STR
                 "_exported_plugins_list_");
             plugin_entry += d.get_mapname();
             plugin_entry += "_" + base_name;
 
-            std::pair<get_plugins_list_type, DeleterType> f =
-                d.get<get_plugins_list_type, DeleterType>(plugin_entry, ec);
+            std::pair<get_plugins_list_type, deleter_type> const f =
+                d.get<get_plugins_list_type, deleter_type>(plugin_entry, ec);
             if (ec)
                 return;
 
@@ -161,9 +161,9 @@ namespace hpx::util::plugin {
         ///////////////////////////////////////////////////////////////////////
         struct plugin_factory_item_base
         {
-            plugin_factory_item_base(dll& d, std::string const& basename)
+            plugin_factory_item_base(dll& d, std::string basename)
               : m_dll(d)
-              , m_basename(basename)
+              , m_basename(HPX_MOVE(basename))
             {
             }
 
@@ -188,12 +188,12 @@ namespace hpx::util::plugin {
         struct plugin_factory_item<BasePlugin, Base,
             hpx::util::pack<Parameters...>> : public Base
         {
-            plugin_factory_item(dll& d, std::string const& basename)
-              : Base(d, basename)
+            plugin_factory_item(dll& d, std::string basename)
+              : Base(d, HPX_MOVE(basename))
             {
             }
 
-            BasePlugin* create(
+            [[nodiscard]] BasePlugin* create(
                 std::string const& name, Parameters... parameters) const
             {
                 std::pair<abstract_factory<BasePlugin>*, dll_handle> r =
@@ -203,8 +203,8 @@ namespace hpx::util::plugin {
                 return r.first->create(r.second, parameters...);
             }
 
-            BasePlugin* create(std::string const& name, error_code& ec,
-                Parameters... parameters) const
+            [[nodiscard]] BasePlugin* create(std::string const& name,
+                error_code& ec, Parameters... parameters) const
             {
                 std::pair<abstract_factory<BasePlugin>*, dll_handle> r =
                     get_abstract_factory<BasePlugin>(
@@ -251,12 +251,12 @@ namespace hpx::util::plugin {
             hpx::util::pack<Parameters...>> : public Base
         {
             explicit static_plugin_factory_item(
-                get_plugins_list_type const& f) noexcept    //-V835
-              : Base(f)
+                get_plugins_list_type const& f_) noexcept    //-V835
+              : Base(f_)
             {
             }
 
-            BasePlugin* create(
+            [[nodiscard]] BasePlugin* create(
                 std::string const& name, Parameters... parameters) const
             {
                 std::pair<abstract_factory<BasePlugin>*, dll_handle> r =
@@ -266,8 +266,8 @@ namespace hpx::util::plugin {
                 return r.first->create(r.second, parameters...);
             }
 
-            BasePlugin* create(std::string const& name, error_code& ec,
-                Parameters... parameters) const
+            [[nodiscard]] BasePlugin* create(std::string const& name,
+                error_code& ec, Parameters... parameters) const
             {
                 std::pair<abstract_factory<BasePlugin>*, dll_handle> r =
                     get_abstract_factory_static<BasePlugin>(
@@ -292,8 +292,8 @@ namespace hpx::util::plugin {
             virtual_constructor_t<BasePlugin>>;
 
     public:
-        plugin_factory(dll& d, std::string const& basename)
-          : base_type(d, basename)
+        plugin_factory(dll& d, std::string basename)
+          : base_type(d, HPX_MOVE(basename))
         {
         }
     };
@@ -312,8 +312,8 @@ namespace hpx::util::plugin {
 
     public:
         explicit static_plugin_factory(
-            get_plugins_list_type const& f) noexcept    //-V835
-          : base_type(f)
+            get_plugins_list_type const& f_) noexcept    //-V835
+          : base_type(f_)
         {
         }
     };

@@ -47,7 +47,7 @@ void test_exclusive_scan_sent(IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(end_len);
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
+    hpx::parallel::detail::sequential_exclusive_scan(
         std::begin(c), std::begin(c) + end_len, std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -76,7 +76,7 @@ void test_exclusive_scan_sent(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(end_len);
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
+    hpx::parallel::detail::sequential_exclusive_scan(
         std::begin(c), std::begin(c) + end_len, std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -99,7 +99,7 @@ void test_exclusive_scan(IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
+    hpx::parallel::detail::sequential_exclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -125,7 +125,7 @@ void test_exclusive_scan(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
+    hpx::parallel::detail::sequential_exclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -150,7 +150,7 @@ void test_exclusive_scan_async(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_exclusive_scan(
+    hpx::parallel::detail::sequential_exclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));

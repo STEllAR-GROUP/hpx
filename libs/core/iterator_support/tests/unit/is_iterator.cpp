@@ -25,17 +25,14 @@ namespace test {
             BaseIterator, void, IteratorTag>
     {
     private:
-        typedef hpx::util::iterator_adaptor<
+        using base_type = hpx::util::iterator_adaptor<
             test_iterator<BaseIterator, IteratorTag>, BaseIterator, void,
-            IteratorTag>
-            base_type;
+            IteratorTag>;
 
     public:
-        test_iterator()
-          : base_type()
-        {
-        }
-        explicit test_iterator(BaseIterator base)
+        test_iterator() = default;
+
+        explicit constexpr test_iterator(BaseIterator base)
           : base_type(base)
         {
         }

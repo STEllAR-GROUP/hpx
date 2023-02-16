@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <eve/eve.hpp>
-#include <eve/function/store.hpp>
 #include <eve/memory/aligned_ptr.hpp>
+#include <eve/module/core.hpp>
 
 #include <memory>
 

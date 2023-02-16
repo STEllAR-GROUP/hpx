@@ -9,13 +9,13 @@
 
 #pragma once
 
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_nonintrusive_factory.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
-#include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -76,7 +76,7 @@ namespace hpx::util::detail {
         template <typename T>
         static void load_element(Archive& ar, T& t)
         {
-            constexpr bool is_polymorphic =
+            static constexpr bool is_polymorphic =
                 hpx::traits::is_intrusive_polymorphic_v<T> ||
                 hpx::traits::is_nonintrusive_polymorphic_v<T>;
 
