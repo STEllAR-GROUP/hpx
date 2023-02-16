@@ -8,6 +8,7 @@
 set(example_programs
   barrier_docs
   composable_guard
+  counting_semaphore_docs
   customize_async
   enumerate_threads
   event_synchronization
