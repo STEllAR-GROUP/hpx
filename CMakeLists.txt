@@ -1867,8 +1867,9 @@ endif()
 if(MSVC)
   # Display full paths in diagnostics
   hpx_add_compile_flag(-FC)
+
   # compile all of HPX in non-permissive mode
-  hpx_add_compile_flag(-permissive-)
+  hpx_add_target_compile_option(-permissive- PUBLIC)
   if(CMAKE_CL_64)
     set(__target_arch "x86_64")
   else()

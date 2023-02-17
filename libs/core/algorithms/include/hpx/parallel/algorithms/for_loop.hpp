@@ -815,6 +815,8 @@ namespace hpx::parallel {
             S stride_;
             hpx::tuple<Ts...> args_;
 
+            part_iterations() = default;    // for serialization purposes only
+
             template <typename F_, typename S_, typename Args>
             part_iterations(F_&& f, S_&& stride, Args&& args)
               : f_(HPX_FORWARD(F_, f))
@@ -877,6 +879,14 @@ namespace hpx::parallel {
                     }
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & stride_ & args_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F, typename S>
@@ -886,6 +896,8 @@ namespace hpx::parallel {
 
             fun_type f_;
             S stride_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_,
                 typename Enable = std::enable_if_t<
@@ -961,6 +973,14 @@ namespace hpx::parallel {
                     }
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & stride_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F, typename... Ts>
@@ -970,6 +990,8 @@ namespace hpx::parallel {
 
             fun_type f_;
             hpx::tuple<Ts...> args_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_, typename Args>
             part_iterations(F_&& f, Args&& args)
@@ -991,6 +1013,14 @@ namespace hpx::parallel {
                     detail::next_iteration(args_, pack);
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & args_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F>
@@ -999,6 +1029,8 @@ namespace hpx::parallel {
             using fun_type = std::decay_t<F>;
 
             fun_type f_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_,
                 typename Enable = std::enable_if_t<
@@ -1028,6 +1060,14 @@ namespace hpx::parallel {
             {
                 parallel::util::loop_n<std::decay_t<ExPolicy>>(
                     part_begin, part_steps, f_);
+            }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_;
+                // clang-format on
             }
         };
 

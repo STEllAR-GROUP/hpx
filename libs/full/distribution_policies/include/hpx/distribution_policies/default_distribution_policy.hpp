@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,14 +34,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \cond NOINTERNAL
     namespace detail {
 
-        HPX_FORCEINLINE std::size_t round_to_multiple(
-            std::size_t n1, std::size_t n2, std::size_t n3)
+        HPX_FORCEINLINE constexpr std::size_t round_to_multiple(
+            std::size_t n1, std::size_t n2, std::size_t n3) noexcept
         {
             return (n1 / n2) * n3;
         }
@@ -117,8 +117,7 @@ namespace hpx { namespace components {
                 }
             }
 
-            // by default the object will be created on the current
-            // locality
+            // by default the object will be created on the current locality
             return create_async<Component>(
                 naming::get_id_from_locality_id(agas::get_locality_id()),
                 HPX_FORWARD(Ts, vs)...);
@@ -129,8 +128,8 @@ namespace hpx { namespace components {
             std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
-        /// Create multiple objects on the localities associated by
-        /// this policy instance
+        /// Create multiple objects on the localities associated by this policy
+        /// instance
         ///
         /// \param count [in] The number of objects to create
         /// \param vs   [in] The arguments which will be forwarded to the
@@ -139,7 +138,7 @@ namespace hpx { namespace components {
         /// \note This function is part of the placement policy implemented by
         ///       this class
         ///
-        /// \returns A future holding the list of global addresses which
+        /// \returns A future holding the list of global addresses that
         ///          represent the newly created objects
         ///
         template <typename Component, typename... Ts>
@@ -268,14 +267,15 @@ namespace hpx { namespace components {
         /// \note This function is part of the creation policy implemented by
         ///       this class
         ///
-        std::size_t get_num_localities() const
+        [[nodiscard]] std::size_t get_num_localities() const
         {
-            return !localities_ ? std::size_t(1) : localities_->size();
+            return !localities_ ? static_cast<std::size_t>(1) :
+                                  localities_->size();
         }
 
         /// Returns the locality which is anticipated to be used for the next
         /// async operation
-        hpx::id_type get_next_target() const
+        [[nodiscard]] hpx::id_type get_next_target() const
         {
             return !localities_ ?
                 naming::get_id_from_locality_id(agas::get_locality_id()) :
@@ -294,15 +294,16 @@ namespace hpx { namespace components {
 
             // this distribution policy places an equal number of items onto
             // each locality
-            std::size_t locs = localities_->size();
+            std::size_t const locs = localities_->size();
 
             // the overall number of items to create is smaller than the number
             // of localities
             if (items < locs)
             {
-                auto it =
+                auto const it =
                     std::find(localities_->begin(), localities_->end(), loc);
-                std::size_t num_loc = std::distance(localities_->begin(), it);
+                std::size_t const num_loc =
+                    std::distance(localities_->begin(), it);
                 return (items < num_loc) ? 1 : 0;
             }
 
@@ -367,7 +368,7 @@ namespace hpx { namespace components {
     /// A predefined instance of the default \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
     static default_distribution_policy const default_layout{};
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {
@@ -376,6 +377,7 @@ namespace hpx {
     using hpx::components::default_layout;
 
     namespace traits {
+
         template <>
         struct is_distribution_policy<components::default_distribution_policy>
           : std::true_type

@@ -19,7 +19,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/runtime_components/default_distribution_policy.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <algorithm>
