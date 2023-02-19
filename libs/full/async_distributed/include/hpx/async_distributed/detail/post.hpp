@@ -259,9 +259,7 @@ namespace hpx {
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
-        bool>
-    post_p(
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool> post_p(
         DistPolicy const& policy, threads::thread_priority priority, Ts&&... vs)
     {
         return policy.template apply<Action>(priority, HPX_FORWARD(Ts, vs)...);
@@ -307,7 +305,7 @@ namespace hpx {
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
             HPX_FORCEINLINE static std::enable_if_t<
-                traits::is_distribution_policy<DistPolicy>::value, bool>
+                traits::is_distribution_policy_v<DistPolicy>, bool>
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
             {
@@ -342,9 +340,8 @@ namespace hpx {
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
-        bool>
-    post(DistPolicy const& policy, Ts&&... vs)
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool> post(
+        DistPolicy const& policy, Ts&&... vs)
     {
         return hpx::post_p<Action>(
             policy, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -481,8 +478,8 @@ namespace hpx {
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline std::enable_if_t<traits::is_continuation<Continuation>::value &&
-            traits::is_distribution_policy<DistPolicy>::value,
+    std::enable_if_t<traits::is_continuation<Continuation>::value &&
+            traits::is_distribution_policy_v<DistPolicy>,
         bool>
     post_p(Continuation&& c, DistPolicy const& policy,
         threads::thread_priority priority, Ts&&... vs)
@@ -532,7 +529,7 @@ namespace hpx {
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
             HPX_FORCEINLINE static std::enable_if_t<
-                traits::is_distribution_policy<DistPolicy>::value, bool>
+                traits::is_distribution_policy_v<DistPolicy>, bool>
             call(Continuation&& c,
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
@@ -571,7 +568,7 @@ namespace hpx {
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value &&
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy> &&
             traits::is_continuation<Continuation>::value,
         bool>
     post(Continuation&& c, DistPolicy const& policy, Ts&&... vs)

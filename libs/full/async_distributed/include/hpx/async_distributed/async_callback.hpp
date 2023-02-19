@@ -67,10 +67,10 @@ namespace hpx::detail {
         // distribution policy
         template <typename Policy_, typename DistPolicy, typename Callback,
             typename... Ts>
-        HPX_FORCEINLINE static typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value,
+        HPX_FORCEINLINE static std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>,
             hpx::future<typename traits::promise_local_result<typename traits::
-                    extract_action<Action>::remote_result_type>::type>>::type
+                    extract_action<Action>::remote_result_type>::type>>
         call(Policy_&& launch_policy, DistPolicy const& policy, Callback&& cb,
             Ts&&... ts)
         {
@@ -99,7 +99,7 @@ namespace hpx::detail {
     // component::client
     template <typename Action, typename Client>
     struct async_cb_action_dispatch<Action, Client,
-        typename std::enable_if<traits::is_client<Client>::value>::type>
+        std::enable_if_t<traits::is_client<Client>::value>>
     {
         template <typename Client_, typename Stub, typename Data,
             typename Callback, typename... Ts>
@@ -124,8 +124,7 @@ namespace hpx::detail {
     // distribution policy
     template <typename Action, typename Policy>
     struct async_cb_action_dispatch<Action, Policy,
-        typename std::enable_if<
-            traits::is_distribution_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_distribution_policy_v<Policy>>>
     {
         template <typename DistPolicy, typename Callback, typename... Ts>
         HPX_FORCEINLINE static hpx::future<
@@ -142,15 +141,15 @@ namespace hpx::detail {
 
 namespace hpx {
 
+    // clang-format off
     template <typename Action, typename F, typename... Ts>
-    HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts)
-        -> decltype(detail::async_cb_action_dispatch<Action,
-            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
-            HPX_FORWARD(Ts, ts)...))
+    HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts) -> decltype(
+        detail::async_cb_action_dispatch<Action, std::decay_t<F>>::call(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
+    // clang-format on
     {
-        return detail::async_cb_action_dispatch<Action,
-            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
-            HPX_FORWARD(Ts, ts)...);
+        return detail::async_cb_action_dispatch<Action, std::decay_t<F>>::call(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
 
@@ -160,7 +159,7 @@ namespace hpx::detail {
     // any action
     template <typename Action>
     struct async_cb_dispatch<Action,
-        typename std::enable_if<traits::is_action<Action>::value>::type>
+        std::enable_if_t<traits::is_action<Action>::value>>
     {
         template <typename Component, typename Signature, typename Derived,
             typename Callback, typename... Ts>
@@ -209,7 +208,7 @@ namespace hpx::detail {
 
     template <typename Policy>
     struct async_cb_dispatch<Policy,
-        typename std::enable_if<traits::is_launch_policy<Policy>::value>::type>
+        std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
         template <typename Policy_, typename Component, typename Signature,
             typename Derived, typename Callback, typename... Ts>

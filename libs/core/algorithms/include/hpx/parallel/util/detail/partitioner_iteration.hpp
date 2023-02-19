@@ -28,6 +28,14 @@ namespace hpx::parallel::util::detail {
         {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
         }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & f_;
+            // clang-format on
+        }
     };
 }    // namespace hpx::parallel::util::detail
 

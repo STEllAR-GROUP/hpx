@@ -12,7 +12,6 @@
 
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/component_registry.hpp>
-#include <hpx/runtime_components/default_distribution_policy.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_components/distributed_metadata_base.hpp>
 #include <hpx/runtime_components/new.hpp>
@@ -46,5 +45,6 @@
 
 #include <hpx/distribution_policies/binpacking_distribution_policy.hpp>
 #include <hpx/distribution_policies/colocating_distribution_policy.hpp>
+#include <hpx/distribution_policies/default_distribution_policy.hpp>
 #include <hpx/distribution_policies/target_distribution_policy.hpp>
 #include <hpx/distribution_policies/unwrapping_result_policy.hpp>

@@ -9,13 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/basic_action.hpp>
 #include <hpx/functional/invoke_result.hpp>
-#include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     namespace detail {
 
@@ -24,23 +22,9 @@ namespace hpx { namespace components { namespace server {
         template <typename F, typename... Ts>
         struct invoke_function
         {
-            static typename util::invoke_result<F, Ts...>::type call(
-                F f, Ts... ts)
+            static util::invoke_result_t<F, Ts...> call(F f, Ts... ts)
             {
                 return f(HPX_MOVE(ts)...);
-            }
-        };
-
-        // simple utility action which invoke an arbitrary global function
-        template <typename F>
-        struct invoke_function_ptr;
-
-        template <typename R, typename... Ts>
-        struct invoke_function_ptr<R (*)(Ts...)>
-        {
-            static R call(std::size_t f, Ts... ts)
-            {
-                return reinterpret_cast<R (*)(Ts...)>(f)(HPX_MOVE(ts)...);
             }
         };
     }    // namespace detail
@@ -49,21 +33,9 @@ namespace hpx { namespace components { namespace server {
     // action definition exposing invoke_function<>
     template <typename F, typename... Ts>
     struct invoke_function_action
-      : ::hpx::actions::action<typename util::invoke_result<F, Ts...>::type (*)(
-                                   F, Ts...),
+      : ::hpx::actions::action<util::invoke_result_t<F, Ts...> (*)(F, Ts...),
             &detail::invoke_function<F, Ts...>::call,
             invoke_function_action<F, Ts...>>
     {
     };
-
-    // action definition exposing invoke_function_ptr<> that binds a global
-    // function (Note: this assumes global function addresses are the same on
-    // all localities)
-    template <typename R, typename... Ts>
-    struct invoke_function_action<R (*)(Ts...), Ts...>
-      : ::hpx::actions::action<R (*)(std::size_t, Ts...),
-            &detail::invoke_function_ptr<R (*)(Ts...)>::call,
-            invoke_function_action<R (*)(Ts...), Ts...>>
-    {
-    };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
