@@ -96,7 +96,7 @@ namespace hpx::parcelset::policies::mpi {
         }
 
         template <typename Lock>
-        connection_ptr accept_locked(Lock& header_lock) noexcept
+        connection_ptr accept_locked(Lock& header_lock)
         {
             connection_ptr res;
             util::mpi_environment::scoped_try_lock l;
@@ -125,7 +125,7 @@ namespace hpx::parcelset::policies::mpi {
 #pragma warning(pop)
 #endif
 
-            return res;
+            return res;    //-V614
         }
 
         header new_header() noexcept

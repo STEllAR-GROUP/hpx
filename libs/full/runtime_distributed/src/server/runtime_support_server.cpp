@@ -462,7 +462,7 @@ namespace hpx { namespace components { namespace server {
             if (locality_id != naming::get_locality_id_from_id(id))
             {
                 using components::stubs::runtime_support;
-                lazy_actions.push_back(
+                lazy_actions.emplace_back(
                     runtime_support::shutdown_async(id, timeout));
             }
         }
@@ -500,7 +500,7 @@ namespace hpx { namespace components { namespace server {
                     using components::stubs::runtime_support;
                     hpx::id_type id(
                         gid, hpx::id_type::management_type::unmanaged);
-                    lazy_actions.push_back(
+                    lazy_actions.emplace_back(
                         runtime_support::terminate_async(id));
                 }
             }
@@ -586,7 +586,7 @@ namespace hpx { namespace components { namespace server {
         while (!stop_done_)
         {
             LRT_(info).format("runtime_support: about to enter wait state");
-            wait_condition_.wait(l);
+            wait_condition_.wait(l);    //-V1089
             LRT_(info).format("runtime_support: exiting wait state");
         }
     }
@@ -631,7 +631,7 @@ namespace hpx { namespace components { namespace server {
                 if (!success)
                 {
                     // now we have to wait for all threads to be aborted
-                    success = util::detail::yield_while_count_timeout(
+                    util::detail::yield_while_count_timeout(
                         [&tm] {
                             tm.abort_all_suspended_threads();
                             tm.cleanup_terminated(true);
@@ -640,7 +640,6 @@ namespace hpx { namespace components { namespace server {
                         shutdown_check_count,
                         std::chrono::duration<double>(timeout),
                         "runtime_support::stop");
-                    HPX_UNUSED(success);
                 }
 
                 // Drop the locality from the partition table.
@@ -698,7 +697,7 @@ namespace hpx { namespace components { namespace server {
             // on the main thread.
             if (std::this_thread::get_id() != main_thread_id_)
             {
-                stop_condition_.wait(l);    // wait for termination
+                stop_condition_.wait(l);    // wait for termination //-V1089
             }
         }
     }
@@ -716,7 +715,8 @@ namespace hpx { namespace components { namespace server {
             // on the main thread.
             if (std::this_thread::get_id() != main_thread_id_)
             {
-                stop_condition_.wait(l);    // wait for termination
+                // wait for termination
+                stop_condition_.wait(l);    //-V1089
             }
         }
     }
@@ -896,7 +896,7 @@ namespace hpx { namespace components { namespace server {
                 continue;
 
             indirect_packaged_task ipt;
-            callbacks.push_back(ipt.get_future());
+            callbacks.emplace_back(ipt.get_future());
             hpx::post_cb(
                 act, id, HPX_MOVE(ipt), agas::get_locality(), rtd->endpoints());
         }
@@ -1500,7 +1500,7 @@ namespace hpx { namespace components { namespace server {
             return false;    // next please :-P
         }
 
-        modules_.insert(std::make_pair(HPX_MANGLE_STRING(component), d));
+        modules_.emplace(HPX_MANGLE_STRING(component), d);
         return true;
     }
 
@@ -1836,12 +1836,12 @@ namespace hpx { namespace components { namespace server {
                     pf(d, "factory");
 
                 // create the component factory object, if not disabled
-                std::shared_ptr<plugins::plugin_factory_base> factory(
+                std::shared_ptr<plugins::plugin_factory_base> const f(
                     pf.create(instance, ec, glob_ini, plugin_ini, isenabled));
                 if (!ec)
                 {
                     // store component factory and module for later use
-                    plugin_factory_type data(factory, d, isenabled);
+                    plugin_factory_type data(f, d, isenabled);
                     std::pair<plugin_map_type::iterator, bool> p =
                         plugins_.insert(
                             plugin_map_type::value_type(instance, data));
@@ -1900,8 +1900,7 @@ namespace hpx { namespace components { namespace server {
         hpx::program_options::options_description& options,
         std::set<std::string>& startup_handled)
     {
-        modules_map_type::iterator it =
-            modules_.find(HPX_MANGLE_STRING(plugin));
+        auto it = modules_.find(HPX_MANGLE_STRING(plugin));
         if (it != modules_.cend())
         {
             // use loaded module, instantiate the requested factory
@@ -1934,7 +1933,7 @@ namespace hpx { namespace components { namespace server {
             return false;    // next please :-P
         }
 
-        modules_.insert(std::make_pair(HPX_MANGLE_STRING(plugin), d));
+        modules_.emplace(HPX_MANGLE_STRING(plugin), d);
         return true;    // plugin got loaded
     }
 #endif

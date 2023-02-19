@@ -145,38 +145,37 @@ namespace hpx::parcelset::policies::tcp {
             // Write the serialized data to the socket. We use "gather-write"
             // to send both the header and the data in a single write operation.
             std::vector<asio::const_buffer> buffers;
-            buffers.push_back(
-                asio::buffer(&buffer_.size_, sizeof(buffer_.size_)));
-            buffers.push_back(
-                asio::buffer(&buffer_.data_size_, sizeof(buffer_.data_size_)));
+            buffers.emplace_back(&buffer_.size_, sizeof(buffer_.size_));
+            buffers.emplace_back(
+                &buffer_.data_size_, sizeof(buffer_.data_size_));
 
             // add chunk description
-            buffers.push_back(asio::buffer(
-                &buffer_.num_chunks_, sizeof(buffer_.num_chunks_)));
+            buffers.emplace_back(
+                &buffer_.num_chunks_, sizeof(buffer_.num_chunks_));
 
             std::vector<parcel_buffer_type::transmission_chunk_type>& chunks =
                 buffer_.transmission_chunks_;
             if (!chunks.empty())
             {
-                buffers.push_back(asio::buffer(chunks.data(),
+                buffers.emplace_back(chunks.data(),
                     chunks.size() *
-                        sizeof(parcel_buffer_type::transmission_chunk_type)));
+                        sizeof(parcel_buffer_type::transmission_chunk_type));
 
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(asio::buffer(buffer_.data_));
+                buffers.emplace_back(asio::buffer(buffer_.data_));
 
                 // now add chunks themselves, those hold zero-copy serialized chunks
                 for (serialization::serialization_chunk& c : buffer_.chunks_)
                 {
                     if (c.type_ ==
                         serialization::chunk_type::chunk_type_pointer)
-                        buffers.push_back(asio::buffer(c.data_.cpos_, c.size_));
+                        buffers.emplace_back(c.data_.cpos_, c.size_);
                 }
             }
             else
             {
                 // add main buffer holding data which was serialized normally
-                buffers.push_back(asio::buffer(buffer_.data_));
+                buffers.emplace_back(asio::buffer(buffer_.data_));
             }
 
             // this additional wrapping of the handler into a bind object is

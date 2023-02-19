@@ -279,7 +279,7 @@ namespace hpx::parcelset {
             HPX_ASSERT(dest.type() == type());
             for (std::size_t i = 1; i != parcels.size(); ++i)
             {
-                HPX_ASSERT(parcels[0].destination_locality() ==
+                HPX_ASSERT(parcels[0].destination_locality() ==    //-V767
                     parcels[i].destination_locality());
             }
 #endif
@@ -575,14 +575,14 @@ namespace hpx::parcelset {
 
                     if (!dequeue_parcels(dest_, parcels, handlers))
                     {
-                        // Give this connection back to the connection handler as
-                        // we couldn't dequeue parcels.
+                        // Give this connection back to the connection
+                        // handler as we couldn't dequeue parcels.
                         connection_handler().reclaim_connection(sender);
                         return;
                     }
 
-                    ps = parcels.data();
-                    fs = handlers.data();
+                    ps = parcels.data();     //-V506
+                    fs = handlers.data();    //-V506
                     num_parcels = parcels.size();
                     HPX_ASSERT(parcels.size() == handlers.size());
                 }
@@ -621,8 +621,10 @@ namespace hpx::parcelset {
             }
         }
 
-        void send_immediate_impl(locality const& dest_, write_handler_type* fs,
-            parcel* ps, std::size_t num_parcels)
+        void send_immediate_impl([[maybe_unused]] locality const& dest_,
+            [[maybe_unused]] write_handler_type* fs,
+            [[maybe_unused]] parcel* ps,
+            [[maybe_unused]] std::size_t num_parcels)
         {
             if constexpr (connection_handler_traits<
                               ConnectionHandler>::is_connectionless::value)
@@ -636,10 +638,6 @@ namespace hpx::parcelset {
             }
             else
             {
-                HPX_UNUSED(dest_);
-                HPX_UNUSED(fs);
-                HPX_UNUSED(ps);
-                HPX_UNUSED(num_parcels);
                 HPX_ASSERT(false);
             }
         }
@@ -946,8 +944,8 @@ namespace hpx::parcelset {
 
         void send_pending_parcels(parcelset::locality const& parcel_locality_id,
             std::shared_ptr<connection> sender_connection,
-            std::vector<parcel>&& parcels,
-            std::vector<write_handler_type>&& handlers)
+            std::vector<parcel>&& parcels,                 //-V826
+            std::vector<write_handler_type>&& handlers)    //-V826
         {
 #if defined(HPX_TRACK_STATE_OF_OUTGOING_TCP_CONNECTION)
             sender_connection->set_state(connection::state_send_pending);

@@ -55,8 +55,8 @@ namespace hpx::util {
     {
         using namespace asio::ip;
         std::error_code ec;
-        address_v4 const addr4 =
-            address_v4::from_string(addr.c_str(), ec);    //-V821
+        address_v4 const addr4 =    //-V821
+            address_v4::from_string(addr.c_str(), ec);
         if (!ec)
         {    // it's an IPV4 address
             ep = tcp::endpoint(address(addr4), port);

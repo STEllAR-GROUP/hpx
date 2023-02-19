@@ -345,9 +345,9 @@ namespace hpx::components {
 
                 for (std::size_t i = 0; i != count; ++i)
                 {
-                    result.push_back(hpx::id_type(
+                    result.emplace_back(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::management_type::managed));
+                        hpx::id_type::management_type::managed);
                 }
 
                 return hpx::make_ready_future(result);
@@ -388,9 +388,9 @@ namespace hpx::components {
 
                 for (std::size_t i = 0; i != count; ++i)
                 {
-                    result.push_back(hpx::id_type(
+                    result.emplace_back(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::management_type::managed));
+                        hpx::id_type::management_type::managed);
                 }
 
                 return result;

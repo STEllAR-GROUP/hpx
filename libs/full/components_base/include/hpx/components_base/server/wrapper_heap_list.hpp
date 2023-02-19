@@ -32,7 +32,7 @@ namespace hpx::components::detail {
             // default initial number of elements
             heap_capacity = 0xFFF,
             // Alignment of one element
-            heap_element_alignment = std::alignment_of_v<value_type>,
+            heap_element_alignment = std::alignment_of_v<value_type>,    //-V103
             // size of one element in the heap
             heap_element_size = sizeof(storage_type)
         };

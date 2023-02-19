@@ -324,10 +324,10 @@ namespace hpx::execution::experimental {
                 template <std::size_t... Is, typename... Ts>
                 void set_value_helper(
                     hpx::util::member_pack<hpx::util::index_pack<Is...>, Ts...>&
-                        ts) noexcept
+                        t) noexcept
                 {
-                    hpx::execution::experimental::set_value(HPX_MOVE(receiver),
-                        HPX_MOVE(*(ts.template get<Is>()))...);
+                    hpx::execution::experimental::set_value(
+                        HPX_MOVE(receiver), HPX_MOVE(*t.template get<Is>())...);
                 }
 
                 void finish() noexcept

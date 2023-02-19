@@ -74,7 +74,12 @@ namespace hpx { namespace components { namespace process { namespace windows {
     {
         if (path.empty())
         {
-            path = ::getenv("PATH");
+            auto* env = ::getenv("PATH");
+            if (env != nullptr)
+            {
+                path = env;
+            }
+
             if (path.empty())
             {
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
@@ -99,8 +104,8 @@ namespace hpx { namespace components { namespace process { namespace windows {
                 std::error_code ec;
                 bool file = filesystem::is_regular_file(p2, ec);
                 if (!ec && file &&
-                    SHGetFileInfoA(p2.string().c_str(), 0, nullptr, 0,
-                        SHGFI_EXETYPE))    //-V575
+                    SHGetFileInfoA(p2.string().c_str(), 0, nullptr,    //-V575
+                        0, SHGFI_EXETYPE))
                 {
                     return p2.string();
                 }

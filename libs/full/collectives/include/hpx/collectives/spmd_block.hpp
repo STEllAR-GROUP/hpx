@@ -306,8 +306,6 @@ namespace hpx { namespace lcos {
             typename hpx::actions::make_action<decltype(&helper_type::call),
                 &helper_type::call>::type;
 
-        helper_action_type act;
-
         std::size_t num_images =
             static_cast<std::size_t>(
                 agas::get_num_localities(hpx::launch::sync)) *
@@ -317,11 +315,12 @@ namespace hpx { namespace lcos {
 
         std::vector<hpx::id_type> localities;
         localities.reserve(ids.size());
-        for (auto id : ids)
+        for (auto const& id : ids)
         {
             localities.push_back(naming::get_id_from_locality_id(id));
         }
 
+        helper_action_type act{};
         return hpx::lcos::broadcast(act, localities,
             HPX_FORWARD(std::string, name), images_per_locality, num_images,
             HPX_FORWARD(Args, args)...);

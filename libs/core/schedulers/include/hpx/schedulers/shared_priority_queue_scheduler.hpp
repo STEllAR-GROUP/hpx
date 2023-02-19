@@ -705,7 +705,7 @@ namespace hpx::threads::policies {
 
             auto msg = spq_deb.declare_variable<char const*>(nullptr);
 
-            std::unique_lock<pu_mutex_type> l;
+            //std::unique_lock<Mutex> l(init_mutex);
 
             using threads::thread_schedule_hint_mode;
 
@@ -1340,7 +1340,7 @@ namespace hpx::threads::policies {
 
         // for each numa domain, the number of queues available
         std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_counts_ = {};
-        // index of first queue on each nume domain
+        // index of first queue on each numa domain
         std::array<std::size_t, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> q_offset_ = {};
         // one item per numa domain of a container for queues on that domain
         std::array<numa_queues, HPX_HAVE_MAX_NUMA_DOMAIN_COUNT> numa_holder_ =

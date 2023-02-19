@@ -48,7 +48,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     class runtime_support
@@ -431,7 +431,7 @@ namespace hpx { namespace components { namespace server {
         typedef typename Component::wrapping_type wrapping_type;
         for (std::size_t i = 0; i != count; ++i)
         {
-            ids.push_back(create<wrapping_type>());
+            ids.emplace_back(create<wrapping_type>());
         }
 
         LRT_(info).format("successfully created {} component(s) of type: {}",
@@ -541,7 +541,7 @@ namespace hpx { namespace components { namespace server {
 
         return id;
     }
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
 
 #include <hpx/config/warnings_suffix.hpp>
 
@@ -600,7 +600,8 @@ HPX_REGISTER_ACTION_DECLARATION(
     dijkstra_termination_action)
 #endif
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
+
     template <typename Component, typename... Ts>
     struct create_component_action
       : ::hpx::actions::action<naming::gid_type (runtime_support::*)(Ts...),
@@ -690,11 +691,11 @@ namespace hpx { namespace components { namespace server {
             migrate_component_here_action<Component>>
     {
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
 
-namespace hpx { namespace traits {
-    ///////////////////////////////////////////////////////////////////////////
-    // Termination detection does not make this locality black
+namespace hpx::traits {
+///////////////////////////////////////////////////////////////////////////
+// Termination detection does not make this locality black
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
     template <>
     struct action_does_termination_detection<
@@ -712,4 +713,5 @@ namespace hpx { namespace traits {
     struct is_component<components::server::runtime_support> : std::true_type
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
+// namespace hpx::traits

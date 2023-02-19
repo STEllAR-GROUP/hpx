@@ -48,18 +48,18 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     std::string get_locality_base_name();
-}}    // namespace hpx::detail
+}
 
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
 
     // shortcut for get_runtime().get_parcel_handler()
     parcelhandler& get_parcel_handler();
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     void register_unassigned_typenames()
     {
@@ -229,9 +229,10 @@ namespace hpx { namespace agas { namespace detail {
         std::vector<std::uint32_t> serialization_ids;
         std::vector<std::uint32_t> action_ids;
     };
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
+
     template <typename Action, typename... Args>
     void big_boot_barrier::apply(std::uint32_t source_locality_id,
         std::uint32_t target_locality_id, parcelset::locality dest, Action act,
@@ -429,8 +430,7 @@ namespace hpx { namespace agas {
         actions::direct_action<void (*)(notification_header const&),
             notify_worker>;
     // }}}
-
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 using hpx::agas::notify_worker_action;
 using hpx::agas::register_worker_action;
@@ -443,7 +443,7 @@ HPX_REGISTER_ACTION_ID(register_worker_action, register_worker_action,
 HPX_REGISTER_ACTION_ID(notify_worker_action, notify_worker_action,
     hpx::actions::notify_worker_action_id)
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // remote call to AGAS
     void register_worker(registration_header const& header)
@@ -647,7 +647,7 @@ namespace hpx { namespace agas {
         std::unique_lock<std::mutex> lock(mtx);
         while (connected)
         {
-            cond.wait(lock);
+            cond.wait(lock);    //-V1089
         }
 
         // pre-cache all known locality endpoints in local AGAS on locality 0 as well
@@ -684,7 +684,7 @@ namespace hpx { namespace agas {
       , cond()
       , mtx()
       , connected(get_number_of_bootstrap_connections(ini_))
-      , thunks(32)
+      , thunks(32)    //-V112
     {
         // register all not registered typenames
         if (service_type == service_mode::bootstrap)
@@ -866,7 +866,6 @@ namespace hpx { namespace agas {
         }
         return *(bbb.get());
     }
-
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 #endif

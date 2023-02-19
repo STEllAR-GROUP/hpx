@@ -669,7 +669,7 @@ namespace hpx { namespace threads {
             std::size_t nt = rp.get_num_threads(pool_iter->get_pool_index());
             for (std::size_t i = 0; i < nt; i++)
             {
-                threads_lookup_.push_back(pool_iter->get_pool_id());
+                threads_lookup_.emplace_back(pool_iter->get_pool_id());
             }
         }
     }
@@ -693,7 +693,7 @@ namespace hpx { namespace threads {
 
     void threadmanager::print_pools(std::ostream& os)
     {
-        os << "The thread-manager owns " << pools_.size()    //  -V128
+        os << "The thread-manager owns " << pools_.size()    //-V128
            << " pool(s) : \n";
 
         for (auto&& pool_iter : pools_)
@@ -1252,7 +1252,7 @@ namespace hpx { namespace threads {
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(suspend_pool(*pool_iter));
+                fs.emplace_back(suspend_pool(*pool_iter));
             }
 
             hpx::wait_all(fs);
@@ -1274,7 +1274,7 @@ namespace hpx { namespace threads {
 
             for (auto& pool_iter : pools_)
             {
-                fs.push_back(resume_pool(*pool_iter));
+                fs.emplace_back(resume_pool(*pool_iter));
             }
             hpx::wait_all(fs);
         }

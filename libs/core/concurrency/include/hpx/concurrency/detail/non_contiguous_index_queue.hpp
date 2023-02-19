@@ -34,7 +34,7 @@ namespace hpx::concurrency::detail {
     template <typename T = std::uint32_t>
     class non_contiguous_index_queue
     {
-        static_assert(sizeof(T) <= 4,
+        static_assert(sizeof(T) <= 4,    //-V112
             "non_contiguous_index_queue assumes at most 32 bit indices to fit "
             "two indices in an at most 64 bit struct");
         static_assert(std::is_integral_v<T>,
@@ -107,12 +107,12 @@ namespace hpx::concurrency::detail {
         ///        range.
         ///
         /// Construct a new queue with the given range as the initial range.
-        constexpr non_contiguous_index_queue(T first, T last, T step) noexcept
+        constexpr non_contiguous_index_queue(T first, T last, T step_) noexcept
           : initial_range{}
           , step{}
           , current_range{}
         {
-            reset(first, last, step);
+            reset(first, last, step_);
         }
 
         /// \brief Copy-construct a queue.

@@ -28,7 +28,7 @@
 
 // TODO: Remove the use of the name "prefix"
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     naming::gid_type bootstrap_component_namespace_gid()
     {
@@ -40,9 +40,9 @@ namespace hpx { namespace agas {
         return hpx::id_type(agas::component_ns_msb, agas::component_ns_lsb,
             hpx::id_type::management_type::unmanaged);
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     void component_namespace::register_server_instance(
         char const* servicename, error_code& ec)
@@ -91,8 +91,7 @@ namespace hpx { namespace agas { namespace server {
         if (component_ids_.find(key) == cend)
         {
             if (HPX_UNLIKELY(!util::insert_checked(
-                    component_ids_.insert(std::make_pair(key, type_counter)),
-                    cit)))
+                    component_ids_.emplace(key, type_counter), cit)))
             {
                 l.unlock();
 
@@ -147,8 +146,7 @@ namespace hpx { namespace agas { namespace server {
         // prevent a copy, though most compilers should be able to optimize
         // this without our help.
         if (HPX_UNLIKELY(!util::insert_checked(
-                factories_.insert(std::make_pair(cit->second, prefixes_type())),
-                fit)))
+                factories_.emplace(cit->second, prefixes_type()), fit)))
         {
             l.unlock();
 
@@ -186,8 +184,7 @@ namespace hpx { namespace agas { namespace server {
         if (it == end)
         {
             if (HPX_UNLIKELY(!util::insert_checked(
-                    component_ids_.insert(std::make_pair(key, type_counter)),
-                    it)))
+                    component_ids_.emplace(key, type_counter), it)))
             {
                 l.unlock();
 
@@ -246,8 +243,8 @@ namespace hpx { namespace agas { namespace server {
             std::vector<std::uint32_t> p;
             p.assign(prefixes.cbegin(), prefixes.cend());
 
-            LAGAS_(info).format(
-                "component_namespace::resolve_id, key({1}), localities({2})",
+            LAGAS_(info).format("component_namespace::resolve_id, "
+                                "key({1}), localities({2})",
                 key, prefixes.size());
 
             return p;
@@ -268,8 +265,8 @@ namespace hpx { namespace agas { namespace server {
         // REVIEW: Should this be an error?
         if (it == component_ids_.end())
         {
-            LAGAS_(info).format(
-                "component_namespace::unbind, key({1}), response(no_success)",
+            LAGAS_(info).format("component_namespace::unbind, key({1}), "
+                                "response(no_success)",
                 key);
 
             return false;
@@ -357,9 +354,9 @@ namespace hpx { namespace agas { namespace server {
 
         if (result.empty())
         {
-            LAGAS_(info).format(
-                "component_namespace::get_component_typename, key({1}/{2}), "
-                "response(no_success)",
+            LAGAS_(info).format("component_namespace::get_component_"
+                                "typename, key({1}/{2}), "
+                                "response(no_success)",
                 int(components::get_derived_type(t)),
                 int(components::get_base_type(t)));
 
@@ -592,5 +589,4 @@ namespace hpx { namespace agas { namespace server {
             ++num_localities_.count_;
         }
     }
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server

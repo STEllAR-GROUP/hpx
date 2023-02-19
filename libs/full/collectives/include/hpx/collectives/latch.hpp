@@ -120,7 +120,7 @@ namespace hpx::distributed {
         ///
         /// \throws Nothing.
         ///
-        bool try_wait() const noexcept
+        bool try_wait() const noexcept    //-V524
         {
             return is_ready_async().get();
         }

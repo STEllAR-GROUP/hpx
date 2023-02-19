@@ -203,7 +203,7 @@ namespace hpx { namespace compute { namespace host {
             catch (...)
             {
                 results.clear();
-                results.push_back(hpx::make_exceptional_future<result_type>(
+                results.emplace_back(hpx::make_exceptional_future<result_type>(
                     std::current_exception()));
             }
             return results;
@@ -249,7 +249,7 @@ namespace hpx { namespace compute { namespace host {
                             executors_[i], HPX_FORWARD(F, f),
                             util::iterator_range(begin, part_end),
                             HPX_FORWARD(Ts, ts)...);
-                    results.insert(results.end(),
+                    results.emplace(results.end(),
                         std::make_move_iterator(part_results.begin()),
                         std::make_move_iterator(part_results.end()));
                 }

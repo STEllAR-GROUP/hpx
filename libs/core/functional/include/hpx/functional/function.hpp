@@ -47,7 +47,7 @@ namespace hpx {
     public:
         using result_type = R;
 
-        constexpr function(std::nullptr_t = nullptr) noexcept {}
+        constexpr function(std::nullptr_t = nullptr) noexcept {}    //-V832
 
         function(function const&) = default;
         function(function&&) noexcept = default;

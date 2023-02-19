@@ -82,7 +82,12 @@ namespace hpx {
         std::vector<hpx::future<hpx::id_type>> results;
         for (std::size_t i = 0; i != num_ids; ++i)
         {
-            std::string name = detail::name_from_basename(basename, i);
+            std::string name;
+            if (i == num_ids - 1)
+                name = detail::name_from_basename(HPX_MOVE(basename), i);
+            else
+                name = detail::name_from_basename(basename, i);
+
             results.push_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
@@ -99,11 +104,15 @@ namespace hpx {
         }
 
         std::vector<hpx::future<hpx::id_type>> results;
-        for (std::size_t const i : ids)
+        for (std::size_t i = 0; i != ids.size(); ++i)
         {
-            std::string name =
-                detail::name_from_basename(basename, i);    //-V106
-            results.push_back(
+            std::string name;
+            if (i == ids.size() - 1)
+                name = detail::name_from_basename(HPX_MOVE(basename), i);
+            else
+                name = detail::name_from_basename(basename, i);
+
+            results.emplace_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
         return results;

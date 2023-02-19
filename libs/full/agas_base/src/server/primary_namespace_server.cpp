@@ -181,8 +181,10 @@ namespace hpx::agas::server {
 
                 get<2>(it->second).wait(l, ec);
 
-                if (--get<1>(it->second) == 0)
+                if (--get<1>(it->second) == 0)    //-V516
+                {
                     migrating_objects_.erase(it);
+                }
             }
             else
             {
@@ -355,7 +357,7 @@ namespace hpx::agas::server {
 
         // Insert a GID -> GVA entry into the GVA table.
         if (HPX_UNLIKELY(!util::insert_checked(
-                gvas_.insert(std::make_pair(id, std::make_pair(g, locality))))))
+                gvas_.emplace(id, std::make_pair(g, locality)))))
         {
             l.unlock();
 
@@ -587,11 +589,8 @@ namespace hpx::agas::server {
             counter_data_.allocate_.time_, counter_data_.allocate_.enabled_);
         counter_data_.increment_allocate_count();
 
-        std::uint64_t const real_count = (count) ? (count - 1) : (0);
-
         // Just return the prefix
-        // REVIEW: Should this be an error?
-        if (0 == count)
+        if (count == 0)
         {
             LAGAS_(info).format(
                 "primary_namespace::allocate, count({1}), lower({1}), "
@@ -601,6 +600,8 @@ namespace hpx::agas::server {
 
             return std::make_pair(next_id_, next_id_);
         }
+
+        std::uint64_t const real_count = count - 1;
 
         // Compute the new allocation.
         naming::gid_type lower(next_id_ + 1);
@@ -630,9 +631,9 @@ namespace hpx::agas::server {
 
         // Set the initial credit count.
         naming::detail::set_credit_for_gid(
-            lower, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            lower, static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL));
         naming::detail::set_credit_for_gid(
-            upper, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            upper, static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL));
 
         LAGAS_(info).format(
             "primary_namespace::allocate, count({1}), lower({2}), upper({3}), "
@@ -719,7 +720,8 @@ namespace hpx::agas::server {
             if (it == refcnts_.end())
             {
                 std::int64_t count =
-                    std::int64_t(HPX_GLOBALCREDIT_INITIAL) + credits;
+                    static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL) +
+                    credits;
 
                 std::pair<refcnt_table_type::iterator, bool> p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
@@ -832,7 +834,7 @@ namespace hpx::agas::server {
 
             // Add the information needed to destroy these components to the
             // free list.
-            free_entry_list.push_back(free_entry(resolved, gid, get<2>(r)));
+            free_entry_list.emplace_back(resolved, gid, get<2>(r));
 
             // remove this entry from the refcnt table
             refcnts_.erase(it);
@@ -886,13 +888,14 @@ namespace hpx::agas::server {
             // we know that it's global reference count is the initial global
             // reference count.
 
-            std::list<refcnt_table_type::iterator> free_list;
+            std::list<refcnt_table_type::iterator> free_list;    //-V826
             for (naming::gid_type raw = lower; raw != upper; ++raw)
             {
                 refcnt_table_type::iterator it = refcnts_.find(raw);
                 if (it == refcnts_.end())
                 {
-                    if (credits > std::int64_t(HPX_GLOBALCREDIT_INITIAL))
+                    if (credits >
+                        static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL))
                     {
                         l.unlock();
 
@@ -906,11 +909,11 @@ namespace hpx::agas::server {
                     }
 
                     std::int64_t count =
-                        std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits;
+                        static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL) -
+                        credits;
 
-                    std::pair<refcnt_table_type::iterator, bool> p =
-                        refcnts_.insert(
-                            refcnt_table_type::value_type(raw, count));
+                    std::pair<refcnt_table_type::iterator, bool> const p =
+                        refcnts_.emplace(raw, count);
                     if (!p.second)
                     {
                         l.unlock();

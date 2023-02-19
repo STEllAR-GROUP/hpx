@@ -417,11 +417,23 @@ namespace hpx::plugins::parcel {
 
         time_between_parcels_histogram_counter_surrogate(
             time_between_parcels_histogram_counter_surrogate const& rhs)
-          : action_name_(rhs.action_name_)
+          : counter_(rhs.counter_)
+          , action_name_(rhs.action_name_)
           , min_boundary_(rhs.min_boundary_)
           , max_boundary_(rhs.max_boundary_)
           , num_buckets_(rhs.num_buckets_)
         {
+        }
+
+        time_between_parcels_histogram_counter_surrogate& operator=(
+            time_between_parcels_histogram_counter_surrogate const& rhs)
+        {
+            counter_ = rhs.counter_;
+            action_name_ = rhs.action_name_;
+            min_boundary_ = rhs.min_boundary_;
+            max_boundary_ = rhs.max_boundary_;
+            num_buckets_ = rhs.num_buckets_;
+            return *this;
         }
 
         std::vector<std::int64_t> operator()(bool reset)

@@ -94,12 +94,12 @@ namespace hpx::parcelset::policies::tcp {
             // Issue a read operation to read the message size.
             using asio::buffer;
             std::vector<asio::mutable_buffer> buffers;
-            buffers.push_back(buffer(&buffer_.size_, sizeof(buffer_.size_)));
-            buffers.push_back(
-                buffer(&buffer_.data_size_, sizeof(buffer_.data_size_)));
+            buffers.emplace_back(&buffer_.size_, sizeof(buffer_.size_));
+            buffers.emplace_back(
+                &buffer_.data_size_, sizeof(buffer_.data_size_));
 
-            buffers.push_back(
-                buffer(&buffer_.num_chunks_, sizeof(buffer_.num_chunks_)));
+            buffers.emplace_back(
+                &buffer_.num_chunks_, sizeof(buffer_.num_chunks_));
 
             {
                 std::unique_lock lk(mtx_);
@@ -202,13 +202,13 @@ namespace hpx::parcelset::policies::tcp {
                     chunks.resize(static_cast<std::size_t>(
                         num_zero_copy_chunks + num_non_zero_copy_chunks));
 
-                    buffers.push_back(asio::buffer(chunks.data(),
-                        chunks.size() * sizeof(transmission_chunk_type)));
+                    buffers.emplace_back(chunks.data(),
+                        chunks.size() * sizeof(transmission_chunk_type));
 
                     // add main buffer holding data which was serialized normally
                     buffer_.data_.resize(
                         static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(asio::buffer(buffer_.data_));
+                    buffers.emplace_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_chunk_data<Handler>;
@@ -218,7 +218,7 @@ namespace hpx::parcelset::policies::tcp {
                     // add main buffer holding data which was serialized normally
                     buffer_.data_.resize(
                         static_cast<std::size_t>(inbound_size));
-                    buffers.push_back(asio::buffer(buffer_.data_));
+                    buffers.emplace_back(asio::buffer(buffer_.data_));
 
                     // Start an asynchronous call to receive the data.
                     f = &receiver::handle_read_data<Handler>;
@@ -277,8 +277,7 @@ namespace hpx::parcelset::policies::tcp {
                     std::size_t chunk_size = static_cast<std::size_t>(
                         buffer_.transmission_chunks_[i].second);
                     buffer_.chunks_[i].resize(chunk_size);
-                    buffers.push_back(
-                        asio::buffer(buffer_.chunks_[i].data(), chunk_size));
+                    buffers.emplace_back(buffer_.chunks_[i].data(), chunk_size);
                 }
 
                 // Start an asynchronous call to receive the data.

@@ -57,90 +57,76 @@ namespace hpx { namespace util {
         }
 
         void* p = nullptr;
+
+        if (!heap_list_.empty())
         {
-            if (!heap_list_.empty())
+            for (auto& heap : heap_list_)
             {
-                for (auto& heap : heap_list_)
+                bool allocated = false;
+
                 {
-                    bool allocated = false;
-
-                    {
-                        hpx::unlock_guard ul(guard);
-                        allocated = heap->alloc(&p, count);
-                    }
-
-                    if (allocated)
-                    {
-#if defined(HPX_DEBUG)
-                        // Allocation succeeded, update statistics.
-                        alloc_count_ += count;
-                        if (alloc_count_ - free_count_ > max_alloc_count_)
-                            max_alloc_count_ = alloc_count_ - free_count_;
-#endif
-                        return p;
-                    }
-
-#if defined(HPX_DEBUG)
-                    LOSH_(info).format(
-                        "{1}::alloc: failed to allocate from heap[{2}] "
-                        "(heap[{2}] has allocated {3} objects and has "
-                        "space for {4} more objects)",
-                        name(), heap->heap_count(), heap->size(),
-                        heap->free_size());
-#endif
+                    hpx::unlock_guard ul(guard);
+                    allocated = heap->alloc(&p, count);
                 }
+
+                if (allocated)
+                {
+#if defined(HPX_DEBUG)
+                    // Allocation succeeded, update statistics.
+                    alloc_count_ += count;
+                    if (alloc_count_ - free_count_ > max_alloc_count_)
+                        max_alloc_count_ = alloc_count_ - free_count_;
+#endif
+                    return p;
+                }
+
+#if defined(HPX_DEBUG)
+                LOSH_(info).format(
+                    "{1}::alloc: failed to allocate from heap[{2}] "
+                    "(heap[{2}] has allocated {3} objects and has "
+                    "space for {4} more objects)",
+                    name(), heap->heap_count(), heap->size(),
+                    heap->free_size());
+#endif
             }
         }
 
         // Create new heap.
-        bool did_create = false;
-        {
 #if defined(HPX_DEBUG)
-            heap_list_.push_front(create_heap_(
-                class_name_.c_str(), heap_count_ + 1, parameters_));
+        heap_list_.push_front(
+            create_heap_(class_name_.c_str(), heap_count_ + 1, parameters_));
 #else
-            heap_list_.push_front(
-                create_heap_(class_name_.c_str(), 0, parameters_));
+        heap_list_.push_front(
+            create_heap_(class_name_.c_str(), 0, parameters_));
 #endif
 
-            iterator itnew = heap_list_.begin();
-            typename list_type::value_type heap = *itnew;
-            bool result = false;
+        auto const itnew = heap_list_.begin();
+        list_type::value_type const heap = *itnew;
+        bool result = false;
 
-            {
-                hpx::unlock_guard ul(guard);
-                result = heap->alloc((void**) &p, count);
-            }
+        {
+            hpx::unlock_guard ul(guard);
+            result = heap->alloc((void**) &p, count);
+        }
 
-            if (HPX_UNLIKELY(!result || nullptr == p))
-            {
-                // out of memory
-                guard.unlock();
-                HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
-                    name() + "::alloc",
-                    "new heap failed to allocate {1} objects", count);
-            }
+        if (HPX_UNLIKELY(!result || nullptr == p))
+        {
+            // out of memory
+            guard.unlock();
+            HPX_THROW_EXCEPTION(hpx::error::out_of_memory, name() + "::alloc",
+                "new heap failed to allocate {1} objects", count);
+        }
 
 #if defined(HPX_DEBUG)
-            alloc_count_ += count;
-            ++heap_count_;
+        alloc_count_ += count;
+        ++heap_count_;
 
-            LOSH_(info).format(
-                "{1}::alloc: creating new heap[{2}], size is now {3}", name(),
-                heap_count_, heap_list_.size());
+        LOSH_(info).format(
+            "{1}::alloc: creating new heap[{2}], size is now {3}", name(),
+            heap_count_, heap_list_.size());
 #endif
-            did_create = true;
-        }
 
-        if (did_create)
-        {
-            return p;
-        }
-
-        guard.unlock();
-
-        // Try again, we just got a new heap, so we should be good.
-        return alloc(count);
+        return p;
     }
 
     bool one_size_heap_list::reschedule(void* p, std::size_t count)

@@ -42,7 +42,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \cond NOINTERNAL
-namespace hpx { namespace server {
+namespace hpx::server {
+
     ///////////////////////////////////////////////////////////////////////////
     struct partitioned_vector_config_data
     {
@@ -107,7 +108,7 @@ namespace hpx { namespace server {
             ar& size_& partitions_;
         }
     };
-}}    // namespace hpx::server
+}    // namespace hpx::server
 
 HPX_DISTRIBUTED_METADATA_DECLARATION(
     hpx::server::partitioned_vector_config_data,
@@ -1218,10 +1219,10 @@ namespace hpx {
 
         const_segment_iterator segment_end() const
         {
-            return const_segment_iterator(partitions_.cend(), this);
+            return segment_cend();
         }
 
-        const_segment_iterator segment_cend() const    //-V524
+        const_segment_iterator segment_cend() const
         {
             return const_segment_iterator(partitions_.cend(), this);
         }
@@ -1236,8 +1237,7 @@ namespace hpx {
 
         const_local_segment_iterator segment_begin(std::uint32_t id) const
         {
-            return const_local_segment_iterator(
-                partitions_.cbegin(), partitions_.cend(), id);
+            return segment_cbegin(id);
         }
 
         const_local_segment_iterator segment_cbegin(std::uint32_t id) const
