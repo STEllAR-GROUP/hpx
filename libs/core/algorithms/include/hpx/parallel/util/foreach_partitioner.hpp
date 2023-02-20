@@ -12,7 +12,7 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
-
+#include <hpx/algorithms/traits/is_pair.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -128,7 +128,6 @@ namespace hpx::parallel::util::detail {
     private:
         template <typename F, typename Items1, typename Items2,
             typename FwdIter>
-
         static auto reduce(
             std::pair<Items1, Items2>&& items, F&& f, FwdIter last)
         {
@@ -145,7 +144,9 @@ namespace hpx::parallel::util::detail {
             return hpx::invoke(f, HPX_MOVE(last));
         }
 
-        template <typename F, typename Items, typename FwdIter>
+        template <typename F, typename Items, typename FwdIter,
+            typename Enable =
+                std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static auto reduce(Items&& items, F&& f, FwdIter last)
         {
             namespace ex = hpx::execution::experimental;
@@ -251,7 +252,9 @@ namespace hpx::parallel::util::detail {
 #endif
         }
 
-        template <typename F, typename Items, typename FwdIter>
+        template <typename F, typename Items, typename FwdIter,
+            typename Enable =
+                std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static hpx::future<FwdIter> reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,

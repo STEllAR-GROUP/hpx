@@ -1125,10 +1125,10 @@ namespace hpx::parallel {
             static auto parallel(
                 ExPolicy&& policy, B first, Size size, F&& f, Ts&&... ts)
             {
-                constexpr bool scheduler_policy =
+                constexpr bool is_scheduler_policy =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!scheduler_policy)
+                if constexpr (!is_scheduler_policy)
                 {
                     if (size == 0)
                     {
@@ -1138,11 +1138,23 @@ namespace hpx::parallel {
 
                 if constexpr (sizeof...(Ts) == 0)
                 {
-                    return util::detail::algorithm_result<ExPolicy>::get(
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy> ||
+                        is_scheduler_policy)
+                    {
+                        return util::detail::algorithm_result<ExPolicy>::get(
+                            util::partitioner<ExPolicy>::call(
+                                HPX_FORWARD(ExPolicy, policy), first, size,
+                                part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
+                                hpx::util::empty_function{}));
+                    }
+                    else
+                    {
                         util::partitioner<ExPolicy>::call(
                             HPX_FORWARD(ExPolicy, policy), first, size,
                             part_iterations<ExPolicy, F>{HPX_FORWARD(F, f)},
-                            hpx::util::empty_function{}));
+                            hpx::util::empty_function{});
+                        return util::detail::algorithm_result<ExPolicy>::get();
+                    }
                 }
                 else
                 {
@@ -1291,10 +1303,10 @@ namespace hpx::parallel {
             static auto parallel(ExPolicy&& policy, B first, Size size,
                 S stride, F&& f, Ts&&... ts)
             {
-                constexpr bool scheduler_policy =
+                constexpr bool is_scheduler_policy =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!scheduler_policy)
+                if constexpr (!is_scheduler_policy)
                 {
                     if (size == 0)
                     {
@@ -1304,7 +1316,7 @@ namespace hpx::parallel {
 
                 if constexpr (sizeof...(Ts) == 0)
                 {
-                    if constexpr (!scheduler_policy)
+                    if constexpr (!is_scheduler_policy)
                     {
                         if (stride == 1)
                         {
@@ -1317,12 +1329,26 @@ namespace hpx::parallel {
                         }
                     }
 
-                    return util::detail::algorithm_result<ExPolicy>::get(
+                    if constexpr (hpx::is_async_execution_policy_v<ExPolicy> ||
+                        is_scheduler_policy)
+                    {
+                        return util::detail::algorithm_result<ExPolicy>::get(
+                            util::partitioner<ExPolicy>::call_with_index(
+                                HPX_FORWARD(ExPolicy, policy), first, size,
+                                stride,
+                                part_iterations<ExPolicy, F, S>{
+                                    HPX_FORWARD(F, f), stride},
+                                [](auto&&) { return hpx::util::unused; }));
+                    }
+                    else
+                    {
                         util::partitioner<ExPolicy>::call_with_index(
                             HPX_FORWARD(ExPolicy, policy), first, size, stride,
                             part_iterations<ExPolicy, F, S>{
                                 HPX_FORWARD(F, f), stride},
-                            [](auto&&) { return hpx::util::unused; }));
+                            [](auto&&) { return hpx::util::unused; });
+                        return util::detail::algorithm_result<ExPolicy>::get();
+                    }
                 }
                 else
                 {

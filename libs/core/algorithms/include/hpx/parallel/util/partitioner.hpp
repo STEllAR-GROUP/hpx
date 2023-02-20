@@ -12,20 +12,21 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
+#include <hpx/algorithms/traits/is_pair.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/type_support/empty_function.hpp>
-#include <hpx/type_support/unused.hpp>
-#include <hpx/type_support/void_guard.hpp>
-
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
+#include <hpx/type_support/empty_function.hpp>
+#include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/void_guard.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -277,7 +278,9 @@ namespace hpx::parallel::util::detail {
         }
 
     private:
-        template <typename Items, typename F>
+        template <typename Items, typename F,
+            typename Enable =
+                std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static auto reduce(Items&& items, F&& f)
         {
             namespace ex = hpx::execution::experimental;
@@ -305,7 +308,9 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Items>
+        template <typename Items,
+            typename Enable =
+                std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static auto reduce(Items&& items, hpx::util::empty_function)
         {
             namespace ex = hpx::execution::experimental;
@@ -328,16 +333,24 @@ namespace hpx::parallel::util::detail {
         }
 
         template <typename Items1, typename Items2, typename F>
-        static R reduce(std::pair<Items1, Items2>&& items, F&& f)
+        static auto reduce(std::pair<Items1, Items2>&& items, F&& f)
         {
             if (items.first.empty())
             {
                 return reduce(HPX_MOVE(items.second), HPX_FORWARD(F, f));
             }
 
-            items.first.insert(items.first.end(),
-                std::make_move_iterator(items.second.begin()),
-                std::make_move_iterator(items.second.end()));
+            if constexpr (hpx::traits::is_future_v<Items2>)
+            {
+                items.first.emplace_back(HPX_MOVE(items.second));
+            }
+            else
+            {
+                items.first.insert(items.first.end(),
+                    std::make_move_iterator(items.second.begin()),
+                    std::make_move_iterator(items.second.end()));
+            }
+
             return reduce(HPX_MOVE(items.first), HPX_FORWARD(F, f));
         }
     };
@@ -453,14 +466,24 @@ namespace hpx::parallel::util::detail {
                     HPX_FORWARD(F, f));
             }
 
-            items.first.insert(items.first.end(),
-                std::make_move_iterator(items.second.begin()),
-                std::make_move_iterator(items.second.end()));
+            if constexpr (hpx::traits::is_future_v<Items2>)
+            {
+                items.first.emplace_back(HPX_MOVE(items.second));
+            }
+            else
+            {
+                items.first.insert(items.first.end(),
+                    std::make_move_iterator(items.second.begin()),
+                    std::make_move_iterator(items.second.end()));
+            }
+
             return reduce(HPX_MOVE(scoped_params), HPX_MOVE(items.first),
                 HPX_FORWARD(F, f));
         }
 
-        template <typename Items, typename F>
+        template <typename Items, typename F,
+            typename Enable =
+                std::enable_if_t<!hpx::traits::is_pair_v<std::decay_t<Items>>>>
         static hpx::future<R> reduce(
             [[maybe_unused]] std::shared_ptr<scoped_executor_parameters>&&
                 scoped_params,
