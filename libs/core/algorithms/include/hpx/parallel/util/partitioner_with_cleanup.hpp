@@ -12,13 +12,11 @@
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/async_local/dataflow.hpp>
 #endif
-#include <hpx/type_support/unused.hpp>
-
-#include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 #include <hpx/parallel/util/detail/select_partitioner.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -29,6 +27,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
@@ -48,19 +47,13 @@ namespace hpx::parallel::util {
 
             template <typename ExPolicy_, typename FwdIter, typename F1,
                 typename F2, typename Cleanup>
-            static R call(ExPolicy_&& orgpolicy, FwdIter first,
-                std::size_t count, F1&& f1, F2&& f2, Cleanup&& cleanup)
+            static R call(ExPolicy_&& policy, FwdIter first, std::size_t count,
+                F1&& f1, F2&& f2, Cleanup&& cleanup)
             {
-                // this is a fork-join invocation, prevent tasks from being
-                // stolen, if possible
-                auto policy = parallel::util::adapt_thread_priority(
-                    HPX_FORWARD(ExPolicy_, orgpolicy),
-                    hpx::threads::thread_priority::bound);
-
                 // inform parameter traits
                 using scoped_executor_parameters =
                     detail::scoped_executor_parameters_ref<parameters_type,
-                        typename decltype(policy)::executor_type>;
+                        typename std::decay_t<ExPolicy_>::executor_type>;
 
                 scoped_executor_parameters scoped_params(
                     policy.parameters(), policy.executor());
@@ -68,7 +61,8 @@ namespace hpx::parallel::util {
                 try
                 {
                     auto&& items = detail::partition<Result>(
-                        policy, first, count, HPX_FORWARD(F1, f1));
+                        HPX_FORWARD(ExPolicy_, policy), first, count,
+                        HPX_FORWARD(F1, f1));
 
                     scoped_params.mark_end_of_scheduling();
 
