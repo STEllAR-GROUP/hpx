@@ -428,7 +428,7 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter2 tag_fallback_invoke(hpx::adjacent_difference_t,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op&& op)
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Op op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
@@ -437,11 +437,12 @@ namespace hpx {
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
                 hpx::execution::sequenced_policy{}, first, last, dest,
-                HPX_FORWARD(Op, op));
+                HPX_MOVE(op));
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter1, typename FwdIter2, typename Op,
+        template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
+            typename Op,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
@@ -450,7 +451,7 @@ namespace hpx {
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::adjacent_difference_t,
             ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
-            Op&& op)
+            Op op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
@@ -458,8 +459,7 @@ namespace hpx {
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::adjacent_difference<FwdIter2>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                HPX_FORWARD(Op, op));
+                HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(op));
         }
     } adjacent_difference{};
 }    // namespace hpx

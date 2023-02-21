@@ -1085,7 +1085,7 @@ namespace hpx::parallel {
             {
                 parallel::util::loop_n<std::decay_t<ExPolicy>>(
                     first, count, HPX_FORWARD(F, f));
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename InIter, typename Size,
@@ -1117,7 +1117,7 @@ namespace hpx::parallel {
                 arg.exit_iteration(size);
                 (args.exit_iteration(size), ...);
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename B, typename Size, typename F,
@@ -1231,7 +1231,7 @@ namespace hpx::parallel {
                     }
                 }
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename InIter, typename Size,
@@ -1283,7 +1283,7 @@ namespace hpx::parallel {
                 arg.exit_iteration(size);
                 (args.exit_iteration(size), ...);
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename B, typename Size, typename S,
@@ -1385,8 +1385,9 @@ namespace hpx::parallel {
             std::size_t size = parallel::detail::distance(first, last);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_algo().call(HPX_FORWARD(ExPolicy, policy), first,
-                size, hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
+                size, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
         // reshuffle arguments, last argument is function object, will go first
@@ -1424,9 +1425,9 @@ namespace hpx::parallel {
             std::size_t size = parallel::detail::distance(first, last);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_strided_algo().call(HPX_FORWARD(ExPolicy, policy),
-                first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
-                hpx::get<Is>(t)...);
+                first, size, stride, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
         // reshuffle arguments, last argument is function object, will go first
@@ -1454,9 +1455,9 @@ namespace hpx::parallel {
 
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_strided_algo().call(HPX_FORWARD(ExPolicy, policy),
-                first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
-                hpx::get<Is>(t)...);
+                first, size, stride, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
         /// \endcond
     }    // namespace detail

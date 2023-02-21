@@ -363,13 +363,13 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
-            RandomIt nth, RandomIt last, Pred&& pred = Pred())
+            RandomIt nth, RandomIt last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
 
             hpx::parallel::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
+                hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
                 hpx::identity_v);
         }
 
@@ -387,7 +387,7 @@ namespace hpx {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
+            RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
@@ -398,7 +398,7 @@ namespace hpx {
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::detail::nth_element<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                       HPX_FORWARD(Pred, pred), hpx::identity_v);
+                       HPX_MOVE(pred), hpx::identity_v);
         }
     } nth_element{};
 }    // namespace hpx

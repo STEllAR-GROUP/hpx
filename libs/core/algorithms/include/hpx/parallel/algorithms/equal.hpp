@@ -657,7 +657,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -666,7 +666,7 @@ namespace hpx {
 
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -707,7 +707,7 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(equal_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, Pred&& op)
+            FwdIter1 last1, FwdIter2 first2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -716,7 +716,7 @@ namespace hpx {
 
             return hpx::parallel::detail::equal().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
-                HPX_FORWARD(Pred, op));
+                HPX_MOVE(op));
         }
 
         // clang-format off
@@ -753,7 +753,7 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -761,8 +761,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
-                hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                hpx::execution::seq, first1, last1, first2, last2, HPX_MOVE(op),
+                hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -797,16 +797,16 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend bool tag_fallback_invoke(equal_t, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, Pred&& op)
+        friend bool tag_fallback_invoke(
+            equal_t, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::detail::equal().call(hpx::execution::seq,
-                first1, last1, first2, HPX_FORWARD(Pred, op));
+            return hpx::parallel::detail::equal().call(
+                hpx::execution::seq, first1, last1, first2, HPX_MOVE(op));
         }
 
         // clang-format off

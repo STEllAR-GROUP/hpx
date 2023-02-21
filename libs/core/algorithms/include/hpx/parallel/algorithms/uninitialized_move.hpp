@@ -528,7 +528,8 @@ namespace hpx {
             typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend std::pair<InIter, FwdIter> tag_fallback_invoke(
@@ -558,7 +559,8 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter1> &&
-                hpx::traits::is_forward_iterator_v<FwdIter2>
+                hpx::traits::is_forward_iterator_v<FwdIter2> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,

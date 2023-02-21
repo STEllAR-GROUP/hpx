@@ -298,7 +298,7 @@ namespace hpx { namespace ranges {
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
     typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
+        hpx::traits::range_iterator_t<Rng>>
     is_heap_until(ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -418,7 +418,7 @@ namespace hpx { namespace ranges {
     template <typename Rng,
         typename Comp = hpx::parallel::detail::less,
         typename Proj = hpx::identity>
-    typename hpx::traits::range_iterator<Rng>::type
+    hpx::traits::range_iterator_t<Rng>
     is_heap_until(Rng&& rng, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -506,21 +506,19 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(is_heap_t, ExPolicy&& policy, Rng&& rng,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type>,
@@ -528,8 +526,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_heap<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -538,24 +535,23 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(is_heap_t, ExPolicy&& policy, Iter first, Sent last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap<Iter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -563,20 +559,19 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            is_heap_t, Rng&& rng, Comp&& comp = Comp(), Proj&& proj = Proj())
+            is_heap_t, Rng&& rng, Comp comp = Comp(), Proj proj = Proj())
         {
-            using iterator_type =
-                typename hpx::traits::range_iterator<Rng>::type;
+            using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
             static_assert(
                 hpx::traits::is_random_access_iterator_v<iterator_type>,
@@ -584,7 +579,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_heap<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -592,23 +587,23 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(is_heap_t, Iter first, Sent last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap<Iter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
     } is_heap{};
 
@@ -624,18 +619,18 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, Rng&& rng,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -646,8 +641,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_heap_until<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -656,24 +650,23 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, Iter first,
-            Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
+            Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap_until<Iter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -681,18 +674,17 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(is_heap_until_t, Rng&& rng, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+            is_heap_until_t, Rng&& rng, Comp comp = Comp(), Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -703,7 +695,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::is_heap_until<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -711,26 +703,25 @@ namespace hpx::ranges {
             typename Comp = hpx::parallel::detail::less,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_sentinel_for_v<Sent, Iter> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     hpx::parallel::traits::projected<Proj, Iter>,
                     hpx::parallel::traits::projected<Proj, Iter>
-                >::value
+                >
             )>
         // clang-format on
         friend Iter tag_fallback_invoke(is_heap_until_t, Iter first, Sent last,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<Iter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap_until<Iter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
     } is_heap_until{};
-
 }    // namespace hpx::ranges
 
 #endif    //DOXYGEN

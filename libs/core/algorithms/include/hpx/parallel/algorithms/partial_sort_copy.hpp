@@ -367,7 +367,7 @@ namespace hpx {
         // clang-format on
         friend RandIter tag_fallback_invoke(hpx::partial_sort_copy_t,
             InIter first, InIter last, RandIter d_first, RandIter d_last,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -380,7 +380,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::detail::partial_sort_copy<result_type>().call(
                     hpx::execution::seq, first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v, hpx::identity_v));
+                    HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
 
         // clang-format off
@@ -400,7 +400,7 @@ namespace hpx {
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
         tag_fallback_invoke(hpx::partial_sort_copy_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, RandIter d_first, RandIter d_last,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -414,7 +414,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 parallel::detail::partial_sort_copy<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, d_first, d_last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v, hpx::identity_v));
+                    HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
     } partial_sort_copy{};
 }    // namespace hpx

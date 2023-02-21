@@ -446,18 +446,17 @@ namespace hpx {
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<
-                    Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            hpx::is_sorted_t, FwdIter first, FwdIter last, Pred&& pred = Pred())
+            hpx::is_sorted_t, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted<FwdIter, FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
                 hpx::identity_v);
         }
 
@@ -467,8 +466,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<
-                    Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
@@ -477,11 +475,11 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(hpx::is_sorted_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred = Pred())
+            FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted<FwdIter, FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred), hpx::identity_v);
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
     } is_sorted{};
 
@@ -493,18 +491,17 @@ namespace hpx {
             // clang-format off
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<
-                    Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::is_sorted_until_t,
-            FwdIter first, FwdIter last, Pred&& pred = Pred())
+            FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
+                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
                     hpx::identity_v);
         }
 
@@ -514,8 +511,7 @@ namespace hpx {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::is_invocable_v<
-                    Pred,
+                hpx::is_invocable_v<Pred,
                     typename std::iterator_traits<FwdIter>::value_type,
                     typename std::iterator_traits<FwdIter>::value_type
                 >
@@ -524,11 +520,11 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_fallback_invoke(hpx::is_sorted_until_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred&& pred = Pred())
+            FwdIter first, FwdIter last, Pred pred = Pred())
         {
             return hpx::parallel::detail::is_sorted_until<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), hpx::identity_v);
+                    HPX_MOVE(pred), hpx::identity_v);
         }
     } is_sorted_until{};
 }    // namespace hpx

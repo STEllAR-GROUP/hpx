@@ -330,7 +330,7 @@ namespace hpx {
         // clang-format on
         friend bool tag_fallback_invoke(hpx::lexicographical_compare_t,
             InIter1 first1, InIter1 last1, InIter2 first2, InIter2 last2,
-            Pred&& pred = Pred())
+            Pred pred = Pred())
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter1>,
                 "Requires at least input iterator.");
@@ -339,7 +339,7 @@ namespace hpx {
 
             return hpx::parallel::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -355,11 +355,10 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred&& pred = Pred())
+            Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -368,7 +367,7 @@ namespace hpx {
 
             return hpx::parallel::detail::lexicographical_compare().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(pred), hpx::identity_v, hpx::identity_v);
         }
     } lexicographical_compare{};
 }    // namespace hpx

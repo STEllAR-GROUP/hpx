@@ -231,7 +231,9 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter>)>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
+            )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             shift_left_t, FwdIter first, FwdIter last, Size n)
@@ -247,7 +249,9 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter>)>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
+            )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type

@@ -23,7 +23,7 @@
 
 #include "test_utils.hpp"
 
-#define ARR_SIZE 100007
+constexpr std::size_t ARR_SIZE = 100007;
 
 unsigned int seed;
 
@@ -44,19 +44,19 @@ void test_shift_left_sent(IteratorTag)
         std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, -4);
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
-    std::size_t n = (std::rand() % (std::size_t)(ARR_SIZE - 1)) + 1;
+    std::size_t n = (std::rand() % (ARR_SIZE - 1)) + 1;
     hpx::ranges::shift_left(
         std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
     std::move(std::begin(d) + n, std::end(d) - 1, std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n - 1), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n - 1), std::begin(d)));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_left(std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_left(
+        std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, ARR_SIZE + 1);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -79,19 +79,19 @@ void test_shift_left_sent(ExPolicy policy, IteratorTag)
         policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, -4);
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
-    std::size_t n = (std::rand() % (std::size_t)(ARR_SIZE - 1)) + 1;
+    std::size_t n = (std::rand() % (ARR_SIZE - 1)) + 1;
     hpx::ranges::shift_left(
         policy, std::begin(c), sentinel<std::size_t>{*std::rbegin(c)}, n);
 
     std::move(std::begin(d) + n, std::end(d) - 1, std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n - 1), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n - 1), std::begin(d)));
 
     // ensure shift by more than n does not crash
     hpx::ranges::shift_left(policy, std::begin(c),
-        sentinel<std::size_t>{*std::rbegin(c)}, (std::size_t)(ARR_SIZE + 1));
+        sentinel<std::size_t>{*std::rbegin(c)}, ARR_SIZE + 1);
 }
 
 template <typename IteratorTag>
@@ -109,17 +109,17 @@ void test_shift_left(IteratorTag)
     hpx::ranges::shift_left(c, -4);
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
-    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    std::size_t n = (std::rand() % ARR_SIZE) + 1;
     hpx::ranges::shift_left(c, n);
 
     std::move(std::begin(d) + n, std::end(d), std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n), std::begin(d)));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_left(c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_left(c, ARR_SIZE + 1);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -140,17 +140,17 @@ void test_shift_left(ExPolicy policy, IteratorTag)
     hpx::ranges::shift_left(policy, c, -4);
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
-    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    std::size_t n = (std::rand() % ARR_SIZE) + 1;
     hpx::ranges::shift_left(policy, c, n);
 
     std::move(std::begin(d) + n, std::end(d), std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n), std::begin(d)));
 
     // ensure shift by more than n does not crash
-    hpx::ranges::shift_left(policy, c, (std::size_t)(ARR_SIZE + 1));
+    hpx::ranges::shift_left(policy, c, ARR_SIZE + 1);
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -173,18 +173,18 @@ void test_shift_left_async(ExPolicy policy, IteratorTag)
     fut2.wait();
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
-    std::size_t n = (std::rand() % (std::size_t) ARR_SIZE) + 1;
+    std::size_t n = (std::rand() % ARR_SIZE) + 1;
     auto fut3 = hpx::ranges::shift_left(policy, c, n);
     fut3.wait();
 
     std::move(std::begin(d) + n, std::end(d), std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + ((std::size_t) ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n), std::begin(d)));
 
     // ensure shift by more than n does not crash
-    auto fut4 = hpx::ranges::shift_left(policy, c, (std::size_t)(ARR_SIZE + 1));
+    auto fut4 = hpx::ranges::shift_left(policy, c, ARR_SIZE + 1);
     fut4.wait();
 }
 
@@ -216,7 +216,7 @@ void shift_left_test()
 ////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed1 = (unsigned int) std::time(nullptr);
+    unsigned int seed1 = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed1 = vm["seed"].as<unsigned int>();
 

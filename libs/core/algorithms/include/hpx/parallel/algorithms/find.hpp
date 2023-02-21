@@ -1149,6 +1149,7 @@ namespace hpx::parallel {
     ///////////////////////////////////////////////////////////////////////////
     // find_first_of
     namespace detail {
+
         template <typename FwdIter>
         struct find_first_of : public algorithm<find_first_of<FwdIter>, FwdIter>
         {
@@ -1302,13 +1303,13 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_fallback_invoke(
-            find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            find_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_if<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -1322,14 +1323,13 @@ namespace hpx {
             )>
         // clang-format on
         friend InIter tag_fallback_invoke(
-            find_if_t, InIter first, InIter last, F&& f)
+            find_if_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if<InIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } find_if{};
 
@@ -1351,14 +1351,14 @@ namespace hpx {
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(find_if_not_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, F&& f)
+        tag_fallback_invoke(
+            find_if_not_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_if_not<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -1372,14 +1372,13 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
-            find_if_not_t, FwdIter first, FwdIter last, F&& f)
+            find_if_not_t, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<FwdIter>,
                 "Requires at least input iterator.");
 
             return hpx::parallel::detail::find_if_not<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } find_if_not{};
 
@@ -1405,7 +1404,7 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter1>::type
         tag_fallback_invoke(find_end_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -1414,7 +1413,7 @@ namespace hpx {
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1454,7 +1453,7 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_end_t, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred&& op)
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -1462,8 +1461,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::find_end<FwdIter1>().call(
-                hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                hpx::execution::seq, first1, last1, first2, last2, HPX_MOVE(op),
+                hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1510,7 +1509,7 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter1>::type
         tag_fallback_invoke(find_first_of_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op)
+            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -1519,7 +1518,7 @@ namespace hpx {
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -1558,7 +1557,7 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter1 tag_fallback_invoke(find_first_of_t, FwdIter1 first,
-            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op)
+            FwdIter1 last, FwdIter2 s_first, FwdIter2 s_last, Pred op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -1566,8 +1565,8 @@ namespace hpx {
                 "Subsequence requires at least forward iterator.");
 
             return hpx::parallel::detail::find_first_of<FwdIter1>().call(
-                hpx::execution::seq, first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                hpx::execution::seq, first, last, s_first, s_last, HPX_MOVE(op),
+                hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off

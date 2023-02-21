@@ -479,7 +479,7 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             typename std::iterator_traits<FwdIter>::difference_type>::type
         tag_fallback_invoke(
-            count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -488,7 +488,7 @@ namespace hpx {
                 typename std::iterator_traits<FwdIter>::difference_type;
 
             return hpx::parallel::detail::count_if<difference_type>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -502,7 +502,7 @@ namespace hpx {
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::difference_type
-        tag_fallback_invoke(count_if_t, InIter first, InIter last, F&& f)
+        tag_fallback_invoke(count_if_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
@@ -511,8 +511,7 @@ namespace hpx {
                 typename std::iterator_traits<InIter>::difference_type;
 
             return hpx::parallel::detail::count_if<difference_type>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } count_if{};
 }    // namespace hpx

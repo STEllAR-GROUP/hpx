@@ -664,14 +664,14 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::replace_if_t, Iter first,
-            Iter last, Pred&& pred, T const& new_value)
+            Iter last, Pred pred, T const& new_value)
         {
             static_assert(hpx::traits::is_input_iterator_v<Iter>,
                 "Required at least input iterator.");
 
             hpx::parallel::detail::replace_if<Iter>().call(
-                hpx::execution::sequenced_policy{}, first, last,
-                HPX_FORWARD(Pred, pred), new_value, hpx::identity_v);
+                hpx::execution::sequenced_policy{}, first, last, HPX_MOVE(pred),
+                new_value, hpx::identity_v);
         }
 
         // clang-format off
@@ -689,15 +689,15 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             void>::type
         tag_fallback_invoke(hpx::replace_if_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred&& pred, T const& new_value)
+            FwdIter last, Pred pred, T const& new_value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return parallel::util::detail::algorithm_result<ExPolicy>::get(
                 hpx::parallel::detail::replace_if<FwdIter>().call(
-                    HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), new_value, hpx::identity_v));
+                    HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                    new_value, hpx::identity_v));
         }
     } replace_if{};
 
@@ -770,7 +770,7 @@ namespace hpx {
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::replace_copy_if_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred, T const& new_value)
+            InIter last, OutIter dest, Pred pred, T const& new_value)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
@@ -782,7 +782,7 @@ namespace hpx {
                 hpx::parallel::detail::replace_copy_if<
                     hpx::parallel::util::in_out_result<InIter, OutIter>>()
                     .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                        HPX_FORWARD(Pred, pred), new_value, hpx::identity_v));
+                        HPX_MOVE(pred), new_value, hpx::identity_v));
         }
 
         // clang-format off
@@ -801,7 +801,7 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::replace_copy_if_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred,
             T const& new_value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
@@ -814,7 +814,7 @@ namespace hpx {
                 hpx::parallel::detail::replace_copy_if<
                     hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
                     .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                        HPX_FORWARD(Pred, pred), new_value, hpx::identity_v));
+                        HPX_MOVE(pred), new_value, hpx::identity_v));
         }
     } replace_copy_if{};
 

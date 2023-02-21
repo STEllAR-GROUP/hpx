@@ -372,8 +372,8 @@ namespace hpx::ranges {
         // clang-format on
         friend partial_sort_copy_result<InIter, RandIter> tag_fallback_invoke(
             hpx::ranges::partial_sort_copy_t, InIter first, Sent1 last,
-            RandIter r_first, Sent2 r_last, Comp&& comp = Comp(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            RandIter r_first, Sent2 r_last, Comp comp = Comp(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires an input iterator.");
@@ -385,8 +385,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
                 hpx::execution::seq, first, last, r_first, r_last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -413,8 +412,7 @@ namespace hpx::ranges {
             partial_sort_copy_result<FwdIter, RandIter>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
             FwdIter first, Sent1 last, RandIter r_first, Sent2 r_last,
-            Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Comp comp = Comp(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires a forward iterator.");
@@ -426,8 +424,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, r_first, r_last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                HPX_MOVE(comp), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -449,8 +446,8 @@ namespace hpx::ranges {
         friend partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
             hpx::traits::range_iterator_t<Rng2>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, Rng1&& rng1,
-            Rng2&& rng2, Comp&& comp = Comp(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Rng2&& rng2, Comp comp = Comp(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
@@ -467,8 +464,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                hpx::util::end(rng2), HPX_MOVE(comp), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -492,8 +489,8 @@ namespace hpx::ranges {
             partial_sort_copy_result<hpx::traits::range_iterator_t<Rng1>,
                 hpx::traits::range_iterator_t<Rng2>>>
         tag_fallback_invoke(hpx::ranges::partial_sort_copy_t, ExPolicy&& policy,
-            Rng1&& rng1, Rng2&& rng2, Comp&& comp = Comp(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            Rng1&& rng1, Rng2&& rng2, Comp comp = Comp(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type1 = hpx::traits::range_iterator_t<Rng1>;
             using iterator_type2 = hpx::traits::range_iterator_t<Rng2>;
@@ -510,8 +507,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::partial_sort_copy<result_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                hpx::util::end(rng2), HPX_MOVE(comp), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
     } partial_sort_copy{};
 }    // namespace hpx::ranges

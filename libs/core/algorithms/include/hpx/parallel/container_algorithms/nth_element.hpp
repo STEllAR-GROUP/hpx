@@ -326,15 +326,15 @@ namespace hpx::ranges {
             )>
         // clang-format on
         friend RandomIt tag_fallback_invoke(hpx::ranges::nth_element_t,
-            RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -355,15 +355,15 @@ namespace hpx::ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
             return hpx::parallel::detail::nth_element<RandomIt>().call(
-                HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                HPX_FORWARD(ExPolicy, policy), first, nth, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -373,17 +373,17 @@ namespace hpx::ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::nth_element_t, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            hpx::traits::range_iterator_t<Rng> nth, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -393,7 +393,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(
                 hpx::execution::seq, std::begin(rng), nth, std::end(rng),
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -415,7 +415,7 @@ namespace hpx::ranges {
             hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
             Rng&& rng, hpx::traits::range_iterator_t<Rng> nth,
-            Pred&& pred = Pred(), Proj&& proj = Proj())
+            Pred pred = Pred(), Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -425,8 +425,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::nth_element<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), std::begin(rng), nth,
-                std::end(rng), HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+                std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } nth_element{};
 }    // namespace hpx::ranges
