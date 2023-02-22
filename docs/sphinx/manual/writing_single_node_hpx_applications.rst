@@ -28,7 +28,7 @@ Synchronization objects
 The following objects are providing synchronization for |hpx| applications:
 
 #. :ref:`barrier`
-#. :ref:`lkriable`
+#. :ref:`condition_variable`
 #. :ref:`latch`
 #. :ref:`mutex`
 #. :ref:`shared_mutex`
@@ -54,6 +54,8 @@ The code below shows how barriers can be used to synchronize two threads:
 
 .. literalinclude:: ../../examples/quickstart/barrier_docs.cpp
    :language: c++
+   :start-after: //[barrier_docs
+   :end-before: //]
 
 In this example, two ``hpx::future`` objects are created, each representing a separate thread of
 execution. The ``wait`` function of the ``hpx::barrier`` object is called by each thread. The
@@ -75,6 +77,8 @@ shows how two threads modifying the shared variable ``data`` can be synchronized
 
 .. literalinclude:: ../../examples/quickstart/condition_variable_docs.cpp
    :language: c++
+   :start-after: //[condition_variable_docs
+   :end-before: //]
 
 The main thread of the code above starts by creating a worker thread and preparing the shared variable ``data``.
 Once the data is ready, the main thread acquires a lock on the mutex ``m`` using ``std::lock_guard<hpx::mutex> lk(m)``
@@ -130,6 +134,8 @@ is released. The code below shows the basic use of mutexes:
 
 .. literalinclude:: ../../examples/quickstart/mutex_docs.cpp
    :language: c++
+   :start-after: //[mutex_docs
+   :end-before: //]
 
 In this example, two |hpx| threads created using ``hpx::async`` are acquiring a ``hpx::mutex m``. The ``m.lock()``
 function is called before accessing the shared resource, and ``m.unlock()`` is called after the access is complete.
@@ -194,6 +200,8 @@ access to a shared resource. The two types of semaphores are:
 
 .. literalinclude:: ../../examples/quickstart/counting_semaphore_docs.cpp
    :language: c++
+   :start-after: //[counting_semaphore_docs
+   :end-before: //]
 
 In this example, the counting semaphore is initialized to the value of 3. This means that up to 3 threads can
 access the critical section (the section of code inside ``the worker()`` function) at the same time. When a thread
@@ -257,13 +265,44 @@ become available at some point in the future, and it can be used to write asynch
 parallel code. Futures can be returned from functions that perform time-consuming operations,
 allowing the calling code to continue executing while the function performs its work. The
 value of the future is set when the operation completes and can be accessed later. Futures
-are used in |hpx| to write asynchronous and parallel code.
-
-TODO: expand
+are used in |hpx| to write asynchronous and parallel code. Below is an example demostrating
+different features of futures:
 
 .. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
    :language: c++
    :lines: 7-
+
+The first section of the main function demonstrates how to use futures for asynchronous execution.
+The first two lines create two futures, one for void and another for an integer, using the
+``hpx::async()`` function. These futures are executed *asynchronously* in separate threads using
+the ``hpx::launch::async`` launch policy. The third future is created by *chaining* the second
+future using the ``then()`` member function. This future multiplies the result of the second future
+by 3.
+
+The next part of the code demonstrates how to use `promises` and `packaged` tasks, which are constructs
+used for communicating data between threads. The ``promise`` class is used to store a value that can be
+retrieved *later* using a future. The ``packaged_task`` class represents a task that can be executed
+*asynchronously*, and its result can be obtained using a future. The last three lines create a
+packaged task that returns an integer, obtain its future, execute the task, and check whether the
+future is ready or not.
+
+The code then demonstrates how to use the ``hpx::post()`` and ``hpx::sync()`` functions for
+*fire-and-forget* and *synchronous* execution, respectively. The ``hpx::post()`` function executes a
+given function *asynchronously* and *returns immediately* without waiting for the result. The
+``hpx::sync()`` function executes a given function *synchronously* and *waits* for the result before
+returning.
+
+Next the code demonstrates the use of `combinators`, which are higher-order functions that combine
+two or more futures into a single future. The ``hpx::when_all()`` function is used to combine two futures,
+which return double values, into a tuple of futures. The ``then()`` member function is then used to
+compute the area of a circle using the values of the two futures. The ``get()`` member function is used to
+retrieve the result of the computation.
+
+The last section demonstrates the use of ``hpx::dataflow()``, which is a higher-order function that waits
+for all the future or shared_future arguments to be ready before executing the continuation. The
+``hpx::make_ready_future()`` function is used to create a future with a given value. The
+``hpx::split_future()`` function is used to split a future of a tuple into a tuple of futures. The last
+line retrieves the value of the second future in the tuple using ``hpx::get()`` and prints it to the console.
 
 .. _extend_futures:
 
@@ -586,10 +625,34 @@ executor associated with the execution policy that was used to call
 Task groups
 -----------
 
-A :ref:`task group <public_api_header_hpx_task_group>` in |hpx| represents concurrent
-execution of a group of tasks. Tasks can be dynamically added to the group while it is executing.
+A :ref:`task group <public_api_header_hpx_task_group>` in |hpx| is a synchronization primitive
+that allows you to execute a group of tasks concurrently and wait for their completion before
+continuing. The tasks in an ``hpx::experimental::task_group`` can be added dynamically. This is the |hpx|
+implementation of `tbb::task_group` of the |tbb|_ library.
 
-TODO: refer to oneTBB, explain difference from task block
+The example below shows that to use a task group, you simply create an ``hpx::task_group`` object
+and add tasks to it using the ``run()`` method. Once all the tasks have been added, you can call
+the ``wait()`` method to synchronize the tasks and wait for them to complete.
+
+.. literalinclude:: ../../examples/quickstart/task_group_docs.cpp
+   :language: c++
+   :start-after: //[task_group_docs
+   :end-before: //]
+
+.. note::
+
+   `task groups` and `task blocks`` are both ways to group and synchronize parallel tasks, but
+   `task groups`` are used to group multiple tasks together as a single unit, while `task blocks``
+   are used to execute a loop in parallel, with each iteration of the loop executing in a separate
+   task. If the difference is not clear yet, continue reading.
+
+   A `task group` is a construct that allows multiple parallel tasks to be grouped together as a
+   single unit. The task group provides a way to synchronize all the tasks in the group before
+   continuing with the rest of the program.
+
+   A `task block`, on the other hand, is a parallel loop construct that allows you to execute a
+   loop in parallel, with each iteration of the loop executing in a separate task. The loop
+   iterations are executed in a block, meaning that the loop body is executed as a single task.
 
 .. _thread:
 
@@ -601,7 +664,15 @@ that can be executed concurrently with other such sequences in multithreading en
 sharing a same address space. These threads can communicate with each other through various means,
 such as futures or shared data structures.
 
-TODO: expand
+TODO: add example and explanation
+
+.. hint::
+
+   An advantage of using ``hpx::thread`` over other threading libraries is that it is optimized for
+   high-performance parallelism, with support for lightweight threads and task scheduling to minimize
+   thread overhead and maximize parallelism. Additionally, ``hpx::thread`` integrates seamlessly with
+   other features of |hpx| such as futures, promises, and task groups, making it a powerful tool for
+   parallel programming.
 
 .. _parallel:
 
@@ -721,447 +792,353 @@ Parallel algorithms
 
 |hpx| provides implementations of the following parallel algorithms:
 
-.. list-table:: Non-modifying parallel algorithms (in header: ``<hpx/algorithm.hpp>``)
+.. list-table:: Non-modifying parallel algorithms of header :ref:` this <public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
 
    * * Name
      * Description
-     * In header
-     * Algorithm page at cppreference.com
+     * C++ standard
    * * :cpp:func:`hpx::adjacent_find`
      * Computes the differences between adjacent elements in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`adjacent_find`
    * * :cpp:func:`hpx::all_of`
      * Checks if a predicate is ``true`` for all of the elements in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`all_any_none_of`
    * * :cpp:func:`hpx::any_of`
      * Checks if a predicate is ``true`` for any of the elements in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`all_any_none_of`
    * * :cpp:func:`hpx::count`
      * Returns the number of elements equal to a given value.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`count`
    * * :cpp:func:`hpx::count_if`
      * Returns the number of elements satisfying a specific criteria.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`count_if`
    * * :cpp:func:`hpx::equal`
      * Determines if two sets of elements are the same.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`equal`
    * * :cpp:func:`hpx::find`
      * Finds the first element equal to a given value.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`find`
    * * :cpp:func:`hpx::find_end`
      * Finds the last sequence of elements in a certain range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`find_end`
    * * :cpp:func:`hpx::find_first_of`
      * Searches for any one of a set of elements.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`find_first_of`
    * * :cpp:func:`hpx::find_if`
      * Finds the first element satisfying a specific criteria.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`find_if`
    * * :cpp:func:`hpx::find_if_not`
      * Finds the first element not satisfying a specific criteria.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`find_if_not`
    * * :cpp:func:`hpx::for_each`
      * Applies a function to a range of elements.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`for_each`
    * * :cpp:func:`hpx::for_each_n`
      * Applies a function to a number of elements.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`for_each_n`
    * * :cpp:func:`hpx::lexicographical_compare`
      * Checks if a range of values is lexicographically less than another range of values.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`lexicographical_compare`
    * * :cpp:func:`hpx::parallel::mismatch`
      * Finds the first position where two ranges differ.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`mismatch`
    * * :cpp:func:`hpx::none_of`
      * Checks if a predicate is ``true`` for none of the elements in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`all_any_none_of`
    * * :cpp:func:`hpx::search`
      * Searches for a range of elements.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`search`
    * * :cpp:func:`hpx::search_n`
      * Searches for a number consecutive copies of an element in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`search_n`
 
-.. list-table:: Modifying parallel algorithms (In Header: `<hpx/algorithm.hpp>`)
+.. list-table:: Modifying parallel algorithms of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
 
    * * Name
      * Description
-     * In header
-     * Algorithm page at cppreference.com
+     * C++ standard
    * * :cpp:func:`hpx::copy`
      * Copies a range of elements to a new location.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`exclusive_scan`
    * * :cpp:func:`hpx::copy_n`
      * Copies a number of elements to a new location.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`copy_n`
    * * :cpp:func:`hpx::copy_if`
      * Copies the elements from a range to a new location for which the given predicate is ``true``
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`copy`
    * * :cpp:func:`hpx::move`
      * Moves a range of elements to a new location.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`move`
    * * :cpp:func:`hpx::fill`
      * Assigns a range of elements a certain value.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`fill`
    * * :cpp:func:`hpx::fill_n`
      * Assigns a value to a number of elements.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`fill_n`
    * * :cpp:func:`hpx::generate`
      * Saves the result of a function in a range.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`generate`
    * * :cpp:func:`hpx::generate_n`
      * Saves the result of N applications of a function.
-     * ``<hpx/algorithm.hpp>``
      * :cppreference-algorithm:`generate_n`
-   * * :cpp:func:`hpx::remove`
-     * Removes the elements from a range that are equal to the given value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`remove`
-   * * :cpp:func:`hpx::remove_if`
-     * Removes the elements from a range that are equal to the given predicate is ``false``
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`remove`
-   * * :cpp:func:`hpx::remove_copy`
-     * Copies the elements from a range to a new location that are not equal to the given value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`remove_copy`
-   * * :cpp:func:`hpx::remove_copy_if`
-     * Copies the elements from a range to a new location for which the given predicate is ``false``
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`remove_copy`
-   * * :cpp:func:`hpx::replace`
-     * Replaces all values satisfying specific criteria with another value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`replace`
-   * * :cpp:func:`hpx::replace_if`
-     * Replaces all values satisfying specific criteria with another value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`replace`
-   * * :cpp:func:`hpx::replace_copy`
-     * Copies a range, replacing elements satisfying specific criteria with another value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`replace_copy`
-   * * :cpp:func:`hpx::replace_copy_if`
-     * Copies a range, replacing elements satisfying specific criteria with another value.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`replace_copy`
-   * * :cpp:func:`hpx::reverse`
-     * Reverses the order elements in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`reverse`
-   * * :cpp:func:`hpx::reverse_copy`
-     * Creates a copy of a range that is reversed.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`reverse_copy`
-   * * :cpp:func:`hpx::parallel::rotate`
-     * Rotates the order of elements in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`rotate`
-   * * :cpp:func:`hpx::parallel::rotate_copy`
-     * Copies and rotates a range of elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`rotate_copy`
-   * * :cpp:func:`hpx::shift_left`
-     * Shifts the elements in the range left by n positions.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`shift_left`
-   * * :cpp:func:`hpx::shift_right`
-     * Shifts the elements in the range right by n positions.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`shift_right`
-   * * :cpp:func:`hpx::swap_ranges`
-     * Swaps two ranges of elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`swap_ranges`
-   * * :cpp:func:`hpx::transform`
-     * Applies a function to a range of elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`transform`
-   * * :cpp:func:`hpx::unique`
-     * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`unique`
-   * * :cpp:func:`hpx::unique_copy`
-     * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`unique_copy`
-
-.. list-table:: Set operations on sorted sequences (In Header: `<hpx/algorithm.hpp>`)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::merge`
-     * Merges two sorted ranges.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`merge`
-   * * :cpp:func:`hpx::inplace_merge`
-     * Merges two ordered ranges in-place.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`inplace_merge`
-   * * :cpp:func:`hpx::includes`
-     * Returns true if one set is a subset of another.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`includes`
-   * * :cpp:func:`hpx::set_difference`
-     * Computes the difference between two sets.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`set_difference`
-   * * :cpp:func:`hpx::set_intersection`
-     * Computes the intersection of two sets.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`set_intersection`
-   * * :cpp:func:`hpx::set_symmetric_difference`
-     * Computes the symmetric difference between two sets.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`set_symmetric_difference`
-   * * :cpp:func:`hpx::set_union`
-     * Computes the union of two sets.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`set_union`
-
-.. list-table:: Heap operations (In Header: <hpx/algorithm.hpp>)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::is_heap`
-     * Returns ``true`` if the range is max heap.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`is_heap`
-   * * :cpp:func:`hpx::is_heap_until`
-     * Returns the first element that breaks a max heap.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`is_heap_until`
-   * * :cpp:func:`hpx::make_heap`
-     * Constructs a max heap in the range [first, last).
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`make_heap`
-
-.. list-table:: Minimum/maximum operations (In Header: <hpx/algorithm.hpp>)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::max_element`
-     * Returns the largest element in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`max_element`
-   * * :cpp:func:`hpx::min_element`
-     * Returns the smallest element in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`min_element`
-   * * :cpp:func:`hpx::minmax_element`
-     * Returns the smallest and the largest element in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`minmax_element`
-
-.. list-table:: Partitioning Operations (In Header: `<hpx/algorithm.hpp>`)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::nth_element`
-     * Partially sorts the given range making sure that it is partitioned by the given element
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`nth_element`
-   * * :cpp:func:`hpx::is_partitioned`
-     * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`is_partitioned`
-   * * :cpp:func:`hpx::parallel::partition`
-     * Divides elements into two groups without preserving their relative order.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`partition`
-   * * :cpp:func:`hpx::partition_copy`
-     * Copies a range dividing the elements into two groups.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`partition_copy`
-   * * :cpp:func:`hpx::stable_partition`
-     * Divides elements into two groups while preserving their relative order.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`stable_partition`
-
-.. list-table:: Sorting Operations (In Header: `<hpx/algorithm.hpp>`)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::is_sorted`
-     * Returns ``true`` if each element in a range is sorted.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`is_sorted`
-   * * :cpp:func:`hpx::is_sorted_until`
-     * Returns the first unsorted element.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`is_sorted_until`
-   * * :cpp:func:`hpx::sort`
-     * Sorts the elements in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`sort`
-   * * :cpp:func:`hpx::stable_sort`
-     * Sorts the elements in a range, maintain sequence of equal elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`stable_sort`
-   * * :cpp:func:`hpx::partial_sort`
-     * Sorts the first elements in a range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`partial_sort`
-   * * :cpp:func:`hpx::partial_sort_copy`
-     * Sorts the first elements in a range, storing the result in another range.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`partial_sort_copy`
-   * * :cpp:func:`hpx::experimental::sort_by_key`
-     * Sorts one range of data using keys supplied in another range.
-     * ``<hpx/algorithm.hpp>``
-     *
-
-
-.. list-table:: Numeric Parallel Algorithms (In Header: `<hpx/numeric.hpp>`)
-
-   * * Name
-     * Description
-     * In header
-     * Algorithm page at cppreference.com
-   * * :cpp:func:`hpx::adjacent_difference`
-     * Calculates the difference between each element in an input range and the preceding element.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`adjacent_difference`
-   * * :cpp:func:`hpx::exclusive_scan`
-     * Does an exclusive parallel scan over a range of elements.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`exclusive_scan`
-   * * :cpp:func:`hpx::reduce`
-     * Sums up a range of elements.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`reduce`
-   * * :cpp:func:`hpx::inclusive_scan`
-     * Does an inclusive parallel scan over a range of elements.
-     * ``<hpx/algorithm.hpp>``
-     * :cppreference-algorithm:`inclusive_scan`
    * * :cpp:func:`hpx::experimental::reduce_by_key`
      * Performs an inclusive scan on consecutive elements with matching keys,
        with a reduction to output only the final sum for each key. The key
        sequence ``{1,1,1,2,3,3,3,3,1}`` and value sequence
        ``{2,3,4,5,6,7,8,9,10}`` would be reduced to ``keys={1,2,3,1}``,
        ``values={9,5,30,10}``.
-     * ``<hpx/numeric.hpp>``
      *
-   * * :cpp:func:`hpx::transform_reduce`
-     * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`transform_reduce`
-   * * :cpp:func:`hpx::transform_inclusive_scan`
-     * Does an inclusive parallel scan over a range of elements after applying a function.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`transform_inclusive_scan`
-   * * :cpp:func:`hpx::parallel::transform_exclusive_scan`
-     * Does an exclusive parallel scan over a range of elements after applying a function.
-     * ``<hpx/numeric.hpp>``
-     * :cppreference-algorithm:`transform_exclusive_scan`
+   * * :cpp:func:`hpx::remove`
+     * Removes the elements from a range that are equal to the given value.
+     * :cppreference-algorithm:`remove`
+   * * :cpp:func:`hpx::remove_if`
+     * Removes the elements from a range that are equal to the given predicate is ``false``
+     * :cppreference-algorithm:`remove`
+   * * :cpp:func:`hpx::remove_copy`
+     * Copies the elements from a range to a new location that are not equal to the given value.
+     * :cppreference-algorithm:`remove_copy`
+   * * :cpp:func:`hpx::remove_copy_if`
+     * Copies the elements from a range to a new location for which the given predicate is ``false``
+     * :cppreference-algorithm:`remove_copy`
+   * * :cpp:func:`hpx::replace`
+     * Replaces all values satisfying specific criteria with another value.
+     * :cppreference-algorithm:`replace`
+   * * :cpp:func:`hpx::replace_if`
+     * Replaces all values satisfying specific criteria with another value.
+     * :cppreference-algorithm:`replace`
+   * * :cpp:func:`hpx::replace_copy`
+     * Copies a range, replacing elements satisfying specific criteria with another value.
+     * :cppreference-algorithm:`replace_copy`
+   * * :cpp:func:`hpx::replace_copy_if`
+     * Copies a range, replacing elements satisfying specific criteria with another value.
+     * :cppreference-algorithm:`replace_copy`
+   * * :cpp:func:`hpx::reverse`
+     * Reverses the order elements in a range.
+     * :cppreference-algorithm:`reverse`
+   * * :cpp:func:`hpx::reverse_copy`
+     * Creates a copy of a range that is reversed.
+     * :cppreference-algorithm:`reverse_copy`
+   * * :cpp:func:`hpx::parallel::rotate`
+     * Rotates the order of elements in a range.
+     * :cppreference-algorithm:`rotate`
+   * * :cpp:func:`hpx::parallel::rotate_copy`
+     * Copies and rotates a range of elements.
+     * :cppreference-algorithm:`rotate_copy`
+   * * :cpp:func:`hpx::shift_left`
+     * Shifts the elements in the range left by n positions.
+     * :cppreference-algorithm:`shift_left`
+   * * :cpp:func:`hpx::shift_right`
+     * Shifts the elements in the range right by n positions.
+     * :cppreference-algorithm:`shift_right`
+   * * :cpp:func:`hpx::swap_ranges`
+     * Swaps two ranges of elements.
+     * :cppreference-algorithm:`swap_ranges`
+   * * :cpp:func:`hpx::transform`
+     * Applies a function to a range of elements.
+     * :cppreference-algorithm:`transform`
+   * * :cpp:func:`hpx::unique`
+     * Eliminates all but the first element from every consecutive group of equivalent elements from a range.
+     * :cppreference-algorithm:`unique`
+   * * :cpp:func:`hpx::unique_copy`
+     * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
+     * :cppreference-algorithm:`unique_copy`
 
-.. list-table:: Dynamic Memory Management (In Header: `<hpx/memory.hpp>`)
+.. list-table:: Set operations on sorted sequences of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
 
    * * Name
      * Description
-     * In header
-     * Algorithm page at cppreference.com
+     * C++ standard
+   * * :cpp:func:`hpx::merge`
+     * Merges two sorted ranges.
+     * :cppreference-algorithm:`merge`
+   * * :cpp:func:`hpx::inplace_merge`
+     * Merges two ordered ranges in-place.
+     * :cppreference-algorithm:`inplace_merge`
+   * * :cpp:func:`hpx::includes`
+     * Returns true if one set is a subset of another.
+     * :cppreference-algorithm:`includes`
+   * * :cpp:func:`hpx::set_difference`
+     * Computes the difference between two sets.
+     * :cppreference-algorithm:`set_difference`
+   * * :cpp:func:`hpx::set_intersection`
+     * Computes the intersection of two sets.
+     * :cppreference-algorithm:`set_intersection`
+   * * :cpp:func:`hpx::set_symmetric_difference`
+     * Computes the symmetric difference between two sets.
+     * :cppreference-algorithm:`set_symmetric_difference`
+   * * :cpp:func:`hpx::set_union`
+     * Computes the union of two sets.
+     * :cppreference-algorithm:`set_union`
+
+.. list-table:: Heap operations of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
+   * * :cpp:func:`hpx::is_heap`
+     * Returns ``true`` if the range is max heap.
+     * :cppreference-algorithm:`is_heap`
+   * * :cpp:func:`hpx::is_heap_until`
+     * Returns the first element that breaks a max heap.
+     * :cppreference-algorithm:`is_heap_until`
+   * * :cpp:func:`hpx::make_heap`
+     * Constructs a max heap in the range [first, last).
+     * :cppreference-algorithm:`make_heap`
+
+.. list-table:: Minimum/maximum operations of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
+   * * :cpp:func:`hpx::max_element`
+     * Returns the largest element in a range.
+     * :cppreference-algorithm:`max_element`
+   * * :cpp:func:`hpx::min_element`
+     * Returns the smallest element in a range.
+     * :cppreference-algorithm:`min_element`
+   * * :cpp:func:`hpx::minmax_element`
+     * Returns the smallest and the largest element in a range.
+     * :cppreference-algorithm:`minmax_element`
+
+.. list-table:: Partitioning Operations of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
+   * * :cpp:func:`hpx::nth_element`
+     * Partially sorts the given range making sure that it is partitioned by the given element
+     * :cppreference-algorithm:`nth_element`
+   * * :cpp:func:`hpx::is_partitioned`
+     * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
+     * :cppreference-algorithm:`is_partitioned`
+   * * :cpp:func:`hpx::parallel::partition`
+     * Divides elements into two groups without preserving their relative order.
+     * :cppreference-algorithm:`partition`
+   * * :cpp:func:`hpx::partition_copy`
+     * Copies a range dividing the elements into two groups.
+     * :cppreference-algorithm:`partition_copy`
+   * * :cpp:func:`hpx::stable_partition`
+     * Divides elements into two groups while preserving their relative order.
+     * :cppreference-algorithm:`stable_partition`
+
+.. list-table:: Sorting Operations of header :ref:`<public_api_header_hpx_algorithm>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
+   * * :cpp:func:`hpx::is_sorted`
+     * Returns ``true`` if each element in a range is sorted.
+     * :cppreference-algorithm:`is_sorted`
+   * * :cpp:func:`hpx::is_sorted_until`
+     * Returns the first unsorted element.
+     * :cppreference-algorithm:`is_sorted_until`
+   * * :cpp:func:`hpx::sort`
+     * Sorts the elements in a range.
+     * :cppreference-algorithm:`sort`
+   * * :cpp:func:`hpx::stable_sort`
+     * Sorts the elements in a range, maintain sequence of equal elements.
+     * :cppreference-algorithm:`stable_sort`
+   * * :cpp:func:`hpx::partial_sort`
+     * Sorts the first elements in a range.
+     * :cppreference-algorithm:`partial_sort`
+   * * :cpp:func:`hpx::partial_sort_copy`
+     * Sorts the first elements in a range, storing the result in another range.
+     * :cppreference-algorithm:`partial_sort_copy`
+   * * :cpp:func:`hpx::experimental::sort_by_key`
+     * Sorts one range of data using keys supplied in another range.
+     *
+
+.. list-table:: Numeric Parallel Algorithms of header :ref:`<public_api_header_hpx_numeric>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
+   * * :cpp:func:`hpx::adjacent_difference`
+     * Calculates the difference between each element in an input range and the preceding element.
+     * :cppreference-algorithm:`adjacent_difference`
+   * * :cpp:func:`hpx::exclusive_scan`
+     * Does an exclusive parallel scan over a range of elements.
+     * :cppreference-algorithm:`exclusive_scan`
+   * * :cpp:func:`hpx::inclusive_scan`
+     * Does an inclusive parallel scan over a range of elements.
+     * :cppreference-algorithm:`inclusive_scan`
+   * * :cpp:func:`hpx::reduce`
+     * Sums up a range of elements.
+     * :cppreference-algorithm:`reduce`
+   * * :cpp:func:`hpx::transform_exclusive_scan`
+     * Does an exclusive parallel scan over a range of elements after applying a function.
+     * :cppreference-algorithm:`transform_exclusive_scan`
+   * * :cpp:func:`hpx::transform_inclusive_scan`
+     * Does an inclusive parallel scan over a range of elements after applying a function.
+     * :cppreference-algorithm:`transform_inclusive_scan`
+   * * :cpp:func:`hpx::transform_reduce`
+     * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
+     * :cppreference-algorithm:`transform_reduce`
+
+
+.. list-table:: Dynamic Memory Management of header :ref:`<public_api_header_hpx_memory>`
+   :widths: 25 55 20
+
+   * * Name
+     * Description
+     * C++ standard
    * * :cpp:func:`hpx::destroy`
      * Destroys a range of objects.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy`
    * * :cpp:func:`hpx::destroy_n`
      * Destroys a range of objects.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`destroy_n`
    * * :cpp:func:`hpx::uninitialized_copy`
      * Copies a range of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy`
    * * :cpp:func:`hpx::uninitialized_copy_n`
      * Copies a number of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_copy_n`
    * * :cpp:func:`hpx::uninitialized_default_construct`
      * Copies a range of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct`
    * * :cpp:func:`hpx::uninitialized_default_construct_n`
      * Copies a number of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_default_construct_n`
    * * :cpp:func:`hpx::uninitialized_fill`
      * Copies an object to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_fill`
    * * :cpp:func:`hpx::uninitialized_fill_n`
      * Copies an object to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_fill_n`
    * * :cpp:func:`hpx::uninitialized_move`
      * Moves a range of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_move`
    * * :cpp:func:`hpx::uninitialized_move_n`
      * Moves a number of objects to an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_move_n`
    * * :cpp:func:`hpx::uninitialized_value_construct`
      * Constructs objects in an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct`
    * * :cpp:func:`hpx::uninitialized_value_construct_n`
      * Constructs objects in an uninitialized area of memory.
-     * ``<hpx/memory.hpp>``
      * :cppreference-memory:`uninitialized_value_construct_n`
 
-.. list-table:: Index-based for-loops (In Header: `<hpx/algorithm.hpp>`)
+.. list-table:: Index-based for-loops of header :ref:`<public_api_header_hpx_algorithm>`
 
    * * Name
      * Description
-     * In header
    * * :cpp:func:`hpx::experimental::for_loop`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/algorithm.hpp>``
    * * :cpp:func:`hpx::experimental::for_loop_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/algorithm.hpp>``
    * * :cpp:func:`hpx::experimental::for_loop_n`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/algorithm.hpp>``
    * * :cpp:func:`hpx::experimental::for_loop_n_strided`
      * Implements loop functionality over a range specified by integral or iterator bounds.
-     * ``<hpx/algorithm.hpp>``
 
 .. _executor_parameters:
 
