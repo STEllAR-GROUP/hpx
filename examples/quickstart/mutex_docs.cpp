@@ -6,6 +6,8 @@
 
 // This example is meant for inclusion in the documentation.
 
+//[mutex_docs
+
 #include <hpx/future.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/mutex.hpp>
@@ -36,3 +38,5 @@ int main(int argc, char* argv[])
 {
     return hpx::local::init(hpx_main, argc, argv);
 }
+
+//]

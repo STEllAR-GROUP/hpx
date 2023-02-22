@@ -6,6 +6,8 @@
 
 // This example is meant for inclusion in the documentation.
 
+//[condition_variable_docs
+
 #include <hpx/condition_variable.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/mutex.hpp>
@@ -70,3 +72,5 @@ int main(int argc, char* argv[])
 {
     return hpx::local::init(hpx_main, argc, argv);
 }
+
+//]
