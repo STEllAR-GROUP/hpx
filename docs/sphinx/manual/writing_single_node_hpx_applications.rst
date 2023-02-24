@@ -664,7 +664,27 @@ that can be executed concurrently with other such sequences in multithreading en
 sharing a same address space. These threads can communicate with each other through various means,
 such as futures or shared data structures.
 
-TODO: add example and explanation
+The example below demonstrates how to launch multiple threads and synchronize them using a ``hpx::latch``
+object. It also shows how to query the state of threads and wait for futures to complete.
+
+.. literalinclude:: ../../examples/quickstart/task_group_docs.cpp
+   :language: c++
+   :start-after: //[threads_docs
+   :end-before: //]
+
+In more detail, the `wait_for_latch()` function is a simple helper function that waits for a ``hpx::latch``
+object to be released. At this point we remind that ``hpx::latch`` is a synchronization primitive that
+allows multiple threads to wait for a common event to occur.
+
+In the ``hpx_main()`` function, an ``hpx::latch`` object is created with a count of ``num_threads + 1``,
+indicating that ``num_threads`` threads need to arrive at the latch before the latch is released. The loop
+that follows launches ``num_threads`` asynchronous operations, each of which calls the ``wait_for_latch``
+function. The resulting futures are added to the vector.
+
+After the threads have been launched, ``hpx::this_thread::yield()`` is called to give them a chance to
+reach the latch before the program proceeds. Then, the ``hpx::threads::enumerate_threads`` function
+prints the state of each suspended thread, while the next call of ``l.arrive_and_wait()``waits for all
+the threads to reach the latch. Finally, ``hpx::wait_all`` is called to wait for all the futures to complete.
 
 .. hint::
 
@@ -673,6 +693,9 @@ TODO: add example and explanation
    thread overhead and maximize parallelism. Additionally, ``hpx::thread`` integrates seamlessly with
    other features of |hpx| such as futures, promises, and task groups, making it a powerful tool for
    parallel programming.
+
+   Checkout the examples of :ref:`shared_mutex`, :ref:`condition_variable`, :ref:`counting_semaphore`
+   to see how |hpx| threads are used in combination with other features.
 
 .. _parallel:
 
@@ -701,7 +724,7 @@ Using parallel algorithms
 .. |parallel_task_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_task_policy`
 .. |execution_policy| replace:: :cpp:class:`hpx::parallel::execution_policy`
 .. |exception_list| replace:: :cpp:class:`hpx::exception_list`
-.. |par_for_each| replace:: :cpp:class:`hpx::parallel::for_each`
+.. |for_each| replace:: :cpp:class:`hpx::for_each`
 
 A parallel algorithm is a function template described by this document
 which is declared in the (inline) namespace ``hpx::parallel``.
@@ -773,7 +796,7 @@ algorithm:
   |exception_list|.
 
 For example, the number of invocations of the user-provided function object in
-for_each is unspecified. When |par_for_each| is executed sequentially, only one
+for_each is unspecified. When |for_each| is executed sequentially, only one
 exception will be contained in the |exception_list| object.
 
 These guarantees imply that, unless the algorithm has failed to allocate memory
@@ -792,7 +815,7 @@ Parallel algorithms
 
 |hpx| provides implementations of the following parallel algorithms:
 
-.. list-table:: Non-modifying parallel algorithms of header :ref:` this <public_api_header_hpx_algorithm>`
+.. list-table:: Non-modifying parallel algorithms of header :ref:` this <public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -853,7 +876,7 @@ Parallel algorithms
      * Searches for a number consecutive copies of an element in a range.
      * :cppreference-algorithm:`search_n`
 
-.. list-table:: Modifying parallel algorithms of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Modifying parallel algorithms of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -945,7 +968,7 @@ Parallel algorithms
      * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
      * :cppreference-algorithm:`unique_copy`
 
-.. list-table:: Set operations on sorted sequences of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Set operations on sorted sequences of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -973,7 +996,7 @@ Parallel algorithms
      * Computes the union of two sets.
      * :cppreference-algorithm:`set_union`
 
-.. list-table:: Heap operations of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Heap operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -989,7 +1012,7 @@ Parallel algorithms
      * Constructs a max heap in the range [first, last).
      * :cppreference-algorithm:`make_heap`
 
-.. list-table:: Minimum/maximum operations of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Minimum/maximum operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -1005,7 +1028,7 @@ Parallel algorithms
      * Returns the smallest and the largest element in a range.
      * :cppreference-algorithm:`minmax_element`
 
-.. list-table:: Partitioning Operations of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Partitioning Operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -1027,7 +1050,7 @@ Parallel algorithms
      * Divides elements into two groups while preserving their relative order.
      * :cppreference-algorithm:`stable_partition`
 
-.. list-table:: Sorting Operations of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Sorting Operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -1055,7 +1078,7 @@ Parallel algorithms
      * Sorts one range of data using keys supplied in another range.
      *
 
-.. list-table:: Numeric Parallel Algorithms of header :ref:`<public_api_header_hpx_numeric>`
+.. list-table:: Numeric Parallel Algorithms of header :ref:`public_api_header_hpx_numeric`
    :widths: 25 55 20
 
    * * Name
@@ -1084,7 +1107,7 @@ Parallel algorithms
      * :cppreference-algorithm:`transform_reduce`
 
 
-.. list-table:: Dynamic Memory Management of header :ref:`<public_api_header_hpx_memory>`
+.. list-table:: Dynamic Memory Management of header :ref:`public_api_header_hpx_memory`
    :widths: 25 55 20
 
    * * Name
@@ -1127,7 +1150,7 @@ Parallel algorithms
      * Constructs objects in an uninitialized area of memory.
      * :cppreference-memory:`uninitialized_value_construct_n`
 
-.. list-table:: Index-based for-loops of header :ref:`<public_api_header_hpx_algorithm>`
+.. list-table:: Index-based for-loops of header :ref:`public_api_header_hpx_algorithm`
 
    * * Name
      * Description
