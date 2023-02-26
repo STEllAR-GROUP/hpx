@@ -33,10 +33,12 @@ struct non_awaitable_sender
     using completion_signatures = Signatures;
 };
 
+using dependent = hpx::execution::experimental::dependent_completion_signatures<
+    hpx::execution::experimental::no_env>;
+
+template <typename Awaiter>
 struct promise
 {
-    using type = promise;
-    using id = promise;
     hpx::coro::coroutine_handle<promise> get_return_object()
     {
         return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
@@ -51,12 +53,9 @@ struct promise
     }
     void return_void() {}
     void unhandled_exception() {}
-};
 
-template <typename Awaiter>
-struct awaitable_sender_1
-{
-    Awaiter operator co_await()
+    template <typename... T>
+    auto await_transform(T&&...) noexcept
     {
         return Awaiter{};
     }
@@ -78,8 +77,62 @@ struct awaiter
     }
 };
 
-using dependent = hpx::execution::experimental::dependent_completion_signatures<
-    hpx::execution::experimental::no_env>;
+template <typename Awaiter>
+struct awaitable_sender_1
+{
+    Awaiter operator co_await()
+    {
+        return Awaiter{};
+    }
+};
+
+struct awaitable_sender_2
+{
+    using promise_type = promise<hpx::coro::suspend_always>;
+
+private:
+    friend dependent operator co_await(awaitable_sender_2);
+};
+
+struct awaitable_sender_3
+{
+    using promise_type = promise<awaiter>;
+
+private:
+    friend dependent operator co_await(awaitable_sender_2);
+};
+
+struct awaitable_sender_4
+{
+    using promise_type = promise<hpx::coro::suspend_always>;
+
+private:
+    template <typename Promise>
+    friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
+        awaitable_sender_3, Promise&)
+    {
+        return {};
+    }
+
+    friend dependent tag_invoke(hpx::execution::experimental::as_awaitable_t,
+        awaitable_sender_3,
+        hpx::execution::experimental::detail::env_promise<
+            hpx::execution::experimental::no_env>&)
+    {
+        return {};
+    }
+};
+
+struct awaitable_sender_5
+{
+private:
+    template <typename Promise>
+    friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
+        awaitable_sender_4, Promise&)
+    {
+        return {};
+    }
+};
 
 struct recv_set_value
 {
@@ -115,15 +168,23 @@ template <typename S1, typename S2,
 task<int> async_answer(S1 s1, S2 s2)
 {
     // Senders are implicitly awaitable (in this coroutine type):
+    // clang-format off
     co_await(S2 &&) s2;
     co_return co_await(S1 &&) s1;
+    // clang-format on
 }
+
+template <class Sender>
+inline constexpr bool is_sender_with_env_v =
+    hpx::execution::experimental::is_sender_v<Sender>&&
+        hpx::is_invocable_v<hpx::execution::experimental::get_env_t, Sender>;
 
 int main()
 {
     using namespace hpx::execution::experimental;
 
     {
+        // clang-format off
         static_assert(
             std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
                                signature_all(std::exception_ptr(), int()))>>,
@@ -132,6 +193,7 @@ int main()
             std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
                                signature_all(std::exception_ptr()))>>,
                 void>);
+        // clang-format on
     }
 
     // single sender value
@@ -158,10 +220,49 @@ int main()
                 operation_t<recv_set_value>>);
     }
 
-    // Promise base
+    // Promise env
     {
-        static_assert(is_awaitable_v<awaitable_sender_1<awaiter>,
-            promise_t<recv_set_value>>);
+        static_assert(is_awaiter_v<awaiter>);
+
+        static_assert(
+            !detail::has_free_operator_co_await_v<awaitable_sender_1<awaiter>>);
+        static_assert(detail::has_free_operator_co_await_v<awaitable_sender_2>);
+        static_assert(detail::has_free_operator_co_await_v<awaitable_sender_3>);
+        static_assert(
+            !detail::has_free_operator_co_await_v<awaitable_sender_4>);
+        static_assert(
+            !detail::has_free_operator_co_await_v<awaitable_sender_5>);
+
+        static_assert(detail::has_member_operator_co_await_v<
+            awaitable_sender_1<awaiter>>);
+        static_assert(
+            !detail::has_member_operator_co_await_v<awaitable_sender_2>);
+        static_assert(
+            !detail::has_member_operator_co_await_v<awaitable_sender_3>);
+        static_assert(
+            !detail::has_member_operator_co_await_v<awaitable_sender_4>);
+        static_assert(
+            !detail::has_member_operator_co_await_v<awaitable_sender_5>);
+
+        static_assert(is_awaitable_v<awaitable_sender_1<awaiter>>);
+        static_assert(is_awaitable_v<awaitable_sender_2>);
+        static_assert(is_awaitable_v<awaitable_sender_3>);
+        static_assert(is_awaitable_v<awaitable_sender_4>);
+        static_assert(is_awaitable_v<awaitable_sender_5>);
+
+        static_assert(is_awaitable_v<awaitable_sender_2,
+            ::promise<hpx::coro::suspend_always>>);
+        static_assert(is_awaitable_v<awaitable_sender_3, ::promise<awaiter>>);
+        static_assert(is_awaitable_v<awaitable_sender_4, ::promise<awaiter>>);
+        static_assert(is_awaitable_v<awaitable_sender_4,
+            ::promise<detail::env_promise<no_env>>>);
+        static_assert(is_awaitable_v<awaitable_sender_4,
+            ::promise<detail::env_promise<empty_env>>>);
+        static_assert(is_awaitable_v<awaitable_sender_5, ::promise<awaiter>>);
+        static_assert(is_awaitable_v<awaitable_sender_5,
+            ::promise<detail::env_promise<no_env>>>);
+        static_assert(is_awaitable_v<awaitable_sender_5,
+            ::promise<detail::env_promise<empty_env>>>);
     }
 
     // Operation base
@@ -184,6 +285,22 @@ int main()
             std::is_same_v<decltype(as_awaitable(awaitable_sender_1<awaiter>{},
                                unmove(::promise{}))),
                 awaitable_sender_1<awaiter>&&>);
+    }
+
+    // sender
+    {
+        static_assert(is_sender_v<awaitable_sender_1<awaiter>>);
+        static_assert(is_sender_v<awaitable_sender_2>);
+        static_assert(is_sender_v<awaitable_sender_3>);
+        static_assert(is_sender_v<awaitable_sender_4>);
+    }
+
+    // env promise
+    {
+        static_assert(is_sender_with_env_v<awaitable_sender_1<awaiter>>);
+        static_assert(is_sender_with_env_v<awaitable_sender_2>);
+        static_assert(is_sender_with_env_v<awaitable_sender_3>);
+        static_assert(is_sender_with_env_v<awaitable_sender_4>);
     }
 
     try

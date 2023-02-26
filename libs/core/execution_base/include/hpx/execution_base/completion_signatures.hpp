@@ -306,8 +306,8 @@ namespace hpx::execution::experimental {
                 return as_awaitable(HPX_FORWARD(Ty, value), *this);
             }
 
-            friend auto tag_invoke(get_env_t, const env_promise&) noexcept
-                -> const Env&;
+            template <typename T>
+            friend auto tag_invoke(get_env_t, const T&) noexcept -> const T&;
         };
 #endif
 
@@ -678,15 +678,41 @@ namespace hpx::execution::experimental {
                         Receiver const&>>
         {
         };
+
+        // sender<T> only checks if T is an awaitable if enable_sender<T>
+        // is false. Then it checks for awaitability with a promise type
+        // that doesn't have any environment queries, but that does have an
+        // await_transform that pipes the T through stdexec::as_awaitable.
+        // So you have two options for opting into the sender concept if you type
+        // is not generally awaitable: (1) specialize enable_sender, or (2)
+        // customize as_awaitable for T.
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
+
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v =
+            is_awaitable_v<Sender, env_promise<empty_env>> ||
+            has_is_sender_v<Sender>;
+
+        // This concept has been introduced to increase atomicity of concepts
+        template <typename Sender, typename Env>
+        inline constexpr bool is_sender_plain_v =
+            std::is_move_constructible_v<std::decay_t<Sender>>&&
+                std::is_class_v<std::decay_t<Sender>>&&
+                    meta::value<detail::provides_completion_signatures<
+                        std::decay_t<Sender>, Env>>;
+
+        template <typename Sender, typename Env>
+        inline constexpr bool is_with_completion_signatures_v =
+            hpx::is_invocable_v<get_completion_signatures_t, Sender, Env>&&
+                meta::value<completion_signatures_of_is_valid<Sender, Env>>;
     }    // namespace detail
 
     template <typename Sender, typename Env>
     struct is_sender
       : std::integral_constant<bool,
-            std::is_move_constructible_v<std::decay_t<Sender>> &&
-                std::is_class_v<std::decay_t<Sender>> &&
-                meta::value<detail::provides_completion_signatures<
-                    std::decay_t<Sender>, Env>>>
+            !!((detail::is_sender_plain_v<Sender, Env> &&
+                   detail::is_enable_sender_v<std::remove_cvref_t<Sender>>) ||
+                detail::is_with_completion_signatures_v<Sender, Env>)>
     {
     };
 
