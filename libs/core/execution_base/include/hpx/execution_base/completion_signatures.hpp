@@ -688,10 +688,15 @@ namespace hpx::execution::experimental {
         // customize as_awaitable for T.
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
 
+#ifdef HPX_HAVE_CXX20_COROUTINES
         template <typename Sender>
         inline constexpr bool is_enable_sender_v =
             is_awaitable_v<Sender, env_promise<empty_env>> ||
             has_is_sender_v<Sender>;
+#else
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
+#endif
 
         // This concept has been introduced to increase atomicity of concepts
         template <typename Sender, typename Env>
