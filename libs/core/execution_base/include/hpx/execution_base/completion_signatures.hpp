@@ -716,7 +716,7 @@ namespace hpx::execution::experimental {
     struct is_sender
       : std::integral_constant<bool,
             !!((detail::is_sender_plain_v<Sender, Env> &&
-                   detail::is_enable_sender_v<std::remove_cvref_t<Sender>>) ||
+                   detail::is_enable_sender_v<std::decay_t<Sender>>) ||
                 detail::is_with_completion_signatures_v<Sender, Env>)>
     {
     };
