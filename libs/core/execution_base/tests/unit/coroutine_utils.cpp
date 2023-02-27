@@ -99,7 +99,7 @@ struct awaitable_sender_3
     using promise_type = promise<awaiter>;
 
 private:
-    friend dependent operator co_await(awaitable_sender_2);
+    friend dependent operator co_await(awaitable_sender_3);
 };
 
 struct awaitable_sender_4
@@ -109,13 +109,13 @@ struct awaitable_sender_4
 private:
     template <typename Promise>
     friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
-        awaitable_sender_3, Promise&)
+        awaitable_sender_4, Promise&)
     {
         return {};
     }
 
     friend dependent tag_invoke(hpx::execution::experimental::as_awaitable_t,
-        awaitable_sender_3,
+        awaitable_sender_4,
         hpx::execution::experimental::detail::env_promise<
             hpx::execution::experimental::no_env>&)
     {
@@ -128,7 +128,7 @@ struct awaitable_sender_5
 private:
     template <typename Promise>
     friend awaiter tag_invoke(hpx::execution::experimental::as_awaitable_t,
-        awaitable_sender_4, Promise&)
+        awaitable_sender_5, Promise&)
     {
         return {};
     }
