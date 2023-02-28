@@ -815,6 +815,8 @@ namespace hpx::parallel {
             S stride_;
             hpx::tuple<Ts...> args_;
 
+            part_iterations() = default;    // for serialization purposes only
+
             template <typename F_, typename S_, typename Args>
             part_iterations(F_&& f, S_&& stride, Args&& args)
               : f_(HPX_FORWARD(F_, f))
@@ -877,6 +879,14 @@ namespace hpx::parallel {
                     }
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & stride_ & args_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F, typename S>
@@ -886,6 +896,8 @@ namespace hpx::parallel {
 
             fun_type f_;
             S stride_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_,
                 typename Enable = std::enable_if_t<
@@ -961,6 +973,14 @@ namespace hpx::parallel {
                     }
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & stride_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F, typename... Ts>
@@ -970,6 +990,8 @@ namespace hpx::parallel {
 
             fun_type f_;
             hpx::tuple<Ts...> args_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_, typename Args>
             part_iterations(F_&& f, Args&& args)
@@ -991,6 +1013,14 @@ namespace hpx::parallel {
                     detail::next_iteration(args_, pack);
                 }
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_ & args_;
+                // clang-format on
+            }
         };
 
         template <typename ExPolicy, typename F>
@@ -999,6 +1029,8 @@ namespace hpx::parallel {
             using fun_type = std::decay_t<F>;
 
             fun_type f_;
+
+            part_iterations() = default;    // for serialization purposes only
 
             template <typename F_,
                 typename Enable = std::enable_if_t<
@@ -1029,6 +1061,14 @@ namespace hpx::parallel {
                 parallel::util::loop_n<std::decay_t<ExPolicy>>(
                     part_begin, part_steps, f_);
             }
+
+            template <typename Archive>
+            void serialize(Archive& ar, unsigned)
+            {
+                // clang-format off
+                ar & f_;
+                // clang-format on
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -1045,7 +1085,7 @@ namespace hpx::parallel {
             {
                 parallel::util::loop_n<std::decay_t<ExPolicy>>(
                     first, count, HPX_FORWARD(F, f));
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename InIter, typename Size,
@@ -1077,7 +1117,7 @@ namespace hpx::parallel {
                 arg.exit_iteration(size);
                 (args.exit_iteration(size), ...);
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename B, typename Size, typename F,
@@ -1191,7 +1231,7 @@ namespace hpx::parallel {
                     }
                 }
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename InIter, typename Size,
@@ -1243,7 +1283,7 @@ namespace hpx::parallel {
                 arg.exit_iteration(size);
                 (args.exit_iteration(size), ...);
 
-                return hpx::util::unused_type();
+                return {};
             }
 
             template <typename ExPolicy, typename B, typename Size, typename S,
@@ -1345,8 +1385,9 @@ namespace hpx::parallel {
             std::size_t size = parallel::detail::distance(first, last);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_algo().call(HPX_FORWARD(ExPolicy, policy), first,
-                size, hpx::get<sizeof...(Args) - 1>(t), hpx::get<Is>(t)...);
+                size, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
         // reshuffle arguments, last argument is function object, will go first
@@ -1384,9 +1425,9 @@ namespace hpx::parallel {
             std::size_t size = parallel::detail::distance(first, last);
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_strided_algo().call(HPX_FORWARD(ExPolicy, policy),
-                first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
-                hpx::get<Is>(t)...);
+                first, size, stride, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
 
         // reshuffle arguments, last argument is function object, will go first
@@ -1414,9 +1455,9 @@ namespace hpx::parallel {
 
             auto&& t = hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
 
+            auto f = hpx::get<sizeof...(Args) - 1>(t);
             return for_loop_strided_algo().call(HPX_FORWARD(ExPolicy, policy),
-                first, size, stride, hpx::get<sizeof...(Args) - 1>(t),
-                hpx::get<Is>(t)...);
+                first, size, stride, HPX_MOVE(f), hpx::get<Is>(t)...);
         }
         /// \endcond
     }    // namespace detail

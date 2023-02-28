@@ -47,6 +47,8 @@ namespace hpx { namespace components {
                 {
                 }
 
+                component_entry& operator=(component_entry&&) noexcept = delete;
+
                 bool enabled_;
                 util::atomic_count instance_count_;
                 component_deleter_type deleter_;

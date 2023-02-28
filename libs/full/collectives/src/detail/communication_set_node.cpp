@@ -43,7 +43,7 @@ namespace hpx::collectives::detail {
         while ((x & 0x1) == 0)
         {
             x >>= 1;
-            ++count;
+            ++count;    //-V127
         }
         return count;
     }
@@ -229,9 +229,8 @@ namespace hpx::collectives::detail {
         if (ec)
         {
             // node doesn't exist yet, create new one and register it with AGAS
-            hpx::id_type const id =
-                hpx::local_new<detail::communication_set_node>(
-                    hpx::launch::sync, num_sites, name, this_site, 0);
+            hpx::id_type id = hpx::local_new<detail::communication_set_node>(
+                hpx::launch::sync, num_sites, name, this_site, 0);
 
             return detail::register_or_resolve_communication_set_name(
                 HPX_MOVE(id), HPX_MOVE(name), this_site);

@@ -161,7 +161,14 @@ namespace hpx::threads {
 
         // handle interruption, if needed
         thread_data* thrd_data = get_thread_id_data(id);
-        HPX_ASSERT(thrd_data);
+        if (HPX_UNLIKELY(thrd_data == nullptr))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::do_yield",
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
+        }
+
         thrd_data->interruption_point();
 
         thrd_data->set_last_worker_thread_num(

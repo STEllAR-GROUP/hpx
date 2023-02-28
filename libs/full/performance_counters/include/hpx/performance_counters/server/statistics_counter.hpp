@@ -42,8 +42,8 @@ namespace hpx { namespace performance_counters { namespace server {
       : public base_performance_counter
       , public components::component_base<statistics_counter<Statistic>>
     {
-        typedef components::component_base<statistics_counter<Statistic>>
-            base_type;
+        using base_type =
+            components::component_base<statistics_counter<Statistic>>;
 
         // avoid warnings about using this in member initializer list
         constexpr statistics_counter* this_() noexcept
@@ -52,8 +52,8 @@ namespace hpx { namespace performance_counters { namespace server {
         }
 
     public:
-        typedef statistics_counter type_holder;
-        typedef base_performance_counter base_type_holder;
+        using type_holder = statistics_counter;
+        using base_type_holder = base_performance_counter;
 
         statistics_counter();
 
@@ -84,7 +84,7 @@ namespace hpx { namespace performance_counters { namespace server {
         bool ensure_base_counter();
 
     private:
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
         mutable mutex_type mtx_;
 
         // base time interval in milliseconds

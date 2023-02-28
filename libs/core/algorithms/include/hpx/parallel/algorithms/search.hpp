@@ -319,11 +319,11 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::search_t, FwdIter first,
-            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
+            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
         {
             return hpx::parallel::detail::search<FwdIter, FwdIter>().call(
-                hpx::execution::seq, first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                hpx::execution::seq, first, last, s_first, s_last, HPX_MOVE(op),
+                hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -342,11 +342,11 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_fallback_invoke(hpx::search_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred&& op = Pred())
+            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
         {
             return hpx::parallel::detail::search<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
     } search{};
 
@@ -368,11 +368,11 @@ namespace hpx {
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::search_n_t, FwdIter first,
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
-            Pred&& op = Pred())
+            Pred op = Pred())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 hpx::execution::seq, first, count, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
 
         // clang-format off
@@ -392,11 +392,11 @@ namespace hpx {
             FwdIter>::type
         tag_fallback_invoke(hpx::search_n_t, ExPolicy&& policy, FwdIter first,
             std::size_t count, FwdIter2 s_first, FwdIter2 s_last,
-            Pred&& op = Pred())
+            Pred op = Pred())
         {
             return hpx::parallel::detail::search_n<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, count, s_first, s_last,
-                HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v);
+                HPX_MOVE(op), hpx::identity_v, hpx::identity_v);
         }
     } search_n{};
 }    // namespace hpx

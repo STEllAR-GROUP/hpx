@@ -35,8 +35,8 @@ namespace hpx { namespace performance_counters {
         return name;
     }
 
-    inline std::string ensure_counter_prefix(
-        std::string const& counter)    //-V659
+    inline std::string ensure_counter_prefix(    //-V659
+        std::string const& counter)
     {
         std::string name(counter);
         return ensure_counter_prefix(name);
@@ -49,8 +49,8 @@ namespace hpx { namespace performance_counters {
         return name;
     }
 
-    inline std::string remove_counter_prefix(
-        std::string const& counter)    //-V659
+    inline std::string remove_counter_prefix(    //-V659
+        std::string const& counter)
     {
         std::string name(counter);
         return remove_counter_prefix(name);
@@ -212,7 +212,7 @@ namespace hpx { namespace performance_counters {
     ///
     struct counter_type_path_elements
     {
-        counter_type_path_elements() {}
+        counter_type_path_elements() = default;
 
         counter_type_path_elements(std::string const& objectname,
             std::string const& countername, std::string const& parameters)
@@ -250,7 +250,7 @@ namespace hpx { namespace performance_counters {
     ///
     struct counter_path_elements : counter_type_path_elements
     {
-        typedef counter_type_path_elements base_type;
+        using base_type = counter_type_path_elements;
 
         counter_path_elements()
           : parentinstanceindex_(-1)
@@ -368,22 +368,21 @@ namespace hpx { namespace performance_counters {
     /// \brief This declares the type of a function, which will be
     ///        called by HPX whenever a new performance counter instance of a
     ///        particular type needs to be created.
-    typedef hpx::function<naming::gid_type(counter_info const&, error_code&)>
-        create_counter_func;
+    using create_counter_func =
+        hpx::function<naming::gid_type(counter_info const&, error_code&)>;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief This declares a type of a function, which will be passed to
     ///        a \a discover_counters_func in order to be called for each
     ///        discovered performance counter instance.
-    typedef hpx::function<bool(counter_info const&, error_code&)>
-        discover_counter_func;
+    using discover_counter_func =
+        hpx::function<bool(counter_info const&, error_code&)>;
 
     /// \brief This declares the type of a function, which will be called by
     ///        HPX whenever it needs to discover all performance counter
     ///        instances of a particular type.
-    typedef hpx::function<bool(counter_info const&,
-        discover_counter_func const&, discover_counters_mode, error_code&)>
-        discover_counters_func;
+    using discover_counters_func = hpx::function<bool(counter_info const&,
+        discover_counter_func const&, discover_counters_mode, error_code&)>;
 
     ///////////////////////////////////////////////////////////////////////
     inline counter_status add_counter_type(

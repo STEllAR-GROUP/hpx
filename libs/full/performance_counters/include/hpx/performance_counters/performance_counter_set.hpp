@@ -28,7 +28,7 @@ namespace hpx { namespace performance_counters {
     // Make a collection of performance counters available as a set
     class HPX_EXPORT performance_counter_set
     {
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
         /// Create an empty set of performance counters

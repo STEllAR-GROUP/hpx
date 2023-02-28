@@ -845,21 +845,10 @@ namespace hpx::threads::policies {
 
                 if (HPX_UNLIKELY(suspended_only))
                 {
-                    if (running)
-                    {
-                        LTM_(warning).format(
-                            "pool({}), scheduler({}), queue({}): no new work "
-                            "available, are we deadlocked?",
-                            *this->get_parent_pool(), *this, num_thread);
-                    }
-                    else
-                    {
-                        LHPX_CONSOLE_(hpx::util::logging::level::warning)
-                            .format(
-                                "  [TM] pool({}), scheduler({}), queue({}): no "
-                                "new work available, are we deadlocked?\n",
-                                *this->get_parent_pool(), *this, num_thread);
-                    }
+                    LTM_(warning).format(
+                        "pool({}), scheduler({}), queue({}): no new work "
+                        "available, are we deadlocked?",
+                        *this->get_parent_pool(), *this, num_thread);
                 }
             }
 #else

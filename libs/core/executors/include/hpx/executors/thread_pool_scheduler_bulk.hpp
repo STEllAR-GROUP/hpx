@@ -162,7 +162,7 @@ namespace hpx::execution::experimental::detail {
             hpx::optional<std::uint32_t> index;
             while ((index = local_queue.template pop<Which>()))
             {
-                do_work_chunk(ts, index.value());
+                do_work_chunk(ts, *index);
             }
 
             if (task_f->allow_stealing)
@@ -182,7 +182,7 @@ namespace hpx::execution::experimental::detail {
                     while (
                         (index = neighbor_queue.template pop<opposite_end>()))
                     {
-                        do_work_chunk(ts, index.value());
+                        do_work_chunk(ts, *index);
                     }
                 }
             }

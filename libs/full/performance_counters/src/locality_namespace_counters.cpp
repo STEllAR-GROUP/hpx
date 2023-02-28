@@ -27,7 +27,7 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // register all performance counter types exposed by this component
     void locality_namespace_register_counter_types(error_code& ec)
@@ -279,16 +279,17 @@ namespace hpx { namespace agas { namespace server {
             return naming::invalid_gid;
         }
         using performance_counters::detail::create_raw_counter;
-        naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
+        naming::gid_type gid = create_raw_counter(
+            info, hpx::function<std::int64_t(bool)>(get_data_func), ec);
         if (ec)
         {
             return naming::invalid_gid;
         }
         return naming::detail::strip_credits_from_gid(gid);
     }
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     // register performance counters for locality_namespace service
     void locality_namespace_register_counter_types(error_code& ec)
@@ -313,7 +314,7 @@ namespace hpx { namespace agas {
         }
         return naming::invalid_gid;
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
 HPX_REGISTER_ACTION_ID(hpx::agas::locality_namespace_statistics_counter_action,
     locality_namespace_statistics_counter_action,

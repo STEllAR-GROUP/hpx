@@ -247,7 +247,7 @@ namespace hpx {
             std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT_LOCKED(l, expected_ > 0);
             --expected_;
-            HPX_UNUSED(arrive_locked(l, 1));
+            [[maybe_unused]] bool result = arrive_locked(l, 1);
         }
 
     private:

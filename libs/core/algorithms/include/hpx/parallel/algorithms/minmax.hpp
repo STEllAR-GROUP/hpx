@@ -843,14 +843,13 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
-            hpx::min_element_t, FwdIter first, FwdIter last, F&& f = F())
+            hpx::min_element_t, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::min_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
         // clang-format off
@@ -864,13 +863,13 @@ namespace hpx {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
         tag_fallback_invoke(hpx::min_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
+            FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::min_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
     } min_element{};
@@ -888,14 +887,13 @@ namespace hpx {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
-            hpx::max_element_t, FwdIter first, FwdIter last, F&& f = F())
+            hpx::max_element_t, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::max_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
         // clang-format off
@@ -909,13 +907,13 @@ namespace hpx {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             FwdIter>
         tag_fallback_invoke(hpx::max_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
+            FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::max_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
     } max_element{};
@@ -933,14 +931,13 @@ namespace hpx {
             )>
         // clang-format on
         friend minmax_element_result<FwdIter> tag_fallback_invoke(
-            hpx::minmax_element_t, FwdIter first, FwdIter last, F&& f = F())
+            hpx::minmax_element_t, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::minmax_element<FwdIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(F, f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
 
         // clang-format off
@@ -954,13 +951,13 @@ namespace hpx {
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
             minmax_element_result<FwdIter>>
         tag_fallback_invoke(hpx::minmax_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F&& f = F())
+            FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::minmax_element<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
     } minmax_element{};

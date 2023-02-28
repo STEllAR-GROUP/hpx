@@ -287,7 +287,8 @@ namespace hpx::agas::server {
             return naming::invalid_gid;
         }
         using performance_counters::detail::create_raw_counter;
-        naming::gid_type gid = create_raw_counter(info, get_data_func, ec);
+        naming::gid_type gid = create_raw_counter(
+            info, hpx::function<std::int64_t(bool)>(get_data_func), ec);
         if (ec)
         {
             return naming::invalid_gid;
@@ -314,7 +315,7 @@ namespace hpx::agas {
     {
         auto* component_service =
             naming::get_agas_client().get_local_component_namespace_service();
-        if (component_service != nullptr)
+        if (component_service != nullptr)    //-V547
         {
             return server::component_namespace_statistics_counter(
                 *component_service, name);

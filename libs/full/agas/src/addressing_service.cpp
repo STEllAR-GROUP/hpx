@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2021 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -49,7 +49,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     struct addressing_service::gva_cache_key
     {    // {{{ gva_cache_key implementation
@@ -220,9 +220,8 @@ namespace hpx { namespace agas {
 
             {
                 std::unique_lock<mutex_type> l(resolved_localities_mtx_);
-                std::pair<resolved_localities_type::iterator, bool> res =
-                    resolved_localities_.insert(
-                        std::make_pair(prefix, endpoints));
+                std::pair<resolved_localities_type::iterator, bool> const res =
+                    resolved_localities_.emplace(prefix, endpoints);
 
                 if (!res.second)
                 {
@@ -248,8 +247,8 @@ namespace hpx { namespace agas {
     {
         std::lock_guard<mutex_type> l(resolved_localities_mtx_);
         std::pair<resolved_localities_type::iterator, bool> res =
-            resolved_localities_.insert(
-                std::make_pair(naming::get_gid_from_locality_id(0), eps));
+            resolved_localities_.emplace(
+                naming::get_gid_from_locality_id(0), eps);
         HPX_ASSERT(res.second);
         HPX_UNUSED(res);
     }
@@ -267,8 +266,8 @@ namespace hpx { namespace agas {
         std::uint32_t locality_id = 0;
         for (parcelset::endpoints_type const& endpoint : endpoints)
         {
-            resolved_localities_.insert(resolved_localities_type::value_type(
-                naming::get_gid_from_locality_id(locality_id), endpoint));
+            resolved_localities_.emplace(
+                naming::get_gid_from_locality_id(locality_id), endpoint);
             ++locality_id;
         }
     }
@@ -303,9 +302,7 @@ namespace hpx { namespace agas {
             if (it == resolved_localities_.end())
             {
                 if (HPX_UNLIKELY(!util::insert_checked(
-                        resolved_localities_.insert(
-                            std::make_pair(gid, endpoints)),
-                        it)))
+                        resolved_localities_.emplace(gid, endpoints), it)))
                 {
                     l.unlock();
 
@@ -318,7 +315,7 @@ namespace hpx { namespace agas {
             }
             else if (it->second.empty() && !endpoints.empty())
             {
-                resolved_localities_[gid] = endpoints;
+                resolved_localities_[gid] = HPX_MOVE(endpoints);
             }
         }
         return it->second;
@@ -441,25 +438,24 @@ namespace hpx { namespace agas {
                 locality_ids.clear();
                 for (unsigned int i : p)
                 {
-                    locality_ids.push_back(naming::get_gid_from_locality_id(i));
+                    locality_ids.emplace_back(
+                        naming::get_gid_from_locality_id(i));
                 }
 
                 return true;
             }
-            else
+
+            std::vector<std::uint32_t> const p = locality_ns_->localities();
+
+            if (!p.size())
+                return false;
+
+            locality_ids.clear();
+            for (unsigned int const i : p)
             {
-                const std::vector<std::uint32_t> p = locality_ns_->localities();
-
-                if (!p.size())
-                    return false;
-
-                locality_ids.clear();
-                for (unsigned int i : p)
-                {
-                    locality_ids.push_back(naming::get_gid_from_locality_id(i));
-                }
-                return true;
+                locality_ids.emplace_back(naming::get_gid_from_locality_id(i));
             }
+            return true;
         }
         catch (hpx::exception const& e)
         {
@@ -1156,7 +1152,6 @@ namespace hpx { namespace agas {
                     addr.type_ = g.type;
                     addr.address_ = g.lva();
 
-                    hpx::error_code ec;
                     if (naming::detail::store_in_cache(gids[i]))
                     {
                         if (range_caching_)
@@ -1644,13 +1639,13 @@ namespace hpx { namespace agas {
         {
             // The entry in AGAS for a locality's RTS component has a count of 0,
             // so we convert it to 1 here so that the cache doesn't break.
-            const std::uint64_t count = (g.count ? g.count : 1);
+            std::uint64_t const count = (g.count ? g.count : 1);
 
             LAGAS_(debug).format(
                 "addressing_service::update_cache_entry, gid({1}), count({2})",
                 gid, count);
 
-            const gva_cache_key key(gid, count);
+            gva_cache_key const key(gid, count);
 
             {
                 std::unique_lock<mutex_type> lock(gva_cache_mtx_);
@@ -1706,7 +1701,7 @@ namespace hpx { namespace agas {
         std::unique_lock<mutex_type> lock(gva_cache_mtx_);
         if (gva_cache_->get_entry(k, idbase_key, gva))
         {
-            const std::uint64_t id_msb =
+            std::uint64_t const id_msb =
                 naming::detail::strip_internal_bits_from_gid(gid.get_msb());
 
             if (HPX_UNLIKELY(id_msb != idbase_key.get_gid().get_msb()))
@@ -1992,7 +1987,7 @@ namespace hpx { namespace agas {
                 return;
             }
 
-            std::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+            auto p = std::make_shared<refcnt_requests_type>();
 
             p.swap(refcnt_requests_);
             refcnt_requests_count_ = 0;
@@ -2025,7 +2020,7 @@ namespace hpx { namespace agas {
                     primary_namespace::get_service_instance(raw),
                     hpx::id_type::management_type::unmanaged);
 
-                requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
+                requests[target].emplace_back(e.second, raw, raw);
             }
 
             // send requests to all locality
@@ -2065,7 +2060,7 @@ namespace hpx { namespace agas {
             return std::vector<hpx::future<std::vector<std::int64_t>>>();
         }
 
-        std::shared_ptr<refcnt_requests_type> p(new refcnt_requests_type);
+        auto p = std::make_shared<refcnt_requests_type>();
 
         p.swap(refcnt_requests_);
         refcnt_requests_count_ = 0;
@@ -2098,7 +2093,7 @@ namespace hpx { namespace agas {
             hpx::id_type target(primary_namespace::get_service_instance(raw),
                 hpx::id_type::management_type::unmanaged);
 
-            requests[target].push_back(hpx::make_tuple(e.second, raw, raw));
+            requests[target].emplace_back(e.second, raw, raw);
         }
 
         // send requests to all locality
@@ -2136,9 +2131,8 @@ namespace hpx { namespace agas {
     hpx::future<void> addressing_service::mark_as_migrated(
         naming::gid_type const& gid_,
         hpx::move_only_function<std::pair<bool, hpx::future<void>>()>&& f,
-        bool expect_to_be_marked_as_migrating)
+        [[maybe_unused]] bool expect_to_be_marked_as_migrating)
     {
-        HPX_UNUSED(expect_to_be_marked_as_migrating);
         if (!gid_)
         {
             return hpx::make_exceptional_future<void>(
@@ -2291,12 +2285,12 @@ namespace hpx { namespace agas {
         }
 
         // Always first grab the AGAS lock before invoking the user supplied
-        // function. The user supplied code will grab another lock. Both locks have
-        // to be acquired and always in the same sequence.
-        // The AGAS lock needs to be acquired first as the migrated object might
-        // not exist on this locality, in which case it should not be accessed
-        // anymore. The only way to determine whether the object still exists on
-        // this locality is to query the migrated objects table in AGAS.
+        // function. The user supplied code will grab another lock. Both locks
+        // have to be acquired and always in the same sequence. The AGAS lock
+        // needs to be acquired first as the migrated object might not exist on
+        // this locality, in which case it should not be accessed anymore. The
+        // only way to determine whether the object still exists on this
+        // locality is to query the migrated objects table in AGAS.
         using lock_type = std::unique_lock<mutex_type>;
 
         lock_type lock(migrated_objects_mtx_);
@@ -2309,5 +2303,4 @@ namespace hpx { namespace agas {
 
         return std::make_pair(false, f());
     }
-
-}}    // namespace hpx::agas
+}    // namespace hpx::agas

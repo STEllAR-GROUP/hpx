@@ -499,14 +499,14 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+            RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp), hpx::identity_v);
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -521,13 +521,13 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            is_heap_t, RandIter first, RandIter last, Comp&& comp = Comp())
+            is_heap_t, RandIter first, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
                 hpx::identity_v);
         }
     } is_heap{};
@@ -553,14 +553,14 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             RandIter>::type
         tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+            RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap_until<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp), hpx::identity_v);
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
@@ -574,14 +574,14 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_invoke(is_heap_until_t, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+        friend RandIter tag_fallback_invoke(
+            is_heap_until_t, RandIter first, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
             return hpx::parallel::detail::is_heap_until<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
                 hpx::identity_v);
         }
     } is_heap_until{};

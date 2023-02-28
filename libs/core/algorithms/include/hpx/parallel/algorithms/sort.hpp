@@ -184,11 +184,8 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
         inline constexpr std::size_t sort_limit_per_task = 65536ul;
 
-        /// \brief this function is the work assigned to each thread in the
-        ///        parallel process
-        /// \exception
-        /// \return
-        /// \remarks
+        // \brief this function is the work assigned to each thread in the
+        //        parallel process
         template <typename ExPolicy, typename RandomIt, typename Comp>
         hpx::future<RandomIt> sort_thread(ExPolicy&& policy, RandomIt first,
             RandomIt last, Comp comp, std::size_t chunk_size)
@@ -305,7 +302,7 @@ namespace hpx::parallel {
             // we should not get smaller than our sort_limit_per_task
             chunk_size = (std::max)(chunk_size, sort_limit_per_task);
 
-            std::ptrdiff_t N = last - first;
+            std::ptrdiff_t const N = last - first;
             HPX_ASSERT(N >= 0);
 
             if (static_cast<std::size_t>(N) < chunk_size)
@@ -382,7 +379,7 @@ namespace hpx::parallel {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<RandomIt> &&
-            traits::is_projected<Proj, RandomIt>::value &&
+            traits::is_projected_v<Proj, RandomIt> &&
             traits::is_indirect_callable<ExPolicy, Comp,
                 traits::projected<Proj, RandomIt>,
                 traits::projected<Proj, RandomIt>
@@ -420,44 +417,39 @@ namespace hpx {
         // clang-format off
         template <typename RandomIt,
             typename Comp = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
-        friend void tag_fallback_invoke(hpx::sort_t, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+        friend void tag_fallback_invoke(
+            hpx::sort_t, RandomIt first, RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::detail::sort<RandomIt>().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                first, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt,
             typename Comp = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected_v<Proj, RandomIt> &&
-                parallel::traits::is_indirect_callable<ExPolicy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::sort_t, ExPolicy&& policy, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+            RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
@@ -469,7 +461,7 @@ namespace hpx {
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::detail::sort<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, last,
-                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                       HPX_MOVE(comp), hpx::identity_v);
         }
     } sort{};
 }    // namespace hpx

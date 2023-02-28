@@ -43,10 +43,10 @@ struct decrement_server
     HPX_DEFINE_COMPONENT_ACTION(decrement_server, call)
 };
 
-typedef hpx::components::managed_component<decrement_server> server_type;
+using server_type = hpx::components::managed_component<decrement_server>;
 HPX_REGISTER_COMPONENT(server_type, decrement_server)
 
-typedef decrement_server::call_action call_action;
+using call_action = decrement_server::call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action)
 HPX_REGISTER_ACTION(call_action)
 

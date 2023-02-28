@@ -449,7 +449,7 @@ namespace hpx::parallel {
     template <typename Iter, typename Sent, typename Comp>
     Iter sequential_partial_sort(Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = parallel::detail::distance(first, end);
+        std::int64_t const nelem = parallel::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t const nmid = middle - first;
@@ -485,7 +485,7 @@ namespace hpx::parallel {
     hpx::future<Iter> parallel_partial_sort(
         ExPolicy&& policy, Iter first, Iter middle, Sent end, Comp&& comp)
     {
-        std::int64_t nelem = parallel::detail::distance(first, end);
+        std::int64_t const nelem = parallel::detail::distance(first, end);
         HPX_ASSERT(nelem >= 0);
 
         std::int64_t const nmid = middle - first;
@@ -569,13 +569,13 @@ namespace hpx {
             )>
         // clang-format on
         friend RandIter tag_fallback_invoke(hpx::partial_sort_t, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+            RandIter middle, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires at least random access iterator.");
 
             return parallel::partial_sort<RandIter>().call(hpx::execution::seq,
-                first, middle, last, HPX_FORWARD(Comp, comp), hpx::identity_v);
+                first, middle, last, HPX_MOVE(comp), hpx::identity_v);
         }
 
         // clang-format off
@@ -592,8 +592,7 @@ namespace hpx {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
         tag_fallback_invoke(hpx::partial_sort_t, ExPolicy&& policy,
-            RandIter first, RandIter middle, RandIter last,
-            Comp&& comp = Comp())
+            RandIter first, RandIter middle, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires at least random access iterator.");
@@ -604,7 +603,7 @@ namespace hpx {
             return algorithm_result::get(
                 parallel::partial_sort<RandIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    HPX_FORWARD(Comp, comp), hpx::identity_v));
+                    HPX_MOVE(comp), hpx::identity_v));
         }
     } partial_sort{};
 }    // namespace hpx

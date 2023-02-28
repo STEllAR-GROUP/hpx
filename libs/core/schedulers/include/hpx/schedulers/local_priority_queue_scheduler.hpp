@@ -1373,7 +1373,8 @@ namespace hpx::threads::policies {
                         bound_queues_[i].data_->dump_suspended_threads(
                             i, idle_loop_count, running);
                     suspended_only = queues_[i].data_->dump_suspended_threads(
-                        i, idle_loop_count, running);
+                                         i, idle_loop_count, running) ||
+                        suspended_only;
                 }
 
                 if (HPX_UNLIKELY(suspended_only))

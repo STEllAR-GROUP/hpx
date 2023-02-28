@@ -58,7 +58,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
@@ -169,8 +169,8 @@ namespace hpx { namespace actions {
             }
 
             template <typename State,
-                typename Enable = typename std::enable_if<std::is_same<State,
-                    threads::thread_restart_state>::value>::type>
+                typename Enable = std::enable_if_t<
+                    std::is_same_v<State, threads::thread_restart_state>>>
             threads::thread_result_type operator()(State)
             {
                 LTM_(debug).format("Executing {} with continuation({})",
@@ -223,8 +223,8 @@ namespace hpx { namespace actions {
 
         // Flag the use of array types as action arguments
         static_assert(
-            !util::any_of<std::is_array<
-                typename std::remove_reference<Args>::type>...>::value,
+            !util::any_of<
+                std::is_array<std::remove_reference_t<Args>>...>::value,
             "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
@@ -253,7 +253,7 @@ namespace hpx { namespace actions {
         static constexpr std::size_t arity = sizeof...(Args);
 
         using internal_result_type = R;
-        using arguments_type = hpx::tuple<typename std::decay<Args>::type...>;
+        using arguments_type = hpx::tuple<std::decay_t<Args>...>;
 
         using action_tag = void;
 
@@ -384,9 +384,8 @@ namespace hpx { namespace actions {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename DistPolicy, typename... Ts>
-        HPX_FORCEINLINE typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value,
-            result_type>::type
+        HPX_FORCEINLINE std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>, result_type>
         operator()(launch policy, DistPolicy const& dist_policy, error_code& ec,
             Ts&&... vs) const
         {
@@ -394,9 +393,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename DistPolicy, typename... Ts>
-        HPX_FORCEINLINE typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value,
-            result_type>::type
+        HPX_FORCEINLINE std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>, result_type>
         operator()(
             DistPolicy const& dist_policy, error_code& ec, Ts&&... vs) const
         {
@@ -405,9 +403,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename DistPolicy, typename... Ts>
-        HPX_FORCEINLINE typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value,
-            result_type>::type
+        HPX_FORCEINLINE std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>, result_type>
         operator()(
             launch policy, DistPolicy const& dist_policy, Ts&&... vs) const
         {
@@ -416,9 +413,8 @@ namespace hpx { namespace actions {
         }
 
         template <typename DistPolicy, typename... Ts>
-        HPX_FORCEINLINE typename std::enable_if<
-            traits::is_distribution_policy<DistPolicy>::value,
-            result_type>::type
+        HPX_FORCEINLINE std::enable_if_t<
+            traits::is_distribution_policy_v<DistPolicy>, result_type>
         operator()(DistPolicy const& dist_policy, Ts&&... vs) const
         {
             return sync_invoke(
@@ -550,16 +546,17 @@ namespace hpx { namespace actions {
     using make_direct_action_t =
         typename make_direct_action<TF, F, Derived>::type;
 
+    /// \endcond
+}    // namespace hpx::actions
+// namespace hpx::actions
+
+/// \cond NOINTERNAL
+
 // Macros usable to refer to an action given the function to expose
 #define HPX_MAKE_ACTION(func)                                                  \
     hpx::actions::make_action<decltype(&func), &func> /**/ /**/
 #define HPX_MAKE_DIRECT_ACTION(func)                                           \
     hpx::actions::make_direct_action<decltype(&func), &func> /**/ /**/
-
-        /// \endcond
-}}    // namespace hpx::actions
-
-/// \cond NOINTERNAL
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \def HPX_DECLARE_ACTION(func, name)

@@ -98,7 +98,7 @@ namespace hpx::parallel::execution::detail {
             hpx::optional<std::uint32_t> index;
             while ((index = local_queue.template pop<Which>()))
             {
-                do_work_chunk(f, ts, index.value());
+                do_work_chunk(f, ts, *index);
             }
 
             if (allow_stealing)
@@ -117,7 +117,7 @@ namespace hpx::parallel::execution::detail {
                     while (
                         (index = neighbor_queue.template pop<opposite_end>()))
                     {
-                        do_work_chunk(f, ts, index.value());
+                        do_work_chunk(f, ts, *index);
                     }
                 }
             }
@@ -228,7 +228,7 @@ namespace hpx::parallel::execution::detail {
         static hpx::threads::mask_type full_mask(
             std::size_t first_thread, std::size_t num_threads)
         {
-            std::size_t const overall_threads =
+            std::size_t const overall_threads =    //-V101
                 hpx::threads::hardware_concurrency();
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, overall_threads);
@@ -251,7 +251,8 @@ namespace hpx::parallel::execution::detail {
         static hpx::threads::mask_type limit_mask(
             hpx::threads::mask_cref_type orgmask, std::size_t num_threads)
         {
-            std::size_t const num_cores = hpx::threads::hardware_concurrency();
+            std::size_t const num_cores =    //-V101
+                hpx::threads::hardware_concurrency();
 
             auto mask = hpx::threads::mask_type();
             hpx::threads::resize(mask, num_cores);
@@ -385,9 +386,9 @@ namespace hpx::parallel::execution::detail {
             std::size_t const num_pus = num_threads;
             if (num_chunks < static_cast<std::uint32_t>(num_threads))
             {
-                num_threads = num_chunks;
+                num_threads = num_chunks;    //-V101
                 tasks_remaining.data_ = num_chunks;
-                pu_mask = limit_mask(pu_mask, num_chunks);
+                pu_mask = limit_mask(pu_mask, num_chunks);    //-V106
             }
 
             HPX_ASSERT(hpx::threads::count(pu_mask) == num_threads);
@@ -422,12 +423,14 @@ namespace hpx::parallel::execution::detail {
             bool main_thread_ok = false;
 
             auto const& rp = hpx::resource::get_partitioner();
-            std::size_t main_pu_num = rp.get_pu_num(local_worker_thread);
+            std::size_t main_pu_num =
+                rp.get_pu_num(local_worker_thread);    //-V106
             if (!hpx::threads::test(pu_mask, main_pu_num) || num_threads == 1)
             {
                 main_thread_ok = true;
                 local_worker_thread = worker_thread++;
-                main_pu_num = rp.get_pu_num(local_worker_thread + first_thread);
+                main_pu_num = rp.get_pu_num(
+                    local_worker_thread + first_thread);    //-V106
             }
 
             bool reverse_placement =
@@ -439,7 +442,8 @@ namespace hpx::parallel::execution::detail {
             for (std::uint32_t pu = 0;
                  worker_thread != num_threads && pu != num_pus; ++pu)
             {
-                std::size_t const pu_num = rp.get_pu_num(pu + first_thread);
+                std::size_t const pu_num =
+                    rp.get_pu_num(pu + first_thread);    //-V106
 
                 // The queue for the local thread is handled later inline.
                 if (!main_thread_ok && pu == local_worker_thread)
@@ -449,8 +453,8 @@ namespace hpx::parallel::execution::detail {
                     HPX_ASSERT(hpx::threads::test(pu_mask, pu_num));
                     main_thread_ok = true;
                     local_worker_thread = worker_thread++;
-                    main_pu_num =
-                        rp.get_pu_num(local_worker_thread + first_thread);
+                    main_pu_num = rp.get_pu_num(
+                        local_worker_thread + first_thread);    //-V106
                     continue;
                 }
 

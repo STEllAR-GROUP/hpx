@@ -264,19 +264,20 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
-                hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter>>::value
+                    hpx::parallel::traits::projected<Proj, FwdIter>
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::is_partitioned_t,
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, Sent>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -286,20 +287,21 @@ namespace hpx::ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected<Proj, FwdIter>>::value
+                    hpx::parallel::traits::projected<Proj, FwdIter>
+                >
             )>
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred&& pred, Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred, Proj proj = Proj())
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, Sent>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -307,15 +309,16 @@ namespace hpx::ranges {
             typename Pred,
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+                    hpx::parallel::traits::projected_range<Proj, Rng>
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::is_partitioned_t,
-            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+            Rng&& rng, Pred& pred, Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -323,7 +326,7 @@ namespace hpx::ranges {
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                    HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         // clang-format off
@@ -332,17 +335,17 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
-                    hpx::parallel::traits::projected_range<Proj, Rng>>::value
+                    hpx::parallel::traits::projected_range<Proj, Rng>
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::is_partitioned_t, ExPolicy&& policy,
-            Rng&& rng, Pred&& pred, Proj&& proj = Proj())
+            Rng&& rng, Pred pred, Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -350,8 +353,7 @@ namespace hpx::ranges {
             return hpx::parallel::detail::is_partitioned<iterator_type,
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
+                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } is_partitioned{};
 }    // namespace hpx::ranges

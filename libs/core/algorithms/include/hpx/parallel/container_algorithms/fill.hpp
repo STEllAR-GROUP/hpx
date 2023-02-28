@@ -311,11 +311,11 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            typename hpx::traits::range_traits<Rng>::iterator_type>
         tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Rng&& rng, T const& value)
         {
@@ -335,11 +335,10 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            Iter>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, Iter>
         tag_fallback_invoke(
             fill_t, ExPolicy&& policy, Iter first, Sent last, T const& value)
         {
@@ -355,7 +354,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
@@ -376,7 +375,7 @@ namespace hpx::ranges {
         template <typename Iter, typename Sent,
             typename T = typename std::iterator_traits<Iter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent, Iter>::value
+                hpx::traits::is_sentinel_for_v<Sent, Iter>
             )>
         // clang-format on
         friend Iter tag_fallback_invoke(
@@ -402,7 +401,7 @@ namespace hpx::ranges {
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
@@ -434,7 +433,8 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -462,7 +462,7 @@ namespace hpx::ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
@@ -489,7 +489,8 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Size,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
@@ -509,7 +510,6 @@ namespace hpx::ranges {
                 value);
         }
     } fill_n{};
-
 }    // namespace hpx::ranges
 
 #endif    // DOXYGEN

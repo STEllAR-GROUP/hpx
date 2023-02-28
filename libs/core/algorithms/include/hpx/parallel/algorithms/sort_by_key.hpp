@@ -137,7 +137,7 @@ namespace hpx::experimental {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
         sort_by_key_result<KeyIter, ValueIter>>
     sort_by_key(ExPolicy&& policy, KeyIter key_first, KeyIter key_last,
-        ValueIter value_first, Compare&& comp = Compare())
+        ValueIter value_first, Compare comp = Compare())
     {
 #if !defined(HPX_HAVE_TUPLE_RVALUE_SWAP)
         static_assert(sizeof(KeyIter) == 0,    // always false
@@ -158,8 +158,7 @@ namespace hpx::experimental {
             hpx::parallel::detail::sort<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy),
                 hpx::util::zip_iterator(key_first, value_first),
-                hpx::util::zip_iterator(key_last, value_last),
-                HPX_FORWARD(Compare, comp),
+                hpx::util::zip_iterator(key_last, value_last), HPX_MOVE(comp),
                 hpx::parallel::detail::extract_key()));
 #endif
     }

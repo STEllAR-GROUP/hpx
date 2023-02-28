@@ -262,8 +262,8 @@ namespace hpx::parallel {
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<RandomIt> &&
-            hpx::traits::is_sentinel_for<Sentinel, RandomIt>::value &&
-            traits::is_projected<Proj, RandomIt>::value &&
+            hpx::traits::is_sentinel_for_v<Sentinel, RandomIt> &&
+            traits::is_projected_v<Proj, RandomIt> &&
             traits::is_indirect_callable<ExPolicy, Compare,
                 traits::projected<Proj, RandomIt>,
                 traits::projected<Proj, RandomIt>
@@ -303,46 +303,40 @@ namespace hpx {
         // clang-format off
         template <typename RandomIt,
             typename Comp = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+            RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             hpx::parallel::detail::stable_sort<RandomIt>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt,
             typename Comp = hpx::parallel::detail::less,
-            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
-            RandomIt first, RandomIt last, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
@@ -353,7 +347,7 @@ namespace hpx {
             return hpx::util::void_guard<result_type>(),
                    hpx::parallel::detail::stable_sort<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, last,
-                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                       HPX_MOVE(comp), hpx::identity_v);
         }
     } stable_sort{};
 }    // namespace hpx

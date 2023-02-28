@@ -381,19 +381,18 @@ namespace hpx::ranges {
             typename Proj2 = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
-                hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
+                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(equal_t, ExPolicy&& policy, Iter1 first1,
-            Sent1 last1, Iter2 first2, Sent2 last2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            Sent1 last1, Iter2 first2, Sent2 last2, Pred op = Pred(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
                 "Requires at least forward iterator.");
@@ -402,8 +401,7 @@ namespace hpx::ranges {
 
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                HPX_MOVE(op), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -413,21 +411,20 @@ namespace hpx::ranges {
             typename Proj2 = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::parallel::traits::is_indirect_callable<ExPolicy, Pred,
+                hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
+                hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
+                hpx::parallel::traits::is_indirect_callable_v<ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1,
                         typename hpx::traits::range_traits<Rng1>::iterator_type>,
                     hpx::parallel::traits::projected<Proj2,
                         typename hpx::traits::range_traits<Rng2>::iterator_type>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(equal_t, ExPolicy&& policy, Rng1&& rng1,
-            Rng2&& rng2, Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Rng2&& rng2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             static_assert(
                 hpx::traits::is_forward_iterator<typename hpx::traits::
@@ -441,8 +438,8 @@ namespace hpx::ranges {
             return hpx::parallel::detail::equal_binary().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                hpx::util::end(rng2), HPX_MOVE(op), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -451,18 +448,18 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_sentinel_for<Sent1, Iter1>::value &&
-                hpx::traits::is_sentinel_for<Sent2, Iter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_sentinel_for_v<Sent1, Iter1> &&
+                hpx::traits::is_sentinel_for_v<Sent2, Iter2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, Iter1>,
                     hpx::parallel::traits::projected<Proj2, Iter2>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(equal_t, Iter1 first1, Sent1 last1,
-            Iter2 first2, Sent2 last2, Pred&& op = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            Iter2 first2, Sent2 last2, Pred op = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_forward_iterator_v<Iter1>,
                 "Requires at least forward iterator.");
@@ -470,9 +467,8 @@ namespace hpx::ranges {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::equal_binary().call(
-                hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, op), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                hpx::execution::seq, first1, last1, first2, last2, HPX_MOVE(op),
+                HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
@@ -480,20 +476,19 @@ namespace hpx::ranges {
             typename Proj1 = hpx::identity,
             typename Proj2 = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
+                hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1,
                         typename hpx::traits::range_traits<Rng1>::iterator_type>,
                     hpx::parallel::traits::projected<Proj2,
                         typename hpx::traits::range_traits<Rng2>::iterator_type>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(equal_t, Rng1&& rng1, Rng2&& rng2,
-            Pred&& op = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Pred op = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             static_assert(
                 hpx::traits::is_forward_iterator<typename hpx::traits::
@@ -507,10 +502,9 @@ namespace hpx::ranges {
             return hpx::parallel::detail::equal_binary().call(
                 hpx::execution::seq, hpx::util::begin(rng1),
                 hpx::util::end(rng1), hpx::util::begin(rng2),
-                hpx::util::end(rng2), HPX_FORWARD(Pred, op),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                hpx::util::end(rng2), HPX_MOVE(op), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
-
     } equal{};
 }    // namespace hpx::ranges
 

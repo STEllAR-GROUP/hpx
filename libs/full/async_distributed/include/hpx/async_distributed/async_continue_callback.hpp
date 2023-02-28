@@ -80,9 +80,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Cont, typename DistPolicy,
         typename Callback, typename... Ts>
-    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>,
         hpx::future<typename traits::promise_local_result<typename detail::
-                result_of_async_continue<Action, Cont>::type>::type>>::type
+                result_of_async_continue<Action, Cont>::type>::type>>
     async_continue_cb(
         Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
@@ -97,9 +97,9 @@ namespace hpx {
 
     template <typename Component, typename Signature, typename Derived,
         typename Cont, typename DistPolicy, typename Callback, typename... Ts>
-    typename std::enable_if<traits::is_distribution_policy<DistPolicy>::value,
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>,
         hpx::future<typename traits::promise_local_result<typename detail::
-                result_of_async_continue<Derived, Cont>::type>::type>>::type
+                result_of_async_continue<Derived, Cont>::type>::type>>
     async_continue_cb(
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         Cont&& cont, DistPolicy const& policy, Callback&& cb, Ts&&... vs)

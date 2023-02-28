@@ -450,14 +450,14 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T init, F&& f)
+            FwdIter last, T init, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
-                HPX_FORWARD(F, f));
+                HPX_MOVE(f));
         }
 
         // clang-format off
@@ -511,13 +511,13 @@ namespace hpx {
             )>
         // clang-format on
         friend T tag_fallback_invoke(
-            hpx::reduce_t, InIter first, InIter last, T init, F&& f)
+            hpx::reduce_t, InIter first, InIter last, T init, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
-                first, last, HPX_MOVE(init), HPX_FORWARD(F, f));
+            return hpx::parallel::detail::reduce<T>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(init), HPX_MOVE(f));
         }
 
         // clang-format off

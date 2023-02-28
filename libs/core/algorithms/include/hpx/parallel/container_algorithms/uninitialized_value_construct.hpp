@@ -273,7 +273,7 @@ namespace hpx::ranges {
         template <typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
@@ -293,11 +293,10 @@ namespace hpx::ranges {
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
             ExPolicy&& policy, FwdIter first, Sent last)
         {
@@ -312,7 +311,7 @@ namespace hpx::ranges {
         // clang-format off
         template <typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
@@ -334,11 +333,11 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename Rng,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            typename hpx::traits::range_traits<Rng>::iterator_type>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
             ExPolicy&& policy, Rng&& rng)
         {
@@ -362,7 +361,8 @@ namespace hpx::ranges {
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
@@ -381,11 +381,11 @@ namespace hpx::ranges {
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {

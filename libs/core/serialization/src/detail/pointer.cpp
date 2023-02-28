@@ -50,7 +50,7 @@ namespace hpx::serialization {
         auto& tracker = ar.get_extra_data<detail::input_pointer_tracker>();
         HPX_ASSERT(tracker.find(pos) == tracker.end());
 
-        tracker.insert(std::make_pair(pos, HPX_MOVE(helper)));
+        tracker.emplace(std::make_pair(pos, HPX_MOVE(helper)));
     }
 
     detail::ptr_helper& tracked_pointer(input_archive& ar, std::uint64_t pos)
@@ -70,7 +70,7 @@ namespace hpx::serialization {
         auto const it = tracker.find(pos);
         if (it == tracker.end())
         {
-            tracker.insert(std::make_pair(pos, ar.bytes_written()));
+            tracker.emplace(std::make_pair(pos, ar.bytes_written()));
             return static_cast<std::uint64_t>(-1);
         }
         return it->second;

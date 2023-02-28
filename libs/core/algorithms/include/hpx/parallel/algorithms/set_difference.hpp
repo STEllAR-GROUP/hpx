@@ -345,7 +345,7 @@ namespace hpx {
             FwdIter3>
         tag_fallback_invoke(set_difference_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            FwdIter3 dest, Pred&& op = Pred())
+            FwdIter3 dest, Pred op = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -367,7 +367,7 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::detail::set_difference<result_type>().call2(
                     HPX_FORWARD(ExPolicy, policy), is_seq(), first1, last1,
-                    first2, last2, dest, HPX_FORWARD(Pred, op), hpx::identity_v,
+                    first2, last2, dest, HPX_MOVE(op), hpx::identity_v,
                     hpx::identity_v));
         }
 
@@ -386,7 +386,7 @@ namespace hpx {
         // clang-format on
         friend FwdIter3 tag_fallback_invoke(set_difference_t, FwdIter1 first1,
             FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, FwdIter3 dest,
-            Pred&& op = Pred())
+            Pred op = Pred())
         {
             static_assert(hpx::traits::is_input_iterator_v<FwdIter1>,
                 "Requires at least input iterator.");
@@ -401,7 +401,7 @@ namespace hpx {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::detail::set_difference<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    HPX_FORWARD(Pred, op), hpx::identity_v, hpx::identity_v));
+                    HPX_MOVE(op), hpx::identity_v, hpx::identity_v));
         }
     } set_difference{};
 }    // namespace hpx

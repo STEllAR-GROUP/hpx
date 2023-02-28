@@ -111,7 +111,7 @@ namespace hpx::util::cache {
             }
 
             max_size_ = max_size;
-            while (current_size_ > max_size_)
+            while (current_size_ > max_size_)    //-V776
             {
                 evict();
             }
@@ -228,7 +228,7 @@ namespace hpx::util::cache {
         void insert_nonexist(key_type const& key, Entry_&& entry)
         {
             // insert ...
-            storage_.push_front(entry_pair(key, HPX_FORWARD(Entry_, entry)));
+            storage_.emplace_front(key, HPX_FORWARD(Entry_, entry));
             map_[key] = storage_.begin();
             ++current_size_;
 

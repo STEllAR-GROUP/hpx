@@ -485,7 +485,7 @@ namespace hpx::parallel {
         struct all_of : public algorithm<all_of, bool>
         {
             constexpr all_of() noexcept
-              : algorithm<all_of, bool>("all_of")
+              : algorithm("all_of")
             {
             }
 
@@ -559,13 +559,13 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
-            none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::none_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -576,13 +576,13 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            none_of_t, InIter first, InIter last, F&& f)
+            none_of_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::detail::none_of().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(F, f), hpx::identity_v);
+            return hpx::parallel::detail::none_of().call(
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } none_of{};
 
@@ -601,13 +601,13 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
-            any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::any_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -618,13 +618,13 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            any_of_t, InIter first, InIter last, F&& f)
+            any_of_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::detail::any_of().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(F, f), hpx::identity_v);
+            return hpx::parallel::detail::any_of().call(
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } any_of{};
 
@@ -643,13 +643,13 @@ namespace hpx {
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(
-            all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::detail::all_of().call(
-                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f),
                 hpx::identity_v);
         }
 
@@ -660,13 +660,13 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            all_of_t, InIter first, InIter last, F&& f)
+            all_of_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
 
-            return hpx::parallel::detail::all_of().call(hpx::execution::seq,
-                first, last, HPX_FORWARD(F, f), hpx::identity_v);
+            return hpx::parallel::detail::all_of().call(
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } all_of{};
 

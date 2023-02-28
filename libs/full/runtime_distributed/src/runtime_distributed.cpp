@@ -248,8 +248,8 @@ namespace hpx {
         if (agas_client_.is_bootstrap())
         {
             // store number of cores used by other processes
-            std::uint32_t cores_needed = assign_cores();
-            std::uint32_t first_used_core = assign_cores(
+            std::uint32_t cores_needed = runtime_distributed::assign_cores();
+            std::uint32_t first_used_core = runtime_distributed::assign_cores(
                 pp ? pp->get_locality_name() : "<console>", cores_needed);
 
             rtcfg_.set_first_used_core(first_used_core);
@@ -564,8 +564,8 @@ namespace hpx {
         {
             std::unique_lock<std::mutex> lk(mtx);
             // NOLINTNEXTLINE(bugprone-infinite-loop)
-            while (!running)    // -V776 // -V1044
-                cond.wait(lk);
+            while (!running)      // -V776 // -V1044
+                cond.wait(lk);    //-V1089
         }
 
         // use main thread to drive main thread pool
@@ -610,7 +610,7 @@ namespace hpx {
 
             std::thread t(hpx::bind(&runtime_distributed::stop_helper, this,
                 blocking, std::ref(cond), std::ref(mtx)));
-            cond.wait(l);
+            cond.wait(l);    //-V1089
 
             t.join();
         }
@@ -1601,8 +1601,7 @@ namespace hpx {
             used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
         {
-            used_cores_map_.insert(used_cores_map_type::value_type(
-                locality_basename, cores_needed));
+            used_cores_map_.emplace(locality_basename, cores_needed);
             return 0;
         }
 
@@ -1734,14 +1733,6 @@ namespace hpx {
         components::component_type type, error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
-        if (nullptr == hpx::applier::get_applier_ptr())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "hpx::find_all_localities",
-                "the runtime system is not available at this time");
-            return locality_ids;
-        }
-
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
         return locality_ids;
     }
@@ -1749,14 +1740,6 @@ namespace hpx {
     std::vector<hpx::id_type> find_all_localities(error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
-        if (nullptr == hpx::applier::get_applier_ptr())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "hpx::find_all_localities",
-                "the runtime system is not available at this time");
-            return locality_ids;
-        }
-
         hpx::applier::get_applier().get_localities(locality_ids, ec);
         return locality_ids;
     }
@@ -1765,14 +1748,6 @@ namespace hpx {
         components::component_type type, error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
-        if (nullptr == hpx::applier::get_applier_ptr())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "hpx::find_remote_localities",
-                "the runtime system is not available at this time");
-            return locality_ids;
-        }
-
         hpx::applier::get_applier().get_remote_localities(
             locality_ids, type, ec);
         return locality_ids;
@@ -1781,30 +1756,14 @@ namespace hpx {
     std::vector<hpx::id_type> find_remote_localities(error_code& ec)
     {
         std::vector<hpx::id_type> locality_ids;
-        if (nullptr == hpx::applier::get_applier_ptr())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status,
-                "hpx::find_remote_localities",
-                "the runtime system is not available at this time");
-            return locality_ids;
-        }
-
         hpx::applier::get_applier().get_remote_localities(
             locality_ids, components::component_invalid, ec);
-
         return locality_ids;
     }
 
     // find a locality supporting the given component
     hpx::id_type find_locality(components::component_type type, error_code& ec)
     {
-        if (nullptr == hpx::applier::get_applier_ptr())
-        {
-            HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::find_locality",
-                "the runtime system is not available at this time");
-            return hpx::invalid_id;
-        }
-
         std::vector<hpx::id_type> locality_ids;
         hpx::applier::get_applier().get_localities(locality_ids, type, ec);
 
@@ -1824,7 +1783,6 @@ namespace hpx {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
-            return 0;
         }
 
         return rt->get_num_localities(hpx::launch::sync, type, ec);
@@ -1833,13 +1791,12 @@ namespace hpx {
     hpx::future<std::uint32_t> get_num_localities(
         components::component_type type)
     {
-        runtime_distributed* rt = get_runtime_distributed_ptr();
+        runtime_distributed const* rt = get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::get_num_localities",
                 "the runtime system has not been initialized yet");
-            return make_ready_future(std::uint32_t(0));
         }
 
         return rt->get_num_localities(type);

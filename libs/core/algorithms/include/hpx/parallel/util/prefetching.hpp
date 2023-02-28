@@ -443,7 +443,7 @@ namespace hpx::parallel::util {
     {
         static_assert(hpx::traits::is_random_access_iterator_v<Itr>,
             "Iterators have to be of random access iterator category");
-        static_assert(hpx::util::all_of<hpx::traits::is_range<Ts>...>::value,
+        static_assert(hpx::util::all_of_v<hpx::traits::is_range<Ts>...>,
             "All variadic parameters have to represent ranges");
 
         using ranges_type = hpx::tuple<std::reference_wrapper<Ts const>...>;

@@ -38,6 +38,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -89,7 +90,13 @@ HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::base_performance_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
+
+    std::ostream& operator<<(std::ostream& os, counter_status rhs)
+    {
+        return (os << static_cast<int>(rhs));
+    }
+
     /// \brief Create a full name of a counter from the contents of the given
     ///        \a counter_path_elements instance.
     counter_status get_counter_name(
@@ -1309,4 +1316,4 @@ namespace hpx { namespace performance_counters {
             unit_of_measure_;
         // clang-format on
     }
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

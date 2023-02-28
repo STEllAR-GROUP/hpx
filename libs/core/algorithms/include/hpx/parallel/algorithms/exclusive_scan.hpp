@@ -600,7 +600,7 @@ namespace hpx {
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::exclusive_scan_t, InIter first,
-            InIter last, OutIter dest, T init, Op&& op)
+            InIter last, OutIter dest, T init, Op op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -612,7 +612,7 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::detail::exclusive_scan<result_type>().call(
                     hpx::execution::seq, first, last, dest, HPX_MOVE(init),
-                    HPX_FORWARD(Op, op)));
+                    HPX_MOVE(op)));
         }
 
         // clang-format off
@@ -632,7 +632,7 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::exclusive_scan_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op&& op)
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, T init, Op op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -645,9 +645,8 @@ namespace hpx {
             return parallel::util::get_second_element(
                 hpx::parallel::detail::exclusive_scan<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_MOVE(init), HPX_FORWARD(Op, op)));
+                    HPX_MOVE(init), HPX_MOVE(op)));
         }
-
     } exclusive_scan{};
 }    // namespace hpx
 

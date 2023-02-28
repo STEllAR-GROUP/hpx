@@ -101,8 +101,8 @@ namespace hpx { namespace performance_counters {
         }
 
         std::pair<counter_type_map_type::iterator, bool> p =
-            countertypes_.insert(counter_type_map_type::value_type(type_name,
-                counter_data(info, create_counter_, discover_counters_)));
+            countertypes_.emplace(type_name,
+                counter_data(info, create_counter_, discover_counters_));
 
         if (!p.second)
         {

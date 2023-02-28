@@ -255,6 +255,7 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -303,6 +304,8 @@ namespace hpx::parallel {
 #endif
             for_each_iteration& operator=(for_each_iteration const&) = default;
             for_each_iteration& operator=(for_each_iteration&&) = default;
+
+            ~for_each_iteration() = default;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
@@ -359,6 +362,8 @@ namespace hpx::parallel {
 #endif
             for_each_iteration& operator=(for_each_iteration const&) = default;
             for_each_iteration& operator=(for_each_iteration&&) = default;
+
+            ~for_each_iteration() = default;
 
             template <typename Iter>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void operator()(
@@ -547,7 +552,7 @@ namespace hpx {
             )>
         // clang-format on
         friend F tag_fallback_invoke(
-            hpx::for_each_t, InIter first, InIter last, F&& f)
+            hpx::for_each_t, InIter first, InIter last, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -555,7 +560,8 @@ namespace hpx {
             if (first != last)
             {
                 hpx::parallel::detail::for_each<InIter>().call(
-                    hpx::execution::seq, first, last, f, hpx::identity_v);
+                    hpx::execution::seq, first, last, std::ref(f),
+                    hpx::identity_v);
             }
             return HPX_FORWARD(F, f);
         }
@@ -569,7 +575,7 @@ namespace hpx {
             )>
         // clang-format on
         friend decltype(auto) tag_fallback_invoke(hpx::for_each_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -577,8 +583,7 @@ namespace hpx {
             return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                 FwdIter>::get(hpx::parallel::detail::for_each<FwdIter>()
                                   .call(HPX_FORWARD(ExPolicy, policy), first,
-                                      last, HPX_FORWARD(F, f),
-                                      hpx::identity_v));
+                                      last, HPX_MOVE(f), hpx::identity_v));
         }
     } for_each{};
 
@@ -590,11 +595,12 @@ namespace hpx {
         // clang-format off
         template <typename InIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter>
+                hpx::traits::is_input_iterator_v<InIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend InIter tag_fallback_invoke(
-            hpx::for_each_n_t, InIter first, Size count, F&& f)
+            hpx::for_each_n_t, InIter first, Size count, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -607,19 +613,20 @@ namespace hpx {
 
             return hpx::parallel::detail::for_each_n<InIter>().call(
                 hpx::execution::seq, first, static_cast<std::size_t>(count),
-                HPX_FORWARD(F, f), hpx::identity_v);
+                HPX_MOVE(f), hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size, typename F,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
-            Size count, F&& f)
+            Size count, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -634,8 +641,7 @@ namespace hpx {
 
             return hpx::parallel::detail::for_each_n<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first,
-                static_cast<std::size_t>(count), HPX_FORWARD(F, f),
-                hpx::identity_v);
+                static_cast<std::size_t>(count), HPX_MOVE(f), hpx::identity_v);
         }
     } for_each_n{};
 }    // namespace hpx

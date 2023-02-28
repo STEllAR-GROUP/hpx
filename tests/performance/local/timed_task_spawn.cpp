@@ -19,8 +19,6 @@
 #include <hpx/string_util/classification.hpp>
 #include <hpx/string_util/split.hpp>
 
-#include <boost/integer/common_factor.hpp>
-
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -29,6 +27,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -412,8 +411,8 @@ int hpx_main(variables_map& vm)
         ///////////////////////////////////////////////////////////////////////
         if (suspended_tasks != 0)
         {
-            std::uint64_t gcd = boost::integer::gcd(
-                tasks_per_feeder, suspended_tasks_per_feeder);
+            std::uint64_t gcd =
+                std::gcd(tasks_per_feeder, suspended_tasks_per_feeder);
 
             suspend_step = suspended_tasks_per_feeder / gcd;
             // We check earlier to make sure that there are never more

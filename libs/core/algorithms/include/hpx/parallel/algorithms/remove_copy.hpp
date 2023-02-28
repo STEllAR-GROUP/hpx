@@ -413,7 +413,7 @@ namespace hpx {
             )>
         // clang-format on
         friend OutIter tag_fallback_invoke(hpx::remove_copy_if_t, InIter first,
-            InIter last, OutIter dest, Pred&& pred)
+            InIter last, OutIter dest, Pred pred)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required input iterator.");
@@ -421,11 +421,10 @@ namespace hpx {
             static_assert(hpx::traits::is_output_iterator_v<InIter>,
                 "Required output iterator.");
 
-            auto&& res =
-                hpx::parallel::detail::remove_copy_if<
-                    hpx::parallel::util::in_out_result<InIter, OutIter>>()
-                    .call(hpx::execution::sequenced_policy{}, first, last, dest,
-                        HPX_FORWARD(Pred, pred), hpx::identity_v);
+            auto&& res = hpx::parallel::detail::remove_copy_if<
+                hpx::parallel::util::in_out_result<InIter, OutIter>>()
+                             .call(hpx::execution::sequenced_policy{}, first,
+                                 last, dest, HPX_MOVE(pred), hpx::identity_v);
 
             return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }
@@ -444,7 +443,7 @@ namespace hpx {
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter2>::type
         tag_fallback_invoke(hpx::remove_copy_if_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred&& pred)
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest, Pred pred)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");
@@ -452,11 +451,10 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Required at least forward iterator.");
 
-            auto&& res =
-                hpx::parallel::detail::remove_copy_if<
-                    hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                        HPX_FORWARD(Pred, pred), hpx::identity_v);
+            auto&& res = hpx::parallel::detail::remove_copy_if<
+                hpx::parallel::util::in_out_result<FwdIter1, FwdIter2>>()
+                             .call(HPX_FORWARD(ExPolicy, policy), first, last,
+                                 dest, HPX_MOVE(pred), hpx::identity_v);
 
             return hpx::parallel::util::get_second_element(HPX_MOVE(res));
         }

@@ -179,7 +179,7 @@ namespace hpx::util::logging {
             }
             else
             {
-                m_cache.push_back(HPX_MOVE(msg));
+                m_cache.emplace_back(HPX_MOVE(msg));
             }
         }
 

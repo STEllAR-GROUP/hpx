@@ -666,7 +666,7 @@ namespace hpx { namespace detail {
         typedef typename action_type::local_result_type result_type;
 
         naming::address addr;
-        agas::is_local_address_cached(id, addr);
+        [[maybe_unused]] bool result = agas::is_local_address_cached(id, addr);
 
         future<result_type> f;
         {

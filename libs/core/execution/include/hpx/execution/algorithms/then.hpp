@@ -152,9 +152,9 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
-                then_sender const& sender)
+                then_sender const& s)
             {
-                return tag(sender.sender);
+                return tag(s.sender);
             }
 
             // TODO: add forwarding_sender_query

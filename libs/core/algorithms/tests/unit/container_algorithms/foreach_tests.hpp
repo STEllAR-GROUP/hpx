@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 #include <hpx/parallel/container_algorithms/for_each.hpp>
 
 #include <cstddef>
-#include <iostream>
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <utility>
@@ -35,8 +35,8 @@ struct counter
 template <typename IteratorTag>
 void test_for_each_seq(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -45,17 +45,17 @@ void test_for_each_seq(IteratorTag)
     auto res =
         hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
                                   iterator(std::end(c))),
-            f);
+            std::ref(f));
 
     // verify values
     std::size_t count = 0;
     std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
+        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
     HPX_TEST(res.in == iterator(std::end(c)));
-    HPX_TEST_EQ(res.fun.count, c.size());
+    HPX_TEST_EQ(static_cast<counter>(res.fun).count, c.size());
     HPX_TEST_EQ(f.count, c.size());
 }
 
@@ -64,8 +64,8 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -79,7 +79,7 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
+        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -88,8 +88,8 @@ void test_for_each(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -103,7 +103,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
+        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -113,7 +113,7 @@ void test_for_each_async(ExPolicy&& p, IteratorTag)
 struct counter_exception
 {
     std::size_t count = 0;
-    void operator()(std::size_t&)
+    [[noreturn]] void operator()(std::size_t&)
     {
         ++count;
         throw std::runtime_error("test");
@@ -123,8 +123,8 @@ struct counter_exception
 template <typename IteratorTag>
 void test_for_each_exception_seq(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -135,7 +135,7 @@ void test_for_each_exception_seq(IteratorTag)
     {
         hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
                                   iterator(std::end(c))),
-            f);
+            std::ref(f));
 
         HPX_TEST(false);
     }
@@ -149,7 +149,7 @@ void test_for_each_exception_seq(IteratorTag)
     }
 
     HPX_TEST(caught_exception);
-    HPX_TEST_EQ(f.count, std::size_t(1));
+    HPX_TEST_EQ(f.count, static_cast<std::size_t>(1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -157,8 +157,8 @@ void test_for_each_exception(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -189,8 +189,8 @@ void test_for_each_exception(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -226,7 +226,7 @@ void test_for_each_exception_async(ExPolicy&& p, IteratorTag)
 struct counter_bad_alloc
 {
     std::size_t count = 0;
-    void operator()(std::size_t&)
+    [[noreturn]] void operator()(std::size_t&)
     {
         ++count;
         throw std::bad_alloc();
@@ -236,8 +236,8 @@ struct counter_bad_alloc
 template <typename IteratorTag>
 void test_for_each_bad_alloc_seq(IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -248,7 +248,7 @@ void test_for_each_bad_alloc_seq(IteratorTag)
     {
         hpx::ranges::for_each(hpx::util::iterator_range(iterator(std::begin(c)),
                                   iterator(std::end(c))),
-            f);
+            std::ref(f));
 
         HPX_TEST(false);
     }
@@ -262,7 +262,7 @@ void test_for_each_bad_alloc_seq(IteratorTag)
     }
 
     HPX_TEST(caught_exception);
-    HPX_TEST_EQ(f.count, std::size_t(1));
+    HPX_TEST_EQ(f.count, static_cast<std::size_t>(1));
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -270,8 +270,8 @@ void test_for_each_bad_alloc(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value);
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -301,8 +301,8 @@ void test_for_each_bad_alloc(ExPolicy&& policy, IteratorTag)
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -336,8 +336,8 @@ void test_for_each_bad_alloc_async(ExPolicy&& p, IteratorTag)
 template <typename Policy, typename ExPolicy, typename IteratorTag>
 void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
 {
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -359,7 +359,7 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
     // verify values
     std::size_t count = 0;
     std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
+        HPX_TEST_EQ(v, static_cast<std::size_t>(42));
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
@@ -371,8 +371,8 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
@@ -410,8 +410,8 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
 
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
