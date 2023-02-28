@@ -9,7 +9,7 @@
 //[task_group_docs
 
 #include <hpx/local/init.hpp>
-#include <hpx/task_group.hpp>
+#include <hpx/parallel/task_group.hpp>
 
 void task1()
 {
