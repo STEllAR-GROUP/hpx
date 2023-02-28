@@ -10,6 +10,7 @@
 
 #include <hpx/local/init.hpp>
 #include <hpx/parallel/task_group.hpp>
+#include <iostream>
 
 void task1()
 {

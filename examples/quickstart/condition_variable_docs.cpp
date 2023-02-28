@@ -12,6 +12,8 @@
 #include <hpx/local/init.hpp>
 #include <hpx/mutex.hpp>
 #include <hpx/thread.hpp>
+#include <iostream>
+#include <string>
 
 hpx::condition_variable cv;
 hpx::mutex m;

@@ -265,7 +265,7 @@ become available at some point in the future, and it can be used to write asynch
 parallel code. Futures can be returned from functions that perform time-consuming operations,
 allowing the calling code to continue executing while the function performs its work. The
 value of the future is set when the operation completes and can be accessed later. Futures
-are used in |hpx| to write asynchronous and parallel code. Below is an example demostrating
+are used in |hpx| to write asynchronous and parallel code. Below is an example demonstrating
 different features of futures:
 
 .. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
