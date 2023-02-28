@@ -672,7 +672,7 @@ object. It also shows how to query the state of threads and wait for futures to 
    :start-after: //[threads_docs
    :end-before: //]
 
-In more detail, the `wait_for_latch()` function is a simple helper function that waits for a ``hpx::latch``
+In more detail, the ``wait_for_latch()`` function is a simple helper function that waits for a ``hpx::latch``
 object to be released. At this point we remind that ``hpx::latch`` is a synchronization primitive that
 allows multiple threads to wait for a common event to occur.
 
@@ -683,7 +683,7 @@ function. The resulting futures are added to the vector.
 
 After the threads have been launched, ``hpx::this_thread::yield()`` is called to give them a chance to
 reach the latch before the program proceeds. Then, the ``hpx::threads::enumerate_threads`` function
-prints the state of each suspended thread, while the next call of ``l.arrive_and_wait()``waits for all
+prints the state of each suspended thread, while the next call of ``l.arrive_and_wait()`` waits for all
 the threads to reach the latch. Finally, ``hpx::wait_all`` is called to wait for all the futures to complete.
 
 .. hint::
@@ -694,7 +694,7 @@ the threads to reach the latch. Finally, ``hpx::wait_all`` is called to wait for
    other features of |hpx| such as futures, promises, and task groups, making it a powerful tool for
    parallel programming.
 
-   Checkout the examples of :ref:`shared_mutex`, :ref:`condition_variable`, :ref:`counting_semaphore`
+   Checkout the examples of :ref:`shared_mutex`, :ref:`condition_variable`, :ref:`semaphore`
    to see how |hpx| threads are used in combination with other features.
 
 .. _parallel:
@@ -815,7 +815,7 @@ Parallel algorithms
 
 |hpx| provides implementations of the following parallel algorithms:
 
-.. list-table:: Non-modifying parallel algorithms of header :ref:` this <public_api_header_hpx_algorithm`
+.. list-table:: Non-modifying parallel algorithms of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
    * * Name
@@ -863,7 +863,7 @@ Parallel algorithms
    * * :cpp:func:`hpx::lexicographical_compare`
      * Checks if a range of values is lexicographically less than another range of values.
      * :cppreference-algorithm:`lexicographical_compare`
-   * * :cpp:func:`hpx::parallel::mismatch`
+   * * :cpp:func:`hpx::mismatch`
      * Finds the first position where two ranges differ.
      * :cppreference-algorithm:`mismatch`
    * * :cpp:func:`hpx::none_of`
@@ -943,10 +943,10 @@ Parallel algorithms
    * * :cpp:func:`hpx::reverse_copy`
      * Creates a copy of a range that is reversed.
      * :cppreference-algorithm:`reverse_copy`
-   * * :cpp:func:`hpx::parallel::rotate`
+   * * :cpp:func:`hpx::rotate`
      * Rotates the order of elements in a range.
      * :cppreference-algorithm:`rotate`
-   * * :cpp:func:`hpx::parallel::rotate_copy`
+   * * :cpp:func:`hpx::rotate_copy`
      * Copies and rotates a range of elements.
      * :cppreference-algorithm:`rotate_copy`
    * * :cpp:func:`hpx::shift_left`
@@ -1040,7 +1040,7 @@ Parallel algorithms
    * * :cpp:func:`hpx::is_partitioned`
      * Returns ``true`` if each true element for a predicate precedes the false elements in a range.
      * :cppreference-algorithm:`is_partitioned`
-   * * :cpp:func:`hpx::parallel::partition`
+   * * :cpp:func:`hpx::partition`
      * Divides elements into two groups without preserving their relative order.
      * :cppreference-algorithm:`partition`
    * * :cpp:func:`hpx::partition_copy`
