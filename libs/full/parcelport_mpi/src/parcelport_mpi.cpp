@@ -228,22 +228,6 @@ namespace hpx::parcelset {
                 }
             }
 
-            void early_write_handler(std::error_code const& ec, parcel const& p)
-            {
-                if (ec)
-                {
-                    // all errors during early parcel handling are fatal
-                    std::exception_ptr exception = hpx::detail::get_exception(
-                        hpx::exception(ec), "mpi::early_write_handler",
-                        __FILE__, __LINE__,
-                        "error while handling early parcel: " + ec.message() +
-                            "(" + std::to_string(ec.value()) + ")" +
-                            parcelset::dump_parcel(p));
-
-                    hpx::report_error(exception);
-                }
-            }
-
             std::size_t background_threads_;
         };
     }    // namespace policies::mpi

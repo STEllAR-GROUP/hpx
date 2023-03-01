@@ -35,7 +35,9 @@ namespace hpx::parallel::util {
 
             // modify sharing hint only if it is the default (do not overwrite
             // user supplied values)
-            if (hint.sharing_mode() == hpx::threads::thread_sharing_hint::none)
+            if (hint.sharing_mode() ==
+                    hpx::threads::thread_sharing_hint::none &&
+                sharing != hpx::threads::thread_sharing_hint::none)
             {
                 hint.sharing_mode(sharing);
             }

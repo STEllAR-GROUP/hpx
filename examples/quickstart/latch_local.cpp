@@ -15,6 +15,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
+//[latch_docs
 std::ptrdiff_t num_threads = 16;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,6 +42,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     return hpx::local::finalize();
 }
+//]
 
 int main(int argc, char* argv[])
 {

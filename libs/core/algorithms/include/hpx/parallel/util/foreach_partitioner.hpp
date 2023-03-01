@@ -17,7 +17,6 @@
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
 #include <hpx/parallel/util/detail/partitioner_iteration.hpp>
@@ -97,19 +96,13 @@ namespace hpx::parallel::util::detail {
 
         template <typename ExPolicy_, typename FwdIter, typename F1,
             typename F2>
-        static decltype(auto) call(ExPolicy_&& orgpolicy, FwdIter first,
+        static decltype(auto) call(ExPolicy_&& policy, FwdIter first,
             std::size_t count, F1&& f1, F2&& f2)
         {
-            // this is a fork-join invocation, prevent tasks from being
-            // stolen, if possible
-            auto policy = parallel::util::adapt_thread_priority(
-                HPX_FORWARD(ExPolicy_, orgpolicy),
-                hpx::threads::thread_priority::bound);
-
             // inform parameter traits
             using scoped_executor_parameters =
                 detail::scoped_executor_parameters_ref<parameters_type,
-                    typename decltype(policy)::executor_type>;
+                    typename std::decay_t<ExPolicy_>::executor_type>;
 
             scoped_executor_parameters scoped_params(
                 policy.parameters(), policy.executor());
@@ -118,7 +111,8 @@ namespace hpx::parallel::util::detail {
             try
             {
                 auto&& items = detail::foreach_partition<Result>(
-                    policy, first, count, HPX_FORWARD(F1, f1));
+                    HPX_FORWARD(ExPolicy_, policy), first, count,
+                    HPX_FORWARD(F1, f1));
 
                 scoped_params.mark_end_of_scheduling();
 

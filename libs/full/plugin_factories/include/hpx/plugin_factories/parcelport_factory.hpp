@@ -127,7 +127,7 @@ namespace hpx::plugins {
                 "_PRIORITY:" +
                 traits::plugin_config_data<Parcelport>::priority() + "}");
             fillini.emplace_back(
-                "sendimm = ${HPX_PARCEL_" + name_uc + "_SENDIMM:0}");
+                "sendimm = ${HPX_PARCEL_" + name_uc + "_SENDIMM:1}");
 
             // get the parcelport specific information ...
             char const* more = traits::plugin_config_data<Parcelport>::call();

@@ -36,7 +36,8 @@ namespace hpx::parallel::util {
             // modify placement hint only if it is the default (do not overwrite
             // user supplied values)
             if (hint.placement_mode() ==
-                hpx::threads::thread_placement_hint::none)
+                    hpx::threads::thread_placement_hint::none &&
+                placement != hpx::threads::thread_placement_hint::none)
             {
                 hint.placement_mode(placement);
             }

@@ -35,7 +35,8 @@ namespace hpx::parallel::util {
 
             // modify priority only if it is the default (do not overwrite user
             // supplied values)
-            if (priority == hpx::threads::thread_priority::default_)
+            if (priority == hpx::threads::thread_priority::default_ &&
+                new_priority != hpx::threads::thread_priority::default_)
             {
                 priority = new_priority;
             }
