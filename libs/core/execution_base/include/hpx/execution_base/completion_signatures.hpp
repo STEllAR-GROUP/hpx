@@ -254,21 +254,6 @@ namespace hpx::execution::experimental {
         {
         };
 
-        template <typename Env>
-        struct dependent_completion_signatures
-        {
-            template <template <typename...> typename,
-                template <typename...> typename>
-            using value_types =
-                completion_signals_of_sender_depend_on_execution_environment;
-
-            template <template <typename...> typename>
-            using error_types =
-                completion_signals_of_sender_depend_on_execution_environment;
-
-            static constexpr bool sends_stopped = false;
-        };
-
 #if defined(HPX_HAVE_CXX20_COROUTINES)
         // https://github.com/NVIDIA/stdexec/pull/733#issue-1537242117
         //
@@ -289,27 +274,49 @@ namespace hpx::execution::experimental {
         struct env_promise
         {
             template <typename Ty>
-            Ty&& await_transform(Ty&& value) noexcept
-            {
-                return HPX_FORWARD(Ty, value);
-            }
-
-            template <typename Ty,
-                typename = std::enable_if_t<hpx::functional::is_tag_invocable_v<
-                    as_awaitable_t, Ty, env_promise&>>>
             auto await_transform(Ty&& value) noexcept(
                 hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t, Ty,
                     env_promise&>)
                 -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Ty,
                     env_promise&>
             {
-                return as_awaitable(HPX_FORWARD(Ty, value), *this);
+                if constexpr (hpx::functional::is_tag_invocable_v<
+                                  as_awaitable_t, Ty, env_promise&>)
+                {
+                    return as_awaitable(HPX_FORWARD(Ty, value), *this);
+                }
+                else
+                {
+                    return HPX_FORWARD(Ty, value);
+                }
             }
 
             template <typename T>
             friend auto tag_invoke(get_env_t, const T&) noexcept -> const T&;
         };
 #endif
+
+        template <typename Env>
+        struct dependent_completion_signatures
+        {
+            template <template <typename...> typename,
+                template <typename...> typename>
+            using value_types =
+                completion_signals_of_sender_depend_on_execution_environment;
+
+            template <template <typename...> typename>
+            using error_types =
+                completion_signals_of_sender_depend_on_execution_environment;
+
+            static constexpr bool sends_stopped = false;
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+            bool await_ready();
+            void await_suspend(
+                hpx::coro::coroutine_handle<env_promise<Env>> const&);
+            dependent_completion_signatures await_resume();
+#endif
+        };
 
         template <>
         struct dependent_completion_signatures<no_env>
@@ -1062,44 +1069,8 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
         template <typename T, typename Promise>
-        static constexpr auto select_impl() noexcept
-        {
-            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t, T,
-                              Promise&>)
-            {
-                using Result =
-                    hpx::functional::tag_invoke_result_t<as_awaitable_t, T,
-                        Promise&>;
-                constexpr bool Nothrow =
-                    hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
-                        T, Promise&>;
-                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
-            }
-            else if constexpr (is_awaitable_v<T>)
-            {    // NOT is_awaitable_v<T, Promise> !!
-                return static_cast < T && (*) () noexcept > (nullptr);
-            }
-            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
-            {
-                using Result = detail::sender_awaitable_t<Promise, T>;
-                constexpr bool Nothrow =
-                    hpx::meta::is_nothrow_constructible_from_v<Result, T,
-                        hpx::coro::coroutine_handle<Promise>>;
-                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
-            }
-            else
-            {
-                return static_cast < T && (*) () noexcept > (nullptr);
-            }
-        }
-
-        template <typename T, typename Promise>
-        using select_impl_t = decltype(select_impl<T, Promise>());
-
-        template <typename T, typename Promise>
-        friend HPX_FORCEINLINE decltype(auto)
-        tag_fallback_invoke(as_awaitable_t, T&& t, Promise& promise) noexcept(
-            std::is_nothrow_invocable_v<select_impl_t<T, Promise>>)
+        friend HPX_FORCEINLINE auto tag_fallback_invoke(
+            as_awaitable_t, T&& t, Promise& promise) noexcept
         {
             if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {

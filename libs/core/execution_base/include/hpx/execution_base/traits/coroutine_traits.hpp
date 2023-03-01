@@ -29,7 +29,7 @@ namespace hpx::execution::experimental {
         inline constexpr bool is_instance_of = is_instance_of_<T, F>;
 
         template <typename T>
-        inline constexpr bool is_await_suspend_result_v =
+        inline constexpr bool is_await_suspend_result_t_v =
             meta::value<meta::one_of<T, void, bool>> ||
             is_instance_of<T, hpx::coro::coroutine_handle>;
 
@@ -53,29 +53,28 @@ namespace hpx::execution::experimental {
         inline constexpr bool has_await_suspend_coro_handle = false;
 
         template <typename T, typename Ts>
-        inline constexpr bool has_await_suspend_coro_handle<T, Ts,
-            std::void_t<decltype(std::declval<T>().await_suspend(
-                hpx::coro::coroutine_handle<Ts>{}))>> = true;
-
-        template <bool await_ready, typename Awaiter, typename Promise>
-        struct is_awaiter_impl;
+        using await_suspend_coro_handle_t =
+            decltype(std::declval<T>().await_suspend(
+                hpx::coro::coroutine_handle<Ts>{}));
 
         template <typename Awaiter, typename Promise>
-        struct is_awaiter_impl<false, Awaiter, Promise> : std::false_type
-        {
-        };
+        using is_await_suspend_result = std::integral_constant<bool,
+            is_await_suspend_result_t_v<
+                await_suspend_coro_handle_t<Awaiter, Promise>>>;
 
-        // different versions of clang-format disagree
-        // clang-format off
+        template <typename Awaiter, typename Promise, typename = void>
+        inline constexpr bool is_with_await_suspend_v = false;
+
         template <typename Awaiter, typename Promise>
-        struct is_awaiter_impl<true, Awaiter, Promise>
-          : std::integral_constant<bool,
-                is_await_suspend_result_v<
-                    decltype(std::declval<Awaiter>().await_suspend(
-                        hpx::coro::coroutine_handle<Promise>{}))>>
-        // clang-format on
-        {
-        };
+        inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
+            std::enable_if_t<has_await_suspend_v<Awaiter> &&
+                (!std::is_same_v<Promise, void>)>> =
+            is_await_suspend_result<Awaiter, Promise>::value;
+
+        template <typename Awaiter, typename Promise>
+        inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
+            std::enable_if_t<std::is_same_v<Promise, void>>> = true;
+
     }    // namespace detail
 
     // An Awaiter type is a type that implements the three special methods that
@@ -94,11 +93,10 @@ namespace hpx::execution::experimental {
     //
     template <typename Awaiter, typename Promise = void>
     struct is_awaiter
-      : detail::is_awaiter_impl<detail::has_await_ready<Awaiter> &&
+      : std::integral_constant<bool,
+            detail::has_await_ready<Awaiter> &&
                 detail::has_await_resume<Awaiter> &&
-                detail::has_await_suspend_coro_handle<Awaiter, Promise> &&
-                detail::has_await_suspend_v<Awaiter>,
-            Awaiter, Promise>
+                detail::is_with_await_suspend_v<Awaiter, Promise>>
     {
     };
 
@@ -150,8 +148,13 @@ namespace hpx::execution::experimental {
         }
     }
 
+    //A common mistake is to declare two function templates that differ
+    //only in their default template arguments. This does not work because
+    //the declarations are treated as redeclarations of the same function
+    //template (default template arguments are not accounted for in
+    //function template equivalence).
     template <typename Awaitable, typename Promise,
-        typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
+        std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
         // different versions of clang-format disagree
