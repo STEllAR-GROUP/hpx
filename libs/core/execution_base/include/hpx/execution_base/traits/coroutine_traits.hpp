@@ -49,9 +49,6 @@ namespace hpx::execution::experimental {
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(await_suspend);
 
-        template <typename, typename, typename = void>
-        inline constexpr bool has_await_suspend_coro_handle = false;
-
         template <typename T, typename Ts>
         using await_suspend_coro_handle_t =
             decltype(std::declval<T>().await_suspend(
@@ -148,13 +145,8 @@ namespace hpx::execution::experimental {
         }
     }
 
-    //A common mistake is to declare two function templates that differ
-    //only in their default template arguments. This does not work because
-    //the declarations are treated as redeclarations of the same function
-    //template (default template arguments are not accounted for in
-    //function template equivalence).
     template <typename Awaitable, typename Promise,
-        std::enable_if_t<detail::has_await_transform_v<Promise>>>
+        typename = std::enable_if_t<detail::has_await_transform_v<Promise>>>
     decltype(auto) get_awaiter(Awaitable&& await, Promise* promise)
     {
         // different versions of clang-format disagree
