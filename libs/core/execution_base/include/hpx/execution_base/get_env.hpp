@@ -17,6 +17,25 @@
 
 namespace hpx::execution::experimental {
 
+    // 11.3.1. queryable concept [exec.queries.queryable]
+    // 1. A query object is a customization point object
+    //    ([customization.point.object]) that accepts as its first argument
+    //    a queryable object, and for each such invocation that is valid,
+    //    produces a value of the corresponding property of the object.
+    // 2. Unless otherwise specified, given a queryable object e, a query
+    //    object Q, and a pack of subexpressions args, the value returned
+    //    by the expression Q(e, args...) is valid as long as e is valid.
+    //
+    //    Let e be an object of type E. The type E models queryable if for
+    //    each callable object Q and a pack of subexpressions args, if
+    //    requires { Q(e, args...) } is true then Q(e, args...) meets any
+    //    semantic requirements imposed by Q.
+    //
+    // Reference implementation avoids using libstdc++'s object concepts
+    // because they instantiate a lot of templates.
+    template <typename T>
+    inline constexpr bool is_queryable_v = std::is_destructible_v<T>;
+
     namespace detail {
 
         // checks whether tag_invoke(CPO, Args...) is contextually convertible
@@ -215,4 +234,8 @@ namespace hpx::execution::experimental {
             return false;
         }
     } forwarding_env_query{};
+
+    template <typename T>
+    inline constexpr bool is_environment_provider_v =
+        std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental
