@@ -271,29 +271,7 @@ namespace hpx::execution::experimental {
         //
         // To be kept in sync with the promise type used in connect_awaitable
         template <typename Env>
-        struct env_promise
-        {
-            template <typename Ty>
-            auto await_transform(Ty&& value) noexcept(
-                hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t, Ty,
-                    env_promise&>)
-                -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Ty,
-                    env_promise&>
-            {
-                if constexpr (hpx::functional::is_tag_invocable_v<
-                                  as_awaitable_t, Ty, env_promise&>)
-                {
-                    return as_awaitable(HPX_FORWARD(Ty, value), *this);
-                }
-                else
-                {
-                    return HPX_FORWARD(Ty, value);
-                }
-            }
-
-            template <typename T>
-            friend auto tag_invoke(get_env_t, const T&) noexcept -> const T&;
-        };
+        struct env_promise;
 #endif
 
         template <typename Env>
@@ -723,7 +701,8 @@ namespace hpx::execution::experimental {
     struct is_sender
       : std::integral_constant<bool,
             !!((detail::is_sender_plain_v<Sender, Env> &&
-                   detail::is_enable_sender_v<std::decay_t<Sender>>) ||
+                   detail::is_enable_sender_v<std::decay_t<Sender>> &&
+                   is_environment_provider_v<Sender>) ||
                 detail::is_with_completion_signatures_v<Sender, Env>)>
     {
     };
@@ -1087,6 +1066,31 @@ namespace hpx::execution::experimental {
     } as_awaitable{};
 
     namespace detail {
+
+        template <typename Env>
+        struct env_promise
+        {
+            template <typename Ty>
+            Ty&& await_transform(Ty&& value) noexcept
+            {
+                return HPX_FORWARD(Ty, value);
+            }
+
+            template <typename Ty,
+                typename = std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                    as_awaitable_t, Ty, env_promise&>>>
+            auto await_transform(Ty&& value) noexcept(
+                hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t, Ty,
+                    env_promise&>)
+                -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Ty,
+                    env_promise&>
+            {
+                return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
+            }
+
+            template <typename T>
+            friend auto tag_invoke(get_env_t, const T&) noexcept -> const T&;
+        };
 
         struct with_awaitable_senders_base
         {
