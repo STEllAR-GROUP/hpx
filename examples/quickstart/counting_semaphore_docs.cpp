@@ -7,10 +7,10 @@
 // This example is meant for inclusion in the documentation.
 
 //[counting_semaphore_docs
-
 #include <hpx/local/init.hpp>
-#include <hpx/synchronization/counting_semaphore.hpp>
-#include <hpx/thread.hpp>
+#include <hpx/local/semaphore.hpp>
+#include <hpx/local/thread.hpp>
+
 #include <iostream>
 
 // initialize the semaphore with a count of 3

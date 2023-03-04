@@ -140,6 +140,14 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx20_std_construct_at(
       DEFINITIONS HPX_HAVE_CXX20_STD_CONSTRUCT_AT
     )
+
+    hpx_check_for_cxx20_std_default_sentinel(
+      DEFINITIONS HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL
+    )
+  endif()
+
+  if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
+    hpx_check_for_cxx23_std_generator(DEFINITIONS HPX_HAVE_CXX23_STD_GENERATOR)
   endif()
 
   hpx_check_for_cxx_lambda_capture_decltype(

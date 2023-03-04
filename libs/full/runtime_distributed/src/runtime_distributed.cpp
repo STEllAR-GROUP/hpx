@@ -1371,7 +1371,16 @@ namespace hpx {
         fullname += context;
         if (postfix && *postfix)
             fullname += postfix;
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         fullname += "#" + std::to_string(global_thread_num);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
+
         detail::thread_name() = HPX_MOVE(fullname);
 
         char const* name = detail::thread_name().c_str();

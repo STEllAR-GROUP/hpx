@@ -24,12 +24,13 @@ namespace hpx::parallel::detail {
     private:
         template <typename InIterB, typename InIterE, typename T,
             typename Reduce>
-        friend constexpr T tag_fallback_invoke(sequential_reduce_t,
-            ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
+        friend constexpr T tag_fallback_invoke(sequential_reduce_t, ExPolicy&&,
+            InIterB first, InIterE last, T init, Reduce&& r)
         {
-            util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, &r](
-                    auto const& v) mutable { init = HPX_INVOKE(r, init, v); });
+            util::loop_ind<ExPolicy>(
+                first, last, [&init, &r](auto const& v) mutable {
+                    init = HPX_INVOKE(r, init, v);
+                });
             return init;
         }
 
@@ -47,11 +48,11 @@ namespace hpx::parallel::detail {
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
         friend constexpr auto tag_fallback_invoke(sequential_reduce_t,
-            ExPolicy&& policy, Iter first, Sent last, T init, Reduce&& r,
+            ExPolicy&&, Iter first, Sent last, T init, Reduce&& r,
             Convert&& conv)
         {
-            util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, &r, &conv](auto const& v) mutable {
+            util::loop_ind<std::decay_t<ExPolicy>>(
+                first, last, [&init, &r, &conv](auto const& v) mutable {
                     init = HPX_INVOKE(r, init, HPX_INVOKE(conv, v));
                 });
             return init;

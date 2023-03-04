@@ -28,10 +28,10 @@ namespace hpx { namespace parallel { namespace detail {
         template <typename ExPolicy, typename Iter, typename Sent, typename T>
         HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
             util::detail::iterator_datapar_compatible_v<Iter>, Iter>::type
-        call(ExPolicy&& policy, Iter first, Sent last, T const& val)
+        call(ExPolicy&&, Iter first, Sent last, T const& val)
         {
-            hpx::parallel::util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
-                last, [&val](auto& v) { v = val; });
+            hpx::parallel::util::loop_ind<std::decay_t<ExPolicy>>(
+                first, last, [&val](auto& v) { v = val; });
             return first;
         }
     };

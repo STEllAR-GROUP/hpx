@@ -1807,12 +1807,13 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes)
     hpx_add_compile_flag_if_available(-Wno-cast-align)
 
-    # gcc V12.1 and above complain about possible ABI incompatibilities caused
-    # by the use of std::destructive_interference_size
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-       AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1"
-    )
-      hpx_add_compile_flag_if_available(-Wno-interference-size)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      hpx_add_compile_flag_if_available(-Wno-use-after-free)
+      if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1")
+        # gcc V12.1 and above complain about possible ABI incompatibilities
+        # caused by the use of std::destructive_interference_size
+        hpx_add_compile_flag_if_available(-Wno-interference-size)
+      endif()
     endif()
 
     # We do not in general guarantee ABI compatibility between C++ standards, so
@@ -2243,15 +2244,15 @@ add_subdirectory(components)
 # ##############################################################################
 # Tests
 # ##############################################################################
+find_package(PythonInterp)
+
+if(NOT PYTHONINTERP_FOUND)
+  hpx_warn(
+    "A python interpreter could not be found. The test suite can not be run automatically."
+  )
+endif()
+
 if(HPX_WITH_TESTS)
-  find_package(PythonInterp)
-
-  if(NOT PYTHONINTERP_FOUND)
-    hpx_warn(
-      "A python interpreter could not be found. The test suite can not be run automatically."
-    )
-  endif()
-
   # pseudo_target added above
   add_subdirectory(tests)
 endif()
@@ -2274,10 +2275,12 @@ if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 # Configure hpxrun.py
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
-  "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
-)
+if(PYTHONINTERP_FOUND)
+  configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+    "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
+  )
+endif()
 
 # Set up precompiled headers
 if(HPX_WITH_PRECOMPILED_HEADERS)
@@ -2397,19 +2400,21 @@ endif()
 # ##############################################################################
 # installation instructions
 # ##############################################################################
-install(
-  FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT core
-  PERMISSIONS
-    OWNER_READ
-    OWNER_WRITE
-    OWNER_EXECUTE
-    GROUP_READ
-    GROUP_EXECUTE
-    WORLD_READ
-    WORLD_EXECUTE
-)
+if(PYTHONINTERP_FOUND)
+  install(
+    FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT core
+    PERMISSIONS
+      OWNER_READ
+      OWNER_WRITE
+      OWNER_EXECUTE
+      GROUP_READ
+      GROUP_EXECUTE
+      WORLD_READ
+      WORLD_EXECUTE
+  )
+endif()
 
 install(
   # install all hpx header files

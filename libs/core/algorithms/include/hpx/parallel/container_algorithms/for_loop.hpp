@@ -785,7 +785,8 @@ namespace hpx::ranges::experimental {
         template <typename ExPolicy, typename R, typename... Args,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<R>
+                (hpx::traits::is_range_v<R> ||
+                 hpx::traits::is_range_generator_v<R>)
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
@@ -796,16 +797,28 @@ namespace hpx::ranges::experimental {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack_t;
-            return hpx::parallel::detail::for_loop(
-                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), make_index_pack_t<sizeof...(Args) - 1>(),
-                HPX_FORWARD(Args, args)...);
+            if constexpr (hpx::traits::is_range_generator_v<R>)
+            {
+                return hpx::parallel::detail::for_loop_range(
+                    HPX_FORWARD(ExPolicy, policy), rng,
+                    make_index_pack_t<sizeof...(Args) - 1>(),
+                    HPX_FORWARD(Args, args)...);
+            }
+            else
+            {
+                return hpx::parallel::detail::for_loop(
+                    HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                    hpx::util::end(rng),
+                    make_index_pack_t<sizeof...(Args) - 1>(),
+                    HPX_FORWARD(Args, args)...);
+            }
         }
 
         // clang-format off
         template <typename Rng, typename... Args,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range_v<Rng>
+                hpx::traits::is_range_v<Rng> ||
+                hpx::traits::is_range_generator_v<Rng>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
@@ -815,10 +828,20 @@ namespace hpx::ranges::experimental {
                 "for_loop must be called with at least a function object");
 
             using hpx::util::make_index_pack_t;
-            return hpx::parallel::detail::for_loop(hpx::execution::seq,
-                hpx::util::begin(rng), hpx::util::end(rng),
-                make_index_pack_t<sizeof...(Args) - 1>(),
-                HPX_FORWARD(Args, args)...);
+            if constexpr (hpx::traits::is_range_generator_v<Rng>)
+            {
+                return hpx::parallel::detail::for_loop_range(
+                    hpx::execution::seq, rng,
+                    make_index_pack_t<sizeof...(Args) - 1>(),
+                    HPX_FORWARD(Args, args)...);
+            }
+            else
+            {
+                return hpx::parallel::detail::for_loop(hpx::execution::seq,
+                    hpx::util::begin(rng), hpx::util::end(rng),
+                    make_index_pack_t<sizeof...(Args) - 1>(),
+                    HPX_FORWARD(Args, args)...);
+            }
         }
     } for_loop{};
 

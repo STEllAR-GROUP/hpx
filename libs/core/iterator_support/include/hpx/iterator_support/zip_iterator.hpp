@@ -14,7 +14,9 @@
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
+#include <hpx/type_support/default_sentinel.hpp>
 #include <hpx/type_support/pack.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -29,22 +31,46 @@ namespace hpx::util {
         template <typename IteratorTuple>
         struct zip_iterator_value;
 
+        template <typename T>
+        struct zip_iterator_element_value
+        {
+            using type = hpx::traits::iter_value_t<T>;
+        };
+
+        template <>
+        struct zip_iterator_element_value<hpx::default_sentinel_t>
+        {
+            using type = hpx::util::unused_type;
+        };
+
         template <typename... Ts>
         struct zip_iterator_value<hpx::tuple<Ts...>>
         {
             using type =
-                hpx::tuple<typename std::iterator_traits<Ts>::value_type...>;
+                hpx::tuple<typename zip_iterator_element_value<Ts>::type...>;
         };
 
         ///////////////////////////////////////////////////////////////////////
         template <typename IteratorTuple>
         struct zip_iterator_reference;
 
+        template <typename T>
+        struct zip_iterator_reference_value
+        {
+            using type = hpx::traits::iter_reference_t<T>;
+        };
+
+        template <>
+        struct zip_iterator_reference_value<hpx::default_sentinel_t>
+        {
+            using type = hpx::util::unused_type;
+        };
+
         template <typename... Ts>
         struct zip_iterator_reference<hpx::tuple<Ts...>>
         {
             using type =
-                hpx::tuple<typename std::iterator_traits<Ts>::reference...>;
+                hpx::tuple<typename zip_iterator_reference_value<Ts>::type...>;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -52,18 +78,29 @@ namespace hpx::util {
         struct zip_iterator_category;
 
         template <typename T>
+        struct zip_iterator_element_category
+        {
+            using type = hpx::traits::iter_category_t<T>;
+        };
+
+        template <>
+        struct zip_iterator_element_category<hpx::default_sentinel_t>
+        {
+            using type = std::random_access_iterator_tag;
+        };
+
+        template <typename T>
         struct zip_iterator_category<hpx::tuple<T>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T>>::value == 1>>
         {
-            using type = typename std::iterator_traits<T>::iterator_category;
+            using type = typename zip_iterator_element_category<T>::type;
         };
 
         template <typename T, typename U>
         struct zip_iterator_category<hpx::tuple<T, U>,
             std::enable_if_t<hpx::tuple_size<hpx::tuple<T, U>>::value == 2>>
-          : minimum_category<
-                typename std::iterator_traits<T>::iterator_category,
-                typename std::iterator_traits<U>::iterator_category>
+          : minimum_category<typename zip_iterator_element_category<T>::type,
+                typename zip_iterator_element_category<U>::type>
         {
         };
 
@@ -73,8 +110,8 @@ namespace hpx::util {
                 hpx::tuple_size<hpx::tuple<T, U, Tail...>>::value > 2)>>
           : minimum_category<
                 typename minimum_category<
-                    typename std::iterator_traits<T>::iterator_category,
-                    typename std::iterator_traits<U>::iterator_category>::type,
+                    typename zip_iterator_element_category<T>::type,
+                    typename zip_iterator_element_category<U>::type>::type,
                 typename zip_iterator_category<hpx::tuple<Tail...>>::type>
         {
         };
@@ -131,6 +168,57 @@ namespace hpx::util {
             }
 
             std::ptrdiff_t n_;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct has_default_sentinel
+          : std::is_same<std::decay_t<T>, hpx::default_sentinel_t>
+        {
+        };
+
+        template <typename... Ts>
+        struct has_default_sentinel<hpx::tuple<Ts...>>
+          : util::any_of<has_default_sentinel<Ts>...>
+        {
+        };
+
+        template <typename Tuple>
+        inline constexpr bool has_default_sentinel_v =
+            has_default_sentinel<Tuple>::value;
+
+        template <std::size_t I, std::size_t Size, typename Enable = void>
+        struct one_tuple_element_equal_to
+        {
+            template <typename TTuple, typename UTuple>
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+                TTuple const& t, UTuple const& u)
+            {
+                if constexpr (has_default_sentinel_v<
+                                  hpx::tuple_element_t<I, TTuple>> ||
+                    has_default_sentinel_v<hpx::tuple_element_t<I, UTuple>>)
+                {
+                    return get<I>(t) == get<I>(u) ||
+                        one_tuple_element_equal_to<I + 1, Size>::call(t, u);
+                }
+                else
+                {
+                    return get<I>(t) == get<I>(u) &&
+                        one_tuple_element_equal_to<I + 1, Size>::call(t, u);
+                }
+            }
+        };
+
+        template <std::size_t I, std::size_t Size>
+        struct one_tuple_element_equal_to<I, Size,
+            std::enable_if_t<I + 1 == Size>>
+        {
+            template <typename TTuple, typename UTuple>
+            static constexpr HPX_HOST_DEVICE HPX_FORCEINLINE bool call(
+                TTuple const& t, UTuple const& u)
+            {
+                return get<I>(t) == get<I>(u);
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -191,15 +279,32 @@ namespace hpx::util {
                 return HPX_MOVE(iterators_);
             }
 
-        private:
+        protected:
             friend class hpx::util::iterator_core_access;
 
+            // Special comparison as two iterators are considered equal if one of
+            // the embedded iterators compares equal to hpx::default_sentinel or
+            // all iterators are equal. This is done to ensure that the shortest
+            // sequence limits the overall iteration (if detectable).
+            template <typename IterTuple, typename Derived_,
+                typename = std::enable_if_t<hpx::tuple_size_v<IterTuple> ==
+                    hpx::tuple_size_v<IteratorTuple>>>
             HPX_HOST_DEVICE constexpr bool equal(
-                zip_iterator_base const& other) const
-                noexcept(noexcept(std::declval<IteratorTuple>() ==
-                    std::declval<IteratorTuple>()))
+                zip_iterator_base<IterTuple, Derived_> const& other) const
+                noexcept(noexcept(
+                    std::declval<IteratorTuple>() == std::declval<IterTuple>()))
             {
-                return iterators_ == other.iterators_;
+                if constexpr (has_default_sentinel_v<IterTuple> ||
+                    has_default_sentinel_v<IteratorTuple>)
+                {
+                    return one_tuple_element_equal_to<0,
+                        hpx::tuple_size_v<IterTuple>>::call(iterators_,
+                        other.get_iterator_tuple());
+                }
+                else
+                {
+                    return iterators_ == other.get_iterator_tuple();
+                }
             }
 
             HPX_HOST_DEVICE constexpr typename base_type::reference

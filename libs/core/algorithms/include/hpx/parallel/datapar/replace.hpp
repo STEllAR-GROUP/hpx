@@ -31,14 +31,14 @@ namespace hpx { namespace parallel { namespace detail {
     struct datapar_replace
     {
         template <typename InIter, typename T1, typename T2, typename Proj>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static auto call(ExPolicy&& policy,
-            InIter first, InIter last, T1 const& old_value, T2 const& new_value,
-            Proj&& proj)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static auto call(
+            [[maybe_unused]] ExPolicy&& policy, InIter first, InIter last,
+            T1 const& old_value, T2 const& new_value, Proj&& proj)
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
-                return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
-                    last, [old_value, new_value, &proj](auto& v) {
+                return util::loop_ind<ExPolicy>(
+                    first, last, [old_value, new_value, &proj](auto& v) {
                         using var_type = std::decay_t<decltype(v)>;
                         traits::mask_assign(
                             HPX_INVOKE(proj, v) == var_type(old_value), v,
@@ -92,13 +92,14 @@ namespace hpx { namespace parallel { namespace detail {
     {
         template <typename InIter, typename Sent, typename F, typename T,
             typename Proj>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static auto call(ExPolicy&& policy,
-            InIter first, Sent last, F&& f, T const& new_value, Proj&& proj)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static auto call(
+            [[maybe_unused]] ExPolicy&& policy, InIter first, Sent last, F&& f,
+            T const& new_value, Proj&& proj)
         {
             if constexpr (hpx::is_sequenced_execution_policy_v<ExPolicy>)
             {
-                return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
-                    last, [&f, new_value, &proj](auto& v) {
+                return util::loop_ind<ExPolicy>(
+                    first, last, [&f, new_value, &proj](auto& v) {
                         using var_type = std::decay_t<decltype(v)>;
                         traits::mask_assign(HPX_INVOKE(f, HPX_INVOKE(proj, v)),
                             v, var_type(new_value));

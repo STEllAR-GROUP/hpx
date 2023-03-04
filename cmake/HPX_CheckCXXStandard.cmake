@@ -44,6 +44,11 @@ elseif(HPX_WITH_CXX20)
     "HPX_WITH_CXX20 is deprecated. Use HPX_WITH_CXX_STANDARD=20 instead."
   )
   set(HPX_CXX_STANDARD 20)
+elseif(HPX_WITH_CXX23)
+  hpx_warn(
+    "HPX_WITH_CXX23 is deprecated. Use HPX_WITH_CXX_STANDARD=23 instead."
+  )
+  set(HPX_CXX_STANDARD 23)
 endif()
 
 if(CMAKE_CXX_STANDARD)

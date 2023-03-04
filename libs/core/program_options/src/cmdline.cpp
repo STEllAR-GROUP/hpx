@@ -611,8 +611,15 @@ namespace hpx::program_options::detail {
         std::string const& tok = args[0];
         if (tok.size() >= 2 && tok[0] == '/')
         {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
             std::string name = "-" + tok.substr(1, 1);
-            std::string adjacent = tok.substr(2);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
+            std::string const adjacent = tok.substr(2);
 
             option opt;
             opt.string_key = HPX_MOVE(name);
@@ -640,7 +647,14 @@ namespace hpx::program_options::detail {
                         is_style_active(long_case_insensitive),
                         is_style_active(short_case_insensitive)))
                 {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
                     args[0].insert(0, "-");
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
                     if (args[0][1] == '/')
                         args[0][1] = '-';
                     return parse_long_option(args);

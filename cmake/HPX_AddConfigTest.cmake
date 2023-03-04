@@ -579,6 +579,24 @@ function(hpx_check_for_cxx20_std_construct_at)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_cxx20_std_default_sentinel)
+  add_hpx_config_test(
+    HPX_WITH_CXX20_STD_DEFAULT_SENTINEL
+    SOURCE cmake/tests/cxx20_std_default_sentinel.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx23_std_generator)
+  add_hpx_config_test(
+    HPX_WITH_CXX23_STD_GENERATOR
+    SOURCE cmake/tests/cxx23_std_generator.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx_lambda_capture_decltype)
   add_hpx_config_test(
     HPX_WITH_CXX_LAMBDA_CAPTURE_DECLTYPE

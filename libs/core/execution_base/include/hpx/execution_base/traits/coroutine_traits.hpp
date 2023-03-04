@@ -10,8 +10,8 @@
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
-#include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 #include <hpx/type_support/meta.hpp>
 
 #include <type_traits>
@@ -33,7 +33,7 @@ namespace hpx::execution::experimental {
         template <typename T>
         inline constexpr bool is_await_suspend_result_t_v =
             meta::value<meta::one_of<T, void, bool>> ||
-            is_instance_of<T, hpx::coro::coroutine_handle>;
+            is_instance_of<T, hpx::coroutine_handle>;
 
         template <typename, typename = void>
         inline constexpr bool has_await_ready = false;
@@ -54,7 +54,7 @@ namespace hpx::execution::experimental {
         // clang-format off
         template <typename T, typename Ts>
         using await_suspend_coro_handle_t = decltype(
-            std::declval<T>().await_suspend(hpx::coro::coroutine_handle<Ts>{}));
+            std::declval<T>().await_suspend(hpx::coroutine_handle<Ts>{}));
         // clang-format on
 
         template <typename Awaiter, typename Promise>

@@ -9,6 +9,7 @@ set(type_support_headers
     hpx/type_support/detail/wrap_int.hpp
     hpx/type_support/construct_at.hpp
     hpx/type_support/decay.hpp
+    hpx/type_support/default_sentinel.hpp
     hpx/type_support/detected.hpp
     hpx/type_support/empty_function.hpp
     hpx/type_support/equality.hpp
@@ -23,6 +24,13 @@ set(type_support_headers
     hpx/type_support/unused.hpp
     hpx/type_support/void_guard.hpp
 )
+
+if(HPX_WITH_CXX20_COROUTINES)
+  set(type_support_headers
+      ${type_support_headers} hpx/type_support/coroutines_support.hpp
+      hpx/type_support/generator.hpp
+  )
+endif()
 
 # cmake-format: off
 set(type_support_compat_headers

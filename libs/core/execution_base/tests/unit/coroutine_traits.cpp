@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/coroutines_support.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 
 #include <utility>
 
@@ -16,28 +16,28 @@ struct awaiter_1
     {
         return false;
     }
-    void await_suspend(hpx::coro::coroutine_handle<>) {}
+    void await_suspend(hpx::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_2
 {
     void await_ready() {}
-    void await_suspend(hpx::coro::coroutine_handle<>) {}
+    void await_suspend(hpx::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_3
 {
     void await_ready() {}
-    void await_suspend(hpx::coro::coroutine_handle<>) {}
+    void await_suspend(hpx::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_4
 {
     void await_ready() {}
-    bool await_suspend(hpx::coro::coroutine_handle<>)
+    bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
     }
@@ -47,7 +47,7 @@ struct awaiter_4
 struct awaiter_5
 {
     void await_ready() {}
-    bool await_suspend(hpx::coro::coroutine_handle<>)
+    bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
     }
@@ -66,7 +66,7 @@ struct awaiter_6
     {
         return false;
     }
-    void await_suspend(hpx::coro::coroutine_handle<Promise>) {}
+    void await_suspend(hpx::coroutine_handle<Promise>) {}
     void await_resume() {}
 };
 
@@ -98,15 +98,15 @@ struct non_awaiter_4
 
 struct promise
 {
-    hpx::coro::coroutine_handle<promise> get_return_object()
+    hpx::coroutine_handle<promise> get_return_object()
     {
-        return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
+        return {hpx::coroutine_handle<promise>::from_promise(*this)};
     }
-    hpx::coro::suspend_always initial_suspend() noexcept
+    hpx::suspend_always initial_suspend() noexcept
     {
         return {};
     }
-    hpx::coro::suspend_always final_suspend() noexcept
+    hpx::suspend_always final_suspend() noexcept
     {
         return {};
     }

@@ -17,6 +17,7 @@ set(include_local_headers
     hpx/local/execution.hpp
     hpx/local/functional.hpp
     hpx/local/future.hpp
+    hpx/local/generator.hpp
     hpx/local/latch.hpp
     hpx/local/memory.hpp
     hpx/local/mutex.hpp
