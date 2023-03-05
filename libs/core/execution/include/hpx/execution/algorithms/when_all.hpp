@@ -182,6 +182,7 @@ namespace hpx::execution::experimental {
         template <typename... Senders>
         struct when_all_sender
         {
+            using is_sender = void;
             using senders_type =
                 hpx::util::member_pack_for<std::decay_t<Senders>...>;
             senders_type senders;

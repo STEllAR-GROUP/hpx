@@ -41,6 +41,7 @@ namespace hpx::execution::experimental {
             typename Scheduler = no_scheduler>
         struct let_stopped_sender
         {
+            using is_sender = void;
             using predecessor_sender_t = std::decay_t<PredecessorSender>;
 
             HPX_NO_UNIQUE_ADDRESS predecessor_sender_t predecessor_sender;

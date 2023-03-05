@@ -31,6 +31,8 @@ namespace hpx::execution::experimental {
         template <typename CPO, std::size_t... Is, typename... Ts>
         struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
         {
+            using is_sender = void;
+
             HPX_NO_UNIQUE_ADDRESS util::member_pack_for<std::decay_t<Ts>...> ts;
 
             constexpr just_sender() = default;

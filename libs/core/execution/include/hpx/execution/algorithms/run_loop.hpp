@@ -153,6 +153,7 @@ namespace hpx::execution::experimental {
 
             struct run_loop_sender
             {
+                using is_sender = void;
                 using type = run_loop_sender;
                 using id = run_loop_sender;
 

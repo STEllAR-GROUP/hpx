@@ -334,6 +334,27 @@ namespace hpx::execution::experimental {
         struct no_completion_signatures
         {
         };
+
+        // sender<T> only checks if T is an awaitable if enable_sender<T>
+        // is false. Then it checks for awaitability with a promise type
+        // that doesn't have any environment queries, but that does have an
+        // await_transform that pipes the T through stdexec::as_awaitable.
+        // So you have two options for opting into the sender concept if you type
+        // is not generally awaitable: (1) specialize enable_sender, or (2)
+        // customize as_awaitable for T.
+        // HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
+        template <typename Sender>
+        inline constexpr bool has_is_sender_v = true;
+
+#ifdef HPX_HAVE_CXX20_COROUTINES
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v =
+            is_awaitable_v<Sender, env_promise<empty_env>> ||
+            has_is_sender_v<Sender>;
+#else
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
+#endif
     }    // namespace detail
 
     // execution::get_completion_signatures is a customization point object. Let
@@ -412,6 +433,11 @@ namespace hpx::execution::experimental {
                 }
             }
 #endif
+            else if constexpr (std::is_same_v<Env, no_env> &&
+                detail::is_enable_sender_v<std::remove_cvref_t<Sender>>)
+            {
+                return detail::dependent_completion_signatures<no_env>{};
+            }
             else
             {
                 return detail::no_completion_signatures{};
@@ -663,25 +689,6 @@ namespace hpx::execution::experimental {
                         Receiver const&>>
         {
         };
-
-        // sender<T> only checks if T is an awaitable if enable_sender<T>
-        // is false. Then it checks for awaitability with a promise type
-        // that doesn't have any environment queries, but that does have an
-        // await_transform that pipes the T through stdexec::as_awaitable.
-        // So you have two options for opting into the sender concept if you type
-        // is not generally awaitable: (1) specialize enable_sender, or (2)
-        // customize as_awaitable for T.
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
-
-#ifdef HPX_HAVE_CXX20_COROUTINES
-        template <typename Sender>
-        inline constexpr bool is_enable_sender_v =
-            is_awaitable_v<Sender, env_promise<empty_env>> ||
-            has_is_sender_v<Sender>;
-#else
-        template <typename Sender>
-        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
-#endif
 
         // This concept has been introduced to increase atomicity of concepts
         template <typename Sender, typename Env>
@@ -1051,7 +1058,11 @@ namespace hpx::execution::experimental {
         friend HPX_FORCEINLINE auto tag_fallback_invoke(
             as_awaitable_t, T&& t, Promise& promise) noexcept
         {
-            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            if constexpr (is_awaitable_v<T>)
+            {
+                return HPX_FORWARD(T, t);
+            }
+            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
@@ -1323,6 +1334,34 @@ namespace hpx::execution::experimental {
     inline constexpr struct connect_awaitable_t
     {
     private:
+        template <typename Fun, typename... Ts>
+        static auto co_call(Fun fun, Ts&&... as) noexcept
+        {
+            auto fn = [&, fun]() noexcept { fun(HPX_FORWARD(Ts, as)...); };
+
+            struct awaiter
+            {
+                decltype(fn) fn_;
+
+                static constexpr bool await_ready() noexcept
+                {
+                    return false;
+                }
+
+                void await_suspend(hpx::coro::coroutine_handle<>) noexcept
+                {
+                    fn_();
+                }
+
+                [[noreturn]] void await_resume() noexcept
+                {
+                    std::terminate();
+                }
+            };
+
+            return awaiter{fn};
+        };
+
         template <typename Awaitable, typename Receiver>
         static operation_t<Receiver> impl(Awaitable await, Receiver rcvr)
         {
@@ -1330,29 +1369,17 @@ namespace hpx::execution::experimental {
             std::exception_ptr eptr;
             try
             {
-                // This is a bit mind bending control-flow wise. We are first
-                // evaluating the co_await expression. Then the result of that
-                // is passed into a lambda that curries a reference to the
-                // result into another lambda which is then returned to
-                // 'co_yield'. The 'co_yield' expression then invokes this
-                // lambda after the coroutine is suspended so that it is safe
-                // for the receiver to destroy the coroutine.
-                auto fun = [&](auto&&... as) noexcept {
-                    return [&]() noexcept -> void {
-                        set_value(HPX_FORWARD(Receiver, rcvr),
-                            (std::add_rvalue_reference_t<result_t>) as...);
-                    };
-                };
-
                 if constexpr (std::is_void_v<result_t>)
                 {
                     // clang-format off
-                    co_yield (co_await HPX_FORWARD(Awaitable, await), fun());
+                    co_await (co_await HPX_FORWARD(Awaitable, await),
+                        co_call(set_value, HPX_FORWARD(Receiver, rcvr)));
                     // clang-format on
                 }
                 else
                 {
-                    co_yield fun(co_await HPX_FORWARD(Awaitable, await));
+                    co_await co_call(set_value, HPX_FORWARD(Receiver, rcvr),
+                        co_await HPX_FORWARD(Awaitable, await));
                 }
             }
             catch (...)
@@ -1360,10 +1387,8 @@ namespace hpx::execution::experimental {
                 eptr = std::current_exception();
             }
 
-            co_yield [&]() noexcept -> void {
-                set_error(HPX_FORWARD(Receiver, rcvr),
-                    HPX_FORWARD(std::exception_ptr, eptr));
-            };
+            co_await co_call(set_value, HPX_FORWARD(Receiver, rcvr),
+                HPX_FORWARD(std::exception_ptr, eptr));
         }
 
         template <typename Receiver, typename Awaitable,
