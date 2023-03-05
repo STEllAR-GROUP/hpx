@@ -49,10 +49,11 @@ namespace hpx::execution::experimental {
 
         HPX_HAS_MEMBER_XXX_TRAIT_DEF(await_suspend);
 
+        // clang-format off
         template <typename T, typename Ts>
-        using await_suspend_coro_handle_t =
-            decltype(std::declval<T>().await_suspend(
-                hpx::coro::coroutine_handle<Ts>{}));
+        using await_suspend_coro_handle_t = decltype(
+            std::declval<T>().await_suspend(hpx::coro::coroutine_handle<Ts>{}));
+        // clang-format on
 
         template <typename Awaiter, typename Promise>
         using is_await_suspend_result = std::integral_constant<bool,

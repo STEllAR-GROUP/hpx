@@ -290,8 +290,7 @@ namespace hpx::execution::experimental {
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             bool await_ready();
-            void await_suspend(
-                hpx::coro::coroutine_handle<env_promise<Env>> const&);
+            void await_suspend(hpx::coro::coroutine_handle<env_promise<Env>>);
             dependent_completion_signatures await_resume();
 #endif
         };
@@ -302,7 +301,7 @@ namespace hpx::execution::experimental {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             bool await_ready();
             void await_suspend(
-                hpx::coro::coroutine_handle<env_promise<no_env>> const&);
+                hpx::coro::coroutine_handle<env_promise<no_env>>);
             dependent_completion_signatures await_resume();
 #endif
         };

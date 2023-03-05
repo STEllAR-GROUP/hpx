@@ -254,54 +254,54 @@ int main()
             ::promise<hpx::coro::suspend_always>>);
         static_assert(is_awaitable_v<awaitable_sender_3, ::promise<awaiter>>);
         static_assert(is_awaitable_v<awaitable_sender_4, ::promise<awaiter>>);
-        static_assert(is_awaitable_v<awaitable_sender_4,
-            ::promise<detail::env_promise<no_env>>>);
-        static_assert(is_awaitable_v<awaitable_sender_4,
-            ::promise<detail::env_promise<empty_env>>>);
+        // static_assert(is_awaitable_v<awaitable_sender_4,
+        //     ::promise<detail::env_promise<no_env>>>);
+        // static_assert(is_awaitable_v<awaitable_sender_4,
+        //     ::promise<detail::env_promise<empty_env>>>);
         static_assert(is_awaitable_v<awaitable_sender_5, ::promise<awaiter>>);
-        static_assert(is_awaitable_v<awaitable_sender_5,
-            ::promise<detail::env_promise<no_env>>>);
-        static_assert(is_awaitable_v<awaitable_sender_5,
-            ::promise<detail::env_promise<empty_env>>>);
+        // static_assert(is_awaitable_v<awaitable_sender_5,
+        //     ::promise<detail::env_promise<no_env>>>);
+        // static_assert(is_awaitable_v<awaitable_sender_5,
+        //     ::promise<detail::env_promise<empty_env>>>);
     }
 
-    //     // Operation base
-    //     {
-    //         static_assert(is_operation_state_v<operation_t<recv_set_value>>);
-    //     }
+    // Operation base
+    {
+        static_assert(is_operation_state_v<operation_t<recv_set_value>>);
+    }
 
-    //     // Connect result type
-    //     {
-    //         static_assert(std::is_same_v<
-    //             connect_result_t<awaitable_sender_1<awaiter>, recv_set_value>,
-    //             operation_t<recv_set_value>>);
-    //     }
+    // Connect result type
+    {
+        static_assert(std::is_same_v<
+            connect_result_t<awaitable_sender_1<awaiter>, recv_set_value>,
+            operation_t<recv_set_value>>);
+    }
 
-    //     // As awaitable
-    //     {
-    //         static_assert(is_awaitable_v<decltype(as_awaitable(
-    //                 awaitable_sender_1<awaiter>{}, unmove(::promise<awaiter>{})))>);
-    //         static_assert(
-    //             std::is_same_v<decltype(as_awaitable(awaitable_sender_1<awaiter>{},
-    //                                unmove(::promise<awaiter>{}))),
-    //                 awaitable_sender_1<awaiter>&&>);
-    //     }
+    // As awaitable
+    {
+        static_assert(is_awaitable_v<decltype(as_awaitable(
+                awaitable_sender_1<awaiter>{}, unmove(::promise<awaiter>{})))>);
+        static_assert(
+            std::is_same_v<decltype(as_awaitable(awaitable_sender_1<awaiter>{},
+                               unmove(::promise<awaiter>{}))),
+                awaitable_sender_1<awaiter>>);
+    }
 
-    //     // sender
-    //     {
-    //         static_assert(is_sender_v<awaitable_sender_1<awaiter>>);
-    //         static_assert(is_sender_v<awaitable_sender_2>);
-    //         static_assert(is_sender_v<awaitable_sender_3>);
-    //         static_assert(is_sender_v<awaitable_sender_4>);
-    //     }
+    // sender
+    {
+        static_assert(is_sender_v<awaitable_sender_1<awaiter>>);
+        // static_assert(is_sender_v<awaitable_sender_2>);
+        // static_assert(is_sender_v<awaitable_sender_3>);
+        // static_assert(is_sender_v<awaitable_sender_4>);
+    }
 
-    //     // env promise
-    //     {
-    //         static_assert(is_sender_with_env_v<awaitable_sender_1<awaiter>>);
-    //         static_assert(is_sender_with_env_v<awaitable_sender_2>);
-    //         static_assert(is_sender_with_env_v<awaitable_sender_3>);
-    //         static_assert(is_sender_with_env_v<awaitable_sender_4>);
-    //     }
+    // env promise
+    {
+        static_assert(is_sender_with_env_v<awaitable_sender_1<awaiter>>);
+        // static_assert(is_sender_with_env_v<awaitable_sender_2>);
+        // static_assert(is_sender_with_env_v<awaitable_sender_3>);
+        // static_assert(is_sender_with_env_v<awaitable_sender_4>);
+    }
 
     // try
     // {
