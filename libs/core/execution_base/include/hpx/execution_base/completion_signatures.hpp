@@ -342,13 +342,20 @@ namespace hpx::execution::experimental {
         // So you have two options for opting into the sender concept if you type
         // is not generally awaitable: (1) specialize enable_sender, or (2)
         // customize as_awaitable for T.
-        // HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
-        template <typename Sender>
-        inline constexpr bool has_is_sender_v = true;
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
 
 #ifdef HPX_HAVE_CXX20_COROUTINES
+
+        template <typename Sender, typename = void>
+        inline constexpr bool is_enable_sender_v = false;
+
         template <typename Sender>
-        inline constexpr bool is_enable_sender_v =
+        inline constexpr bool is_enable_sender_v<Sender,
+            std::enable_if_t<
+                std::is_move_constructible_v<std::decay_t<Sender>> &&
+                std::is_class_v<std::decay_t<Sender>> &&
+                hpx::util::is_detected_v<is_awaitable, Sender,
+                    env_promise<empty_env>>>> =
             is_awaitable_v<Sender, env_promise<empty_env>> ||
             has_is_sender_v<Sender>;
 #else
@@ -433,11 +440,6 @@ namespace hpx::execution::experimental {
                 }
             }
 #endif
-            else if constexpr (std::is_same_v<Env, no_env> &&
-                detail::is_enable_sender_v<std::remove_cvref_t<Sender>>)
-            {
-                return detail::dependent_completion_signatures<no_env>{};
-            }
             else
             {
                 return detail::no_completion_signatures{};
@@ -698,8 +700,12 @@ namespace hpx::execution::experimental {
                     meta::value<detail::provides_completion_signatures<
                         std::decay_t<Sender>, Env>>;
 
+        template <typename Sender, typename Env, typename = void>
+        inline constexpr bool is_with_completion_signatures_v = false;
+
         template <typename Sender, typename Env>
-        inline constexpr bool is_with_completion_signatures_v =
+        inline constexpr bool is_with_completion_signatures_v<Sender, Env,
+            std::enable_if_t<is_sender_plain_v<Sender, Env>>> =
             hpx::is_invocable_v<get_completion_signatures_t, Sender, Env>&&
                 meta::value<completion_signatures_of_is_valid<Sender, Env>>;
     }    // namespace detail
@@ -707,10 +713,9 @@ namespace hpx::execution::experimental {
     template <typename Sender, typename Env>
     struct is_sender
       : std::integral_constant<bool,
-            !!((detail::is_sender_plain_v<Sender, Env> &&
-                   detail::is_enable_sender_v<std::decay_t<Sender>> &&
-                   is_environment_provider_v<Sender>) ||
-                detail::is_with_completion_signatures_v<Sender, Env>)>
+            !!(detail::is_sender_plain_v<Sender, Env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>) ||
+                detail::is_with_completion_signatures_v<Sender, Env>>
     {
     };
 
@@ -1387,7 +1392,7 @@ namespace hpx::execution::experimental {
                 eptr = std::current_exception();
             }
 
-            co_await co_call(set_value, HPX_FORWARD(Receiver, rcvr),
+            co_await co_call(set_error, HPX_FORWARD(Receiver, rcvr),
                 HPX_FORWARD(std::exception_ptr, eptr));
         }
 
