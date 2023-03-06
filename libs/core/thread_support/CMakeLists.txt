@@ -18,7 +18,7 @@ set(thread_support_compat_headers
     hpx/thread_support.hpp => hpx/modules/thread_support.hpp
     hpx/util/assert_owns_lock.hpp => hpx/modules/thread_support.hpp
     hpx/util/atomic_count.hpp => hpx/modules/thread_support.hpp
-    hpx/util/set_thread_name. => hpx/modules/thread_support.hpp
+    hpx/util/set_thread_name.hpp => hpx/modules/thread_support.hpp
     hpx/util/thread_specific_ptr.hpp => hpx/modules/thread_support.hpp
     hpx/util/unlock_guard.hpp => hpx/modules/thread_support.hpp
 )
