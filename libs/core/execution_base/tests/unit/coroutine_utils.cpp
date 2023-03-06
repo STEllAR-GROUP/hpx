@@ -254,15 +254,37 @@ int main()
             ::promise<hpx::coro::suspend_always>>);
         static_assert(is_awaitable_v<awaitable_sender_3, ::promise<awaiter>>);
         static_assert(is_awaitable_v<awaitable_sender_4, ::promise<awaiter>>);
-        // static_assert(is_awaitable_v<awaitable_sender_4,
-        //     ::promise<detail::env_promise<no_env>>>);
-        // static_assert(is_awaitable_v<awaitable_sender_4,
-        //     ::promise<detail::env_promise<empty_env>>>);
         static_assert(is_awaitable_v<awaitable_sender_5, ::promise<awaiter>>);
-        // static_assert(is_awaitable_v<awaitable_sender_5,
-        //     ::promise<detail::env_promise<no_env>>>);
-        // static_assert(is_awaitable_v<awaitable_sender_5,
-        //     ::promise<detail::env_promise<empty_env>>>);
+        static_assert(
+            std::is_same_v<hpx::functional::tag_invoke_result_t<as_awaitable_t,
+                               awaitable_sender_4, ::promise<awaiter>&>,
+                awaiter>);
+        static_assert(std::is_same_v<
+            hpx::functional::tag_invoke_result_t<as_awaitable_t,
+                awaitable_sender_4, detail::env_promise<no_env>&>,
+            detail::dependent_completion_signatures<no_env>>);
+        static_assert(std::is_same_v<
+            decltype(get_awaiter(std::declval<awaitable_sender_4>(),
+                static_cast<detail::env_promise<no_env>*>(nullptr))),
+            detail::dependent_completion_signatures<no_env>>);
+        static_assert(is_awaiter_v<decltype(get_awaiter(
+                std::declval<awaitable_sender_4>(),
+                static_cast<detail::env_promise<no_env>*>(nullptr)))>);
+        static_assert(detail::has_await_suspend_v<decltype(get_awaiter(
+                std::declval<awaitable_sender_4>(),
+                static_cast<detail::env_promise<no_env>*>(nullptr)))>);
+        static_assert(detail::is_with_await_suspend_v<
+            decltype(get_awaiter(std::declval<awaitable_sender_4>(),
+                static_cast<detail::env_promise<no_env>*>(nullptr))),
+            detail::env_promise<no_env>>);
+        static_assert(
+            is_awaitable_v<awaitable_sender_4, detail::env_promise<no_env>>);
+        static_assert(
+            is_awaitable_v<awaitable_sender_4, detail::env_promise<empty_env>>);
+        static_assert(
+            is_awaitable_v<awaitable_sender_5, detail::env_promise<no_env>>);
+        static_assert(
+            is_awaitable_v<awaitable_sender_5, detail::env_promise<empty_env>>);
     }
 
     // Operation base
@@ -284,37 +306,39 @@ int main()
         static_assert(
             std::is_same_v<decltype(as_awaitable(awaitable_sender_1<awaiter>{},
                                unmove(::promise<awaiter>{}))),
-                awaitable_sender_1<awaiter>>);
+                awaitable_sender_1<awaiter>&&>);
     }
 
     // sender
     {
         static_assert(is_sender_v<awaitable_sender_1<awaiter>>);
-        // static_assert(is_sender_v<awaitable_sender_2>);
-        // static_assert(is_sender_v<awaitable_sender_3>);
-        // static_assert(is_sender_v<awaitable_sender_4>);
+        static_assert(is_sender_v<awaitable_sender_2>);
+        static_assert(detail::is_enable_sender_v<awaitable_sender_2>);
+        static_assert(detail::is_sender_plain_v<awaitable_sender_2, no_env>);
+        static_assert(is_sender_v<awaitable_sender_3>);
+        static_assert(is_sender_v<awaitable_sender_4>);
     }
 
     // env promise
     {
         static_assert(is_sender_with_env_v<awaitable_sender_1<awaiter>>);
-        // static_assert(is_sender_with_env_v<awaitable_sender_2>);
-        // static_assert(is_sender_with_env_v<awaitable_sender_3>);
-        // static_assert(is_sender_with_env_v<awaitable_sender_4>);
+        static_assert(is_sender_with_env_v<awaitable_sender_2>);
+        static_assert(is_sender_with_env_v<awaitable_sender_3>);
+        static_assert(is_sender_with_env_v<awaitable_sender_4>);
     }
 
-    // try
-    // {
-    //     // Awaitables are implicitly senders:
-    //     auto i = hpx::this_thread::experimental::sync_wait(
-    //         async_answer(hpx::execution::experimental::just(42),
-    //             hpx::execution::experimental::just()))
-    //                  .value();
-    //     std::cout << "The answer is " << hpx::get<0>(i) << '\n';
-    // }
-    // catch (std::exception& e)
-    // {
-    //     std::cout << e.what() << '\n';
-    // }
+    try
+    {
+        // Awaitables are implicitly senders:
+        auto i = hpx::this_thread::experimental::sync_wait(
+            async_answer(hpx::execution::experimental::just(42),
+                hpx::execution::experimental::just()))
+                     .value();
+        std::cout << "The answer is " << hpx::get<0>(i) << '\n';
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what() << '\n';
+    }
     return hpx::util::report_errors();
 }

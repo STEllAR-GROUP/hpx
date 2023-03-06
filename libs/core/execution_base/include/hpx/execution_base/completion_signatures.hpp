@@ -346,7 +346,7 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_CXX20_COROUTINES
 
         template <typename Sender, typename = void>
-        inline constexpr bool is_enable_sender_v = false;
+        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
 
         template <typename Sender>
         inline constexpr bool is_enable_sender_v<Sender,
@@ -354,8 +354,8 @@ namespace hpx::execution::experimental {
                 std::is_move_constructible_v<std::decay_t<Sender>> &&
                 std::is_class_v<std::decay_t<Sender>> &&
                 hpx::util::is_detected_v<is_awaitable, Sender,
-                    env_promise<empty_env>>>> =
-            is_awaitable_v<Sender, env_promise<empty_env>> ||
+                    env_promise<no_env>>>> =
+            is_awaitable_v<Sender, env_promise<no_env>> ||
             has_is_sender_v<Sender>;
 #else
         template <typename Sender>
@@ -439,6 +439,11 @@ namespace hpx::execution::experimental {
                 }
             }
 #endif
+            else if constexpr (std::is_same_v<Env, no_env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>)
+            {
+                return detail::dependent_completion_signatures<no_env>{};
+            }
             else
             {
                 return detail::no_completion_signatures{};
@@ -695,18 +700,7 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Env>
         inline constexpr bool is_sender_plain_v =
             std::is_move_constructible_v<std::decay_t<Sender>>&&
-                std::is_class_v<std::decay_t<Sender>>&&
-                    meta::value<detail::provides_completion_signatures<
-                        std::decay_t<Sender>, Env>>;
-
-        template <typename Sender, typename Env, typename = void>
-        inline constexpr bool is_with_completion_signatures_v = false;
-
-        template <typename Sender, typename Env>
-        inline constexpr bool is_with_completion_signatures_v<Sender, Env,
-            std::enable_if_t<is_sender_plain_v<Sender, Env>>> =
-            hpx::is_invocable_v<get_completion_signatures_t, Sender, Env>&&
-                meta::value<completion_signatures_of_is_valid<Sender, Env>>;
+                std::is_class_v<std::decay_t<Sender>>;
     }    // namespace detail
 
     template <typename Sender, typename Env>
@@ -714,7 +708,8 @@ namespace hpx::execution::experimental {
       : std::integral_constant<bool,
             !!(detail::is_sender_plain_v<Sender, Env> &&
                 detail::is_enable_sender_v<std::decay_t<Sender>>) ||
-                detail::is_with_completion_signatures_v<Sender, Env>>
+                meta::value<detail::provides_completion_signatures<
+                    std::decay_t<Sender>, Env>>>
     {
     };
 
@@ -1059,14 +1054,46 @@ namespace hpx::execution::experimental {
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
         template <typename T, typename Promise>
-        friend HPX_FORCEINLINE auto tag_fallback_invoke(
-            as_awaitable_t, T&& t, Promise& promise) noexcept
+        static constexpr auto select_impl() noexcept
         {
-            if constexpr (is_awaitable_v<T>)
+            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t, T,
+                              Promise&>)
             {
-                return HPX_FORWARD(T, t);
+                using Result =
+                    hpx::functional::tag_invoke_result_t<as_awaitable_t, T,
+                        Promise&>;
+                constexpr bool Nothrow =
+                    hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
+                        T, Promise&>;
+                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
+            }
+            else if constexpr (is_awaitable_v<T>)
+            {    // NOT awaitable<T, Promise> !!
+                return static_cast < T && (*) () noexcept > (nullptr);
             }
             else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            {
+                using Result = detail::sender_awaitable_t<Promise, T>;
+                constexpr bool Nothrow = std::is_nothrow_constructible_v<Result,
+                    T, hpx::coro::coroutine_handle<Promise>>;
+                return static_cast<Result (*)() noexcept(Nothrow)>(nullptr);
+            }
+            else
+            {
+                return static_cast < T && (*) () noexcept > (nullptr);
+            }
+        }
+
+        template <typename T, typename Promise>
+        using select_impl_t = decltype(select_impl<T, Promise>());
+
+        template <typename T, typename Promise>
+        friend HPX_FORCEINLINE auto
+        tag_fallback_invoke(as_awaitable_t, T&& t, Promise& promise) noexcept(
+            hpx::is_nothrow_invocable_v<select_impl_t<T, Promise>>)
+            -> hpx::util::invoke_result_t<select_impl_t<T, Promise>>
+        {
+            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
                     hpx::coro::coroutine_handle<Promise>::from_promise(promise);
@@ -1085,7 +1112,10 @@ namespace hpx::execution::experimental {
         template <typename Env>
         struct env_promise
         {
-            template <typename Ty>
+            template <typename Ty,
+                typename =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        as_awaitable_t, Ty, env_promise&>>>
             Ty&& await_transform(Ty&& value) noexcept
             {
                 return HPX_FORWARD(Ty, value);
@@ -1103,8 +1133,8 @@ namespace hpx::execution::experimental {
                 return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
             }
 
-            template <typename T>
-            friend auto tag_invoke(get_env_t, const T&) noexcept -> const T&;
+            friend auto tag_invoke(get_env_t, const env_promise&) noexcept
+                -> const Env&;
         };
 
         struct with_awaitable_senders_base

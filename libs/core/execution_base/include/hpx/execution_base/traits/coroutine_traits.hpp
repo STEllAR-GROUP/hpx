@@ -56,9 +56,9 @@ namespace hpx::execution::experimental {
         // clang-format on
 
         template <typename Awaiter, typename Promise>
-        using is_await_suspend_result = std::integral_constant<bool,
+        inline constexpr bool is_await_suspend_result_v =
             is_await_suspend_result_t_v<
-                await_suspend_coro_handle_t<Awaiter, Promise>>>;
+                await_suspend_coro_handle_t<Awaiter, Promise>>;
 
         template <typename Awaiter, typename Promise, typename = void>
         inline constexpr bool is_with_await_suspend_v = false;
@@ -67,7 +67,7 @@ namespace hpx::execution::experimental {
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
             std::enable_if_t<has_await_suspend_v<Awaiter> &&
                 (!std::is_same_v<Promise, void>)>> =
-            is_await_suspend_result<Awaiter, Promise>::value;
+            is_await_suspend_result_v<Awaiter, Promise>;
 
         template <typename Awaiter, typename Promise>
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
