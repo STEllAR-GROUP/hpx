@@ -267,16 +267,18 @@ int main()
             decltype(get_awaiter(std::declval<awaitable_sender_4>(),
                 static_cast<detail::env_promise<no_env>*>(nullptr))),
             detail::dependent_completion_signatures<no_env>>);
-        static_assert(is_awaiter_v<decltype(get_awaiter(
-                std::declval<awaitable_sender_4>(),
-                static_cast<detail::env_promise<no_env>*>(nullptr)))>);
-        static_assert(detail::has_await_suspend_v<decltype(get_awaiter(
-                std::declval<awaitable_sender_4>(),
-                static_cast<detail::env_promise<no_env>*>(nullptr)))>);
+        // clang-format off
+        static_assert(is_awaiter_v<decltype(
+                get_awaiter(std::declval<awaitable_sender_4>(),
+                    static_cast<detail::env_promise<no_env>*>(nullptr)))>);
+        static_assert(detail::has_await_suspend_v<decltype(
+                get_awaiter(std::declval<awaitable_sender_4>(),
+                    static_cast<detail::env_promise<no_env>*>(nullptr)))>);
         static_assert(detail::is_with_await_suspend_v<
             decltype(get_awaiter(std::declval<awaitable_sender_4>(),
                 static_cast<detail::env_promise<no_env>*>(nullptr))),
             detail::env_promise<no_env>>);
+        // clang-format on
         static_assert(
             is_awaitable_v<awaitable_sender_4, detail::env_promise<no_env>>);
         static_assert(
