@@ -6,7 +6,7 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests bulk_then_execute_3182 bulk_sync_wait future_then_async_executor
-          parallel_executor_1781 wrapping_executor
+          parallel_executor_1781 pu_count_6184 wrapping_executor
 )
 
 foreach(test ${tests})
