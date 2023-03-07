@@ -1394,7 +1394,7 @@ namespace hpx::execution::experimental {
             };
 
             return awaiter{fn};
-        };
+        }
 
         template <typename Awaitable, typename Receiver>
         static operation_t<Receiver> impl(Awaitable await, Receiver rcvr)
