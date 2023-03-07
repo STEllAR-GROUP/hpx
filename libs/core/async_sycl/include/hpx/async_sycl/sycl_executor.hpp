@@ -311,8 +311,8 @@ HPX_FORCEINLINE bool apply(Executor&& exec,
     Ts&& ts)
 {
 // Make sure we only use this for sycl executors
-static_assert(std::is_same<std::decay_t<Executor>,
-    hpx::sycl::experimental::sycl_executor>::value);
+static_assert(std::is_same_v<std::decay_t<Executor>,
+    hpx::sycl::experimental::sycl_executor>);
 // Use the same apply_dispatch than the normal apply otherwise
 return detail::post_dispatch<typename std::decay<Executor>::type>::call(
     HPX_FORWARD(Executor, exec),
