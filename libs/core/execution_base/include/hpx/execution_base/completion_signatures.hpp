@@ -341,7 +341,7 @@ namespace hpx::execution::experimental {
         // So you have two options for opting into the sender concept if you type
         // is not generally awaitable: (1) specialize enable_sender, or (2)
         // customize as_awaitable for T.
-        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender);
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender)
 
 #ifdef HPX_HAVE_CXX20_COROUTINES
 
