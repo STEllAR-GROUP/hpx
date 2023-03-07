@@ -1133,7 +1133,7 @@ namespace hpx::execution::experimental {
                 return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
             }
 
-            friend auto tag_invoke(get_env_t, const env_promise&) noexcept
+            friend auto tag_invoke(get_env_t, const env_promise<Env>&) noexcept
                 -> const Env&;
         };
 
