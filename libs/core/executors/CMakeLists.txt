@@ -13,6 +13,7 @@ set(executors_headers
     hpx/executors/guided_pool_executor.hpp
     hpx/executors/async.hpp
     hpx/executors/dataflow.hpp
+    hpx/executors/detail/bulk_system_context.hpp
     hpx/executors/detail/hierarchical_spawning.hpp
     hpx/executors/detail/index_queue_spawning.hpp
     hpx/executors/execute_on.hpp
@@ -35,6 +36,7 @@ set(executors_headers
     hpx/executors/service_executors.hpp
     hpx/executors/std_execution_policy.hpp
     hpx/executors/sync.hpp
+    hpx/executors/system_context.hpp
     hpx/executors/thread_pool_executor.hpp
     hpx/executors/thread_pool_scheduler.hpp
     hpx/executors/thread_pool_scheduler_bulk.hpp
@@ -82,8 +84,9 @@ if(HPX_WITH_DATAPAR)
 endif()
 # cmake-format: on
 
-set(executors_sources current_executor.cpp exception_list_callbacks.cpp
-                      fork_join_executor.cpp
+set(executors_sources
+    current_executor.cpp detail/bulk_system_context.cpp
+    exception_list_callbacks.cpp fork_join_executor.cpp system_context.cpp
 )
 
 include(HPX_AddModule)
@@ -105,6 +108,7 @@ add_hpx_module(
     hpx_futures
     hpx_hardware
     hpx_io_service
+    hpx_iterator_support
     hpx_itt_notify
     hpx_memory
     hpx_properties

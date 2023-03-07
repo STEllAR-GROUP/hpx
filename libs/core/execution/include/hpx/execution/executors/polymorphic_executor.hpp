@@ -572,8 +572,6 @@ namespace hpx::parallel::execution {
         ///////////////////////////////////////////////////////////////////////
         // make sure the empty table instance is initialized in time, even
         // during early startup
-        template <typename Sig>
-        struct polymorphic_executor_vtable;
 
         // NOTE: nvcc (at least CUDA 9.2 and 10.1) fails with an internal
         // compiler error ("there was an error in verifying the lgenfe output!")
