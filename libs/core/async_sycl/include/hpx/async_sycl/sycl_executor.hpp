@@ -64,9 +64,9 @@ namespace hpx { namespace sycl { namespace experimental {
         /// function matching easier (see sycl_stream.cpp test)
         template <typename... Params>
         using queue_function_ptr_t = cl::sycl::event (cl::sycl::queue::*)(
-            typename std::conditional<
-                std::is_trivial<std::remove_reference_t<Params>>::value,
-                std::decay_t<Params>, Params>::type...);
+            std::conditional_t<
+                std::is_trivial_v<std::remove_reference_t<Params>>,
+                std::decay_t<Params>, Params>...);
         /// Invoke queue member function given queue and parameters -- do not
         /// use event to return a hpx::future (One way)
         template <typename... Params>
