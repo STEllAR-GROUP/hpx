@@ -26,7 +26,7 @@ namespace hpx { namespace sycl { namespace experimental {
     /// This RAII helper class enables polling for a scoped block
     struct [[nodiscard]] enable_user_polling
     {
-        enable_user_polling(std::string const& pool_name = "")
+        explicit enable_user_polling(std::string const& pool_name = {})
           : pool_name_(pool_name)
         {
             if (pool_name_.empty())
