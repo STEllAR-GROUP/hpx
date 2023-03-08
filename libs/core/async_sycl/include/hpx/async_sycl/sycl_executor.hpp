@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-//#include <hpx/async_base/apply.hpp>
 #include <hpx/include/post.hpp>
 #include <hpx/async_base/async.hpp>
 #include <hpx/async_sycl/sycl_future.hpp>
