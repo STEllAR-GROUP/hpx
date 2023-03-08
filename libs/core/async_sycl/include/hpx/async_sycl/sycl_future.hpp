@@ -53,7 +53,7 @@ namespace hpx { namespace sycl { namespace experimental {
 
             future_data() = default;
 
-            /// Default way to construct a SYCL future 
+            /// Default way to construct a SYCL future
             /// Prefer this over the host_task version
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cl::sycl::event command_event)
@@ -75,18 +75,16 @@ namespace hpx { namespace sycl { namespace experimental {
             /// Alternative integration: Leverage SYCL host tasks
             /// Slower but useful for comparisons...
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cl::sycl::event command_event, cl::sycl::queue &command_queue)
+                cl::sycl::event command_event, cl::sycl::queue& command_queue)
               : lcos::detail::future_data_allocator<void, Allocator>(
-                    no_addref, alloc) 
+                    no_addref, alloc)
             {
-                command_queue.submit(
-                    [fdp = hpx::intrusive_ptr<future_data>(this),
-                    command_event](cl::sycl::handler& h) {
+                command_queue.submit([fdp = hpx::intrusive_ptr<future_data>(
+                                          this),
+                                         command_event](cl::sycl::handler& h) {
                     h.depends_on(command_event);
-                    h.host_task([fdp]() {
-                        fdp->set_data(hpx::util::unused);
-                      });
-                    });
+                    h.host_task([fdp]() { fdp->set_data(hpx::util::unused); });
+                });
             }
 #endif
         };
@@ -123,9 +121,8 @@ namespace hpx { namespace sycl { namespace experimental {
         /// Construct an HPX future, using SYCL host tasks to set data
         /// Note: Slower than event polling version in my tests
         template <typename Allocator>
-        hpx::future<void> get_future_using_host_task(
-            Allocator const& a, cl::sycl::event command_event,
-            cl::sycl::queue& command_queue)
+        hpx::future<void> get_future_using_host_task(Allocator const& a,
+            cl::sycl::event command_event, cl::sycl::queue& command_queue)
         {
             using shared_state = future_data<Allocator>;
 
@@ -142,15 +139,15 @@ namespace hpx { namespace sycl { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(
-                alloc, p.get(), init_no_addref{}, alloc, command_event, command_queue);
+            traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+                command_event, command_queue);
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
         }
 #endif
         // -------------------------------------------------------------
-        // non allocator version of get future with an event 
+        // non allocator version of get future with an event
         HPX_CORE_EXPORT hpx::future<void> get_future(
             cl::sycl::event command_event);
         // -------------------------------------------------------------
