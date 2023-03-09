@@ -322,7 +322,7 @@ void test_for_loop_idx_bad_alloc(ExPolicy&& policy)
 
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const& e)
+    catch (std::bad_alloc const&)
     {
         caught_exception = true;
     }
@@ -353,7 +353,7 @@ void test_for_loop_idx_bad_alloc_async(ExPolicy&& p)
 
         HPX_TEST(false);
     }
-    catch (std::bad_alloc const& e)
+    catch (std::bad_alloc const&)
     {
         caught_exception = true;
     }
