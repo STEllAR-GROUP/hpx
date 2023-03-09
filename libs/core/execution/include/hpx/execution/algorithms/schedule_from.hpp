@@ -37,6 +37,7 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Scheduler>
         struct schedule_from_sender
         {
+            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> predecessor_sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 

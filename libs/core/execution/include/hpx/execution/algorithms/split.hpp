@@ -88,6 +88,7 @@ namespace hpx::execution::experimental {
             typename Scheduler = no_scheduler>
         struct split_sender
         {
+            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
             template <typename Tuple>

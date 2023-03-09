@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/type_support/detected.hpp>
+#include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
@@ -476,4 +477,43 @@ namespace hpx::meta {
         using apply =
             std::enable_if_t<sizeof...(As) <= 1, meta::type<front<As..., Ty>>>;
     };
+
+    template <typename T, typename = void>
+    inline constexpr bool has_id_v = false;
+
+    template <typename T>
+    inline constexpr bool has_id_v<T, std::void_t<typename T::id>> = true;
+
+    template <typename T>
+    struct has_id : std::integral_constant<bool, has_id_v<T>>
+    {
+    };
+
+    template <bool val = true>
+    struct get_id_func
+    {
+        template <typename T>
+        using apply = typename T::id;
+    };
+
+    template <>
+    struct get_id_func<false>
+    {
+        template <typename T>
+        using apply = type_identity<T>;
+    };
+
+    template <typename T>
+    using get_id_t = hpx::type_identity_t<
+        hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>>;
+
+    template <typename T, typename... As>
+    inline constexpr bool is_constructible_from_v =
+        std::is_destructible_v<T>&& std::is_constructible_v<T, As...>;
+
+    template <typename T, typename... As>
+    inline constexpr bool is_nothrow_constructible_from_v =
+        is_constructible_from_v<T, As...>&&
+            std::is_nothrow_constructible_v<T, As...>;
+
 }    // namespace hpx::meta

@@ -58,7 +58,10 @@ namespace hpx::lcos::detail {
         return f.is_ready();
     }
 
-    template <typename T, typename Promise>
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_exception);
+
+    template <typename T, typename Promise,
+        typename = std::enable_if_t<has_set_exception_v<Promise>>>
     HPX_FORCEINLINE void await_suspend(
         hpx::future<T>& f, coroutine_handle<Promise> rh)
     {
@@ -100,7 +103,8 @@ namespace hpx::lcos::detail {
         return f.is_ready();
     }
 
-    template <typename T, typename Promise>
+    template <typename T, typename Promise,
+        typename = std::enable_if_t<has_set_exception_v<Promise>>>
     HPX_FORCEINLINE void await_suspend(
         hpx::shared_future<T>& f, coroutine_handle<Promise> rh)
     {

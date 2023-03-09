@@ -87,6 +87,7 @@ namespace hpx::execution::experimental {
         struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::future<T>;
             using base_type = keep_future_sender_base<hpx::future<T>>;
             using base_type::future;
@@ -116,6 +117,7 @@ namespace hpx::execution::experimental {
         struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::shared_future<T>;
             using base_type = keep_future_sender_base<hpx::shared_future<T>>;
             using base_type::future;

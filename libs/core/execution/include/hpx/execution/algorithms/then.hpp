@@ -94,6 +94,8 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename F>
         struct then_sender
         {
+            using is_sender = void;
+
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 

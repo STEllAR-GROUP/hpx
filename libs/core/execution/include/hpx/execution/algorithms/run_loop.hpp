@@ -76,73 +76,87 @@ namespace hpx::execution::experimental {
             }
         };
 
-        template <typename Receiver>
-        struct run_loop_opstate : run_loop_opstate_base
+        template <typename ReceiverId>
+        struct run_loop_opstate
         {
-            run_loop& loop;
-            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            using Receiver = hpx::meta::type<ReceiverId>;
 
-            template <typename Receiver_>
-            run_loop_opstate(run_loop_opstate_base* tail, run_loop& loop,
-                Receiver_&& receiver) noexcept(noexcept(std::
-                    is_nothrow_constructible_v<std::decay_t<Receiver>,
-                        Receiver_>))
-              : run_loop_opstate_base(tail)
-              , loop(loop)
-              , receiver(HPX_FORWARD(Receiver_, receiver))
+            struct type : run_loop_opstate_base
             {
-            }
+                using id = run_loop_opstate;
 
-            static void execute(run_loop_opstate_base* p) noexcept
-            {
-                auto& receiver = static_cast<run_loop_opstate*>(p)->receiver;
-                hpx::detail::try_catch_exception_ptr(
-                    [&]() {
-                        if (get_stop_token(get_env(receiver)).stop_requested())
-                        {
-                            hpx::execution::experimental::set_stopped(
-                                HPX_MOVE(receiver));
-                        }
-                        else
-                        {
-                            hpx::execution::experimental::set_value(
-                                HPX_MOVE(receiver));
-                        }
-                    },
-                    [&](std::exception_ptr ep) {
-                        hpx::execution::experimental::set_error(
-                            HPX_MOVE(receiver), HPX_MOVE(ep));
-                    });
-            }
+                run_loop& loop;
+                HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
 
-            explicit run_loop_opstate(run_loop_opstate_base* tail) noexcept
-              : run_loop_opstate_base(tail)
-            {
-            }
+                template <typename Receiver_>
+                type(run_loop_opstate_base* tail, run_loop& loop,
+                    Receiver_&& receiver) noexcept(noexcept(std::
+                        is_nothrow_constructible_v<std::decay_t<Receiver>,
+                            Receiver_>))
+                  : run_loop_opstate_base(tail)
+                  , loop(loop)
+                  , receiver(HPX_FORWARD(Receiver_, receiver))
+                {
+                }
 
-            run_loop_opstate(
-                run_loop_opstate_base* next, run_loop& loop, Receiver r)
-              : run_loop_opstate_base(next, &execute)
-              , loop(loop)
-              , receiver(HPX_MOVE(r))
-            {
-            }
+                static void execute(run_loop_opstate_base* p) noexcept
+                {
+                    auto& receiver = static_cast<type*>(p)->receiver;
+                    hpx::detail::try_catch_exception_ptr(
+                        [&]() {
+                            if (get_stop_token(get_env(receiver))
+                                    .stop_requested())
+                            {
+                                hpx::execution::experimental::set_stopped(
+                                    HPX_MOVE(receiver));
+                            }
+                            else
+                            {
+                                hpx::execution::experimental::set_value(
+                                    HPX_MOVE(receiver));
+                            }
+                        },
+                        [&](std::exception_ptr ep) {
+                            hpx::execution::experimental::set_error(
+                                HPX_MOVE(receiver), HPX_MOVE(ep));
+                        });
+                }
 
-            friend void tag_invoke(hpx::execution::experimental::start_t,
-                run_loop_opstate& os) noexcept
-            {
-                os.start();
-            }
+                explicit type(run_loop_opstate_base* tail) noexcept
+                  : run_loop_opstate_base(tail)
+                {
+                }
 
-            void start() & noexcept;
+                type(run_loop_opstate_base* next, run_loop& loop, Receiver r)
+                  : run_loop_opstate_base(next, &execute)
+                  , loop(loop)
+                  , receiver(HPX_MOVE(r))
+                {
+                }
+
+                friend void tag_invoke(
+                    hpx::execution::experimental::start_t, type& os) noexcept
+                {
+                    os.start();
+                }
+
+                void start() & noexcept;
+            };
         };
 
     public:
         class run_loop_scheduler
         {
         public:
+            using type = run_loop_scheduler;
+            using id = run_loop_scheduler;
+
             struct run_loop_sender
             {
+                using is_sender = void;
+                using type = run_loop_sender;
+                using id = run_loop_sender;
+
                 explicit run_loop_sender(run_loop& loop) noexcept
                   : loop(loop)
                 {
@@ -152,7 +166,8 @@ namespace hpx::execution::experimental {
                 friend run_loop_scheduler;
 
                 template <typename Receiver>
-                using operation_state = run_loop_opstate<Receiver>;
+                using operation_state = hpx::meta::type<
+                    run_loop_opstate<hpx::meta::get_id_t<Receiver>>>;
 
                 template <typename Receiver>
                 friend operation_state<Receiver> tag_invoke(
@@ -332,8 +347,8 @@ namespace hpx::execution::experimental {
     using run_loop_scheduler = run_loop::run_loop_scheduler;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Receiver>
-    inline void run_loop::run_loop_opstate<Receiver>::start() & noexcept
+    template <typename ReceiverId>
+    inline void run_loop::run_loop_opstate<ReceiverId>::type::start() & noexcept
     try
     {
         loop.push_back(this);

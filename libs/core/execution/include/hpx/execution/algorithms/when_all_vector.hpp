@@ -59,6 +59,7 @@ namespace hpx::when_all_vector_detail {
     template <typename Sender>
     struct when_all_vector_sender_impl<Sender>::when_all_vector_sender_type
     {
+        using is_sender = void;
         using senders_type = std::vector<Sender>;
         senders_type senders;
 
