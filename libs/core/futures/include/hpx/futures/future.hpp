@@ -919,6 +919,47 @@ namespace hpx {
         using base_type::is_ready;
         using base_type::valid;
 
+        /// \brief Attaches a continuation to \a *this. The behavior is undefined
+        ///        if \a *this has no associated shared state (i.e.,
+        ///        \a valid()==false ).
+        /// \details In cases where \a decltype(func(*this)) is \a future<R>,
+        ///          the resulting type is \a future<R> instead of
+        ///          \a future<future<R>>.
+        ///          Effects:
+        ///             - The continuation is called when the object's shared
+        ///               state is ready (has a value or exception stored).
+        ///             - The continuation launches according to the specified
+        ///               launch policy or executor.
+        ///             - When the executor or launch policy is not provided the
+        ///               continuation inherits the parent's launch policy or
+        ///               executor.
+        ///             - If the parent was created with \a std::promise or with a
+        ///               packaged_task (has no associated launch policy), the
+        ///               continuation behaves the same as the third overload
+        ///               with a policy argument of \a launch::async |
+        ///               \a launch::deferred and the same argument for \a func.
+        ///             - If the parent has a policy of \a launch::deferred and the
+        ///               continuation does not have a specified launch policy or
+        ///               scheduler, then the parent is filled by immediately
+        ///               calling \a .wait(), and the policy of the antecedent is
+        ///               \a launch::deferred
+        ///
+        /// \tparam F           The type of the function/function object to use
+        ///                     (deduced). F must meet requirements of
+        ///                     \a MoveConstructible.
+        /// \tparam error_code  The type of error code.
+        ///
+        /// \param f            A continuation to be attached.
+        /// \param ec           Used to hold error code value originated during the
+        ///                     operation. Defaults to \a throws -- A special
+        ///                     'throw on error' \a error_code.
+        /// \returns            An object of type \a future<decltype(func(*this))> that
+        ///                     refers to the shared state created by the continuation.
+        /// \note               Postcondition:
+        ///                        - The future object is moved to the parameter of the
+        ///                          continuation function.
+        ///                        - valid() == false on original future object immediately
+        ///                          after it returns.
         template <typename F>
         decltype(auto) then(F&& f, error_code& ec = throws)
         {
@@ -940,6 +981,27 @@ namespace hpx {
 #endif
         }
 
+        /// \copybrief hpx::future::then(F&& f, error_code& ec = throws)
+        /// \copydetail hpx::future::then(F&& f, error_code& ec = throws)
+        ///
+        /// \tparam T0          The type of executor or launch policy.
+        /// \tparam F           The type of the function/function object to use
+        ///                     (deduced). F must meet requirements of
+        ///                     \a MoveConstructible.
+        /// \tparam error_code  The type of error code.
+        ///
+        /// \param t0           The executor or launch policy to be used.
+        /// \param f            A continuation to be attached.
+        /// \param ec           Used to hold error code value originated during the
+        ///                     operation. Defaults to \a throws -- A special
+        ///                     'throw on error' \a error_code.
+        /// \returns            An object of type \a future<decltype(func(*this))> that
+        ///                     refers to the shared state created by the continuation.
+        /// \note               Postcondition:
+        ///                        - The future object is moved to the parameter of the
+        ///                          continuation function.
+        ///                        - valid() == false on original future object immediately
+        ///                          after it returns.
         template <typename T0, typename F>
         decltype(auto) then(T0&& t0, F&& f, error_code& ec = throws)
         {
@@ -1202,6 +1264,7 @@ namespace hpx {
         using base_type::is_ready;
         using base_type::valid;
 
+        /// \copydoc hpx::future::then(F&& f, error_code& ec = throws)
         template <typename F>
         decltype(auto) then(F&& f, error_code& ec = throws) const
         {
@@ -1217,6 +1280,7 @@ namespace hpx {
 #endif
         }
 
+        /// \copydoc hpx::future::then(T0&& t0, F&& f, error_code& ec = throws)
         template <typename T0, typename F>
         decltype(auto) then(T0&& t0, F&& f, error_code& ec = throws) const
         {
