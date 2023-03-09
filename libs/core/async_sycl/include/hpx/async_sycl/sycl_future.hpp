@@ -149,8 +149,7 @@ namespace hpx { namespace sycl { namespace experimental {
                         p.release(), false);
                 },
                 [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(
-                        HPX_MOVE(ep));
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
 #endif
@@ -179,8 +178,7 @@ namespace hpx { namespace sycl { namespace experimental {
                     return get_future(event);
                 },
                 [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(
-                        HPX_MOVE(ep));
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
 #if !defined(__HIPSYCL__)
@@ -200,8 +198,7 @@ namespace hpx { namespace sycl { namespace experimental {
                     return get_future_using_host_task(event, command_queue);
                 },
                 [&](std::exception_ptr&& ep) {
-                    return hpx::make_exceptional_future<void>(
-                        HPX_MOVE(ep));
+                    return hpx::make_exceptional_future<void>(HPX_MOVE(ep));
                 });
         }
 #endif

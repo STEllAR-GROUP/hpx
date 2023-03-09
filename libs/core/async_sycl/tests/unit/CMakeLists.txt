@@ -25,7 +25,9 @@ foreach(test ${tests})
   if(HPX_WITH_HIPSYCL)
     add_sycl_to_target(TARGET ${test}_test SOURCES ${test}.cpp)
   else()
-    separate_arguments(HPX_WITH_SYCL_FLAGS UNIX_COMMAND "${HPX_WITH_SYCL_FLAGS}")
+    separate_arguments(
+      HPX_WITH_SYCL_FLAGS UNIX_COMMAND "${HPX_WITH_SYCL_FLAGS}"
+    )
     target_compile_options(${test}_test PUBLIC -fsycl ${HPX_WITH_SYCL_FLAGS})
     target_link_options(${test}_test PUBLIC -fsycl ${HPX_WITH_SYCL_FLAGS})
   endif()
