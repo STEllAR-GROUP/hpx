@@ -104,14 +104,15 @@ namespace hpx { namespace sycl { namespace experimental {
                     // kernel within the hipsycl dag. Runtime of this is about
                     // 5us, so not too bad. Still keeping this as a ToDo, might
                     // be a hipsycl issue...
+                    //
+                    // NOTE 1: Alternative workaround: use environment
+                    // variable: export HIPSYCL_RT_SCHEDULER=direct This
+                    // directly circumvents the problematic scheduler, allowing
+                    // us to also use get_future(e)
+                    //
+                    // NOTE2 : Not a problem with oneapi in either case from
+                    // what I can see
                     return get_future();
-                // NOTE 1: Alternative workaround: use environment
-                // variable: export HIPSYCL_RT_SCHEDULER=direct This
-                // directly circumvents the problematic scheduler, allowing
-                // us to also use get_future(e)
-                //
-                // NOTE2 : Not a problem with oneapi in either case from
-                // what I can see
 #else
                     return get_future(e);
 #endif
@@ -290,7 +291,6 @@ namespace hpx {
             HPX_FORWARD(Ts, ts)...);
     }
 
-//#if defined(__LIBSYCL_MAJOR_VERSION) && defined(__LIBSYCL_MINOR_VERSION)
 #if defined(__INTEL_LLVM_COMPILER) ||                                          \
     (defined(__clang__) && defined(SYCL_IMPLEMENTATION_ONEAPI))
     /// hpx::async overload for launching sycl queue member functions with an

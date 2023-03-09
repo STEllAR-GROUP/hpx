@@ -72,7 +72,7 @@ namespace hpx { namespace sycl { namespace experimental {
                     command_event);
             }
 #if !defined(__HIPSYCL__)
-            /// Alternative integration: Leverage SYCL host tasks
+            /// Alternative integration: Use SYCL host tasks
             /// Slower but useful for comparisons...
             future_data(init_no_addref no_addref, other_allocator const& alloc,
                 cl::sycl::event command_event, cl::sycl::queue& command_queue)
@@ -135,15 +135,23 @@ namespace hpx { namespace sycl { namespace experimental {
             using unique_ptr = std::unique_ptr<shared_state,
                 util::allocator_deleter<other_allocator>>;
 
-            other_allocator alloc(a);
-            unique_ptr p(traits::allocate(alloc, 1),
-                hpx::util::allocator_deleter<other_allocator>{alloc});
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    other_allocator alloc(a);
+                    unique_ptr p(traits::allocate(alloc, 1),
+                        hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-                command_event, command_queue);
+                    // Call host_task internally which may throw (I think...)
+                    traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+                        command_event, command_queue);
 
-            return hpx::traits::future_access<future<void>>::create(
-                p.release(), false);
+                    return hpx::traits::future_access<future<void>>::create(
+                        p.release(), false);
+                },
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(
+                        HPX_MOVE(ep));
+                });
         }
 #endif
         // -------------------------------------------------------------
@@ -161,12 +169,19 @@ namespace hpx { namespace sycl { namespace experimental {
             cl::sycl::queue& command_queue)
         {
             HPX_ASSERT(queue.is_in_order());
-            // The SYCL standard does not include a eventRecord method Instead
-            // we have to submit some dummy function and use the event the
-            // launch returns
-            cl::sycl::event event = command_queue.submit(
-                [](cl::sycl::handler& h) { h.single_task([]() {}); });
-            return get_future(event);
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    // The SYCL standard does not include a eventRecord method Instead
+                    // we have to submit some dummy function and use the event the
+                    // launch returns
+                    cl::sycl::event event = command_queue.submit(
+                        [](cl::sycl::handler& h) { h.single_task([]() {}); });
+                    return get_future(event);
+                },
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(
+                        HPX_MOVE(ep));
+                });
         }
 #if !defined(__HIPSYCL__)
         /// Convenience wrapper to get future from just a queue using SYCL host tasks
@@ -175,12 +190,19 @@ namespace hpx { namespace sycl { namespace experimental {
             cl::sycl::queue& command_queue)
         {
             HPX_ASSERT(queue.is_in_order());
-            // The SYCL standard does not include a eventRecord method Instead
-            // we have to submit some dummy function and use the event the
-            // launch returns
-            cl::sycl::event event = command_queue.submit(
-                [](cl::sycl::handler& h) { h.single_task([]() {}); });
-            return get_future_using_host_task(event, command_queue);
+            return hpx::detail::try_catch_exception_ptr(
+                [&]() {
+                    // The SYCL standard does not include a eventRecord method Instead
+                    // we have to submit some dummy function and use the event the
+                    // launch returns
+                    cl::sycl::event event = command_queue.submit(
+                        [](cl::sycl::handler& h) { h.single_task([]() {}); });
+                    return get_future_using_host_task(event, command_queue);
+                },
+                [&](std::exception_ptr&& ep) {
+                    return hpx::make_exceptional_future<void>(
+                        HPX_MOVE(ep));
+                });
         }
 #endif
     }    // namespace detail
