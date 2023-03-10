@@ -91,7 +91,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -198,7 +198,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -283,7 +283,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -387,7 +387,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -481,7 +481,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -592,7 +592,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -681,7 +681,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -790,7 +790,7 @@ namespace hpx { namespace ranges {
     ///           GENERALIZED_NONCOMMUTATIVE_SUM(op, aM, ..., aN)
     ///           where 1 < K+1 = M <= N.
     ///
-    /// Neither \a conv nor \a op shall invalidate iterators or subranges, or
+    /// Neither \a conv nor \a op shall invalidate iterators or sub-ranges, or
     /// modify elements in the ranges [first,last) or [result,result +
     /// (last - first)).
     ///
@@ -812,23 +812,21 @@ namespace hpx { namespace ranges {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
 
     template <typename I, typename O>
     using transform_inclusive_scan_result = parallel::util::in_out_result<I, O>;
@@ -842,22 +840,22 @@ namespace hpx { namespace ranges {
              typename BinOp, typename UnOp,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for<Sent, InIter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<InIter>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<InIter>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<InIter>::value_type>
                 >
             )>
         // clang-format on
         friend transform_inclusive_scan_result<InIter, OutIter>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
-            InIter first, Sent last, OutIter dest, BinOp&& binary_op,
-            UnOp&& unary_op)
+            InIter first, Sent last, OutIter dest, BinOp binary_op,
+            UnOp unary_op)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -867,35 +865,35 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<InIter, OutIter>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2, typename BinOp, typename UnOp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            transform_inclusive_scan_result<FwdIter1, FwdIter2>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            transform_inclusive_scan_result<FwdIter1, FwdIter2>>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
-            BinOp&& binary_op, UnOp&& unary_op)
+            BinOp binary_op, UnOp unary_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -905,22 +903,22 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<FwdIter1, FwdIter2>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
         // clang-format off
         template <typename Rng, typename O, typename BinOp, typename UnOp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>
                 >
             )>
@@ -928,7 +926,7 @@ namespace hpx { namespace ranges {
         friend transform_inclusive_scan_result<
             hpx::traits::range_iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t, Rng&& rng,
-            O dest, BinOp&& binary_op, UnOp&& unary_op)
+            O dest, BinOp binary_op, UnOp unary_op)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -939,34 +937,34 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<iterator_type, O>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(binary_op));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng,  typename O,
             typename BinOp, typename UnOp,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
-                O>>::type
+                O>>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
-            ExPolicy&& policy, Rng&& rng, O dest, BinOp&& binary_op,
-            UnOp&& unary_op)
+            ExPolicy&& policy, Rng&& rng, O dest, BinOp binary_op,
+            UnOp unary_op)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -977,11 +975,11 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<iterator_type, O>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), dest, HPX_FORWARD(UnOp, unary_op),
-                    HPX_FORWARD(BinOp, binary_op));
+                    std::end(rng), dest, HPX_MOVE(unary_op),
+                    HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -990,22 +988,22 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<InIter> &&
-                hpx::traits::is_sentinel_for<Sent, InIter>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, InIter> &&
                 hpx::traits::is_iterator_v<OutIter> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<InIter>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<InIter>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<InIter>::value_type>
                 >
             )>
         // clang-format on
         friend transform_inclusive_scan_result<InIter, OutIter>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
-            InIter first, Sent last, OutIter dest, BinOp&& binary_op,
-            UnOp&& unary_op, T init)
+            InIter first, Sent last, OutIter dest, BinOp binary_op,
+            UnOp unary_op, T init)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
@@ -1015,11 +1013,10 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<InIter, OutIter>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -1027,25 +1024,25 @@ namespace hpx { namespace ranges {
             typename FwdIter2, typename BinOp, typename UnOp,
             typename T = typename std::iterator_traits<FwdIter1>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter1>::value &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2> &&
                 hpx::is_invocable_v<UnOp,
                     typename std::iterator_traits<FwdIter1>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename std::iterator_traits<FwdIter1>::value_type>
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            transform_inclusive_scan_result<FwdIter1, FwdIter2>>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            transform_inclusive_scan_result<FwdIter1, FwdIter2>>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
             ExPolicy&& policy, FwdIter1 first, Sent last, FwdIter2 dest,
-            BinOp&& binary_op, UnOp&& unary_op, T init)
+            BinOp binary_op, UnOp unary_op, T init)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -1055,11 +1052,10 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<FwdIter1, FwdIter2>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last, dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -1067,13 +1063,13 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>
                 >
             )>
@@ -1081,7 +1077,7 @@ namespace hpx { namespace ranges {
         friend transform_inclusive_scan_result<
             hpx::traits::range_iterator_t<Rng>, O>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t, Rng&& rng,
-            O dest, BinOp&& binary_op, UnOp&& unary_op, T init)
+            O dest, BinOp binary_op, UnOp unary_op, T init)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -1092,11 +1088,10 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<iterator_type, O>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng), dest,
-                    HPX_FORWARD(UnOp, unary_op), HPX_MOVE(init),
-                    HPX_FORWARD(BinOp, binary_op));
+                    HPX_MOVE(unary_op), HPX_MOVE(init), HPX_MOVE(binary_op));
         }
 
         // clang-format off
@@ -1105,24 +1100,24 @@ namespace hpx { namespace ranges {
             typename T = typename std::iterator_traits<
                 hpx::traits::range_iterator_t<Rng>>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
                 hpx::is_invocable_v<UnOp,
                     typename hpx::traits::range_traits<Rng>::value_type> &&
                 hpx::is_invocable_v<BinOp,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>,
-                    typename hpx::util::invoke_result_t<UnOp,
+                    hpx::util::invoke_result_t<UnOp,
                         typename hpx::traits::range_traits<Rng>::value_type>
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
             transform_inclusive_scan_result<hpx::traits::range_iterator_t<Rng>,
-                O>>::type
+                O>>
         tag_fallback_invoke(hpx::ranges::transform_inclusive_scan_t,
-            ExPolicy&& policy, Rng&& rng, O dest, BinOp&& binary_op,
-            UnOp&& unary_op, T init)
+            ExPolicy&& policy, Rng&& rng, O dest, BinOp binary_op,
+            UnOp unary_op, T init)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -1133,13 +1128,13 @@ namespace hpx { namespace ranges {
             using result_type =
                 transform_inclusive_scan_result<iterator_type, O>;
 
-            return hpx::parallel::v1::detail::transform_inclusive_scan<
+            return hpx::parallel::detail::transform_inclusive_scan<
                 result_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), dest, HPX_FORWARD(UnOp, unary_op),
-                    HPX_MOVE(init), HPX_FORWARD(BinOp, binary_op));
+                    std::end(rng), dest, HPX_MOVE(unary_op), HPX_MOVE(init),
+                    HPX_MOVE(binary_op));
         }
     } transform_inclusive_scan{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

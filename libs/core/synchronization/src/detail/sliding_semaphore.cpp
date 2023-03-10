@@ -42,7 +42,7 @@ namespace hpx::lcos::local::detail {
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
-        while (upper_limit - max_difference_ > lower_limit_)
+        while (upper_limit - max_difference_ > lower_limit_)    //-V776
         {
             cond_.wait(l, "sliding_semaphore::wait");
         }

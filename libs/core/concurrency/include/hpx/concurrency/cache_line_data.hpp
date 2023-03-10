@@ -59,6 +59,13 @@ namespace hpx {
             };
         }    // namespace detail
 
+        // Variable 'cacheline_pad' is uninitialized. Always initialize a member
+        // variable
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
         // NOTE: We do not use alignas here because asking for overaligned
         // memory is significantly more expensive than asking for unaligned
         // memory. Padding the struct is cheaper and enough for internal
@@ -75,7 +82,8 @@ namespace hpx {
         {
             // We have an explicit (default) constructor here to avoid for the
             // entire cache-line to be initialized by the compiler.
-            constexpr cache_aligned_data() noexcept(
+
+            constexpr cache_aligned_data() noexcept(    //-V730
                 std::is_nothrow_default_constructible_v<Data>)
               : data_()
             {
@@ -129,7 +137,7 @@ namespace hpx {
         {
             // We have an explicit (default) constructor here to avoid for the
             // entire cache-line to be initialized by the compiler.
-            constexpr cache_aligned_data_derived() noexcept(
+            constexpr cache_aligned_data_derived() noexcept(    //-V730
                 std::is_nothrow_default_constructible_v<Data>)
               : Data()
             {
@@ -170,6 +178,10 @@ namespace hpx {
 
             // no need to pad to cache line size
         };
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         ///////////////////////////////////////////////////////////////////////////
         // special struct to data type is cache line aligned and fully occupies a

@@ -194,13 +194,13 @@ namespace hpx {
     ///            not be migrated as long as there is at least one copy of the
     ///            returned shared_ptr alive.
     ///
-    template <typename Derived, typename Stub>
-    hpx::future<std::shared_ptr<
-        typename components::client_base<Derived, Stub>::server_component_type>>
-    get_ptr(components::client_base<Derived, Stub> const& c)
+    template <typename Derived, typename Stub, typename Data>
+    hpx::future<std::shared_ptr<typename components::client_base<Derived, Stub,
+        Data>::server_component_type>>
+    get_ptr(components::client_base<Derived, Stub, Data> const& c)
     {
-        typedef typename components::client_base<Derived,
-            Stub>::server_component_type component_type;
+        using component_type = typename components::client_base<Derived, Stub,
+            Data>::server_component_type;
 
         return get_ptr<component_type>(c.get_id());
     }
@@ -293,15 +293,15 @@ namespace hpx {
     ///            parameter \a ec. Otherwise it throws an instance of
     ///            hpx::exception.
     ///
-    template <typename Derived, typename Stub>
-    std::shared_ptr<
-        typename components::client_base<Derived, Stub>::server_component_type>
+    template <typename Derived, typename Stub, typename Data>
+    std::shared_ptr<typename components::client_base<Derived, Stub,
+        Data>::server_component_type>
     get_ptr(launch::sync_policy p,
-        components::client_base<Derived, Stub> const& c,
+        components::client_base<Derived, Stub, Data> const& c,
         error_code& ec = throws)
     {
-        using component_type = typename components::client_base<Derived,
-            Stub>::server_component_type;
+        using component_type = typename components::client_base<Derived, Stub,
+            Data>::server_component_type;
 
         return get_ptr<component_type>(p, c.get_id(), ec);
     }

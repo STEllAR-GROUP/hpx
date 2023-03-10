@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>
@@ -29,34 +30,34 @@ namespace hpx::serialization::detail {
     {
         if (id >= cache.size())    //-V104
         {
-            cache.resize(id + 1, nullptr);    //-V106
-            cache[id] = ctor;                 //-V108
+            cache.resize(static_cast<std::size_t>(id) + 1, nullptr);
+            cache[id] = ctor;    //-V108
         }
-        else if (cache[id] == nullptr)
+        else if (cache[id] == nullptr)    //-V108
         {
             cache[id] = ctor;    //-V108
         }
     }
 
     void id_registry::register_factory_function(
-        const std::string& type_name, ctor_t ctor)
+        std::string const& type_name, ctor_t ctor)
     {
         HPX_ASSERT(ctor != nullptr);
 
         typename_to_ctor.emplace(type_name, ctor);
 
         // populate cache
-        typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
+        auto const it = typename_to_id.find(type_name);
         if (it != typename_to_id.end())
             cache_id(it->second, ctor);
     }
 
     void id_registry::register_typename(
-        const std::string& type_name, std::uint32_t id)
+        std::string const& type_name, std::uint32_t id)
     {
         HPX_ASSERT(id != invalid_id);
 
-        std::pair<typename_to_id_t::iterator, bool> p =
+        std::pair<typename_to_id_t::iterator, bool> const p =
             typename_to_id.emplace(type_name, id);
 
         if (!p.second)
@@ -69,8 +70,7 @@ namespace hpx::serialization::detail {
         }
 
         // populate cache
-        typename_to_ctor_t::const_iterator it =
-            typename_to_ctor.find(type_name);
+        auto const it = typename_to_ctor.find(type_name);
         if (it != typename_to_ctor.end())
             cache_id(id, it->second);
 
@@ -87,27 +87,26 @@ namespace hpx::serialization::detail {
 
         // Go over all registered mappings from type-names to ids and
         // fill in missing id to constructor mappings.
-        for (auto const& d : typename_to_id)
+        for (auto const& [fst, snd] : typename_to_id)
         {
-            typename_to_ctor_t::const_iterator it =
-                typename_to_ctor.find(d.first);
+            auto const it = typename_to_ctor.find(fst);
             if (it != typename_to_ctor.end())
-                cache_id(d.second, it->second);
+                cache_id(snd, it->second);
         }
 
         // Go over all registered mappings from type-names to
         // constructors and fill in missing id to constructor mappings.
-        for (auto const& d : typename_to_ctor)
+        for (auto const& [fst, snd] : typename_to_ctor)
         {
-            typename_to_id_t::const_iterator it = typename_to_id.find(d.first);
+            typename_to_id_t::const_iterator it = typename_to_id.find(fst);
             HPX_ASSERT(it != typename_to_id.end());
-            cache_id(it->second, d.second);
+            cache_id(it->second, snd);    //-V783
         }
     }
 
-    std::uint32_t id_registry::try_get_id(const std::string& type_name) const
+    std::uint32_t id_registry::try_get_id(std::string const& type_name) const
     {
-        typename_to_id_t::const_iterator it = typename_to_id.find(type_name);
+        auto const it = typename_to_id.find(type_name);
         if (it == typename_to_id.end())
             return invalid_id;
 
@@ -118,12 +117,12 @@ namespace hpx::serialization::detail {
     {
         std::vector<std::string> result;
 
-        // O(Nlog(M)) ?
-        for (auto const& v : typename_to_ctor)
+        // O(N log(M)) ?
+        for (auto const& [fst, snd] : typename_to_ctor)
         {
-            if (!typename_to_id.count(v.first))
+            if (!typename_to_id.count(fst))
             {
-                result.push_back(v.first);
+                result.push_back(fst);
             }
         }
 
@@ -137,9 +136,9 @@ namespace hpx::serialization::detail {
         return factory.get();
     }
 
-    std::uint32_t polymorphic_id_factory::get_id(const std::string& type_name)
+    std::uint32_t polymorphic_id_factory::get_id(std::string const& type_name)
     {
-        std::uint32_t id = id_registry::instance().try_get_id(type_name);
+        std::uint32_t const id = id_registry::instance().try_get_id(type_name);
 
         if (id == id_registry::invalid_id)
         {
@@ -156,16 +155,16 @@ namespace hpx::serialization::detail {
 #if defined(HPX_DEBUG)
         std::string msg("known constructors:\n");
 
-        for (auto const& desc : id_registry::instance().typename_to_ctor)
+        for (auto const& [fst, snd] : id_registry::instance().typename_to_ctor)
         {
-            msg += desc.first + "\n";
+            msg += fst + "\n";
         }
 
         msg += "\nknown typenames:\n";
-        for (auto const& desc : id_registry::instance().typename_to_id)
+        for (auto const& [fst, snd] : id_registry::instance().typename_to_id)
         {
-            msg += desc.first + " (";
-            msg += std::to_string(desc.second) + ")\n";
+            msg += fst + " (";
+            msg += std::to_string(snd) + ")\n";
         }
 
         return msg;

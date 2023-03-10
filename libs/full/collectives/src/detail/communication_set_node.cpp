@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,49 +13,48 @@
 #include <hpx/components/basename_registration.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parallel/container_algorithms/count.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/get_num_localities.hpp>
 
-#include <climits>
-#include <cmath>
 #include <cstddef>
-#include <cstdlib>
 #include <string>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-using communication_set_node_component =
-    hpx::components::component<hpx::lcos::detail::communication_set_node>;
+using communication_set_node_component = hpx::components::component<
+    hpx::collectives::detail::communication_set_node>;
 
 HPX_REGISTER_COMPONENT(communication_set_node_component)
 
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::collectives::detail {
 
-    constexpr int count_trailing_zeros(std::size_t x)
+    std::string get_local_communication_node_name(char const* name)
+    {
+        return hpx::util::format("/{}/{}", agas::get_locality_id(), name);
+    }
+
+    constexpr int count_trailing_zeros(std::size_t x) noexcept
     {
         int count = 0;
         while ((x & 0x1) == 0)
         {
             x >>= 1;
-            ++count;
+            ++count;    //-V127
         }
         return count;
     }
 
-    constexpr std::size_t create_digit_mask(int bits)
+    constexpr std::size_t create_digit_mask(int bits) noexcept
     {
         constexpr std::size_t masks[] = {0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f};
         return masks[bits - 1];
     }
 
-    constexpr int max_number_of_digits(int bits)
+    constexpr int max_number_of_digits(int bits) noexcept
     {
         constexpr int num_digits[] = {64, 32, 22, 16, 13, 11, 10};
         return num_digits[bits - 1];
@@ -64,8 +63,12 @@ namespace hpx { namespace lcos { namespace detail {
     // We calculate the number of the connected node (the parent) by clearing
     // out the lowest non-zero digit in the base-arity representation of the
     // given node number (site).
-    std::size_t calculate_connected_node(std::size_t site, std::size_t arity)
+    std::size_t calculate_connected_node(
+        std::size_t site, std::size_t arity) noexcept
     {
+        // the arity has to be a power of two but not equal to zero
+        HPX_ASSERT(arity != 0 && next_power_of_two(arity) == arity);
+
         // avoid executing the loop below for a maximal number of iterations
         if (site == 0)
         {
@@ -73,7 +76,7 @@ namespace hpx { namespace lcos { namespace detail {
         }
 
         // pure leaf nodes can be handled directly
-        auto quot_rem = site % arity;
+        auto const quot_rem = site % arity;
         if (quot_rem != 0)
         {
             return site - quot_rem;
@@ -87,10 +90,7 @@ namespace hpx { namespace lcos { namespace detail {
                     -static_cast<std::ptrdiff_t>(site));
         }
 
-        // the arity has to be a power of two but not equal to zero
-        HPX_ASSERT(arity != 0 && next_power_of_two(arity) == arity);
-
-        int trailing_zeros = count_trailing_zeros(arity);
+        int const trailing_zeros = count_trailing_zeros(arity);
         std::size_t mask = create_digit_mask(trailing_zeros);
         int count = max_number_of_digits(trailing_zeros);
 
@@ -103,9 +103,9 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     std::size_t calculate_num_connected(
-        std::size_t num_sites, std::size_t site, std::size_t arity)
+        std::size_t num_sites, std::size_t site, std::size_t arity) noexcept
     {
-        std::size_t num_children =
+        std::size_t const num_children =
             hpx::ranges::count(hpx::util::counting_iterator(site + 1),
                 hpx::util::counting_iterator(num_sites), site,
                 [&](std::size_t node) {
@@ -128,9 +128,8 @@ namespace hpx { namespace lcos { namespace detail {
     }
 
     communication_set_node::communication_set_node(std::size_t num_sites,
-        std::string name, std::size_t site, std::size_t arity)
-      : name_(name)
-      , arity_(arity)
+        std::string const& name, std::size_t site, std::size_t arity)
+      : arity_(arity)
       , num_connected_(calculate_num_connected(num_sites, site, arity))
       , num_sites_(num_sites)
       , site_(site)
@@ -147,8 +146,7 @@ namespace hpx { namespace lcos { namespace detail {
         HPX_ASSERT(site_ == 0 || connect_to_ != site_);
         if (connect_to_ != site_)
         {
-            connected_node_ =
-                hpx::find_from_basename(HPX_MOVE(name), connect_to_);
+            connected_node_ = hpx::find_from_basename(name, connect_to_);
         }
     }
 
@@ -164,8 +162,7 @@ namespace hpx { namespace lcos { namespace detail {
         return result.then(hpx::launch::sync,
             [target = HPX_MOVE(target), basename = HPX_MOVE(basename)](
                 hpx::future<bool>&& f) -> hpx::id_type {
-                bool result = f.get();
-                if (!result)
+                if (bool const result = f.get(); !result)
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "hpx::lcos::detail::register_communication_set_name",
@@ -177,15 +174,39 @@ namespace hpx { namespace lcos { namespace detail {
             });
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    hpx::future<hpx::id_type> create_communication_set_node(
-        char const* basename, std::size_t num_sites, std::size_t this_site,
-        std::size_t arity)
+    hpx::id_type resolve_local_communication_set_name(
+        std::string basename, std::size_t site)
     {
+        std::string const name =
+            hpx::detail::name_from_basename(HPX_MOVE(basename), site);
+        return agas::resolve_name(hpx::launch::sync, name);
+    }
+
+    hpx::id_type register_or_resolve_communication_set_name(
+        hpx::id_type target, std::string basename, std::size_t site)
+    {
+        // try to register new id with name
+        bool const result = hpx::register_with_basename(
+            hpx::launch::sync, basename, target, site);
+
+        if (!result)
+        {
+            // if that fails (because the name was already registered)
+            return resolve_local_communication_set_name(
+                HPX_MOVE(basename), site);
+        }
+
+        return target;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    hpx::future<hpx::id_type> create_communication_set_node(std::string name,
+        std::size_t num_sites, std::size_t this_site, std::size_t arity)
+    {
+        HPX_ASSERT(arity != 0);
+
         // we create communication nodes for base participants only
         HPX_ASSERT((this_site % arity) == 0);
-
-        std::string name(basename);
 
         // create a new communication_set_node
         hpx::future<hpx::id_type> id =
@@ -197,6 +218,25 @@ namespace hpx { namespace lcos { namespace detail {
             hpx::bind_back(&detail::register_communication_set_name,
                 HPX_MOVE(name), this_site));
     }
-}}}    // namespace hpx::lcos::detail
+
+    hpx::id_type create_local_communication_set_node(
+        char const* basename, std::size_t num_sites, std::size_t this_site)
+    {
+        std::string name = get_local_communication_node_name(basename);
+
+        error_code ec;
+        hpx::id_type result = agas::resolve_name(hpx::launch::sync, name, ec);
+        if (ec)
+        {
+            // node doesn't exist yet, create new one and register it with AGAS
+            hpx::id_type id = hpx::local_new<detail::communication_set_node>(
+                hpx::launch::sync, num_sites, name, this_site, 0);
+
+            return detail::register_or_resolve_communication_set_name(
+                HPX_MOVE(id), HPX_MOVE(name), this_site);
+        }
+        return result;
+    }
+}    // namespace hpx::collectives::detail
 
 #endif

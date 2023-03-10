@@ -36,11 +36,11 @@ namespace hpx::traits {
     using iter_category_t =
         typename std::iterator_traits<Iter>::iterator_category;
 
-    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        // This implementation of is_iterator seems to work fine even for
-        // VS2013 which has an implementation of std::iterator_traits that is
+        // This implementation of is_iterator seems to work fine even for VS2013
+        // which has an implementation of std::iterator_traits that is
         // SFINAE-unfriendly.
         template <typename T>
         struct is_iterator

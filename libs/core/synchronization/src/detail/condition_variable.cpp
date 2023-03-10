@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -75,7 +75,16 @@ namespace hpx::lcos::local::detail {
 
             hpx::no_mutex no_mtx;
             std::unique_lock<hpx::no_mutex> lock(no_mtx);
+
+            // Failing to release lock 'no_mtx' in function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
             abort_all<hpx::no_mutex>(HPX_MOVE(lock));
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
     }
 
@@ -98,6 +107,12 @@ namespace hpx::lcos::local::detail {
     bool condition_variable::notify_one(std::unique_lock<mutex_type> lock,
         threads::thread_priority /* priority */, error_code& ec)
     {
+        // Caller failing to hold lock 'lock' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+
         HPX_ASSERT_OWNS_LOCK(lock);
 
         if (!queue_.empty())
@@ -130,11 +145,20 @@ namespace hpx::lcos::local::detail {
             ec = make_success_code();
 
         return false;
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 
     void condition_variable::notify_all(std::unique_lock<mutex_type> lock,
         threads::thread_priority /* priority */, error_code& ec)
     {
+        // Caller failing to hold lock 'lock' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
         HPX_ASSERT_OWNS_LOCK(lock);
 
         // swap the list
@@ -146,7 +170,7 @@ namespace hpx::lcos::local::detail {
             // update reference to queue for all queue entries
             for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
             {
-                qe->q_ = &queue;
+                qe->q_ = &queue;    //-V506
             }
 
             do
@@ -178,6 +202,10 @@ namespace hpx::lcos::local::detail {
 
         if (&ec != &throws)
             ec = make_success_code();
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
     }
 
     void condition_variable::abort_all(std::unique_lock<mutex_type> lock)
@@ -245,7 +273,7 @@ namespace hpx::lcos::local::detail {
             // update reference to queue for all queue entries
             for (queue_entry* qe = queue_.front(); qe != nullptr; qe = qe->next)
             {
-                qe->q_ = &queue;
+                qe->q_ = &queue;    //-V506
             }
 
             while (!queue.empty())

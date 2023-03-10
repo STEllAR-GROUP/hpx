@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_adjacent_difference
@@ -245,7 +245,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -281,8 +281,8 @@ namespace hpx { namespace segmented {
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
         using traits = hpx::traits::segmented_iterator_traits<FwdIter2>;
 
-        return hpx::parallel::v1::detail::segmented_adjacent_difference(
-            hpx::parallel::v1::detail::adjacent_difference<
+        return hpx::parallel::detail::segmented_adjacent_difference(
+            hpx::parallel::detail::adjacent_difference<
                 typename traits::local_iterator>(),
             HPX_FORWARD(ExPolicy, policy), first, last, dest,
             HPX_FORWARD(Op, op), is_seq());
@@ -312,8 +312,8 @@ namespace hpx { namespace segmented {
 
         using traits = hpx::traits::segmented_iterator_traits<InIter2>;
 
-        return hpx::parallel::v1::detail::segmented_adjacent_difference(
-            hpx::parallel::v1::detail::adjacent_difference<
+        return hpx::parallel::detail::segmented_adjacent_difference(
+            hpx::parallel::detail::adjacent_difference<
                 typename traits::local_iterator>(),
             hpx::execution::seq, first, last, dest, HPX_FORWARD(Op, op),
             std::true_type{});

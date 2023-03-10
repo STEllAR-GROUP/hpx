@@ -1,4 +1,4 @@
-//  Copyright (c) 2013 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -188,7 +188,7 @@ namespace hpx { namespace lcos {
         template <typename Action>
         struct fold_with_index
         {
-            typedef typename Action::arguments_type arguments_type;
+            using arguments_type = typename Action::arguments_type;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -213,10 +213,8 @@ namespace hpx { namespace lcos {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Action, typename Futures, typename... Ts>
-        void fold_invoke(Action /*act*/
-            ,
-            Futures& futures, hpx::id_type const& id, std::size_t,
-            Ts const&... vs)
+        void fold_invoke(Action, Futures& futures, hpx::id_type const& id,
+            std::size_t, Ts const&... vs)
         {
             futures.push_back(hpx::async<Action>(id, vs...));
         }
@@ -232,7 +230,7 @@ namespace hpx { namespace lcos {
         template <typename Action, typename FoldOp, typename... Ts>
         struct fold_invoker
         {
-            typedef typename fold_result<Action>::type result_type;
+            using result_type = typename fold_result<Action>::type;
 
             static result_type call(Action const& act,
                 std::vector<hpx::id_type> const& ids, FoldOp const& fold_op,
@@ -249,20 +247,20 @@ namespace hpx { namespace lcos {
         template <typename Action, std::size_t... Is>
         struct make_fold_action_impl<Action, util::index_pack<Is...>>
         {
-            typedef typename fold_result<Action>::type action_result;
+            using action_result = typename fold_result<Action>::type;
 
             template <typename FoldOp>
             struct fold_invoker
             {
-                typedef typename std::decay<FoldOp>::type fold_op_type;
+                using fold_op_type = typename std::decay<FoldOp>::type;
 
-                typedef detail::fold_invoker<Action, fold_op_type,
-                    typename hpx::tuple_element<Is,
-                        typename Action::arguments_type>::type...>
-                    fold_invoker_type;
+                using fold_invoker_type =
+                    detail::fold_invoker<Action, fold_op_type,
+                        typename hpx::tuple_element<Is,
+                            typename Action::arguments_type>::type...>;
 
-                typedef typename HPX_MAKE_ACTION(
-                    fold_invoker_type::call)::type type;
+                using type = typename HPX_MAKE_ACTION(
+                    fold_invoker_type::call)::type;
             };
         };
 
@@ -318,7 +316,7 @@ namespace hpx { namespace lcos {
             typename fold_result<Action>::type const& init, long global_idx,
             Ts const&... vs)
         {
-            typedef typename fold_result<Action>::type result_type;
+            using result_type = typename fold_result<Action>::type;
 
             if (ids.empty())
                 return result_type();
@@ -333,14 +331,11 @@ namespace hpx { namespace lcos {
                 using fold_impl_action = typename detail::make_fold_action<
                     Action>::template fold_invoker<FoldOp>::type;
 
-                if (!ids.empty())
-                {
-                    std::vector<id_type> ids_next(ids.begin() + 1, ids.end());
-                    fold_futures.push_back(
-                        hpx::detail::async_colocated<fold_impl_action>(
-                            ids_next.front(), act, HPX_MOVE(ids_next), fold_op,
-                            init, global_idx + 1, vs...));
-                }
+                std::vector<id_type> ids_next(ids.begin() + 1, ids.end());
+                fold_futures.push_back(
+                    hpx::detail::async_colocated<fold_impl_action>(
+                        ids_next.front(), act, HPX_MOVE(ids_next), fold_op,
+                        init, global_idx + 1, vs...));
             }
 
             // now perform the local operation
@@ -359,7 +354,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        typedef typename detail::fold_result<Action>::type action_result;
+        using action_result = typename detail::fold_result<Action>::type;
 
         if (ids.empty())
         {
@@ -368,8 +363,8 @@ namespace hpx { namespace lcos {
                     "empty list of targets for fold operation"));
         }
 
-        typedef typename detail::make_fold_action<
-            Action>::template fold_invoker<FoldOp>::type fold_impl_action;
+        using fold_impl_action = typename detail::make_fold_action<
+            Action>::template fold_invoker<FoldOp>::type;
 
         return hpx::detail::async_colocated<fold_impl_action>(ids[0], Action(),
             ids, HPX_FORWARD(FoldOp, fold_op), HPX_FORWARD(Init, init), 0,
@@ -415,7 +410,7 @@ namespace hpx { namespace lcos {
         std::vector<hpx::id_type> const& ids, FoldOp&& fold_op, Init&& init,
         Ts const&... vs)
     {
-        typedef typename detail::fold_result<Action>::type action_result;
+        using action_result = typename detail::fold_result<Action>::type;
 
         if (ids.empty())
         {
@@ -429,10 +424,10 @@ namespace hpx { namespace lcos {
         std::reverse_copy(
             ids.begin(), ids.end(), std::back_inserter(inverted_ids));
 
-        typedef typename detail::make_fold_action<
-            Action>::template fold_invoker<FoldOp>::type fold_impl_action;
+        using fold_impl_action = typename detail::make_fold_action<
+            Action>::template fold_invoker<FoldOp>::type;
 
-        if (ids.empty())
+        if (inverted_ids.empty())
         {
             return hpx::make_exceptional_future<action_result>(hpx::exception(
                 hpx::error::bad_parameter, "array of targets is empty"));

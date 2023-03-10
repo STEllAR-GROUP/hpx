@@ -40,9 +40,9 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first1       Refers to the beginning of the sequence of elements
     ///                     of the first range the algorithm will be applied to.
@@ -87,9 +87,9 @@ namespace hpx { namespace ranges {
     ///           it returns false.
     ///           range [first2, last2), it returns false.
     template <typename InIter1, typename Sent1, typename InIter2, typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = hpx::parallel::v1::detail::less>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity,
+        typename Pred = hpx::parallel::detail::less>
     bool lexicographical_compare(InIter1 first1, Sent1 last1, InIter2 first2,
         Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
         Proj2&& proj2 = Proj2());
@@ -124,9 +124,9 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function for FwdIter1. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function for FwdIter2. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -187,10 +187,10 @@ namespace hpx { namespace ranges {
 
     template <typename ExPolicy, typename FwdIter1, typename Sent1,
         typename FwdIter2, typename Sent2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = hpx::parallel::v1::detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity,
+        typename Pred = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     lexicographical_compare(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
         FwdIter2 first2, Sent2 last2, Pred&& pred = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
@@ -215,9 +215,9 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     This defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     This defaults to \a hpx::identity
     ///
     /// \param rng1         Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -258,9 +258,9 @@ namespace hpx { namespace ranges {
     ///           it returns false.
     ///           range [first2, last2), it returns false.
     template <typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = hpx::parallel::v1::detail::less>
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity,
+        typename Pred = hpx::parallel::detail::less>
     bool lexicographical_compare(Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
         Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
 
@@ -288,9 +288,9 @@ namespace hpx { namespace ranges {
     ///                     meet the requirements of \a CopyConstructible. This defaults
     ///                     to std::less<>
     /// \tparam Proj1       The type of an optional projection function for elements of the first range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     This defaults to \a hpx::identity
     /// \tparam Proj2       The type of an optional projection function for elements of the second range.
-    ///                     This defaults to \a util::projection_identity
+    ///                     This defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -346,10 +346,10 @@ namespace hpx { namespace ranges {
     ///           range [first2, last2), it returns false.
 
     template <typename ExPolicy, typename Rng1, typename Rng2,
-        typename Proj1 = hpx::parallel::util::projection_identity,
-        typename Proj2 = hpx::parallel::util::projection_identity,
-        typename Pred = hpx::parallel::v1::detail::less>
-    typename parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Proj1 = hpx::identity,
+        typename Proj2 = hpx::identity,
+        typename Pred = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     lexicographical_compare(ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2,
         Pred&& pred = Pred(), Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2());
     // clang-format on
@@ -364,175 +364,164 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/lexicographical_compare.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct lexicographical_compare_t final
       : hpx::detail::tag_parallel_algorithm<lexicographical_compare_t>
     {
     private:
         // clang-format off
         template <typename InIter1, typename Sent1, typename InIter2, typename Sent2,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter1>::value &&
-                hpx::traits::is_sentinel_for<Sent1, InIter1>::value &&
-                hpx::traits::is_iterator<InIter2>::value &&
-                hpx::traits::is_sentinel_for<Sent2, InIter2>::value &&
-                hpx::parallel::traits::is_projected<Proj1, InIter1>::value &&
-                hpx::parallel::traits::is_projected<Proj2, InIter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_iterator_v<InIter1> &&
+                hpx::traits::is_sentinel_for_v<Sent1, InIter1> &&
+                hpx::traits::is_iterator_v<InIter2> &&
+                hpx::traits::is_sentinel_for_v<Sent2, InIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj1, InIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj2, InIter2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj1, InIter1>,
                     hpx::parallel::traits::projected<Proj2, InIter2>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             InIter1 first1, Sent1 last1, InIter2 first2, Sent2 last2,
-            Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Pred pred = Pred(), Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_input_iterator<InIter1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter1>,
                 "Requires at least input iterator.");
-            static_assert(hpx::traits::is_input_iterator<InIter2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter2>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
+            return hpx::parallel::detail::lexicographical_compare().call(
                 hpx::execution::seq, first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter1>::value &&
-                hpx::traits::is_sentinel_for<Sent1, FwdIter1>::value &&
-                hpx::traits::is_forward_iterator<FwdIter2>::value &&
-                hpx::traits::is_sentinel_for<Sent2, FwdIter2>::value &&
-                hpx::parallel::traits::is_projected<Proj1, FwdIter1>::value &&
-                hpx::parallel::traits::is_projected<Proj2, FwdIter2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter1> &&
+                hpx::traits::is_sentinel_for_v<Sent1, FwdIter1> &&
+                hpx::traits::is_forward_iterator_v<FwdIter2> &&
+                hpx::traits::is_sentinel_for_v<Sent2, FwdIter2> &&
+                hpx::parallel::traits::is_projected_v<Proj1, FwdIter1> &&
+                hpx::parallel::traits::is_projected_v<Proj2, FwdIter2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj1, FwdIter1>,
                     hpx::parallel::traits::projected<Proj2, FwdIter2>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
             ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
-            Sent2 last2, Pred&& pred = Pred(), Proj1&& proj1 = Proj1(),
-            Proj2&& proj2 = Proj2())
+            Sent2 last2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::is_forward_iterator<FwdIter2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
+            return hpx::parallel::detail::lexicographical_compare().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
-                HPX_FORWARD(Proj2, proj2));
+                HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
         template <typename Rng1, typename Rng2,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng1>::value &&
-                hpx::traits::is_range<Rng2>::value &&
-                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng1> &&
+                hpx::traits::is_range_v<Rng2> &&
+                hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
+                hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
-                >::value
+                >
             )>
         // clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
-            Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
             using iterator_type2 =
                 typename hpx::traits::range_traits<Rng2>::iterator_type;
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type1>,
                 "Requires at least input iterator.");
 
-            static_assert(hpx::traits::is_input_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_input_iterator_v<iterator_type2>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
+            return hpx::parallel::detail::lexicographical_compare().call(
                 hpx::execution::seq, std::begin(rng1), std::end(rng1),
-                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                std::begin(rng2), std::end(rng2), HPX_MOVE(pred),
+                HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-            typename Proj1 = hpx::parallel::util::projection_identity,
-            typename Proj2 = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng1>::value &&
-                hpx::traits::is_range<Rng2>::value &&
-                hpx::parallel::traits::is_projected_range<Proj1, Rng1>::value &&
-                hpx::parallel::traits::is_projected_range<Proj2, Rng2>::value &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng1> &&
+                hpx::traits::is_range_v<Rng2> &&
+                hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
+                hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
+                hpx::parallel::traits::is_indirect_callable_v<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj1, Rng1>,
                     hpx::parallel::traits::projected_range<Proj2, Rng2>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
         tag_fallback_invoke(hpx::ranges::lexicographical_compare_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred&& pred = Pred(),
-            Proj1&& proj1 = Proj1(), Proj2&& proj2 = Proj2())
+            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(),
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
             using iterator_type2 =
                 typename hpx::traits::range_traits<Rng2>::iterator_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type1>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type1>,
                 "Requires at least forward iterator.");
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type2>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::lexicographical_compare().call(
+            return hpx::parallel::detail::lexicographical_compare().call(
                 HPX_FORWARD(ExPolicy, policy), std::begin(rng1), std::end(rng1),
-                std::begin(rng2), std::end(rng2), HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                std::begin(rng2), std::end(rng2), HPX_MOVE(pred),
+                HPX_MOVE(proj1), HPX_MOVE(proj2));
         }
     } lexicographical_compare{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

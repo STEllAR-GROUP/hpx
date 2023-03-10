@@ -91,6 +91,7 @@ namespace hpx {
 namespace hpx {
 
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename ContResult>
         class split_nth_continuation

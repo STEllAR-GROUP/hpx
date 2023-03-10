@@ -240,7 +240,7 @@ namespace hpx { namespace mpi { namespace experimental {
         while (keep_trying)
         {
             int index = 0;
-            int flag = false;
+            int flag = 0;
             MPI_Status status;
 
             int result = MPI_Testany(static_cast<int>(requests_vector.size()),
@@ -317,7 +317,7 @@ namespace hpx { namespace mpi { namespace experimental {
             std::size_t nulls = std::count(requests_vector.begin(),
                 requests_vector.end(), MPI_REQUEST_NULL);
 
-            if (nulls > requests_vector.size() / 4)
+            if (nulls > requests_vector.size() / 4)    //-V112
             {
                 // compact away any requests that have been replaced by
                 // MPI_REQUEST_NULL

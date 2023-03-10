@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy_mappings.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -27,7 +28,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any non-simd policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_simd_t, ExPolicy&& policy) noexcept
         {
@@ -48,7 +54,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any simd policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_simd_t, ExPolicy&& policy) noexcept
         {

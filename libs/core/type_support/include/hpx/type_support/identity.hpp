@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 
-#include <functional>
 #include <type_traits>
 
 namespace hpx {
@@ -24,6 +23,8 @@ namespace hpx {
         }
     };
 
+    inline constexpr identity identity_v = identity();
+
     template <typename T>
     struct type_identity
     {
@@ -32,6 +33,7 @@ namespace hpx {
 
     template <typename T>
     using type_identity_t = typename type_identity<T>::type;
+
 }    // namespace hpx
 
 namespace hpx::util {

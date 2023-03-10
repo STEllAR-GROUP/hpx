@@ -22,7 +22,7 @@
 
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
@@ -41,7 +41,7 @@ namespace hpx { namespace detail {
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             hpx::id_type::management_type::unmanaged);
 
-        typedef agas::server::primary_namespace::colocate_action action_type;
+        using action_type = agas::server::primary_namespace::colocate_action;
 
         using placeholders::_2;
         return post_continue_cb<action_type>(
@@ -81,7 +81,7 @@ namespace hpx { namespace detail {
             agas::primary_namespace::get_service_instance(gid.get_gid()),
             hpx::id_type::management_type::unmanaged);
 
-        typedef agas::server::primary_namespace::colocate_action action_type;
+        using action_type = agas::server::primary_namespace::colocate_action;
 
         using placeholders::_2;
         return post_continue_cb<action_type>(
@@ -102,6 +102,6 @@ namespace hpx { namespace detail {
         return post_colocated_cb<Derived>(HPX_FORWARD(Continuation, cont), gid,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #endif

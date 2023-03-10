@@ -33,7 +33,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        Comparison function object which returns true if
     ///                     the first argument is less than the second.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -59,7 +59,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
-    ///                     This defaults to projection_identity.
+    ///                     This defaults to hpx::identity.
     ///
     /// The comparison operations in the parallel \a nth_element
     /// algorithm invoked without an execution policy object execute in
@@ -71,8 +71,8 @@ namespace hpx { namespace ranges {
     ///           to last.
     ///
     template <typename RandomIt, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     RandomIt nth_element(RandomIt first, RandomIt nth, Sent last,
         Pred&& pred = Pred(), Proj&& proj = Proj());
 
@@ -98,7 +98,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        Comparison function object which returns true if
     ///                     the first argument is less than the second.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -126,7 +126,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
-    ///                     This defaults to projection_identity.
+    ///                     This defaults to hpx::identity.
     ///
     /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -146,8 +146,8 @@ namespace hpx { namespace ranges {
     ///           to last.
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
     nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
         Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
@@ -168,7 +168,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        Comparison function object which returns true if
     ///                     the first argument is less than the second.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -192,7 +192,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
-    ///                     This defaults to projection_identity.
+    ///                     This defaults to hpx::identity.
     ///
     /// The comparison operations in the parallel \a nth_element
     /// algorithm invoked without an execution policy object execute in
@@ -204,8 +204,8 @@ namespace hpx { namespace ranges {
     ///           to last.
     ///
     template <typename Rng,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     hpx::traits::range_iterator_t<Rng> nth_element(Rng&& rng,
         hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
         Proj&& proj = Proj());
@@ -230,7 +230,7 @@ namespace hpx { namespace ranges {
     /// \tparam Pred        Comparison function object which returns true if
     ///                     the first argument is less than the second.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -256,7 +256,7 @@ namespace hpx { namespace ranges {
     ///                     will be invoked for each of the elements as a
     ///                     projection operation before the actual predicate
     ///                     \a is invoked.
-    ///                     This defaults to projection_identity.
+    ///                     This defaults to hpx::identity.
     ///
     /// The comparison operations in the parallel \a nth_element invoked with
     /// an execution policy object of type \a sequenced_policy
@@ -276,8 +276,8 @@ namespace hpx { namespace ranges {
     ///           to last.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Pred = hpx::parallel::v1::detail::less,
-        typename Proj = hpx::parallel::util::projection_identity>
+        typename Pred = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
     parallel::util::detail::algorithm_result_t<ExPolicy,
         hpx::traits::range_iterator_t<Rng>>
     nth_element(ExPolicy&& policy, Rng&& rng,
@@ -296,24 +296,24 @@ namespace hpx { namespace ranges {
 #include <hpx/parallel/algorithms/nth_element.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct nth_element_t final
       : hpx::detail::tag_parallel_algorithm<nth_element_t>
     {
     private:
         // clang-format off
         template <typename RandomIt, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_random_access_iterator_v<RandomIt> &&
                 hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
@@ -326,21 +326,21 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend RandomIt tag_fallback_invoke(hpx::ranges::nth_element_t,
-            RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::nth_element<RandomIt>().call(
+                hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt, typename Sent,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_random_access_iterator_v<RandomIt> &&
@@ -355,35 +355,35 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt nth, Sent last, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::nth_element<RandomIt>().call(
+                HPX_FORWARD(ExPolicy, policy), first, nth, last, HPX_MOVE(pred),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename Rng,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_range_v<Rng> &&
                 hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
-                hpx::parallel::traits::is_indirect_callable<
+                hpx::parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
                     hpx::parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
         friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
             hpx::ranges::nth_element_t, Rng&& rng,
-            hpx::traits::range_iterator_t<Rng> nth, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            hpx::traits::range_iterator_t<Rng> nth, Pred pred = Pred(),
+            Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -391,15 +391,15 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element<iterator_type>().call(
+            return hpx::parallel::detail::nth_element<iterator_type>().call(
                 hpx::execution::seq, std::begin(rng), nth, std::end(rng),
-                HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng,
-            typename Pred = hpx::parallel::v1::detail::less,
-            typename Proj = hpx::parallel::util::projection_identity,
+            typename Pred = hpx::parallel::detail::less,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_range_v<Rng> &&
@@ -415,7 +415,7 @@ namespace hpx { namespace ranges {
             hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::nth_element_t, ExPolicy&& policy,
             Rng&& rng, hpx::traits::range_iterator_t<Rng> nth,
-            Pred&& pred = Pred(), Proj&& proj = Proj())
+            Pred pred = Pred(), Proj proj = Proj())
         {
             using iterator_type = hpx::traits::range_iterator_t<Rng>;
 
@@ -423,12 +423,11 @@ namespace hpx { namespace ranges {
                 hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires at least random access iterator.");
 
-            return hpx::parallel::v1::detail::nth_element<iterator_type>().call(
+            return hpx::parallel::detail::nth_element<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), std::begin(rng), nth,
-                std::end(rng), HPX_FORWARD(Pred, pred),
-                HPX_FORWARD(Proj, proj));
+                std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } nth_element{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

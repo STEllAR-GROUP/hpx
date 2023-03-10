@@ -261,6 +261,7 @@ namespace hpx {
 }    // namespace hpx
 
 namespace hpx::lcos {
+
     template <typename F, typename... Ts>
     HPX_DEPRECATED_V(
         1, 8, "hpx::lcos::wait_each is deprecated. Use hpx::wait_each instead.")

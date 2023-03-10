@@ -1,4 +1,4 @@
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     // helper facility to both advance the iterator to the sentinel and return the
     // distance
     template <typename Iter, typename Sent>
-    constexpr inline typename std::iterator_traits<Iter>::difference_type
+    constexpr typename std::iterator_traits<Iter>::difference_type
     advance_and_get_distance(Iter& first, Sent last)
     {
         using difference_type =
@@ -58,4 +58,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return offset;
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

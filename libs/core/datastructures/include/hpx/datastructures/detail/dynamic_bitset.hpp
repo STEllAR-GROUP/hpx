@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0 Distributed under the Boost Software
 //  License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,7 +26,6 @@
 #include <cstdint>
 #include <iterator>    // used to implement append(Iter, Iter)
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -73,7 +72,7 @@ namespace hpx::detail {
         template <typename T>
         constexpr unsigned char const* object_representation(T* p) noexcept
         {
-            return static_cast<unsigned const char*>(
+            return static_cast<unsigned char const*>(
                 static_cast<void const*>(p));
         }
 
@@ -119,26 +118,26 @@ namespace hpx::detail {
         template <typename T>
         constexpr std::size_t popcount(T value) noexcept
         {
-            constexpr byte_type const count_table[] = {0, 1, 1, 2, 1, 2, 2, 3,
-                1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3,
-                4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3,
-                3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3,
-                4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5,
-                4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3,
-                4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3,
-                3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4,
-                5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
-                3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3,
-                4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5,
-                5, 6, 5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6,
-                7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
+            constexpr byte_type count_table[] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2,
+                2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4,
+                5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4,
+                3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2,
+                3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5,
+                5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4,
+                5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4,
+                2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4,
+                5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4,
+                4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4,
+                5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6,
+                5, 6, 6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4,
+                5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8};
 
             std::size_t num = 0u;
             while (value)
             {
                 num += count_table[value & ((1u << table_width) - 1)];
                 // NOLINTNEXTLINE(clang-diagnostic-shift-count-overflow)
-                value = T(std::size_t(value) >> table_width);
+                value = T(static_cast<std::size_t>(value) >> table_width);
             }
             return num;
         }
@@ -266,12 +265,12 @@ namespace hpx::detail {
         using block_width_type = typename buffer_type::size_type;
 
         static constexpr block_width_type bits_per_block =
-            std::numeric_limits<Block>::digits;
+            static_cast<block_width_type>(std::numeric_limits<Block>::digits);
         static constexpr size_type npos = static_cast<size_type>(-1);
 
     public:
         // A proxy class to simulate lvalues of bit type.
-        class reference
+        class reference    //-V690
         {
             friend class dynamic_bitset<Block, Allocator>;
 
@@ -283,17 +282,17 @@ namespace hpx::detail {
                 HPX_ASSERT(pos < bits_per_block);
             }
 
+        public:
             void operator&() = delete;
 
-        public:
-            // copy constructor: compiler generated
+            reference(reference const& rhs) = default;
 
-            constexpr operator bool() const noexcept
+            [[nodiscard]] explicit constexpr operator bool() const noexcept
             {
                 return (block_ & mask_) != 0;
             }
 
-            constexpr bool operator~() const noexcept
+            [[nodiscard]] constexpr bool operator~() const noexcept
             {
                 return (block_ & mask_) == 0;
             }
@@ -312,7 +311,7 @@ namespace hpx::detail {
 
             reference& operator=(reference const& rhs) noexcept
             {
-                do_assign(bool(rhs));
+                do_assign(static_cast<bool>(rhs));
                 return *this;
             }    // for b[i] = b[j]
 
@@ -348,22 +347,22 @@ namespace hpx::detail {
             block_type& block_;
             block_type const mask_;
 
-            void do_set() noexcept
+            void do_set() const noexcept
             {
                 block_ |= mask_;
             }
 
-            void do_reset() noexcept
+            void do_reset() const noexcept
             {
                 block_ &= ~mask_;
             }
 
-            void do_flip() noexcept
+            void do_flip() const noexcept
             {
                 block_ ^= mask_;
             }
 
-            void do_assign(bool x) noexcept
+            void do_assign(bool x) const noexcept
             {
                 x ? do_set() : do_reset();
             }
@@ -381,14 +380,16 @@ namespace hpx::detail {
 
         // WARNING: you should avoid using this constructor.
         //
-        //  A conversion from string is, in most cases, formatting,
-        //  and should be performed by using operator>>.
+        //  A conversion from string is, in most cases, formatting, and should
+        //  be performed by using operator>>.
         //
         // NOTE:
-        //  Leave the parentheses around std::basic_string<CharT, Traits, Alloc>::npos.
-        //  g++ 3.2 requires them and probably the standard will - see core issue 325
+        //  Leave the parentheses around std::basic_string<CharT, Traits,
+        //  Alloc>::npos. g++ 3.2 requires them and probably the standard will -
+        //  see core issue 325
         // NOTE 2:
-        //  split into two constructors because of bugs in MSVC 6.0sp5 with STLport
+        //  split into two constructors because of bugs in MSVC 6.0sp5 with
+        //  STLport
         template <typename CharT, typename Traits, typename Alloc>
         dynamic_bitset(std::basic_string<CharT, Traits, Alloc> const& s,
             typename std::basic_string<CharT, Traits, Alloc>::size_type pos,
@@ -444,17 +445,17 @@ namespace hpx::detail {
 
         void swap(dynamic_bitset& b) noexcept;
 
-        dynamic_bitset(dynamic_bitset&& src) noexcept;
-        dynamic_bitset& operator=(dynamic_bitset&& src) noexcept;
+        dynamic_bitset(dynamic_bitset&& b) noexcept;
+        dynamic_bitset& operator=(dynamic_bitset&& b) noexcept;
 
-        allocator_type get_allocator() const noexcept;
+        [[nodiscard]] allocator_type get_allocator() const noexcept;
 
         // size changing operations
         void resize(size_type nubits, bool value = false);
         void clear();
         void push_back(bool bit);
         void pop_back();
-        void append(Block block);
+        void append(Block value);
 
         template <typename BlockInputIterator>
         void append(BlockInputIterator first, BlockInputIterator last,
@@ -504,34 +505,34 @@ namespace hpx::detail {
         }
 
         // bitset operations
-        dynamic_bitset& operator&=(dynamic_bitset const& b) noexcept;
-        dynamic_bitset& operator|=(dynamic_bitset const& b) noexcept;
-        dynamic_bitset& operator^=(dynamic_bitset const& b) noexcept;
-        dynamic_bitset& operator-=(dynamic_bitset const& b) noexcept;
+        dynamic_bitset& operator&=(dynamic_bitset const& rhs) noexcept;
+        dynamic_bitset& operator|=(dynamic_bitset const& rhs) noexcept;
+        dynamic_bitset& operator^=(dynamic_bitset const& rhs) noexcept;
+        dynamic_bitset& operator-=(dynamic_bitset const& rhs) noexcept;
         dynamic_bitset& operator<<=(size_type n);
         dynamic_bitset& operator>>=(size_type n);
         dynamic_bitset operator<<(size_type n) const;
         dynamic_bitset operator>>(size_type n) const;
 
         // basic bit operations
-        dynamic_bitset& set(size_type n, size_type len, bool val) noexcept;
-        dynamic_bitset& set(size_type n, bool val = true) noexcept;
+        dynamic_bitset& set(size_type pos, size_type len, bool val) noexcept;
+        dynamic_bitset& set(size_type pos, bool val = true) noexcept;
         dynamic_bitset& set() noexcept;
-        dynamic_bitset& reset(size_type n, size_type len) noexcept;
-        dynamic_bitset& reset(size_type n) noexcept;
+        dynamic_bitset& reset(size_type pos, size_type len) noexcept;
+        dynamic_bitset& reset(size_type pos) noexcept;
         dynamic_bitset& reset() noexcept;
-        dynamic_bitset& flip(size_type n, size_type len) noexcept;
-        dynamic_bitset& flip(size_type n) noexcept;
+        dynamic_bitset& flip(size_type pos, size_type len) noexcept;
+        dynamic_bitset& flip(size_type pos) noexcept;
         dynamic_bitset& flip() noexcept;
 
-        bool test(size_type n) const noexcept;
-        bool test_set(size_type n, bool val = true) noexcept;
-        bool all() const noexcept;
-        bool any() const noexcept;
-        bool none() const noexcept;
+        [[nodiscard]] bool test(size_type pos) const noexcept;
+        bool test_set(size_type pos, bool val = true) noexcept;
+        [[nodiscard]] bool all() const noexcept;
+        [[nodiscard]] bool any() const noexcept;
+        [[nodiscard]] bool none() const noexcept;
 
         dynamic_bitset operator~() const;
-        size_type count() const noexcept;
+        [[nodiscard]] size_type count() const noexcept;
 
         // subscript
         reference operator[](size_type pos)
@@ -544,23 +545,24 @@ namespace hpx::detail {
             return test(pos);
         }
 
-        unsigned long to_ulong() const;
+        [[nodiscard]] unsigned long to_ulong() const;
 
-        size_type size() const noexcept;
-        size_type num_blocks() const noexcept;
-        size_type max_size() const noexcept;
-        bool empty() const noexcept;
-        size_type capacity() const noexcept;
+        [[nodiscard]] size_type size() const noexcept;
+        [[nodiscard]] size_type num_blocks() const noexcept;
+        [[nodiscard]] size_type max_size() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
+        [[nodiscard]] size_type capacity() const noexcept;
         void reserve(size_type nubits);
         void shrink_to_fit();
 
-        bool is_subset_of(dynamic_bitset const& a) const noexcept;
-        bool is_proper_subset_of(dynamic_bitset const& a) const noexcept;
-        bool intersects(dynamic_bitset const& a) const noexcept;
+        [[nodiscard]] bool is_subset_of(dynamic_bitset const& a) const noexcept;
+        [[nodiscard]] bool is_proper_subset_of(
+            dynamic_bitset const& a) const noexcept;
+        [[nodiscard]] bool intersects(dynamic_bitset const& b) const noexcept;
 
         // lookup
-        size_type find_first() const noexcept;
-        size_type find_next(size_type pos) const noexcept;
+        [[nodiscard]] size_type find_first() const noexcept;
+        [[nodiscard]] size_type find_next(size_type pos) const noexcept;
 
         // lexicographical comparison
         template <typename B, typename A>
@@ -594,7 +596,7 @@ namespace hpx::detail {
         template <typename B, typename A>
         friend std::size_t hash_value(dynamic_bitset<B, A> const& a);
 
-        bool check_invariants() const noexcept;
+        [[nodiscard]] bool check_invariants() const noexcept;
 
     private:
         template <typename B, typename A>
@@ -620,29 +622,31 @@ namespace hpx::detail {
             return x != Block(0);
         }
 
-        size_type do_find_from(size_type first_block) const noexcept;
+        [[nodiscard]] size_type do_find_from(
+            size_type first_block) const noexcept;
 
-        block_width_type count_extra_bits() const noexcept
+        [[nodiscard]] block_width_type count_extra_bits() const noexcept
         {
             return bit_index(size());
         }
 
-        static size_type block_index(size_type pos) noexcept
+        [[nodiscard]] static size_type block_index(size_type pos) noexcept
         {
             return pos / bits_per_block;
         }
 
-        static block_width_type bit_index(size_type pos) noexcept
+        [[nodiscard]] static block_width_type bit_index(size_type pos) noexcept
         {
             return static_cast<block_width_type>(pos % bits_per_block);
         }
 
-        static Block bit_mask(size_type pos) noexcept
+        [[nodiscard]] static Block bit_mask(size_type pos) noexcept
         {
             return Block(1) << bit_index(pos);
         }
 
-        static Block bit_mask(size_type first, size_type last) noexcept
+        [[nodiscard]] static Block bit_mask(
+            size_type first, size_type last) noexcept
         {
             Block res = (last == bits_per_block - 1) ?
                 dynamic_bitset_impl::max_limit<Block> :
@@ -651,7 +655,7 @@ namespace hpx::detail {
             return res;
         }
 
-        static Block set_block_bits(
+        [[nodiscard]] static Block set_block_bits(
             Block block, size_type first, size_type last, bool val) noexcept
         {
             if (val)
@@ -660,35 +664,35 @@ namespace hpx::detail {
         }
 
         // Functions for operations on ranges
-        inline static Block set_block_partial(
+        [[nodiscard]] static Block set_block_partial(
             Block block, size_type first, size_type last) noexcept
         {
             return set_block_bits(block, first, last, true);
         }
 
-        static constexpr Block set_block_full(Block) noexcept
+        [[nodiscard]] static constexpr Block set_block_full(Block) noexcept
         {
             return dynamic_bitset_impl::max_limit<Block>;
         }
 
-        inline static Block reset_block_partial(
+        [[nodiscard]] static Block reset_block_partial(
             Block block, size_type first, size_type last) noexcept
         {
             return set_block_bits(block, first, last, false);
         }
 
-        static constexpr Block reset_block_full(Block) noexcept
+        [[nodiscard]] static constexpr Block reset_block_full(Block) noexcept
         {
             return 0;
         }
 
-        inline static Block flip_block_partial(
+        [[nodiscard]] static Block flip_block_partial(
             Block block, size_type first, size_type last) noexcept
         {
             return block ^ bit_mask(first, last);
         }
 
-        inline static Block flip_block_full(Block block) noexcept
+        [[nodiscard]] static Block flip_block_full(Block block) noexcept
         {
             return ~block;
         }
@@ -701,7 +705,7 @@ namespace hpx::detail {
         {
             HPX_ASSERT(pos <= s.size());
 
-            using StrT = typename std::basic_string<CharT, Traits, Alloc>;
+            using StrT = std::basic_string<CharT, Traits, Alloc>;
             using Tr = typename StrT::traits_type;
 
             typename StrT::size_type const rlen = (std::min)(n, s.size() - pos);
@@ -740,7 +744,7 @@ namespace hpx::detail {
             // note that: nubits == 0 implies value == 0
             if (nubits < static_cast<size_type>(ulong_width))
             {
-                num_type const mask = (num_type(1) << nubits) - 1;
+                num_type const mask = (static_cast<num_type>(1) << nubits) - 1;
                 value &= mask;
             }
 
@@ -754,7 +758,7 @@ namespace hpx::detail {
         }
 
     private:
-        bool unchecked_test(size_type pos) const noexcept;
+        [[nodiscard]] bool unchecked_test(size_type pos) const noexcept;
         static size_type calc_num_blocks(size_type nubits) noexcept;
 
         Block& highest_block() noexcept;
@@ -768,12 +772,11 @@ namespace hpx::detail {
         friend class bit_appender;
         class bit_appender
         {
-            // helper for stream >>
-            // Supplies to the lack of an efficient append at the less
-            // significant end: bits are actually appended "at left" but
-            // rearranged in the destructor. From the perspective of
-            // client code everything works *as if* dynamic_bitset<> had
-            // an append_at_right() function (eventually throwing the same
+            // helper for stream >>. Supplies to the lack of an efficient append
+            // at the less significant end: bits are actually appended "at left"
+            // but rearranged in the destructor. From the perspective of client
+            // code everything works *as if* dynamic_bitset<> had an
+            // append_at_right() function (eventually throwing the same
             // exceptions as push_back) except that the function is in fact
             // called bit_appender::do_append().
             dynamic_bitset& bs;
@@ -781,10 +784,10 @@ namespace hpx::detail {
             Block mask;
             Block* current = nullptr;
 
+        public:
             bit_appender(bit_appender const&) = delete;
             bit_appender& operator=(bit_appender const&) = delete;
 
-        public:
             explicit bit_appender(dynamic_bitset& r) noexcept
               : bs(r)
               , mask(0)
@@ -803,7 +806,7 @@ namespace hpx::detail {
                 HPX_ASSERT(bs.check_invariants());
             }
 
-            inline void do_append(bool value)
+            void do_append(bool value)
             {
                 if (mask == 0)
                 {
@@ -819,7 +822,7 @@ namespace hpx::detail {
                 ++n;
             }
 
-            constexpr size_type get_count() const noexcept
+            [[nodiscard]] constexpr size_type get_count() const noexcept
             {
                 return n;
             }
@@ -860,29 +863,29 @@ namespace hpx::detail {
 
     // bitset operations
     template <typename Block, typename Allocator>
-    dynamic_bitset<Block, Allocator> operator&(
-        dynamic_bitset<Block, Allocator> const& b1,
-        dynamic_bitset<Block, Allocator> const& b2);
+    [[nodiscard]] dynamic_bitset<Block, Allocator> operator&(
+        dynamic_bitset<Block, Allocator> const& x,
+        dynamic_bitset<Block, Allocator> const& y);
 
     template <typename Block, typename Allocator>
-    dynamic_bitset<Block, Allocator> operator|(
-        dynamic_bitset<Block, Allocator> const& b1,
-        dynamic_bitset<Block, Allocator> const& b2);
+    [[nodiscard]] dynamic_bitset<Block, Allocator> operator|(
+        dynamic_bitset<Block, Allocator> const& x,
+        dynamic_bitset<Block, Allocator> const& y);
 
     template <typename Block, typename Allocator>
-    dynamic_bitset<Block, Allocator> operator^(
-        dynamic_bitset<Block, Allocator> const& b1,
-        dynamic_bitset<Block, Allocator> const& b2);
+    [[nodiscard]] dynamic_bitset<Block, Allocator> operator^(
+        dynamic_bitset<Block, Allocator> const& x,
+        dynamic_bitset<Block, Allocator> const& y);
 
     template <typename Block, typename Allocator>
-    dynamic_bitset<Block, Allocator> operator-(
-        dynamic_bitset<Block, Allocator> const& b1,
-        dynamic_bitset<Block, Allocator> const& b2);
+    [[nodiscard]] dynamic_bitset<Block, Allocator> operator-(
+        dynamic_bitset<Block, Allocator> const& x,
+        dynamic_bitset<Block, Allocator> const& y);
 
     // namespace scope swap
     template <typename Block, typename Allocator>
-    void swap(dynamic_bitset<Block, Allocator>& b1,
-        dynamic_bitset<Block, Allocator>& b2) noexcept;
+    void swap(dynamic_bitset<Block, Allocator>& left,
+        dynamic_bitset<Block, Allocator>& right) noexcept;
 
     template <typename Block, typename Allocator, typename String>
     void to_string(dynamic_bitset<Block, Allocator> const& b, String& s);
@@ -1485,27 +1488,26 @@ namespace hpx::detail {
         }
     }
 
-    // A comment similar to the one about the constructor from
-    // basic_string can be done here. Thanks to James Kanze for
-    // making me (Gennaro) realize this important separation of
-    // concerns issue, as well as many things about i18n.
+    // A comment similar to the one about the constructor from basic_string can
+    // be done here. Thanks to James Kanze for making me (Gennaro) realize this
+    // important separation of concerns issue, as well as many things about
+    // i18n.
     template <typename Block, typename Allocator, typename String>
-    inline void to_string(dynamic_bitset<Block, Allocator> const& b, String& s)
+    void to_string(dynamic_bitset<Block, Allocator> const& b, String& s)
     {
         to_string_helper(b, s, false);
     }
 
-    // Differently from to_string this function dumps out
-    // every bit of the internal representation (may be
-    // useful for debugging purposes)
+    // Differently from to_string this function dumps out every bit of the
+    // internal representation (may be useful for debugging purposes)
     template <typename B, typename A, typename String>
-    inline void dump_to_string(dynamic_bitset<B, A> const& b, String& s)
+    void dump_to_string(dynamic_bitset<B, A> const& b, String& s)
     {
         to_string_helper(b, s, true /* =dump_all*/);
     }
 
     template <typename Block, typename Allocator, typename BlockOutputIterator>
-    inline void to_block_range(
+    void to_block_range(
         dynamic_bitset<Block, Allocator> const& b, BlockOutputIterator result)
     {
         // note how this copies *all* bits, including the
@@ -1519,8 +1521,8 @@ namespace hpx::detail {
         if (nubits_ == 0)
             return 0;    // convention
 
-        // Check for overflows. This may be a performance burden on very
-        // large bitsets but is required by the specification, sorry
+        // Check for overflows. This may be a performance burden on very large
+        // bitsets but is required by the specification, sorry
         if (find_next(ulong_width - 1) != npos)
         {
             HPX_THROW_EXCEPTION(hpx::error::out_of_range,
@@ -1568,8 +1570,9 @@ namespace hpx::detail {
     dynamic_bitset<Block, Allocator>::max_size() const noexcept
     {
         size_type const m = bits_.max_size();
-        return m <= (size_type(-1) / bits_per_block) ? m * bits_per_block :
-                                                       size_type(-1);
+        return m <= (static_cast<size_type>(-1) / bits_per_block) ?
+            m * bits_per_block :
+            static_cast<size_type>(-1);
     }
 
     template <typename Block, typename Allocator>
@@ -1636,7 +1639,7 @@ namespace hpx::detail {
     bool dynamic_bitset<Block, Allocator>::intersects(
         dynamic_bitset const& b) const noexcept
     {
-        size_type common_blocks =
+        size_type const common_blocks =
             num_blocks() < b.num_blocks() ? num_blocks() : b.num_blocks();
 
         for (size_type i = 0; i < common_blocks; ++i)
@@ -1649,8 +1652,8 @@ namespace hpx::detail {
 
     // lookup
     //
-    // look for the first bit "on", starting
-    // from the block with index first_block
+    // look for the first bit "on", starting from the block with index
+    // first_block
     template <typename Block, typename Allocator>
     typename dynamic_bitset<Block, Allocator>::size_type
     dynamic_bitset<Block, Allocator>::do_find_from(
@@ -1706,7 +1709,7 @@ namespace hpx::detail {
     }
 
     template <typename Block, typename Allocator>
-    inline bool operator!=(dynamic_bitset<Block, Allocator> const& a,
+    bool operator!=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return !(a == b);
@@ -1719,7 +1722,6 @@ namespace hpx::detail {
         //    HPX_ASSERT(a.size() == b.size());
         using size_type = typename dynamic_bitset<Block, Allocator>::size_type;
 
-        size_type asize(a.size());
         size_type bsize(b.size());
 
         if (!bsize)
@@ -1727,6 +1729,7 @@ namespace hpx::detail {
             return false;
         }
 
+        size_type asize(a.size());
         if (!asize)
         {
             return true;
@@ -1739,7 +1742,7 @@ namespace hpx::detail {
                 size_type i = ii - 1;
                 if (a.bits_[i] < b.bits_[i])
                     return true;
-                else if (a.bits_[i] > b.bits_[i])
+                if (a.bits_[i] > b.bits_[i])
                     return false;
             }
             return false;
@@ -1749,14 +1752,14 @@ namespace hpx::detail {
 
         for (size_type ii = 0; ii < leqsize; ++ii, --asize, --bsize)
         {
-            size_type i = asize - 1;
-            size_type j = bsize - 1;
+            size_type const i = asize - 1;
+            size_type const j = bsize - 1;
             if (a[i] < b[j])
                 return true;
-            else if (a[i] > b[j])
+            if (a[i] > b[j])
                 return false;
         }
-        return (a.size() < b.size());
+        return a.size() < b.size();
     }
 
     template <typename Block, typename Allocator>
@@ -1766,15 +1769,16 @@ namespace hpx::detail {
         //    HPX_ASSERT(a.size() == b.size());
         using size_type = typename dynamic_bitset<Block, Allocator>::size_type;
 
-        size_type asize(a.num_blocks());
         size_type bsize(b.num_blocks());
-        HPX_ASSERT(asize == 3);
-        HPX_ASSERT(bsize == 4);
+        HPX_ASSERT(bsize == 4);    //-V112
 
         if (!bsize)
         {
             return false;
         }
+
+        size_type asize(a.num_blocks());
+        HPX_ASSERT(asize == 3);
 
         if (!asize)
         {
@@ -1784,11 +1788,8 @@ namespace hpx::detail {
         size_type leqsize((std::min)(asize, bsize));
         HPX_ASSERT(leqsize == 3);
 
-        //if (a.size() == 0)
-        //  return false;
-
-        // Since we are storing the most significant bit
-        // at pos == size() - 1, we need to do the comparisons in reverse.
+        // Since we are storing the most significant bit at pos == size() - 1,
+        // we need to do the comparisons in reverse.
         //
         for (size_type ii = 0; ii < leqsize; ++ii, --asize, --bsize)
         {
@@ -1803,21 +1804,21 @@ namespace hpx::detail {
     }
 
     template <typename Block, typename Allocator>
-    inline bool operator<=(dynamic_bitset<Block, Allocator> const& a,
+    bool operator<=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return !(a > b);
     }
 
     template <typename Block, typename Allocator>
-    inline bool operator>(dynamic_bitset<Block, Allocator> const& a,
+    bool operator>(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return b < a;
     }
 
     template <typename Block, typename Allocator>
-    inline bool operator>=(dynamic_bitset<Block, Allocator> const& a,
+    bool operator>=(dynamic_bitset<Block, Allocator> const& a,
         dynamic_bitset<Block, Allocator> const& b) noexcept
     {
         return !(a < b);
@@ -1825,7 +1826,7 @@ namespace hpx::detail {
 
     // hash operations
     template <typename Block, typename Allocator>
-    inline std::size_t hash_value(dynamic_bitset<Block, Allocator> const& a)
+    std::size_t hash_value(dynamic_bitset<Block, Allocator> const& a)
     {
         std::size_t res = hash_value(a.nubits_);
         return res ^ std::hash<decltype(a.bits_)>()(a.bits_);
@@ -1949,7 +1950,8 @@ namespace hpx::detail {
             is);    // skips whitespaces
         if (cerberos)
         {
-            // in accordance with prop. resol. of lib DR 303 [last checked 4 Feb 2004]
+            // in accordance with prop. resolution of lib DR 303 [last checked 4
+            // Feb 2004]
             std::ctype<Ch> const& fac =
                 std::use_facet<std::ctype<Ch>>(is.getloc());
             Ch const zero = fac.widen('0');
@@ -2051,7 +2053,7 @@ namespace hpx::detail {
 
     // namespace scope swap
     template <typename Block, typename Allocator>
-    inline void swap(dynamic_bitset<Block, Allocator>& left,
+    void swap(dynamic_bitset<Block, Allocator>& left,
         dynamic_bitset<Block, Allocator>& right) noexcept
     {
         left.swap(right);
@@ -2076,7 +2078,7 @@ namespace hpx::detail {
 
     // gives a const-reference to the highest block
     template <typename Block, typename Allocator>
-    inline const Block& dynamic_bitset<Block, Allocator>::highest_block()
+    inline Block const& dynamic_bitset<Block, Allocator>::highest_block()
         const noexcept
     {
         HPX_ASSERT(size() > 0 && num_blocks() > 0);
@@ -2193,6 +2195,7 @@ namespace hpx::detail {
 #include <functional>
 
 namespace std {
+
     template <typename Block, typename Allocator>
     struct hash<::hpx::detail::dynamic_bitset<Block, Allocator>>
     {
@@ -2201,7 +2204,7 @@ namespace std {
 
         result_type operator()(argument_type const& a) const noexcept
         {
-            std::hash<argument_type> hasher;
+            std::hash<argument_type> const hasher;
             return hasher(a);
         }
     };

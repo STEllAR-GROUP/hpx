@@ -14,7 +14,8 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
+
     get_os_thread_count_type& get_get_os_thread_count()
     {
         static get_os_thread_count_type f;
@@ -23,7 +24,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     void set_get_os_thread_count(get_os_thread_count_type f)
     {
-        get_get_os_thread_count() = f;
+        get_get_os_thread_count() = HPX_MOVE(f);
     }
 
     std::size_t get_os_thread_count()
@@ -54,7 +55,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
 
     void set_get_pu_mask(get_pu_mask_type f)
     {
-        get_get_pu_mask() = f;
+        get_get_pu_mask() = HPX_MOVE(f);
     }
 
     threads::mask_type get_pu_mask(
@@ -79,4 +80,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
             return mask;
         }
     }
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

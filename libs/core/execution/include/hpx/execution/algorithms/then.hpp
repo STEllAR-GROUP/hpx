@@ -94,6 +94,8 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename F>
         struct then_sender
         {
+            using is_sender = void;
+
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
@@ -152,9 +154,9 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
-                then_sender const& sender)
+                then_sender const& s)
             {
-                return tag(sender.sender);
+                return tag(s.sender);
             }
 
             // TODO: add forwarding_sender_query

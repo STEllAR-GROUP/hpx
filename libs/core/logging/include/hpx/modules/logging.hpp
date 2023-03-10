@@ -80,7 +80,7 @@ namespace hpx::util {
     ////////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        HPX_CORE_EXPORT hpx::util::logging::level get_log_level(
+        [[nodiscard]] HPX_CORE_EXPORT hpx::util::logging::level get_log_level(
             std::string const& env, bool allow_always = false);
     }
 
@@ -206,11 +206,12 @@ namespace hpx::util {
 // helper type to forward logging during bootstrap to two destinations
 struct bootstrap_logging
 {
-    constexpr bootstrap_logging() noexcept {}
+    constexpr bootstrap_logging() noexcept = default;
 };
 
 template <typename T>
-bootstrap_logging const& operator<<(bootstrap_logging const& l, T const& t)
+bootstrap_logging const& operator<<(
+    bootstrap_logging const& l, T const& t)    //-V835
 {
     // NOLINTNEXTLINE(bugprone-branch-clone)
     LBT_(info) << t;
@@ -226,9 +227,10 @@ inline constexpr bootstrap_logging lbt_;
 namespace hpx ::util {
 
     namespace detail {
+
         struct dummy_log_impl
         {
-            constexpr dummy_log_impl() noexcept {}
+            constexpr dummy_log_impl() noexcept = default;
 
             template <typename T>
             dummy_log_impl const& operator<<(T&&) const noexcept
@@ -243,6 +245,7 @@ namespace hpx ::util {
                 return *this;
             }
         };
+
         inline constexpr dummy_log_impl dummy_log;
     }    // namespace detail
 
@@ -286,7 +289,7 @@ namespace hpx ::util {
 
 struct bootstrap_logging
 {
-    constexpr bootstrap_logging() noexcept {}
+    constexpr bootstrap_logging() noexcept = default;
 };
 
 inline constexpr bootstrap_logging lbt_;

@@ -23,6 +23,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <iosfwd>
 #include <iostream>
 #include <memory>
@@ -50,11 +51,13 @@ namespace hpx::resource::detail {
     std::size_t init_pool_data::num_threads_overall = 0;
 
     init_pool_data::init_pool_data(std::string const& name,
-        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode)
+        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
       : pool_name_(name)
       , scheduling_policy_(sched)
       , num_threads_(0)
       , mode_(mode)
+      , background_work_(HPX_MOVE(func))
     {
         if (name.empty())
         {
@@ -66,12 +69,14 @@ namespace hpx::resource::detail {
 
     init_pool_data::init_pool_data(std::string const& name,
         scheduler_function create_func,
-        hpx::threads::policies::scheduler_mode mode)
+        hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
       : pool_name_(name)
       , scheduling_policy_(scheduling_policy::user_defined)
       , num_threads_(0)
       , mode_(mode)
       , create_function_(HPX_MOVE(create_func))
+      , background_work_(HPX_MOVE(func))
     {
         if (name.empty())
         {
@@ -87,7 +92,8 @@ namespace hpx::resource::detail {
     void init_pool_data::add_resource(
         std::size_t pu_index, bool exclusive, std::size_t num_threads)
     {
-        if (pu_index >= hpx::threads::hardware_concurrency())
+        if (pu_index >=
+            static_cast<std::size_t>(hpx::threads::hardware_concurrency()))
         {
             throw_invalid_argument("init_pool_data::add_resource",
                 "init_pool_data::add_resource: processing unit index "
@@ -102,15 +108,15 @@ namespace hpx::resource::detail {
 
         // Add pu mask to internal data structure
         threads::mask_type pu_mask = threads::mask_type();
-        threads::resize(pu_mask, threads::hardware_concurrency());
+        threads::resize(
+            pu_mask, static_cast<std::size_t>(threads::hardware_concurrency()));
         threads::set(pu_mask, pu_index);
 
         // Add one mask for each OS-thread
         for (std::size_t i = 0; i != num_threads; i++)
         {
             assigned_pus_.push_back(pu_mask);
-            assigned_pu_nums_.push_back(
-                hpx::make_tuple(pu_index, exclusive, false));
+            assigned_pu_nums_.emplace_back(pu_index, exclusive, false);
         }
     }
 
@@ -166,7 +172,8 @@ namespace hpx::resource::detail {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
         HPX_ASSERT(!hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        hpx::get<2>(assigned_pu_nums_[virt_core]) = true;    // -V601
+        hpx::get<2>(assigned_pu_nums_[virt_core]) =    //-V688 //-V808
+            true;                                      // -V601
     }
 
     void init_pool_data::unassign_pu(std::size_t virt_core)
@@ -174,7 +181,8 @@ namespace hpx::resource::detail {
         HPX_ASSERT(virt_core <= assigned_pu_nums_.size());
         HPX_ASSERT(hpx::get<2>(assigned_pu_nums_[virt_core]));
 
-        hpx::get<2>(assigned_pu_nums_[virt_core]) = false;    // -V601
+        hpx::get<2>(assigned_pu_nums_[virt_core])    //-V688 //-V808
+            = false;                                 // -V601
     }
 
     bool init_pool_data::pu_is_exclusive(std::size_t virt_core) const
@@ -199,7 +207,8 @@ namespace hpx::resource::detail {
         for (std::size_t i = 0; i != num_threads_; ++i)
         {
             std::size_t& pu_num = hpx::get<0>(assigned_pu_nums_[i]);
-            pu_num = (pu_num + first_core) % threads::hardware_concurrency();
+            pu_num = (pu_num + first_core) %
+                static_cast<std::size_t>(threads::hardware_concurrency());
 
             threads::reset(assigned_pus_[i]);
             threads::set(assigned_pus_[i], pu_num);
@@ -210,6 +219,7 @@ namespace hpx::resource::detail {
     partitioner::partitioner()
       : rtcfg_()
       , first_core_(std::size_t(-1))
+      , pus_needed_(std::size_t(-1))
       , mode_(partitioner_mode::default_)
       , topo_(threads::create_topology())
       , default_scheduler_mode_(threads::policies::scheduler_mode::default_)
@@ -250,8 +260,8 @@ namespace hpx::resource::detail {
         }
 
         // Create the default pool
-        initial_thread_pools_.push_back(init_pool_data("default",
-            scheduling_policy::unspecified, default_scheduler_mode_));
+        initial_thread_pools_.emplace_back(
+            "default", scheduling_policy::unspecified, default_scheduler_mode_);
     }
 
     partitioner::~partitioner()
@@ -263,7 +273,8 @@ namespace hpx::resource::detail {
     bool partitioner::pu_exposed(std::size_t pu_num)
     {
         threads::mask_type pu_mask = threads::mask_type();
-        threads::resize(pu_mask, threads::hardware_concurrency());
+        threads::resize(
+            pu_mask, static_cast<std::size_t>(threads::hardware_concurrency()));
         threads::set(pu_mask, pu_num);
         threads::topology& topo = get_topology();
 
@@ -370,8 +381,17 @@ namespace hpx::resource::detail {
             reconfigure_affinities_locked();
         }
 
-        HPX_ASSERT(affinity_data_.get_num_pus_needed() != std::size_t(-1));
-        return affinity_data_.get_num_pus_needed();
+        return threads_needed();
+    }
+
+    std::size_t partitioner::threads_needed() noexcept
+    {
+        if (pus_needed_ == std::size_t(-1))
+        {
+            pus_needed_ = affinity_data_.get_num_pus_needed();
+            HPX_ASSERT(pus_needed_ != std::size_t(-1));
+        }
+        return pus_needed_;
     }
 
     // This function is called in hpx_init, before the instantiation of the
@@ -570,7 +590,8 @@ namespace hpx::resource::detail {
 
     // create a new thread_pool
     void partitioner::create_thread_pool(std::string const& pool_name,
-        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode)
+        scheduling_policy sched, hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
     {
         if (pool_name.empty())
         {
@@ -584,8 +605,8 @@ namespace hpx::resource::detail {
 
         if (pool_name == get_default_pool_name())
         {
-            initial_thread_pools_[0] =
-                detail::init_pool_data(get_default_pool_name(), sched, mode);
+            initial_thread_pools_[0] = detail::init_pool_data(
+                get_default_pool_name(), sched, mode, HPX_MOVE(func));
             return;
         }
 
@@ -603,13 +624,13 @@ namespace hpx::resource::detail {
             }
         }
 
-        initial_thread_pools_.push_back(
-            detail::init_pool_data(pool_name, sched, mode));
+        initial_thread_pools_.emplace_back(
+            pool_name, sched, mode, HPX_MOVE(func));
     }
 
     // create a new thread_pool
-    void partitioner::create_thread_pool(
-        std::string const& pool_name, scheduler_function scheduler_creation)
+    void partitioner::create_thread_pool(std::string const& pool_name,
+        scheduler_function scheduler_creation, background_work_function func)
     {
         if (pool_name.empty())
         {
@@ -623,9 +644,9 @@ namespace hpx::resource::detail {
 
         if (pool_name == get_default_pool_name())
         {
-            initial_thread_pools_[0] =
-                detail::init_pool_data(get_default_pool_name(),
-                    HPX_MOVE(scheduler_creation), default_scheduler_mode_);
+            initial_thread_pools_[0] = detail::init_pool_data(
+                get_default_pool_name(), HPX_MOVE(scheduler_creation),
+                default_scheduler_mode_, HPX_MOVE(func));
             return;
         }
 
@@ -643,8 +664,9 @@ namespace hpx::resource::detail {
             }
         }
 
-        initial_thread_pools_.push_back(detail::init_pool_data(
-            pool_name, HPX_MOVE(scheduler_creation), default_scheduler_mode_));
+        initial_thread_pools_.emplace_back(pool_name,
+            HPX_MOVE(scheduler_creation), default_scheduler_mode_,
+            HPX_MOVE(func));
     }
 
     // ----------------------------------------------------------------------
@@ -838,6 +860,13 @@ namespace hpx::resource::detail {
         return get_pool_data(l, pool_index).mode_;
     }
 
+    background_work_function partitioner::get_background_work(
+        std::size_t pool_index) const
+    {
+        std::unique_lock<mutex_type> l(mtx_);
+        return get_pool_data(l, pool_index).background_work_;
+    }
+
     detail::init_pool_data const& partitioner::get_pool_data(
         std::unique_lock<mutex_type>& l, std::size_t pool_index) const
     {
@@ -889,7 +918,8 @@ namespace hpx::resource::detail {
         }
 
         auto mask = hpx::threads::mask_type();
-        hpx::threads::resize(mask, hpx::threads::hardware_concurrency());
+        hpx::threads::resize(mask,
+            static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
         threads::set(mask, pu_num);
         return mask;
     }
@@ -903,14 +933,15 @@ namespace hpx::resource::detail {
         }
 
         auto mask = hpx::threads::mask_type();
-        hpx::threads::resize(mask, hpx::threads::hardware_concurrency());
+        hpx::threads::resize(mask,
+            static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
         threads::set(mask, global_thread_num);
         return mask;
     }
 
     void partitioner::init(resource::partitioner_mode rpmode,
         hpx::util::section const& rtcfg,
-        hpx::threads::policies::detail::affinity_data affinity_data)
+        hpx::threads::policies::detail::affinity_data const& affinity_data)
     {
         mode_ = rpmode;
         rtcfg_ = rtcfg;
@@ -1116,7 +1147,8 @@ namespace hpx::resource::detail {
         std::lock_guard<mutex_type> l(mtx_);
 
         //! make this prettier
-        os << "the resource partitioner owns " << initial_thread_pools_.size()
+        os << "the resource partitioner owns "
+           << static_cast<std::uint64_t>(initial_thread_pools_.size())
            << " pool(s) : \n";    // -V128
         for (auto itp : initial_thread_pools_)
         {

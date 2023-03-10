@@ -21,14 +21,14 @@ namespace hpx::util {
     {
         using map_type = std::map<std::string, std::string>;
 
-        manage_config(std::vector<std::string> const& cfg);
+        explicit manage_config(std::vector<std::string> const& cfg);
 
         void add(std::vector<std::string> const& cfg);
 
         template <typename T>
         T get_value(std::string const& key, T dflt = T()) const
         {
-            map_type::const_iterator it = config_.find(key);
+            auto const it = config_.find(key);
             if (it != config_.end())
                 return hpx::util::from_string<T>((*it).second, dflt);
             return dflt;

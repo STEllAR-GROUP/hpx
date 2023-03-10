@@ -11,7 +11,7 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     // get action code from counter type
     namespace_action_code retrieve_action_code(
@@ -30,31 +30,33 @@ namespace hpx { namespace agas { namespace detail {
         }
 
         // component_ns
-        for (std::size_t i = 0; i != num_component_namespace_services; ++i)
+        for (auto const& component_namespace_service :
+            component_namespace_services)
         {
-            if (p.countername_ == component_namespace_services[i].name_)
-                return component_namespace_services[i].code_;
+            if (p.countername_ == component_namespace_service.name_)
+                return component_namespace_service.code_;
         }
 
         // locality_ns
-        for (std::size_t i = 0; i != num_locality_namespace_services; ++i)
+        for (auto const& locality_namespace_service :
+            locality_namespace_services)
         {
-            if (p.countername_ == locality_namespace_services[i].name_)
-                return locality_namespace_services[i].code_;
+            if (p.countername_ == locality_namespace_service.name_)
+                return locality_namespace_service.code_;
         }
 
         // primary_ns
-        for (std::size_t i = 0; i != num_primary_namespace_services; ++i)
+        for (auto const& primary_namespace_service : primary_namespace_services)
         {
-            if (p.countername_ == primary_namespace_services[i].name_)
-                return primary_namespace_services[i].code_;
+            if (p.countername_ == primary_namespace_service.name_)
+                return primary_namespace_service.code_;
         }
 
         // symbol_ns
-        for (std::size_t i = 0; i != num_symbol_namespace_services; ++i)
+        for (auto const& symbol_namespace_service : symbol_namespace_services)
         {
-            if (p.countername_ == symbol_namespace_services[i].name_)
-                return symbol_namespace_services[i].code_;
+            if (p.countername_ == symbol_namespace_service.name_)
+                return symbol_namespace_service.code_;
         }
 
         HPX_THROWS_IF(ec, hpx::error::bad_parameter, "retrieve_action_code",
@@ -80,31 +82,33 @@ namespace hpx { namespace agas { namespace detail {
         }
 
         // component_ns
-        for (std::size_t i = 0; i != num_component_namespace_services; ++i)
+        for (auto const& component_namespace_service :
+            component_namespace_services)
         {
-            if (p.countername_ == component_namespace_services[i].name_)
-                return component_namespace_services[i].service_code_;
+            if (p.countername_ == component_namespace_service.name_)
+                return component_namespace_service.service_code_;
         }
 
         // locality_ns
-        for (std::size_t i = 0; i != num_locality_namespace_services; ++i)
+        for (auto const& locality_namespace_service :
+            locality_namespace_services)
         {
-            if (p.countername_ == locality_namespace_services[i].name_)
-                return locality_namespace_services[i].service_code_;
+            if (p.countername_ == locality_namespace_service.name_)
+                return locality_namespace_service.service_code_;
         }
 
         // primary_ns
-        for (std::size_t i = 0; i != num_primary_namespace_services; ++i)
+        for (auto const& primary_namespace_service : primary_namespace_services)
         {
-            if (p.countername_ == primary_namespace_services[i].name_)
-                return primary_namespace_services[i].service_code_;
+            if (p.countername_ == primary_namespace_service.name_)
+                return primary_namespace_service.service_code_;
         }
 
         // symbol_ns
-        for (std::size_t i = 0; i != num_symbol_namespace_services; ++i)
+        for (auto const& symbol_namespace_service : symbol_namespace_services)
         {
-            if (p.countername_ == symbol_namespace_services[i].name_)
-                return symbol_namespace_services[i].service_code_;
+            if (p.countername_ == symbol_namespace_service.name_)
+                return symbol_namespace_service.service_code_;
         }
 
         HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -112,4 +116,4 @@ namespace hpx { namespace agas { namespace detail {
             "unknown performance counter (unrelated to AGAS)");
         return invalid_request;
     }
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail

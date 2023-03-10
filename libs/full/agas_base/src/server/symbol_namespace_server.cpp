@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,23 +9,17 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/symbol_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/base_lco_with_value.hpp>
-#include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
+#include <hpx/format.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/naming/credit_handling.hpp>
 #include <hpx/naming/split_gid.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/scoped_timer.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 #include <hpx/util/regex_from_pattern.hpp>
 
 #include <atomic>
-#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -35,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     naming::gid_type bootstrap_symbol_namespace_gid()
     {
@@ -44,12 +38,12 @@ namespace hpx { namespace agas {
 
     hpx::id_type bootstrap_symbol_namespace_id()
     {
-        return hpx::id_type(agas::symbol_ns_msb, agas::symbol_ns_lsb,
-            hpx::id_type::management_type::unmanaged);
+        return {agas::symbol_ns_msb, agas::symbol_ns_lsb,
+            hpx::id_type::management_type::unmanaged};
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     void symbol_namespace::register_server_instance(
         char const* servicename, std::uint32_t locality_id, error_code& ec)
@@ -71,13 +65,13 @@ namespace hpx { namespace agas { namespace server {
             launch::sync, instance_name_, get_unmanaged_id().get_gid(), ec);
     }
 
-    void symbol_namespace::unregister_server_instance(error_code& ec)
+    void symbol_namespace::unregister_server_instance(error_code& ec) const
     {
         agas::unregister_name(launch::sync, instance_name_, ec);
         this->base_type::finalize();
     }
 
-    void symbol_namespace::finalize()
+    void symbol_namespace::finalize() const
     {
         if (!instance_name_.empty())
         {
@@ -86,19 +80,19 @@ namespace hpx { namespace agas { namespace server {
         }
     }
 
-    bool symbol_namespace::bind(std::string key, naming::gid_type gid)
-    {    // {{{ bind implementation
-        // parameters
+    bool symbol_namespace::bind(
+        std::string const& key, naming::gid_type const& gid_)
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.bind_.time_, counter_data_.bind_.enabled_);
         counter_data_.increment_bind_count();
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gid_table_type::iterator it = gids_.find(key);
-        gid_table_type::iterator end = gids_.end();
+        naming::gid_type gid = gid_;
 
-        if (it != end)
+        gid_table_type::iterator const it = gids_.find(key);
+        if (auto const end = gids_.end(); it != end)
         {
             std::int64_t const credits =
                 naming::detail::get_credit_from_gid(gid);
@@ -110,10 +104,12 @@ namespace hpx { namespace agas { namespace server {
             // increase reference count
             if (raw_gid == gid)
             {
-                // REVIEW: do we need to add the credit of the argument to the table?
+                // REVIEW: do we need to add the credit of the argument to the
+                // table?
                 naming::detail::add_credit_to_gid(*(it->second), credits);
 
                 l.unlock();
+
                 LAGAS_(info).format(
                     "symbol_namespace::bind, key({1}), gid({2}), "
                     "old_credit({3}), new_credit({4})",
@@ -139,8 +135,8 @@ namespace hpx { namespace agas { namespace server {
             return false;
         }
 
-        if (HPX_UNLIKELY(!util::insert_checked(gids_.insert(
-                std::make_pair(key, std::make_shared<naming::gid_type>(gid))))))
+        if (HPX_UNLIKELY(!util::insert_checked(
+                gids_.emplace(key, std::make_shared<naming::gid_type>(gid)))))
         {
             l.unlock();
 
@@ -151,28 +147,27 @@ namespace hpx { namespace agas { namespace server {
         }
 
         // handle registered events
-        typedef on_event_data_map_type::iterator iterator;
-        std::pair<iterator, iterator> p = on_event_data_.equal_range(key);
-
-        std::vector<hpx::id_type> lcos;
-        if (p.first != p.second)
+        if (auto const [first, last] = on_event_data_.equal_range(key);
+            first != last)
         {
-            iterator it = p.first;
-            while (it != p.second)
+            std::vector<hpx::id_type> lcos;
+
+            auto iter = first;
+            while (iter != last)
             {
-                lcos.push_back((*it).second);
-                ++it;
+                lcos.push_back((*iter).second);
+                ++iter;
             }
 
-            on_event_data_.erase(p.first, p.second);
+            on_event_data_.erase(first, last);
 
             // notify all LCOS which were registered with this name
             for (hpx::id_type const& id : lcos)
             {
                 // re-locate the entry in the GID table for each LCO anew, as we
-                // need to unlock the mutex protecting the table for each iteration
-                // below
-                gid_table_type::iterator gid_it = gids_.find(key);
+                // need to unlock the mutex protecting the table for each
+                // iteration below
+                auto gid_it = gids_.find(key);
                 if (gid_it == gids_.end())
                 {
                     l.unlock();
@@ -182,14 +177,15 @@ namespace hpx { namespace agas { namespace server {
                         "unable to re-locate the entry in the GID table");
                 }
 
-                // hold on to the gid while the map is unlocked
-                std::shared_ptr<naming::gid_type> current_gid = gid_it->second;
-
                 {
+                    // hold on to the gid while the map is unlocked
+                    std::shared_ptr<naming::gid_type> current_gid =
+                        gid_it->second;
+
                     unlock_guard<std::unique_lock<mutex_type>> ul(l);
 
-                    // split the credit as the receiving end will expect to keep the
-                    // object alive
+                    // split the credit as the receiving end will expect to keep
+                    // the object alive
                     naming::gid_type new_gid =
                         naming::detail::split_gid_if_needed(*current_gid).get();
 
@@ -210,22 +206,21 @@ namespace hpx { namespace agas { namespace server {
             "symbol_namespace::bind, key({1}), gid({2})", key, gid);
 
         return true;
-    }    // }}}
+    }
 
     naming::gid_type symbol_namespace::resolve(std::string const& key)
-    {    // {{{ resolve implementation
-        // parameters
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.resolve_.time_, counter_data_.resolve_.enabled_);
         counter_data_.increment_resolve_count();
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gid_table_type::iterator it = gids_.find(key);
-        gid_table_type::iterator end = gids_.end();
-
-        if (it == end)
+        gid_table_type::iterator const it = gids_.find(key);
+        if (auto const end = gids_.end(); it == end)
         {
+            l.unlock();
+
             LAGAS_(info).format(
                 "symbol_namespace::resolve, key({1}), response(no_success)",
                 key);
@@ -234,33 +229,33 @@ namespace hpx { namespace agas { namespace server {
         }
 
         // hold on to gid before unlocking the map
-        std::shared_ptr<naming::gid_type> current_gid(it->second);
+        std::shared_ptr<naming::gid_type> const current_gid(it->second);
 
         l.unlock();
 
         naming::gid_type gid =
             naming::detail::split_gid_if_needed(*current_gid).get();
 
-        LAGAS_(info).format(
-            "symbol_namespace::resolve, key({1}), stored_gid({2}), gid({3})",
+        LAGAS_(info).format("symbol_namespace::resolve, key({1}), "
+                            "stored_gid({2}), gid({3})",
             key, *current_gid, gid);
 
         return gid;
-    }    // }}}
+    }
 
     naming::gid_type symbol_namespace::unbind(std::string const& key)
-    {    // {{{ unbind implementation
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.unbind_.time_, counter_data_.unbind_.enabled_);
         counter_data_.increment_unbind_count();
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gid_table_type::iterator it = gids_.find(key);
-        gid_table_type::iterator end = gids_.end();
-
-        if (it == end)
+        auto const it = gids_.find(key);
+        if (auto const end = gids_.end(); it == end)
         {
+            l.unlock();
+
             LAGAS_(info).format(
                 "symbol_namespace::unbind, key({1}), response(no_success)",
                 key);
@@ -268,7 +263,7 @@ namespace hpx { namespace agas { namespace server {
             return naming::invalid_gid;
         }
 
-        naming::gid_type const gid = *(it->second);
+        naming::gid_type gid = *(it->second);
 
         gids_.erase(it);
 
@@ -278,12 +273,12 @@ namespace hpx { namespace agas { namespace server {
             "symbol_namespace::unbind, key({1}), gid({2})", key, gid);
 
         return gid;
-    }    // }}}
+    }
 
     // TODO: catch exceptions
     symbol_namespace::iterate_names_return_type symbol_namespace::iterate(
         std::string const& pattern)
-    {    // {{{ iterate implementation
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.iterate_names_.time_,
             counter_data_.iterate_names_.enabled_);
@@ -293,12 +288,11 @@ namespace hpx { namespace agas { namespace server {
 
         if (pattern.find_first_of("*?[]") != std::string::npos)
         {
-            std::string str_rx(util::regex_from_pattern(pattern, throws));
-            std::regex rx(str_rx);
+            std::string const str_rx(util::regex_from_pattern(pattern, throws));
+            std::regex const rx(str_rx);
 
             std::unique_lock<mutex_type> l(mutex_);
-            for (gid_table_type::iterator it = gids_.begin(); it != gids_.end();
-                 ++it)
+            for (auto it = gids_.begin(); it != gids_.end(); ++it)
             {
                 if (!std::regex_match(it->first, rx))
                     continue;
@@ -314,8 +308,7 @@ namespace hpx { namespace agas { namespace server {
         else
         {
             std::unique_lock<mutex_type> l(mutex_);
-            for (gid_table_type::iterator it = gids_.begin(); it != gids_.end();
-                 ++it)
+            for (auto it = gids_.begin(); it != gids_.end(); ++it)
             {
                 if (!pattern.empty() && pattern != it->first)
                     continue;
@@ -332,11 +325,11 @@ namespace hpx { namespace agas { namespace server {
         LAGAS_(info).format("symbol_namespace::iterate");
 
         return found;
-    }    // }}}
+    }
 
-    bool symbol_namespace::on_event(
-        std::string const& name, bool call_for_past_events, hpx::id_type lco)
-    {    // {{{ on_event implementation
+    bool symbol_namespace::on_event(std::string const& name,
+        bool call_for_past_events, hpx::id_type const& lco)
+    {
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.on_event_.time_, counter_data_.on_event_.enabled_);
         counter_data_.increment_on_event_count();
@@ -344,21 +337,20 @@ namespace hpx { namespace agas { namespace server {
         std::unique_lock<mutex_type> l(mutex_);
 
         bool handled = false;
-        naming::gid_type new_gid;
 
         if (call_for_past_events)
         {
-            gid_table_type::iterator it = gids_.find(name);
-            if (it != gids_.end())
+            if (auto const it = gids_.find(name); it != gids_.end())
             {
-                // hold on to entry while map is unlocked
-                std::shared_ptr<naming::gid_type> current_gid(it->second);
-
                 // split the credit as the receiving end will expect to keep the
                 // object alive
                 {
+                    // hold on to entry while map is unlocked
+                    std::shared_ptr<naming::gid_type> const current_gid(
+                        it->second);
+
                     unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                    new_gid =
+                    naming::gid_type new_gid =
                         naming::detail::split_gid_if_needed(*current_gid).get();
 
                     // trigger the lco
@@ -377,20 +369,19 @@ namespace hpx { namespace agas { namespace server {
 
         if (!handled)
         {
-            on_event_data_map_type::iterator it = on_event_data_.insert(
-                on_event_data_map_type::value_type(name, lco));
+            [[maybe_unused]] auto const it = on_event_data_.emplace(name, lco);
 
             // This overload of insert always returns the iterator pointing
             // to the inserted value. It should never point to end
-            HPX_ASSERT(it != on_event_data_.end());
-            HPX_UNUSED(it);
+            HPX_ASSERT_LOCKED(l, it != on_event_data_.end());
         }
+
         l.unlock();
 
         LAGAS_(info).format("symbol_namespace::on_event: name({1})", name);
 
         return true;
-    }    // }}}
+    }
 
     // access current counter values
     std::int64_t symbol_namespace::counter_data::get_bind_count(bool reset)
@@ -513,5 +504,4 @@ namespace hpx { namespace agas { namespace server {
             ++on_event_.count_;
         }
     }
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server

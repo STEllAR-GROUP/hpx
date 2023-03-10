@@ -45,10 +45,9 @@ namespace hpx::parcelset {
             static_assert(traits::is_action_v<Action>,
                 "We need an action to construct a parcel");
 
-            return std::unique_ptr<actions::base_action>(
-                new actions::transfer_continuation_action<Action>(
-                    std::forward<Continuation>(cont),
-                    std::forward<Args>(args)...));
+            return std::make_unique<
+                actions::transfer_continuation_action<Action>>(
+                std::forward<Continuation>(cont), std::forward<Args>(args)...);
         }
 
         template <typename Action, typename... Args>
@@ -58,9 +57,8 @@ namespace hpx::parcelset {
             static_assert(traits::is_action_v<Action>,
                 "We need an action to construct a parcel");
 
-            return std::unique_ptr<actions::base_action>(
-                new actions::transfer_action<Action>(
-                    std::forward<Args>(args)...));
+            return std::make_unique<actions::transfer_action<Action>>(
+                std::forward<Args>(args)...);
         }
 
         template <typename Arg0, typename... Args>

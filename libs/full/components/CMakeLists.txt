@@ -34,7 +34,7 @@ set(components_compat_headers
 )
 # cmake-format: on
 
-set(components_sources basename_registration.cpp)
+set(components_sources basename_registration.cpp client_base.cpp)
 
 include(HPX_AddModule)
 add_hpx_module(

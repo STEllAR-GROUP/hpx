@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,7 +8,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/server/wrapper_heap.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/modules/logging.hpp>
@@ -28,7 +27,7 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     namespace one_size_heap_allocators {
 
@@ -68,12 +67,7 @@ namespace hpx { namespace components { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     wrapper_heap::wrapper_heap(char const* class_name,
-#if defined(HPX_DEBUG)
-        std::size_t count,
-#else
-        std::size_t,
-#endif
-        heap_parameters parameters)
+        [[maybe_unused]] std::size_t count, heap_parameters parameters)
       : pool_(nullptr)
       , first_free_(nullptr)
       , parameters_(parameters)
@@ -88,8 +82,7 @@ namespace hpx { namespace components { namespace detail {
       , heap_alloc_function_("wrapper_heap::alloc", class_name)
       , heap_free_function_("wrapper_heap::free", class_name)
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         if (!init_pool())
         {
@@ -116,40 +109,35 @@ namespace hpx { namespace components { namespace detail {
 
     wrapper_heap::~wrapper_heap()
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         tidy();
     }
 
     std::size_t wrapper_heap::size() const
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         return parameters_.capacity - free_size_;
     }
 
     std::size_t wrapper_heap::free_size() const
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         return free_size_;
     }
 
     bool wrapper_heap::is_empty() const
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         return nullptr == pool_;
     }
 
     bool wrapper_heap::has_allocatable_slots() const
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         std::size_t const num_bytes =
             parameters_.capacity * parameters_.element_size;
@@ -188,7 +176,7 @@ namespace hpx { namespace components { namespace detail {
         return true;
     }
 
-    void wrapper_heap::free(void* p, std::size_t count)
+    void wrapper_heap::free([[maybe_unused]] void* p, std::size_t count)
     {
         util::itt::heap_free heap_free(heap_free_function_, p);
 
@@ -213,8 +201,6 @@ namespace hpx { namespace components { namespace detail {
 
         // give memory back to pool
         debug::fill_bytes(p1, freed_value, num_bytes);
-#else
-        HPX_UNUSED(p);
 #endif
 
 #if defined(HPX_DEBUG)
@@ -229,8 +215,8 @@ namespace hpx { namespace components { namespace detail {
     bool wrapper_heap::did_alloc(void* p) const
     {
         // no lock is necessary here as all involved variables are immutable
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
+
         if (nullptr == pool_)
             return false;
         if (nullptr == p)
@@ -242,61 +228,41 @@ namespace hpx { namespace components { namespace detail {
     }
 
     naming::gid_type wrapper_heap::get_gid(
-        util::unique_id_ranges& ids, void* p, components::component_type type)
+        void* p, components::component_type type)
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         HPX_ASSERT(did_alloc(p));
 
-        std::unique_lock l(mtx_);
-
-        if (!base_gid_)
         {
-            naming::gid_type base_gid;
-
-            {
-                // this is the first call to get_gid() for this heap - allocate
-                // a sufficiently large range of global ids
-                unlock_guard ul(l);
-                base_gid = ids.get_id(parameters_.capacity);
-
-                // register the global ids and the base address of this heap
-                // with the AGAS
-                if (!agas::bind_range_local(base_gid, parameters_.capacity,
-                        naming::address(naming::get_gid_from_locality_id(
-                                            agas::get_locality_id()),
-                            type, pool_),
-                        parameters_.element_size))
-                {
-                    return naming::invalid_gid;
-                }
-            }
-
-            // if some other thread has already set the base GID for this
-            // heap, we ignore the result
+            std::unique_lock l(mtx_);
             if (!base_gid_)
             {
-                // this is the first thread succeeding in binding the new gid
-                // range
-                base_gid_ = base_gid;
-            }
-            else
-            {
-                // unbind the range which is not needed anymore
-                unlock_guard ul(l);
-                agas::unbind_range_local(base_gid, parameters_.capacity);
+                // use the pool's base address as the first gid, this will also
+                // allow for the ids to be locally resolvable
+                base_gid_ = naming::replace_locality_id(
+                    naming::replace_component_type(
+                        naming::gid_type(pool_), type),
+                    agas::get_locality_id());
+
+                naming::detail::set_credit_for_gid(
+                    base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
             }
         }
 
-        std::uint64_t const distance = static_cast<char*>(p) - pool_;
-        return base_gid_ + distance / parameters_.element_size;
+        naming::gid_type result = base_gid_;
+        result.set_lsb(p);
+
+        // We have to assume this credit was split as otherwise the gid returned
+        // at this point will control the lifetime of the component.
+        naming::detail::set_credit_split_mask_for_gid(result);
+
+        return result;
     }
 
     void wrapper_heap::set_gid(naming::gid_type const& g)
     {
-        util::itt::heap_internal_access hia;
-        HPX_UNUSED(hia);
+        [[maybe_unused]] util::itt::heap_internal_access hia;
 
         std::unique_lock l(mtx_);
         base_gid_ = g;
@@ -389,12 +355,13 @@ namespace hpx { namespace components { namespace detail {
                         !class_name_.empty() ? class_name_.c_str() :
                                                "<Unknown>")
 #if defined(HPX_DEBUG)
-                    .format(": releasing heap: alloc count: {}, free count: {}",
+                    .format(": releasing heap: alloc count: {}, free "
+                            "count: {}",
                         alloc_count_, free_count_)
 #endif
                 << ".";
 
-            if (size() > 0
+            if (wrapper_heap::size() > 0
 #if defined(HPX_DEBUG)
                 || alloc_count_ != free_count_
 #endif
@@ -403,7 +370,7 @@ namespace hpx { namespace components { namespace detail {
                 LOSH_(warning).format("wrapper_heap ({}): releasing heap ({}) "
                                       "with {} allocated object(s)!",
                     !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
-                    static_cast<void*>(pool_), size());
+                    static_cast<void*>(pool_), wrapper_heap::size());
             }
 
             std::size_t const total_num_bytes =
@@ -413,4 +380,4 @@ namespace hpx { namespace components { namespace detail {
             free_size_ = 0;
         }
     }
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail

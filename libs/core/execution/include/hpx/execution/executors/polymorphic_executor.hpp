@@ -28,7 +28,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     namespace detail {
 
@@ -163,7 +163,7 @@ namespace hpx { namespace parallel { namespace execution {
                 return end_;
             }
 
-            std::ptrdiff_t size() const noexcept
+            constexpr std::ptrdiff_t size() const noexcept
             {
                 return size_;
             }
@@ -235,10 +235,10 @@ namespace hpx { namespace parallel { namespace execution {
             template <typename T>
             static void* allocate(void* storage, std::size_t storage_size)
             {
-                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
-
                 if (sizeof(T) > storage_size)
                 {
+                    using storage_t =
+                        std::aligned_storage_t<sizeof(T), alignof(T)>;
                     return new storage_t;
                 }
                 return storage;
@@ -248,8 +248,6 @@ namespace hpx { namespace parallel { namespace execution {
             static void _deallocate(
                 void* obj, std::size_t storage_size, bool destroy) noexcept
             {
-                using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
-
                 if (destroy)
                 {
                     get<T>(obj).~T();
@@ -257,6 +255,8 @@ namespace hpx { namespace parallel { namespace execution {
 
                 if (sizeof(T) > storage_size)
                 {
+                    using storage_t =
+                        std::aligned_storage_t<sizeof(T), alignof(T)>;
                     delete static_cast<storage_t*>(obj);
                 }
             }
@@ -267,7 +267,9 @@ namespace hpx { namespace parallel { namespace execution {
                 void const* src, bool destroy)
             {
                 if (destroy)
+                {
                     get<T>(storage).~T();
+                }
 
                 void* buffer = allocate<T>(storage, storage_size);
                 return hpx::construct_at(static_cast<T*>(buffer), get<T>(src));
@@ -790,9 +792,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::post_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            vptr->post(exec.object, function_type(HPX_FORWARD(F, f)),
+            vptr_->post(exec.object, function_type(HPX_FORWARD(F, f)),
                 HPX_FORWARD(Ts, ts)...);
         }
 
@@ -804,9 +806,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::sync_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->sync_execute(exec.object,
+            return vptr_->sync_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -818,9 +820,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::async_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->async_execute(exec.object,
+            return vptr_->async_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), HPX_FORWARD(Ts, ts)...);
         }
 
@@ -832,9 +834,9 @@ namespace hpx { namespace parallel { namespace execution {
         {
             using function_type = typename vtable::then_execute_function_type;
 
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->then_execute(exec.object,
+            return vptr_->then_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)),
                 hpx::make_shared_future(HPX_FORWARD(Future, predecessor)),
                 HPX_FORWARD(Ts, ts)...);
@@ -855,9 +857,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_sync_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_sync_execute(exec.object,
+            return vptr_->bulk_sync_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -877,9 +879,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_async_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_async_execute(exec.object,
+            return vptr_->bulk_async_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape,
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -899,9 +901,9 @@ namespace hpx { namespace parallel { namespace execution {
                 typename vtable::bulk_then_execute_function_type;
 
             detail::range_proxy shape(s);
-            vtable const* vptr =
+            vtable const* vptr_ =
                 static_cast<vtable const*>(exec.base_type::vptr);
-            return vptr->bulk_then_execute(exec.object,
+            return vptr_->bulk_then_execute(exec.object,
                 function_type(HPX_FORWARD(F, f)), shape, predecessor,
                 HPX_FORWARD(Ts, ts)...);
         }
@@ -923,10 +925,6 @@ namespace hpx { namespace parallel { namespace execution {
         using base_type::storage;
         using base_type::vptr;
     };
-
-}}}    // namespace hpx::parallel::execution
-
-namespace hpx { namespace parallel { namespace execution {
 
     /// \cond NOINTERNAL
     template <typename Sig>
@@ -959,4 +957,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,22 +10,24 @@
 
 #include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     // main template represents non-integral types (raises error)
     template <typename Size, typename Enable = void>
     struct is_negative_helper;
 
     // signed integral values may be negative
     template <typename T>
-    struct is_negative_helper<T,
-        typename std::enable_if<std::is_signed<T>::value>::type>
+    struct is_negative_helper<T, std::enable_if_t<std::is_signed_v<T>>>
     {
-        HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(T const& size)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
+            T const& size) noexcept
         {
             return size < 0;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE static T abs(T const& val)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr T abs(
+            T const& val) noexcept
         {
             return val < 0 ? -val : val;
         }
@@ -38,20 +40,22 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     // unsigned integral values are never negative
     template <typename T>
-    struct is_negative_helper<T,
-        typename std::enable_if<std::is_unsigned<T>::value>::type>
+    struct is_negative_helper<T, std::enable_if_t<std::is_unsigned_v<T>>>
     {
-        HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(T const&)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr bool call(
+            T const&) noexcept
         {
             return false;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE static T abs(T const& val)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr T abs(
+            T const& val) noexcept
         {
             return val;
         }
 
-        HPX_HOST_DEVICE HPX_FORCEINLINE static T negate(T const& val)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr T negate(
+            T const& val) noexcept
         {
             return val;
         }
@@ -59,20 +63,21 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_HOST_DEVICE HPX_FORCEINLINE bool is_negative(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr bool is_negative(
+        T const& val) noexcept
     {
         return is_negative_helper<T>::call(val);
     }
 
     template <typename T>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T abs(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T abs(T const& val) noexcept
     {
         return is_negative_helper<T>::abs(val);
     }
 
     template <typename T>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T negate(T const& val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T negate(T const& val) noexcept
     {
         return is_negative_helper<T>::negate(val);
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

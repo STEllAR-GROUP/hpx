@@ -12,14 +12,15 @@
 #include <eve/module/core.hpp>
 #include <eve/wide.hpp>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename T, typename Abi, typename Reduce>
     HPX_HOST_DEVICE HPX_FORCEINLINE T reduce(
-        Reduce r, eve::wide<T, Abi> const& val)
+        Reduce r, eve::wide<T, Abi> const& val) noexcept
     {
         return eve::reduce(val, r);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

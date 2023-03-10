@@ -415,7 +415,7 @@ namespace hpx { namespace performance_counters { namespace server {
         }
 
         // make sure this counter starts collecting data
-        start();
+        statistics_counter<Statistic>::start();
     }
 
     template <typename Statistic>

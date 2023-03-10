@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace util { namespace detail {
+namespace hpx::parallel::util::detail {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -32,9 +32,9 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             {
                 std::rethrow_exception(e);
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (exception_list const& el)
             {
@@ -139,4 +139,4 @@ namespace hpx { namespace parallel { namespace util { namespace detail {
             }
         }
     };
-}}}}    // namespace hpx::parallel::util::detail
+}    // namespace hpx::parallel::util::detail

@@ -215,7 +215,7 @@ namespace hpx::parcelset {
                         else if (deferred_schedule)
                         {
                             // If we got a direct action
-                            deferred_parcels.push_back(HPX_MOVE(p));
+                            deferred_parcels.emplace_back(HPX_MOVE(p));
                         }
 
                         // be sure not to measure add_parcel as serialization time

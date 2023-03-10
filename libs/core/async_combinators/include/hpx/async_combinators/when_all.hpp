@@ -186,7 +186,7 @@ namespace hpx::lcos::detail {
         using base_type = hpx::lcos::detail::future_data<result_type>;
 
         explicit async_when_all_frame(
-            typename base_type::init_no_addref no_addref)
+            typename base_type::init_no_addref no_addref) noexcept
           : base_type(no_addref)
         {
         }
@@ -210,7 +210,7 @@ namespace hpx::lcos::detail {
         template <typename T>
         void operator()(hpx::util::async_traverse_complete_tag, T&& pack)
         {
-            this->set_value(when_all_result<Tuple>::call(HPX_FORWARD(T, pack)));
+            this->set_data(when_all_result<Tuple>::call(HPX_FORWARD(T, pack)));
         }
     };
 

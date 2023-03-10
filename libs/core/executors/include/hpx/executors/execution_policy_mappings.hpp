@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/modules/concepts.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -34,7 +35,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any non-parallel policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_par_t, ExPolicy&& policy) noexcept
         {
@@ -55,7 +61,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any parallel policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_par_t, ExPolicy&& policy) noexcept
         {
@@ -77,7 +88,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any non-task policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_task_t, ExPolicy&& policy) noexcept
         {
@@ -98,7 +114,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any task policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_task_t, ExPolicy&& policy) noexcept
         {
@@ -120,7 +141,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any non-unsequenced policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_non_unseq_t, ExPolicy&& policy) noexcept
         {
@@ -141,7 +167,12 @@ namespace hpx::execution::experimental {
     {
     private:
         // any unsequenced policy just returns itself
-        template <typename ExPolicy>
+        // clang-format off
+        template <typename ExPolicy,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy>
+            )>
+        // clang-format on
         friend constexpr decltype(auto) tag_fallback_invoke(
             to_unseq_t, ExPolicy&& policy) noexcept
         {

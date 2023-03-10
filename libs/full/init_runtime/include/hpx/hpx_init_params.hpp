@@ -17,7 +17,6 @@
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstring>
 #include <functional>

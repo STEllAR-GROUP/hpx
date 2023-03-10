@@ -51,12 +51,12 @@ namespace hpx::lcos::detail {
     void invoke_continuation_nounwrap(
         Func& func, Future&& future, Continuation& cont)
     {
-        constexpr bool is_void =
-            std::is_void_v<util::invoke_result_t<Func, Future&&>>;
-
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
+                static constexpr bool is_void =
+                    std::is_void_v<util::invoke_result_t<Func, Future&&>>;
+
                 if constexpr (is_void)
                 {
                     func(HPX_FORWARD(Future, future));
@@ -254,6 +254,11 @@ namespace hpx::lcos::detail {
                     if (this->is_ready())
                         return;    // nothing we can do
 
+                    // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
                     if (id_ != threads::invalid_thread_id)
                     {
                         // interrupt the executing thread
@@ -274,6 +279,10 @@ namespace hpx::lcos::detail {
                             "continuation<Future, ContResult>::cancel",
                             "future can't be canceled at this time");
                     }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
                 },
                 [&](std::exception_ptr ep) {
                     this->started_ = true;

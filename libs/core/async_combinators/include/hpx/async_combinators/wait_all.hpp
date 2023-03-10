@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -267,7 +267,7 @@ namespace hpx::detail {
         static constexpr bool is_end_v = is_end<I>::value;
 
     public:
-        wait_all_frame(Tuple const& t)
+        explicit wait_all_frame(Tuple const& t) noexcept
           : base_type(init_no_addref{})
           , t_(t)
         {
@@ -329,8 +329,8 @@ namespace hpx::detail {
             next = std::decay_t<Iter>{};
             end = std::decay_t<Iter>{};
 
-            // All elements of the sequence are ready now, proceed to the
-            // next argument.
+            // All elements of the sequence are ready now, proceed to the next
+            // argument.
             do_await<I + 1>();
         }
 
@@ -360,8 +360,8 @@ namespace hpx::detail {
                     if (!next_future_data->is_ready(std::memory_order_relaxed))
                     {
                         // Attach a continuation to this future which will
-                        // re-evaluate it and continue to the next argument
-                        // (if any).
+                        // re-evaluate it and continue to the next argument (if
+                        // any).
                         next_future_data->set_on_completed(
                             [this_ = HPX_MOVE(this_)]() -> void {
                                 this_->template await_future<I>();
@@ -389,7 +389,7 @@ namespace hpx::detail {
             if constexpr (is_end_v<I>)
             {
                 // simply make ourself ready
-                this->set_value(util::unused);
+                this->set_data(util::unused);
             }
             else
             {
@@ -441,8 +441,7 @@ namespace hpx {
     {
     private:
         template <typename Future>
-        friend bool tag_invoke(
-            wait_all_nothrow_t, std::vector<Future> const& values)
+        static bool wait_all_nothrow_impl(std::vector<Future> const& values)
         {
             if (!values.empty())
             {
@@ -460,10 +459,17 @@ namespace hpx {
         }
 
         template <typename Future>
+        friend bool tag_invoke(
+            wait_all_nothrow_t, std::vector<Future> const& values)
+        {
+            return wait_all_nothrow_t::wait_all_nothrow_impl(values);
+        }
+
+        template <typename Future>
         friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
             wait_all_nothrow_t, std::vector<Future>& values)
         {
-            return tag_invoke(wait_all_nothrow_t{},
+            return wait_all_nothrow_t::wait_all_nothrow_impl(
                 const_cast<std::vector<Future> const&>(values));
         }
 
@@ -471,13 +477,12 @@ namespace hpx {
         friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
             wait_all_nothrow_t, std::vector<Future>&& values)
         {
-            return tag_invoke(wait_all_nothrow_t{},
+            return wait_all_nothrow_t::wait_all_nothrow_impl(
                 const_cast<std::vector<Future> const&>(values));
         }
 
         template <typename Future, std::size_t N>
-        friend bool tag_invoke(
-            wait_all_nothrow_t, std::array<Future, N> const& values)
+        static bool wait_all_nothrow_impl(std::array<Future, N> const& values)
         {
             using result_type = hpx::tuple<std::array<Future, N> const&>;
             using frame_type = hpx::detail::wait_all_frame<result_type>;
@@ -490,10 +495,17 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
+        friend bool tag_invoke(
+            wait_all_nothrow_t, std::array<Future, N> const& values)
+        {
+            return wait_all_nothrow_t::wait_all_nothrow_impl(values);
+        }
+
+        template <typename Future, std::size_t N>
         friend HPX_WAIT_ALL_FORCEINLINE bool tag_invoke(
             wait_all_nothrow_t, std::array<Future, N>& values)
         {
-            return tag_invoke(wait_all_nothrow_t{},
+            return wait_all_nothrow_t::wait_all_nothrow_impl(
                 const_cast<std::array<Future, N> const&>(values));
         }
 
@@ -508,7 +520,7 @@ namespace hpx {
             }
 
             auto values = traits::acquire_shared_state<Iterator>()(begin, end);
-            return tag_invoke(wait_all_nothrow_t{}, values);
+            return wait_all_nothrow_t::wait_all_nothrow_impl(values);
         }
 
         friend HPX_WAIT_ALL_FORCEINLINE constexpr bool tag_invoke(

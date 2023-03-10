@@ -257,10 +257,20 @@ namespace hpx::lockfree::detail {
         using tag_t = std::uint16_t;
         using index_t = std::uint16_t;
 
+        // Variable 'hpx::lockfree::detail::tagged_index_data::tag' is uninitialized
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
         /** uninitialized constructor */
-        tagged_index_data() noexcept    //: index(0), tag(0)
+        tagged_index_data() noexcept    //-V832 //-V730
         {
         }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         /** copy constructor */
         tagged_index_data(tagged_index_data const& rhs) = default;

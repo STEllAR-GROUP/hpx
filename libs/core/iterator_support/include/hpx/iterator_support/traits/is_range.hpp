@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
@@ -24,10 +23,9 @@ namespace hpx::traits {
 
     template <typename T>
     struct is_range<T,
-        typename std::enable_if<hpx::traits::is_sentinel_for<
+        std::enable_if_t<hpx::traits::is_sentinel_for<
             typename util::detail::sentinel<T>::type,
-            typename util::detail::iterator<T>::type>::value>::type>
-      : std::true_type
+            typename util::detail::iterator<T>::type>::value>> : std::true_type
     {
     };
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,7 +32,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     /// This class specifies the parameters for a distribution policy to use
     /// for creating a given number of items on the locality where a given
@@ -42,7 +42,7 @@ namespace hpx { namespace components {
     public:
         /// Default-construct a new instance of a \a colocating_distribution_policy.
         /// This policy will represent the local locality.
-        colocating_distribution_policy() = default;
+        constexpr colocating_distribution_policy() = default;
 
         /// Create a new \a colocating_distribution_policy representing the
         /// locality where the given object is current located
@@ -61,9 +61,9 @@ namespace hpx { namespace components {
         /// \param client  [in] The client side representation of the object
         ///                with which the new instances should be colocated on
         ///
-        template <typename Client, typename Stub>
+        template <typename Client, typename Stub, typename Data>
         colocating_distribution_policy operator()(
-            client_base<Client, Stub> const& client) const
+            client_base<Client, Stub, Data> const& client) const
         {
             return colocating_distribution_policy(client.get_id());
         }
@@ -254,14 +254,14 @@ namespace hpx { namespace components {
         /// \note This function is part of the creation policy implemented by
         ///       this class
         ///
-        std::size_t get_num_localities() const
+        [[nodiscard]] static std::size_t get_num_localities()
         {
             return 1;
         }
 
         /// Returns the locality which is anticipated to be used for the next
         /// async operation
-        hpx::id_type get_next_target() const
+        [[nodiscard]] hpx::id_type get_next_target() const
         {
             return id_ ?
                 id_ :
@@ -270,8 +270,8 @@ namespace hpx { namespace components {
 
     protected:
         /// \cond NOINTERNAL
-        explicit colocating_distribution_policy(id_type const& id)
-          : id_(id)
+        explicit colocating_distribution_policy(id_type id)
+          : id_(HPX_MOVE(id))
         {
         }
 
@@ -286,7 +286,7 @@ namespace hpx { namespace components {
         }
 
         hpx::id_type id_;    // the global address of the object with which the
-                             // new objects will be colocated
+                             // target objects are colocated
         /// \endcond
     };
 
@@ -294,7 +294,7 @@ namespace hpx { namespace components {
     /// will represent the local locality and will place all items to create
     /// here.
     static colocating_distribution_policy const colocated{};
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {
@@ -303,6 +303,7 @@ namespace hpx {
     using hpx::components::colocating_distribution_policy;
 
     namespace traits {
+
         template <>
         struct is_distribution_policy<
             components::colocating_distribution_policy> : std::true_type

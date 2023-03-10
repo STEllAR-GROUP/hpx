@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //                2017-2018 Taeguk Kwon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
@@ -265,4 +265,4 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     // we're just reusing our existing implementation
     using hpx::exception_list;
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel

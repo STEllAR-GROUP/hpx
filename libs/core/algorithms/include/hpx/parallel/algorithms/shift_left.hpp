@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -107,12 +107,9 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
 #include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/reverse.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -125,10 +122,12 @@ namespace hpx {
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // shift_left
     namespace detail {
+
         template <typename ExPolicy, typename FwdIter, typename Sent>
         hpx::future<FwdIter> shift_left_helper(
             ExPolicy policy, FwdIter first, Sent last, FwdIter new_first)
@@ -145,8 +144,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
                     hpx::future<FwdIter> f = r.call2(p, non_seq(), first, last);
                     return f.then(
-                        [=](hpx::future<FwdIter>&& f) mutable -> FwdIter {
-                            f.get();
+                        [=](hpx::future<FwdIter>&& fut) mutable -> FwdIter {
+                            fut.get();
                             std::advance(
                                 first, detail::distance(new_first, last));
                             return first;
@@ -155,8 +154,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 r.call2(p, non_seq(), new_first, last));
         }
 
-        /* Sequential shift_left implementation inspired
-        from https://github.com/danra/shift_proposal */
+        // Sequential shift_left implementation inspired from
+        // https://github.com/danra/shift_proposal
 
         template <typename FwdIter, typename Sent, typename Size>
         static constexpr FwdIter sequential_shift_left(
@@ -177,11 +176,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         template <typename FwdIter2>
-        struct shift_left
-          : public detail::algorithm<shift_left<FwdIter2>, FwdIter2>
+        struct shift_left : public algorithm<shift_left<FwdIter2>, FwdIter2>
         {
-            shift_left()
-              : shift_left::algorithm("shift_left")
+            constexpr shift_left() noexcept
+              : algorithm<shift_left, FwdIter2>("shift_left")
             {
             }
 
@@ -205,7 +203,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 FwdIter2>::type
             parallel(ExPolicy&& policy, FwdIter2 first, Sent last, Size n)
             {
-                auto dist =
+                auto const dist =
                     static_cast<std::size_t>(detail::distance(first, last));
                 if (n <= 0 || static_cast<std::size_t>(n) >= dist)
                 {
@@ -220,7 +218,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -233,33 +231,37 @@ namespace hpx {
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value)>
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
+            )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             shift_left_t, FwdIter first, FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+            return hpx::parallel::detail::shift_left<FwdIter>().call(
                 hpx::execution::seq, first, last, n);
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value)>
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
+            )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
         tag_fallback_invoke(shift_left_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, Size n)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::shift_left<FwdIter>().call(
+            return hpx::parallel::detail::shift_left<FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, n);
         }
     } shift_left{};

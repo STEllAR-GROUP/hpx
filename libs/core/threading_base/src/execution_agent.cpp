@@ -112,7 +112,7 @@ namespace hpx::threads {
         std::size_t k = 0;
         do
         {
-            if (k < 32 || k & 1)
+            if (k < 32 || k & 1)    //-V112
             {
                 do_yield(
                     desc, hpx::threads::thread_schedule_state::pending_boost);
@@ -161,7 +161,14 @@ namespace hpx::threads {
 
         // handle interruption, if needed
         thread_data* thrd_data = get_thread_id_data(id);
-        HPX_ASSERT(thrd_data);
+        if (HPX_UNLIKELY(thrd_data == nullptr))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
+                "execution_agent::do_yield",
+                "null thread id encountered (is this executed on a "
+                "HPX-thread?)");
+        }
+
         thrd_data->interruption_point();
 
         thrd_data->set_last_worker_thread_num(
@@ -180,16 +187,18 @@ namespace hpx::threads {
 #endif
             [[maybe_unused]] on_exit_reset_held_lock_data held_locks;
 
-            HPX_ASSERT(thrd_data->get_state().state() ==
-                thread_schedule_state::active);
+            HPX_ASSERT(thrd_data != nullptr &&
+                thrd_data->get_state().state() ==
+                    thread_schedule_state::active);
             HPX_ASSERT(state != thread_schedule_state::active);
 
             // actual yield operation
             statex = self_.yield(
                 threads::thread_result_type(state, threads::invalid_thread_id));
 
-            HPX_ASSERT(get_thread_id_data(id)->get_state().state() ==
-                thread_schedule_state::active);
+            HPX_ASSERT(thrd_data != nullptr &&
+                thrd_data->get_state().state() ==
+                    thread_schedule_state::active);
         }
 
         // handle interruption, if needed

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,11 +18,12 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // Executor customization points
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Executor, typename Enable = void>
         struct timed_post_fn_helper;
@@ -295,4 +296,4 @@ namespace hpx { namespace parallel { namespace execution {
                 rel_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
         }
     } sync_execute_after{};
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

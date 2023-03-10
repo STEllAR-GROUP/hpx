@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,10 +23,10 @@ namespace hpx::util::cache::statistics {
     class local_full_statistics : public local_statistics
     {
     private:
-        std::int64_t get_and_reset_value(
+        [[nodiscard]] static std::int64_t get_and_reset_value(
             std::int64_t& value, bool reset) noexcept
         {
-            std::int64_t result = value;
+            std::int64_t const result = value;
             if (reset)
                 value = 0;
             return result;
@@ -45,12 +45,13 @@ namespace hpx::util::cache::statistics {
         struct update_on_exit
         {
         private:
-            static constexpr api_counter_data& get_api_counter_data(
-                local_full_statistics& stat, method m) noexcept
+            [[nodiscard]] static constexpr api_counter_data&
+            get_api_counter_data(local_full_statistics& stat, method m) noexcept
             {
                 switch (m)
                 {
                 case method::get_entry:
+                    [[fallthrough]];
                 default:
                     break;
 
@@ -67,12 +68,12 @@ namespace hpx::util::cache::statistics {
                 return stat.get_entry_;
             }
 
-            static std::int64_t now() noexcept
+            [[nodiscard]] static std::int64_t now() noexcept
             {
 #if defined(__bgq__)
                 return std::uint64_t(GetTimeBase());
 #else
-                std::chrono::nanoseconds ns =
+                std::chrono::nanoseconds const ns =
                     std::chrono::steady_clock::now().time_since_epoch();
                 return static_cast<std::int64_t>(ns.count());
 #endif
@@ -97,56 +98,56 @@ namespace hpx::util::cache::statistics {
 
         /// The function \a get_get_entry_count returns the number of
         /// invocations of the get_entry() API function of the cache.
-        std::int64_t get_get_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_get_entry_count(bool reset) noexcept
         {
             return get_and_reset_value(get_entry_.count_, reset);
         }
 
         /// The function \a get_insert_entry_count returns the number of
         /// invocations of the insert_entry() API function of the cache.
-        std::int64_t get_insert_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_insert_entry_count(bool reset) noexcept
         {
             return get_and_reset_value(insert_entry_.count_, reset);
         }
 
         /// The function \a get_update_entry_count returns the number of
         /// invocations of the update_entry() API function of the cache.
-        std::int64_t get_update_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_update_entry_count(bool reset) noexcept
         {
             return get_and_reset_value(update_entry_.count_, reset);
         }
 
         /// The function \a get_erase_entry_count returns the number of
         /// invocations of the erase() API function of the cache.
-        std::int64_t get_erase_entry_count(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_erase_entry_count(bool reset) noexcept
         {
             return get_and_reset_value(erase_entry_.count_, reset);
         }
 
         /// The function \a get_get_entry_time returns the overall time spent
         /// executing of the get_entry() API function of the cache.
-        std::int64_t get_get_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_get_entry_time(bool reset) noexcept
         {
             return get_and_reset_value(get_entry_.time_, reset);
         }
 
         /// The function \a get_insert_entry_time returns the overall time
         /// spent executing of the insert_entry() API function of the cache.
-        std::int64_t get_insert_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_insert_entry_time(bool reset) noexcept
         {
             return get_and_reset_value(insert_entry_.time_, reset);
         }
 
         /// The function \a get_update_entry_time returns the overall time
         /// spent executing of the update_entry() API function of the cache.
-        std::int64_t get_update_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_update_entry_time(bool reset) noexcept
         {
             return get_and_reset_value(update_entry_.time_, reset);
         }
 
         /// The function \a get_erase_entry_time returns the overall time spent
         /// executing of the erase() API function of the cache.
-        std::int64_t get_erase_entry_time(bool reset) noexcept
+        [[nodiscard]] std::int64_t get_erase_entry_time(bool reset) noexcept
         {
             return get_and_reset_value(erase_entry_.time_, reset);
         }

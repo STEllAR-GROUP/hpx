@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,7 +16,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -33,10 +32,14 @@ namespace hpx {
     }
 #endif
 
+#if HPX_HAVE_ITTNOTIFY != 0
     mutex::~mutex()
     {
         HPX_ITT_SYNC_DESTROY(this);
     }
+#else
+    mutex::~mutex() = default;
+#endif
 
     void mutex::lock(char const* description, error_code& ec)
     {
@@ -112,10 +115,19 @@ namespace hpx {
         owner_id_ = threads::invalid_thread_id;
 
         {
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
+
+            // Failing to release lock 'no_mtx' in function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
 
             cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost, ec);
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
     }
 
@@ -125,7 +137,7 @@ namespace hpx {
     {
     }
 
-    timed_mutex::~timed_mutex() {}
+    timed_mutex::~timed_mutex() = default;
 
     bool timed_mutex::try_lock_until(
         hpx::chrono::steady_time_point const& abs_time,

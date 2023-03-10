@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,7 +28,7 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -112,25 +112,26 @@ namespace hpx::threads::policies {
                 init.num_queues_, create_topology().get_machine_affinity_mask())
         {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-            resize(steals_in_numa_domain_, threads::hardware_concurrency());
-            resize(
-                steals_outside_numa_domain_, threads::hardware_concurrency());
+            resize(steals_in_numa_domain_,
+                static_cast<std::size_t>(threads::hardware_concurrency()));
+            resize(steals_outside_numa_domain_,
+                static_cast<std::size_t>(threads::hardware_concurrency()));
 #endif
             if (!deferred_initialization)
             {
                 HPX_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
-                    queues_[i] = new thread_queue_type(i, thread_queue_init_);
+                    queues_[i] = new thread_queue_type(thread_queue_init_);
             }
         }
 
-        virtual ~local_queue_scheduler()
+        ~local_queue_scheduler()
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 delete queues_[i];
         }
 
-        static std::string get_scheduler_name()
+        static std::string_view get_scheduler_name()
         {
             return "local_queue_scheduler";
         }
@@ -308,8 +309,7 @@ namespace hpx::threads::policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread);
+            num_thread = select_active_pu(num_thread);
 
             HPX_ASSERT(num_thread < queue_size);
             queues_[num_thread]->create_thread(data, id, ec);
@@ -327,9 +327,8 @@ namespace hpx::threads::policies {
 
         // Return the next thread to be executed, return false if none is
         // available
-        virtual bool get_next_thread(std::size_t num_thread, bool running,
-            threads::thread_id_ref_type& thrd,
-            bool /*enable_stealing*/) override
+        bool get_next_thread(std::size_t num_thread, bool running,
+            threads::thread_id_ref_type& thrd, bool /*enable_stealing*/)
         {
             std::size_t queues_size = queues_.size();
 
@@ -461,7 +460,8 @@ namespace hpx::threads::policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
+            if (schedulehint.mode ==
+                thread_schedule_hint_mode::thread)    //-V1051
             {
                 num_thread = schedulehint.hint;
             }
@@ -481,8 +481,7 @@ namespace hpx::threads::policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
@@ -504,7 +503,8 @@ namespace hpx::threads::policies {
         {
             // NOTE: This scheduler ignores NUMA hints.
             std::size_t num_thread = std::size_t(-1);
-            if (schedulehint.mode == thread_schedule_hint_mode::thread)
+            if (schedulehint.mode ==
+                thread_schedule_hint_mode::thread)    //-V1051
             {
                 num_thread = schedulehint.hint;
             }
@@ -524,8 +524,7 @@ namespace hpx::threads::policies {
                 num_thread %= queue_size;
             }
 
-            std::unique_lock<pu_mutex_type> l;
-            num_thread = select_active_pu(l, num_thread, allow_fallback);
+            num_thread = select_active_pu(num_thread, allow_fallback);
 
             HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() == this);
 
@@ -708,9 +707,9 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        virtual bool wait_or_add_new(std::size_t num_thread, bool running,
+        bool wait_or_add_new(std::size_t num_thread, bool running,
             std::int64_t& idle_loop_count, bool /* enable_stealing */,
-            std::size_t& added) override
+            std::size_t& added, thread_id_ref_type* = nullptr)
         {
             std::size_t queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
@@ -846,21 +845,10 @@ namespace hpx::threads::policies {
 
                 if (HPX_UNLIKELY(suspended_only))
                 {
-                    if (running)
-                    {
-                        LTM_(warning).format(
-                            "pool({}), scheduler({}), queue({}): no new work "
-                            "available, are we deadlocked?",
-                            *this->get_parent_pool(), *this, num_thread);
-                    }
-                    else
-                    {
-                        LHPX_CONSOLE_(hpx::util::logging::level::warning)
-                            .format(
-                                "  [TM] pool({}), scheduler({}), queue({}): no "
-                                "new work available, are we deadlocked?\n",
-                                *this->get_parent_pool(), *this, num_thread);
-                    }
+                    LTM_(warning).format(
+                        "pool({}), scheduler({}), queue({}): no new work "
+                        "available, are we deadlocked?",
+                        *this->get_parent_pool(), *this, num_thread);
                 }
             }
 #else
@@ -879,8 +867,7 @@ namespace hpx::threads::policies {
 
             if (nullptr == queues_[num_thread])
             {
-                queues_[num_thread] =
-                    new thread_queue_type(num_thread, thread_queue_init_);
+                queues_[num_thread] = new thread_queue_type(thread_queue_init_);
             }
 
             queues_[num_thread]->on_start_thread(num_thread);

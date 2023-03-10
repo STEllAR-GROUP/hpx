@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx { namespace parallel { namespace detail {
     template <typename T>
     struct seg_reduce : public detail::algorithm<seg_reduce<T>, T>
     {
@@ -155,4 +155,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 }));
         }
     };
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::detail

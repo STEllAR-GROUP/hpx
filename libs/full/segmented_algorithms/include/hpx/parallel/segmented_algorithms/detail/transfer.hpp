@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented transfer
     namespace detail {
@@ -265,4 +265,4 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel

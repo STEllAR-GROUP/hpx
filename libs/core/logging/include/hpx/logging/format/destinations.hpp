@@ -32,9 +32,9 @@ namespace hpx::util::logging::destination {
     */
     struct cout : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<cout> make();
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<cout> make();
 
-        HPX_CORE_EXPORT ~cout();
+        HPX_CORE_EXPORT ~cout() override;
 
     protected:
         cout() = default;
@@ -45,9 +45,9 @@ namespace hpx::util::logging::destination {
     */
     struct cerr : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<cerr> make();
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<cerr> make();
 
-        HPX_CORE_EXPORT ~cerr();
+        HPX_CORE_EXPORT ~cerr() override;
 
     protected:
         cerr() = default;
@@ -62,10 +62,10 @@ namespace hpx::util::logging::destination {
     */
     struct stream : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<stream> make(
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<stream> make(
             std::ostream* stream_ptr);
 
-        HPX_CORE_EXPORT ~stream();
+        HPX_CORE_EXPORT ~stream() override;
 
         /**
          @brief resets the stream. Further output will be written to this stream
@@ -100,9 +100,9 @@ namespace hpx::util::logging::destination {
      */
     struct dbg_window : manipulator
     {
-        HPX_CORE_EXPORT static std::unique_ptr<dbg_window> make();
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<dbg_window> make();
 
-        HPX_CORE_EXPORT ~dbg_window();
+        HPX_CORE_EXPORT ~dbg_window() override;
 
     protected:
         dbg_window() = default;
@@ -144,14 +144,14 @@ namespace hpx::util::logging::destination {
         @param set [optional] file settings - see file_settings class,
         and @ref dealing_with_flags
         */
-        HPX_CORE_EXPORT static std::unique_ptr<file> make(
+        [[nodiscard]] HPX_CORE_EXPORT static std::unique_ptr<file> make(
             std::string const& file_name, file_settings set = {});
 
-        HPX_CORE_EXPORT ~file();
+        HPX_CORE_EXPORT ~file() override;
 
     protected:
-        file(std::string const& file_name, file_settings set)
-          : name(file_name)
+        file(std::string file_name, file_settings set)
+          : name(HPX_MOVE(file_name))
           , settings(set)
         {
         }

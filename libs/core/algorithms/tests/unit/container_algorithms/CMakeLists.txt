@@ -124,9 +124,6 @@ set(tests
     unique_copy_range
 )
 
-set(transform_range_binary_FLAGS COMPILE_FLAGS
-                                 -DHPX_HAVE_DEPRECATION_WARNINGS_V1_6=0
-)
 foreach(test ${tests})
   set(sources ${test}.cpp)
 

@@ -63,7 +63,7 @@ namespace hpx::compute::host {
         {
             if (hpx::threads::any(mask))
             {
-                res.push_back(target(mask));
+                res.emplace_back(mask);
             }
         }
 

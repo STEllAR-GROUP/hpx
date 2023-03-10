@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,7 @@ hpx_option(
 
 if(HPX_DATASTRUCTURES_WITH_ADAPT_STD_VARIANT)
   hpx_add_config_define_namespace(
-    DEFINE HPX_DATASTRUCTURESHAVE_ADAPT_STD_VARIANT NAMESPACE DATASTRUCTURES
+    DEFINE HPX_DATASTRUCTURES_HAVE_ADAPT_STD_VARIANT NAMESPACE DATASTRUCTURES
   )
 endif()
 

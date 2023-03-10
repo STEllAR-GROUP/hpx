@@ -27,7 +27,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx { namespace parallel { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -341,4 +341,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         return f.get();
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::detail

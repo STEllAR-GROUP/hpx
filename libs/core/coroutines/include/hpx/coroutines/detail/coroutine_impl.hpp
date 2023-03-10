@@ -102,7 +102,7 @@ namespace hpx::threads::coroutines::detail {
         }
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
-        std::size_t get_thread_phase() const noexcept
+        constexpr std::size_t get_thread_phase() const noexcept
         {
             return this->phase();
         }

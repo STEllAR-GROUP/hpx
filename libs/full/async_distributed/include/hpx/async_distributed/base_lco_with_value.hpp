@@ -36,7 +36,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     namespace detail {
 
@@ -145,7 +145,18 @@ namespace hpx { namespace lcos {
 
         Result get_value_nonvirt()
         {
+            // Use of the comma-operator in a tested expression causes the left
+            // argument to be ignored when it has no side-effects.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 6319)
+#endif
+
             return util::void_guard<Result>(), get_value();
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
     public:
@@ -204,9 +215,9 @@ namespace hpx { namespace lcos {
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
             base_lco_with_value, get_value, get_value_action)
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // define component type data base entry generator
     template <typename Result, typename RemoteResult, typename Enable>
@@ -242,9 +253,9 @@ namespace hpx { namespace traits {
             HPX_ASSERT(false);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     template <typename Result, typename RemoteResult>
     struct component_heap_impl<
@@ -281,7 +292,7 @@ namespace hpx { namespace components { namespace detail {
             return heap.get();
         }
     };
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(...)                      \

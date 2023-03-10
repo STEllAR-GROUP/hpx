@@ -54,7 +54,7 @@ void test_transform_inclusive_scan_sent(IteratorTag)
 
     // verify values
     std::vector<std::size_t> f(end_len);
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+    hpx::parallel::detail::sequential_transform_inclusive_scan(
         std::begin(c), std::begin(c) + end_len, std::begin(f), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
@@ -91,7 +91,7 @@ void test_transform_inclusive_scan_sent(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> f(end_len);
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+    hpx::parallel::detail::sequential_transform_inclusive_scan(
         std::begin(c), std::begin(c) + end_len, std::begin(f), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
@@ -123,7 +123,7 @@ void test_transform_inclusive_scan(IteratorTag)
 
     // verify values
     std::vector<std::size_t> f(c.size());
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+    hpx::parallel::detail::sequential_transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
@@ -158,7 +158,7 @@ void test_transform_inclusive_scan(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> f(c.size());
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+    hpx::parallel::detail::sequential_transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));
@@ -190,7 +190,7 @@ void test_transform_inclusive_scan_async(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> f(c.size());
-    hpx::parallel::v1::detail::sequential_transform_inclusive_scan(
+    hpx::parallel::detail::sequential_transform_inclusive_scan(
         std::begin(c), std::end(c), std::begin(f), conv, val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(f)));

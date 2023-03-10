@@ -109,7 +109,7 @@ namespace hpx::util {
 
         static unsigned int random_seed(size_type size)
         {
-            unsigned int seed = std::random_device{}();
+            unsigned int const seed = std::random_device{}();
             std::mt19937 gen{seed};
             return std::uniform_int_distribution<>(0, size - 1)(gen);
         }
@@ -186,7 +186,7 @@ namespace hpx::util {
         // Use for hash table lookup, or anything where one collision in 2^^32 is
         // acceptable.  Do NOT use for cryptographic purposes.
         constexpr size_type hash(
-            const char* k, std::size_t length) const noexcept
+            char const* k, std::size_t length) const noexcept
         {
             /* Set up the internal state */
             size_type a = 0x9e3779b9; /* the golden ratio; an arbitrary value */
@@ -199,55 +199,61 @@ namespace hpx::util {
             /*---------------------------------------- handle most of the key */
             while (len >= 12)
             {
-                a += (k[0] + ((size_type) k[1] << 8) +
-                    ((size_type) k[2] << 16) + ((size_type) k[3] << 24));
-                b += (k[4] + ((size_type) k[5] << 8) +
-                    ((size_type) k[6] << 16) + ((size_type) k[7] << 24));
-                c += (k[8] + ((size_type) k[9] << 8) +
-                    ((size_type) k[10] << 16) + ((size_type) k[11] << 24));
+                a += (k[0] + (static_cast<size_type>(k[1]) << 8) +
+                    (static_cast<size_type>(k[2]) << 16) +
+                    (static_cast<size_type>(k[3]) << 24));
+                b += (k[4] + (static_cast<size_type>(k[5]) << 8) +
+                    (static_cast<size_type>(k[6]) << 16) +
+                    (static_cast<size_type>(k[7]) << 24));
+                c += (k[8] + (static_cast<size_type>(k[9]) << 8) +
+                    (static_cast<size_type>(k[10]) << 16) +
+                    (static_cast<size_type>(k[11]) << 24));
                 detail::mix(a, b, c);
                 k += 12;
                 len -= 12;
             }
 
             /*------------------------------------- handle the last 11 bytes */
-            c += (size_type) length;
+            c += static_cast<size_type>(length);
             switch (len) /* all the case statements fall through */
             {
             case 11:
-                c += ((size_type) k[10] << 24);
+                c += (static_cast<size_type>(k[10]) << 24);
                 [[fallthrough]];
             case 10:
-                c += ((size_type) k[9] << 16);
+                c += (static_cast<size_type>(k[9]) << 16);
                 [[fallthrough]];
             case 9:
-                c += ((size_type) k[8] << 8);
+                c += (static_cast<size_type>(k[8]) << 8);
                 [[fallthrough]];
                 /* the first byte of c is reserved for the length */
             case 8:
-                b += ((size_type) k[7] << 24);
+                b += (static_cast<size_type>(k[7]) << 24);
                 [[fallthrough]];
             case 7:
-                b += ((size_type) k[6] << 16);
+                b += (static_cast<size_type>(k[6]) << 16);
                 [[fallthrough]];
             case 6:
-                b += ((size_type) k[5] << 8);
+                b += (static_cast<size_type>(k[5]) << 8);
                 [[fallthrough]];
             case 5:
                 b += k[4];
                 [[fallthrough]];
             case 4:
-                a += ((size_type) k[3] << 24);
+                a += (static_cast<size_type>(k[3]) << 24);
                 [[fallthrough]];
             case 3:
-                a += ((size_type) k[2] << 16);
+                a += (static_cast<size_type>(k[2]) << 16);
                 [[fallthrough]];
             case 2:
-                a += ((size_type) k[1] << 8);
+                a += (static_cast<size_type>(k[1]) << 8);
                 [[fallthrough]];
             case 1:
                 a += k[0];
                 /* case 0: nothing left to add */
+                [[fallthrough]];
+            default:
+                break;
             }
 
             detail::mix(a, b, c);
@@ -262,7 +268,7 @@ namespace hpx::util {
         friend class hpx::serialization::access;
 
         template <class Archive>
-        void serialize(Archive& ar, const unsigned int version)
+        void serialize(Archive& ar, unsigned int const version)
         {
             // clang-format off
             ar & seed_;

@@ -11,12 +11,35 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
+#include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/timing.hpp>
+#include <hpx/modules/util.hpp>
+
 #include <hpx/assert.hpp>
+#include <hpx/command_line_handling/command_line_handling.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset/parcelport_impl.hpp>
+#include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/parcelset_base/locality.hpp>
+#include <hpx/plugin/traits/plugin_config_data.hpp>
+#include <hpx/plugin_factories/parcelport_factory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <hpx/parcelset/parcelport_connection.hpp>
+#include <hpx/parcelset_base/detail/gatherer.hpp>
+#include <hpx/parcelset_base/parcelport.hpp>
+
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/sender_connection.hpp>
-#include <hpx/parcelport_lci/tag_provider.hpp>
+#include <hpx/parcelport_lci/backlog_queue.hpp>
+#include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/locality.hpp>
+#include <hpx/parcelport_lci/receiver.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -24,97 +47,33 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 namespace hpx::parcelset::policies::lci {
+    struct sender_connection;
     struct sender
     {
         using connection_type = sender_connection;
         using connection_ptr = std::shared_ptr<connection_type>;
-        using connection_list = std::deque<connection_ptr>;
-
-        using mutex_type = hpx::spinlock;
 
         sender() noexcept {}
 
         void run() noexcept {}
 
-        connection_ptr create_connection(int dest, parcelset::parcelport* pp)
-        {
-            return std::make_shared<connection_type>(this, dest, pp);
-        }
+        connection_ptr create_connection(int dest, parcelset::parcelport* pp);
 
-        void add(connection_ptr const& ptr)
-        {
-            std::unique_lock<mutex_type> l(connections_mtx_);
-            connections_.push_back(ptr);
-        }
+        bool background_work(size_t num_thread) noexcept;
 
-        int acquire_tag() noexcept
-        {
-            return tag_provider_.acquire();
-        }
+        // connectionless interface
+        using buffer_type = std::vector<char>;
+        using chunk_type = serialization::serialization_chunk;
+        using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
+        using callback_fn_type =
+            hpx::move_only_function<void(error_code const&)>;
 
-        void send_messages(connection_ptr connection)
-        {
-            // Check if sending has been completed....
-            if (connection->send())
-            {
-                error_code ec(throwmode::lightweight);
-                hpx::move_only_function<void(error_code const&,
-                    parcelset::locality const&, connection_ptr)>
-                    postprocess_handler;
-                std::swap(
-                    postprocess_handler, connection->postprocess_handler_);
-                postprocess_handler(ec, connection->destination(), connection);
-            }
-            else
-            {
-                std::unique_lock<mutex_type> l(connections_mtx_);
-                connections_.push_back(HPX_MOVE(connection));
-            }
-        }
-
-        bool background_work() noexcept
-        {
-            connection_ptr connection;
-            {
-                std::unique_lock<mutex_type> l(
-                    connections_mtx_, std::try_to_lock);
-                if (l.owns_lock() && !connections_.empty())
-                {
-                    connection = HPX_MOVE(connections_.front());
-                    connections_.pop_front();
-                }
-            }
-
-            bool has_work = false;
-            if (connection)
-            {
-                send_messages(HPX_MOVE(connection));
-                has_work = true;
-            }
-            //            next_free_tag();
-            return has_work;
-        }
-
-    private:
-        tag_provider tag_provider_;
-
-        void next_free_tag() noexcept
-        {
-            LCI_request_t request;
-            LCI_error_t ret =
-                LCI_queue_pop(util::lci_environment::rt_queue(), &request);
-            if (ret == LCI_OK)
-            {
-                int next_free = *(int*) &request.data.immediate;
-                HPX_ASSERT(next_free > 1);
-                tag_provider_.release(next_free);
-            }
-        }
-
-        mutex_type connections_mtx_;
-        connection_list connections_;
+        static bool send(parcelset::parcelport* pp,
+            parcelset::locality const& dest, parcel_buffer_type buffer,
+            callback_fn_type&& callbackFn);
     };
 
 }    // namespace hpx::parcelset::policies::lci

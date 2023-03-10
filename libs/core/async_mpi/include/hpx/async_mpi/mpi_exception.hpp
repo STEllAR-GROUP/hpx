@@ -22,7 +22,8 @@ namespace hpx::mpi::experimental {
         inline std::string error_message(int code)
         {
             int N = 1023;
-            std::unique_ptr<char[]> err_buff(new char[std::size_t(N) + 1]);
+            std::unique_ptr<char[]> err_buff =
+                std::make_unique<char[]>(std::size_t(N) + 1);
             err_buff[0] = '\0';
 
             MPI_Error_string(code, err_buff.get(), &N);
@@ -36,12 +37,12 @@ namespace hpx::mpi::experimental {
     // exception type for failed launch of MPI functions
     struct mpi_exception : hpx::exception
     {
-        explicit mpi_exception(int err_code, const std::string& msg = "")
-          : err_code_(err_code)
-        {
-            hpx::exception(hpx::error::bad_function_call,
+        explicit mpi_exception(int err_code, std::string const& msg = "")
+          : hpx::exception(hpx::error::bad_function_call,
                 msg + std::string(" MPI returned with error: ") +
-                    detail::error_message(err_code));
+                    detail::error_message(err_code))
+          , err_code_(err_code)
+        {    //-V1067
         }
 
         int get_mpi_errorcode()

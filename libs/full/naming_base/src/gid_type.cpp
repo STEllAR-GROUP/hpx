@@ -25,16 +25,6 @@
 namespace hpx::naming {
 
     ///////////////////////////////////////////////////////////////////////////
-    bool operator==(gid_type const& lhs, gid_type const& rhs) noexcept
-    {
-        std::int64_t lhs_msb =
-            detail::strip_internal_bits_from_gid(lhs.id_msb_);
-        std::int64_t rhs_msb =
-            detail::strip_internal_bits_from_gid(rhs.id_msb_);
-
-        return (lhs_msb == rhs_msb) && (lhs.id_lsb_ == rhs.id_lsb_);
-    }
-
     bool operator<(gid_type const& lhs, gid_type const& rhs) noexcept
     {
         std::int64_t lhs_msb =

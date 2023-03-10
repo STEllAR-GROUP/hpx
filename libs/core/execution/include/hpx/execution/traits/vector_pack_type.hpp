@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,25 +14,32 @@
 #include <cstddef>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // exposition only
     template <typename T, std::size_t N = 0, typename Abi = void>
     struct vector_pack_type;
 
+    template <typename T, std::size_t N = 0, typename Abi = void>
+    using vector_pack_type_t = typename vector_pack_type<T, N, Abi>::type;
+
     // handle tuple<> transformations
     template <typename... T, std::size_t N, typename Abi>
     struct vector_pack_type<hpx::tuple<T...>, N, Abi>
     {
-        typedef hpx::tuple<typename vector_pack_type<T, N, Abi>::type...> type;
+        using type = hpx::tuple<vector_pack_type_t<T, N, Abi>...>;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename NewT>
     struct rebind_pack
     {
-        typedef typename vector_pack_type<T>::type type;
+        using type = vector_pack_type_t<T>;
     };
+
+    template <typename T, typename NewT>
+    using rebind_pack_t = typename rebind_pack<T, NewT>::type;
 
     ////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -40,7 +47,10 @@ namespace hpx { namespace parallel { namespace traits {
     {
         using type = bool;
     };
-}}}    // namespace hpx::parallel::traits
+
+    template <typename T>
+    using vector_pack_mask_type_t = typename vector_pack_mask_type<T>::type;
+}    // namespace hpx::parallel::traits
 
 #if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/eve/vector_pack_type.hpp>

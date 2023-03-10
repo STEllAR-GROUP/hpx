@@ -84,12 +84,12 @@ namespace {
 
     auto const raw_uint_def = x3::raw[x3::uint_];
 
-    BOOST_SPIRIT_DEFINE(
+    BOOST_SPIRIT_DEFINE(    //-V801
         path_parser, instance, parent, child, subchild, raw_uint)
 
 }    // namespace
 
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     bool parse_counter_name(std::string const& name, path_elements& elements)
     {
@@ -98,4 +98,4 @@ namespace hpx { namespace performance_counters {
         return x3::parse(begin, name.end(), path_parser, elements) &&
             begin == name.end();
     }
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

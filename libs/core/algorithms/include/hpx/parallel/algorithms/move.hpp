@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -63,7 +63,7 @@ namespace hpx {
     ///           moved.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     move(ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest);
 
     /// Moves the elements in the range [first, last), to another range
@@ -102,10 +102,10 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/algorithms/traits/segmented_iterator_traits.hpp>
-#include <hpx/executors/execution_policy.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/transfer.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
@@ -116,11 +116,11 @@ namespace hpx {
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // move
     namespace detail {
@@ -128,10 +128,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename IterPair>
         struct move_pair
-          : public detail::algorithm<detail::move_pair<IterPair>, IterPair>
+          : public algorithm<move_pair<IterPair>, IterPair>
         {
             move_pair()
-              : move_pair::algorithm("move")
+              : algorithm<move_pair, IterPair>("move")
             {
             }
 
@@ -187,8 +187,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_segmented<FwdIter1, FwdIter2>::value>::type>
+             std::enable_if_t<
+                iterators_are_segmented<FwdIter1, FwdIter2>::value>>
           : public move_pair<util::in_out_result<
                 typename hpx::traits::segmented_iterator_traits<
                     FwdIter1>::local_iterator,
@@ -199,48 +199,48 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename FwdIter1, typename FwdIter2>
         struct move<FwdIter1, FwdIter2,
-            typename std::enable_if<
-                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>::type>
+             std::enable_if_t<
+                iterators_are_not_segmented<FwdIter1, FwdIter2>::value>>
           : public move_pair<util::in_out_result<FwdIter1, FwdIter2>>
         {
         };
         /// \endcond
     }    // namespace detail
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::move
-    inline constexpr struct move_t final
+    inline constexpr struct move_t
       : hpx::detail::tag_parallel_algorithm<move_t>
     {
     private:
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value)>
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>)>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>
         tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
             FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
-                hpx::parallel::v1::detail::transfer<
-                    hpx::parallel::v1::detail::move<FwdIter1, FwdIter2>>(
+                hpx::parallel::detail::transfer<
+                    hpx::parallel::detail::move<FwdIter1, FwdIter2>>(
                     HPX_FORWARD(ExPolicy, policy), first, last, dest));
         }
 
         // clang-format off
         template <typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter1>::value &&
-                hpx::traits::is_iterator<FwdIter2>::value)>
+                hpx::traits::is_iterator_v<FwdIter1> &&
+                hpx::traits::is_iterator_v<FwdIter2>)>
         // clang-format on
-        friend FwdIter2 tag_fallback_invoke(
+        friend constexpr FwdIter2 tag_fallback_invoke(
             move_t, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return std::move(first, last, dest);

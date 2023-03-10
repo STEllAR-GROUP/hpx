@@ -13,7 +13,7 @@ namespace hpx::config_registry {
 
     namespace detail {
 
-        std::vector<module_config>& get_module_configs()
+        [[nodiscard]] std::vector<module_config>& get_module_configs()
         {
             static std::vector<module_config> configs;
             return configs;

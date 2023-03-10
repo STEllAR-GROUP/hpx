@@ -6,7 +6,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(example_programs
+    barrier_docs
     composable_guard
+    condition_variable_docs
+    counting_semaphore_docs
     customize_async
     enumerate_threads
     event_synchronization
@@ -20,10 +23,12 @@ set(example_programs
     local_channel_docs
     local_channel
     matrix_multiplication
+    mutex_docs
     pipeline1
     safe_object
     shared_mutex
     simple_future_continuation
+    task_group_docs
     timed_futures
     timed_wake
     use_main_thread
@@ -60,7 +65,6 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       hello_world_distributed
       interest_calculator
       interval_timer
-      invoke_function
       latch_remote
       partitioned_vector_spmd_foreach
       pingpong
@@ -68,6 +72,7 @@ if(HPX_WITH_DISTRIBUTED_RUNTIME)
       print_to_console
       receive_buffer
       sierpinski
+      simple_master_slave
       zerocopy_rdma
   )
 endif()
@@ -87,6 +92,7 @@ set(component_with_executor_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(error_handling_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_1_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(hello_world_2_FLAGS COMPONENT_DEPENDENCIES iostreams)
+
 if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams
                                     DEPENDENCIES compress_snappy
@@ -94,6 +100,7 @@ if(HPX_HAVE_COMPRESSION_SNAPPY AND SNAPPY_FOUND)
 else()
   set(hello_world_distributed_FLAGS COMPONENT_DEPENDENCIES iostreams)
 endif()
+
 set(interval_timer_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(sierpinski_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(partitioned_vector_spmd_foreach_FLAGS COMPONENT_DEPENDENCIES iostreams
@@ -159,5 +166,4 @@ foreach(example_program ${example_programs})
       "quickstart" ${example_program} ${${example_program}_PARAMETERS}
     )
   endif()
-
 endforeach()

@@ -223,6 +223,8 @@ Functions
    :cpp:func:`hpx::make_unique_any_nonser`
    =======================================  ================================================
 
+.. _public_api_header_hpx_assert:
+
 ``hpx/assert.hpp``
 ==================
 
@@ -558,12 +560,7 @@ Functions
    :cpp:func:`hpx::wait_each`
    ========================================  =====================================
 
-Examples
---------
-
-.. literalinclude:: ../../libs/full/include/tests/unit/api_future.cpp
-   :language: c++
-   :lines: 7-
+.. _public_api_header_hpx_init:
 
 ``hpx/init.hpp``
 ================
@@ -890,7 +887,7 @@ Classes
 ======================
 
 The header :hpx-header:`libs/full/include/include,hpx/task_block.hpp` corresponds to the
-``task_block`` feature in |cpp11_n4088|_. See :ref:`using_task_block` for more details on using task
+``task_block`` feature in |cpp17_n4755|_. See :ref:`using_task_block` for more details on using task
 blocks.
 
 Classes
@@ -901,9 +898,9 @@ Classes
    +---------------------------------------------------------+
    | Class                                                   |
    +=========================================================+
-   | :cpp:class:`hpx::parallel::v2::task_canceled_exception` |
+   | :cpp:class:`hpx::experimental::task_canceled_exception` |
    +---------------------------------------------------------+
-   | :cpp:class:`hpx::parallel::v2::task_block`              |
+   | :cpp:class:`hpx::experimental::task_block`              |
    +---------------------------------------------------------+
 
 Functions
@@ -914,9 +911,9 @@ Functions
    +-----------------------------------------------------------------+
    | Function                                                        |
    +=================================================================+
-   | :cpp:func:`hpx::parallel::v2::define_task_block`                |
+   | :cpp:func:`hpx::experimental::define_task_block`                |
    +-----------------------------------------------------------------+
-   | :cpp:func:`hpx::parallel::v2::define_task_block_restore_thread` |
+   | :cpp:func:`hpx::experimental::define_task_block_restore_thread` |
    +-----------------------------------------------------------------+
 
 .. _public_api_header_hpx_task_group:
@@ -935,7 +932,7 @@ Classes
    +---------------------------------------------------------+
    | Class                                                   |
    +=========================================================+
-   | :cpp:class:`hpx::execution::experimental::task_group`   |
+   | :cpp:class:`hpx::experimental::task_group`              |
    +---------------------------------------------------------+
 
 .. _public_api_header_hpx_thread:
@@ -1158,6 +1155,8 @@ Functions
    | :cpp:func:`hpx::unwrapping_all`  |
    +----------------------------------+
 
+.. _public_api_header_hpx_version:
+
 ``hpx/version.hpp``
 ===================
 
@@ -1213,6 +1212,8 @@ Functions
    +-----------------------------------------+
    | :cpp:func:`hpx::build_date_time`        |
    +-----------------------------------------+
+
+.. _public_api_header_hpx_wrap_main:
 
 ``hpx/wrap_main.hpp``
 =====================

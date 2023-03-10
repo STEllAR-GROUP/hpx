@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2007-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c)      2017 Shoshana Jakobovits
@@ -239,8 +239,8 @@ namespace hpx { namespace threads {
         mask_type get_used_processing_units() const
         {
             mask_type total_used_processing_punits = mask_type();
-            threads::resize(
-                total_used_processing_punits, hardware_concurrency());
+            threads::resize(total_used_processing_punits,
+                static_cast<std::size_t>(hardware_concurrency()));
 
             for (auto& pool_iter : pools_)
             {
@@ -252,12 +252,12 @@ namespace hpx { namespace threads {
         }
 
         hwloc_bitmap_ptr get_pool_numa_bitmap(
-            const std::string& pool_name) const
+            std::string const& pool_name) const
         {
             return get_pool(pool_name).get_numa_domain_bitmap();
         }
 
-        void set_scheduler_mode(threads::policies::scheduler_mode mode)
+        void set_scheduler_mode(threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -265,7 +265,7 @@ namespace hpx { namespace threads {
             }
         }
 
-        void add_scheduler_mode(threads::policies::scheduler_mode mode)
+        void add_scheduler_mode(threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -275,7 +275,7 @@ namespace hpx { namespace threads {
 
         void add_remove_scheduler_mode(
             threads::policies::scheduler_mode to_add_mode,
-            threads::policies::scheduler_mode to_remove_mode)
+            threads::policies::scheduler_mode to_remove_mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -284,7 +284,8 @@ namespace hpx { namespace threads {
             }
         }
 
-        void remove_scheduler_mode(threads::policies::scheduler_mode mode)
+        void remove_scheduler_mode(
+            threads::policies::scheduler_mode mode) noexcept
         {
             for (auto& pool_iter : pools_)
             {
@@ -363,16 +364,16 @@ namespace hpx { namespace threads {
         }
 
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
-        std::int64_t avg_idle_rate(bool reset);
+        std::int64_t avg_idle_rate(bool reset) noexcept;
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
-        std::int64_t avg_creation_idle_rate(bool reset);
-        std::int64_t avg_cleanup_idle_rate(bool reset);
+        std::int64_t avg_creation_idle_rate(bool reset) noexcept;
+        std::int64_t avg_cleanup_idle_rate(bool reset) noexcept;
 #endif
 #endif
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-        std::int64_t get_executed_threads(bool reset);
-        std::int64_t get_executed_thread_phases(bool reset);
+        std::int64_t get_executed_threads(bool reset) noexcept;
+        std::int64_t get_executed_thread_phases(bool reset) noexcept;
 #ifdef HPX_HAVE_THREAD_IDLE_RATES
         std::int64_t get_thread_duration(bool reset);
         std::int64_t get_thread_phase_duration(bool reset);
@@ -393,6 +394,34 @@ namespace hpx { namespace threads {
 #endif
 
     private:
+        policies::thread_queue_init_parameters get_init_parameters() const;
+        void create_scheduler_user_defined(
+            hpx::resource::scheduler_function const&,
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&);
+        void create_scheduler_local(thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_priority_fifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_local_priority_lifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_static(thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_static_priority(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_abp_priority_fifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_abp_priority_lifo(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+        void create_scheduler_shared_priority(
+            thread_pool_init_parameters const&,
+            policies::thread_queue_init_parameters const&, std::size_t);
+
         mutable mutex_type mtx_;    // mutex protecting the members
 
         hpx::util::runtime_configuration& rtcfg_;

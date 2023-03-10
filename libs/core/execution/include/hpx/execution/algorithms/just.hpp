@@ -31,6 +31,8 @@ namespace hpx::execution::experimental {
         template <typename CPO, std::size_t... Is, typename... Ts>
         struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
         {
+            using is_sender = void;
+
             HPX_NO_UNIQUE_ADDRESS util::member_pack_for<std::decay_t<Ts>...> ts;
 
             constexpr just_sender() = default;
@@ -58,12 +60,15 @@ namespace hpx::execution::experimental {
             template <typename Receiver>
             struct operation_state
             {
+                using data_type =
+                    hpx::util::member_pack_for<std::decay_t<Ts>...>;
+
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
-                hpx::util::member_pack_for<std::decay_t<Ts>...> ts;
+                HPX_NO_UNIQUE_ADDRESS
+                data_type ts;
 
                 template <typename Receiver_>
-                operation_state(Receiver_&& receiver,
-                    hpx::util::member_pack_for<std::decay_t<Ts>...> ts)
+                operation_state(Receiver_&& receiver, data_type ts)
                   : receiver(HPX_FORWARD(Receiver_, receiver))
                   , ts(HPX_MOVE(ts))
                 {

@@ -15,6 +15,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
+
     // Hand-crafted function object allowing to replace a more complex
     // bind(hpx::functional::invoke_fused(), f1, _1)
     template <typename Result, typename F>
@@ -26,6 +27,14 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE Result operator()(T&& t)
         {
             return hpx::invoke_fused_r<Result>(f_, HPX_FORWARD(T, t));
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned)
+        {
+            // clang-format off
+            ar & f_;
+            // clang-format on
         }
     };
 }    // namespace hpx::parallel::util::detail
@@ -40,7 +49,7 @@ namespace hpx::traits {
     struct get_function_address<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {
@@ -52,7 +61,7 @@ namespace hpx::traits {
     struct get_function_annotation<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {
@@ -65,7 +74,7 @@ namespace hpx::traits {
     struct get_function_annotation_itt<
         parallel::util::detail::partitioner_iteration<Result, F>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             parallel::util::detail::partitioner_iteration<Result, F> const&
                 f) noexcept
         {

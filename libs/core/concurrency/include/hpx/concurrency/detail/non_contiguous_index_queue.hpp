@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Mikael Simberg
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,7 @@ namespace hpx::concurrency::detail {
     template <typename T = std::uint32_t>
     class non_contiguous_index_queue
     {
-        static_assert(sizeof(T) <= 4,
+        static_assert(sizeof(T) <= 4,    //-V112
             "non_contiguous_index_queue assumes at most 32 bit indices to fit "
             "two indices in an at most 64 bit struct");
         static_assert(std::is_integral_v<T>,
@@ -74,12 +74,12 @@ namespace hpx::concurrency::detail {
         ///
         /// Reset the queue with the given range. No additional synchronization
         /// is done to ensure that other threads are not accessing elements from
-        /// the queue. It is the callees responsibility to ensure that it is
+        /// the queue. It is the caller's responsibility to ensure that it is
         /// safe to reset the queue.
         ///
         /// \param first Beginning of the new range.
         /// \param last  End of the new range.
-        /// \param step  Steps size to use when advancing through the range.
+        /// \param newstep  Steps size to use when advancing through the range.
         constexpr void reset(T first, T last, T newstep = 1) noexcept
         {
             initial_range = range{first, last};
@@ -107,19 +107,19 @@ namespace hpx::concurrency::detail {
         ///        range.
         ///
         /// Construct a new queue with the given range as the initial range.
-        constexpr non_contiguous_index_queue(T first, T last, T step) noexcept
+        constexpr non_contiguous_index_queue(T first, T last, T step_) noexcept
           : initial_range{}
           , step{}
           , current_range{}
         {
-            reset(first, last, step);
+            reset(first, last, step_);
         }
 
         /// \brief Copy-construct a queue.
         ///
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
-        /// callees responsibility to ensure that it is safe to copy the queue.
+        /// caller's responsibility to ensure that it is safe to copy the queue.
         non_contiguous_index_queue(
             non_contiguous_index_queue<T> const& other) noexcept
           : initial_range{other.initial_range}
@@ -134,7 +134,7 @@ namespace hpx::concurrency::detail {
         ///
         /// No additional synchronization is done to ensure that other threads
         /// are not accessing elements from the queue being copied. It is the
-        /// callees responsibility to ensure that it is safe to copy the queue.
+        /// caller's responsibility to ensure that it is safe to copy the queue.
         non_contiguous_index_queue& operator=(
             non_contiguous_index_queue const& other) noexcept
         {
@@ -161,7 +161,7 @@ namespace hpx::concurrency::detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::nullopt;
+                    return hpx::optional<T>(hpx::nullopt);
                 }
 
                 // reduce pipeline pressure
@@ -192,7 +192,7 @@ namespace hpx::concurrency::detail {
             {
                 if (expected_range.empty())
                 {
-                    return hpx::nullopt;
+                    return hpx::optional<T>(hpx::nullopt);
                 }
 
                 // reduce pipeline pressure

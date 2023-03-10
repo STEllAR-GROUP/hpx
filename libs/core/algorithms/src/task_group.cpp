@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,7 @@
 
 #include <exception>
 
-namespace hpx::execution::experimental {
+namespace hpx::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     task_group::on_exit::on_exit(task_group& tg)
@@ -28,7 +28,7 @@ namespace hpx::execution::experimental {
 
     task_group::on_exit::~on_exit()
     {
-        if (latch_)
+        if (latch_ != nullptr)
         {
             latch_->count_down(1);
         }
@@ -75,8 +75,7 @@ namespace hpx::execution::experimental {
                 throw errors_;
             }
 
-            auto state = HPX_MOVE(state_);
-            if (state)
+            if (auto const state = HPX_MOVE(state_))
             {
                 state->set_value(hpx::util::unused);
             }
@@ -95,8 +94,7 @@ namespace hpx::execution::experimental {
         {
             if (ar.is_preprocessing())
             {
-                using init_no_addref =
-                    typename shared_state_type::init_no_addref;
+                using init_no_addref = shared_state_type::init_no_addref;
                 state_.reset(new shared_state_type(init_no_addref{}), false);
                 preprocess_future(ar, *state_);
             }
@@ -113,6 +111,4 @@ namespace hpx::execution::experimental {
         // the state is not needed anymore
         state_.reset();
     }
-
-    void task_group::serialize(serialization::input_archive&, unsigned const) {}
-}    // namespace hpx::execution::experimental
+}    // namespace hpx::experimental

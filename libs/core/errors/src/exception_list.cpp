@@ -112,7 +112,7 @@ namespace hpx {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::error_code exception_list::get_error() const
+    std::error_code exception_list::get_error_code() const
     {
         std::lock_guard<mutex_type> l(mtx_);
         if (exceptions_.empty())

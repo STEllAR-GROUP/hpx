@@ -99,7 +99,7 @@ namespace hpx::lockfree {
             {
             }
 
-            node_data() noexcept {}
+            node_data() noexcept = default;
 
             std::atomic<tagged_node_handle> next;
             T data;

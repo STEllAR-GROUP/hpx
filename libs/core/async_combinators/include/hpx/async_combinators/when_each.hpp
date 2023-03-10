@@ -188,7 +188,7 @@ namespace hpx::lcos::detail {
         {
             if constexpr (is_end_v<I>)
             {
-                this->set_value(util::unused);
+                this->set_data(util::unused);
             }
             else
             {
@@ -264,7 +264,7 @@ namespace hpx::lcos::detail {
 
                 if (++count_ == needed_count_)
                 {
-                    this->set_value(util::unused);
+                    this->set_data(util::unused);
 
                     // explicitly destruct iterators as those might
                     // become dangling after we make ourselves ready
@@ -320,7 +320,7 @@ namespace hpx::lcos::detail {
 
             if (++count_ == needed_count_)
             {
-                this->set_value(util::unused);
+                this->set_data(util::unused);
                 return;
             }
 
@@ -382,7 +382,7 @@ namespace hpx {
             when_each_t, F&& f, Iterator begin, Iterator end)
         {
             using future_type =
-                typename lcos::detail::future_iterator_traits<Iterator>::type;
+                lcos::detail::future_iterator_traits_t<Iterator>;
 
             std::vector<future_type> values;
             traits::detail::reserve_if_random_access_by_range(
@@ -440,7 +440,7 @@ namespace hpx {
             when_each_n_t, F&& f, Iterator begin, std::size_t count)
         {
             using future_type =
-                typename lcos::detail::future_iterator_traits<Iterator>::type;
+                lcos::detail::future_iterator_traits_t<Iterator>;
 
             std::vector<future_type> values;
             values.reserve(count);

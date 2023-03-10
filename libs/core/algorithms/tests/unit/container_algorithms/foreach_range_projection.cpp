@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2015 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -105,9 +105,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_each_test<hpx::parallel::util::projection_identity>();
-    for_each_exception_test<hpx::parallel::util::projection_identity>();
-    for_each_bad_alloc_test<hpx::parallel::util::projection_identity>();
+    for_each_test<hpx::identity>();
+    for_each_exception_test<hpx::identity>();
+    for_each_bad_alloc_test<hpx::identity>();
 
     for_each_test<projection_square>();
     for_each_exception_test<projection_square>();

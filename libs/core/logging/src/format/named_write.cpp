@@ -30,11 +30,12 @@ namespace hpx::util::logging::detail {
 
     static std::string unescape(std::string escaped)
     {
-        typedef std::size_t size_type;
+        using size_type = std::size_t;
+
         size_type idx_start = 0;
         while (true)
         {
-            size_type found = escaped.find("%%", idx_start);
+            size_type const found = escaped.find("%%", idx_start);
             if (found != std::string::npos)
             {
                 escaped.erase(
@@ -66,8 +67,8 @@ namespace hpx::util::logging::detail {
                 std::string spacer = detail::unescape(remaining.substr(0, idx));
                 remaining.erase(0, idx + 1);
 
-                formatter::manipulator* fmt = (formatter::manipulator*) -1;
-                write_steps.push_back(write_step(spacer, fmt));
+                auto* fmt = reinterpret_cast<formatter::manipulator*>(-1);
+                write_steps.emplace_back(spacer, fmt);
                 break;
             }
             case '%':
@@ -96,17 +97,18 @@ namespace hpx::util::logging::detail {
                         fmt = iter->value.get();
                 }
                 // note: fmt could be null, in case
-                write_steps.push_back(write_step(spacer, fmt));
+                write_steps.emplace_back(spacer, fmt);
                 break;
             }
             case '\0':
             {
                 // last part
-                write_steps.push_back(
-                    write_step(detail::unescape(remaining), nullptr));
+                write_steps.emplace_back(detail::unescape(remaining), nullptr);
                 remaining.clear();
                 break;
             }
+            default:
+                break;
             }
         }
     }
@@ -135,7 +137,7 @@ namespace hpx::util::logging::detail {
         struct parse_formatter
         {
             // formatter starts and ends with %
-            bool has_manipulator_name() const
+            [[nodiscard]] bool has_manipulator_name() const
             {
                 if (m_manipulator.empty())
                     return false;
@@ -147,7 +149,7 @@ namespace hpx::util::logging::detail {
                 return false;
             }
 
-            std::string get_manipulator_name() const
+            [[nodiscard]] std::string get_manipulator_name() const
             {
                 HPX_ASSERT(has_manipulator_name());
                 // ignore starting and ending %
@@ -174,7 +176,7 @@ namespace hpx::util::logging::detail {
                 }
                 else if (m_manipulator.empty())
                 {
-                    ;    // ignore this char - not from a manipulator
+                    // ignore this char - not from a manipulator
                 }
                 else if (m_manipulator[0] == '%')
                 {
@@ -193,12 +195,12 @@ namespace hpx::util::logging::detail {
 
         struct parse_destination
         {
-            bool has_manipulator_name() const
+            [[nodiscard]] bool has_manipulator_name() const
             {
                 return !m_manipulator.empty();
             }
 
-            std::string get_manipulator_name() const
+            [[nodiscard]] std::string get_manipulator_name() const
             {
                 HPX_ASSERT(has_manipulator_name());
                 if (m_manipulator[0] == '-' || m_manipulator[0] == '+')
@@ -272,7 +274,7 @@ namespace hpx::util::logging::detail {
     }    // namespace
 }    // namespace hpx::util::logging::detail
 
-namespace hpx { namespace util { namespace logging { namespace writer {
+namespace hpx::util::logging::writer {
 
     named_write::named_write()
     {
@@ -295,5 +297,4 @@ namespace hpx { namespace util { namespace logging { namespace writer {
     {
         detail::configure(m_destination, format, detail::parse_destination{});
     }
-
-}}}}    // namespace hpx::util::logging::writer
+}    // namespace hpx::util::logging::writer

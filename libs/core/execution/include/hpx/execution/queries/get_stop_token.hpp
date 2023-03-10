@@ -63,5 +63,4 @@ namespace hpx::execution::experimental {
     template <typename T>
     using stop_token_of_t = std::remove_cv_t<
         std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;
-
 }    // namespace hpx::execution::experimental

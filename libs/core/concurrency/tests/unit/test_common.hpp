@@ -120,8 +120,8 @@ namespace tests {
         {
             writers_finished.store(0);
 
-            hpx::execution::experimental::task_group writer;
-            hpx::execution::experimental::task_group reader;
+            hpx::experimental::task_group writer;
+            hpx::experimental::task_group reader;
 
             HPX_TEST(stk.empty());
 

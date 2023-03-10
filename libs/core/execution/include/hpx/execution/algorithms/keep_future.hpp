@@ -22,8 +22,10 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     namespace detail {
+
         template <typename Receiver, typename Future>
         struct operation_state
         {
@@ -44,9 +46,10 @@ namespace hpx { namespace execution { namespace experimental {
                                 "the future has no valid shared state");
                         }
 
-                        // The operation state has to be kept alive until set_value
-                        // is called, which means that we don't need to move
-                        // receiver and future into the on_completed callback.
+                        // The operation state has to be kept alive until
+                        // set_value is called, which means that we don't need
+                        // to move receiver and future into the on_completed
+                        // callback.
                         state->set_on_completed([&os]() mutable {
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(os.receiver), HPX_MOVE(os.future));
@@ -84,13 +87,14 @@ namespace hpx { namespace execution { namespace experimental {
         struct keep_future_sender<hpx::future<T>>
           : public keep_future_sender_base<hpx::future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::future<T>;
             using base_type = keep_future_sender_base<hpx::future<T>>;
             using base_type::future;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    keep_future_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, keep_future_sender>>>
             explicit keep_future_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {
@@ -113,13 +117,14 @@ namespace hpx { namespace execution { namespace experimental {
         struct keep_future_sender<hpx::shared_future<T>>
           : keep_future_sender_base<hpx::shared_future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::shared_future<T>;
             using base_type = keep_future_sender_base<hpx::shared_future<T>>;
             using base_type::future;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    keep_future_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, keep_future_sender>>>
             explicit keep_future_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {
@@ -160,4 +165,4 @@ namespace hpx { namespace execution { namespace experimental {
                 HPX_FORWARD(Future, future));
         }
     } keep_future{};
-}}}    // namespace hpx::execution::experimental
+}    // namespace hpx::execution::experimental

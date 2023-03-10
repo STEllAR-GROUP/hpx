@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -168,7 +168,9 @@ namespace hpx {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Sequence>
         struct wait_some;
@@ -176,7 +178,8 @@ namespace hpx {
         template <typename Sequence>
         struct set_wait_some_callback_impl
         {
-            explicit set_wait_some_callback_impl(wait_some<Sequence>& wait)
+            explicit set_wait_some_callback_impl(
+                wait_some<Sequence>& wait) noexcept
               : wait_(wait)
             {
             }
@@ -197,8 +200,9 @@ namespace hpx {
                     {
                         if (!shared_state->is_ready(std::memory_order_relaxed))
                         {
-                            // handle future only if not enough futures are ready yet
-                            // also, do not touch any futures which are already ready
+                            // handle future only if not enough futures are
+                            // ready yet also, do not touch any futures which
+                            // are already ready
                             shared_state->execute_deferred();
 
                             // execute_deferred might have made the future ready
@@ -290,7 +294,7 @@ namespace hpx {
         public:
             using argument_type = Sequence;
 
-            wait_some(argument_type const& values, std::size_t n)
+            wait_some(argument_type const& values, std::size_t n) noexcept
               : values_(values)
               , count_(0)
               , needed_count_(n)
@@ -339,8 +343,8 @@ namespace hpx {
     {
     private:
         template <typename Future>
-        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
-            std::vector<Future> const& values)
+        static bool wait_some_nothrow_impl(
+            std::size_t n, std::vector<Future> const& values)
         {
             static_assert(hpx::traits::is_future_v<Future>,
                 "invalid use of hpx::wait_some");
@@ -364,24 +368,31 @@ namespace hpx {
         }
 
         template <typename Future>
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
+            std::vector<Future> const& values)
+        {
+            return wait_some_nothrow_t::wait_some_nothrow_impl(n, values);
+        }
+
+        template <typename Future>
         friend HPX_FORCEINLINE bool tag_invoke(
             wait_some_nothrow_t, std::size_t n, std::vector<Future>& values)
         {
-            return tag_invoke(wait_some_nothrow_t{}, n,
-                const_cast<std::vector<Future> const&>(values));
+            return wait_some_nothrow_t::wait_some_nothrow_impl(
+                n, const_cast<std::vector<Future> const&>(values));
         }
 
         template <typename Future>
         friend HPX_FORCEINLINE bool tag_invoke(
             wait_some_nothrow_t, std::size_t n, std::vector<Future>&& values)
         {
-            return tag_invoke(wait_some_nothrow_t{}, n,
-                const_cast<std::vector<Future> const&>(values));
+            return wait_some_nothrow_t::wait_some_nothrow_impl(
+                n, const_cast<std::vector<Future> const&>(values));
         }
 
         template <typename Future, std::size_t N>
-        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
-            std::array<Future, N> const& values)
+        static bool wait_some_nothrow_impl(
+            std::size_t n, std::array<Future, N> const& values)
         {
             static_assert(
                 hpx::traits::is_future_v<Future>, "invalid use of wait_some");
@@ -405,19 +416,26 @@ namespace hpx {
         }
 
         template <typename Future, std::size_t N>
+        friend bool tag_invoke(wait_some_nothrow_t, std::size_t n,
+            std::array<Future, N> const& values)
+        {
+            return wait_some_nothrow_t::wait_some_nothrow_impl(n, values);
+        }
+
+        template <typename Future, std::size_t N>
         friend HPX_FORCEINLINE bool tag_invoke(wait_some_nothrow_t,
             std::size_t n, std::array<Future, N>& lazy_values)
         {
-            return tag_invoke(wait_some_nothrow_t{}, n,
-                const_cast<std::array<Future, N> const&>(lazy_values));
+            return wait_some_nothrow_t::wait_some_nothrow_impl(
+                n, const_cast<std::array<Future, N> const&>(lazy_values));
         }
 
         template <typename Future, std::size_t N>
         friend HPX_FORCEINLINE bool tag_invoke(wait_some_nothrow_t,
             std::size_t n, std::array<Future, N>&& lazy_values)
         {
-            return tag_invoke(wait_some_nothrow_t{}, n,
-                const_cast<std::array<Future, N> const&>(lazy_values));
+            return wait_some_nothrow_t::wait_some_nothrow_impl(
+                n, const_cast<std::array<Future, N> const&>(lazy_values));
         }
 
         template <typename Iterator,

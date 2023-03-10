@@ -63,7 +63,8 @@ namespace hpx::util {
         // will not exit until they are explicitly stopped.
         for (std::size_t i = 0; i < pool_size_; ++i)
         {
-            std::unique_ptr<asio::io_context> p(new asio::io_context);
+            std::unique_ptr<asio::io_context> p =
+                std::make_unique<asio::io_context>();
             io_services_.emplace_back(HPX_MOVE(p));
             work_.emplace_back(initialize_work(*io_services_[i]));
         }
@@ -106,7 +107,7 @@ namespace hpx::util {
         {
             io_services_[index]->run();    // run io service
 
-            if (waiting_)
+            if (waiting_)    //-V779
             {
                 wait_barrier_->wait();
                 continue_barrier_->wait();
@@ -180,7 +181,8 @@ namespace hpx::util {
 
             for (std::size_t i = 0; i < num_threads; ++i)
             {
-                std::unique_ptr<asio::io_context> p(new asio::io_context);
+                std::unique_ptr<asio::io_context> p =
+                    std::make_unique<asio::io_context>();
                 io_services_.emplace_back(HPX_MOVE(p));
                 work_.emplace_back(initialize_work(*io_services_[i]));
             }

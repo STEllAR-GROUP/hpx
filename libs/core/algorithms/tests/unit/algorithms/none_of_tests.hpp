@@ -10,7 +10,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -68,8 +68,7 @@ void test_none_of(ExPolicy&& policy, IteratorTag)
     }
 }
 
-template <typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+template <typename IteratorTag, typename Proj = hpx::identity>
 void test_none_of_ranges_seq(IteratorTag, Proj proj = Proj())
 {
     typedef std::vector<int>::iterator base_iterator;
@@ -93,7 +92,7 @@ void test_none_of_ranges_seq(IteratorTag, Proj proj = Proj())
 }
 
 template <typename ExPolicy, typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+    typename Proj = hpx::identity>
 void test_none_of_ranges(ExPolicy&& policy, IteratorTag, Proj proj = Proj())
 {
     static_assert(hpx::is_execution_policy<ExPolicy>::value,
@@ -143,7 +142,7 @@ void test_none_of_async(ExPolicy&& p, IteratorTag)
 }
 
 template <typename ExPolicy, typename IteratorTag,
-    typename Proj = hpx::parallel::util::projection_identity>
+    typename Proj = hpx::identity>
 void test_none_of_ranges_async(ExPolicy&& p, IteratorTag, Proj proj = Proj())
 {
     typedef std::vector<int>::iterator base_iterator;

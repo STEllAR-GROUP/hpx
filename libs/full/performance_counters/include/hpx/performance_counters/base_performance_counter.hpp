@@ -29,12 +29,12 @@ namespace hpx { namespace performance_counters {
       , public hpx::components::component_base<Derived>
     {
     private:
-        typedef hpx::components::component_base<Derived> base_type;
+        using base_type = hpx::components::component_base<Derived>;
 
     public:
-        typedef Derived type_holder;
-        typedef hpx::performance_counters::server::base_performance_counter
-            base_type_holder;
+        using type_holder = Derived;
+        using base_type_holder =
+            hpx::performance_counters::server::base_performance_counter;
 
         base_performance_counter() = default;
 

@@ -32,9 +32,11 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
+            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
@@ -71,9 +73,9 @@ namespace hpx::execution::experimental {
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<CPO>
                     tag,
-                bulk_sender const& sender)
+                bulk_sender const& s)
             {
-                return tag(sender.sender);
+                return tag(s.sender);
             }
 
             template <typename Receiver>

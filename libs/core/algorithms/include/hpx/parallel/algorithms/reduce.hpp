@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 Bhumit Attarde
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -89,7 +89,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter, typename F,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, T>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init, F&& f);
 
     /// Returns GENERALIZED_SUM(+, init, *first, ..., *(first + (last - first) - 1)).
@@ -149,7 +149,7 @@ namespace hpx {
     ///
     template <typename ExPolicy, typename FwdIter,
         typename T = typename std::iterator_traits<FwdIter>::value_type>
-    typename util::detail::algorithm_result<ExPolicy, T>::type
+    util::detail::algorithm_result_t<ExPolicy, T>
     reduce(ExPolicy&& policy, FwdIter first, FwdIter last, T init);
 
     /// Returns GENERALIZED_SUM(+, T(), *first, ..., *(first + (last - first) - 1)).
@@ -355,45 +355,43 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/iterator_support/range.hpp>
-#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/iterator_support/range.hpp>
+#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/parallel/algorithms/detail/accumulate.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/reduce.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <numeric>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // reduce
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename T>
-        struct reduce : public detail::algorithm<reduce<T>, T>
+        struct reduce : public algorithm<reduce<T>, T>
         {
-            reduce()
-              : reduce::algorithm("reduce")
+            constexpr reduce() noexcept
+              : algorithm<reduce, T>("reduce")
             {
             }
 
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename T_, typename Reduce>
-            static T sequential(ExPolicy&& policy, InIterB first, InIterE last,
-                T_&& init, Reduce&& r)
+            static constexpr T sequential(ExPolicy&& policy, InIterB first,
+                InIterE last, T_&& init, Reduce&& r)
             {
                 return detail::sequential_reduce<ExPolicy>(
                     HPX_FORWARD(ExPolicy, policy), first, last,
@@ -402,9 +400,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIterB, typename FwdIterE,
                 typename T_, typename Reduce>
-            static typename util::detail::algorithm_result<ExPolicy, T>::type
-            parallel(ExPolicy&& policy, FwdIterB first, FwdIterE last,
-                T_&& init, Reduce&& r)
+            static util::detail::algorithm_result_t<ExPolicy, T> parallel(
+                ExPolicy&& policy, FwdIterB first, FwdIterE last, T_&& init,
+                Reduce&& r)
             {
                 if (first == last)
                 {
@@ -432,7 +430,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -446,40 +444,38 @@ namespace hpx {
         template <typename ExPolicy, typename FwdIter, typename F,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T init, F&& f)
+            FwdIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
-                HPX_FORWARD(F, f));
+                HPX_MOVE(f));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             typename T = typename std::iterator_traits<FwdIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            T>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
         tag_fallback_invoke(hpx::reduce_t, ExPolicy&& policy, FwdIter first,
             FwdIter last, T init)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
+            return hpx::parallel::detail::reduce<T>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
                 std::plus<>{});
         }
@@ -487,22 +483,22 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::value_type>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            typename std::iterator_traits<FwdIter>::value_type>
         tag_fallback_invoke(
             hpx::reduce_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             using value_type =
                 typename std::iterator_traits<FwdIter>::value_type;
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, value_type{},
                 std::plus<>{});
         }
@@ -511,54 +507,52 @@ namespace hpx {
         template <typename InIter, typename F,
             typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value
+                hpx::traits::is_iterator_v<InIter>
             )>
         // clang-format on
         friend T tag_fallback_invoke(
-            hpx::reduce_t, InIter first, InIter last, T init, F&& f)
+            hpx::reduce_t, InIter first, InIter last, T init, F f)
         {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(init),
-                HPX_FORWARD(F, f));
+            return hpx::parallel::detail::reduce<T>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(init), HPX_MOVE(f));
         }
 
         // clang-format off
         template <typename InIter,
             typename T = typename std::iterator_traits<InIter>::value_type,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value
+                hpx::traits::is_iterator_v<InIter>
             )>
         // clang-format on
         friend T tag_fallback_invoke(
             hpx::reduce_t, InIter first, InIter last, T init)
         {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
-            return hpx::parallel::v1::detail::reduce<T>().call(
-                hpx::execution::seq, first, last, HPX_MOVE(init),
-                std::plus<>{});
+            return hpx::parallel::detail::reduce<T>().call(hpx::execution::seq,
+                first, last, HPX_MOVE(init), std::plus<>{});
         }
 
         // clang-format off
         template <typename InIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<InIter>::value
+                hpx::traits::is_iterator_v<InIter>
             )>
         // clang-format on
         friend typename std::iterator_traits<InIter>::value_type
         tag_fallback_invoke(hpx::reduce_t, InIter first, InIter last)
         {
-            static_assert(hpx::traits::is_input_iterator<InIter>::value,
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Requires at least input iterator.");
 
             using value_type =
                 typename std::iterator_traits<InIter>::value_type;
 
-            return hpx::parallel::v1::detail::reduce<value_type>().call(
+            return hpx::parallel::detail::reduce<value_type>().call(
                 hpx::execution::seq, first, last, value_type{}, std::plus<>());
         }
     } reduce{};

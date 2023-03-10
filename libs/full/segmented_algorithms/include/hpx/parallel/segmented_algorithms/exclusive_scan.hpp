@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
     ///////////////////////////////////////////////////////////////////////////
     // segmented exclusive_scan
     namespace detail {
@@ -241,7 +241,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -272,10 +272,9 @@ namespace hpx { namespace segmented {
         if (first == last)
             return dest;
 
-        return hpx::parallel::v1::detail::segmented_exclusive_scan(
+        return hpx::parallel::detail::segmented_exclusive_scan(
             hpx::execution::seq, first, last, dest, HPX_MOVE(init),
-            HPX_FORWARD(Op, op), std::true_type{},
-            parallel::util::projection_identity{});
+            HPX_FORWARD(Op, op), std::true_type{}, hpx::identity_v);
     }
 
     // clang-format off
@@ -309,9 +308,8 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_exclusive_scan(
+        return hpx::parallel::detail::segmented_exclusive_scan(
             HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(init),
-            HPX_FORWARD(Op, op), is_seq(),
-            parallel::util::projection_identity{});
+            HPX_FORWARD(Op, op), is_seq(), hpx::identity_v);
     }
 }}    // namespace hpx::segmented

@@ -17,7 +17,7 @@
 using hpx::execution::par;
 using hpx::execution::task;
 using hpx::execution::experimental::static_chunk_size;
-using hpx::parallel::define_task_block;
+using hpx::experimental::define_task_block;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>

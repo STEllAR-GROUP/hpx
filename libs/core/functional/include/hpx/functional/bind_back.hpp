@@ -23,136 +23,142 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx {
+namespace hpx::detail {
 
-    namespace detail {
+    template <typename F, typename Ts, typename... Us>
+    struct invoke_bound_back_result;
 
-        template <typename F, typename Ts, typename... Us>
-        struct invoke_bound_back_result;
+    template <typename F, typename... Ts, typename... Us>
+    struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
+      : util::invoke_result<F, Us..., Ts...>
+    {
+    };
 
-        template <typename F, typename... Ts, typename... Us>
-        struct invoke_bound_back_result<F, util::pack<Ts...>, Us...>
-          : util::invoke_result<F, Us..., Ts...>
+    template <typename F, typename Ts, typename... Us>
+    using invoke_bound_back_result_t =
+        typename invoke_bound_back_result<F, Ts, Us...>::type;
+
+    ///////////////////////////////////////////////////////////////////////
+    template <typename F, typename Is, typename... Ts>
+    class bound_back;
+
+    template <typename F, std::size_t... Is, typename... Ts>
+    class bound_back<F, util::index_pack<Is...>, Ts...>
+    {
+    public:
+        bound_back() = default;    // needed for serialization
+
+        template <typename F_, typename... Ts_,
+            typename = std::enable_if_t<std::is_constructible_v<F, F_>>>
+        constexpr explicit bound_back(F_&& f, Ts_&&... vs)
+          : _f(HPX_FORWARD(F_, f))
+          , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
         {
-        };
-
-        template <typename F, typename Ts, typename... Us>
-        using invoke_bound_back_result_t =
-            typename invoke_bound_back_result<F, Ts, Us...>::type;
-
-        ///////////////////////////////////////////////////////////////////////
-        template <typename F, typename Is, typename... Ts>
-        class bound_back;
-
-        template <typename F, std::size_t... Is, typename... Ts>
-        class bound_back<F, util::index_pack<Is...>, Ts...>
-        {
-        public:
-            bound_back() = default;    // needed for serialization
-
-            template <typename F_, typename... Ts_,
-                typename = std::enable_if_t<std::is_constructible_v<F, F_>>>
-            constexpr explicit bound_back(F_&& f, Ts_&&... vs)
-              : _f(HPX_FORWARD(F_, f))
-              , _args(std::piecewise_construct, HPX_FORWARD(Ts_, vs)...)
-            {
-            }
+        }
 
 #if !defined(__NVCC__) && !defined(__CUDACC__)
-            bound_back(bound_back const&) = default;
-            bound_back(bound_back&&) = default;
+        bound_back(bound_back const&) = default;
+        bound_back(bound_back&&) = default;
 #else
-            constexpr HPX_HOST_DEVICE bound_back(bound_back const& other)
-              : _f(other._f)
-              , _args(other._args)
-            {
-            }
+        constexpr HPX_HOST_DEVICE bound_back(bound_back const& other)
+          : _f(other._f)
+          , _args(other._args)
+        {
+        }
 
-            constexpr HPX_HOST_DEVICE bound_back(bound_back&& other) noexcept
-              : _f(HPX_MOVE(other._f))
-              , _args(HPX_MOVE(other._args))
-            {
-            }
+        constexpr HPX_HOST_DEVICE bound_back(bound_back&& other) noexcept
+          : _f(HPX_MOVE(other._f))
+          , _args(HPX_MOVE(other._args))
+        {
+        }
 #endif
 
-            bound_back& operator=(bound_back const&) = delete;
+        bound_back& operator=(bound_back const&) = delete;
+        bound_back& operator=(bound_back&&) = delete;
 
-            template <typename... Us>
-            constexpr HPX_HOST_DEVICE
-                invoke_bound_back_result_t<F&, util::pack<Ts&...>, Us&&...>
-                operator()(Us&&... vs) &
-            {
-                return HPX_INVOKE(
-                    _f, HPX_FORWARD(Us, vs)..., _args.template get<Is>()...);
-            }
+        ~bound_back() = default;
 
-            template <typename... Us>
-            constexpr HPX_HOST_DEVICE invoke_bound_back_result_t<F const&,
-                util::pack<Ts const&...>, Us&&...>
-            operator()(Us&&... vs) const&
-            {
-                return HPX_INVOKE(
-                    _f, HPX_FORWARD(Us, vs)..., _args.template get<Is>()...);
-            }
+        template <typename... Us>
+        constexpr HPX_HOST_DEVICE
+            invoke_bound_back_result_t<F&, util::pack<Ts&...>, Us&&...>
+            operator()(Us&&... vs) &
+        {
+            return HPX_INVOKE(
+                _f, HPX_FORWARD(Us, vs)..., _args.template get<Is>()...);
+        }
 
-            template <typename... Us>
-            constexpr HPX_HOST_DEVICE
-                invoke_bound_back_result_t<F&&, util::pack<Ts&&...>, Us&&...>
-                operator()(Us&&... vs) &&
-            {
-                return HPX_INVOKE(HPX_MOVE(_f), HPX_FORWARD(Us, vs)...,
-                    HPX_MOVE(_args).template get<Is>()...);
-            }
+        template <typename... Us>
+        constexpr HPX_HOST_DEVICE invoke_bound_back_result_t<F const&,
+            util::pack<Ts const&...>, Us&&...>
+        operator()(Us&&... vs) const&
+        {
+            return HPX_INVOKE(
+                _f, HPX_FORWARD(Us, vs)..., _args.template get<Is>()...);
+        }
 
-            template <typename... Us>
-            constexpr HPX_HOST_DEVICE invoke_bound_back_result_t<F const&&,
-                util::pack<Ts const&&...>, Us&&...>
-            operator()(Us&&... vs) const&&
-            {
-                return HPX_INVOKE(HPX_MOVE(_f), HPX_FORWARD(Us, vs)...,
-                    HPX_MOVE(_args).template get<Is>()...);
-            }
+        template <typename... Us>
+        constexpr HPX_HOST_DEVICE
+            invoke_bound_back_result_t<F&&, util::pack<Ts&&...>, Us&&...>
+            operator()(Us&&... vs) &&
+        {
+            return HPX_INVOKE(HPX_MOVE(_f), HPX_FORWARD(Us, vs)...,
+                HPX_MOVE(_args).template get<Is>()...);
+        }
 
-            template <typename Archive>
-            void serialize(Archive& ar, unsigned int const /*version*/)
-            {
-                // clang-format off
+        template <typename... Us>
+        constexpr HPX_HOST_DEVICE invoke_bound_back_result_t<F const&&,
+            util::pack<Ts const&&...>, Us&&...>
+        operator()(Us&&... vs) const&&
+        {
+            return HPX_INVOKE(HPX_MOVE(_f), HPX_FORWARD(Us, vs)...,
+                HPX_MOVE(_args).template get<Is>()...);
+        }
+
+        template <typename Archive>
+        void serialize(Archive& ar, unsigned int const /*version*/)
+        {
+            // clang-format off
                 ar & _f;
                 ar & _args;
-                // clang-format on
-            }
+            // clang-format on
+        }
 
-            constexpr std::size_t get_function_address() const noexcept
-            {
-                return traits::get_function_address<F>::call(_f);
-            }
+        [[nodiscard]] constexpr std::size_t get_function_address()
+            const noexcept
+        {
+            return traits::get_function_address<F>::call(_f);
+        }
 
-            constexpr char const* get_function_annotation() const noexcept
-            {
+        [[nodiscard]] constexpr char const* get_function_annotation()
+            const noexcept
+        {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation<F>::call(_f);
+            return traits::get_function_annotation<F>::call(_f);
 #else
-                return nullptr;
+            return nullptr;
 #endif
-            }
+        }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            util::itt::string_handle get_function_annotation_itt() const
-            {
+        [[nodiscard]] util::itt::string_handle get_function_annotation_itt()
+            const
+        {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-                return traits::get_function_annotation_itt<F>::call(_f);
+            return traits::get_function_annotation_itt<F>::call(_f);
 #else
-                static util::itt::string_handle sh("bound_back");
-                return sh;
+            static util::itt::string_handle sh("bound_back");
+            return sh;
 #endif
-            }
+        }
 #endif
 
-        private:
-            F _f;
-            util::member_pack_for<Ts...> _args;
-        };
-    }    // namespace detail
+    private:
+        F _f;
+        util::member_pack_for<Ts...> _args;
+    };
+}    // namespace hpx::detail
+
+namespace hpx {
 
     /// \brief Function templates \c bind_back generate a forwarding call wrapper
     ///        for \c f. Calling this wrapper is equivalent to invoking \c f with its
@@ -180,7 +186,7 @@ namespace hpx {
 
     // nullary functions do not need to be bound again
     template <typename F>
-    constexpr std::decay_t<F> bind_back(F&& f)
+    constexpr std::decay_t<F> bind_back(F&& f)    //-V524
     {
         return HPX_FORWARD(F, f);
     }
@@ -205,7 +211,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_address<hpx::detail::bound_back<F, Ts...>>
     {
-        static constexpr std::size_t call(
+        [[nodiscard]] static constexpr std::size_t call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_address();
@@ -216,7 +222,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation<hpx::detail::bound_back<F, Ts...>>
     {
-        static constexpr char const* call(
+        [[nodiscard]] static constexpr char const* call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation();
@@ -227,7 +233,7 @@ namespace hpx::traits {
     template <typename F, typename... Ts>
     struct get_function_annotation_itt<hpx::detail::bound_back<F, Ts...>>
     {
-        static util::itt::string_handle call(
+        [[nodiscard]] static util::itt::string_handle call(
             hpx::detail::bound_back<F, Ts...> const& f) noexcept
         {
             return f.get_function_annotation_itt();

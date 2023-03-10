@@ -496,6 +496,8 @@ rst_prolog += '''
 .. _cpp17_n4399: http://wg21.link/n4399
 .. |cpp17_n4560| replace:: N4560
 .. _cpp17_n4560: http://wg21.link/n4560
+.. |cpp17_n4755| replace:: N4755
+.. _cpp17_n4755: http://wg21.link/n4755
 .. |cpp19_n4808| replace:: N4808
 .. _cpp19_n4808: http://wg21.link/n4808
 .. |cpp20_p0075r1| replace:: P0075R1

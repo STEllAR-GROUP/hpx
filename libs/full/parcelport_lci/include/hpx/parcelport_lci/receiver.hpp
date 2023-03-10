@@ -118,100 +118,139 @@ namespace hpx::parcelset::policies::lci {
         {
             // We first try to accept a new connection
             request_wrapper_t request;
-            LCI_queue_pop(util::lci_environment::h_queue(), &request.request);
+            LCI_queue_pop(util::lci_environment::get_rcq(), &request.request);
 
             if (request.request.flag == LCI_OK)
             {
-                buffer_type buffer = decode_request(request.request);
-                decode_parcels(pp_, HPX_MOVE(buffer), -1);
+                process_request(request.request);
                 return true;
             }
             return false;
         }
 
-        buffer_type decode_request(LCI_request_t request)
+        void process_request(LCI_request_t request)
         {
-            buffer_type buffer_;
-            header* header_;
-            // decode header
             if (request.type == LCI_MEDIUM)
             {
-                // only header
-                header_ = (header*) (request.data.mbuffer.address);
-                header_->assert_valid();
-
-                HPX_ASSERT(header_->piggy_back());
-                HPX_ASSERT(header_->num_chunks().first == 0);
+                size_t consumed = 0;
+                while (consumed < request.data.mbuffer.length)
+                {
+                    buffer_type buffer;
+                    consumed += decode_eager(
+                        (char*) request.data.mbuffer.address + consumed,
+                        buffer);
+                    decode_parcels(pp_, HPX_MOVE(buffer), -1);
+                }
+                HPX_ASSERT(consumed == request.data.mbuffer.length);
             }
             else
             {
                 // iovec
                 HPX_ASSERT(request.type == LCI_IOVEC);
-                header_ = (header*) (request.data.iovec.piggy_back.address);
-                header_->assert_valid();
+                buffer_type buffer;
+                decode_iovec(request.data.iovec, buffer);
+                decode_parcels(pp_, HPX_MOVE(buffer), -1);
             }
+        }
+
+        size_t decode_eager(void* address, buffer_type& buffer)
+        {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             hpx::chrono::high_resolution_timer timer_;
-            parcelset::data_point& data = buffer_.data_point_;
+            parcelset::data_point& data = buffer.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
-            data.bytes_ = static_cast<std::size_t>(header_->numbytes());
 #endif
+            // decode header
+            header header_ = header((char*) address);
+            header_.assert_valid();
+            HPX_ASSERT(
+                header_.piggy_back_data() && !header_.piggy_back_tchunk());
+            HPX_ASSERT(header_.num_zero_copy_chunks() == 0);    // decode data
+            // decode data
+            buffer.data_.length = header_.numbytes_nonzero_copy();
+            buffer.data_.ptr = header_.piggy_back_data();
+            // decode transmission chunk
+            int num_zero_copy_chunks = header_.num_zero_copy_chunks();
+            int num_non_zero_copy_chunks = header_.num_non_zero_copy_chunks();
+            buffer.num_chunks_.first = num_zero_copy_chunks;
+            buffer.num_chunks_.second = num_non_zero_copy_chunks;
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+            data.bytes_ = static_cast<std::size_t>(header_.numbytes());
+            data.time_ = timer_.elapsed_nanoseconds() - data.time_;
+#endif
+            return header_.size();
+        }
+
+        void decode_iovec(LCI_iovec_t iovec, buffer_type& buffer)
+        {
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+            hpx::chrono::high_resolution_timer timer_;
+            parcelset::data_point& data = buffer.data_point_;
+            data.time_ = timer_.elapsed_nanoseconds();
+#endif
+            // decode header
+            header header_ = header((char*) iovec.piggy_back.address);
+            header_.assert_valid();
             int i = 0;
             // decode data
-            char* piggy_back = header_->piggy_back();
-            if (piggy_back)
+            char* piggy_back_data = header_.piggy_back_data();
+            if (piggy_back_data)
             {
-                buffer_.data_.length = header_->size();
-                buffer_.data_.ptr = piggy_back;
+                buffer.data_.length = header_.numbytes_nonzero_copy();
+                buffer.data_.ptr = piggy_back_data;
             }
             else
             {
-                HPX_ASSERT(request.type == LCI_IOVEC);
-                HPX_ASSERT((size_t) header_->size() ==
-                    request.data.iovec.lbuffers[i].length);
-                buffer_.data_.length = header_->size();
-                buffer_.data_.ptr = request.data.iovec.lbuffers[i].address;
+                HPX_ASSERT((size_t) header_.numbytes_nonzero_copy() ==
+                    iovec.lbuffers[i].length);
+                buffer.data_.length = header_.numbytes_nonzero_copy();
+                buffer.data_.ptr = iovec.lbuffers[i].address;
                 ++i;
             }
-            // decode transmission chunk
-            buffer_.num_chunks_ = header_->num_chunks();
-            int num_zero_copy_chunks =
-                static_cast<int>(buffer_.num_chunks_.first);
-            int num_non_zero_copy_chunks =
-                static_cast<int>(buffer_.num_chunks_.second);
-            auto& tchunks = buffer_.transmission_chunks_;
-            tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-            if (num_zero_copy_chunks != 0)
+            if (header_.num_zero_copy_chunks() != 0)
             {
-                HPX_ASSERT(request.type == LCI_IOVEC);
-                buffer_.chunks_.resize(num_zero_copy_chunks);
+                // decode transmission chunk
+                int num_zero_copy_chunks = header_.num_zero_copy_chunks();
+                int num_non_zero_copy_chunks =
+                    header_.num_non_zero_copy_chunks();
+                buffer.num_chunks_.first = num_zero_copy_chunks;
+                buffer.num_chunks_.second = num_non_zero_copy_chunks;
+                auto& tchunks = buffer.transmission_chunks_;
+                tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
                 int tchunks_length = static_cast<int>(tchunks.size() *
                     sizeof(buffer_type::transmission_chunk_type));
-                HPX_ASSERT((size_t) tchunks_length ==
-                    request.data.iovec.lbuffers[i].length);
-                std::memcpy((void*) tchunks.data(),
-                    request.data.iovec.lbuffers[i].address, tchunks_length);
-                ++i;
+                char* piggy_back_tchunk = header_.piggy_back_tchunk();
+                if (piggy_back_tchunk)
+                {
+                    std::memcpy((void*) tchunks.data(), piggy_back_tchunk,
+                        tchunks_length);
+                }
+                else
+                {
+                    HPX_ASSERT(
+                        (size_t) tchunks_length == iovec.lbuffers[i].length);
+                    std::memcpy((void*) tchunks.data(),
+                        iovec.lbuffers[i].address, tchunks_length);
+                    ++i;
+                }
                 // zero-copy chunks
+                buffer.chunks_.resize(num_zero_copy_chunks);
                 for (int j = 0; j < num_zero_copy_chunks; ++j)
                 {
                     std::size_t chunk_size =
-                        buffer_.transmission_chunks_[j].second;
-                    HPX_ASSERT(
-                        request.data.iovec.lbuffers[i].length == chunk_size);
-                    buffer_wrapper& c = buffer_.chunks_[j];
+                        buffer.transmission_chunks_[j].second;
+                    HPX_ASSERT(iovec.lbuffers[i].length == chunk_size);
+                    buffer_wrapper& c = buffer.chunks_[j];
                     c.length = chunk_size;
-                    c.ptr = request.data.iovec.lbuffers[i].address;
+                    c.ptr = iovec.lbuffers[i].address;
                     ++i;
                 }
             }
-            HPX_ASSERT(
-                request.type == LCI_MEDIUM || i == request.data.iovec.count);
-
+            HPX_ASSERT(i == iovec.count);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+            data.bytes_ = static_cast<std::size_t>(header_.numbytes());
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
-            return buffer_;
         }
 
         Parcelport& pp_;

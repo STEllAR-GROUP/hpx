@@ -93,6 +93,13 @@ namespace hpx {
             std::ptrdiff_t new_count = (counter_ -= update);
             HPX_ASSERT(new_count >= 0);
 
+            // 26111: Caller failing to release lock 'this->mtx_.data_'
+            // 26115: Failing to release lock 'this->mtx_.data_'
+            // 26117: Releasing unheld lock 'this->mtx_.data_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26111 26115 26117)
+#endif
             if (new_count == 0)
             {
                 std::unique_lock l(mtx_.data_);
@@ -101,7 +108,7 @@ namespace hpx {
                 // Note: we use notify_one repeatedly instead of notify_all as we
                 // know that our implementation of condition_variable::notify_one
                 // relinquishes the lock before resuming the waiting thread
-                // which avoids suspension of this thread when it tries to
+                // that avoids suspension of this thread when it tries to
                 // re-lock the mutex while exiting from condition_variable::wait
                 while (cond_.data_.notify_one(
                     HPX_MOVE(l), threads::thread_priority::boost))
@@ -109,6 +116,10 @@ namespace hpx {
                     l = std::unique_lock(mtx_.data_);
                 }
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         /// Returns:        With very low probability false. Otherwise
@@ -126,6 +137,13 @@ namespace hpx {
         ///
         void wait() const
         {
+            // 26110: Caller failing to hold lock 'this->mtx_.data_'
+            // 26117: Releasing unheld lock 'this->mtx_.data_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110 26117)
+#endif
+
             std::unique_lock l(mtx_.data_);
             if (counter_.load(std::memory_order_relaxed) > 0 || !notified_)
             {
@@ -135,6 +153,10 @@ namespace hpx {
                     l, counter_.load(std::memory_order_relaxed) == 0);
                 HPX_ASSERT_LOCKED(l, notified_);
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         /// Effects: Equivalent to:
@@ -149,6 +171,15 @@ namespace hpx {
             std::ptrdiff_t old_count =
                 counter_.fetch_sub(update, std::memory_order_relaxed);
             HPX_ASSERT_LOCKED(l, old_count >= update);
+
+            // 26110: Caller failing to hold lock 'this->mtx_.data_'
+            // 26111: Caller failing to release lock 'this->mtx_.data_'
+            // 26115: Failing to release lock 'this->mtx_.data_'
+            // 26117: Releasing unheld lock 'this->mtx_.data_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110 26111 26115 26117)
+#endif
 
             if (old_count > update)
             {
@@ -173,6 +204,10 @@ namespace hpx {
                     l = std::unique_lock(mtx_.data_);
                 }
             }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
     protected:
@@ -262,8 +297,18 @@ namespace hpx::lcos::local {
 
         void abort_all()
         {
+            // 26115: Failing to release lock 'this->mtx_.data_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
+
             std::unique_lock l(mtx_.data_);
             cond_.data_.abort_all(HPX_MOVE(l));
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         }
 
         /// Increments counter_ by n. Does not block.

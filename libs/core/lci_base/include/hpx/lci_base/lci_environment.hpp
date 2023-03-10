@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <cstdlib>
+#include <memory>
 #include <string>
 #include <thread>
 
@@ -25,28 +26,31 @@
 namespace hpx { namespace util {
     struct HPX_EXPORT lci_environment
     {
-        static bool check_lci_environment(runtime_configuration const& cfg);
+        static bool check_lci_environment(runtime_configuration& cfg);
 
-        static LCI_error_t init_lci();
+        static void init_config(runtime_configuration& cfg);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
+        static void setup(runtime_configuration& cfg);
         static void finalize();
 
-        static void progress_fn();
+        static void join_prg_thread_if_running();
+        static void progress_fn(LCI_device_t device);
+        static bool do_progress(LCI_device_t device);
 
         static bool enabled();
 
         static int rank();
         static int size();
 
-        static LCI_endpoint_t& lci_endpoint();
+        static LCI_device_t& get_device_eager();
+        static LCI_device_t& get_device_iovec();
 
-        static LCI_endpoint_t& rt_endpoint();
+        static LCI_endpoint_t& get_endpoint_eager();
+        static LCI_endpoint_t& get_endpoint_iovec();
 
-        static LCI_endpoint_t& h_endpoint();
+        static LCI_comp_t& get_scq();
 
-        static LCI_comp_t& rt_queue();
-
-        static LCI_comp_t& h_queue();
+        static LCI_comp_t& get_rcq();
 
         static std::string get_processor_name();
 
@@ -74,13 +78,27 @@ namespace hpx { namespace util {
     private:
         static mutex_type mtx_;
         static bool enabled_;
-        static LCI_endpoint_t ep_;
-        static LCI_endpoint_t rt_ep_;
-        static LCI_endpoint_t h_ep_;
-        static LCI_comp_t rt_cq_r_;
-        static LCI_comp_t h_cq_r_;
-        static std::thread* prg_thread_p;
+        static bool setuped_;
+        static LCI_device_t device_eager;
+        static LCI_device_t device_iovec;
+        static LCI_endpoint_t ep_eager;
+        static LCI_endpoint_t ep_iovec;
+        static LCI_comp_t scq;
+        static LCI_comp_t rcq;
+        static std::unique_ptr<std::thread> prg_thread_eager_p;
+        static std::unique_ptr<std::thread> prg_thread_iovec_p;
         static std::atomic<bool> prg_thread_flag;
+
+    public:
+        // configurations:
+        // whether to use separate devices/progress threads for eager and iovec messages.
+        static bool use_two_device;
+        // whether to bypass the parcel queue and connection cache.
+        static bool enable_send_immediate;
+        // whether to use HPX resource partitioner to run the LCI progress function.
+        static bool enable_lci_progress_pool;
+        // whether to enable the backlog queue and eager message aggregation
+        static bool enable_lci_backlog_queue;
     };
 }}    // namespace hpx::util
 
@@ -95,7 +113,7 @@ namespace hpx { namespace util {
 namespace hpx { namespace util {
     struct HPX_EXPORT lci_environment
     {
-        static bool check_lci_environment(runtime_configuration const& cfg);
+        static bool check_lci_environment(runtime_configuration& cfg);
     };
 }}    // namespace hpx::util
 

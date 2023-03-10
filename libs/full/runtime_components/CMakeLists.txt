@@ -17,7 +17,6 @@ set(runtime_components_headers
     hpx/runtime_components/console_error_sink.hpp
     hpx/runtime_components/console_logging.hpp
     hpx/runtime_components/create_component_helpers.hpp
-    hpx/runtime_components/default_distribution_policy.hpp
     hpx/runtime_components/derived_component_factory.hpp
     hpx/runtime_components/distributed_metadata_base.hpp
     hpx/runtime_components/new.hpp
@@ -34,7 +33,6 @@ set(runtime_components_compat_headers
     hpx/runtime/components/console_error_sink.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/console_logging.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/create_component_helpers.hpp => hpx/modules/runtime_components.hpp
-    hpx/runtime/components/default_distribution_policy.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/derived_component_factory.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/new.hpp => hpx/modules/runtime_components.hpp
     hpx/runtime/components/server/console_error_sink.hpp => hpx/modules/runtime_components.hpp

@@ -145,7 +145,7 @@ namespace hpx::execution_base {
 
             while (!running_)
             {
-                suspend_cv_.wait(l);
+                suspend_cv_.wait(l);    //-V1089
             }
 
             if (aborted_)
@@ -161,7 +161,7 @@ namespace hpx::execution_base {
                 std::unique_lock<std::mutex> l(mtx_);
                 while (running_)
                 {
-                    resume_cv_.wait(l);
+                    resume_cv_.wait(l);    //-V1089
                 }
                 running_ = true;
             }
@@ -174,7 +174,7 @@ namespace hpx::execution_base {
                 std::unique_lock<std::mutex> l(mtx_);
                 while (running_)
                 {
-                    resume_cv_.wait(l);
+                    resume_cv_.wait(l);    //-V1089
                 }
                 running_ = true;
                 aborted_ = true;

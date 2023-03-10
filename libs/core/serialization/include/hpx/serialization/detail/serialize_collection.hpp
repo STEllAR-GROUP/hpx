@@ -73,7 +73,7 @@ namespace hpx::serialization::detail {
         }
         else
         {
-            constexpr bool is_polymorphic =
+            static constexpr bool is_polymorphic =
                 hpx::traits::is_intrusive_polymorphic_v<value_type> ||
                 hpx::traits::is_nonintrusive_polymorphic_v<value_type>;
 

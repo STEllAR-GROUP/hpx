@@ -12,14 +12,13 @@
 #include <hpx/config.hpp>
 
 #include <cstdint>
-#include <cstdlib>
 
 namespace hpx::util {
 
     namespace detail {
 
         template <std::uint64_t N>
-        inline constexpr std::uint64_t log2 = log2<(N >> 1)> + 1;
+        inline constexpr std::uint64_t log2 = log2<(N >> 1)> + 1;    //-V573
 
         template <>
         inline constexpr std::uint64_t log2<0> = -1;

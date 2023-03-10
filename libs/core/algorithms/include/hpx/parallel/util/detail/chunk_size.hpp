@@ -62,7 +62,7 @@ namespace hpx::parallel::util::detail {
         {
             if (chunk_size == 0)
             {
-                std::size_t cores_times_4 = 4 * cores;    // -V112
+                std::size_t const cores_times_4 = 4 * cores;    // -V112
 
                 // try to calculate chunk-size and maximum number of chunks
                 chunk_size = (count + cores_times_4 - 1) / cores_times_4;
@@ -104,7 +104,7 @@ namespace hpx::parallel::util::detail {
 
             // in this case we make sure that there are no more chunks than
             // max_chunks
-            std::size_t calculated_max_chunks =
+            std::size_t const calculated_max_chunks =
                 (count + chunk_size - 1) / chunk_size;
 
             if (calculated_max_chunks > max_chunks)
@@ -128,8 +128,8 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        FwdIter last = parallel::v1::detail::next(begin, count);
-        Stride stride = parallel::v1::detail::abs(s);
+        FwdIter last = parallel::detail::next(begin, count);
+        Stride stride = parallel::detail::abs(s);
 
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
             policy.executor(), hpx::chrono::null_duration, cores, count);
@@ -141,8 +141,8 @@ namespace hpx::parallel::util::detail {
         {
             // different versions of clang-format do different things
             // clang-format off
-            chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride - 1) / stride) * stride);
+            chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                (chunk_size + stride - 1) / stride * stride);
             // clang-format on
         }
 
@@ -161,7 +161,7 @@ namespace hpx::parallel::util::detail {
     get_bulk_iteration_shape(ExPolicy&& policy, std::vector<Future>& workitems,
         F1&& f1, FwdIter& begin, std::size_t& count, Stride s = Stride(1))
     {
-        Stride stride = parallel::v1::detail::abs(s);
+        Stride stride = parallel::detail::abs(s);
 
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
             if (test_chunk_size == 0)
@@ -173,15 +173,15 @@ namespace hpx::parallel::util::detail {
                 // clang-format off
 
                 // rounding up
-                test_chunk_size = (std::max) (std::size_t(stride),
-                    ((test_chunk_size + stride - 1) / stride) * stride);
+                test_chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                    (test_chunk_size + stride - 1) / stride * stride);
                 // clang-format on
             }
 
             add_ready_future(workitems, f1, begin, test_chunk_size);
 
             // modifies 'test_chunk_size'
-            begin = parallel::v1::detail::next(begin, count, test_chunk_size);
+            begin = parallel::detail::next(begin, count, test_chunk_size);
 
             count -= test_chunk_size;
             return test_chunk_size;
@@ -197,7 +197,7 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        FwdIter last = parallel::v1::detail::next(begin, count);
+        FwdIter last = parallel::detail::next(begin, count);
 
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
             policy.executor(), iteration_duration, cores, count);
@@ -209,8 +209,8 @@ namespace hpx::parallel::util::detail {
         {
             // different versions of clang-format do different things
             // clang-format off
-            chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride - 1) / stride) * stride);
+            chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                (chunk_size + stride - 1) / stride * stride);
             // clang-format on
         }
 
@@ -239,7 +239,7 @@ namespace hpx::parallel::util::detail {
         HPX_ASSERT(0 != max_chunks);
 
         std::vector<tuple_type> shape;
-        Stride stride = parallel::v1::detail::abs(s);
+        Stride stride = parallel::detail::abs(s);
 
         // different versions of clang-format do different things
         // clang-format off
@@ -262,17 +262,17 @@ namespace hpx::parallel::util::detail {
 
             if (stride != 1)
             {
-                chunk_size = (std::max) (std::size_t(stride),
-                    ((chunk_size + stride - 1) / stride) * stride);
+                chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                    (chunk_size + stride - 1) / stride * stride);
             }
 
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min) (chunk_size, count);
 
-            shape.push_back(hpx::make_tuple(first, chunk));
+            shape.emplace_back(first, chunk);
 
             // modifies 'chunk'
-            first = parallel::v1::detail::next(first, count, chunk);
+            first = parallel::detail::next(first, count, chunk);
             count -= chunk;
         }
         // clang-format on
@@ -339,8 +339,8 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        FwdIter last = parallel::v1::detail::next(begin, count);
-        Stride stride = parallel::v1::detail::abs(s);
+        FwdIter last = parallel::detail::next(begin, count);
+        Stride stride = parallel::detail::abs(s);
 
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
             policy.executor(), hpx::chrono::null_duration, cores, count);
@@ -352,8 +352,8 @@ namespace hpx::parallel::util::detail {
         {
             // different versions of clang-format do different things
             // clang-format off
-            chunk_size = (std::max) (std::size_t(stride),
-                std::size_t(((chunk_size + stride - 1) / stride) * stride));
+            chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                static_cast<std::size_t>((chunk_size + stride - 1) / stride * stride));
             // clang-format on
         }
 
@@ -374,7 +374,7 @@ namespace hpx::parallel::util::detail {
         std::vector<Future>& workitems, F1&& f1, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
-        Stride stride = parallel::v1::detail::abs(s);
+        Stride stride = parallel::detail::abs(s);
 
         std::size_t base_idx = 0;
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
@@ -385,8 +385,8 @@ namespace hpx::parallel::util::detail {
             {
                 // different versions of clang-format do different things
                 // clang-format off
-                test_chunk_size = (std::max)(std::size_t(stride),
-                    ((test_chunk_size + stride - 1) / stride) * stride);
+                test_chunk_size = (std::max)(static_cast<std::size_t>(stride),
+                    (test_chunk_size + stride - 1) / stride * stride);
                 // clang-format on
             }
 
@@ -394,7 +394,7 @@ namespace hpx::parallel::util::detail {
                 workitems, f1, begin, base_idx, test_chunk_size);
 
             // modifies 'test_chunk_size'
-            begin = parallel::v1::detail::next(begin, count, test_chunk_size);
+            begin = parallel::detail::next(begin, count, test_chunk_size);
 
             base_idx += test_chunk_size;
             count -= test_chunk_size;
@@ -412,7 +412,7 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        FwdIter last = parallel::v1::detail::next(begin, count);
+        FwdIter last = parallel::detail::next(begin, count);
 
         std::size_t chunk_size = execution::get_chunk_size(policy.parameters(),
             policy.executor(), iteration_duration, cores, count);
@@ -424,8 +424,8 @@ namespace hpx::parallel::util::detail {
         {
             // different versions of clang-format do different things
             // clang-format off
-            chunk_size = (std::max) (std::size_t(stride),
-                ((chunk_size + stride - 1) / stride) * stride);
+            chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                (chunk_size + stride - 1) / stride * stride);
             // clang-format on
         }
 
@@ -454,7 +454,7 @@ namespace hpx::parallel::util::detail {
             policy.parameters(), policy.executor(), cores, count);
 
         std::vector<tuple_type> shape;
-        Stride stride = parallel::v1::detail::abs(s);
+        Stride stride = parallel::detail::abs(s);
 
         // different versions of clang-format do different things
         // clang-format off
@@ -478,17 +478,17 @@ namespace hpx::parallel::util::detail {
 
             if (stride != 1)
             {
-                chunk_size = (std::max) (std::size_t(stride),
-                    ((chunk_size + stride - 1) / stride) * stride);
+                chunk_size = (std::max) (static_cast<std::size_t>(stride),
+                    (chunk_size + stride - 1) / stride * stride);
             }
 
             // in last chunk, consider only remaining number of elements
             std::size_t chunk = (std::min) (chunk_size, count);
 
-            shape.push_back(hpx::make_tuple(first, chunk, base_idx));
+            shape.emplace_back(first, chunk, base_idx);
 
             // modifies 'chunk'
-            first = parallel::v1::detail::next(first, count, chunk);
+            first = parallel::detail::next(first, count, chunk);
 
             count -= chunk;
             base_idx += chunk;

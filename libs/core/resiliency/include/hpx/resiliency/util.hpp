@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_ALWAYS_EXPORT abort_replicate_exception : std::exception
@@ -95,6 +95,5 @@ namespace hpx { namespace resiliency { namespace experimental {
             }
             return ex;
         }
-
     }    // namespace detail
-}}}      // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental

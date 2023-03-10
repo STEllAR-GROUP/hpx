@@ -155,7 +155,7 @@ namespace hpx::lcos::local {
         "instead") = hpx::packaged_task<Sig>;
 }
 
-namespace std {
+namespace std {    //-V1061
 
     // Requires: Allocator shall be an allocator (17.6.3.5)
     template <typename Sig, typename Allocator>

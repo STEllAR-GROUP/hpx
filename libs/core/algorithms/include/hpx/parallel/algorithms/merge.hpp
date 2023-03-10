@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -90,8 +90,8 @@ namespace hpx {
     ///           the end of the \a dest range.
     ///
     template <typename ExPolicy, typename RandIter1, typename RandIter2,
-        typename RandIter3, typename Comp = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, RandIter3>::type
+        typename RandIter3, typename Comp = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RandIter3>
     merge(ExPolicy&& policy, RandIter1 first1, RandIter1 last1,
         RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
 
@@ -152,7 +152,7 @@ namespace hpx {
     ///           the end of the \a dest range.
     ///
     template <typename RandIter1, typename RandIter2,
-        typename RandIter3, typename Comp = hpx::parallel::v1::detail::less>
+        typename RandIter3, typename Comp = hpx::parallel::detail::less>
     RandIter3 merge(RandIter1 first1, RandIter1 last1,
         RandIter2 first2, RandIter2 last2, RandIter3 dest, Comp&& comp = Comp());
 
@@ -221,8 +221,8 @@ namespace hpx {
     ///           the source iterator \a last.
     ///
     template <typename ExPolicy, typename RandIter,
-        typename Comp = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
+        typename Comp = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
     inplace_merge(ExPolicy&& policy, RandIter first, RandIter middle,
         RandIter last, Comp&& comp = Comp());
 
@@ -269,7 +269,7 @@ namespace hpx {
     ///           The \a inplace_merge algorithm returns
     ///           the source iterator \a last.
     ///
-    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::detail::less>
     void inplace_merge(RandIter first, RandIter middle,
         RandIter last, Comp&& comp = Comp());
     // clang-format on
@@ -280,14 +280,10 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
-#include <hpx/algorithms/traits/projected.hpp>
-#include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -296,8 +292,9 @@ namespace hpx {
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/handle_local_exceptions.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -309,7 +306,8 @@ namespace hpx {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     /////////////////////////////////////////////////////////////////////////////
     // merge
     namespace detail {
@@ -396,8 +394,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             constexpr std::size_t threshold = 65536;
 
-            std::size_t size1 = detail::distance(first1, last1);
-            std::size_t size2 = detail::distance(first2, last2);
+            std::size_t const size1 = detail::distance(first1, last1);
+            std::size_t const size2 = detail::distance(first2, last2);
 
             // Perform sequential merge if data size is smaller than threshold.
             if (size1 + size2 <= threshold)
@@ -469,9 +467,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 util::detail::handle_local_exceptions<ExPolicy>::call(
                     futures, errors);
 
-                // Not reachable.
-                HPX_ASSERT(false);
-                return;
+                HPX_UNREACHABLE;
             }
 
             fut.get();
@@ -498,8 +494,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
                         first2, last2, dest, HPX_MOVE(comp), HPX_MOVE(proj1),
                         HPX_MOVE(proj2), false, lower_bound_helper());
 
-                    auto len1 = detail::distance(first1, last1);
-                    auto len2 = detail::distance(first2, last2);
+                    auto const len1 = detail::distance(first1, last1);
+                    auto const len2 = detail::distance(first2, last2);
                     return {std::next(first1, len1), std::next(first2, len2),
                         std::next(dest, len1 + len2)};
                 }
@@ -514,9 +510,6 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     return {std::next(first1, len1), std::next(first2, len2),
                         std::next(dest, len1 + len2)};
                 }
-
-                // Not reachable.
-                HPX_ASSERT(false);
             };
 
             return execution::async_execute(policy.executor(), HPX_MOVE(f1));
@@ -524,19 +517,20 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename IterTuple>
-        struct merge : public detail::algorithm<merge<IterTuple>, IterTuple>
+        struct merge : public algorithm<merge<IterTuple>, IterTuple>
         {
-            merge()
-              : merge::algorithm("merge")
+            constexpr merge() noexcept
+              : algorithm<merge, IterTuple>("merge")
             {
             }
 
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename Iter3, typename Comp,
                 typename Proj1, typename Proj2>
-            static util::in_in_out_result<Iter1, Iter2, Iter3> sequential(
-                ExPolicy, Iter1 first1, Sent1 last1, Iter2 first2, Sent2 last2,
-                Iter3 dest, Comp&& comp, Proj1&& proj1, Proj2&& proj2)
+            static constexpr util::in_in_out_result<Iter1, Iter2, Iter3>
+            sequential(ExPolicy, Iter1 first1, Sent1 last1, Iter2 first2,
+                Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1,
+                Proj2&& proj2)
             {
                 return sequential_merge(first1, last1, first2, last2, dest,
                     HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj1, proj1),
@@ -552,9 +546,9 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 Sent2 last2, Iter3 dest, Comp&& comp, Proj1&& proj1,
                 Proj2&& proj2)
             {
-                typedef util::in_in_out_result<Iter1, Iter2, Iter3> result_type;
-                typedef util::detail::algorithm_result<ExPolicy, result_type>
-                    algorithm_result;
+                using result_type = util::in_in_out_result<Iter1, Iter2, Iter3>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, result_type>;
 
                 try
                 {
@@ -580,7 +574,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // sequential inplace_merge with projection function.
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        inline Iter sequential_inplace_merge(
+        constexpr Iter sequential_inplace_merge(
             Iter first, Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
             std::inplace_merge(first, middle,
@@ -594,11 +588,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
         void parallel_inplace_merge_helper(ExPolicy&& policy, Iter first,
             Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
-            const std::size_t threshold = 65536ul;
-            HPX_ASSERT(threshold >= 5ul);
+            constexpr std::size_t threshold = 65536ul;
+            static_assert(threshold >= 5ul);
 
-            std::size_t left_size = middle - first;
-            std::size_t right_size = last - middle;
+            std::size_t const left_size = middle - first;
+            std::size_t const right_size = last - middle;
 
             // Perform sequential inplace_merge
             //   if data size is smaller than threshold.
@@ -656,8 +650,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         futures, errors);
 
-                    // Not reachable.
-                    HPX_ASSERT(false);
+                    HPX_UNREACHABLE;
                 }
 
                 if (fut.valid())    // NOLINT
@@ -712,8 +705,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     util::detail::handle_local_exceptions<ExPolicy>::call(
                         futures, errors);
 
-                    // Not reachable.
-                    HPX_ASSERT(false);
+                    HPX_UNREACHABLE;
                 }
 
                 if (fut.valid())    // NOLINT
@@ -725,8 +717,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename ExPolicy, typename Iter, typename Sent,
             typename Comp, typename Proj>
-        inline hpx::future<Iter> parallel_inplace_merge(ExPolicy&& policy,
-            Iter first, Iter middle, Sent last, Comp&& comp, Proj&& proj)
+        hpx::future<Iter> parallel_inplace_merge(ExPolicy&& policy, Iter first,
+            Iter middle, Sent last, Comp&& comp, Proj&& proj)
         {
             return execution::async_execute(policy.executor(),
                 [policy, first, middle, last, comp = HPX_FORWARD(Comp, comp),
@@ -743,25 +735,22 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::current_exception());
                     }
 
-                    // Not reachable.
-                    HPX_ASSERT(false);
-                    return last;
+                    HPX_UNREACHABLE;
                 });
         }
 
         template <typename Result>
-        struct inplace_merge
-          : public detail::algorithm<inplace_merge<Result>, Result>
+        struct inplace_merge : public algorithm<inplace_merge<Result>, Result>
         {
-            inplace_merge()
-              : inplace_merge::algorithm("inplace_merge")
+            constexpr inplace_merge() noexcept
+              : algorithm<inplace_merge, Result>("inplace_merge")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static Iter sequential(ExPolicy, Iter first, Iter middle, Sent last,
-                Comp&& comp, Proj&& proj)
+            static constexpr Iter sequential(ExPolicy, Iter first, Iter middle,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_inplace_merge(first, middle, last,
                     HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
@@ -769,8 +758,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& policy, Iter first, Iter middle, Sent last,
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& policy, Iter first, Iter middle, Sent last,
                 Comp&& comp, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, Iter>;
@@ -792,17 +781,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename Iter>
-        inline void get_void_result(Iter)
+        constexpr void get_void_result(Iter) noexcept
         {
         }
 
         template <typename Iter>
-        inline hpx::future<void> get_void_result(hpx::future<Iter>&& f)
+        hpx::future<void> get_void_result(hpx::future<Iter>&& f) noexcept
         {
             return hpx::future<void>(HPX_MOVE(f));
         }
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -814,52 +803,47 @@ namespace hpx {
     private:
         // clang-format off
         template <typename ExPolicy, typename RandIter1, typename RandIter2,
-            typename RandIter3, typename Comp = hpx::parallel::v1::detail::less,
+            typename RandIter3, typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandIter1>::value &&
-                hpx::traits::is_iterator<RandIter2>::value &&
-                hpx::traits::is_iterator<RandIter3>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandIter1> &&
+                hpx::traits::is_iterator_v<RandIter2> &&
+                hpx::traits::is_iterator_v<RandIter3> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            RandIter3>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
+            RandIter3>
         tag_fallback_invoke(merge_t, ExPolicy&& policy, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter1>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter2>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter3>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
                 RandIter2, RandIter3>;
 
             return hpx::parallel::util::get_third_element(
-                hpx::parallel::v1::detail::merge<result_type>().call(
+                hpx::parallel::detail::merge<result_type>().call(
                     HPX_FORWARD(ExPolicy, policy), first1, last1, first2, last2,
-                    dest, HPX_FORWARD(Comp, comp),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity()));
+                    dest, HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
 
         // clang-format off
         template <typename RandIter1, typename RandIter2, typename RandIter3,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandIter1>::value &&
-                hpx::traits::is_iterator<RandIter2>::value &&
-                hpx::traits::is_iterator<RandIter3>::value &&
+                hpx::traits::is_iterator_v<RandIter1> &&
+                hpx::traits::is_iterator_v<RandIter2> &&
+                hpx::traits::is_iterator_v<RandIter3> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter1>::value_type,
                     typename std::iterator_traits<RandIter2>::value_type
@@ -868,27 +852,22 @@ namespace hpx {
         // clang-format on
         friend RandIter3 tag_fallback_invoke(merge_t, RandIter1 first1,
             RandIter1 last1, RandIter2 first2, RandIter2 last2, RandIter3 dest,
-            Comp&& comp = Comp())
+            Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter1>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter1>,
                 "Required at least random access iterator.");
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter2>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter2>,
                 "Requires at least random access iterator.");
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter3>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter3>,
                 "Requires at least random access iterator.");
 
             using result_type = hpx::parallel::util::in_in_out_result<RandIter1,
                 RandIter2, RandIter3>;
 
             return hpx::parallel::util::get_third_element(
-                hpx::parallel::v1::detail::merge<result_type>().call(
+                hpx::parallel::detail::merge<result_type>().call(
                     hpx::execution::seq, first1, last1, first2, last2, dest,
-                    HPX_FORWARD(Comp, comp),
-                    hpx::parallel::util::projection_identity(),
-                    hpx::parallel::util::projection_identity()));
+                    HPX_MOVE(comp), hpx::identity_v, hpx::identity_v));
         }
     } merge{};
 
@@ -900,37 +879,34 @@ namespace hpx {
     private:
         // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(inplace_merge_t, ExPolicy&& policy, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+            RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::get_void_result(
-                hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
+            return hpx::parallel::detail::get_void_result(
+                hpx::parallel::detail::inplace_merge<RandIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, middle, last,
-                    HPX_FORWARD(Comp, comp),
-                    hpx::parallel::util::projection_identity()));
+                    HPX_MOVE(comp), hpx::identity_v));
         }
 
         // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -938,17 +914,15 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(inplace_merge_t, RandIter first,
-            RandIter middle, RandIter last, Comp&& comp = Comp())
+            RandIter middle, RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Required at least random access iterator.");
 
-            return hpx::parallel::v1::detail::get_void_result(
-                hpx::parallel::v1::detail::inplace_merge<RandIter>().call(
-                    hpx::execution::seq, first, middle, last,
-                    HPX_FORWARD(Comp, comp),
-                    hpx::parallel::util::projection_identity()));
+            return hpx::parallel::detail::get_void_result(
+                hpx::parallel::detail::inplace_merge<RandIter>().call(
+                    hpx::execution::seq, first, middle, last, HPX_MOVE(comp),
+                    hpx::identity_v));
         }
     } inplace_merge{};
 }    // namespace hpx

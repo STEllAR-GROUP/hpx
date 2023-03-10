@@ -1,0 +1,69 @@
+#!groovy
+
+// Copyright (c) 2020 ETH Zurich
+// Copyright (c) 2022 Hartmut Kaiser
+//
+// SPDX-License-Identifier: BSL-1.0
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+pipeline {
+    agent any
+    options {
+        buildDiscarder(
+            logRotator(
+                daysToKeepStr: "14",
+                numToKeepStr: "50",
+                artifactDaysToKeepStr: "14",
+                artifactNumToKeepStr: "50"
+            )
+        )
+    }
+    environment {
+        GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
+    }
+    stages {
+        stage('checkout') {
+            steps {
+                dir('hpx') {
+                    sh '''
+                    #!/bin/bash -l
+                    rm -rf *
+                    '''
+                    checkout scm
+                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                }
+            }
+        }
+        stage('perftests') {
+            matrix {
+                axes {
+                    axis {
+                        name 'configuration_name'
+                        values 'perftests'
+                    }
+                }
+                stages {
+                    stage('perftests') {
+                        steps {
+                            dir('hpx') {
+                                sh '''
+                                #!/bin/bash -l
+                                .jenkins/lsu-perftests/entry.sh
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
+            archiveArtifacts artifacts: 'hpx/*-Testing/**', fingerprint: true
+            archiveArtifacts artifacts: 'hpx/*-reports/**', fingerprint: true
+        }
+    }
+}

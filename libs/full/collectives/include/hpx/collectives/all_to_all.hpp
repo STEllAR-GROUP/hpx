@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -127,7 +127,7 @@ namespace hpx { namespace collectives {
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace communication {
         struct all_to_all_tag;
@@ -160,9 +160,9 @@ namespace hpx { namespace traits {
                 });
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     // all_to_all plain values
@@ -172,9 +172,9 @@ namespace hpx { namespace collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg())
     {
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
-            this_site = static_cast<std::size_t>(agas::get_locality_id());
+            this_site = agas::get_locality_id();
         }
         if (generation == 0)
         {
@@ -187,8 +187,8 @@ namespace hpx { namespace collectives {
         auto all_to_all_data =
             [local_result = HPX_MOVE(local_result), this_site, generation](
                 communicator&& c) mutable -> hpx::future<std::vector<T>> {
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
+            using action_type =
+                detail::communicator_server::communication_get_action<
                     traits::communication::all_to_all_tag,
                     hpx::future<std::vector<T>>, std::vector<T>>;
 
@@ -230,7 +230,7 @@ namespace hpx { namespace collectives {
                               generation, root_site),
             HPX_MOVE(local_result), this_site);
     }
-}}    // namespace hpx::collectives
+}    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_ALLTOALL_DECLARATION(...) /**/

@@ -85,10 +85,15 @@ namespace hpx::resource {
 
         std::unique_ptr<detail::partitioner>& get_partitioner()
         {
-            std::lock_guard<std::recursive_mutex> l(partitioner_mtx());
             std::unique_ptr<detail::partitioner>& part = partitioner_ref();
-            if (!part)
-                part.reset(new detail::partitioner);
+            if (HPX_UNLIKELY(!part))
+            {
+                std::lock_guard<std::recursive_mutex> l(partitioner_mtx());
+                if (!part)    //-V1036
+                {
+                    part.reset(new detail::partitioner);
+                }
+            }
             return part;
         }
 
@@ -129,7 +134,7 @@ namespace hpx::resource {
 
         detail::partitioner& create_partitioner(
             resource::partitioner_mode rpmode, hpx::util::section const& rtcfg,
-            hpx::threads::policies::detail::affinity_data affinity_data)
+            hpx::threads::policies::detail::affinity_data const& affinity_data)
         {
             std::unique_ptr<detail::partitioner>& rp =
                 detail::get_partitioner();
@@ -143,15 +148,17 @@ namespace hpx::resource {
     ///////////////////////////////////////////////////////////////////////////
     void partitioner::create_thread_pool(std::string const& name,
         scheduling_policy sched /*= scheduling_policy::unspecified*/,
-        hpx::threads::policies::scheduler_mode mode)
+        hpx::threads::policies::scheduler_mode mode,
+        background_work_function func)
     {
-        partitioner_.create_thread_pool(name, sched, mode);
+        partitioner_.create_thread_pool(name, sched, mode, HPX_MOVE(func));
     }
 
-    void partitioner::create_thread_pool(
-        std::string const& name, scheduler_function scheduler_creation)
+    void partitioner::create_thread_pool(std::string const& name,
+        scheduler_function scheduler_creation, background_work_function func)
     {
-        partitioner_.create_thread_pool(name, scheduler_creation);
+        partitioner_.create_thread_pool(
+            name, scheduler_creation, HPX_MOVE(func));
     }
 
     void partitioner::set_default_pool_name(std::string const& name)
@@ -159,7 +166,7 @@ namespace hpx::resource {
         partitioner_.set_default_pool_name(name);
     }
 
-    const std::string& partitioner::get_default_pool_name() const
+    std::string const& partitioner::get_default_pool_name() const
     {
         return partitioner_.get_default_pool_name();
     }

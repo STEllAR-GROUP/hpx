@@ -71,7 +71,7 @@ namespace hpx { namespace components { namespace detail {
         values.reserve(counters.size());
 
         for (performance_counter const& counter : counters)
-            values.push_back(counter.get_value<std::uint64_t>());
+            values.emplace_back(counter.get_value<std::uint64_t>());
 
         return hpx::dataflow(
             hpx::launch::sync,

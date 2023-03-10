@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,14 +6,11 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <hpx/datastructures/detail/dynamic_bitset.hpp>
 #include <hpx/serialization.hpp>
-#include <hpx/serialization/vector.hpp>
 
 #include <cstddef>
-#include <vector>
+#include <cstdint>
 
 namespace hpx::detail {
 
@@ -21,7 +18,7 @@ namespace hpx::detail {
     void serialize(hpx::serialization::output_archive& ar,
         dynamic_bitset<Block, Alloc> const& bs, unsigned)
     {
-        ar << bs.nubits_;
+        ar << static_cast<std::uint64_t>(bs.nubits_);
         ar << bs.bits_;
     }
 
@@ -29,7 +26,9 @@ namespace hpx::detail {
     void serialize(hpx::serialization::input_archive& ar,
         dynamic_bitset<Block, Alloc>& bs, unsigned)
     {
-        ar >> bs.nubits_;
+        std::uint64_t nubits;
+        ar >> nubits;
+        bs.nubits_ = static_cast<std::size_t>(nubits);
         ar >> bs.bits_;
     }
 }    // namespace hpx::detail

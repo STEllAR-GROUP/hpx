@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,22 +7,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/agas_base/gva.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/serialization/serialize.hpp>
-#include <hpx/serialization/unique_ptr.hpp>
-#include <hpx/type_support/decay.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <memory>
 #include <type_traits>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util { namespace functional {
+namespace hpx::util::functional {
 
     ///////////////////////////////////////////////////////////////////////////
     struct extract_locality
@@ -35,7 +31,6 @@ namespace hpx { namespace util { namespace functional {
                 HPX_THROW_EXCEPTION(hpx::error::no_success,
                     "extract_locality::operator()",
                     "could not resolve colocated locality for id({1})", id);
-                return hpx::invalid_id;
             }
             return locality_id;
         }
@@ -47,10 +42,11 @@ namespace hpx { namespace util { namespace functional {
         template <typename Bound, typename Continuation>
         struct post_continuation_impl
         {
-            typedef typename std::decay<Bound>::type bound_type;
-            typedef typename std::decay<Continuation>::type continuation_type;
+            using bound_type = std::decay_t<Bound>;
+            using continuation_type = std::decay_t<Continuation>;
 
             post_continuation_impl() = default;
+            ~post_continuation_impl() = default;
 
             template <typename Bound_, typename Continuation_>
             explicit post_continuation_impl(Bound_&& bound, Continuation_&& c)
@@ -59,17 +55,20 @@ namespace hpx { namespace util { namespace functional {
             {
             }
 
-            post_continuation_impl(post_continuation_impl&& o) = default;
+            post_continuation_impl(post_continuation_impl const& o) = default;
+            post_continuation_impl& operator=(
+                post_continuation_impl const& o) = default;
 
+            post_continuation_impl(post_continuation_impl&& o) = default;
             post_continuation_impl& operator=(
                 post_continuation_impl&& o) = default;
 
             template <typename T>
-            typename util::invoke_result<bound_type, hpx::id_type, T>::type
-            operator()(hpx::id_type lco, T&& t)
+            util::invoke_result_t<bound_type, hpx::id_type, T> operator()(
+                hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type, hpx::id_type,
-                    T>::type result_type;
+                using result_type =
+                    invoke_result_t<bound_type, hpx::id_type, T>;
 
                 bound_.post_c(HPX_MOVE(cont_), lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -94,21 +93,24 @@ namespace hpx { namespace util { namespace functional {
         template <typename Bound>
         struct post_continuation_impl<Bound, hpx::util::unused_type>
         {
-            typedef typename std::decay<Bound>::type bound_type;
+            using bound_type = std::decay_t<Bound>;
 
             post_continuation_impl() = default;
+            ~post_continuation_impl() = default;
 
             template <typename Bound_,
-                typename Enable = typename std::enable_if<
-                    !std::is_same<typename std::decay<Bound_>::type,
-                        post_continuation_impl>::value>::type>
+                typename Enable = std::enable_if_t<!std::is_same_v<
+                    std::decay_t<Bound_>, post_continuation_impl>>>
             explicit post_continuation_impl(Bound_&& bound)
               : bound_(HPX_FORWARD(Bound_, bound))
             {
             }
 
-            post_continuation_impl(post_continuation_impl&& o) = default;
+            post_continuation_impl(post_continuation_impl const& o) = default;
+            post_continuation_impl& operator=(
+                post_continuation_impl const& o) = default;
 
+            post_continuation_impl(post_continuation_impl&& o) = default;
             post_continuation_impl& operator=(
                 post_continuation_impl&& o) = default;
 
@@ -116,8 +118,8 @@ namespace hpx { namespace util { namespace functional {
             typename util::invoke_result<bound_type, hpx::id_type, T>::type
             operator()(hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type, hpx::id_type,
-                    T>::type result_type;
+                using result_type = typename util::invoke_result<bound_type,
+                    hpx::id_type, T>::type;
 
                 bound_.post(lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -157,13 +159,15 @@ namespace hpx { namespace util { namespace functional {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Bound, typename Continuation>
         struct async_continuation_impl
         {
-            using bound_type = typename std::decay<Bound>::type;
-            using continuation_type = typename std::decay<Continuation>::type;
+            using bound_type = std::decay_t<Bound>;
+            using continuation_type = std::decay_t<Continuation>;
 
             async_continuation_impl() = default;
+            ~async_continuation_impl() = default;
 
             template <typename Bound_, typename Continuation_>
             explicit async_continuation_impl(Bound_&& bound, Continuation_&& c)
@@ -172,25 +176,20 @@ namespace hpx { namespace util { namespace functional {
             {
             }
 
-            async_continuation_impl(async_continuation_impl&& o)
-              : bound_(HPX_MOVE(o.bound_))
-              , cont_(HPX_MOVE(o.cont_))
-            {
-            }
+            async_continuation_impl(async_continuation_impl const& o) = default;
+            async_continuation_impl& operator=(
+                async_continuation_impl const& o) = default;
 
-            async_continuation_impl& operator=(async_continuation_impl&& o)
-            {
-                bound_ = HPX_MOVE(o.bound_);
-                cont_ = HPX_MOVE(o.cont_);
-                return *this;
-            }
+            async_continuation_impl(async_continuation_impl&& o) = default;
+            async_continuation_impl& operator=(
+                async_continuation_impl&& o) = default;
 
             template <typename T>
-            typename util::invoke_result<bound_type, hpx::id_type, T>::type
-            operator()(hpx::id_type lco, T&& t)
+            util::invoke_result_t<bound_type, hpx::id_type, T> operator()(
+                hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type, hpx::id_type,
-                    T>::type result_type;
+                using result_type =
+                    util::invoke_result_t<bound_type, hpx::id_type, T>;
 
                 bound_.post_c(HPX_MOVE(cont_), lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -215,36 +214,33 @@ namespace hpx { namespace util { namespace functional {
         template <typename Bound>
         struct async_continuation_impl<Bound, hpx::util::unused_type>
         {
-            using bound_type = typename std::decay<Bound>::type;
+            using bound_type = std::decay_t<Bound>;
 
             async_continuation_impl() = default;
+            ~async_continuation_impl() = default;
 
             template <typename Bound_,
-                typename Enable = typename std::enable_if<
-                    !std::is_same<typename std::decay<Bound_>::type,
-                        async_continuation_impl>::value>::type>
+                typename Enable = std::enable_if_t<!std::is_same_v<
+                    std::decay_t<Bound_>, async_continuation_impl>>>
             explicit async_continuation_impl(Bound_&& bound)
               : bound_(HPX_FORWARD(Bound_, bound))
             {
             }
 
-            async_continuation_impl(async_continuation_impl&& o)
-              : bound_(HPX_MOVE(o.bound_))
-            {
-            }
+            async_continuation_impl(async_continuation_impl const& o) = default;
+            async_continuation_impl& operator=(
+                async_continuation_impl const& o) = default;
 
-            async_continuation_impl& operator=(async_continuation_impl&& o)
-            {
-                bound_ = HPX_MOVE(o.bound_);
-                return *this;
-            }
+            async_continuation_impl(async_continuation_impl&& o) = default;
+            async_continuation_impl& operator=(
+                async_continuation_impl&& o) = default;
 
             template <typename T>
-            typename util::invoke_result<bound_type, hpx::id_type, T>::type
-            operator()(hpx::id_type lco, T&& t)
+            util::invoke_result_t<bound_type, hpx::id_type, T> operator()(
+                hpx::id_type lco, T&& t)
             {
-                typedef typename util::invoke_result<bound_type, hpx::id_type,
-                    T>::type result_type;
+                using result_type =
+                    util::invoke_result_t<bound_type, hpx::id_type, T>;
 
                 bound_.post_c(lco, lco, HPX_FORWARD(T, t));
                 return result_type();
@@ -281,4 +277,4 @@ namespace hpx { namespace util { namespace functional {
         return functional::detail::async_continuation_impl<Bound, Continuation>(
             HPX_FORWARD(Bound, bound), HPX_FORWARD(Continuation, c));
     }
-}}}    // namespace hpx::util::functional
+}    // namespace hpx::util::functional

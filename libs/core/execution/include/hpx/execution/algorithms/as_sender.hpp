@@ -170,13 +170,14 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::future<T>>
           : public as_sender_sender_base<hpx::future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::future<T>;
             using base_type = as_sender_sender_base<hpx::future<T>>;
             using base_type::future_;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    as_sender_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, as_sender_sender>>>
             explicit as_sender_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {
@@ -199,13 +200,14 @@ namespace hpx::execution::experimental {
         struct as_sender_sender<hpx::shared_future<T>>
           : as_sender_sender_base<hpx::shared_future<T>>
         {
+            using is_sender = void;
             using future_type = hpx::shared_future<T>;
             using base_type = as_sender_sender_base<hpx::shared_future<T>>;
             using base_type::future_;
 
             template <typename Future,
-                typename = std::enable_if_t<!std::is_same<std::decay_t<Future>,
-                    as_sender_sender>::value>>
+                typename = std::enable_if_t<
+                    !std::is_same_v<std::decay_t<Future>, as_sender_sender>>>
             explicit as_sender_sender(Future&& future)
               : base_type{HPX_FORWARD(Future, future)}
             {

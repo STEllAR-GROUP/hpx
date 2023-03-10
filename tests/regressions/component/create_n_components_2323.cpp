@@ -55,7 +55,7 @@ int hpx_main()
 
     for (auto const& c : mass_construct.get())
     {
-        c.get();
+        (void) c.get();
     }
 
     HPX_TEST_EQ(count, test_num_components);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // verify that given Action is actually supported by the given Component
     template <typename Action, typename Component, typename Enable = void>
@@ -18,4 +18,8 @@ namespace hpx { namespace traits {
             std::decay_t<Component>>
     {
     };
-}}    // namespace hpx::traits
+
+    template <typename Action, typename Component>
+    inline constexpr bool is_valid_action_v =
+        is_valid_action<Action, Component>::value;
+}    // namespace hpx::traits

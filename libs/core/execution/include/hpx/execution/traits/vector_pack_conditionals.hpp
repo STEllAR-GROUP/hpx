@@ -10,25 +10,29 @@
 
 #if defined(HPX_HAVE_DATAPAR)
 
-#if !defined(__CUDACC__)
+namespace hpx::parallel::traits {
 
-namespace hpx { namespace parallel { namespace traits {
     ////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_HOST_DEVICE HPX_FORCEINLINE T choose(bool msk, T v_true, T v_false)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr T choose(
+        bool msk, T v_true, T v_false) noexcept
     {
         return msk ? v_true : v_false;
     }
 
     ////////////////////////////////////////////////////////////////////
     template <typename T>
-    HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(bool msk, T& v, T val)
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr void mask_assign(
+        bool msk, T& v, T val) noexcept
     {
         if (msk)
+        {
             v = val;
+        }
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
+#if !defined(__CUDACC__)
 #include <hpx/execution/traits/detail/eve/vector_pack_conditionals.hpp>
 #include <hpx/execution/traits/detail/simd/vector_pack_conditionals.hpp>
 #include <hpx/execution/traits/detail/vc/vector_pack_conditionals.hpp>

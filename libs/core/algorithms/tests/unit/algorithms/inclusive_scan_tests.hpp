@@ -43,7 +43,7 @@ void inclusive_scan_benchmark()
 
         // verify values
         std::vector<double> e(c.size());
-        hpx::parallel::v1::detail::sequential_inclusive_scan(
+        hpx::parallel::detail::sequential_inclusive_scan(
             std::begin(c), std::end(c), std::begin(e), val, op);
 
         bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
@@ -79,7 +79,7 @@ void test_inclusive_scan1(IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -113,7 +113,7 @@ void test_inclusive_scan1(ExPolicy&& policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -144,7 +144,7 @@ void test_inclusive_scan1_async(ExPolicy&& p, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan(
+    hpx::parallel::detail::sequential_inclusive_scan(
         std::begin(c), std::end(c), std::begin(e), val, op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -174,7 +174,7 @@ void test_inclusive_scan2(IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -206,7 +206,7 @@ void test_inclusive_scan2(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -236,7 +236,7 @@ void test_inclusive_scan2_async(ExPolicy p, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), op);
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -264,7 +264,7 @@ void test_inclusive_scan3(IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), std::plus<std::size_t>());
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -294,7 +294,7 @@ void test_inclusive_scan3(ExPolicy policy, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), std::plus<std::size_t>());
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));
@@ -322,7 +322,7 @@ void test_inclusive_scan3_async(ExPolicy p, IteratorTag)
 
     // verify values
     std::vector<std::size_t> e(c.size());
-    hpx::parallel::v1::detail::sequential_inclusive_scan_noinit(
+    hpx::parallel::detail::sequential_inclusive_scan_noinit(
         std::begin(c), std::end(c), std::begin(e), std::plus<std::size_t>());
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(e)));

@@ -568,12 +568,12 @@ namespace hpx { namespace compute { namespace host {
             {
                 if (threads::test(numa_mask, i))
                 {
-                    hwloc_bitmap_t bitmap = hwloc_bitmap_alloc();
-                    hwloc_bitmap_zero(bitmap);
-                    hwloc_bitmap_set(bitmap, i);
+                    hwloc_bitmap_t bmp = hwloc_bitmap_alloc();
+                    hwloc_bitmap_zero(bmp);
+                    hwloc_bitmap_set(bmp, static_cast<unsigned>(i));
                     nodesets.push_back(
                         std::make_shared<threads::hpx_hwloc_bitmap_wrapper>(
-                            bitmap));
+                            bmp));
                     nba_deb.debug(
                         debug::str<>("Node mask"), i, " is ", nodesets.back());
                 }

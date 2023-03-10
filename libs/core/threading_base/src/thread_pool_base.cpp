@@ -44,7 +44,8 @@ namespace hpx::threads {
         auto const sched = get_scheduler();
 
         mask_type used_processing_units = mask_type();
-        threads::resize(used_processing_units, hardware_concurrency());
+        threads::resize(used_processing_units,
+            static_cast<std::size_t>(hardware_concurrency()));
 
         std::size_t max_cores = get_os_thread_count();
         for (std::size_t thread_num = 0;
@@ -142,7 +143,7 @@ namespace hpx::threads {
         std::ostream& os, thread_pool_base const& thread_pool)
     {
         auto id = thread_pool.get_pool_id();
-        os << id.name() << "(" << id.index() << ")";
+        os << id.name() << "(" << static_cast<std::uint64_t>(id.index()) << ")";
 
         return os;
     }

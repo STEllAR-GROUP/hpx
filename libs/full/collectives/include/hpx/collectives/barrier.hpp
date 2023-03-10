@@ -17,7 +17,6 @@
 
 #include <cstddef>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -51,7 +50,7 @@ namespace hpx::distributed {
         /// A barrier \a base_name is created. It expects that
         /// hpx::get_num_localities() participate and the local rank is
         /// hpx::get_locality_id().
-        barrier(std::string const& base_name);
+        explicit barrier(std::string const& base_name);
 
         /// Creates a barrier with a given size, rank is locality id
         ///
@@ -86,8 +85,8 @@ namespace hpx::distributed {
             std::vector<std::size_t> const& ranks, std::size_t rank);
 
         /// \cond NOINTERNAL
-        barrier(barrier&& other);
-        barrier& operator=(barrier&& other);
+        barrier(barrier&& other) noexcept;
+        barrier& operator=(barrier&& other) noexcept;
 
         /// \cond NOINTERNAL
         ~barrier();
@@ -143,4 +142,5 @@ namespace hpx::lcos {
         "instead") = hpx::distributed::barrier;
 }
 /// \endcond
+
 #include <hpx/config/warnings_suffix.hpp>

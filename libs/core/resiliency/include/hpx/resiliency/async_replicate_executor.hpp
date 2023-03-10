@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -27,7 +27,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace resiliency { namespace experimental {
+namespace hpx::resiliency::experimental {
+
     namespace detail {
 
         ///////////////////////////////////////////////////////////////////////
@@ -60,9 +61,9 @@ namespace hpx { namespace resiliency { namespace experimental {
                 // do not schedule new thread for the lambda
                 return hpx::dataflow(
                     hpx::launch::sync,
-                    [pred = HPX_FORWARD(Pred, pred),
-                        vote = HPX_FORWARD(Vote, vote),
-                        n](auto&& results) mutable -> result_type {
+                    [n, pred = HPX_FORWARD(Pred, pred),
+                        vote = HPX_FORWARD(Vote, vote)](
+                        auto&& results) mutable -> result_type {
                         // Store all valid results
                         std::vector<result_type> valid_results;
                         valid_results.reserve(n);
@@ -70,8 +71,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                         std::exception_ptr ex;
 
                         // clang-format off
-                        if constexpr (hpx::traits::is_future_v<
-                                          decltype(results)>)
+                        if constexpr (
+                            hpx::traits::is_future_v<decltype(results)>)
                         // clang-format on
                         {
                             if (results.has_exception())
@@ -96,7 +97,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                             {
                                 if (f.has_exception())
                                 {
-                                    // rethrow abort_replicate_exception, if caught
+                                    // rethrow abort_replicate_exception, if
+                                    // caught
                                     ex = detail::rethrow_on_abort_replicate(f);
                                 }
                                 else
@@ -122,7 +124,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                             std::rethrow_exception(ex);
                         }
 
-                        // throw aborting exception no correct results ere produced
+                        // throw aborting exception no correct results ere
+                        // produced
                         throw abort_replicate_exception{};
                     },
                     HPX_MOVE(results));
@@ -186,7 +189,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                             {
                                 if (f.has_exception())
                                 {
-                                    // rethrow abort_replicate_exception, if caught
+                                    // rethrow abort_replicate_exception, if
+                                    // caught
                                     ex = detail::rethrow_on_abort_replicate(f);
                                 }
                                 else
@@ -206,7 +210,8 @@ namespace hpx { namespace resiliency { namespace experimental {
                             std::rethrow_exception(ex);
                         }
 
-                        // throw aborting exception if no correct results were produced
+                        // throw aborting exception if no correct results were
+                        // produced
                         throw abort_replicate_exception{};
                     },
                     HPX_MOVE(results));
@@ -223,15 +228,15 @@ namespace hpx { namespace resiliency { namespace experimental {
     template <typename Executor, typename Vote, typename Pred, typename F,
         typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_vote_validate_t, Executor&& exec,
         std::size_t n, Vote&& vote, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         return detail::async_replicate_vote_validate_executor<
             result_type>::call(HPX_FORWARD(Executor, exec), n,
@@ -247,15 +252,15 @@ namespace hpx { namespace resiliency { namespace experimental {
     // clang-format off
     template <typename Executor, typename Vote, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_vote_t, Executor&& exec,
         std::size_t n, Vote&& vote, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         return detail::async_replicate_vote_validate_executor<
             result_type>::call(HPX_FORWARD(Executor, exec), n,
@@ -270,15 +275,15 @@ namespace hpx { namespace resiliency { namespace experimental {
     // clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         return detail::async_replicate_vote_validate_executor<
             result_type>::call(HPX_FORWARD(Executor, exec), n,
@@ -293,19 +298,19 @@ namespace hpx { namespace resiliency { namespace experimental {
     // clang-format off
     template <typename Executor, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor<Executor>::value ||
-            hpx::traits::is_two_way_executor<Executor>::value
+            hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>
         )>
     // clang-format on
     decltype(auto) tag_invoke(
         async_replicate_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)
     {
         using result_type =
-            typename hpx::util::detail::invoke_deferred_result<F, Ts...>::type;
+            hpx::util::detail::invoke_deferred_result_t<F, Ts...>;
 
         return detail::async_replicate_vote_validate_executor<
             result_type>::call(HPX_FORWARD(Executor, exec), n,
             detail::replicate_voter{}, detail::replicate_validator{},
             HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }
-}}}    // namespace hpx::resiliency::experimental
+}    // namespace hpx::resiliency::experimental

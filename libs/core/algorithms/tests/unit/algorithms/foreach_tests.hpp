@@ -1,4 +1,4 @@
-//  Copyright (c) 2014 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/parallel/algorithms/for_each.hpp>
 
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <numeric>
 #include <random>
@@ -139,7 +140,8 @@ void test_for_each_exception_seq(IteratorTag)
     throw_always f;
     try
     {
-        hpx::for_each(iterator(std::begin(c)), iterator(std::end(c)), f);
+        hpx::for_each(
+            iterator(std::begin(c)), iterator(std::end(c)), std::ref(f));
 
         HPX_TEST(false);
     }
@@ -236,7 +238,8 @@ void test_for_each_bad_alloc_seq(IteratorTag)
     throw_bad_alloc f;
     try
     {
-        hpx::for_each(iterator(std::begin(c)), iterator(std::end(c)), f);
+        hpx::for_each(
+            iterator(std::begin(c)), iterator(std::end(c)), std::ref(f));
 
         HPX_TEST(false);
     }

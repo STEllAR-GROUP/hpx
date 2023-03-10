@@ -15,7 +15,7 @@
 #if defined(HPX_HAVE_DATAPAR_STD_EXPERIMENTAL_SIMD)
 #include <experimental/simd>
 
-namespace hpx { namespace datapar { namespace experimental {
+namespace hpx::datapar::experimental {
 
     using std::experimental::fixed_size_simd;
     using std::experimental::is_simd_v;
@@ -39,7 +39,7 @@ namespace hpx { namespace datapar { namespace experimental {
     HPX_HOST_DEVICE HPX_FORCEINLINE auto choose(
         std::experimental::simd_mask<T, Abi> const& msk,
         std::experimental::simd<T, Abi> const& v_true,
-        std::experimental::simd<T, Abi> const& v_false)
+        std::experimental::simd<T, Abi> const& v_false) noexcept
     {
         std::experimental::simd<T, Abi> v;
         where(msk, v) = v_true;
@@ -51,34 +51,36 @@ namespace hpx { namespace datapar { namespace experimental {
     HPX_HOST_DEVICE HPX_FORCEINLINE void mask_assign(
         std::experimental::simd_mask<T, Abi> const& msk,
         std::experimental::simd<T, Abi>& v,
-        std::experimental::simd<T, Abi> const& val)
+        std::experimental::simd<T, Abi> const& val) noexcept
     {
         where(msk, v) = val;
     }
 
     template <typename Vector, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
-        Vector& vec, std::size_t index, T val)
+        Vector& vec, std::size_t index, T val) noexcept
     {
         vec[index] = val;
     }
-}}}    // namespace hpx::datapar::experimental
+}    // namespace hpx::datapar::experimental
 #endif
 
 #if defined(HPX_HAVE_DATAPAR_SVE)
 #include <sve/sve.hpp>
-namespace hpx { namespace datapar { namespace experimental {
+
+namespace hpx::datapar::experimental {
 
     using namespace sve::experimental;
     using simd_abi::native;
 
     template <typename Vector, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
-        Vector& vec, std::size_t index, T val)
+        Vector& vec, std::size_t index, T val) noexcept
     {
         vec.set(index, val);
     }
-}}}    // namespace hpx::datapar::experimental
+}    // namespace hpx::datapar::experimental
+
 #endif
 
 #endif

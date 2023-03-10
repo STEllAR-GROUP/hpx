@@ -27,7 +27,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx { namespace parallel {
 
     ///////////////////////////////////////////////////////////////////////////
     // segmented_transform_reduce
@@ -372,7 +372,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}}       // namespace hpx::parallel
 
 // The segmented iterators we support all live in namespace hpx::segmented
 namespace hpx { namespace segmented {
@@ -399,8 +399,8 @@ namespace hpx { namespace segmented {
             return HPX_FORWARD(T, init);
         }
 
-        return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
+        return hpx::parallel::detail::segmented_transform_reduce(
+            hpx::parallel::detail::seg_transform_reduce<init_type>(),
             hpx::execution::seq, first, last, HPX_FORWARD(T, init),
             HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
@@ -433,8 +433,8 @@ namespace hpx { namespace segmented {
                 init_type>::get(HPX_FORWARD(T, init));
         }
 
-        return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce<init_type>(),
+        return hpx::parallel::detail::segmented_transform_reduce(
+            hpx::parallel::detail::seg_transform_reduce<init_type>(),
             HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
             HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             is_seq());
@@ -463,8 +463,8 @@ namespace hpx { namespace segmented {
             return HPX_MOVE(init);
         }
 
-        return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
+        return hpx::parallel::detail::segmented_transform_reduce(
+            hpx::parallel::detail::seg_transform_reduce_binary<T>(),
             hpx::execution::seq, first1, last1, first2, HPX_FORWARD(T, init),
             HPX_FORWARD(Reduce, red_op), HPX_FORWARD(Convert, conv_op),
             std::true_type{});
@@ -498,8 +498,8 @@ namespace hpx { namespace segmented {
                 HPX_FORWARD(T, init));
         }
 
-        return hpx::parallel::v1::detail::segmented_transform_reduce(
-            hpx::parallel::v1::detail::seg_transform_reduce_binary<T>(),
+        return hpx::parallel::detail::segmented_transform_reduce(
+            hpx::parallel::detail::seg_transform_reduce_binary<T>(),
             HPX_FORWARD(ExPolicy, policy), first1, last1, first2,
             HPX_FORWARD(T, init), HPX_FORWARD(Reduce, red_op),
             HPX_FORWARD(Convert, conv_op), is_seq());

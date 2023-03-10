@@ -47,17 +47,19 @@ namespace hpx::resource::detail {
 
         void assign_first_core(std::size_t first_core);
 
-        friend class resource::detail::partitioner;
-
         // counter ... overall, in all the thread pools
         static std::size_t num_threads_overall;
 
-    private:
         init_pool_data(std::string const& name, scheduling_policy policy,
-            hpx::threads::policies::scheduler_mode mode);
+            hpx::threads::policies::scheduler_mode mode,
+            background_work_function func = background_work_function());
 
         init_pool_data(std::string const& name, scheduler_function create_func,
-            hpx::threads::policies::scheduler_mode mode);
+            hpx::threads::policies::scheduler_mode mode,
+            background_work_function func = background_work_function());
+
+    private:
+        friend class resource::detail::partitioner;
 
         std::string pool_name_;
         scheduling_policy scheduling_policy_;
@@ -72,6 +74,9 @@ namespace hpx::resource::detail {
         std::size_t num_threads_;
         hpx::threads::policies::scheduler_mode mode_;
         scheduler_function create_function_;
+
+        // possible additional beckground work to run on this scheduler
+        background_work_function background_work_;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -89,12 +94,14 @@ namespace hpx::resource::detail {
         void create_thread_pool(std::string const& name,
             scheduling_policy sched = scheduling_policy::unspecified,
             hpx::threads::policies::scheduler_mode =
-                hpx::threads::policies::scheduler_mode::default_);
+                hpx::threads::policies::scheduler_mode::default_,
+            background_work_function func = background_work_function());
 
         // create a thread_pool with a callback function for creating a custom
         // scheduler
-        void create_thread_pool(
-            std::string const& name, scheduler_function scheduler_creation);
+        void create_thread_pool(std::string const& name,
+            scheduler_function scheduler_creation,
+            background_work_function func = background_work_function());
 
         // Functions to add processing units to thread pools via the
         // pu/core/numa_domain API
@@ -130,11 +137,7 @@ namespace hpx::resource::detail {
         // returns the number of threads(pus) requested by the user at startup.
         // This should not be called before the RP has parsed the config and
         // assigned affinity data
-        std::size_t threads_needed() noexcept
-        {
-            HPX_ASSERT(pus_needed_ != std::size_t(-1));
-            return pus_needed_;
-        }
+        std::size_t threads_needed() noexcept;
 
         ////////////////////////////////////////////////////////////////////////
         scheduling_policy which_scheduler(std::string const& pool_name);
@@ -149,6 +152,9 @@ namespace hpx::resource::detail {
         hpx::threads::policies::scheduler_mode get_scheduler_mode(
             std::size_t pool_index) const;
 
+        background_work_function get_background_work(
+            std::size_t pool_index) const;
+
         std::string const& get_pool_name(std::size_t index) const;
         std::size_t get_pool_index(std::string const& pool_name) const;
 
@@ -159,7 +165,7 @@ namespace hpx::resource::detail {
 
         void init(resource::partitioner_mode rpmode,
             hpx::util::section const& cfg,
-            hpx::threads::policies::detail::affinity_data affinity_data);
+            hpx::threads::policies::detail::affinity_data const& affinity_data);
 
         scheduler_function get_pool_creator(size_t index) const;
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #if defined(DOXYGEN)
 
 // clang-format off
-namespace hpx { namespace lcos {
+namespace hpx::collectives {
 
     /// The function \a create_communication_set sets up a (distributed)
     /// tree-like communication structure that can be used with any of the
@@ -21,35 +21,41 @@ namespace hpx { namespace lcos {
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
+    /// \param  generation  The generational counter identifying the sequence
+    ///                     number of the collective operation performed on the
+    ///                     given base name. This is optional and needs to be
+    ///                     supplied only if the collective operation on the
+    ///                     given base name has to be performed more than once.
     /// \param arity        The number of children each of the communication
     ///                     nodes is connected to (default: picked based on
-    ///                     num_sites)
+    ///                     num_sites).
     ///
-    /// \returns    This function returns a future holding an id_type of the
-    ///             communicator object to be used on the current locality.
+    /// \returns    This function returns a new communicator object usable
+    ///             with the collective operation.
     ///
-    hpx::future<hpx::id_type> create_communication_set(char const* basename,
-        std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t arity = std::size_t(-1));
-}}
+    communicator create_communication_set(char const* basename,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        arity_arg arity = arity_arg());
+}
 // clang-format on
 
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/modules/futures.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 
-#include <cstddef>
+namespace hpx::collectives {
 
-namespace hpx { namespace lcos {
+    struct communicator;
 
-    HPX_EXPORT hpx::future<hpx::id_type> create_communication_set(
-        char const* name, std::size_t num_sites = std::size_t(-1),
-        std::size_t this_site = std::size_t(-1),
-        std::size_t arity = std::size_t(-1));
-
-}}    // namespace hpx::lcos
+    HPX_EXPORT communicator create_communication_set(char const* name,
+        num_sites_arg num_sites = num_sites_arg(),
+        this_site_arg this_site = this_site_arg(),
+        generation_arg generation = generation_arg(),
+        arity_arg arity = arity_arg());
+}    // namespace hpx::collectives
 
 #endif    // DOXYGEN

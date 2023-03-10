@@ -40,7 +40,7 @@ namespace hpx::util {
             void set_max_length(std::size_t /* size */) override {}
             void save(void const* src, std::size_t src_count) override
             {
-                char const* data = static_cast<char const*>(src);
+                auto const data = static_cast<char const*>(src);
                 boost::hash_range(hash, data, data + src_count);
             }
             bool flush(void* /* dst */, std::size_t dst_count,
@@ -58,11 +58,11 @@ namespace hpx::util {
             }
             void load(void* /* dst */, std::size_t /* dst_count */) override {}
 
-            template <class T>
-            constexpr void serialize(T&, unsigned) noexcept
+            template <typename T>
+            static constexpr void serialize(T&, unsigned) noexcept
             {
             }
-            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter, override);
+            HPX_SERIALIZATION_POLYMORPHIC(hash_binary_filter, override)
 
             std::size_t hash;
         };

@@ -35,6 +35,7 @@
 
 #include <algorithm>    // for find_if
 #include <cctype>
+#include <cstddef>
 #include <cwctype>
 #include <initializer_list>
 #include <iterator>
@@ -398,7 +399,7 @@ namespace hpx::string_util {
                 return false;
             }
 
-            if (current_offset_ == offsets_.size())
+            if (static_cast<std::size_t>(current_offset_) == offsets_.size())
             {
                 if (wrap_offsets_)
                 {
@@ -410,7 +411,7 @@ namespace hpx::string_util {
                 }
             }
 
-            int c = offsets_[current_offset_];
+            int const c = offsets_[static_cast<std::size_t>(current_offset_)];
             int i = 0;
             for (; i < c; ++i)
             {
@@ -477,7 +478,7 @@ namespace hpx::string_util {
         // use ispunct() for kept delimiters and isspace for dropped.
         char_separator() = default;
 
-        constexpr void reset() noexcept {}
+        static constexpr void reset() noexcept {}
 
         template <typename InputIterator, typename Token>
         bool operator()(InputIterator& next, InputIterator end, Token& tok)
@@ -649,7 +650,7 @@ namespace hpx::string_util {
                 }
                 else
                 {
-                    int r = traits_type::ispunct(E);
+                    int const r = traits_type::ispunct(E);
                     return r != 0;
                 }
             }
@@ -669,7 +670,7 @@ namespace hpx::string_util {
                 }
                 else
                 {
-                    int r = traits_type::isspace(E);
+                    int const r = traits_type::isspace(E);
                     return r != 0;
                 }
             }
@@ -688,7 +689,7 @@ namespace hpx::string_util {
         {
         }
 
-        constexpr void reset() noexcept {}
+        static constexpr void reset() noexcept {}
 
     public:
         template <typename InputIterator, typename Token>

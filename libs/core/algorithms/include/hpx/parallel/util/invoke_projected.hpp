@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/is_value_proxy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Pred, typename Proj>
     struct invoke_projected
@@ -25,20 +28,23 @@ namespace hpx { namespace parallel { namespace util {
         proj_type proj_;
 
         template <typename Pred_, typename Proj_>
-        constexpr invoke_projected(Pred_&& pred, Proj_&& proj)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr invoke_projected(
+            Pred_&& pred, Proj_&& proj)
           : pred_(HPX_FORWARD(Pred_, pred))
           , proj_(HPX_FORWARD(Proj_, proj))
         {
         }
 
         template <typename T>
-        decltype(auto) operator()(T&& t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            T&& t)
         {
             return HPX_INVOKE(pred_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)));
         }
 
         template <typename T>
-        decltype(auto) operator()(T&& t, T&& u)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            T&& t, T&& u)
         {
             return HPX_INVOKE(pred_, HPX_INVOKE(proj_, HPX_FORWARD(T, t)),
                 HPX_INVOKE(proj_, HPX_FORWARD(T, u)));
@@ -46,28 +52,94 @@ namespace hpx { namespace parallel { namespace util {
     };
 
     template <typename Pred>
-    struct invoke_projected<Pred, projection_identity>
+    struct invoke_projected<Pred, hpx::identity>
     {
         using pred_type = std::decay_t<Pred>;
 
         pred_type pred_;
 
         template <typename Pred_>
-        constexpr invoke_projected(Pred_&& pred, projection_identity)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr invoke_projected(
+            Pred_&& pred, hpx::identity)
           : pred_(HPX_FORWARD(Pred_, pred))
         {
         }
 
         template <typename T>
-        decltype(auto) operator()(T&& t)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            T&& t)
         {
             return HPX_INVOKE(pred_, HPX_FORWARD(T, t));
         }
 
         template <typename T>
-        decltype(auto) operator()(T&& t, T&& u)
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            T&& t, T&& u)
         {
             return HPX_INVOKE(pred_, HPX_FORWARD(T, t), HPX_FORWARD(T, u));
         }
     };
-}}}    // namespace hpx::parallel::util
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename F, typename Proj = hpx::identity>
+    struct invoke_projected_ind
+    {
+        using pred_type = std::decay_t<F>;
+        using proj_type = std::decay_t<Proj>;
+
+        pred_type pred_;
+        proj_type proj_;
+
+        template <typename Iter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Iter curr)
+        {
+            using value_type = hpx::traits::iter_reference_t<Iter>;
+            if constexpr (hpx::traits::is_value_proxy_v<value_type>)
+            {
+                auto tmp = HPX_INVOKE(proj_, *curr);
+                return HPX_INVOKE(pred_, tmp);
+            }
+            else
+            {
+                return HPX_INVOKE(pred_, HPX_INVOKE(proj_, *curr));
+            }
+        }
+    };
+
+    template <typename F>
+    struct invoke_projected_ind<F, hpx::identity>
+    {
+        using pred_type = std::decay_t<F>;
+
+        pred_type pred_;
+
+        HPX_HOST_DEVICE HPX_FORCEINLINE explicit constexpr invoke_projected_ind(
+            F& f) noexcept
+          : pred_(f)
+        {
+        }
+
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr invoke_projected_ind(
+            F& f, hpx::identity) noexcept
+          : pred_(f)
+        {
+        }
+
+        template <typename Iter>
+        HPX_HOST_DEVICE HPX_FORCEINLINE constexpr decltype(auto) operator()(
+            Iter curr)
+        {
+            using value_type = hpx::traits::iter_reference_t<Iter>;
+            if constexpr (hpx::traits::is_value_proxy_v<value_type>)
+            {
+                auto tmp = *curr;
+                return HPX_INVOKE(pred_, tmp);
+            }
+            else
+            {
+                return HPX_INVOKE(pred_, *curr);
+            }
+        }
+    };
+}    // namespace hpx::parallel::util

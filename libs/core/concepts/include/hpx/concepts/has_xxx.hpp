@@ -12,11 +12,10 @@
 
 #include <type_traits>
 
-/// This macro creates a boolean unary meta-function such that for
-/// any type X, has_name<X>::value == true if and only if X is a
-/// class type and has a nested type member x::name. The generated
-/// trait ends up in a namespace where the macro itself has been
-/// placed.
+/// This macro creates a boolean unary meta-function such that for any type X,
+/// has_name<X>::value == true if and only if X is a class type and has a nested
+/// type member x::name. The generated trait ends up in a namespace where the
+/// macro itself has been placed.
 #define HPX_HAS_XXX_TRAIT_DEF(Name)                                            \
     template <typename T, typename Enable = void>                              \
     struct HPX_PP_CAT(has_, Name)                                              \

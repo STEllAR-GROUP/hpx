@@ -25,7 +25,7 @@
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
-using identity = hpx::parallel::util::projection_identity;
+using identity = hpx::identity;
 
 struct negate
 {

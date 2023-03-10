@@ -27,7 +27,7 @@ namespace hpx::util::logging::formatter {
 
     idx::~idx() = default;
 
-    struct idx_impl : idx
+    struct idx_impl final : idx
     {
         idx_impl()
           : value(0ull)
@@ -45,6 +45,6 @@ namespace hpx::util::logging::formatter {
 
     std::unique_ptr<idx> idx::make()
     {
-        return std::unique_ptr<idx>(new idx_impl());
+        return std::make_unique<idx_impl>();
     }
 }    // namespace hpx::util::logging::formatter

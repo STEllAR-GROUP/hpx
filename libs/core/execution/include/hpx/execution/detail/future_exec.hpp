@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -263,7 +263,7 @@ namespace hpx::lcos::detail {
             alloc, p.get(), init_no_addref{}, alloc, HPX_FORWARD(F, f));
 
         // create a continuation
-        typename hpx::traits::detail::shared_state_ptr<result_type>::type r(
+        hpx::traits::detail::shared_state_ptr_t<result_type> r(
             p.release(), false);
 
         static_cast<shared_state*>(r.get())->template attach<false>(

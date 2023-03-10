@@ -44,12 +44,14 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
 
     // customization point for OneWayExecutor interface
     // execute()
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Executor, typename F, typename... Ts>
         struct sync_execute_not_callable;
@@ -729,11 +731,14 @@ namespace hpx { namespace parallel { namespace execution {
         using bulk_function_result_t =
             typename bulk_function_result<F, Shape, Ts...>::type;
 
+        // clang-format off
         template <typename Executor>
         struct bulk_async_execute_fn_helper<Executor,
-            std::enable_if_t<(hpx::traits::is_one_way_executor_v<Executor> ||
-                hpx::traits::is_two_way_executor_v<Executor>) &&!hpx::traits::
-                    is_bulk_two_way_executor_v<Executor>>>
+            std::enable_if_t<
+                (hpx::traits::is_one_way_executor_v<Executor> ||
+                 hpx::traits::is_two_way_executor_v<Executor>) &&
+                !hpx::traits::is_bulk_two_way_executor_v<Executor>>>
+        // clang-format on
         {
             template <typename BulkExecutor, typename F, typename Shape,
                 typename... Ts>
@@ -1418,4 +1423,4 @@ namespace hpx { namespace parallel { namespace execution {
         };
     }    // namespace detail
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

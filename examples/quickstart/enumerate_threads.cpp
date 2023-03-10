@@ -4,6 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+//[threads_docs
+
 #include <hpx/local/future.hpp>
 #include <hpx/local/init.hpp>
 #include <hpx/local/thread.hpp>
@@ -57,3 +59,5 @@ int main(int argc, char* argv[])
 {
     return hpx::local::init(hpx_main, argc, argv);
 }
+
+//]

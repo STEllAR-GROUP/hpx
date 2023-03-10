@@ -8,11 +8,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename T>
     struct is_value_proxy : std::false_type
@@ -30,4 +28,4 @@ namespace hpx { namespace traits {
 
     template <typename T>
     using proxy_value_t = typename proxy_value<T>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

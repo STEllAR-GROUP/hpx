@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2020 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,7 +20,7 @@ namespace hpx { namespace ranges {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = detail::distance(first, last)
+    /// \note   Complexity: O(N log(N)), where N = detail::distance(first, last)
     ///                     comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -37,7 +37,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -67,7 +67,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename RandomIt, typename Sent,
         typename Comp = ranges::less,
-        typename Proj = parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     RandomIt sort(RandomIt first, Sent last,  Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -77,7 +77,7 @@ namespace hpx { namespace ranges {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = detail::distance(first, last)
+    /// \note   Complexity: O(N log(N)), where N = detail::distance(first, last)
     ///                     comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -98,7 +98,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp        The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -142,7 +142,7 @@ namespace hpx { namespace ranges {
     ///
     template <typename ExPolicy, typename RandomIt, typename Sent,
         typename Comp = ranges::less,
-        typename Proj = parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         RandomIt>::type
     sort(ExPolicy&& policy, RandomIt first, Sent last, Comp&& comp = Comp(),
@@ -154,7 +154,7 @@ namespace hpx { namespace ranges {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: O(Nlog(N)),
+    /// \note   Complexity: O(N log(N)),
     ///             where N = std::distance(begin(rng), end(rng)) comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -169,7 +169,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp     The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
     ///                     will be applied to.
@@ -192,10 +192,10 @@ namespace hpx { namespace ranges {
     /// calling thread.
     ///
     /// \returns  The \a sort algorithm returns \a
-    ///           typename hpx::traits::range_iterator<Rng>::type.
+    ///           hpx::traits::range_iterator_t<Rng>.
     ///           It returns \a last.
     template <typename Rng, typename Comp, typename Proj>
-    typename hpx::traits::range_iterator<Rng>::type
+    hpx::traits::range_iterator_t<Rng>
     sort(Rng&& rng, Comp&& comp = Comp(), Proj&& proj = Proj());
 
     ///////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ namespace hpx { namespace ranges {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: O(Nlog(N)),
+    /// \note   Complexity: O(N log(N)),
     ///             where N = std::distance(begin(rng), end(rng)) comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -223,7 +223,7 @@ namespace hpx { namespace ranges {
     /// \tparam Comp     The type of the function/function object to use
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -255,19 +255,19 @@ namespace hpx { namespace ranges {
     /// threads, and indeterminately sequenced within each thread.
     ///
     /// \returns  The \a sort algorithm returns a
-    ///           \a hpx::future<typename hpx::traits::range_iterator_t<Rng>
+    ///           \a hpx::future<hpx::traits::range_iterator_t<Rng>
     ///           if the execution policy is of type
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and returns \a
-    ///           typename hpx::traits::range_iterator<Rng>::type
+    ///           hpx::traits::range_iterator_t<Rng>
     ///           otherwise.
     ///           It returns \a last.
     ///
     template <typename ExPolicy, typename Rng,
         typename Comp = ranges::less,
-        typename Proj = parallel::util::projection_identity>
+        typename Proj = hpx::identity>
     typename parallel::util::detail::algorithm_result<ExPolicy,
-        typename hpx::traits::range_iterator<Rng>::type>::type
+        hpx::traits::range_iterator_t<Rng>>
     sort(ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -277,27 +277,27 @@ namespace hpx { namespace ranges {
 #else
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/iterator_support/traits/is_range.hpp>
-
-#include <hpx/algorithms/traits/projected_range.hpp>
 #include <hpx/parallel/algorithms/sort.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace rangev1 {
+namespace hpx::parallel {
+
     // clang-format off
     template <typename ExPolicy, typename Rng,
-        typename Comp = v1::detail::less,
-        typename Proj = util::projection_identity,
+        typename Comp = detail::less,
+        typename Proj = hpx::identity,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
-            hpx::traits::is_range<Rng>::value &&
-            traits::is_projected_range<Proj, Rng>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
+            hpx::traits::is_range_v<Rng> &&
+            traits::is_projected_range_v<Proj, Rng> &&
             traits::is_indirect_callable<ExPolicy, Comp,
                 traits::projected_range<Proj, Rng>,
                 traits::projected_range<Proj, Rng>
@@ -306,25 +306,25 @@ namespace hpx { namespace parallel { inline namespace rangev1 {
     // clang-format on
     HPX_DEPRECATED_V(
         1, 8, "hpx::parallel::sort is deprecated, use hpx::sort instead")
-        typename util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
-        sort(ExPolicy&& policy, Rng&& rng, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+        util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>> sort(ExPolicy&& policy,
+            Rng&& rng, Comp&& comp = Comp(), Proj&& proj = Proj())
     {
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-        return v1::sort(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+        return sort(HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
             hpx::util::end(rng), HPX_FORWARD(Comp, comp),
             HPX_FORWARD(Proj, proj));
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
 #pragma GCC diagnostic pop
 #endif
     }
-}}}    // namespace hpx::parallel::rangev1
+}    // namespace hpx::parallel
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ranges::sort
     inline constexpr struct sort_t final
@@ -334,122 +334,117 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename RandomIt, typename Sent,
             typename Comp = ranges::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandomIt>::value &&
-                hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
+                parallel::traits::is_projected_v<Proj, RandomIt> &&
+                parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     parallel::traits::projected<Proj, RandomIt>,
                     parallel::traits::projected<Proj, RandomIt>
-                >::value
+                >
             )>
         // clang-format on
         friend RandomIt tag_fallback_invoke(hpx::ranges::sort_t, RandomIt first,
-            Sent last, Comp&& comp = Comp(), Proj&& proj = Proj())
+            Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<RandomIt>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::sort<RandomIt>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt, typename Sent,
             typename Comp = ranges::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandomIt>::value &&
-                hpx::traits::is_sentinel_for<Sent, RandomIt>::value &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandomIt> &&
+                hpx::traits::is_sentinel_for_v<Sent, RandomIt> &&
+                parallel::traits::is_projected_v<Proj, RandomIt> &&
+                parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     parallel::traits::projected<Proj, RandomIt>,
                     parallel::traits::projected<Proj, RandomIt>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            RandomIt>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, RandomIt>
         tag_fallback_invoke(hpx::ranges::sort_t, ExPolicy&& policy,
-            RandomIt first, Sent last, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            RandomIt first, Sent last, Comp comp = Comp(), Proj proj = Proj())
         {
-            static_assert(
-                hpx::traits::is_random_access_iterator<RandomIt>::value,
+            static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<RandomIt>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::sort<RandomIt>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename Rng,
             typename Comp = ranges::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                parallel::traits::is_projected_range<Proj, Rng>::value &&
-                parallel::traits::is_indirect_callable<
+                hpx::traits::is_range_v<Rng> &&
+                parallel::traits::is_projected_range_v<Proj, Rng> &&
+                parallel::traits::is_indirect_callable_v<
                     hpx::execution::sequenced_policy, Comp,
                     parallel::traits::projected_range<Proj, Rng>,
                     parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename hpx::traits::range_iterator<Rng>::type
-        tag_fallback_invoke(hpx::ranges::sort_t, Rng&& rng,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+        friend hpx::traits::range_iterator_t<Rng> tag_fallback_invoke(
+            hpx::ranges::sort_t, Rng&& rng, Comp comp = Comp(),
+            Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<iterator_type>().call(
+            return hpx::parallel::detail::sort<iterator_type>().call(
                 hpx::execution::seq, hpx::util::begin(rng), hpx::util::end(rng),
-                HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                HPX_MOVE(comp), HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng,
             typename Comp = ranges::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value &&
-                parallel::traits::is_projected_range<Proj, Rng>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Comp,
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
+                parallel::traits::is_projected_range_v<Proj, Rng> &&
+                parallel::traits::is_indirect_callable_v<ExPolicy, Comp,
                     parallel::traits::projected_range<Proj, Rng>,
                     parallel::traits::projected_range<Proj, Rng>
-                >::value
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_iterator<Rng>::type>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            hpx::traits::range_iterator_t<Rng>>
         tag_fallback_invoke(hpx::ranges::sort_t, ExPolicy&& policy, Rng&& rng,
-            Comp&& comp = Comp(), Proj&& proj = Proj())
+            Comp comp = Comp(), Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
             static_assert(
-                hpx::traits::is_random_access_iterator<iterator_type>::value,
+                hpx::traits::is_random_access_iterator_v<iterator_type>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::sort<iterator_type>().call(
+            return hpx::parallel::detail::sort<iterator_type>().call(
                 HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
-                hpx::util::end(rng), HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+                hpx::util::end(rng), HPX_MOVE(comp), HPX_MOVE(proj));
         }
     } sort{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

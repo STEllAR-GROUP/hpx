@@ -81,7 +81,6 @@ namespace hpx::util::detail {
         {
             if (format_str[0] == '{' || format_str[0] == '}')
             {
-                HPX_ASSERT(!format_str.empty());
                 if (format_str[1] == format_str[0])
                 {
                     os.write(format_str.data(), 1);    // '{' or '}'

@@ -68,6 +68,19 @@ namespace hpx::util::logging {
             other.m_full_msg_computed = false;
         }
 
+        message& operator=(message&& other) noexcept
+        {
+            m_full_msg_computed = other.m_full_msg_computed;
+            other.m_full_msg_computed = false;
+#if defined(HPX_COMPUTE_HOST_CODE)
+            m_full_msg = HPX_MOVE(other.m_full_msg);
+#endif
+#if defined(HPX_COMPUTE_HOST_CODE)
+            m_str = HPX_MOVE(other.m_str);
+#endif
+            return *this;
+        }
+
         template <typename T>
         message& operator<<(T&& v)
         {

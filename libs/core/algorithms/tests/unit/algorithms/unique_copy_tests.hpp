@@ -371,24 +371,6 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
         HPX_TEST(equality);
     }
 
-    // Test projection.
-    {
-        using iterator = test::test_iterator<base_iterator, IteratorTag>;
-
-        DataType val;
-        auto result = hpx::unique_copy(
-            policy, iterator(std::begin(c)), iterator(std::end(c)),
-            iterator(std::begin(dest_res)),
-            [](DataType const& a, DataType const& b) -> bool { return a == b; },
-            [&val](DataType const&) -> DataType {
-                // This is projection.
-                return val;
-            });
-
-        auto dist = std::distance(std::begin(dest_res), result.base());
-        HPX_TEST_EQ(dist, 1);
-    }
-
     // Test sequential_unique_copy with input_iterator_tag.
     {
         typedef test::test_iterator<base_iterator, std::input_iterator_tag>
@@ -396,7 +378,7 @@ void test_unique_copy_etc(ExPolicy policy, IteratorTag, DataType, int rand_base)
         typedef test::test_iterator<base_iterator, std::output_iterator_tag>
             output_iterator;
 
-        auto result = hpx::parallel::v1::detail::sequential_unique_copy(
+        auto result = hpx::parallel::detail::sequential_unique_copy(
             input_iterator(std::begin(c)), input_iterator(std::end(c)),
             output_iterator(std::begin(dest_res)),
             [](DataType const& a, DataType const& b) -> bool { return a == b; },

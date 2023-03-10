@@ -29,7 +29,8 @@ namespace hpx::components {
         return global_module_init_data;
     }
 
-    void init_registry_module(static_factory_load_data_type const& data)
+    void init_registry_module(
+        static_factory_load_data_type const& data)    //-V835
     {
         if (get_initial_static_loading())
         {
@@ -46,12 +47,12 @@ namespace hpx::components {
         return global_factory_init_data;
     }
 
-    void init_registry_factory(static_factory_load_data_type const& data)
+    void init_registry_factory(
+        static_factory_load_data_type const& data)    //-V835
     {
         if (get_initial_static_loading())
         {
-            get_static_factory_data().insert(
-                std::make_pair(data.name, data.get_factory));
+            get_static_factory_data().emplace(data.name, data.get_factory);
         }
     }
 
@@ -79,12 +80,12 @@ namespace hpx::components {
         return global_commandline_init_data;
     }
 
-    void init_registry_commandline(static_factory_load_data_type const& data)
+    void init_registry_commandline(
+        static_factory_load_data_type const& data)    //-V835
     {
         if (get_initial_static_loading())
         {
-            get_static_commandline_data().insert(
-                std::make_pair(data.name, data.get_factory));
+            get_static_commandline_data().emplace(data.name, data.get_factory);
         }
     }
 
@@ -113,12 +114,12 @@ namespace hpx::components {
     }
 
     void init_registry_startup_shutdown(
-        static_factory_load_data_type const& data)
+        static_factory_load_data_type const& data)    //-V835
     {
         if (get_initial_static_loading())
         {
-            get_static_startup_shutdown_data().insert(
-                std::make_pair(data.name, data.get_factory));
+            get_static_startup_shutdown_data().emplace(
+                data.name, data.get_factory);
         }
     }
 

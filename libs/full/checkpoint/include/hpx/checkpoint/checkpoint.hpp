@@ -1,5 +1,5 @@
 // Copyright (c) 2018 Adrian Serio
-// Copyright (c) 2018-2021 Hartmut Kaiser
+// Copyright (c) 2018-2023 Hartmut Kaiser
 //
 // SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -224,14 +224,15 @@ namespace hpx { namespace util {
         }
 
         // Properly handle Clients to components
-        template <typename Client, typename Server>
+        template <typename Client, typename Server, typename Data>
         hpx::future<std::shared_ptr<typename hpx::components::client_base<
-            Client, Server>::server_component_type>>
-        prepare_client(hpx::components::client_base<Client, Server> const& c)
+            Client, Server, Data>::server_component_type>>
+        prepare_client(
+            hpx::components::client_base<Client, Server, Data> const& c)
         {
             // Use shared pointer to serialize server
             using server_type = typename hpx::components::client_base<Client,
-                Server>::server_component_type;
+                Server, Data>::server_component_type;
             return hpx::get_ptr<server_type>(c.get_id());
         }
 
@@ -793,14 +794,14 @@ namespace hpx { namespace util {
             }
 
             // Properly handle client/server restoration
-            template <typename Client, typename Server>
+            template <typename Client, typename Server, typename Data>
             void operator()(hpx::serialization::input_archive& ar,
-                hpx::components::client_base<Client, Server>& c) const
+                hpx::components::client_base<Client, Server, Data>& c) const
             {
                 // Revive server
                 using server_component_type =
-                    typename hpx::components::client_base<Client,
-                        Server>::server_component_type;
+                    typename hpx::components::client_base<Client, Server,
+                        Data>::server_component_type;
 
                 hpx::future<std::shared_ptr<server_component_type>>
                     f_server_ptr;

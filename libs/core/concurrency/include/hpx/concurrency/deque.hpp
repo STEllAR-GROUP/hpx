@@ -73,14 +73,14 @@ namespace hpx::lockfree {
         {
         }
 
-        deque_node(deque_node const& p) noexcept
+        deque_node(deque_node const& p) noexcept    //-V730
           : left(p.left.load(std::memory_order_relaxed))
           , right(p.right.load(std::memory_order_relaxed))
         {
         }
 
         deque_node(deque_node* lptr, deque_node* rptr, T const& v,
-            tag_t ltag = 0, tag_t rtag = 0)
+            tag_t ltag = 0, tag_t rtag = 0) noexcept
           : left(pointer(lptr, ltag))
           , right(pointer(rptr, rtag))
           , data(v)
@@ -125,7 +125,7 @@ namespace hpx::lockfree {
         {
         }
 
-        explicit deque_anchor(pair const& p)
+        explicit deque_anchor(pair const& p) noexcept
           : pair_(p)
         {
         }
@@ -383,11 +383,21 @@ namespace hpx::lockfree {
         }
 
     public:
+        //  Variable 'padding' is uninitialized
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
+
         explicit deque(std::size_t initial_nodes = 128)
           : anchor_()
           , pool_(initial_nodes)
         {
         }
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         // Not thread-safe.
         // Complexity: O(N*Processes)

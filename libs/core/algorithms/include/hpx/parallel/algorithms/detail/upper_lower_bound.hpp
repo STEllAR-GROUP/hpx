@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,13 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke.hpp>
-
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
-#include <functional>
 #include <iterator>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename Sent, typename T, typename F,
@@ -131,4 +129,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
         return first;
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

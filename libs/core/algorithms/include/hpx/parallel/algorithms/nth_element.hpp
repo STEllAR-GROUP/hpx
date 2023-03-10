@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //  Copyright (c) 2020 Francisco Jose Tapia
 //  Copyright (c) 2021 Akhil J Nair
 //
@@ -61,7 +61,7 @@ namespace hpx {
     ///
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
-    template <typename RandomIt, typename Pred = hpx::parallel::v1::detail::less>
+    template <typename RandomIt, typename Pred = hpx::parallel::detail::less>
     void nth_element(RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred());
 
     /// nth_element is a partial sorting algorithm that rearranges elements in
@@ -121,7 +121,7 @@ namespace hpx {
     /// \returns  The \a nth_element algorithms returns nothing.
     ///
     template <typename ExPolicy, typename RandomIt,
-        typename Pred = hpx::parallel::v1::detail::less>
+        typename Pred = hpx::parallel::detail::less>
     void nth_element(ExPolicy&& policy, RandomIt first, RandomIt nth,
         RandomIt last, Pred&& pred = Pred());
 
@@ -133,18 +133,17 @@ namespace hpx {
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/parallel/util/detail/sender_util.hpp>
-
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/pivot.hpp>
 #include <hpx/parallel/algorithms/minmax.hpp>
 #include <hpx/parallel/algorithms/partial_sort.hpp>
 #include <hpx/parallel/algorithms/partition.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
+#include <hpx/parallel/util/detail/sender_util.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -152,9 +151,9 @@ namespace hpx {
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // nth_element
     namespace detail {
@@ -178,7 +177,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         static constexpr void nth_element_seq(RandomIt first, RandomIt nth,
             RandomIt end, std::uint32_t level, Compare&& comp, Proj&& proj)
         {
-            std::uint32_t const nmin_sort = 24;
+            constexpr std::uint32_t nmin_sort = 24;
             auto nelem = end - first;
 
             // Check  the special conditions
@@ -198,7 +197,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 }
 
                 return;
-            };
+            }
 
             if (nelem < nmin_sort)
             {
@@ -211,7 +210,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 std::make_heap(first, end, comp);
                 std::sort_heap(first, nth, comp);
                 return;
-            };
+            }
 
             // Filter the range and check which part contains the nth element
             RandomIt c_last = filter(first, end, comp);
@@ -220,35 +219,37 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 return;
 
             if (nth < c_last)
+            {
                 nth_element_seq(first, nth, c_last, level - 1,
                     HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
+            }
             else
+            {
                 nth_element_seq(c_last + 1, nth, end, level - 1,
                     HPX_FORWARD(Compare, comp), HPX_FORWARD(Proj, proj));
-
-            return;
+            }
         }
 
         template <typename Iter>
-        struct nth_element : public detail::algorithm<nth_element<Iter>, Iter>
+        struct nth_element : public algorithm<nth_element<Iter>, Iter>
         {
-            nth_element()
-              : nth_element::algorithm("nth_element")
+            constexpr nth_element() noexcept
+              : algorithm<nth_element, Iter>("nth_element")
             {
             }
 
             template <typename ExPolicy, typename RandomIt, typename Sent,
                 typename Pred, typename Proj>
-            static RandomIt sequential(ExPolicy, RandomIt first, RandomIt nth,
-                Sent last, Pred&& pred, Proj&& proj)
+            static constexpr RandomIt sequential(ExPolicy, RandomIt first,
+                RandomIt nth, Sent last, Pred&& pred, Proj&& proj)
             {
                 auto end = detail::advance_to_sentinel(first, last);
 
                 auto nelem = end - first;
                 if (nelem == 0)
                     return first;
-                HPX_ASSERT(nelem >= 0 && (nth - first + 1) > 0 &&
-                    (nth - first + 1) <= nelem);
+                HPX_ASSERT(nelem >= 0 && nth - first + 1 > 0 &&
+                    nth - first + 1 <= nelem);
 
                 uint32_t level = detail::nbits64(nelem) * 2;
                 detail::nth_element_seq(first, nth, end, level,
@@ -266,7 +267,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
                 using value_type =
                     typename std::iterator_traits<RandomIt>::value_type;
 
-                RandomIt partitionIter, return_last;
+                RandomIt partition_iter, return_last;
 
                 if (first == last)
                 {
@@ -290,36 +291,36 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     {
                         detail::pivot9(first, last_iter, pred);
 
-                        partitionIter =
-                            hpx::parallel::v1::detail::partition<RandomIt>()
-                                .call(
-                                    policy(hpx::execution::non_task), first + 1,
-                                    last_iter,
-                                    [val = HPX_INVOKE(proj, *first), &pred](
-                                        value_type const& elem) {
-                                        return HPX_INVOKE(pred, elem, val);
-                                    },
-                                    proj);
+                        partition_iter =
+                            hpx::parallel::detail::partition<RandomIt>().call(
+                                policy(hpx::execution::non_task), first + 1,
+                                last_iter,
+                                [val = HPX_INVOKE(proj, *first), &pred](
+                                    value_type const& elem) {
+                                    return HPX_INVOKE(pred, elem, val);
+                                },
+                                proj);
 
-                        --partitionIter;
+                        --partition_iter;
+
                         // swap first element and partitionIter
                         // (ending element of first group)
 #if defined(HPX_HAVE_CXX20_STD_RANGES_ITER_SWAP)
-                        std::ranges::iter_swap(first, partitionIter);
+                        std::ranges::iter_swap(first, partition_iter);
 #else
-                        std::iter_swap(first, partitionIter);
+                        std::iter_swap(first, partition_iter);
 #endif
 
                         // if nth element < partitioned index,
                         // it lies in [first, partitionIter)
-                        if (partitionIter < nth)
+                        if (partition_iter < nth)
                         {
-                            first = partitionIter + 1;
+                            first = partition_iter + 1;
                         }
                         // else it lies in [partitionIter + 1, last)
-                        else if (partitionIter > nth)
+                        else if (partition_iter > nth)
                         {
-                            last_iter = partitionIter;
+                            last_iter = partition_iter;
                         }
                         // partitionIter == nth
                         else
@@ -341,9 +342,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::nth_element
     inline constexpr struct nth_element_t final
@@ -351,7 +353,7 @@ namespace hpx {
     {
         // clang-format off
         template <typename RandomIt,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<RandomIt> &&
                 hpx::is_invocable_v<Pred,
@@ -361,19 +363,19 @@ namespace hpx {
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::nth_element_t, RandomIt first,
-            RandomIt nth, RandomIt last, Pred&& pred = Pred())
+            RandomIt nth, RandomIt last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
 
-            hpx::parallel::v1::detail::nth_element<RandomIt>().call(
-                hpx::execution::seq, first, nth, last, HPX_FORWARD(Pred, pred),
-                hpx::parallel::util::projection_identity{});
+            hpx::parallel::detail::nth_element<RandomIt>().call(
+                hpx::execution::seq, first, nth, last, HPX_MOVE(pred),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Pred = hpx::parallel::v1::detail::less,
+            typename Pred = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
@@ -385,7 +387,7 @@ namespace hpx {
         // clang-format on
         friend parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::nth_element_t, ExPolicy&& policy,
-            RandomIt first, RandomIt nth, RandomIt last, Pred&& pred = Pred())
+            RandomIt first, RandomIt nth, RandomIt last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires at least random iterator.");
@@ -394,10 +396,9 @@ namespace hpx {
                 hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
 
             return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::v1::detail::nth_element<RandomIt>().call(
+                   hpx::parallel::detail::nth_element<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, nth, last,
-                       HPX_FORWARD(Pred, pred),
-                       hpx::parallel::util::projection_identity{});
+                       HPX_MOVE(pred), hpx::identity_v);
         }
     } nth_element{};
 }    // namespace hpx

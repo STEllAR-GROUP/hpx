@@ -11,10 +11,12 @@
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <cstddef>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename Vector>
-    HPX_HOST_DEVICE HPX_FORCEINLINE auto get(Vector& vec, std::size_t index)
+    HPX_HOST_DEVICE HPX_FORCEINLINE auto get(
+        Vector& vec, std::size_t index) noexcept
     {
         return vec.get(index);
     }
@@ -22,10 +24,10 @@ namespace hpx { namespace parallel { namespace traits {
     ///////////////////////////////////////////////////////////////////////
     template <typename Vector, typename T>
     HPX_HOST_DEVICE HPX_FORCEINLINE auto set(
-        Vector& vec, std::size_t index, T val)
+        Vector& vec, std::size_t index, T val) noexcept
     {
         vec.set(index, val);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

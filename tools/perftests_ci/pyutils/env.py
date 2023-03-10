@@ -92,7 +92,7 @@ def hostname():
 
 
 @functools.lru_cache()
-def clustername(local):
+def clustername():
     """
     SLURM cluster name of the current machine.
 
@@ -100,9 +100,6 @@ def clustername(local):
         >>> clustername()
         'kesch'
     """
-    if local:
-        # We only run on daint, the script is run in an sbatch
-        return 'daint'
     try:
         output = runtools.run(['scontrol', 'show', 'config'])
         m = re.compile(r'.*ClusterName\s*=\s*(\S*).*',

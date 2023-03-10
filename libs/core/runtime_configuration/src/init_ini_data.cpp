@@ -198,15 +198,16 @@ namespace hpx { namespace util {
 
                 for (fs::directory_iterator dir(this_path); dir != nodir; ++dir)
                 {
-                    if (dir->path().extension() != ".ini")
+                    auto& p = dir->path();
+                    if (p.extension() != ".ini")
                         continue;
 
                     // read and merge the ini file into the main ini hierarchy
                     try
                     {
-                        ini.merge(dir->path().string());
+                        ini.merge(p.string());
                         LBT_(info).format(
-                            "loaded configuration: {}", dir->path().string());
+                            "loaded configuration: {}", p.string());
                     }
                     catch (hpx::exception const& /*e*/)
                     {
@@ -251,11 +252,11 @@ namespace hpx { namespace util {
             if (name[name.size() - 1] == 'd')
                 name.resize(name.size() - 1);
 #endif
-            ini_data.push_back(std::string("[hpx.components.") + name + "]");
-            ini_data.push_back("name = " + name);
-            ini_data.push_back("no_factory = 1");
-            ini_data.push_back("enabled = 1");
-            ini_data.push_back("static = 1");
+            ini_data.emplace_back("[hpx.components." + name + "]");
+            ini_data.emplace_back("name = " + name);
+            ini_data.emplace_back("no_factory = 1");
+            ini_data.emplace_back("enabled = 1");
+            ini_data.emplace_back("static = 1");
         }
         else
         {
@@ -306,11 +307,11 @@ namespace hpx { namespace util {
             if (name[name.size() - 1] == 'd')
                 name.resize(name.size() - 1);
 #endif
-            ini_data.push_back(std::string("[hpx.components.") + name + "]");
-            ini_data.push_back("name = " + name);
-            ini_data.push_back("path = " + curr);
-            ini_data.push_back("no_factory = 1");
-            ini_data.push_back("enabled = 1");
+            ini_data.emplace_back("[hpx.components." + name + "]");
+            ini_data.emplace_back("name = " + name);
+            ini_data.emplace_back("path = " + curr);
+            ini_data.emplace_back("no_factory = 1");
+            ini_data.emplace_back("enabled = 1");
         }
         else
         {
@@ -437,7 +438,7 @@ namespace hpx { namespace util {
                     continue;
 
                 // instance name and module name are the same
-                std::string name(fs::basename(curr));
+                std::string name(fs::basename(curr));    //-V821
 
 #if !defined(HPX_WINDOWS)
                 if (0 == name.find("lib"))
@@ -461,11 +462,11 @@ namespace hpx { namespace util {
                 // first occurrence of a module name is used
                 std::string basename = canonical_curr.filename().string();
                 std::pair<std::map<std::string, fs::path>::iterator, bool> p =
-                    basenames.insert(std::make_pair(basename, canonical_curr));
+                    basenames.emplace(basename, canonical_curr);
 
                 if (p.second)
                 {
-                    libdata.push_back(std::make_pair(canonical_curr, name));
+                    libdata.emplace_back(canonical_curr, name);
                 }
                 else
                 {
@@ -490,8 +491,7 @@ namespace hpx { namespace util {
         std::mt19937 generator(random_device());
         std::shuffle(libdata.begin(), libdata.end(), HPX_MOVE(generator));
 
-        typedef std::pair<fs::path, std::string> libdata_type;
-        for (libdata_type const& p : libdata)
+        for (auto const& p : libdata)
         {
             LRT_(info).format("attempting to load: {}", p.first.string());
 
@@ -549,7 +549,7 @@ namespace hpx { namespace util {
             // store loaded library for future use
             if (must_keep_loaded)
             {
-                modules.insert(std::make_pair(p.second, HPX_MOVE(d)));
+                modules.emplace(p.second, HPX_MOVE(d));
             }
         }
         return plugin_registries;

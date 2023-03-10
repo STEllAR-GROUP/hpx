@@ -31,6 +31,7 @@ namespace hpx::util::detail {
         function_base const& other, vtable const* /* empty_vtable */)
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (other.object != nullptr)
         {
@@ -43,6 +44,7 @@ namespace hpx::util::detail {
         function_base&& other, vtable const* empty_vptr) noexcept
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (object == &other.storage)
         {
@@ -69,8 +71,8 @@ namespace hpx::util::detail {
                 HPX_ASSERT(other.object != nullptr);
 
                 // reuse object storage
-                object = vptr->copy(
-                    object, std::size_t(-1), other.object, /*destroy*/ true);
+                object = vptr->copy(object, static_cast<std::size_t>(-1),
+                    other.object, /*destroy*/ true);
             }
         }
         else
@@ -99,7 +101,7 @@ namespace hpx::util::detail {
         }
     }
 
-    void function_base::destroy() noexcept
+    void function_base::destroy() const noexcept
     {
         if (object != nullptr)
         {

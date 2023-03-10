@@ -15,7 +15,6 @@
 
 #include <memory>
 #include <mutex>
-#include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -97,7 +96,7 @@ namespace hpx::util::plugin {
             {
             }
 
-            void operator()(T)
+            void operator()(T) const
             {
                 if (nullptr != h_)
                 {
@@ -118,29 +117,25 @@ namespace hpx::util::plugin {
 
     public:
         dll()
-          : dll_handle(nullptr)
-          , mtx_(mutex_instance())
+          : mtx_(mutex_instance())
         {
         }
 
         dll(dll const& rhs)
           : dll_name(rhs.dll_name)
           , map_name(rhs.map_name)
-          , dll_handle(nullptr)
           , mtx_(rhs.mtx_)
         {
         }
 
-        dll(std::string const& name)
-          : dll_name(name)
-          , map_name("")
-          , dll_handle(nullptr)
+        explicit dll(std::string name)
+          : dll_name(HPX_MOVE(name))
           , mtx_(mutex_instance())
         {
             // map_name defaults to dll base name
             namespace fs = filesystem;
 
-            fs::path dll_path(dll_name);
+            fs::path const dll_path(dll_name);
             map_name = fs::basename(dll_path);
         }
 
@@ -149,10 +144,9 @@ namespace hpx::util::plugin {
             LoadLibrary(ec);
         }
 
-        dll(std::string const& libname, std::string const& mapname)
-          : dll_name(libname)
-          , map_name(mapname)
-          , dll_handle(nullptr)
+        dll(std::string libname, std::string mapname)
+          : dll_name(HPX_MOVE(libname))
+          , map_name(HPX_MOVE(mapname))
           , mtx_(mutex_instance())
         {
         }
@@ -200,17 +194,17 @@ namespace hpx::util::plugin {
             FreeLibrary();
         }
 
-        std::string const& get_name() const noexcept
+        [[nodiscard]] std::string const& get_name() const noexcept
         {
             return dll_name;
         }
-        std::string const& get_mapname() const noexcept
+        [[nodiscard]] std::string const& get_mapname() const noexcept
         {
             return map_name;
         }
 
         template <typename SymbolType, typename Deleter>
-        std::pair<SymbolType, Deleter> get(
+        [[nodiscard]] std::pair<SymbolType, Deleter> get(
             std::string const& symbol_name, error_code& ec = throws) const
         {
             // make sure everything is initialized
@@ -223,11 +217,11 @@ namespace hpx::util::plugin {
             static_assert(
                 std::is_pointer_v<SymbolType>, "std::is_pointer_v<SymbolType>");
 
-            SymbolType address =
+            auto address =
                 (SymbolType) MyGetProcAddress(dll_handle, symbol_name.c_str());
             if (nullptr == address)
             {
-                std::string str = hpx::util::format(
+                std::string const str = hpx::util::format(
                     "Hpx.Plugin: Unable to locate the exported symbol name "
                     "'{}' in the shared library '{}' (dlerror: {})",
                     symbol_name, dll_name, dlerror());
@@ -250,7 +244,7 @@ namespace hpx::util::plugin {
                 MyLoadLibrary((dll_name.empty() ? nullptr : dll_name.c_str()));
             if (!handle)
             {
-                std::string str =
+                std::string const str =
                     hpx::util::format("Hpx.Plugin: Could not open shared "
                                       "library '{}' (dlerror: {})",
                         dll_name, dlerror());
@@ -294,7 +288,7 @@ namespace hpx::util::plugin {
                     (dll_name.empty() ? nullptr : dll_name.c_str()));
                 if (!dll_handle)
                 {
-                    std::string str =
+                    std::string const str =
                         hpx::util::format("Hpx.Plugin: Could not open shared "
                                           "library '{}' (dlerror: {})",
                             dll_name, dlerror());
@@ -314,7 +308,7 @@ namespace hpx::util::plugin {
         }
 
     public:
-        std::string get_directory(error_code& ec = throws) const
+        [[nodiscard]] std::string get_directory(error_code& ec = throws) const
         {
             // now find the full path of the loaded library
             using filesystem::path;
@@ -326,7 +320,7 @@ namespace hpx::util::plugin {
             const_cast<dll&>(*this).LoadLibrary(ec);
             if (!ec && ::dlinfo(dll_handle, RTLD_DI_ORIGIN, directory) < 0)
             {
-                std::string str = hpx::util::format(
+                std::string const str = hpx::util::format(
                     "Hpx.Plugin: Could not extract path the shared library "
                     "'{}' has been loaded from (dlerror: {})",
                     dll_name, dlerror());
@@ -347,7 +341,7 @@ namespace hpx::util::plugin {
                 // iterate through all images currently in memory
                 for (size_t i = 0; i < ::_dyld_image_count(); ++i)
                 {
-                    if (const char* image_name = ::_dyld_get_image_name(i))
+                    if (char const* image_name = ::_dyld_get_image_name(i))
                     {
                         HMODULE probe_handle = ::dlopen(image_name, RTLD_NOW);
                         ::dlclose(probe_handle);
@@ -385,17 +379,17 @@ namespace hpx::util::plugin {
         }
 
         // protect access to dl... functions
-        static std::shared_ptr<std::recursive_mutex> mutex_instance()
+        [[nodiscard]] static std::shared_ptr<std::recursive_mutex>
+        mutex_instance()
         {
-            static std::shared_ptr<std::recursive_mutex> mutex =
-                std::make_shared<std::recursive_mutex>();
+            static auto mutex = std::make_shared<std::recursive_mutex>();
             return mutex;
         }
 
     private:
         std::string dll_name;
         std::string map_name;
-        HMODULE dll_handle;
+        HMODULE dll_handle = nullptr;
         std::shared_ptr<std::recursive_mutex> mtx_;
     };
 }    // namespace hpx::util::plugin

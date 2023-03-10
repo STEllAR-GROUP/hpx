@@ -23,7 +23,6 @@ void test_for_each_n()
 
     test_for_each_n(seq, IteratorTag());
     test_for_each_n(par, IteratorTag());
-    test_for_each_n(par_unseq, IteratorTag());
 
     test_for_each_n_async(seq(task), IteratorTag());
     test_for_each_n_async(par(task), IteratorTag());

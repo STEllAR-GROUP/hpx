@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,9 +14,7 @@
 #include <hpx/agas_base/agas_fwd.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
-#include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/fixed_component_base.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -27,20 +25,19 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     HPX_EXPORT naming::gid_type bootstrap_symbol_namespace_gid();
     HPX_EXPORT hpx::id_type bootstrap_symbol_namespace_id();
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // Base name used to register the component
-    static constexpr char const* const symbol_namespace_service_name =
+    inline constexpr char const* const symbol_namespace_service_name =
         "symbol/";
 
     struct HPX_EXPORT symbol_namespace
@@ -63,46 +60,46 @@ namespace hpx { namespace agas { namespace server {
         on_event_data_map_type on_event_data_;
 
     public:
-        // data structure holding all counters for the omponent_namespace component
+        // data structure holding all counters for the component_namespace component
         struct counter_data
         {
         public:
             HPX_NON_COPYABLE(counter_data);
 
         public:
-            typedef hpx::spinlock mutex_type;
+            using mutex_type = hpx::spinlock;
 
             struct api_counter_data
             {
                 api_counter_data()
                   : count_(0)
                   , time_(0)
-                  , enabled_(false)
                 {
                 }
 
                 std::atomic<std::int64_t> count_;
                 std::atomic<std::int64_t> time_;
-                bool enabled_;
+                bool enabled_ = false;
             };
 
             counter_data() = default;
+            ~counter_data() = default;
 
         public:
             // access current counter values
-            std::int64_t get_bind_count(bool);
-            std::int64_t get_resolve_count(bool);
-            std::int64_t get_unbind_count(bool);
-            std::int64_t get_iterate_names_count(bool);
-            std::int64_t get_on_event_count(bool);
-            std::int64_t get_overall_count(bool);
+            [[nodiscard]] std::int64_t get_bind_count(bool);
+            [[nodiscard]] std::int64_t get_resolve_count(bool);
+            [[nodiscard]] std::int64_t get_unbind_count(bool);
+            [[nodiscard]] std::int64_t get_iterate_names_count(bool);
+            [[nodiscard]] std::int64_t get_on_event_count(bool);
+            [[nodiscard]] std::int64_t get_overall_count(bool);
 
-            std::int64_t get_bind_time(bool);
-            std::int64_t get_resolve_time(bool);
-            std::int64_t get_unbind_time(bool);
-            std::int64_t get_iterate_names_time(bool);
-            std::int64_t get_on_event_time(bool);
-            std::int64_t get_overall_time(bool);
+            [[nodiscard]] std::int64_t get_bind_time(bool);
+            [[nodiscard]] std::int64_t get_resolve_time(bool);
+            [[nodiscard]] std::int64_t get_unbind_time(bool);
+            [[nodiscard]] std::int64_t get_iterate_names_time(bool);
+            [[nodiscard]] std::int64_t get_on_event_time(bool);
+            [[nodiscard]] std::int64_t get_overall_time(bool);
 
             // increment counter values
             void increment_bind_count();
@@ -128,19 +125,15 @@ namespace hpx { namespace agas { namespace server {
         {
         }
 
-        void finalize();
-
-        // register all performance counter types exposed by this component
-        static void register_counter_types(error_code& ec = throws);
-        static void register_global_counter_types(error_code& ec = throws);
+        void finalize() const;
 
         void register_server_instance(char const* servicename,
             std::uint32_t locality_id = naming::invalid_locality_id,
             error_code& ec = throws);
 
-        void unregister_server_instance(error_code& ec = throws);
+        void unregister_server_instance(error_code& ec = throws) const;
 
-        bool bind(std::string key, naming::gid_type gid);
+        bool bind(std::string const& key, naming::gid_type const& gid);
 
         naming::gid_type resolve(std::string const& key);
 
@@ -149,7 +142,7 @@ namespace hpx { namespace agas { namespace server {
         iterate_names_return_type iterate(std::string const& pattern);
 
         bool on_event(std::string const& name, bool call_for_past_events,
-            hpx::id_type lco);
+            hpx::id_type const& lco);
 
         HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, bind)
         HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, resolve)
@@ -157,8 +150,7 @@ namespace hpx { namespace agas { namespace server {
         HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, iterate)
         HPX_DEFINE_COMPONENT_ACTION(symbol_namespace, on_event)
     };
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
 HPX_ACTION_USES_MEDIUM_STACK(hpx::agas::server::symbol_namespace::bind_action)
 

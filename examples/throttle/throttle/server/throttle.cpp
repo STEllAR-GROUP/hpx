@@ -57,7 +57,7 @@ namespace throttle { namespace server {
                 "invalid thread number");
         }
 
-        bool is_suspended = blocked_os_threads_[shepherd];
+        bool is_suspended = bool(blocked_os_threads_[shepherd]);
         if (!is_suspended)
         {
             blocked_os_threads_[shepherd] = true;

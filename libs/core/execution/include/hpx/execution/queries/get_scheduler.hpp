@@ -97,7 +97,7 @@ namespace hpx::execution::experimental {
         template <typename T>
         friend constexpr HPX_FORCEINLINE forward_progress_guarantee
         tag_fallback_invoke(get_forward_progress_guarantee_t,
-            const hpx::util::unwrap_reference<T>&) noexcept
+            hpx::util::unwrap_reference<T> const&) noexcept
         {
             return forward_progress_guarantee::weakly_parallel;
         }

@@ -368,7 +368,7 @@ namespace hpx::lcos::detail {
     public:
         using argument_type = Sequence;
 
-        when_some(argument_type&& values, std::size_t n)
+        when_some(argument_type&& values, std::size_t n) noexcept
           : values_(HPX_MOVE(values))
           , count_(0)
           , needed_count_(n)
@@ -456,8 +456,7 @@ namespace hpx {
         friend decltype(auto) tag_invoke(
             when_some_t, std::size_t n, Iterator begin, Iterator end)
         {
-            using value_type =
-                typename lcos::detail::future_iterator_traits<Iterator>::type;
+            using value_type = lcos::detail::future_iterator_traits_t<Iterator>;
 
             std::vector<value_type> values;
             traits::detail::reserve_if_random_access_by_range(
@@ -535,8 +534,7 @@ namespace hpx {
         friend decltype(auto) tag_invoke(
             when_some_n_t, std::size_t n, Iterator begin, std::size_t count)
         {
-            using value_type =
-                typename lcos::detail::future_iterator_traits<Iterator>::type;
+            using value_type = lcos::detail::future_iterator_traits_t<Iterator>;
 
             std::vector<value_type> values;
             values.reserve(count);
@@ -566,8 +564,8 @@ namespace hpx::lcos {
     }
 
     template <typename Iterator,
-        typename Container = std::vector<
-            typename lcos::detail::future_iterator_traits<Iterator>::type>,
+        typename Container =
+            std::vector<lcos::detail::future_iterator_traits_t<Iterator>>,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     HPX_DEPRECATED_V(
@@ -579,8 +577,8 @@ namespace hpx::lcos {
     }
 
     template <typename Iterator,
-        typename Container = std::vector<
-            typename lcos::detail::future_iterator_traits<Iterator>::type>,
+        typename Container =
+            std::vector<lcos::detail::future_iterator_traits_t<Iterator>>,
         typename Enable =
             std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     HPX_DEPRECATED_V(1, 8,

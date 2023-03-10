@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,15 +45,16 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace execution { namespace experimental {
+namespace hpx::execution::experimental {
+
     /// \brief An executor with fork-join (blocking) semantics.
     ///
     /// The fork_join_executor creates on construction a set of worker threads
     /// that are kept alive for the duration of the executor. Copying the
     /// executor has reference semantics, i.e. copies of a fork_join_executor
     /// hold a reference to the worker threads of the original instance.
-    /// Scheduling work through the executor concurrently from different
-    /// threads is undefined behaviour.
+    /// Scheduling work through the executor concurrently from different threads
+    /// is undefined behaviour.
     ///
     /// The executor keeps a set of worker threads alive for the lifetime of the
     /// executor, meaning other work will not be executed while the executor is
@@ -457,13 +458,15 @@ namespace hpx { namespace execution { namespace experimental {
               , region_data_(num_threads_)
             {
                 HPX_ASSERT(pool_);
-                if (num_threads_ > pool_->get_os_thread_count())
+                if (pool_ == nullptr ||
+                    num_threads_ > pool_->get_os_thread_count())
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "for_join_executor::shared_data::shared_data",
                         hpx::util::format("unexpected number of PUs in given "
                                           "mask: {}, available threads: {}",
-                            pu_mask, pool_->get_os_thread_count()));
+                            pu_mask,
+                            pool_ ? pool_->get_os_thread_count() : -1));
                 }
 
                 init_threads();
@@ -598,8 +601,8 @@ namespace hpx { namespace execution { namespace experimental {
                             hpx::optional<std::uint32_t> index;
                             while ((index = local_queue.pop_left()))
                             {
-                                auto it = std::next(
-                                    hpx::util::begin(shape), index.value());
+                                auto it =
+                                    std::next(hpx::util::begin(shape), *index);
                                 invoke_helper(index_pack_type{},
                                     element_function, *it, argument_pack);
                             }
@@ -625,7 +628,7 @@ namespace hpx { namespace execution { namespace experimental {
                                 while ((index = neighbor_queue.pop_right()))
                                 {
                                     auto it = std::next(
-                                        hpx::util::begin(shape), index.value());
+                                        hpx::util::begin(shape), *index);
                                     invoke_helper(index_pack_type{},
                                         element_function, *it, argument_pack);
                                 }
@@ -884,8 +887,8 @@ namespace hpx { namespace execution { namespace experimental {
     };
 
     HPX_CORE_EXPORT std::ostream& operator<<(
-        std::ostream& os, fork_join_executor::loop_schedule const& schedule);
-}}}    // namespace hpx::execution::experimental
+        std::ostream& os, fork_join_executor::loop_schedule schedule);
+}    // namespace hpx::execution::experimental
 
 namespace hpx { namespace parallel { namespace execution {
     /// \cond NOINTERNAL

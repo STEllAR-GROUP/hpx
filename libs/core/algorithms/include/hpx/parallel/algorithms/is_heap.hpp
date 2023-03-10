@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Taeguk Kwon
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -63,8 +63,8 @@ namespace hpx {
     ///           That is, true if the range is max heap, false otherwise.
     ///
     template <typename ExPolicy, typename RandIter,
-        typename Comp = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, bool>::type
+        typename Comp = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
     is_heap(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
 
@@ -99,7 +99,7 @@ namespace hpx {
     ///           The \a is_heap algorithm returns whether the range is max heap.
     ///           That is, true if the range is max heap, false otherwise.
     ///
-    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::detail::less>
     bool is_heap(RandIter first, RandIter last, Comp&& comp = Comp());
 
     /// Returns the upper bound of the largest range beginning at \a first
@@ -157,8 +157,8 @@ namespace hpx {
     ///           is a max heap.
     ///
     template <typename ExPolicy, typename RandIter,
-        typename Comp = hpx::parallel::v1::detail::less>
-    typename hpx::parallel::util::detail::algorithm_result<ExPolicy, RandIter>::type
+        typename Comp = hpx::parallel::detail::less>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, RandIter>
     is_heap_until(ExPolicy&& policy, RandIter first, RandIter last,
         Comp&& comp = Comp());
 
@@ -197,7 +197,7 @@ namespace hpx {
     ///           That is, the last iterator \a it for which range [first, it)
     ///           is a max heap.
     ///
-    template <typename RandIter, typename Comp = hpx::parallel::v1::detail::less>
+    template <typename RandIter, typename Comp = hpx::parallel::detail::less>
     RandIter is_heap_until(RandIter first, RandIter last, Comp&& comp = Comp());
 
     // clang-format on
@@ -213,7 +213,6 @@ namespace hpx {
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -224,27 +223,27 @@ namespace hpx {
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
-#include <list>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // is_heap
     namespace detail {
 
         // sequential is_heap with projection function
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        bool sequential_is_heap(Iter first, Sent last, Comp&& comp, Proj&& proj)
+        constexpr bool sequential_is_heap(
+            Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
-            typedef typename std::iterator_traits<Iter>::difference_type
-                difference_type;
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
 
             difference_type count = detail::distance(first, last);
 
@@ -261,14 +260,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            typename util::detail::algorithm_result<ExPolicy, bool>::type
-            operator()(ExPolicy&& orgpolicy, Iter first, Sent last, Comp&& comp,
+            util::detail::algorithm_result_t<ExPolicy, bool> operator()(
+                ExPolicy&& orgpolicy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
-                typedef util::detail::algorithm_result<ExPolicy, bool> result;
-                typedef typename std::iterator_traits<Iter>::value_type type;
-                typedef typename std::iterator_traits<Iter>::difference_type
-                    difference_type;
+                using result = util::detail::algorithm_result<ExPolicy, bool>;
+                using type = typename std::iterator_traits<Iter>::value_type;
+                using difference_type =
+                    typename std::iterator_traits<Iter>::difference_type;
 
                 difference_type count = detail::distance(first, last);
                 if (count <= 1)
@@ -325,16 +324,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
 
         template <typename RandIter>
-        struct is_heap : public detail::algorithm<is_heap<RandIter>, bool>
+        struct is_heap : public algorithm<is_heap<RandIter>, bool>
         {
             constexpr is_heap() noexcept
-              : is_heap::algorithm("is_heap")
+              : algorithm<is_heap, bool>("is_heap")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static bool sequential(
+            static constexpr bool sequential(
                 ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap(first, last, HPX_FORWARD(Comp, comp),
@@ -343,8 +342,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, bool>::type
-            parallel(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
+            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
                 return is_heap_helper()(HPX_FORWARD(ExPolicy, policy), first,
@@ -359,11 +358,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         // sequential is_heap_until with projection function
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        Iter sequential_is_heap_until(
+        constexpr Iter sequential_is_heap_until(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
         {
-            typedef typename std::iterator_traits<Iter>::difference_type
-                difference_type;
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
 
             difference_type count = detail::distance(first, last);
 
@@ -380,14 +379,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            operator()(ExPolicy&& orgpolicy, Iter first, Sent last, Comp comp,
+            util::detail::algorithm_result_t<ExPolicy, Iter> operator()(
+                ExPolicy&& orgpolicy, Iter first, Sent last, Comp comp,
                 Proj proj)
             {
-                typedef util::detail::algorithm_result<ExPolicy, Iter> result;
-                typedef typename std::iterator_traits<Iter>::value_type type;
-                typedef typename std::iterator_traits<Iter>::difference_type
-                    difference_type;
+                using result = util::detail::algorithm_result<ExPolicy, Iter>;
+                using type = typename std::iterator_traits<Iter>::value_type;
+                using difference_type =
+                    typename std::iterator_traits<Iter>::difference_type;
 
                 difference_type count = detail::distance(first, last);
                 if (count <= 1)
@@ -447,16 +446,16 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         template <typename RandIter>
         struct is_heap_until
-          : public detail::algorithm<is_heap_until<RandIter>, RandIter>
+          : public algorithm<is_heap_until<RandIter>, RandIter>
         {
             constexpr is_heap_until() noexcept
-              : is_heap_until::algorithm("is_heap_until")
+              : algorithm<is_heap_until, RandIter>("is_heap_until")
             {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static Iter sequential(
+            static constexpr Iter sequential(
                 ExPolicy&&, Iter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 return sequential_is_heap_until(first, last,
@@ -465,8 +464,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
                 Proj&& proj)
             {
                 return is_heap_until_helper()(HPX_FORWARD(ExPolicy, policy),
@@ -475,7 +474,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
         };
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -487,10 +486,10 @@ namespace hpx {
     private:
         // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -500,23 +499,21 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
         tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+            RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
+            return hpx::parallel::detail::is_heap<RandIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -524,15 +521,14 @@ namespace hpx {
             )>
         // clang-format on
         friend bool tag_fallback_invoke(
-            is_heap_t, RandIter first, RandIter last, Comp&& comp = Comp())
+            is_heap_t, RandIter first, RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
+            return hpx::parallel::detail::is_heap<RandIter>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
     } is_heap{};
 
@@ -544,10 +540,10 @@ namespace hpx {
     private:
         // clang-format off
         template <typename ExPolicy, typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
@@ -557,42 +553,38 @@ namespace hpx {
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
             RandIter>::type
         tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+            RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
+            return hpx::parallel::detail::is_heap_until<RandIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename RandIter,
-            typename Comp = hpx::parallel::v1::detail::less,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<RandIter>::value &&
+                hpx::traits::is_iterator_v<RandIter> &&
                 hpx::is_invocable_v<Comp,
                     typename std::iterator_traits<RandIter>::value_type,
                     typename std::iterator_traits<RandIter>::value_type
                 >
             )>
         // clang-format on
-        friend RandIter tag_fallback_invoke(is_heap_until_t, RandIter first,
-            RandIter last, Comp&& comp = Comp())
+        friend RandIter tag_fallback_invoke(
+            is_heap_until_t, RandIter first, RandIter last, Comp comp = Comp())
         {
-            static_assert(
-                (hpx::traits::is_random_access_iterator<RandIter>::value),
+            static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
 
-            return hpx::parallel::v1::detail::is_heap_until<RandIter>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                hpx::parallel::util::projection_identity{});
+            return hpx::parallel::detail::is_heap_until<RandIter>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
     } is_heap_until{};
-
 }    // namespace hpx
 
 #endif    // DOXYGEN

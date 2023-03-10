@@ -37,7 +37,8 @@
 namespace hpx::threads::policies {
 
     scheduler_base::scheduler_base(std::size_t num_threads,
-        char const* description, thread_queue_init_parameters thread_queue_init,
+        char const* description,
+        thread_queue_init_parameters const& thread_queue_init,
         scheduler_mode mode)
       : suspend_mtxs_(num_threads)
       , suspend_conds_(num_threads)
@@ -54,7 +55,7 @@ namespace hpx::threads::policies {
       , polling_work_count_function_cuda_(&null_polling_work_count_function)
       , polling_work_count_function_sycl_(&null_polling_work_count_function)
     {
-        set_scheduler_mode(mode);
+        scheduler_base::set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         double max_time = thread_queue_init.max_idle_backoff_time_;
@@ -68,7 +69,7 @@ namespace hpx::threads::policies {
 #endif
 
         for (std::size_t i = 0; i != num_threads; ++i)
-            states_[i].store(hpx::state::initialized);
+            states_[i].data_.store(hpx::state::initialized);
     }
 
     void scheduler_base::idle_callback([[maybe_unused]] std::size_t num_thread)
@@ -83,8 +84,10 @@ namespace hpx::threads::policies {
             idle_backoff_data& data = wait_counts_[num_thread].data_;
 
             // Exponential back-off with a maximum sleep time.
-            double exponent = (std::min)(double(data.wait_count_),
-                double(std::numeric_limits<double>::max_exponent - 1));
+            static constexpr std::int64_t const max_exponent =
+                std::numeric_limits<double>::max_exponent;
+            double exponent =
+                (std::min)(double(data.wait_count_), double(max_exponent - 1));
 
             std::chrono::milliseconds period(std::lround((std::min)(
                 data.max_idle_backoff_time_, std::pow(2.0, exponent))));
@@ -92,7 +95,8 @@ namespace hpx::threads::policies {
             ++data.wait_count_;
 
             std::unique_lock<pu_mutex_type> l(mtx_);
-            if (cond_.wait_for(l, period) == std::cv_status::no_timeout)
+            if (cond_.wait_for(l, period) ==    //-V1089
+                std::cv_status::no_timeout)
             {
                 // reset counter if thread was woken up
                 data.wait_count_ = 0;
@@ -119,15 +123,15 @@ namespace hpx::threads::policies {
     {
         HPX_ASSERT(num_thread < suspend_conds_.size());
 
-        states_[num_thread].store(hpx::state::sleeping);
+        states_[num_thread].data_.store(hpx::state::sleeping);
         std::unique_lock<pu_mutex_type> l(suspend_mtxs_[num_thread]);
-        suspend_conds_[num_thread].wait(l);
+        suspend_conds_[num_thread].wait(l);    //-V1089
 
         // Only set running if still in hpx::state::sleeping. Can be set with
         // non-blocking/locking functions to stopping or terminating, in which
         // case the state is left untouched.
         hpx::state expected = hpx::state::sleeping;
-        states_[num_thread].compare_exchange_strong(
+        states_[num_thread].data_.compare_exchange_strong(
             expected, hpx::state::running);
 
         HPX_ASSERT(expected == hpx::state::sleeping ||
@@ -152,8 +156,7 @@ namespace hpx::threads::policies {
     }
 
     std::size_t scheduler_base::select_active_pu(
-        std::unique_lock<pu_mutex_type>& l, std::size_t num_thread,
-        bool allow_fallback)
+        std::size_t num_thread, bool allow_fallback)
     {
         if (mode_.data_.load(std::memory_order_relaxed) &
             threads::policies::scheduler_mode::enable_elasticity)
@@ -167,7 +170,7 @@ namespace hpx::threads::policies {
                 // available for scheduling.
                 auto max_allowed_state = hpx::state::suspended;
 
-                hpx::util::yield_while([this, states_size, &l, &num_thread,
+                hpx::util::yield_while([this, states_size, &num_thread,
                                            &max_allowed_state]() {
                     std::size_t num_allowed_threads = 0;
 
@@ -176,21 +179,24 @@ namespace hpx::threads::policies {
                         std::size_t num_thread_local =
                             (num_thread + offset) % states_size;
 
-                        l = std::unique_lock<pu_mutex_type>(
-                            pu_mtxs_[num_thread_local], std::try_to_lock);
-
-                        if (l.owns_lock())
                         {
-                            if (states_[num_thread_local] <= max_allowed_state)
-                            {
-                                num_thread = num_thread_local;
-                                return false;
-                            }
+                            std::unique_lock<pu_mutex_type> l(
+                                pu_mtxs_[num_thread_local], std::try_to_lock);
 
-                            l.unlock();
+                            if (l.owns_lock())
+                            {
+                                if (states_[num_thread_local].data_.load(
+                                        std::memory_order_relaxed) <=
+                                    max_allowed_state)
+                                {
+                                    num_thread = num_thread_local;
+                                    return false;
+                                }
+                            }
                         }
 
-                        if (states_[num_thread_local] <= max_allowed_state)
+                        if (states_[num_thread_local].data_.load(
+                                std::memory_order_relaxed) <= max_allowed_state)
                         {
                             ++num_allowed_threads;
                         }
@@ -228,11 +234,12 @@ namespace hpx::threads::policies {
                 std::size_t num_thread_local =
                     (num_thread + offset) % states_size;
 
-                l = std::unique_lock<pu_mutex_type>(
+                std::unique_lock<pu_mutex_type> l(
                     pu_mtxs_[num_thread_local], std::try_to_lock);
 
                 if (l.owns_lock() &&
-                    states_[num_thread_local] <= hpx::state::suspended)
+                    states_[num_thread_local].data_.load(
+                        std::memory_order_relaxed) <= hpx::state::suspended)
                 {
                     return num_thread_local;
                 }
@@ -246,21 +253,21 @@ namespace hpx::threads::policies {
     std::atomic<hpx::state>& scheduler_base::get_state(std::size_t num_thread)
     {
         HPX_ASSERT(num_thread < states_.size());
-        return states_[num_thread];
+        return states_[num_thread].data_;
     }
 
     std::atomic<hpx::state> const& scheduler_base::get_state(
         std::size_t num_thread) const
     {
         HPX_ASSERT(num_thread < states_.size());
-        return states_[num_thread];
+        return states_[num_thread].data_;
     }
 
     void scheduler_base::set_all_states(hpx::state s)
     {
         for (auto& state : states_)
         {
-            state.store(s);
+            state.data_.store(s);
         }
     }
 
@@ -268,9 +275,9 @@ namespace hpx::threads::policies {
     {
         for (auto& state : states_)
         {
-            if (state < s)
+            if (state.data_.load(std::memory_order_relaxed) < s)
             {
-                state.store(s);
+                state.data_.store(s, std::memory_order_release);
             }
         }
     }
@@ -280,7 +287,7 @@ namespace hpx::threads::policies {
     {
         for (auto const& state : states_)
         {
-            if (state.load(std::memory_order_relaxed) < s)
+            if (state.data_.load(std::memory_order_relaxed) < s)
                 return false;
         }
         return true;
@@ -290,7 +297,7 @@ namespace hpx::threads::policies {
     {
         for (auto const& state : states_)
         {
-            if (state.load(std::memory_order_relaxed) != s)
+            if (state.data_.load(std::memory_order_relaxed) != s)
                 return false;
         }
         return true;
@@ -304,7 +311,7 @@ namespace hpx::threads::policies {
 
         for (auto const& state_iter : states_)
         {
-            hpx::state s = state_iter.load();
+            hpx::state s = state_iter.data_.load(std::memory_order_relaxed);
             result.first = (std::min)(result.first, s);
             result.second = (std::max)(result.second, s);
         }
@@ -313,35 +320,36 @@ namespace hpx::threads::policies {
     }
 
     // get/set scheduler mode
-    void scheduler_base::set_scheduler_mode(scheduler_mode mode)
+    void scheduler_base::set_scheduler_mode(scheduler_mode mode) noexcept
     {
         // distribute the same value across all cores
         mode_.data_.store(mode, std::memory_order_release);
         do_some_work(std::size_t(-1));
     }
 
-    void scheduler_base::add_scheduler_mode(scheduler_mode mode)
+    void scheduler_base::add_scheduler_mode(scheduler_mode mode) noexcept
     {
         // distribute the same value across all cores
         mode = scheduler_mode(get_scheduler_mode() | mode);
         set_scheduler_mode(mode);
     }
 
-    void scheduler_base::remove_scheduler_mode(scheduler_mode mode)
+    void scheduler_base::remove_scheduler_mode(scheduler_mode mode) noexcept
     {
         mode = scheduler_mode(get_scheduler_mode() & ~mode);
         set_scheduler_mode(mode);
     }
 
     void scheduler_base::add_remove_scheduler_mode(
-        scheduler_mode to_add_mode, scheduler_mode to_remove_mode)
+        scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept
     {
         scheduler_mode mode = scheduler_mode(
             (get_scheduler_mode() | to_add_mode) & ~to_remove_mode);
         set_scheduler_mode(mode);
     }
 
-    void scheduler_base::update_scheduler_mode(scheduler_mode mode, bool set)
+    void scheduler_base::update_scheduler_mode(
+        scheduler_mode mode, bool set) noexcept
     {
         if (set)
         {

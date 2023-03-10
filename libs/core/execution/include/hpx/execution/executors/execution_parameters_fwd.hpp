@@ -26,6 +26,7 @@ namespace hpx::parallel::execution {
     ///////////////////////////////////////////////////////////////////////////
     // Executor information customization points
     namespace detail {
+
         /// \cond NOINTERNAL
         template <typename Parameters, typename Executor,
             typename Enable = void>
@@ -89,8 +90,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -108,8 +109,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -149,8 +150,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor, typename F,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -184,8 +185,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -216,8 +217,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -252,8 +253,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -270,8 +271,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -280,6 +281,36 @@ namespace hpx::parallel::execution {
         {
             return tag(HPX_FORWARD(Parameters, params),
                 HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
+                num_tasks);
+        }
+
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            processing_units_count_t, Executor&& exec,
+            hpx::chrono::steady_duration const& iteration_duration,
+            std::size_t num_tasks)
+        {
+            return detail::processing_units_count_fn_helper<void,
+                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
+                iteration_duration, num_tasks);
+        }
+
+        // clang-format off
+        template <typename Executor,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_any<Executor>::value
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            processing_units_count_t tag, Executor&& exec,
+            std::size_t num_tasks = 0)
+        {
+            return tag(HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
                 num_tasks);
         }
     } processing_units_count{};
@@ -306,8 +337,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -335,8 +366,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -364,8 +395,8 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Parameters, typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_parameters<Parameters>::value &&
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_parameters_v<Parameters> &&
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(

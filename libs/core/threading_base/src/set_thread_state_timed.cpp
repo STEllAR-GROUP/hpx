@@ -108,9 +108,7 @@ namespace hpx::threads::detail {
         using deadline_timer =
             asio::basic_waitable_timer<std::chrono::steady_clock>;
 
-        asio::io_context* s = get_default_timer_service();
-        HPX_ASSERT(s);
-        deadline_timer t(*s, abs_time);
+        deadline_timer t(get_default_timer_service(), abs_time);
 
         // let the timer invoke the set_state on the new (suspended) thread
         t.async_wait([wake_id = HPX_MOVE(wake_id), priority, retry_on_active](

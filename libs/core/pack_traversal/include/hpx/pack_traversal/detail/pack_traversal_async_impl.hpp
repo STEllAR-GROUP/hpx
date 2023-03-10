@@ -253,14 +253,14 @@ namespace hpx::util::detail {
         }
 
         static_async_range(static_async_range const& rhs) = default;
-        static_async_range(static_async_range&& rhs)
+        static_async_range(static_async_range&& rhs) noexcept
           : target_(rhs.target_)
         {
             rhs.target_ = nullptr;
         }
 
         static_async_range& operator=(static_async_range const& rhs) = default;
-        static_async_range& operator=(static_async_range&& rhs)
+        static_async_range& operator=(static_async_range&& rhs) noexcept
         {
             if (&rhs != this)
             {

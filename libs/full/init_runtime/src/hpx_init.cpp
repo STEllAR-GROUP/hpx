@@ -104,27 +104,29 @@ namespace hpx_startup {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // forward declarations only
     void console_print(std::string const&);
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     // forward declarations only
     void list_symbolic_name(std::string const&, hpx::id_type const&);
     void list_component_type(std::string const&, components::component_type);
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 HPX_PLAIN_ACTION_ID(hpx::detail::console_print, console_print_action,
     hpx::actions::console_print_action_id)
 HPX_PLAIN_ACTION_ID(hpx::detail::list_component_type,
     list_component_type_action, hpx::actions::list_component_type_action_id)
 
-typedef hpx::detail::bound_action<list_component_type_action,
-    hpx::util::index_pack<0, 1, 2>, hpx::id_type, hpx::detail::placeholder<1>,
-    hpx::detail::placeholder<2>>
-    bound_list_component_type_action;
+using bound_list_component_type_action =
+    hpx::detail::bound_action<list_component_type_action,
+        hpx::util::index_pack<0, 1, 2>, hpx::id_type,
+        hpx::detail::placeholder<1>, hpx::detail::placeholder<2>>;
 
 HPX_UTIL_REGISTER_FUNCTION_DECLARATION(
     void(std::string const&, hpx::components::component_type),
@@ -135,7 +137,8 @@ HPX_UTIL_REGISTER_FUNCTION(
     bound_list_component_type_action, list_component_type_function)
 #endif
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     ///////////////////////////////////////////////////////////////////////////
     // print string on the console
     void console_print(std::string const& name)
@@ -309,7 +312,7 @@ namespace hpx { namespace detail {
         }
     }
 #endif
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_HAVE_DYNAMIC_HPX_MAIN) &&                                      \
@@ -325,6 +328,7 @@ namespace hpx_start {
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     // Print stack trace and exit.
 #if defined(HPX_WINDOWS)
     extern BOOL WINAPI termination_handler(DWORD ctrl_type);
@@ -389,9 +393,13 @@ namespace hpx {
             hpx::program_options::variables_map& vm,
             bool print_counters_locally)
         {
-            runtime_distributed* rtd =
-                dynamic_cast<hpx::runtime_distributed*>(&rt);
-            HPX_ASSERT(rtd != nullptr);
+            auto* rtd = dynamic_cast<hpx::runtime_distributed*>(&rt);
+            if (rtd == nullptr)
+            {
+                throw detail::command_line_error(
+                    "Unexpected: runtime system was not initialized.");
+            }
+
             if (vm.count("hpx:list-counters"))
             {
                 // Print the names of all registered performance counters.
@@ -470,10 +478,10 @@ namespace hpx {
                         vm["hpx:print-counter-format"].as<std::string>();
                     if (counter_format == "csv-short")
                     {
-                        for (std::size_t i = 0; i != counters.size(); ++i)
+                        for (auto& counter : counters)
                         {
                             std::vector<std::string> entry;
-                            hpx::string_util::split(entry, counters[i],
+                            hpx::string_util::split(entry, counter,
                                 hpx::string_util::is_any_of(","),
                                 hpx::string_util::token_compress_mode::on);
 
@@ -486,7 +494,7 @@ namespace hpx {
                             }
 
                             counter_shortnames.push_back(entry[0]);
-                            counters[i] = entry[1];
+                            counter = entry[1];
                         }
                     }
                 }
@@ -532,16 +540,14 @@ namespace hpx {
                 throw detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:print-counter-interval, valid in conjunction "
-                    "with "
-                    "--hpx:print-counter only");
+                    "with --hpx:print-counter only");
             }
             else if (vm.count("hpx:print-counter-destination"))
             {
                 throw detail::command_line_error(
                     "Invalid command line option "
                     "--hpx:print-counter-destination, valid in conjunction "
-                    "with "
-                    "--hpx:print-counter only");
+                    "with --hpx:print-counter only");
             }
             else if (vm.count("hpx:print-counter-format"))
             {
@@ -712,7 +718,7 @@ namespace hpx {
                 &hpx::detail::get_pu_mask);
             hpx::parallel::execution::detail::set_get_os_thread_count(
                 []() { return hpx::get_os_thread_count(); });
-            hpx::parallel::v1::detail::set_exception_list_termination_handler(
+            hpx::parallel::detail::set_exception_list_termination_handler(
                 &hpx::terminate);
             hpx::parallel::util::detail::
                 set_parallel_exception_termination_handler(&hpx::terminate);

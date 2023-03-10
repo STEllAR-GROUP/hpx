@@ -83,7 +83,9 @@ namespace hpx::parcelset {
         // pair of (zero-copy, non-zero-copy) chunks
         count_chunks_type num_chunks_;
 
+        // non-zero-copy chunk size (data_.size())
         std::uint64_t size_;
+        // how many bytes in total (including zero-copy and non-zero-copy chunks)
         std::uint64_t data_size_;
         std::uint64_t header_size_;
 

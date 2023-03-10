@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -242,16 +242,16 @@ namespace hpx {
             id, priority, HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool post_p(components::client_base<Client, Stub> const& c,
+    template <typename Action, typename Client, typename Stub, typename Data,
+        typename... Ts>
+    inline bool post_p(components::client_base<Client, Stub, Data> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::detail::post_impl<Action>(
@@ -259,9 +259,7 @@ namespace hpx {
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
-        bool>
-    post_p(
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool> post_p(
         DistPolicy const& policy, threads::thread_priority priority, Ts&&... vs)
     {
         return policy.template apply<Action>(priority, HPX_FORWARD(Ts, vs)...);
@@ -285,18 +283,18 @@ namespace hpx {
             }
 
             template <typename Component, typename Signature, typename Derived,
-                typename Client, typename Stub, typename... Ts>
+                typename Client, typename Stub, typename Data, typename... Ts>
             HPX_FORCEINLINE static bool call(
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                components::client_base<Client, Stub> const& c, Ts&&... ts)
+                components::client_base<Client, Stub, Data> const& c,
+                Ts&&... ts)
             {
                 // make sure the action is compatible with the component type
-                typedef typename components::client_base<Client,
-                    Stub>::server_component_type component_type;
+                typedef typename components::client_base<Client, Stub,
+                    Data>::server_component_type component_type;
 
-                typedef traits::is_valid_action<Derived, component_type>
-                    is_valid;
-                static_assert(is_valid::value,
+                static_assert(
+                    traits::is_valid_action_v<Derived, component_type>,
                     "The action to invoke is not supported by the target");
 
                 return hpx::post_p<Derived>(c.get_id(),
@@ -307,7 +305,7 @@ namespace hpx {
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
             HPX_FORCEINLINE static std::enable_if_t<
-                traits::is_distribution_policy<DistPolicy>::value, bool>
+                traits::is_distribution_policy_v<DistPolicy>, bool>
             call(hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
             {
@@ -325,15 +323,16 @@ namespace hpx {
             id, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
     }
 
-    template <typename Action, typename Client, typename Stub, typename... Ts>
-    inline bool post(components::client_base<Client, Stub> const& c, Ts&&... vs)
+    template <typename Action, typename Client, typename Stub, typename Data,
+        typename... Ts>
+    inline bool post(
+        components::client_base<Client, Stub, Data> const& c, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::post_p<Action>(c.get_id(),
@@ -341,9 +340,8 @@ namespace hpx {
     }
 
     template <typename Action, typename DistPolicy, typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value,
-        bool>
-    post(DistPolicy const& policy, Ts&&... vs)
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool> post(
+        DistPolicy const& policy, Ts&&... vs)
     {
         return hpx::post_p<Action>(
             policy, actions::action_priority<Action>(), HPX_FORWARD(Ts, vs)...);
@@ -461,17 +459,17 @@ namespace hpx {
     }
 
     template <typename Action, typename Continuation, typename Client,
-        typename Stub, typename... Ts>
+        typename Stub, typename Data, typename... Ts>
     inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post_p(Continuation&& cont, components::client_base<Client, Stub> const& c,
+    post_p(Continuation&& cont,
+        components::client_base<Client, Stub, Data> const& c,
         threads::thread_priority priority, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, cont),
@@ -480,8 +478,8 @@ namespace hpx {
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline std::enable_if_t<traits::is_continuation<Continuation>::value &&
-            traits::is_distribution_policy<DistPolicy>::value,
+    std::enable_if_t<traits::is_continuation<Continuation>::value &&
+            traits::is_distribution_policy_v<DistPolicy>,
         bool>
     post_p(Continuation&& c, DistPolicy const& policy,
         threads::thread_priority priority, Ts&&... vs)
@@ -509,18 +507,18 @@ namespace hpx {
 
             template <typename Continuation_, typename Component,
                 typename Signature, typename Derived, typename Client,
-                typename Stub, typename... Ts>
+                typename Stub, typename Data, typename... Ts>
             HPX_FORCEINLINE static bool call(Continuation_&& cont,
                 hpx::actions::basic_action<Component, Signature, Derived>,
-                components::client_base<Client, Stub> const& c, Ts&&... ts)
+                components::client_base<Client, Stub, Data> const& c,
+                Ts&&... ts)
             {
                 // make sure the action is compatible with the component type
-                typedef typename components::client_base<Client,
-                    Stub>::server_component_type component_type;
+                typedef typename components::client_base<Client, Stub,
+                    Data>::server_component_type component_type;
 
-                typedef traits::is_valid_action<Derived, component_type>
-                    is_valid;
-                static_assert(is_valid::value,
+                static_assert(
+                    traits::is_valid_action_v<Derived, component_type>,
                     "The action to invoke is not supported by the target");
 
                 return hpx::post_p<Derived>(HPX_FORWARD(Continuation, cont),
@@ -531,7 +529,7 @@ namespace hpx {
             template <typename Component, typename Signature, typename Derived,
                 typename DistPolicy, typename... Ts>
             HPX_FORCEINLINE static std::enable_if_t<
-                traits::is_distribution_policy<DistPolicy>::value, bool>
+                traits::is_distribution_policy_v<DistPolicy>, bool>
             call(Continuation&& c,
                 hpx::actions::basic_action<Component, Signature, Derived>,
                 DistPolicy const& policy, Ts&&... ts)
@@ -552,17 +550,16 @@ namespace hpx {
     }
 
     template <typename Action, typename Continuation, typename Client,
-        typename Stub, typename... Ts>
+        typename Stub, typename Data, typename... Ts>
     inline std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post(Continuation&& cont, components::client_base<Client, Stub> const& c,
-        Ts&&... vs)
+    post(Continuation&& cont,
+        components::client_base<Client, Stub, Data> const& c, Ts&&... vs)
     {
         // make sure the action is compatible with the component type
-        typedef typename components::client_base<Client,
-            Stub>::server_component_type component_type;
+        typedef typename components::client_base<Client, Stub,
+            Data>::server_component_type component_type;
 
-        typedef traits::is_valid_action<Action, component_type> is_valid;
-        static_assert(is_valid::value,
+        static_assert(traits::is_valid_action_v<Action, component_type>,
             "The action to invoke is not supported by the target");
 
         return hpx::post_p<Action>(HPX_FORWARD(Continuation, cont), c.get_id(),
@@ -571,7 +568,7 @@ namespace hpx {
 
     template <typename Action, typename Continuation, typename DistPolicy,
         typename... Ts>
-    inline std::enable_if_t<traits::is_distribution_policy<DistPolicy>::value &&
+    std::enable_if_t<traits::is_distribution_policy_v<DistPolicy> &&
             traits::is_continuation<Continuation>::value,
         bool>
     post(Continuation&& c, DistPolicy const& policy, Ts&&... vs)

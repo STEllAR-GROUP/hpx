@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     template <typename Func, typename Enable = void>
     struct async_dispatch_launch_policy_helper;
 
@@ -44,6 +45,8 @@ namespace hpx { namespace detail {
     struct async_dispatch<Policy,
         std::enable_if_t<traits::is_launch_policy_v<Policy>>>
     {
+        // different versions of clang-format disagree
+        // clang-format off
         template <typename Policy_, typename F, typename... Ts>
         HPX_FORCEINLINE static auto call(
             Policy_&& launch_policy, F&& f, Ts&&... ts)
@@ -51,6 +54,7 @@ namespace hpx { namespace detail {
                 async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
                     HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...))
+        // clang-format on
         {
             return async_dispatch_launch_policy_helper<std::decay_t<F>>::call(
                 HPX_FORWARD(Policy_, launch_policy), HPX_FORWARD(F, f),
@@ -93,4 +97,4 @@ namespace hpx { namespace detail {
                 HPX_FORWARD(Ts, ts)...);
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

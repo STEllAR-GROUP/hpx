@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -48,7 +48,7 @@ namespace hpx {
     ///           \a parallel_task_policy and returns \a void otherwise.
     ///
     template <typename ExPolicy, typename FwdIter>
-    typename util::detail::algorithm_result<ExPolicy>::type
+    util::detail::algorithm_result_t<ExPolicy>
     destroy(ExPolicy&& policy, FwdIter first, FwdIter last);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
@@ -114,7 +114,7 @@ namespace hpx {
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size>
-    typename util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    util::detail::algorithm_result_t<ExPolicy, FwdIter>
     destroy_n(ExPolicy&& policy, FwdIter first, Size count);
 
     /// Destroys objects of type typename iterator_traits<ForwardIt>::value_type
@@ -159,25 +159,23 @@ namespace hpx {
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/foreach_partitioner.hpp>
 #include <hpx/parallel/util/loop.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // destroy
     namespace detail {
         /// \cond NOINTERNAL
 
-        // provide our own implementation of std::destroy
-        // as some versions of MSVC horribly fail at compiling it for some types
-        // T
+        // provide our own implementation of std::destroy as some versions of
+        // MSVC horribly fail at compiling it for some types T
         template <typename Iter, typename Sent>
         Iter sequential_destroy(Iter first, Sent last)
         {
@@ -190,7 +188,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter>
-        typename util::detail::algorithm_result<ExPolicy, Iter>::type
+        util::detail::algorithm_result_t<ExPolicy, Iter>
         parallel_sequential_destroy_n(
             ExPolicy&& policy, Iter first, std::size_t count)
         {
@@ -208,15 +206,15 @@ namespace hpx { namespace parallel { inline namespace v1 {
                             std::destroy_at(std::addressof(*it));
                         });
                 },
-                util::projection_identity());
+                hpx::identity_v);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename FwdIter>
-        struct destroy : public detail::algorithm<destroy<FwdIter>, FwdIter>
+        struct destroy : public algorithm<destroy<FwdIter>, FwdIter>
         {
-            destroy()
-              : destroy::algorithm("destroy")
+            constexpr destroy() noexcept
+              : algorithm<destroy, FwdIter>("destroy")
             {
             }
 
@@ -227,8 +225,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename Iter, typename Sent>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& policy, Iter first, Sent last)
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& policy, Iter first, Sent last)
             {
                 return parallel_sequential_destroy_n(
                     HPX_FORWARD(ExPolicy, policy), first,
@@ -243,9 +241,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // provide our own implementation of std::destroy
-        // as some versions of MSVC horribly fail at compiling it for some
-        // types T
+        // provide our own implementation of std::destroy as some versions of
+        // MSVC horribly fail at compiling it for some types T
         template <typename Iter>
         Iter sequential_destroy_n(Iter first, std::size_t count)
         {
@@ -257,10 +254,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
         }
 
         template <typename FwdIter>
-        struct destroy_n : public detail::algorithm<destroy_n<FwdIter>, FwdIter>
+        struct destroy_n : public algorithm<destroy_n<FwdIter>, FwdIter>
         {
-            destroy_n()
-              : destroy_n::algorithm("destroy_n")
+            constexpr destroy_n() noexcept
+              : algorithm<destroy_n, FwdIter>("destroy_n")
             {
             }
 
@@ -271,8 +268,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
             }
 
             template <typename ExPolicy, typename Iter>
-            static typename util::detail::algorithm_result<ExPolicy, Iter>::type
-            parallel(ExPolicy&& policy, Iter first, std::size_t count)
+            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+                ExPolicy&& policy, Iter first, std::size_t count)
             {
                 return parallel_sequential_destroy_n(
                     HPX_FORWARD(ExPolicy, policy), first, count);
@@ -280,7 +277,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
         };
         /// \endcond
     }    // namespace detail
-}}}      // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
 
@@ -293,8 +290,8 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<
@@ -302,26 +299,26 @@ namespace hpx {
         tag_fallback_invoke(
             destroy_t, ExPolicy&& policy, FwdIter first, FwdIter last)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
             return hpx::parallel::util::detail::algorithm_result<ExPolicy>::get(
-                hpx::parallel::v1::detail::destroy<FwdIter>().call(
+                hpx::parallel::detail::destroy<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, last));
         }
 
         // clang-format off
         template <typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
         friend void tag_fallback_invoke(destroy_t, FwdIter first, FwdIter last)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
-            hpx::parallel::v1::detail::destroy<FwdIter>().call(
+            hpx::parallel::detail::destroy<FwdIter>().call(
                 hpx::execution::seq, first, last);
         }
     } destroy{};
@@ -335,8 +332,8 @@ namespace hpx {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
         friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
@@ -344,40 +341,41 @@ namespace hpx {
         tag_fallback_invoke(
             destroy_n_t, ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
+            if (hpx::parallel::detail::is_negative(count))
             {
                 return hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     FwdIter>::get(HPX_MOVE(first));
             }
 
-            return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                HPX_FORWARD(ExPolicy, policy), first, std::size_t(count));
+            return hpx::parallel::detail::destroy_n<FwdIter>().call(
+                HPX_FORWARD(ExPolicy, policy), first,
+                static_cast<std::size_t>(count));
         }
 
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator<FwdIter>::value
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             destroy_n_t, FwdIter first, Size count)
         {
-            static_assert((hpx::traits::is_forward_iterator<FwdIter>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
             // if count is representing a negative value, we do nothing
-            if (hpx::parallel::v1::detail::is_negative(count))
+            if (hpx::parallel::detail::is_negative(count))
             {
                 return first;
             }
 
-            return hpx::parallel::v1::detail::destroy_n<FwdIter>().call(
-                hpx::execution::seq, first, std::size_t(count));
+            return hpx::parallel::detail::destroy_n<FwdIter>().call(
+                hpx::execution::seq, first, static_cast<std::size_t>(count));
         }
     } destroy_n{};
 }    // namespace hpx

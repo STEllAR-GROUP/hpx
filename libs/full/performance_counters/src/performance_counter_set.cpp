@@ -171,7 +171,7 @@ namespace hpx { namespace performance_counters {
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.start());
+            v.emplace_back(c.start());
         }
 
         return v;
@@ -208,7 +208,7 @@ namespace hpx { namespace performance_counters {
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.stop());
+            v.emplace_back(c.stop());
         }
 
         return v;
@@ -245,7 +245,7 @@ namespace hpx { namespace performance_counters {
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.reset());
+            v.emplace_back(c.reset());
         }
 
         return v;
@@ -279,7 +279,7 @@ namespace hpx { namespace performance_counters {
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.reinit(reset));
+            v.emplace_back(c.reinit(reset));
         }
 
         return v;
@@ -323,7 +323,7 @@ namespace hpx { namespace performance_counters {
             }
 
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.get_counter_value(reset || reset_[i]));
+            v.emplace_back(c.get_counter_value(reset || reset_[i]));
         }
 
         return v;
@@ -369,7 +369,7 @@ namespace hpx { namespace performance_counters {
             }
 
             performance_counters::performance_counter c(ids[i]);
-            v.push_back(c.get_counter_values_array(reset || reset_[i]));
+            v.emplace_back(c.get_counter_values_array(reset || reset_[i]));
         }
 
         return v;

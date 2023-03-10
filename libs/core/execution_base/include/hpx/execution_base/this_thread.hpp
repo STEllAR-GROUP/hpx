@@ -216,7 +216,7 @@ namespace hpx::util {
         // is stopped and the function returns false. If the predicate is
         // successfully waited for the function returns true.
         template <typename Predicate>
-        [[nodiscard]] bool yield_while_count_timeout(Predicate&& predicate,
+        bool yield_while_count_timeout(Predicate&& predicate,
             std::size_t required_count, std::chrono::duration<double> timeout,
             char const* thread_name = nullptr,
             bool allow_timed_suspension = true)

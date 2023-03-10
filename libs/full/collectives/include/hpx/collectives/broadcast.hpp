@@ -202,16 +202,13 @@ namespace hpx { namespace collectives {
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/execution_base.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // support for broadcast
@@ -256,9 +253,9 @@ namespace hpx { namespace traits {
                 1);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace collectives {
+namespace hpx::collectives {
 
     template <typename T>
     hpx::future<std::decay_t<T>> broadcast_to(communicator fid,
@@ -267,7 +264,7 @@ namespace hpx { namespace collectives {
     {
         using arg_type = std::decay_t<T>;
 
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
@@ -281,8 +278,8 @@ namespace hpx { namespace collectives {
         auto broadcast_data =
             [local_result = HPX_FORWARD(T, local_result), this_site,
                 generation](communicator&& c) mutable -> hpx::future<arg_type> {
-            using action_type = typename detail::communicator_server::
-                template communication_set_action<
+            using action_type =
+                detail::communicator_server::communication_set_action<
                     traits::communication::broadcast_tag, hpx::future<arg_type>,
                     arg_type>;
 
@@ -318,9 +315,8 @@ namespace hpx { namespace collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg())
     {
-        return broadcast_to(
-            create_communicator(basename, num_sites, this_site, generation,
-                root_site_arg(this_site.this_site_)),
+        return broadcast_to(create_communicator(basename, num_sites, this_site,
+                                generation, root_site_arg(this_site.argument_)),
             HPX_FORWARD(T, local_result), this_site);
     }
 
@@ -330,7 +326,7 @@ namespace hpx { namespace collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg())
     {
-        if (this_site == std::size_t(-1))
+        if (this_site == static_cast<std::size_t>(-1))
         {
             this_site = static_cast<std::size_t>(agas::get_locality_id());
         }
@@ -343,8 +339,8 @@ namespace hpx { namespace collectives {
 
         auto broadcast_data = [this_site, generation](
                                   communicator&& c) -> hpx::future<T> {
-            using action_type = typename detail::communicator_server::
-                template communication_get_action<
+            using action_type =
+                detail::communicator_server::communication_get_action<
                     traits::communication::broadcast_tag, hpx::future<T>>;
 
             // make sure id is kept alive as long as the returned future,
@@ -382,7 +378,7 @@ namespace hpx { namespace collectives {
                                      this_site, generation, root_site),
             this_site);
     }
-}}    // namespace hpx::collectives
+}    // namespace hpx::collectives
 
 ////////////////////////////////////////////////////////////////////////////////
 #define HPX_REGISTER_BROADCAST_DECLARATION(...) /**/

@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,6 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include <new>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -30,7 +29,7 @@ namespace hpx::optional_ns {
     };
     constexpr nullopt_t nullopt{nullopt_t::init()};
 
-    class bad_optional_access : public std::logic_error
+    class HPX_ALWAYS_EXPORT bad_optional_access : public std::logic_error
     {
     public:
         explicit bad_optional_access(std::string const& what_arg)
@@ -261,12 +260,12 @@ namespace hpx::optional_ns {
             return HPX_MOVE(*reinterpret_cast<T*>(&storage_));
         }
 
-        constexpr explicit operator bool() const noexcept
+        [[nodiscard]] constexpr explicit operator bool() const noexcept
         {
             return !empty_;
         }
 
-        constexpr bool has_value() const
+        [[nodiscard]] constexpr bool has_value() const
         {
             return !empty_;
         }
@@ -339,7 +338,7 @@ namespace hpx::optional_ns {
 
 #if !defined(HPX_HAVE_CXX17_COPY_ELISION) ||                                   \
     !defined(HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION)
-        // workaround for broken return type copy elison in MSVC
+        // workaround for broken return type copy elision in MSVC
         template <typename F, typename... Ts>
         void emplace_f(F&& f, Ts&&... ts)
         {
@@ -376,7 +375,7 @@ namespace hpx::optional_ns {
             optional* empty = empty_ ? this : &other;
             optional* non_empty = empty_ ? &other : this;
 
-            std::construct_at(
+            hpx::construct_at(
                 reinterpret_cast<T*>(&empty->storage_), HPX_MOVE(**non_empty));
             std::destroy_at(reinterpret_cast<T*>(&non_empty->storage_));
 
@@ -532,188 +531,222 @@ namespace hpx::optional_ns {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr bool operator==(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator==(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         // different clang-format versions disagree
         // clang-format off
-        return (bool(lhs) != bool(rhs)) ? false :
-            (!bool(lhs) && !bool(rhs))  ? true :
+        return (static_cast<bool>(lhs) != static_cast<bool>(rhs)) ? false :
+            (!static_cast<bool>(lhs) && !static_cast<bool>(rhs))  ? true :
                                           (*lhs == *rhs);
         // clang-format on
     }
 
     template <typename T>
-    constexpr bool operator!=(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator!=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs == rhs);
     }
 
     template <typename T>
-    constexpr bool operator<(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator<(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
-        return (!bool(rhs)) ? false : (!bool(lhs)) ? true : *rhs < *lhs;
+        return (!static_cast<bool>(rhs)) ? false :
+            (!static_cast<bool>(lhs))    ? true :
+                                           *rhs < *lhs;
     }
 
     template <typename T>
-    constexpr bool operator>=(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator>=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs < rhs);
     }
 
     template <typename T>
-    constexpr bool operator>(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator>(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
-        return (!bool(lhs)) ? false : (!bool(rhs)) ? true : *rhs > *lhs;
+        return (!static_cast<bool>(lhs)) ? false :
+            (!static_cast<bool>(rhs))    ? true :
+                                           *rhs > *lhs;
     }
 
     template <typename T>
-    constexpr bool operator<=(optional<T> const& lhs, optional<T> const& rhs)
+    [[nodiscard]] constexpr bool operator<=(
+        optional<T> const& lhs, optional<T> const& rhs)
     {
         return !(lhs > rhs);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr bool operator==(optional<T> const& opt, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator==(
+        optional<T> const& opt, nullopt_t) noexcept
     {
-        return !bool(opt);
+        return !static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator==(nullopt_t, optional<T> const& opt) noexcept
+    [[nodiscard]] constexpr bool operator==(
+        nullopt_t, optional<T> const& opt) noexcept
     {
-        return !bool(opt);
+        return !static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator!=(optional<T> const& opt, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator!=(
+        optional<T> const& opt, nullopt_t) noexcept
     {
-        return bool(opt);
+        return static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator!=(nullopt_t, optional<T> const& opt) noexcept
+    [[nodiscard]] constexpr bool operator!=(
+        nullopt_t, optional<T> const& opt) noexcept
     {
-        return bool(opt);
+        return static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator<(optional<T> const&, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator<(
+        optional<T> const&, nullopt_t) noexcept
     {
         return false;
     }
 
     template <typename T>
-    constexpr bool operator<(nullopt_t, optional<T> const& opt) noexcept
+    [[nodiscard]] constexpr bool operator<(
+        nullopt_t, optional<T> const& opt) noexcept
     {
-        return bool(opt);
+        return static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator>=(optional<T> const&, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator>=(
+        optional<T> const&, nullopt_t) noexcept
     {
         return true;
     }
 
     template <typename T>
-    constexpr bool operator>=(nullopt_t, optional<T> const& opt) noexcept
+    [[nodiscard]] constexpr bool operator>=(
+        nullopt_t, optional<T> const& opt) noexcept
     {
-        return !bool(opt);
+        return !static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator>(optional<T> const& opt, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator>(
+        optional<T> const& opt, nullopt_t) noexcept
     {
-        return bool(opt);
+        return static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator>(nullopt_t, optional<T> const&) noexcept
+    [[nodiscard]] constexpr bool operator>(
+        nullopt_t, optional<T> const&) noexcept
     {
         return false;
     }
 
     template <typename T>
-    constexpr bool operator<=(optional<T> const& opt, nullopt_t) noexcept
+    [[nodiscard]] constexpr bool operator<=(
+        optional<T> const& opt, nullopt_t) noexcept
     {
-        return !bool(opt);
+        return !static_cast<bool>(opt);
     }
 
     template <typename T>
-    constexpr bool operator<=(nullopt_t, optional<T> const&) noexcept
+    [[nodiscard]] constexpr bool operator<=(
+        nullopt_t, optional<T> const&) noexcept
     {
         return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    constexpr bool operator==(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator==(
+        optional<T> const& opt, T const& value)
     {
-        return bool(opt) ? (*opt == value) : false;
+        return static_cast<bool>(opt) ? (*opt == value) : false;
     }
 
     template <typename T>
-    constexpr bool operator==(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator==(
+        T const& value, optional<T> const& opt)
     {
-        return bool(opt) ? (value == *opt) : false;
+        return static_cast<bool>(opt) ? (value == *opt) : false;
     }
 
     template <typename T>
-    constexpr bool operator!=(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator!=(
+        optional<T> const& opt, T const& value)
     {
         return !(opt == value);
     }
 
     template <typename T>
-    constexpr bool operator!=(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator!=(
+        T const& value, optional<T> const& opt)
     {
         return !(value == *opt);
     }
 
     template <typename T>
-    constexpr bool operator<(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator<(
+        optional<T> const& opt, T const& value)
     {
-        return bool(opt) ? (*opt < value) : true;
+        return static_cast<bool>(opt) ? (*opt < value) : true;
     }
 
     template <typename T>
-    constexpr bool operator<(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator<(
+        T const& value, optional<T> const& opt)
     {
-        return bool(opt) ? (value < *opt) : false;
+        return static_cast<bool>(opt) ? (value < *opt) : false;
     }
 
     template <typename T>
-    constexpr bool operator>=(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator>=(
+        optional<T> const& opt, T const& value)
     {
         return !(*opt < value);
     }
 
     template <typename T>
-    constexpr bool operator>=(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator>=(
+        T const& value, optional<T> const& opt)
     {
         return !(value < *opt);
     }
 
     template <typename T>
-    constexpr bool operator>(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator>(
+        optional<T> const& opt, T const& value)
     {
-        return bool(opt) ? (*opt > value) : false;
+        return static_cast<bool>(opt) ? (*opt > value) : false;
     }
 
     template <typename T>
-    constexpr bool operator>(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator>(
+        T const& value, optional<T> const& opt)
     {
-        return bool(opt) ? (value > *opt) : true;
+        return static_cast<bool>(opt) ? (value > *opt) : true;
     }
 
     template <typename T>
-    constexpr bool operator<=(optional<T> const& opt, T const& value)
+    [[nodiscard]] constexpr bool operator<=(
+        optional<T> const& opt, T const& value)
     {
         return !(*opt > value);
     }
 
     template <typename T>
-    constexpr bool operator<=(T const& value, optional<T> const& opt)
+    [[nodiscard]] constexpr bool operator<=(
+        T const& value, optional<T> const& opt)
     {
         return !(value > *opt);
     }
@@ -749,7 +782,7 @@ namespace hpx::optional_ns {
 namespace std {
 
     template <typename T>
-    struct hash<hpx::optional_ns::optional<T>>
+    struct hash<::hpx::optional_ns::optional<T>>
     {
         constexpr std::size_t operator()(
             ::hpx::optional_ns::optional<T> const& arg) const

@@ -21,9 +21,6 @@ namespace hpx::util::detail {
     /// Lockable spinlock class
     struct spinlock
     {
-    public:
-        HPX_NON_COPYABLE(spinlock);
-
     private:
         std::atomic<bool> m;
 
@@ -35,6 +32,10 @@ namespace hpx::util::detail {
         {
         }
 
+        HPX_NON_COPYABLE(spinlock);
+
+        ~spinlock() = default;
+
         HPX_FORCEINLINE bool try_lock() noexcept
         {
             // First do a relaxed load to check if lock is free in order to
@@ -44,7 +45,7 @@ namespace hpx::util::detail {
                 !m.exchange(true, std::memory_order_acquire);
         }
 
-        void lock() noexcept
+        HPX_FORCEINLINE void lock() noexcept
         {
             // Wait for lock to be released without generating cache misses
             // Similar implementation to hpx::spinlock

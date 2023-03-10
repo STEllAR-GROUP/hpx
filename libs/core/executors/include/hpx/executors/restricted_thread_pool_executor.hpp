@@ -66,9 +66,18 @@ namespace hpx::parallel::execution {
 
         restricted_policy_executor(restricted_policy_executor const& other)
           : first_thread_(other.first_thread_)
-          , os_thread_(other.first_thread_)
+          , os_thread_(other.os_thread_.load())
           , exec_(other.exec_)
         {
+        }
+
+        restricted_policy_executor& operator=(
+            restricted_policy_executor const& rhs)
+        {
+            first_thread_ = rhs.first_thread_;
+            os_thread_ = rhs.os_thread_.load();
+            exec_ = rhs.exec_;
+            return *this;
         }
 
         /// \cond NOINTERNAL

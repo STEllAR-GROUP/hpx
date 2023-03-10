@@ -124,6 +124,7 @@ struct receiver_2
 
 struct sender_1
 {
+    using is_sender = void;
     struct completion_signatures
     {
         template <template <class...> class Tuple,
@@ -156,6 +157,7 @@ struct sender_1
 
 struct sender_2
 {
+    using is_sender = void;
     struct completion_signatures
     {
         template <template <class...> class Tuple,
@@ -188,6 +190,7 @@ sender_2::operation_state tag_invoke(
 
 struct sender_3
 {
+    using is_sender = void;
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -217,6 +220,7 @@ struct sender_3
 template <bool val, typename T>
 struct sender_4
 {
+    using is_sender = void;
     struct completion_signatures
     {
         template <template <class...> class Tuple,

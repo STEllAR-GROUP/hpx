@@ -16,9 +16,11 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename T, std::size_t N, typename Abi>
         struct vector_pack_type
         {
@@ -28,7 +30,7 @@ namespace hpx { namespace parallel { namespace traits {
         template <typename T, typename Abi>
         struct vector_pack_type<T, 0, Abi>
         {
-            using abi_type = std::conditional_t<std::is_void<Abi>::value,
+            using abi_type = std::conditional_t<std::is_void_v<Abi>,
                 eve::expected_cardinal_t<T>, Abi>;
 
             using type = eve::wide<T, abi_type>;
@@ -54,6 +56,6 @@ namespace hpx { namespace parallel { namespace traits {
     {
         using type = eve::logical<T>;
     };
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

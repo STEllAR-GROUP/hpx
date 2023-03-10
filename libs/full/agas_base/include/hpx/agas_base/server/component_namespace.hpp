@@ -145,10 +145,6 @@ namespace hpx { namespace agas { namespace server {
 
         void finalize();
 
-        // register all performance counter types exposed by this component
-        static void register_counter_types(error_code& ec = throws);
-        static void register_global_counter_types(error_code& ec = throws);
-
         void register_server_instance(
             char const* servicename, error_code& ec = throws);
 

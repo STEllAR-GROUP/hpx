@@ -11,7 +11,7 @@
 #if defined(HPX_HAVE_CXX17_COPY_ELISION) &&                                    \
     defined(HPX_HAVE_CXX17_OPTIONAL_COPY_ELISION)
 
-#include <functional>    // for std::hash<optional<T>>
+#include <functional>    // for std::hash<std::optional<T>>
 #include <optional>
 
 namespace hpx {

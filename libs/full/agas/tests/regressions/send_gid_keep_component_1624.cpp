@@ -19,7 +19,7 @@ namespace server {
     struct view_registry
       : hpx::components::managed_component_base<view_registry>
     {
-        int register_view(const hpx::id_type& gid)
+        int register_view(hpx::id_type const& gid)
         {
             hpx::util::format_to(std::cout, "register view at {1} by {2}",
                 this->get_unmanaged_id(), gid)
@@ -50,7 +50,7 @@ namespace client {
         {
         }
 
-        void register_view(const hpx::id_type& viewerId)
+        void register_view(hpx::id_type const& viewerId)
         {
             hpx::async<server::view_registry::register_view_action>(
                 gid_, viewerId)
@@ -88,9 +88,9 @@ namespace server {
 
         // This function does a broadcast to all writers to register a certain
         // region
-        void register_region(const std::vector<hpx::id_type>& writers)
+        void register_region(std::vector<hpx::id_type> const& writers)
         {
-            for (const auto& id : writers)
+            for (auto const& id : writers)
             {
                 hpx::util::format_to(std::cout, "{1} registering region at {2}",
                     this->get_unmanaged_id(), id)
@@ -121,12 +121,12 @@ HPX_REGISTER_ACTION_DECLARATION(
 namespace client {
     struct viewer
     {
-        viewer(const hpx::id_type& gid)
+        viewer(hpx::id_type const& gid)
           : gid_(gid)
         {
         }
 
-        void register_region(const std::vector<hpx::id_type>& writers)
+        void register_region(std::vector<hpx::id_type> const& writers)
         {
             hpx::async<server::viewer::register_region_action>(gid_, writers)
                 .get();

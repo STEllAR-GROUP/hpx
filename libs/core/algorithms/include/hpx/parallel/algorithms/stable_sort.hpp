@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,7 @@ namespace hpx {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()).
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
+    /// \note   Complexity: O(N log(N)), where N = std::distance(first, last)
     ///                     comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -35,7 +35,7 @@ namespace hpx {
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to
-    ///                     \a parallel::util::projection_identity.
+    ///                     \a hpx::identity.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
@@ -62,8 +62,8 @@ namespace hpx {
     /// \returns  The \a stable_sort algorithm returns \a void.
     ///
     template <typename RandomIt,
-            typename Comp = hpx::parallel::v1::detail::less,
-            typename Proj = parallel::util::projection_identity>
+            typename Comp = hpx::parallel::detail::less,
+            typename Proj = hpx::identity>
     void stable_sort(RandomIt first, RandomIt last, Comp&& comp = Comp(),
         Proj&& proj = Proj());
 
@@ -73,7 +73,7 @@ namespace hpx {
     /// uses the given comparison function object comp (defaults to using
     /// operator<()). Executed according to the policy.
     ///
-    /// \note   Complexity: O(Nlog(N)), where N = std::distance(first, last)
+    /// \note   Complexity: O(N log(N)), where N = std::distance(first, last)
     ///                     comparisons.
     ///
     /// A sequence is sorted with respect to a comparator \a comp and a
@@ -93,7 +93,7 @@ namespace hpx {
     ///                     (deduced).
     /// \tparam Proj        The type of an optional projection function. This
     ///                     defaults to
-    ///                     \a parallel::util::projection_identity.
+    ///                     \a hpx::identity.
     ///
     /// \param policy       The execution policy to use for the scheduling of
     ///                     the iterations.
@@ -134,9 +134,9 @@ namespace hpx {
     ///           otherwise.
     ///
     template <typename ExPolicy, typename RandomIt,
-        typename Comp = hpx::parallel::v1::detail::less,
-        typename Proj = parallel::util::projection_identity>
-    typename parallel::util::detail::algorithm_result<ExPolicy>::type
+        typename Comp = hpx::parallel::detail::less,
+        typename Proj = hpx::identity>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
     stable_sort(ExPolicy&& policy, RandomIt first, RandomIt last,
         Comp&& comp = Comp(), Proj&& proj = Proj());
 
@@ -146,41 +146,34 @@ namespace hpx {
 #else    // DOXYGEN
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/async_local/dataflow.hpp>
-#include <hpx/concepts/concepts.hpp>
-#include <hpx/functional/invoke.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-
 #include <hpx/algorithms/traits/projected.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/execution_information.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/executors/exception_list.hpp>
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/functional/invoke.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/advance_and_get_distance.hpp>
 #include <hpx/parallel/algorithms/detail/advance_to_sentinel.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
-#include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/detail/parallel_stable_sort.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/compare_projected.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <exception>
-#include <functional>
-#include <iterator>
-#include <list>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     ///////////////////////////////////////////////////////////////////////////
     // stable_sort
     namespace detail {
@@ -189,18 +182,17 @@ namespace hpx { namespace parallel { inline namespace v1 {
         ///////////////////////////////////////////////////////////////////////
         // stable_sort
         template <typename RandomIt>
-        struct stable_sort
-          : public detail::algorithm<stable_sort<RandomIt>, RandomIt>
+        struct stable_sort : public algorithm<stable_sort<RandomIt>, RandomIt>
         {
-            stable_sort()
-              : stable_sort::algorithm("stable_sort")
+            constexpr stable_sort() noexcept
+              : algorithm<stable_sort, RandomIt>("stable_sort")
             {
             }
 
             template <typename ExPolicy, typename Sentinel, typename Compare,
                 typename Proj>
-            static RandomIt sequential(ExPolicy, RandomIt first, Sentinel last,
-                Compare&& comp, Proj&& proj)
+            static constexpr RandomIt sequential(ExPolicy, RandomIt first,
+                Sentinel last, Compare&& comp, Proj&& proj)
             {
                 using compare_type = util::compare_projected<Compare&, Proj&>;
 
@@ -212,8 +204,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename Sentinel, typename Compare,
                 typename Proj>
-            static typename util::detail::algorithm_result<ExPolicy,
-                RandomIt>::type
+            static util::detail::algorithm_result_t<ExPolicy, RandomIt>
             parallel(ExPolicy&& policy, RandomIt first, Sentinel last,
                 Compare&& compare, Proj&& proj)
             {
@@ -267,13 +258,12 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
     // clang-format off
     template <typename ExPolicy, typename RandomIt, typename Sentinel,
-        typename Proj = util::projection_identity,
-        typename Compare = detail::less,
+        typename Proj = hpx::identity, typename Compare = detail::less,
         HPX_CONCEPT_REQUIRES_(
-            hpx::is_execution_policy<ExPolicy>::value &&
+            hpx::is_execution_policy_v<ExPolicy> &&
             hpx::traits::is_iterator_v<RandomIt> &&
-            hpx::traits::is_sentinel_for<Sentinel, RandomIt>::value &&
-            traits::is_projected<Proj, RandomIt>::value &&
+            hpx::traits::is_sentinel_for_v<Sentinel, RandomIt> &&
+            traits::is_projected_v<Proj, RandomIt> &&
             traits::is_indirect_callable<ExPolicy, Compare,
                 traits::projected<Proj, RandomIt>,
                 traits::projected<Proj, RandomIt>
@@ -283,11 +273,11 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::stable_sort is deprecated, use hpx::stable_sort "
         "instead")
-        typename util::detail::algorithm_result<ExPolicy, RandomIt>::type
-        stable_sort(ExPolicy&& policy, RandomIt first, Sentinel last,
+        util::detail::algorithm_result_t<ExPolicy, RandomIt> stable_sort(
+            ExPolicy&& policy, RandomIt first, Sentinel last,
             Compare&& comp = Compare(), Proj&& proj = Proj())
     {
-        static_assert((hpx::traits::is_random_access_iterator_v<RandomIt>),
+        static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
             "Requires a random access iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -301,9 +291,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic pop
 #endif
     }
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::stable_sort
     inline constexpr struct stable_sort_t final
@@ -311,59 +302,52 @@ namespace hpx {
     {
         // clang-format off
         template <typename RandomIt,
-            typename Comp = hpx::parallel::v1::detail::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<
-                    hpx::execution::sequenced_policy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
         friend void tag_fallback_invoke(hpx::stable_sort_t, RandomIt first,
-            RandomIt last, Comp&& comp = Comp(), Proj&& proj = Proj())
+            RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
-            hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(Comp, comp),
-                HPX_FORWARD(Proj, proj));
+            hpx::parallel::detail::stable_sort<RandomIt>().call(
+                hpx::execution::seq, first, last, HPX_MOVE(comp),
+                hpx::identity_v);
         }
 
         // clang-format off
         template <typename ExPolicy, typename RandomIt,
-            typename Comp = hpx::parallel::v1::detail::less,
-            typename Proj = parallel::util::projection_identity,
+            typename Comp = hpx::parallel::detail::less,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<RandomIt> &&
-                parallel::traits::is_projected<Proj, RandomIt>::value &&
-                parallel::traits::is_indirect_callable<ExPolicy, Comp,
-                    parallel::traits::projected<Proj, RandomIt>,
-                    parallel::traits::projected<Proj, RandomIt>
-                >::value
+                hpx::is_invocable_v<Comp,
+                    hpx::traits::iter_value_t<RandomIt>,
+                    hpx::traits::iter_value_t<RandomIt>
+                >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy>::type
+        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::stable_sort_t, ExPolicy&& policy,
-            RandomIt first, RandomIt last, Comp&& comp = Comp(),
-            Proj&& proj = Proj())
+            RandomIt first, RandomIt last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandomIt>,
                 "Requires a random access iterator.");
 
             using result_type =
-                typename hpx::parallel::util::detail::algorithm_result<
-                    ExPolicy>::type;
+                hpx::parallel::util::detail::algorithm_result_t<ExPolicy>;
 
             return hpx::util::void_guard<result_type>(),
-                   hpx::parallel::v1::detail::stable_sort<RandomIt>().call(
+                   hpx::parallel::detail::stable_sort<RandomIt>().call(
                        HPX_FORWARD(ExPolicy, policy), first, last,
-                       HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                       HPX_MOVE(comp), hpx::identity_v);
         }
     } stable_sort{};
 }    // namespace hpx

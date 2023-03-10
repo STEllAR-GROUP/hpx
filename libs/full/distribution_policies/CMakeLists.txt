@@ -14,6 +14,7 @@ set(distribution_policies_headers
     hpx/distribution_policies/binpacking_distribution_policy.hpp
     hpx/distribution_policies/colocating_distribution_policy.hpp
     hpx/distribution_policies/container_distribution_policy.hpp
+    hpx/distribution_policies/default_distribution_policy.hpp
     hpx/distribution_policies/target_distribution_policy.hpp
     hpx/distribution_policies/unwrapping_result_policy.hpp
 )
@@ -25,6 +26,7 @@ set(distribution_policies_compat_headers
     hpx/runtime/components/colocating_distribution_policy.hpp => hpx/modules/distribution_policies.hpp
     hpx/runtime/components/target_distribution_policy.hpp => hpx/modules/distribution_policies.hpp
     hpx/runtime/components/unwrapping_result_policy.hpp => hpx/modules/distribution_policies.hpp
+    hpx/runtime/components/default_distribution_policy.hpp => hpx/modules/runtime_components.hpp
 )
 # cmake-format: on
 

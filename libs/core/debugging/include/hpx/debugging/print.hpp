@@ -89,7 +89,7 @@ namespace hpx::debug {
     }    // namespace detail
 
     template <int N = 2, typename T>
-    constexpr detail::dec<N, T> dec(T const& v) noexcept
+    [[nodiscard]] constexpr detail::dec<N, T> dec(T const& v) noexcept
     {
         return detail::dec<N, T>(v);
     }
@@ -137,7 +137,7 @@ namespace hpx::debug {
             }
         };
 
-        HPX_CORE_EXPORT void print_ptr(std::ostream& os, void* v, int n);
+        HPX_CORE_EXPORT void print_ptr(std::ostream& os, void const* v, int n);
 
         template <int N, typename T>
         struct hex<N, T, std::enable_if_t<std::is_pointer_v<T>>>
@@ -159,7 +159,7 @@ namespace hpx::debug {
     }    // namespace detail
 
     template <int N = 4, typename T>
-    constexpr detail::hex<N, T> hex(T const& v) noexcept
+    [[nodiscard]] constexpr detail::hex<N, T> hex(T const& v) noexcept
     {
         return detail::hex<N, T>(v);
     }
@@ -192,7 +192,7 @@ namespace hpx::debug {
     }    // namespace detail
 
     template <int N = 8, typename T>
-    constexpr detail::bin<N, T> bin(T const& v) noexcept
+    [[nodiscard]] constexpr detail::bin<N, T> bin(T const& v) noexcept
     {
         return detail::bin<N, T>(v);
     }
@@ -245,14 +245,15 @@ namespace hpx::debug {
         struct current_time_print_helper
         {
             HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& os, current_time_print_helper const&);
+                std::ostream& os, current_time_print_helper);
         };
     }    // namespace detail
 
     // ------------------------------------------------------------------
     // helper function for printing CRC32
     // ------------------------------------------------------------------
-    constexpr inline std::uint32_t crc32(void const*, std::size_t) noexcept
+    [[nodiscard]] constexpr std::uint32_t crc32(
+        void const*, std::size_t) noexcept
     {
         return 0;
     }
@@ -285,7 +286,7 @@ namespace hpx::debug {
         }
 
         template <typename... Args>
-        void tuple_print(std::ostream& os, const std::tuple<Args...>& t)
+        void tuple_print(std::ostream& os, std::tuple<Args...> const& t)
         {
             tuple_print(os, t, std::make_index_sequence<sizeof...(Args)>());
         }
@@ -298,11 +299,11 @@ namespace hpx::debug {
         // ------------------------------------------------------------------
         struct hostname_print_helper
         {
-            HPX_CORE_EXPORT char const* get_hostname() const;
-            HPX_CORE_EXPORT int guess_rank() const;
+            [[nodiscard]] HPX_CORE_EXPORT char const* get_hostname() const;
+            [[nodiscard]] HPX_CORE_EXPORT int guess_rank() const;
 
             HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& os, hostname_print_helper const& h);
+                std::ostream& os, hostname_print_helper h);
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -394,7 +395,7 @@ namespace hpx::debug {
         double const delay_;
         std::tuple<Args...> const message_;
         //
-        timed_var(double const& delay, Args const&... args)
+        timed_var(double delay, Args const&... args)
           : time_start_(std::chrono::steady_clock::now())
           , delay_(delay)
           , message_(args...)
@@ -403,7 +404,7 @@ namespace hpx::debug {
 
         bool elapsed(std::chrono::steady_clock::time_point const& now) const
         {
-            double elapsed_ =
+            double const elapsed_ =
                 std::chrono::duration_cast<std::chrono::duration<double>>(
                     now - time_start_)
                     .count();
@@ -432,82 +433,84 @@ namespace hpx::debug {
     template <>
     struct enable_print<false>
     {
-        explicit constexpr enable_print(const char*) noexcept {}
+        explicit constexpr enable_print(char const*) noexcept {}
 
-        constexpr bool is_enabled() const noexcept
+        [[nodiscard]] static constexpr bool is_enabled() noexcept
         {
             return false;
         }
 
         template <typename... Args>
-        constexpr void debug(Args const&...) const noexcept
+        static constexpr void debug(Args const&...) noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void warning(Args const&...) const noexcept
+        static constexpr void warning(Args const&...) noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void trace(Args const&...) const noexcept
+        static constexpr void trace(Args const&...) noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void error(Args const&...) const noexcept
+        static constexpr void error(Args const&...) noexcept
         {
         }
 
         template <typename... Args>
-        constexpr void timed(Args const&...) const noexcept
+        static constexpr void timed(Args const&...) noexcept
         {
         }
 
         template <typename T>
-        constexpr void array(
-            std::string const&, std::vector<T> const&) const noexcept
+        static constexpr void array(
+            std::string const&, std::vector<T> const&) noexcept
         {
         }
 
         template <typename T, std::size_t N>
-        constexpr void array(
-            std::string const&, std::array<T, N> const&) const noexcept
+        static constexpr void array(
+            std::string const&, std::array<T, N> const&) noexcept
         {
         }
 
         template <typename T>
-        constexpr void array(
-            std::string const&, T const*, std::size_t) const noexcept
+        static constexpr void array(
+            std::string const&, T const*, std::size_t) noexcept
         {
         }
 
         template <typename... Args>
-        constexpr bool scope(Args const&...) noexcept
+        static constexpr bool scope(Args const&...) noexcept
         {
             return true;
         }
 
         template <typename T, typename... Args>
-        constexpr bool declare_variable(Args const&...) const noexcept
+        [[nodiscard]] static constexpr bool declare_variable(
+            Args const&...) noexcept
         {
             return true;
         }
 
         template <typename T, typename V>
-        constexpr void set(T&, V const&) noexcept
+        static constexpr void set(T&, V const&) noexcept
         {
         }
 
         // @todo, return void so that timers have zero footprint when disabled
         template <typename... Args>
-        constexpr int make_timer(const double, Args const&...) const noexcept
+        [[nodiscard]] static constexpr int make_timer(
+            double const, Args const&...) noexcept
         {
             return 0;
         }
 
         template <typename Expr>
-        constexpr bool eval(Expr const&) noexcept
+        [[nodiscard]] static constexpr bool eval(Expr const&) noexcept
         {
             return true;
         }
@@ -533,12 +536,12 @@ namespace hpx::debug {
         {
         }
 
-        explicit constexpr enable_print(const char* p) noexcept
+        explicit constexpr enable_print(char const* p) noexcept
           : prefix_(p)
         {
         }
 
-        constexpr bool is_enabled() const noexcept
+        [[nodiscard]] static constexpr bool is_enabled() noexcept
         {
             return true;
         }
@@ -568,7 +571,7 @@ namespace hpx::debug {
         }
 
         template <typename... Args>
-        scoped_var<Args...> scope(Args const&... args)
+        [[nodiscard]] scoped_var<Args...> scope(Args const&... args)
         {
             return scoped_var<Args...>(prefix_, args...);
         }
@@ -584,45 +587,45 @@ namespace hpx::debug {
         }
 
         template <typename T>
-        void array(std::string const& name, std::vector<T> const& v) const
+        static void array(std::string const& name, std::vector<T> const& v)
         {
             detail::print_array(name, v.data(), v.size());
         }
 
         template <typename T, std::size_t N>
-        void array(std::string const& name, std::array<T, N> const& v) const
+        static void array(std::string const& name, std::array<T, N> const& v)
         {
             detail::print_array(name, v.data(), N);
         }
 
         template <typename T>
-        void array(
-            std::string const& name, T const* data, std::size_t size) const
+        static void array(
+            std::string const& name, T const* data, std::size_t size)
         {
             detail::print_array(name, data, size);
         }
 
         template <typename T, typename... Args>
-        T declare_variable(Args const&... args) const
+        [[nodiscard]] static T declare_variable(Args const&... args)
         {
             return T(args...);
         }
 
         template <typename T, typename V>
-        void set(T& var, V const& val)
+        static void set(T& var, V const& val)
         {
             var = val;
         }
 
         template <typename... Args>
-        timed_var<Args...> make_timer(
-            const double delay, const Args... args) const
+        [[nodiscard]] static timed_var<Args...> make_timer(
+            double const delay, Args const... args)
         {
             return timed_var<Args...>(delay, args...);
         }
 
         template <typename Expr>
-        auto eval(Expr const& e)
+        [[nodiscard]] static auto eval(Expr const& e)
         {
             return e();
         }

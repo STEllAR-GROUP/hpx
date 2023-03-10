@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx { namespace parallel { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ExPolicy>
@@ -50,7 +50,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(
             InIter1 first1, InIter1 last1, InIter2 first2, F&& f)
         {
-            auto count = hpx::parallel::v1::detail::distance(first1, last1);
+            auto count = hpx::parallel::detail::distance(first1, last1);
             util::cancellation_token<> tok;
             call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f));
@@ -60,8 +60,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename ZipIterator, typename Token,
         typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_equal_t<ExPolicy>, ZipIterator it, std::size_t part_count,
         Token& tok, F&& f)
@@ -83,8 +82,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename ExPolicy, typename InIter1, typename InIter2, typename F,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
         sequential_equal_t<ExPolicy>, InIter1 first1, InIter1 last1,
         InIter2 first2, F&& f)
@@ -134,7 +132,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         HPX_HOST_DEVICE HPX_FORCEINLINE static bool call(InIter1 first1,
             Sent1 last1, InIter2 first2, F&& f, Proj1&& proj1, Proj2&& proj2)
         {
-            auto count = hpx::parallel::v1::detail::distance(first1, last1);
+            auto count = hpx::parallel::detail::distance(first1, last1);
             util::cancellation_token<> tok;
             call(hpx::util::zip_iterator(first1, first2), count, tok,
                 HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
@@ -145,8 +143,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     template <typename ExPolicy, typename ZipIterator, typename Token,
         typename F, typename Proj1, typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE void tag_invoke(
         sequential_equal_binary_t<ExPolicy>, ZipIterator it,
         std::size_t part_count, Token& tok, F&& f, Proj1&& proj1, Proj2&& proj2)
@@ -172,8 +169,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     template <typename ExPolicy, typename InIter1, typename Sent1,
         typename InIter2, typename Sent2, typename F, typename Proj1,
         typename Proj2,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::is_vectorpack_execution_policy<ExPolicy>::value)>
+        HPX_CONCEPT_REQUIRES_(hpx::is_vectorpack_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE bool tag_invoke(
         sequential_equal_binary_t<ExPolicy>, InIter1 first1, Sent1 last1,
         InIter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
@@ -197,5 +193,5 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
                 HPX_FORWARD(Proj2, proj2));
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}}}    // namespace hpx::parallel::detail
 #endif

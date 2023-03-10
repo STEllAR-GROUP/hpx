@@ -16,13 +16,14 @@ namespace hpx::util {
     class atomic_count
     {
     public:
-        HPX_NON_COPYABLE(atomic_count);
-
-    public:
         explicit constexpr atomic_count(long value) noexcept
           : value_(value)
         {
         }
+
+        HPX_NON_COPYABLE(atomic_count);
+
+        ~atomic_count() = default;
 
         atomic_count& operator=(long value) noexcept
         {

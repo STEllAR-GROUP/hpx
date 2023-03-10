@@ -99,7 +99,7 @@ namespace hpx::local::detail {
         hpx::program_options::variables_map& vm,
         void (*handle_print_bind)(std::size_t))
     {
-        if (vm.count("hpx:print-bind"))
+        if (handle_print_bind != nullptr && vm.count("hpx:print-bind"))
         {
             std::size_t num_threads = hpx::util::from_string<std::size_t>(
                 ini.get_entry("hpx.os_threads", 1));

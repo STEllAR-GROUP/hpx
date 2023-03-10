@@ -1,10 +1,11 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(algorithms_headers
+    hpx/algorithms/traits/is_pair.hpp
     hpx/algorithms/traits/is_value_proxy.hpp
     hpx/algorithms/traits/pointer_category.hpp
     hpx/algorithms/traits/projected.hpp
@@ -178,8 +179,14 @@ set(algorithms_headers
     hpx/parallel/spmd_block.hpp
     hpx/parallel/task_block.hpp
     hpx/parallel/task_group.hpp
+    hpx/parallel/unseq.hpp
+    hpx/parallel/unseq/loop.hpp
+    hpx/parallel/unseq/reduce.hpp
+    hpx/parallel/unseq/reduce_helpers.hpp
+    hpx/parallel/unseq/transform_loop.hpp
     hpx/parallel/util/adapt_placement_mode.hpp
     hpx/parallel/util/adapt_sharing_mode.hpp
+    hpx/parallel/util/adapt_thread_priority.hpp
     hpx/parallel/util/cancellation_token.hpp
     hpx/parallel/util/compare_projected.hpp
     hpx/parallel/util/detail/algorithm_result.hpp

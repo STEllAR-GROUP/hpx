@@ -1,11 +1,13 @@
 //  Copyright (c) 2014 Grant Mercer
-//  Copyright (c) 2021 Akhli J Nair
+//  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/swap_ranges.hpp
+
+#pragma once
 
 #if defined(DOXYGEN)
 
@@ -96,7 +98,7 @@ namespace hpx {
     ///           \a first2.
     ///
     template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter2>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
     swap_ranges(ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1,
         FwdIter2 first2);
 
@@ -105,37 +107,35 @@ namespace hpx {
 
 #else    // DOXYGEN
 
-#pragma once
-
 #include <hpx/config.hpp>
-#include <hpx/iterator_support/traits/is_iterator.hpp>
-
 #include <hpx/executors/execution_policy.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { inline namespace v1 {
+namespace hpx::parallel {
+
     template <typename Iter1, typename Iter2>
     using swap_ranges_result = hpx::parallel::util::in_in_result<Iter1, Iter2>;
 
     ///////////////////////////////////////////////////////////////////////////
     // swap ranges
     namespace detail {
+
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             typename Size>
-        typename util::detail::algorithm_result<ExPolicy,
-            swap_ranges_result<FwdIter1, FwdIter2>>::type
+        util::detail::algorithm_result_t<ExPolicy,
+            swap_ranges_result<FwdIter1, FwdIter2>>
         parallel_swap_ranges(
             ExPolicy&& policy, FwdIter1 first1, FwdIter2 first2, Size n)
         {
@@ -148,15 +148,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
                     using hpx::get;
                     std::swap(get<0>(t), get<1>(t));
                 },
-                util::projection_identity()));
+                hpx::identity_v));
         }
 
         template <typename IterPair>
-        struct swap_ranges
-          : public detail::algorithm<swap_ranges<IterPair>, IterPair>
+        struct swap_ranges : public algorithm<swap_ranges<IterPair>, IterPair>
         {
-            swap_ranges()
-              : swap_ranges::algorithm("swap_ranges")
+            constexpr swap_ranges() noexcept
+              : algorithm<swap_ranges, IterPair>("swap_ranges")
             {
             }
 
@@ -195,8 +194,7 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                FwdIter2>::type
+            static util::detail::algorithm_result_t<ExPolicy, FwdIter2>
             parallel(
                 ExPolicy&& policy, FwdIter1 first1, Sent last1, FwdIter2 first2)
             {
@@ -207,8 +205,8 @@ namespace hpx { namespace parallel { inline namespace v1 {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
                 typename FwdIter2, typename Sent2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                swap_ranges_result<FwdIter1, FwdIter2>>::type
+            static util::detail::algorithm_result_t<ExPolicy,
+                swap_ranges_result<FwdIter1, FwdIter2>>
             parallel(ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
                 FwdIter2 first2, Sent2 last2)
             {
@@ -225,14 +223,14 @@ namespace hpx { namespace parallel { inline namespace v1 {
     HPX_DEPRECATED_V(1, 8,
         "hpx::parallel::transform_exclusive_scan is deprecated, use "
         "hpx::transform_exclusive_scan instead")
-    inline typename std::enable_if<hpx::is_execution_policy<ExPolicy>::value,
-        typename util::detail::algorithm_result<ExPolicy, FwdIter2>::type>::type
-        swap_ranges(
-            ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
+    std::enable_if_t<hpx::is_execution_policy_v<ExPolicy>,
+        util::detail::algorithm_result_t<ExPolicy,
+            FwdIter2>> swap_ranges(ExPolicy&& policy, FwdIter1 first1,
+        FwdIter1 last1, FwdIter2 first2)
     {
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter1>),
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
             "Requires at least forward iterator.");
-        static_assert((hpx::traits::is_forward_iterator_v<FwdIter2>),
+        static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
             "Requires at least forward iterator.");
 
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
@@ -245,9 +243,10 @@ namespace hpx { namespace parallel { inline namespace v1 {
 #pragma GCC diagnostic pop
 #endif
     }
-}}}    // namespace hpx::parallel::v1
+}    // namespace hpx::parallel
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::swap_ranges
     inline constexpr struct swap_ranges_t final
@@ -268,20 +267,19 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::swap_ranges<FwdIter2>().call(
+            return hpx::parallel::detail::swap_ranges<FwdIter2>().call(
                 hpx::execution::seq, first1, last1, first2);
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter2>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
         tag_fallback_invoke(hpx::swap_ranges_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2)
         {
@@ -290,7 +288,7 @@ namespace hpx {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter2>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::swap_ranges<FwdIter2>().call(
+            return hpx::parallel::detail::swap_ranges<FwdIter2>().call(
                 HPX_FORWARD(ExPolicy, policy), first1, last1, first2);
         }
     } swap_ranges{};

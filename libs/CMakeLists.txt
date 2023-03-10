@@ -354,7 +354,7 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "VC")
 endif()
 
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
-  target_link_libraries(hpx_core PUBLIC Eve::eve)
+  target_link_libraries(hpx_core PUBLIC eve::eve)
 endif()
 
 if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")

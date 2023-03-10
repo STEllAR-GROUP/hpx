@@ -52,6 +52,7 @@ namespace hpx::parcelset {
         using send_early_parcel = std::true_type;
         using do_background_work = std::true_type;
         using send_immediate_parcels = std::false_type;
+        using is_connectionless = std::false_type;
 
         static constexpr const char* type() noexcept
         {
@@ -224,22 +225,6 @@ namespace hpx::parcelset {
                             "hpx::parcelset::policies::mpi::parcelport::"
                             "io_service_work");
                     }
-                }
-            }
-
-            void early_write_handler(std::error_code const& ec, parcel const& p)
-            {
-                if (ec)
-                {
-                    // all errors during early parcel handling are fatal
-                    std::exception_ptr exception = hpx::detail::get_exception(
-                        hpx::exception(ec), "mpi::early_write_handler",
-                        __FILE__, __LINE__,
-                        "error while handling early parcel: " + ec.message() +
-                            "(" + std::to_string(ec.value()) + ")" +
-                            parcelset::dump_parcel(p));
-
-                    hpx::report_error(exception);
                 }
             }
 

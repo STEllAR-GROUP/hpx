@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,6 +15,8 @@
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
+#include <hpx/executors/execution_policy_mappings.hpp>
+#include <hpx/executors/parallel_executor.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
 #include <hpx/futures/future.hpp>
@@ -26,7 +28,6 @@
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -77,14 +78,12 @@ namespace hpx::execution {
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::sync_execute_t,
-            sequenced_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] sequenced_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::scoped_annotation annotate(exec.annotation_ ?
                     exec.annotation_ :
                     "parallel_policy_executor::sync_execute");
-#else
-            HPX_UNUSED(exec);
 #endif
             return sequenced_executor::sync_execute_impl(
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -103,13 +102,12 @@ namespace hpx::execution {
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::async_execute_t,
-            sequenced_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] sequenced_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::threads::thread_description desc(f, exec.annotation_);
 #else
             hpx::threads::thread_description desc(f);
-            HPX_UNUSED(exec);
 #endif
             return sequenced_executor::async_execute_impl(
                 desc, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -118,14 +116,12 @@ namespace hpx::execution {
         // NonBlockingOneWayExecutor (adapted) interface
         template <typename F, typename... Ts>
         friend void tag_invoke(hpx::parallel::execution::post_t,
-            sequenced_executor const& exec, F&& f, Ts&&... ts)
+            [[maybe_unused]] sequenced_executor const& exec, F&& f, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::scoped_annotation annotate(exec.annotation_ ?
                     exec.annotation_ :
                     "parallel_policy_executor::sync_execute");
-#else
-            HPX_UNUSED(exec);
 #endif
             sequenced_executor::sync_execute_impl(
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
@@ -140,13 +136,13 @@ namespace hpx::execution {
         // clang-format on
         friend decltype(auto) tag_invoke(
             hpx::parallel::execution::bulk_async_execute_t,
-            sequenced_executor const& exec, F&& f, S const& shape, Ts&&... ts)
+            [[maybe_unused]] sequenced_executor const& exec, F&& f,
+            S const& shape, Ts&&... ts)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
             hpx::threads::thread_description desc(f, exec.annotation_);
 #else
             hpx::threads::thread_description desc(f);
-            HPX_UNUSED(exec);
 #endif
 
             using result_type =
@@ -240,6 +236,17 @@ namespace hpx::execution {
                 ->get_used_processing_unit(hpx::get_worker_thread_num(), true);
         }
 
+        friend decltype(auto) tag_invoke(hpx::execution::experimental::to_par_t,
+            [[maybe_unused]] sequenced_executor const& exec)
+        {
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
+            return hpx::execution::experimental::with_annotation(
+                parallel_executor(), exec.annotation_);
+#else
+            return parallel_executor();
+#endif
+        }
+
     private:
         friend class hpx::serialization::access;
 
@@ -256,6 +263,7 @@ namespace hpx::execution {
 }    // namespace hpx::execution
 
 namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
     struct is_one_way_executor<hpx::execution::sequenced_executor>

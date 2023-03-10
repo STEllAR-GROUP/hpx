@@ -221,7 +221,7 @@ namespace hpx {
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT_LOCKED(l, phase_ != old_phase);
+                HPX_ASSERT_LOCKED(l, phase_ != old_phase);    //-V547
             }
         }
 
@@ -247,7 +247,7 @@ namespace hpx {
             std::unique_lock<mutex_type> l(mtx_);
             HPX_ASSERT_LOCKED(l, expected_ > 0);
             --expected_;
-            HPX_UNUSED(arrive_locked(l, 1));
+            [[maybe_unused]] bool result = arrive_locked(l, 1);
         }
 
     private:

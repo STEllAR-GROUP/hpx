@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-using hpx::parallel::v1::detail::insertion_sort;
+using hpx::parallel::detail::insertion_sort;
 
 void test01()
 {

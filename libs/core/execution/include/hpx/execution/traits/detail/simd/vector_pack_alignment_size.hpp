@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,8 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     struct is_vector_pack<datapar::experimental::native_simd<T>>
@@ -46,13 +47,13 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Enable>
     struct vector_pack_alignment
     {
-        static std::size_t const value = sizeof(T);
+        static constexpr std::size_t const value = sizeof(T);
     };
 
     template <typename T, typename Abi>
     struct vector_pack_alignment<datapar::experimental::simd<T, Abi>>
     {
-        static std::size_t const value =
+        static constexpr std::size_t const value =
             datapar::experimental::memory_alignment_v<
                 datapar::experimental::simd<T, Abi>>;
     };
@@ -61,15 +62,15 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename T, typename Enable>
     struct vector_pack_size
     {
-        static std::size_t const value = 1;
+        static constexpr std::size_t const value = 1;
     };
 
     template <typename T, typename Abi>
     struct vector_pack_size<datapar::experimental::simd<T, Abi>>
     {
-        static std::size_t const value =
+        static constexpr std::size_t const value =
             datapar::experimental::simd<T, Abi>::size();
     };
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,32 +8,31 @@
 #pragma once
 
 #include <hpx/config/move.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/util/low_level.hpp>
 #include <hpx/parallel/util/range.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <functional>
-#include <iterator>
 #include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
 
-    /// \brief Compare the elements pointed by it1 and it2, and if they
-    ///        are equals, compare their position, doing a stable comparison
-    ///
-    /// \param [in] it1 : iterator to the first element
-    /// \param [in] pos1 : position of the object pointed by it1
-    /// \param [in] it2 : iterator to the second element
-    /// \param [in] pos2 : position of the element pointed by it2
-    /// \param [in] comp : comparison object
-    /// \return result of the comparison
+    // \brief Compare the elements pointed by it1 and it2, and if they
+    //        are equals, compare their position, doing a stable comparison
+    //
+    // \param [in] it1 : iterator to the first element
+    // \param [in] pos1 : position of the object pointed by it1
+    // \param [in] it2 : iterator to the second element
+    // \param [in] pos2 : position of the element pointed by it2
+    // \param [in] comp : comparison object
+    // \return result of the comparison
     template <typename Iter, typename Sent, typename Compare>
-    inline bool less_range(Iter it1, std::uint32_t pos1, Sent it2,
-        std::uint32_t pos2, Compare comp)
+    bool less_range(Iter it1, std::uint32_t pos1, Sent it2, std::uint32_t pos2,
+        Compare comp)
     {
         if (comp(*it1, *it2))
         {
@@ -46,14 +45,14 @@ namespace hpx { namespace parallel { namespace util {
         return !comp(*it2, *it1);
     }
 
-    /// \brief Merge four ranges
-    /// \param [in] dest: range where move the elements merged. Their size must be
-    ///                   greater or equal than the sum of the sizes of the ranges
-    ///                   in the array R
-    /// \param [in] R : array of ranges to merge
-    /// \param [in] nrange_input : number of ranges in R
-    /// \param [in] comp : comparison object
-    /// \return range with all the elements move with the size adjusted
+    // \brief Merge four ranges
+    // \param [in] dest: range where move the elements merged. Their size must be
+    //                   greater or equal than the sum of the sizes of the ranges
+    //                   in the array R
+    // \param [in] R : array of ranges to merge
+    // \param [in] nrange_input : number of ranges in R
+    // \param [in] comp : comparison object
+    // \return range with all the elements move with the size adjusted
     template <typename Iter1, typename Sent1, typename Iter2, typename Sent2,
         typename Compare>
     util::range<Iter1, Sent1> full_merge4(util::range<Iter1, Sent1>& rdest,
@@ -61,11 +60,10 @@ namespace hpx { namespace parallel { namespace util {
         Compare comp)
     {
         using range1_t = util::range<Iter1, Sent1>;
-        using type1 = typename std::iterator_traits<Iter1>::value_type;
-        using type2 = typename std::iterator_traits<Iter2>::value_type;
+        using type1 = hpx::traits::iter_value_t<Iter1>;
+        using type2 = hpx::traits::iter_value_t<Iter2>;
 
-        static_assert(
-            std::is_same<type1, type2>::value, "Incompatible iterators\n");
+        static_assert(std::is_same_v<type1, type2>, "Incompatible iterators\n");
 
         std::size_t ndest = 0;
         std::uint32_t i = 0;
@@ -146,7 +144,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             auto& r = vrange_input[pos[0]];
 
-            *(it_dest++) = HPX_MOVE(*(r.begin()));
+            *it_dest++ = HPX_MOVE(*r.begin());
             r = util::range<Iter2, Sent2>(r.begin() + 1, r.end());
 
             if (r.size() == 0)
@@ -191,23 +189,23 @@ namespace hpx { namespace parallel { namespace util {
                 raux2, vrange_input[pos[1]], vrange_input[pos[0]], comp));
     }
 
-    /// \brief Merge four ranges and put the result in uninitialized memory
-    /// \param [in] dest: range where create and move the elements merged. Their
-    ///                   size must be greater or equal than the sum of the sizes
-    ///                   of the ranges in the array R
-    /// \param [in] R : array of ranges to merge
-    /// \param [in] nrange_input : number of ranges in vrange_input
-    /// \param [in] comp : comparison object
-    /// \return range with all the elements move with the size adjusted
+    // \brief Merge four ranges and put the result in uninitialized memory
+    // \param [in] dest: range where create and move the elements merged. Their
+    //                   size must be greater or equal than the sum of the sizes
+    //                   of the ranges in the array R
+    // \param [in] R : array of ranges to merge
+    // \param [in] nrange_input : number of ranges in vrange_input
+    // \param [in] comp : comparison object
+    // \return range with all the elements move with the size adjusted
     template <typename Value, typename Iter, typename Sent, typename Compare>
     util::range<Value*> uninit_full_merge4(util::range<Value*> const& dest,
         util::range<Iter, Sent> vrange_input[4], std::uint32_t nrange_input,
         Compare comp)
     {
-        using value_type = typename std::iterator_traits<Iter>::value_type;
+        using value_type = hpx::traits::iter_value_t<Iter>;
 
         static_assert(
-            std::is_same<value_type, Value>::value, "Incompatible iterators\n");
+            std::is_same_v<value_type, Value>, "Incompatible iterators\n");
 
         std::size_t ndest = 0;
         std::uint32_t i = 0;
@@ -289,7 +287,7 @@ namespace hpx { namespace parallel { namespace util {
         {
             auto& r = vrange_input[pos[0]];
 
-            util::construct_object(&(*(it_dest++)), HPX_MOVE(*(r.begin())));
+            util::construct_object(&*it_dest++, HPX_MOVE(*r.begin()));
             r = util::range<Iter, Sent>(r.begin() + 1, r.end());
 
             if (r.size() == 0)
@@ -333,4 +331,4 @@ namespace hpx { namespace parallel { namespace util {
             uninit_full_merge(
                 raux2, vrange_input[pos[1]], vrange_input[pos[0]], comp));
     }
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util

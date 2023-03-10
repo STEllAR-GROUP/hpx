@@ -77,8 +77,7 @@ void test_remove_copy(IteratorTag)
     test_vector c(10007);
     std::vector<std::size_t> d(c.size() / 2);
     std::size_t middle_idx = std::rand() % (c.size() / 2);
-    auto middle =
-        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    auto middle = hpx::parallel::detail::next(std::begin(c.base()), middle_idx);
     std::fill(std::begin(c.base()), middle, 1);
     std::fill(middle, std::end(c.base()), 2);
 
@@ -106,8 +105,7 @@ void test_remove_copy(ExPolicy policy, IteratorTag)
     test_vector c(10007);
     std::vector<std::size_t> d(c.size() / 2);
     std::size_t middle_idx = std::rand() % (c.size() / 2);
-    auto middle =
-        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    auto middle = hpx::parallel::detail::next(std::begin(c.base()), middle_idx);
     std::fill(std::begin(c.base()), middle, 1);
     std::fill(middle, std::end(c.base()), 2);
 
@@ -132,8 +130,7 @@ void test_remove_copy_async(ExPolicy p, IteratorTag)
     test_vector c(10007);
     std::vector<std::size_t> d(c.size() / 2);
     std::size_t middle_idx = std::rand() % (c.size() / 2);
-    auto middle =
-        hpx::parallel::v1::detail::next(std::begin(c.base()), middle_idx);
+    auto middle = hpx::parallel::detail::next(std::begin(c.base()), middle_idx);
     std::fill(std::begin(c.base()), middle, 1);
     std::fill(middle, std::end(c.base()), 2);
 

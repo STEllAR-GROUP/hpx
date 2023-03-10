@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -347,7 +347,7 @@ namespace hpx::execution::experimental {
     }
 }    // namespace hpx::execution::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     /// \cond NOINTERNAL
     template <typename BaseScheduler>
@@ -385,4 +385,4 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

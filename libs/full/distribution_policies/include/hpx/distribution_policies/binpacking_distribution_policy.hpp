@@ -33,7 +33,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     inline constexpr char const* const default_binpacking_counter_name =
         "/runtime{locality/total}/count/component@";
@@ -104,7 +104,7 @@ namespace hpx { namespace components {
 
                 for (std::size_t i = 0; i != to_create.size(); ++i)
                 {
-                    objs.push_back(bulk_create_async<Component>(
+                    objs.emplace_back(bulk_create_async<Component>(
                         localities_[i], to_create[i], vs...));
                 }
 
@@ -361,7 +361,7 @@ namespace hpx { namespace components {
     /// A predefined instance of the binpacking \a distribution_policy. It will
     /// represent the local locality and will place all items to create here.
     static binpacking_distribution_policy const binpacked{};
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {

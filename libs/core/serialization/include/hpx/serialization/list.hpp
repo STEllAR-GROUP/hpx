@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,13 +28,14 @@ namespace hpx::serialization {
     }
 
     template <typename T, typename Allocator>
-    void serialize(
-        output_archive& ar, std::list<T, Allocator> const& ls, unsigned)
+    void serialize(output_archive& ar,
+        std::list<T, Allocator> const& ls,    //-V826
+        unsigned)
     {
         // normal save ...
-        std::uint64_t size = ls.size();
+        std::uint64_t const size = ls.size();
         ar << size;
-        if (ls.empty())
+        if (size == 0)
             return;
 
         detail::save_collection(ar, ls);

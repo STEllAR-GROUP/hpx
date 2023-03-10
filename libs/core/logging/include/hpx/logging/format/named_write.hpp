@@ -249,7 +249,7 @@ In the above example, I know that the available destinations are @c out_file,
                 iter->value->configure(configure_str);
         }
 
-        void operator()(const message& msg) const
+        void operator()(message const& msg) const
         {
             for (auto const& step : write_steps)
                 (*step)(msg);
@@ -268,91 +268,92 @@ In the above example, I know that the available destinations are @c out_file,
     };
 }    // namespace hpx::util::logging::detail
 
-namespace hpx { namespace util { namespace logging { namespace writer {
+namespace hpx::util::logging::writer {
 
     /**
-@brief Composed of a named formatter and a named destinations.
-Thus, you can specify the formatting and destinations as strings
+    @brief Composed of a named formatter and a named destinations.
+    Thus, you can specify the formatting and destinations as strings
 
-@code
-#include <hpx/logging/format/named_write.hpp>
-@endcode
-
-
-Contains a very easy interface for using @ref manipulator "formatters and destinations":
-- at construction, specify 2 params: the %formatter string and the destinations string
-
-Setting the @ref manipulator "formatters and destinations" to
-write to is extremely simple:
-
-@code
-// Set the formatters (first param) and destinatins (second step) in one step
-g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n",
-"cout file(out.txt) debug");
-
-// set the formatter(s)
-g_l()->writer().format("%time%($hh:$mm.$ss.$mili) [%idx%] |\n");
-
-// set the destination(s)
-g_l()->writer().destination("cout file(out.txt) debug");
-@endcode
+    @code
+    #include <hpx/logging/format/named_write.hpp>
+    @endcode
 
 
-@section format_string_syntax The syntax of the format string
+    Contains a very easy interface for using @ref manipulator
+        "formatters and destinations":
+    - at construction, specify 2 params: the %formatter string and the
+      destinations string
 
-- The format string specifies how the message is to be logged
-- Every formatter is escaped using <tt>%</tt><em>fmt</em><tt>%</tt>
-  - Available formatters:
-    - <tt>"%idx%"</tt> - writes the index of the message (formatter::idx)
-    - <tt>"%time%"</tt> - writes the time (formatter::high_precision_time)
-    - <tt>"%thread_id%"</tt> - writes the thread id (formatter::thread_id)
-    - if you want to write @c "%", double it, like this: @c "%%"
-- @c "|" is used to specify the original message. What is before it,
-is prepended to the message, what is after, is appended to the message
-- If a formatter is configurable, append @em (params) to it
-  - For now, only @c "%time%" is configurable. For instance,
-  @c "%time%($hh:$mm.$ss.$mili)" writes time like @c "21:14.24.674"
+    Setting the @ref manipulator "formatters and destinations" to
+    write to is extremely simple:
 
-Example:
-@code
-"%time%($hh:$mm.$ss.$mili) [%idx%] |\n"
-@endcode
+    @code
+    // Set the formatters (first param) and destinatins (second step) in one
+    step g_l()->writer().write("%time%($hh:$mm.$ss.$mili) [%idx%] |\n",
+    "cout file(out.txt) debug");
 
-The output can look like:
+    // set the formatter(s)
+    g_l()->writer().format("%time%($hh:$mm.$ss.$mili) [%idx%] |\n");
 
-@code
-21:03.17.243 [1] this is so cool
-21:03.17.243 [2] first error
-21:03.17.243 [3] hello, world
-@endcode
+    // set the destination(s)
+    g_l()->writer().destination("cout file(out.txt) debug");
+    @endcode
 
 
-@section dest_string_syntax The syntax of the destinations string
+    @section format_string_syntax The syntax of the format string
 
-- The syntax of the destination string specifies where the message is to be logged
-  - Every destination is specified by name
-  - Separate destinations by space (' ')
-- Available destinations
-  - <tt>"cout"</tt> - writes to std::cout (destination::cout)
-  - <tt>"cerr"</tt> - writes to std::cerr (destination::cerr)
-  - <tt>"debug"</tt> - writes to the debug window: OutputDebugString in Windows,
-  console on Linux (destination::dbg_window)
-  - <tt>"file"</tt> - writes to a file (destination::file)
-- If a destination is configurable, append @em (params) to it
-  - Right now, @c "file" is configurable
-    - Append <tt>(</tt><em>filename</em><tt>)</tt> to them to specify the file name.
-    Example: @c "file(out.txt)" will write to the out.txt file
+    - The format string specifies how the message is to be logged
+    - Every formatter is escaped using <tt>%</tt><em>fmt</em><tt>%</tt>
+      - Available formatters:
+        - <tt>"%idx%"</tt> - writes the index of the message (formatter::idx)
+        - <tt>"%time%"</tt> - writes the time (formatter::high_precision_time)
+        - <tt>"%thread_id%"</tt> - writes the thread id (formatter::thread_id)
+        - if you want to write @c "%", double it, like this: @c "%%"
+    - @c "|" is used to specify the original message. What is before it,
+    is prepended to the message, what is after, is appended to the message
+    - If a formatter is configurable, append @em (params) to it
+      - For now, only @c "%time%" is configurable. For instance,
+      @c "%time%($hh:$mm.$ss.$mili)" writes time like @c "21:14.24.674"
 
-Examples:
-- <tt>"file(out.txt) cout"</tt> - will write to a file called out.txt and to cout
-- <tt>"cout debug"</tt> - will write to cout and debug window (see above)
+    Example:
+    @code
+    "%time%($hh:$mm.$ss.$mili) [%idx%] |\n"
+    @endcode
 
-@note
-If you want to output to 2 files, don't use "file(one.txt) file(two.txt)".
-This will just configure "file" twice, ending up with writing only to "two.txt" file.
+    The output can look like:
 
-@param format_write_ the underlying format writer
+    @code
+    21:03.17.243 [1] this is so cool
+    21:03.17.243 [2] first error
+    21:03.17.243 [3] hello, world
+    @endcode
 
+
+    @section dest_string_syntax The syntax of the destinations string
+
+    - The syntax of the destination string specifies where the message is to be logged
+      - Every destination is specified by name
+      - Separate destinations by space (' ')
+    - Available destinations
+      - <tt>"cout"</tt> - writes to std::cout (destination::cout)
+      - <tt>"cerr"</tt> - writes to std::cerr (destination::cerr)
+      - <tt>"debug"</tt> - writes to the debug window: OutputDebugString in Windows,
+      console on Linux (destination::dbg_window)
+      - <tt>"file"</tt> - writes to a file (destination::file)
+    - If a destination is configurable, append @em (params) to it
+      - Right now, @c "file" is configurable
+        - Append <tt>(</tt><em>filename</em><tt>)</tt> to them to specify the file name.
+        Example: @c "file(out.txt)" will write to the out.txt file
+
+    Examples:
+    - <tt>"file(out.txt) cout"</tt> - will write to a file called out.txt and to cout
+    - <tt>"cout debug"</tt> - will write to cout and debug window (see above)
+
+    @note
+    If you want to output to 2 files, don't use "file(one.txt) file(two.txt)".
+    This will just configure "file" twice, ending up with writing only to "two.txt" file.
+
+    @param format_write_ the underlying format writer
 
 */
     struct named_write
@@ -360,14 +361,14 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         HPX_CORE_EXPORT named_write();
 
         /** @brief sets the format string: what should be before,
-    and what after the original message, separated by "|"
+            and what after the original message, separated by "|"
 
-    Example: \n
-    "[%idx%] |\n" - this writes "[%idx%] " before the message,
-    and "\n" after the message
+            Example: \n
+            "[%idx%] |\n" - this writes "[%idx%] " before the message,
+            and "\n" after the message
 
-    If "|" is not present, the whole message is prepended to the message
-    */
+            If "|" is not present, the whole message is prepended to the message
+         */
         void format(std::string const& format_str)
         {
             m_format_str = format_str;
@@ -376,7 +377,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
         /** @brief sets the destinations string - where should logged messages
          * be outputted
-    */
+         */
         void destination(std::string const& destination_str)
         {
             m_destination_str = destination_str;
@@ -384,7 +385,7 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         }
 
         /** @brief Specifies the formats and destinations in one step
-    */
+         */
         void write(
             std::string const& format_str, std::string const& destination_str)
         {
@@ -398,16 +399,16 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
             m_format(out, msg);
 
 #if defined(HPX_COMPUTE_HOST_CODE)
-            message formatted(HPX_MOVE(out));
+            message const formatted(HPX_MOVE(out));
             m_destination(formatted);
 #endif
         }
 
         /** @brief Replaces a formatter from the named formatter.
 
-    You can use this, for instance, when you want to share
-    a formatter between multiple named writers.
-    */
+            You can use this, for instance, when you want to share
+            a formatter between multiple named writers.
+         */
         template <typename Formatter>
         void set_formatter(std::string const& name, Formatter fmt)
         {
@@ -423,9 +424,9 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
 
         /** @brief Replaces a destination from the named destination.
 
-    You can use this, for instance, when you want to share a
-    destination between multiple named writers.
-    */
+            You can use this, for instance, when you want to share a
+            destination between multiple named writers.
+         */
         template <typename Destination>
         void set_destination(std::string const& name, Destination dest)
         {
@@ -451,5 +452,4 @@ This will just configure "file" twice, ending up with writing only to "two.txt" 
         std::string m_format_str;
         std::string m_destination_str;
     };
-
-}}}}    // namespace hpx::util::logging::writer
+}    // namespace hpx::util::logging::writer

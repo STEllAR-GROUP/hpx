@@ -56,7 +56,7 @@ namespace hpx::threads::policies {
         {
         }
 
-        bool push(const_reference val, bool /*other_end*/ = false)
+        bool push(const_reference val, bool /*other_end*/ = false)    //-V659
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             return queue_.push_left(val);
@@ -65,7 +65,7 @@ namespace hpx::threads::policies {
 #endif
         }
 
-        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        bool push(rvalue_reference val, bool /*other_end*/ = false)    //-V659
         {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             return queue_.push_left(HPX_MOVE(val));
@@ -120,12 +120,12 @@ namespace hpx::threads::policies {
         {
         }
 
-        bool push(const_reference val, bool /*other_end*/ = false)
+        bool push(const_reference val, bool /*other_end*/ = false)    //-V659
         {
             return queue_.enqueue(val);
         }
 
-        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        bool push(rvalue_reference val, bool /*other_end*/ = false)    //-V659
         {
             return queue_.enqueue(HPX_MOVE(val));
         }
@@ -176,14 +176,14 @@ namespace hpx::threads::policies {
         {
         }
 
-        bool push(const_reference val, bool other_end = false)
+        bool push(const_reference val, bool other_end = false)    //-V659
         {
             if (other_end)
                 return queue_.push_right(val);
             return queue_.push_left(val);
         }
 
-        bool push(rvalue_reference val, bool other_end = false)
+        bool push(rvalue_reference val, bool other_end = false)    //-V659
         {
             if (other_end)
                 return queue_.push_right(HPX_MOVE(val));
@@ -236,12 +236,12 @@ namespace hpx::threads::policies {
         {
         }
 
-        bool push(const_reference val, bool /*other_end*/ = false)
+        bool push(const_reference val, bool /*other_end*/ = false)    //-V659
         {
             return queue_.push_left(val);
         }
 
-        bool push(rvalue_reference val, bool /*other_end*/ = false)
+        bool push(rvalue_reference val, bool /*other_end*/ = false)    //-V659
         {
             return queue_.push_left(HPX_MOVE(val));
         }
@@ -293,18 +293,18 @@ namespace hpx::threads::policies {
         {
         }
 
-        bool push(const_reference val, bool other_end = false)
-        {
-            if (other_end)
-                return queue_.push_right(HPX_MOVE(val));
-            return queue_.push_left(HPX_MOVE(val));
-        }
-
-        bool push(rvalue_reference val, bool other_end = false)
+        bool push(const_reference val, bool other_end = false)    //-V659
         {
             if (other_end)
                 return queue_.push_right(val);
             return queue_.push_left(val);
+        }
+
+        bool push(rvalue_reference val, bool other_end = false)    //-V659
+        {
+            if (other_end)
+                return queue_.push_right(HPX_MOVE(val));
+            return queue_.push_left(HPX_MOVE(val));
         }
 
         bool pop(reference val, bool steal = true) noexcept

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,19 +20,20 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct projected_iterator
     {
-        using type = typename std::decay<T>::type;
+        using type = std::decay_t<T>;
     };
 
     // For segmented iterators, we consider the local_raw_iterator instead of
     // the given one.
     template <typename Iterator>
     struct projected_iterator<Iterator,
-        typename std::enable_if<is_segmented_iterator<Iterator>::value>::type>
+        std::enable_if_t<is_segmented_iterator_v<Iterator>>>
     {
         using local_iterator =
             typename segmented_iterator_traits<Iterator>::local_iterator;
@@ -45,22 +46,25 @@ namespace hpx { namespace traits {
     struct projected_iterator<Iterator,
         std::void_t<typename std::decay_t<Iterator>::proxy_type>>
     {
-        using type = typename std::decay<Iterator>::type::proxy_type;
+        using type = typename std::decay_t<Iterator>::proxy_type;
     };
-}}    // namespace hpx::traits
 
-namespace hpx { namespace parallel { namespace traits {
+    template <typename Iterator>
+    using projected_iterator_t = typename projected_iterator<Iterator>::type;
+}    // namespace hpx::traits
+
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F, typename Iter, typename Enable = void>
         struct projected_result_of;
 
         template <typename Proj, typename Iter>
         struct projected_result_of<Proj, Iter,
-            typename std::enable_if<
-                hpx::traits::is_iterator<Iter>::value>::type>
-          : hpx::util::invoke_result<Proj,
-                typename std::iterator_traits<Iter>::reference>
+            std::enable_if_t<hpx::traits::is_iterator_v<Iter>>>
+          : hpx::util::invoke_result<Proj, hpx::traits::iter_reference_t<Iter>>
         {
         };
 
@@ -92,8 +96,7 @@ namespace hpx { namespace parallel { namespace traits {
         struct projected_result_of_vector_pack<Projected,
             std::void_t<typename Projected::iterator_type>>
           : projected_result_of_vector_pack_<typename Projected::projector_type,
-                typename std::iterator_traits<
-                    typename Projected::iterator_type>::value_type>
+                hpx::traits::iter_value_t<typename Projected::iterator_type>>
         {
         };
 #endif
@@ -101,13 +104,13 @@ namespace hpx { namespace parallel { namespace traits {
 
     template <typename F, typename Iter, typename Enable = void>
     struct projected_result_of
-      : detail::projected_result_of<typename std::decay<F>::type,
-            typename std::decay<Iter>::type>
+      : detail::projected_result_of<std::decay_t<F>, std::decay_t<Iter>>
     {
     };
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F, typename Iter, typename Enable = void>
         struct is_projected : std::false_type
         {
@@ -120,15 +123,13 @@ namespace hpx { namespace parallel { namespace traits {
         // clang-format off
         template <typename Proj, typename Iter>
         struct is_projected<Proj, Iter,
-            typename std::enable_if<
-                hpx::traits::is_iterator<Iter>::value &&
-                hpx::is_invocable<Proj,
-                    typename std::iterator_traits<Iter>::reference>::value
-             >::type>
+            std::enable_if_t<
+                hpx::traits::is_iterator_v<Iter> &&
+                hpx::is_invocable_v<Proj, hpx::traits::iter_reference_t<Iter>>
+             >>
           : std::integral_constant<bool,
-                !std::is_void<typename hpx::util::invoke_result<Proj,
-                    typename std::iterator_traits<Iter>::reference>::type
-                >::value>
+                !std::is_void_v<hpx::util::invoke_result_t<
+                    Proj, hpx::traits::iter_reference_t<Iter>>>>
         {
         };
         // clang-format on
@@ -149,13 +150,10 @@ namespace hpx { namespace parallel { namespace traits {
 
     template <typename F, typename Iter, typename Enable = void>
     struct is_projected
-      : detail::is_projected<typename std::decay<F>::type,
-            typename hpx::traits::projected_iterator<Iter>::type>
+      : detail::is_projected<std::decay_t<F>,
+            hpx::traits::projected_iterator_t<Iter>>
     {
     };
-
-    template <typename F, typename Iter>
-    using is_projected_t = typename is_projected<F, Iter>::type;
 
     template <typename F, typename Iter>
     inline constexpr bool is_projected_v = is_projected<F, Iter>::value;
@@ -164,9 +162,8 @@ namespace hpx { namespace parallel { namespace traits {
     template <typename Proj, typename Iter>
     struct projected
     {
-        using projector_type = typename std::decay<Proj>::type;
-        using iterator_type =
-            typename hpx::traits::projected_iterator<Iter>::type;
+        using projector_type = std::decay_t<Proj>;
+        using iterator_type = hpx::traits::projected_iterator_t<Iter>;
     };
 
     template <typename Projected, typename Enable = void>
@@ -188,6 +185,7 @@ namespace hpx { namespace parallel { namespace traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename F, typename... Args>
         struct is_indirect_callable_impl : hpx::is_invocable<F, Args...>
         {
@@ -201,11 +199,11 @@ namespace hpx { namespace parallel { namespace traits {
 
         template <typename ExPolicy, typename F, typename... Projected>
         struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
-            typename std::enable_if<
-                hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
-                (!hpx::is_vectorpack_execution_policy<ExPolicy>::value ||
-                    !hpx::util::all_of<
-                        is_projected_zip_iterator<Projected>...>::value)>::type>
+            std::enable_if_t<
+                hpx::util::all_of_v<is_projected_indirect<Projected>...> &&
+                (!hpx::is_vectorpack_execution_policy_v<ExPolicy> ||
+                    !hpx::util::all_of_v<
+                        is_projected_zip_iterator<Projected>...>)>>
           : is_indirect_callable_impl<F,
                 typename projected_result_of_indirect<Projected>::type...>
         {
@@ -217,11 +215,10 @@ namespace hpx { namespace parallel { namespace traits {
         // reference type.
         template <typename ExPolicy, typename F, typename... Projected>
         struct is_indirect_callable<ExPolicy, F, hpx::util::pack<Projected...>,
-            typename std::enable_if<
-                hpx::util::all_of<is_projected_indirect<Projected>...>::value &&
-                hpx::is_vectorpack_execution_policy<ExPolicy>::value &&
-                hpx::util::all_of<
-                    is_projected_zip_iterator<Projected>...>::value>::type>
+            std::enable_if_t<
+                hpx::util::all_of_v<is_projected_indirect<Projected>...> &&
+                hpx::is_vectorpack_execution_policy_v<ExPolicy> &&
+                hpx::util::all_of_v<is_projected_zip_iterator<Projected>...>>>
           : is_indirect_callable_impl<F,
                 typename projected_result_of_vector_pack<Projected>::type...>
         {
@@ -231,18 +228,12 @@ namespace hpx { namespace parallel { namespace traits {
 
     template <typename ExPolicy, typename F, typename... Projected>
     struct is_indirect_callable
-      : detail::is_indirect_callable<typename std::decay<ExPolicy>::type,
-            typename std::decay<F>::type,
-            hpx::util::pack<typename std::decay<Projected>::type...>>
+      : detail::is_indirect_callable<std::decay_t<ExPolicy>, std::decay_t<F>,
+            hpx::util::pack<std::decay_t<Projected>...>>
     {
     };
 
     template <typename ExPolicy, typename F, typename... Projected>
-    using is_indirect_callable_t =
-        typename is_indirect_callable<ExPolicy, F, Projected...>::type;
-
-    template <typename ExPolicy, typename F, typename... Projected>
     inline constexpr bool is_indirect_callable_v =
         is_indirect_callable<ExPolicy, F, Projected...>::value;
-
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits

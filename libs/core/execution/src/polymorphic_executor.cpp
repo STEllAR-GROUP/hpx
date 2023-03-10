@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace parallel { namespace execution { namespace detail {
+namespace hpx::parallel::execution::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     [[noreturn]] void throw_bad_polymorphic_executor()
@@ -32,6 +32,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         vtable const* /* empty_vtable */)
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (other.object != nullptr)
         {
@@ -44,6 +45,7 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         polymorphic_executor_base&& other, vtable const* empty_vptr) noexcept
       : vptr(other.vptr)
       , object(other.object)
+      , storage_init()
     {
         if (object == &other.storage)
         {
@@ -125,4 +127,4 @@ namespace hpx { namespace parallel { namespace execution { namespace detail {
         if (f.object == &storage)
             f.object = &f.storage;
     }
-}}}}    // namespace hpx::parallel::execution::detail
+}    // namespace hpx::parallel::execution::detail

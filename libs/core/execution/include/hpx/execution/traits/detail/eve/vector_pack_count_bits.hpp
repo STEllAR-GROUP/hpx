@@ -11,15 +11,17 @@
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <cstddef>
 
-#include <eve/function/count_true.hpp>
+#include <eve/module/core.hpp>
 
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
+
     ///////////////////////////////////////////////////////////////////////
     template <typename Mask>
-    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(Mask const& msk)
+    HPX_HOST_DEVICE HPX_FORCEINLINE std::size_t count_bits(
+        Mask const& msk) noexcept
     {
         return eve::count_true(msk);
     }
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

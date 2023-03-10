@@ -21,7 +21,6 @@ void test_transform()
     test_transform(IteratorTag());
     test_transform(seq, IteratorTag());
     test_transform(par, IteratorTag());
-    test_transform(par_unseq, IteratorTag());
 
     test_transform_async(seq(task), IteratorTag());
     test_transform_async(par(task), IteratorTag());

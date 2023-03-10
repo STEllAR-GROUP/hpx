@@ -25,7 +25,7 @@ namespace hpx { namespace util {
         while (total_ > barrier_flag)
         {
             // Wait until everyone exits the barrier
-            cond_.wait(l);
+            cond_.wait(l);    //-V1089
         }
     }
 
@@ -36,7 +36,7 @@ namespace hpx { namespace util {
         while (total_ > barrier_flag)
         {
             // wait until everyone exits the barrier
-            cond_.wait(l);
+            cond_.wait(l);    //-V1089
         }
 
         // Are we the first to enter?
@@ -55,7 +55,7 @@ namespace hpx { namespace util {
             while (total_ < barrier_flag)
             {
                 // wait until enough threads enter the barrier
-                cond_.wait(l);
+                cond_.wait(l);    //-V1089
             }
             --total_;
 

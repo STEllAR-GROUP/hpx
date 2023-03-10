@@ -133,9 +133,8 @@ namespace hpx::threads::detail {
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os) const
     {
         os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
-           << "] with scheduler " << sched_->Scheduler::get_scheduler_name()
-           << "\n"
-           << "is running on PUs : \n";
+           << "] with scheduler " << Scheduler::get_scheduler_name()
+           << "\nis running on PUs : \n";
         os << hpx::threads::to_string(get_used_processing_units())
 #ifdef HPX_HAVE_MAX_CPU_COUNT
            << " "
@@ -143,7 +142,9 @@ namespace hpx::threads::detail {
 #endif
            << '\n';
         os << "on numa domains : \n" << get_numa_domain_bitmap() << '\n';
-        os << "pool offset : \n" << std::dec << this->thread_offset_ << "\n";
+        os << "pool offset : \n"
+           << std::dec << static_cast<std::uint64_t>(this->thread_offset_)
+           << "\n";
     }
 
     template <typename Scheduler>
@@ -708,7 +709,7 @@ namespace hpx::threads::detail {
             executed_threads = counter_data_[num].executed_threads_;
             reset_executed_threads = counter_data_[num].reset_executed_threads_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_executed_threads_ = executed_threads;
         }
         else
@@ -720,7 +721,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_executed_threads_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -768,7 +769,7 @@ namespace hpx::threads::detail {
             reset_executed_phases =
                 counter_data_[num].reset_executed_thread_phases_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_executed_thread_phases_ =
                     executed_phases;
         }
@@ -781,7 +782,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_executed_thread_phases_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -1119,7 +1120,7 @@ namespace hpx::threads::detail {
             reset_exec_total =
                 counter_data_[num].reset_cumulative_thread_duration_;
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 counter_data_[num].reset_cumulative_thread_duration_ =
                     exec_total;
@@ -1134,7 +1135,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_cumulative_thread_duration_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -1573,7 +1574,7 @@ namespace hpx::threads::detail {
             tfunc_total = counter_data_[num].tfunc_times_;
             reset_tfunc_total = counter_data_[num].reset_tfunc_times_;
 
-            if (reset)
+            if (reset)    //-V1051
                 counter_data_[num].reset_tfunc_times_ = tfunc_total;
         }
         else
@@ -1585,7 +1586,7 @@ namespace hpx::threads::detail {
                 counter_data_.end(), std::int64_t(0),
                 &scheduling_counter_data::reset_tfunc_times_);
 
-            if (reset)
+            if (reset)    //-V1051
             {
                 copy_projected(counter_data_.begin(), counter_data_.end(),
                     counter_data_.begin(),
@@ -1605,7 +1606,7 @@ namespace hpx::threads::detail {
 #if defined(HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES)
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_creation_idle_rate(
-        std::size_t, bool reset)
+        std::size_t, bool reset) noexcept
     {
         double const creation_total =
             static_cast<double>(sched_->Scheduler::get_creation_time(reset));
@@ -1652,7 +1653,7 @@ namespace hpx::threads::detail {
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_cleanup_idle_rate(
-        std::size_t, bool reset)
+        std::size_t, bool reset) noexcept
     {
         double const cleanup_total =
             static_cast<double>(sched_->Scheduler::get_cleanup_time(reset));
@@ -1699,7 +1700,8 @@ namespace hpx::threads::detail {
 #endif    // HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 
     template <typename Scheduler>
-    std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate_all(bool reset)
+    std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate_all(
+        bool reset) noexcept
     {
         std::int64_t exec_total =
             accumulate_projected(counter_data_.begin(), counter_data_.end(),
@@ -1742,7 +1744,7 @@ namespace hpx::threads::detail {
 
     template <typename Scheduler>
     std::int64_t scheduled_thread_pool<Scheduler>::avg_idle_rate(
-        std::size_t num, bool reset)
+        std::size_t num, bool reset) noexcept
     {
         if (num == std::size_t(-1))
             return avg_idle_rate_all(reset);

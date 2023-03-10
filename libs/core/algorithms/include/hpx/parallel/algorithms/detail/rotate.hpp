@@ -7,20 +7,18 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/functional/invoke.hpp>
-
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/functional/invoke.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 
 #include <algorithm>
-#include <functional>
 #include <iterator>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
     // provide implementation of std::rotate supporting iterators/sentinels
     template <typename Iter, typename Sent>
-    inline constexpr void sequential_rotate_helper(
+    constexpr void sequential_rotate_helper(
         Iter first, Iter new_first, Sent last)
     {
         Iter next = new_first;
@@ -43,7 +41,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     }
 
     template <typename Iter, typename Sent>
-    inline constexpr util::in_out_result<Iter, Sent> sequential_rotate(
+    constexpr util::in_out_result<Iter, Sent> sequential_rotate(
         Iter first, Iter new_first, Sent last)
     {
         if (first != new_first && new_first != last)
@@ -52,4 +50,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         detail::advance(first, detail::distance(new_first, last));
         return {first, last};
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

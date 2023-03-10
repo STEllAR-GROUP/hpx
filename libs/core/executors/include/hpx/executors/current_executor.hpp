@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,16 +9,18 @@
 #include <hpx/config.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     using current_executor HPX_DEPRECATED_V(1, 9,
         "hpx::parallel::execution::current_executor is deprecated, use "
         "hpx::execution::parallel_executor instead") =
         hpx::execution::parallel_executor;
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace threads {
-    ///  Returns a reference to the executor which was used to create
-    /// the given thread.
+namespace hpx::threads {
+
+    /// Returns a reference to the executor that was used to create the given
+    /// thread.
     ///
     /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
     ///         to an appropriate value when an error occurs. Otherwise, this
@@ -34,10 +36,11 @@ namespace hpx { namespace threads {
     ///
     HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         thread_id_type const& id, error_code& ec = throws);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
-namespace hpx { namespace this_thread {
-    /// Returns a reference to the executor which was used to create the current
+namespace hpx::this_thread {
+
+    /// Returns a reference to the executor that was used to create the current
     /// thread.
     ///
     /// \throws If <code>&ec != &throws</code>, never throws, but will set \a ec
@@ -54,4 +57,4 @@ namespace hpx { namespace this_thread {
     ///
     HPX_CORE_EXPORT hpx::execution::parallel_executor get_executor(
         error_code& ec = throws);
-}}    // namespace hpx::this_thread
+}    // namespace hpx::this_thread

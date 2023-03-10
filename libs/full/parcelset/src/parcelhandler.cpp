@@ -59,9 +59,10 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     void dijkstra_make_black();    // forward declaration only
-}}                                 // namespace hpx::detail
+}    // namespace hpx::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parcelset {
@@ -185,6 +186,13 @@ namespace hpx::parcelset {
                     {
                         if (pp.first > 0)
                             pp.second->run(false);
+                    }
+
+                    // early parcel handling is finished, normal operation is
+                    // about to start
+                    if (pp.first > 0)
+                    {
+                        pp.second->initialized();
                     }
                 },
                 [&](std::exception_ptr&& e) {
@@ -443,7 +451,7 @@ namespace hpx::parcelset {
         locality_ids.reserve(ids.size());
         for (auto id : ids)
         {
-            locality_ids.push_back(naming::get_gid_from_locality_id(id));
+            locality_ids.emplace_back(naming::get_gid_from_locality_id(id));
         }
 
         return !locality_ids.empty();
@@ -767,8 +775,8 @@ namespace hpx::parcelset {
                     }
                 }
 
-                resolved_parcels.push_back(HPX_MOVE(p));
-                resolved_handlers.push_back(HPX_MOVE(f));
+                resolved_parcels.emplace_back(HPX_MOVE(p));
+                resolved_handlers.emplace_back(HPX_MOVE(f));
                 if (!resolved_dest.second)
                 {
                     resolved_dest = dest;
@@ -780,8 +788,8 @@ namespace hpx::parcelset {
             }
             else
             {
-                nonresolved_parcels.push_back(HPX_MOVE(p));
-                nonresolved_handlers.push_back(HPX_MOVE(f));
+                nonresolved_parcels.emplace_back(HPX_MOVE(p));
+                nonresolved_handlers.emplace_back(HPX_MOVE(f));
             }
         }
 
@@ -806,11 +814,7 @@ namespace hpx::parcelset {
     void parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        write_handler_type f;
-        {
-            std::lock_guard<mutex_type> l(mtx_);
-            f = write_handler_;
-        }
+        write_handler_type f = write_handler_;
         f(ec, p);
     }
 
@@ -914,8 +918,8 @@ namespace hpx::parcelset {
                 // insert an empty entry into the map to avoid trying to
                 // create this handler again
                 p.reset();
-                std::pair<message_handler_map::iterator, bool> r =
-                    handlers_.insert(message_handler_map::value_type(key, p));
+                std::pair<message_handler_map::iterator, bool> const r =
+                    handlers_.emplace(key, p);
 
                 l.unlock();
                 if (!r.second)
@@ -928,8 +932,8 @@ namespace hpx::parcelset {
                 return nullptr;    // no message handler available
             }
 
-            std::pair<message_handler_map::iterator, bool> r =
-                handlers_.insert(message_handler_map::value_type(key, p));
+            std::pair<message_handler_map::iterator, bool> const r =
+                handlers_.emplace(key, p);
 
             l.unlock();
             if (!r.second)

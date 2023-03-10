@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2015 Anton Bikineev
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/access.hpp>
 #include <hpx/serialization/basic_archive.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/detail/non_default_constructible.hpp>
 #include <hpx/serialization/detail/polymorphic_id_factory.hpp>
 #include <hpx/serialization/detail/polymorphic_intrusive_factory.hpp>
@@ -19,6 +18,7 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/string.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
+#include <hpx/type_support/extra_data.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
@@ -29,45 +29,51 @@
 #include <type_traits>
 #include <utility>
 
+namespace hpx::serialization::detail {
+
+    struct ptr_helper;
+
+    // we need top use shared_ptr as util::any requires for the held type
+    // to be copy-constructible
+    using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
+
+    using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
+    using output_pointer_tracker = std::map<void const*, std::uint64_t>;
+}    // namespace hpx::serialization::detail
+
+namespace hpx::util {
+
+    // This is explicitly instantiated to ensure that the id is stable across
+    // shared libraries.
+    template <>
+    struct extra_data_helper<serialization::detail::input_pointer_tracker>
+    {
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
+        static constexpr void reset(
+            serialization::detail::input_pointer_tracker*) noexcept
+        {
+        }
+    };
+
+    template <>
+    struct extra_data_helper<serialization::detail::output_pointer_tracker>
+    {
+        HPX_CORE_EXPORT static extra_data_id_type id() noexcept;
+        HPX_CORE_EXPORT static void reset(
+            serialization::detail::output_pointer_tracker* data);
+    };
+}    // namespace hpx::util
+
 namespace hpx::serialization {
-
-    ////////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        struct ptr_helper;
-
-        // we need top use shared_ptr as util::any requires for the held type
-        // to be copy-constructible
-        using ptr_helper_ptr = std::unique_ptr<ptr_helper>;
-
-        using input_pointer_tracker = std::map<std::uint64_t, ptr_helper_ptr>;
-        using output_pointer_tracker = std::map<void const*, std::uint64_t>;
-
-        // This is explicitly instantiated to ensure that the id is stable across
-        // shared libraries.
-        template <>
-        struct extra_archive_data_helper<input_pointer_tracker>
-        {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-            static constexpr void reset(input_pointer_tracker*) noexcept {}
-        };
-
-        template <>
-        struct extra_archive_data_helper<output_pointer_tracker>
-        {
-            HPX_CORE_EXPORT static extra_archive_data_id_type id() noexcept;
-            HPX_CORE_EXPORT static void reset(output_pointer_tracker* data);
-        };
-    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT void register_pointer(
         input_archive& ar, std::uint64_t pos, detail::ptr_helper_ptr helper);
 
-    HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
+    [[nodiscard]] HPX_CORE_EXPORT detail::ptr_helper& tracked_pointer(
         input_archive& ar, std::uint64_t pos);
 
-    HPX_CORE_EXPORT std::uint64_t track_pointer(
+    [[nodiscard]] HPX_CORE_EXPORT std::uint64_t track_pointer(
         output_archive& ar, void const* pos);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -189,7 +195,7 @@ namespace hpx::serialization {
                     ar << id;
                     ar << *ptr;
 #else
-                    std::string const name(access::get_name(ptr.get()));
+                    std::string const name = access::get_name(ptr.get());
                     std::uint32_t const id =
                         polymorphic_id_factory::get_id(name);
                     ar << name;
@@ -230,14 +236,14 @@ namespace hpx::serialization {
         HPX_FORCEINLINE void serialize_pointer_tracked(
             output_archive& ar, Pointer const& ptr)
         {
-            bool valid = static_cast<bool>(ptr);
+            bool const valid = static_cast<bool>(ptr);
             ar << valid;
             if (valid)
             {
-                std::uint64_t cur_pos = current_pos(ar);
-                std::uint64_t pos = track_pointer(ar, ptr.get());
+                std::uint64_t const cur_pos = current_pos(ar);
+                std::uint64_t const pos = track_pointer(ar, ptr.get());
                 ar << pos;
-                if (pos == std::uint64_t(-1))
+                if (pos == static_cast<std::uint64_t>(-1))
                 {
                     ar << cur_pos;
                     detail::pointer_output_dispatcher<Pointer>::type::call(
@@ -256,7 +262,7 @@ namespace hpx::serialization {
             {
                 std::uint64_t pos = 0;
                 ar >> pos;
-                if (pos == std::uint64_t(-1))
+                if (pos == static_cast<std::uint64_t>(-1))
                 {
                     pos = 0;
                     ar >> pos;
@@ -264,8 +270,9 @@ namespace hpx::serialization {
                         detail::pointer_input_dispatcher<Pointer>::type::call(
                             ar);
                     register_pointer(ar, pos,
-                        ptr_helper_ptr(new detail::erase_ptr_helper<Pointer>(
-                            HPX_MOVE(temp), ptr)));
+                        ptr_helper_ptr(    //-V824
+                            new detail::erase_ptr_helper<Pointer>(
+                                HPX_MOVE(temp), ptr)));
                 }
                 else
                 {
@@ -281,7 +288,7 @@ namespace hpx::serialization {
         HPX_FORCEINLINE void serialize_pointer_untracked(
             output_archive& ar, Pointer const& ptr)
         {
-            bool valid = static_cast<bool>(ptr);
+            bool const valid = static_cast<bool>(ptr);
             ar << valid;
             if (valid)
             {
@@ -300,6 +307,5 @@ namespace hpx::serialization {
                 ptr = detail::pointer_input_dispatcher<Pointer>::type::call(ar);
             }
         }
-
     }    // namespace detail
 }    // namespace hpx::serialization

@@ -490,8 +490,8 @@ namespace hpx { namespace components {
             static_cast<Component const&>(*this).get_base_gid();
 
         // The underlying heap will always give us a full set of credits, but
-        // those are valid for the first invocation of get_base_gid() only.
-        // We have to get rid of those credits and properly replenish those.
+        // those are valid for the first invocation of get_base_gid() only. We
+        // have to get rid of those credits and properly replenish those.
         naming::detail::strip_credits_from_gid(gid);
 
         // any invocation causes the credits to be replenished

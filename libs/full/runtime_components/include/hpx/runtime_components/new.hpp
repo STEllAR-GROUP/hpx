@@ -19,7 +19,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
-#include <hpx/runtime_components/default_distribution_policy.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <algorithm>
@@ -245,9 +244,11 @@ namespace hpx {
 
 #else
 
-namespace hpx { namespace components {
+namespace hpx::components {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         // create a single instance of a component
         template <typename Component>
         struct new_component
@@ -343,9 +344,9 @@ namespace hpx { namespace components {
 
                 for (std::size_t i = 0; i != count; ++i)
                 {
-                    result.push_back(hpx::id_type(
+                    result.emplace_back(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::management_type::managed));
+                        hpx::id_type::management_type::managed);
                 }
 
                 return hpx::make_ready_future(result);
@@ -386,9 +387,9 @@ namespace hpx { namespace components {
 
                 for (std::size_t i = 0; i != count; ++i)
                 {
-                    result.push_back(hpx::id_type(
+                    result.emplace_back(
                         components::server::create<component_type>(ts...),
-                        hpx::id_type::management_type::managed));
+                        hpx::id_type::management_type::managed);
                 }
 
                 return result;
@@ -513,8 +514,7 @@ namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Client, typename... Ts>
-    inline typename util::lazy_enable_if<
-        traits::is_client_or_client_array<Client>::value,
+    typename util::lazy_enable_if<traits::is_client_or_client_array_v<Client>,
         detail::new_client<Client>>::type
     new_(id_type const& locality, Ts&&... vs)
     {
@@ -530,9 +530,8 @@ namespace hpx { namespace components {
     }
 
     template <typename Client, typename DistPolicy, typename... Ts>
-    inline typename util::lazy_enable_if<
-        traits::is_client_or_client_array<Client>::value &&
-            traits::is_distribution_policy<DistPolicy>::value,
+    typename util::lazy_enable_if<traits::is_client_or_client_array_v<Client> &&
+            traits::is_distribution_policy_v<DistPolicy>,
         detail::new_client<Client>>::type
     new_(DistPolicy const& policy, Ts&&... vs)
     {
@@ -541,11 +540,11 @@ namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
     // Same as above, but just on this locality. This does not go through an
-    // action, that means that the constructor arguments can be non-copyable
-    // and non-movable.
+    // action, that means that the constructor arguments can be non-copyable and
+    // non-movable.
     template <typename Component>
-    inline typename util::lazy_enable_if<
-        traits::is_component_or_component_array<Component>::value,
+    typename util::lazy_enable_if<
+        traits::is_component_or_component_array_v<Component>,
         detail::local_new_component<Component>>::type
     local_new()
     {
@@ -553,10 +552,9 @@ namespace hpx { namespace components {
     }
 
     template <typename Component, typename T1, typename... Ts>
-    inline typename util::lazy_enable_if<
-        traits::is_component_or_component_array<Component>::value &&
-            !std::is_same<typename std::decay<T1>::type,
-                launch::sync_policy>::value,
+    typename util::lazy_enable_if<
+        traits::is_component_or_component_array_v<Component> &&
+            !std::is_same_v<std::decay_t<T1>, launch::sync_policy>,
         detail::local_new_component<Component>>::type
     local_new(T1&& t1, Ts&&... ts)
     {
@@ -565,8 +563,8 @@ namespace hpx { namespace components {
     }
 
     template <typename Component, typename... Ts>
-    inline typename util::lazy_enable_if<
-        traits::is_component_or_component_array<Component>::value,
+    typename util::lazy_enable_if<
+        traits::is_component_or_component_array_v<Component>,
         detail::local_new_component_sync<Component>>::type
     local_new(launch::sync_policy, Ts&&... ts)
     {
@@ -576,14 +574,13 @@ namespace hpx { namespace components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Client, typename... Ts>
-    inline typename util::lazy_enable_if<
-        traits::is_client_or_client_array<Client>::value,
+    typename util::lazy_enable_if<traits::is_client_or_client_array_v<Client>,
         detail::local_new_client<Client>>::type
     local_new(Ts&&... ts)
     {
         return detail::local_new_client<Client>::call(HPX_FORWARD(Ts, ts)...);
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 namespace hpx {
 

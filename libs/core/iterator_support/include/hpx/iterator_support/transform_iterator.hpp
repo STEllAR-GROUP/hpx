@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
+#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_conditional.hpp>
 
@@ -69,8 +70,8 @@ namespace hpx::util {
             Value, Category, Difference>::type
     {
     private:
-        typedef typename detail::transform_iterator_base<Iterator, Transformer,
-            Reference, Value, Category, Difference>::type base_type;
+        using base_type = typename detail::transform_iterator_base<Iterator,
+            Transformer, Reference, Value, Category, Difference>::type;
 
     public:
         transform_iterator() = default;
@@ -101,7 +102,7 @@ namespace hpx::util {
         {
         }
 
-        constexpr Transformer const& transformer() const noexcept
+        [[nodiscard]] constexpr Transformer const& transformer() const noexcept
         {
             return transformer_;
         }

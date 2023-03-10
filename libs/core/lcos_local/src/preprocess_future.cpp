@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,22 +6,22 @@
 
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/serialization/output_archive.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstdint>
 
-namespace hpx::serialization::detail {
+namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    extra_archive_data_id_type
-    extra_archive_data_helper<preprocess_futures>::id() noexcept
+    extra_data_id_type
+    extra_data_helper<serialization::detail::preprocess_futures>::id() noexcept
     {
         static std::uint8_t id = 0;
         return &id;
     }
-}    // namespace hpx::serialization::detail
+}    // namespace hpx::util
 
 namespace hpx::lcos::detail {
 

@@ -193,7 +193,8 @@ namespace hpx::program_options::detail {
             from_next + last_octet_count <= from_end && char_count <= max_limit)
         {
             from_next += last_octet_count;
-            last_octet_count = (get_octet_count(*from_next));
+            last_octet_count =
+                static_cast<std::size_t>(get_octet_count(*from_next));
             ++char_count;
         }
         return static_cast<int>(from_next - from);

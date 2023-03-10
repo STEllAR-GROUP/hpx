@@ -27,7 +27,7 @@ namespace hpx { namespace ranges {
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Pred        The type of an optional function/function object to use.
     ///
     /// \param first        Refers to the beginning of the sequence of elements
@@ -55,7 +55,7 @@ namespace hpx { namespace ranges {
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
     template <typename FwdIter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
     FwdIter adjacent_find(
         FwdIter first, Sent last, Pred&& pred = Pred(), Proj&& proj = Proj());
@@ -78,7 +78,7 @@ namespace hpx { namespace ranges {
     /// \tparam Sent        The type of the source sentinel (deduced). This
     ///                     sentinel type must be a sentinel for InIter.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_find requires \a Pred to meet the
@@ -132,7 +132,7 @@ namespace hpx { namespace ranges {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
     typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
@@ -149,7 +149,7 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Pred        The type of an optional function/function object to use.
     ///
     /// \param rng          Refers to the sequence of elements the algorithm
@@ -175,7 +175,7 @@ namespace hpx { namespace ranges {
     ///           first of the identical elements. If no such elements are
     ///           found, \a last is returned.
     template <typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
     typename hpx::traits::range_traits<Rng>::iterator_type adjacent_find(
         Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj());
@@ -194,7 +194,7 @@ namespace hpx { namespace ranges {
     ///                     The iterators extracted from this range type must
     ///                     meet the requirements of an forward iterator.
     /// \tparam Proj        The type of an optional projection function. This
-    ///                     defaults to \a util::projection_identity
+    ///                     defaults to \a hpx::identity
     /// \tparam Pred        The type of an optional function/function object to use.
     ///                     Unlike its sequential form, the parallel
     ///                     overload of \a adjacent_find requires \a Pred to meet the
@@ -246,7 +246,7 @@ namespace hpx { namespace ranges {
     ///           predicate \a pred.
     ///
     template <typename ExPolicy, typename Rng,
-        typename Proj = hpx::parallel::util::projection_identity,
+        typename Proj = hpx::identity,
         typename Pred = detail::equal_to>
     typename parallel::util::detail::algorithm_result<ExPolicy,
         typename hpx::traits::range_traits<Rng>::iterator_type>::type
@@ -263,28 +263,28 @@ namespace hpx { namespace ranges {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
+#include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct adjacent_find_t final
       : hpx::detail::tag_parallel_algorithm<adjacent_find_t>
     {
     private:
         // clang-format off
         template <typename FwdIter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Proj = hpx::identity,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
-                hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected<Proj, FwdIter>,
@@ -293,23 +293,22 @@ namespace hpx { namespace ranges {
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(hpx::ranges::adjacent_find_t,
-            FwdIter first, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
+            return hpx::parallel::detail::adjacent_find<FwdIter, FwdIter>()
+                .call(hpx::execution::seq, first, last, HPX_MOVE(pred),
+                    HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename Proj = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Proj = hpx::identity,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value &&
-                hpx::parallel::traits::is_projected<Proj, FwdIter>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter> &&
+                hpx::parallel::traits::is_projected_v<Proj, FwdIter> &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected<Proj, FwdIter>,
@@ -317,24 +316,22 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
-            FwdIter first, Sent last, Pred&& pred = Pred(),
-            Proj&& proj = Proj())
+            FwdIter first, Sent last, Pred pred = Pred(), Proj proj = Proj())
         {
-            return hpx::parallel::v1::detail::adjacent_find<FwdIter, FwdIter>()
+            return hpx::parallel::detail::adjacent_find<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                    HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Proj = hpx::identity,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
                     hpx::execution::sequenced_policy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -344,29 +341,28 @@ namespace hpx { namespace ranges {
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, Rng&& rng,
-            Pred&& pred = Pred(), Proj&& proj = Proj())
+            Pred pred = Pred(), Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_find<iterator_type,
+            return hpx::parallel::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng),
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                    HPX_MOVE(pred), HPX_MOVE(proj));
         }
 
         // clang-format off
         template <typename ExPolicy, typename Rng,
-            typename Proj = hpx::parallel::util::projection_identity,
-            typename Pred = hpx::parallel::v1::detail::equal_to,
+            typename Proj = hpx::identity,
+            typename Pred = hpx::parallel::detail::equal_to,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value &&
-                hpx::parallel::traits::is_projected_range<Proj, Rng>::value &&
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng> &&
+                hpx::parallel::traits::is_projected_range_v<Proj, Rng> &&
                 hpx::parallel::traits::is_indirect_callable<
                     ExPolicy, Pred,
                     hpx::parallel::traits::projected_range<Proj, Rng>,
@@ -374,25 +370,23 @@ namespace hpx { namespace ranges {
                 >::value
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            typename hpx::traits::range_traits<Rng>::iterator_type>
         tag_fallback_invoke(hpx::ranges::adjacent_find_t, ExPolicy&& policy,
             Rng&& rng, Pred&& pred = Pred(), Proj&& proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                (hpx::traits::is_forward_iterator<iterator_type>::value),
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::adjacent_find<iterator_type,
+            return hpx::parallel::detail::adjacent_find<iterator_type,
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
-                    std::end(rng), HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj, proj));
+                    std::end(rng), HPX_MOVE(pred), HPX_MOVE(proj));
         }
     } adjacent_find{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

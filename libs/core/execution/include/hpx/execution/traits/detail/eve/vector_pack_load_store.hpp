@@ -10,13 +10,13 @@
 
 #if defined(HPX_HAVE_DATAPAR_EVE)
 #include <eve/eve.hpp>
-#include <eve/function/store.hpp>
 #include <eve/memory/aligned_ptr.hpp>
+#include <eve/module/core.hpp>
 
 #include <memory>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { namespace traits {
+namespace hpx::parallel::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename V, typename ValueType, typename Enable>
@@ -56,6 +56,6 @@ namespace hpx { namespace parallel { namespace traits {
             return;
         }
     };
-}}}    // namespace hpx::parallel::traits
+}    // namespace hpx::parallel::traits
 
 #endif

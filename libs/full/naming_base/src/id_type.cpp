@@ -155,9 +155,9 @@ namespace hpx::traits {
         for (naming::gid_type const& r : rhs)
         {
             bool has_credits = naming::detail::has_credits(r);
-            result.push_back(hpx::id_type(r,
+            result.emplace_back(r,
                 has_credits ? hpx::id_type::management_type::managed :
-                              hpx::id_type::management_type::unmanaged));
+                              hpx::id_type::management_type::unmanaged);
         }
         return result;
     }

@@ -12,19 +12,19 @@
 namespace hpx::util::detail {
 
     template <typename Sig, bool Serializable>
-    inline void reset_function(hpx::function<Sig, Serializable>& f)
+    void reset_function(hpx::function<Sig, Serializable>& f)
     {
         f.reset();
     }
 
     template <typename Sig, bool Serializable>
-    inline void reset_function(hpx::move_only_function<Sig, Serializable>& f)
+    void reset_function(hpx::move_only_function<Sig, Serializable>& f)
     {
         f.reset();
     }
 
     template <typename Function>
-    inline void reset_function(Function& f)
+    void reset_function(Function& f)
     {
         f = Function();
     }

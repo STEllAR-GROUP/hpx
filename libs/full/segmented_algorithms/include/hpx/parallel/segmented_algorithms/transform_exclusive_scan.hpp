@@ -20,7 +20,6 @@
 #include <hpx/parallel/segmented_algorithms/detail/scan.hpp>
 #include <hpx/parallel/segmented_algorithms/exclusive_scan.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -50,7 +49,7 @@ namespace hpx { namespace segmented {
         if (first == last)
             return dest;
 
-        return hpx::parallel::v1::detail::segmented_exclusive_scan(
+        return hpx::parallel::detail::segmented_exclusive_scan(
             hpx::execution::seq, first, last, dest, HPX_MOVE(init),
             HPX_FORWARD(Op, op), std::true_type{}, HPX_FORWARD(Conv, conv));
     }
@@ -83,7 +82,7 @@ namespace hpx { namespace segmented {
 
         using is_seq = hpx::is_sequenced_execution_policy<ExPolicy>;
 
-        return hpx::parallel::v1::detail::segmented_exclusive_scan(
+        return hpx::parallel::detail::segmented_exclusive_scan(
             HPX_FORWARD(ExPolicy, policy), first, last, dest, HPX_MOVE(init),
             HPX_FORWARD(Op, op), is_seq(), HPX_FORWARD(Conv, conv));
     }

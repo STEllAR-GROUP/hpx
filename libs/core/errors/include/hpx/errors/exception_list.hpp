@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -54,7 +54,7 @@ namespace hpx {
 
         /// \cond NOINTERNAL
         // \throws nothing
-        ~exception_list() noexcept = default;
+        ~exception_list() noexcept override = default;
 
         exception_list();
         explicit exception_list(std::exception_ptr const& e);
@@ -74,7 +74,7 @@ namespace hpx {
         /// exception_list.
         ///
         /// \note Complexity: Constant time.
-        std::size_t size() const noexcept
+        [[nodiscard]] std::size_t size() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.size();
@@ -82,23 +82,23 @@ namespace hpx {
 
         /// An iterator referring to the first exception_ptr object contained
         /// within the exception_list.
-        exception_list_type::const_iterator begin() const noexcept
+        [[nodiscard]] exception_list_type::const_iterator begin() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.begin();
         }
 
         /// An iterator which is the past-the-end value for the exception_list.
-        exception_list_type::const_iterator end() const noexcept
+        [[nodiscard]] exception_list_type::const_iterator end() const noexcept
         {
             std::lock_guard<mutex_type> l(mtx_);
             return exceptions_.end();
         }
 
         /// \cond NOINTERNAL
-        std::error_code get_error() const;
+        [[nodiscard]] std::error_code get_error_code() const;
 
-        std::string get_message() const;
+        [[nodiscard]] std::string get_message() const;
         /// \endcond
     };
 }    // namespace hpx

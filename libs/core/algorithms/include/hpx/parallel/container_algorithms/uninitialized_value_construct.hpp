@@ -89,7 +89,7 @@ namespace hpx { namespace ranges {
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Sent>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_value_construct(ExPolicy&& policy, FwdIter first, Sent last);
 
     /// Constructs objects of type typename iterator_traits<ForwardIt>::value_type
@@ -243,7 +243,7 @@ namespace hpx { namespace ranges {
     ///           the last element constructed.
     ///
     template <typename ExPolicy, typename FwdIter, typename Size>
-    typename parallel::util::detail::algorithm_result<ExPolicy, FwdIter>::type
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_value_construct_n(ExPolicy&& policy, FwdIter first, Size count);
 
     // clang-format on
@@ -251,23 +251,20 @@ namespace hpx { namespace ranges {
 #else
 
 #include <hpx/config.hpp>
-#include <hpx/algorithms/traits/projected_range.hpp>
-#include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/uninitialized_value_construct.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
-#include <hpx/parallel/util/projection_identity.hpp>
 
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
-namespace hpx { namespace ranges {
+namespace hpx::ranges {
+
     inline constexpr struct uninitialized_value_construct_t final
       : hpx::detail::tag_parallel_algorithm<uninitialized_value_construct_t>
     {
@@ -275,18 +272,18 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_value_construct_t, FwdIter first,
             Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct<
+            return hpx::parallel::detail::uninitialized_value_construct<
                 FwdIter>()
                 .call(hpx::execution::seq, first, last);
         }
@@ -294,20 +291,19 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value &&
-                hpx::traits::is_sentinel_for<Sent, FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_sentinel_for_v<Sent, FwdIter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
             ExPolicy&& policy, FwdIter first, Sent last)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct<
+            return hpx::parallel::detail::uninitialized_value_construct<
                 FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last);
         }
@@ -315,7 +311,7 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_range<Rng>::value
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
         friend typename hpx::traits::range_traits<Rng>::iterator_type
@@ -325,11 +321,10 @@ namespace hpx { namespace ranges {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct<
+            return hpx::parallel::detail::uninitialized_value_construct<
                 iterator_type>()
                 .call(hpx::execution::seq, std::begin(rng), std::end(rng));
         }
@@ -337,23 +332,22 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename Rng,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_range<Rng>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_range_v<Rng>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            typename hpx::traits::range_traits<Rng>::iterator_type>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy,
+            typename hpx::traits::range_traits<Rng>::iterator_type>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_t,
             ExPolicy&& policy, Rng&& rng)
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
 
-            static_assert(
-                hpx::traits::is_forward_iterator<iterator_type>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<iterator_type>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct<
+            return hpx::parallel::detail::uninitialized_value_construct<
                 iterator_type>()
                 .call(HPX_FORWARD(ExPolicy, policy), std::begin(rng),
                     std::end(rng));
@@ -367,17 +361,18 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator<FwdIter>::value
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         friend FwdIter tag_fallback_invoke(
             hpx::ranges::uninitialized_value_construct_n_t, FwdIter first,
             Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct_n<
+            return hpx::parallel::detail::uninitialized_value_construct_n<
                 FwdIter>()
                 .call(hpx::execution::seq, first, count);
         }
@@ -385,23 +380,23 @@ namespace hpx { namespace ranges {
         // clang-format off
         template <typename ExPolicy, typename FwdIter, typename Size,
             HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy<ExPolicy>::value &&
-                hpx::traits::is_forward_iterator<FwdIter>::value
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
+        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
         tag_fallback_invoke(hpx::ranges::uninitialized_value_construct_n_t,
             ExPolicy&& policy, FwdIter first, Size count)
         {
-            static_assert(hpx::traits::is_forward_iterator<FwdIter>::value,
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::v1::detail::uninitialized_value_construct_n<
+            return hpx::parallel::detail::uninitialized_value_construct_n<
                 FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, count);
         }
     } uninitialized_value_construct_n{};
-}}    // namespace hpx::ranges
+}    // namespace hpx::ranges
 
 #endif

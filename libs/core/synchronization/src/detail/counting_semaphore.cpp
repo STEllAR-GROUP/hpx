@@ -32,7 +32,7 @@ namespace hpx::lcos::local::detail {
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
-        while (value_ < count)
+        while (value_ < count)    //-V776
         {
             cond_.wait(l, "counting_semaphore::wait");
         }

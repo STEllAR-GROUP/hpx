@@ -277,7 +277,7 @@ namespace hpx::threads::policies {
                 debug::dec<4>(std::get<0>(rollover_counters_.data_)),
                 debug::dec<4>(std::get<1>(rollover_counters_.data_)), "workers",
                 debug::dec<4>(workers));
-            if (--std::get<1>(rollover_counters_.data_) == 0)
+            if (--std::get<1>(rollover_counters_.data_) == 0)    //-V516
             {
                 std::get<1>(rollover_counters_.data_) = round_robin_rollover;
                 std::get<0>(rollover_counters_.data_) = fast_mod(
@@ -489,7 +489,7 @@ namespace hpx::threads::policies {
             // ASAN gets confused by reusing threads/stacks
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
             // Check for an unused thread object.
-            if (!heap->empty())
+            if (heap && !heap->empty())    //-V522
             {
                 // Take ownership of the thread object and rebind it.
                 tid = heap->front();

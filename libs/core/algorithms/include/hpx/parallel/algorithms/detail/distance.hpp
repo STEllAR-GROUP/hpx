@@ -13,11 +13,12 @@
 #include <iterator>
 #include <type_traits>
 
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
+
     // provide implementation of std::distance supporting iterators/sentinels
     template <typename InIterB, typename InIterE>
-    constexpr inline typename std::iterator_traits<InIterB>::difference_type
-    distance(InIterB first, InIterE last)
+    constexpr typename std::iterator_traits<InIterB>::difference_type distance(
+        InIterB first, InIterE last)
     {
         // we add this since passing in random access iterators
         // as begin and end might not pass the sized sentinel check
@@ -41,4 +42,4 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             return offset;
         }
     }
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

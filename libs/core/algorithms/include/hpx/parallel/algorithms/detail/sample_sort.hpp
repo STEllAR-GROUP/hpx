@@ -11,7 +11,6 @@
 #include <hpx/iterator_support/counting_iterator.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/async_combinators.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/parallel/algorithms/detail/is_sorted.hpp>
 #include <hpx/parallel/algorithms/detail/spin_sort.hpp>
 #include <hpx/parallel/util/merge_four.hpp>
@@ -25,17 +24,14 @@
 #include <cstdlib>
 #include <functional>
 #include <iterator>
-#include <memory>
-#include <stdexcept>
-#include <thread>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
+namespace hpx::parallel::detail {
 
-    static constexpr std::uint32_t sample_sort_limit_per_task = (1 << 16);
+    static constexpr std::uint32_t sample_sort_limit_per_task = 1 << 16;
 
     /// \struct sample_sort
     /// \brief This a structure for to implement a sample sort, exception
@@ -72,11 +68,10 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         /// \brief constructor of the typename
         ///
-        /// \param [in] range_initial : range of objects to sort
-        /// \param [in] comp : object for to Compare two elements
+        /// \param [in] cmp : object for to Compare two elements
         /// \param [in] nthreads : define the number of threads to use
         ///              in the process. By default is the number of thread HW
-        sample_sort_helper(Compare cmp, std::uint32_t num_threads);
+        sample_sort_helper(Compare cmp, std::uint32_t nthreads);
 
         /// \brief destructor of the typename. The utility is to destroy the
         ///        temporary buffer used in the sorting process
@@ -94,7 +89,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         }
 
         /// \brief this is a function to assign each thread the final merge
-        inline void execute()
+        void execute()
         {
             std::uint32_t job = 0;
             while ((job = njob++) < nintervals)
@@ -107,12 +102,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         /// \brief Implement the merge of the initially sparse ranges
         template <typename Exec>
-        inline void first_merge(Exec& exec)
+        void first_merge(Exec& exec)
         {
             njob = 0;
 
             auto shape = hpx::util::iterator_range(
-                hpx::util::counting_iterator(std::uint32_t(0)),
+                hpx::util::counting_iterator(static_cast<std::uint32_t>(0)),
                 hpx::util::counting_iterator(nthreads));
 
             hpx::wait_all(execution::bulk_async_execute(
@@ -131,7 +126,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
             njob = 0;
 
             auto shape = hpx::util::iterator_range(
-                hpx::util::counting_iterator(std::uint32_t(0)),
+                hpx::util::counting_iterator(static_cast<std::uint32_t>(0)),
                 hpx::util::counting_iterator(nthreads));
 
             hpx::wait_all(execution::bulk_async_execute(
@@ -141,14 +136,14 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
     /// \brief constructor of the typename
     ///
-    /// \param [in] range_initial : range of objects to sort
-    /// \param [in] comp : object for to Compare two elements
+    /// \param [in] cmp : object for to Compare two elements
     /// \param [in] nthreads : nthreads object for to define the number of threads
     ///            to use in the process. By default is the number of thread HW
     template <typename Iter, typename Sent, typename Compare>
     sample_sort_helper<Iter, Sent, Compare>::sample_sort_helper(
-        Compare cmp, std::uint32_t num_threads)
-      : nthreads(num_threads)
+        Compare cmp, std::uint32_t nthreads)
+      : nthreads(nthreads)
+      , nintervals(0)
       , construct(false)
       , owner(false)
       , comp(cmp)
@@ -169,12 +164,12 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t nelem = static_cast<std::size_t>(last - first);
 
         // Adjust when there are many threads and only a few elements
-        while (nelem > chunk_size && (nthreads * nthreads) > (nelem >> 3))
+        while (nelem > chunk_size && nthreads * nthreads > nelem >> 3)
         {
             nthreads /= 2;
         }
 
-        nintervals = (nthreads << 3);
+        nintervals = nthreads << 3;
 
         if (nthreads < 2 || nelem <= chunk_size)
         {
@@ -262,7 +257,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
     {
         std::vector<range_it> vmem_thread;
         std::vector<range_buf> vbuf_thread;
-        std::size_t nelem = global_range.size();
+        std::size_t const nelem = global_range.size();
 
         std::size_t chunk_size = nelem / nthreads;
         Iter it_first = global_range.begin();
@@ -280,7 +275,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         // Sorting of the ranges
         auto shape = hpx::util::iterator_range(
-            hpx::util::counting_iterator(std::uint32_t(0)),
+            hpx::util::counting_iterator(static_cast<std::uint32_t>(0)),
             hpx::util::counting_iterator(nthreads));
 
         hpx::wait_all(execution::bulk_async_execute(
@@ -297,7 +292,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         for (std::uint32_t i = 0; i < nthreads; ++i)
         {
-            std::size_t distance = vmem_thread[i].size() / nintervals;
+            std::size_t const distance = vmem_thread[i].size() / nintervals;
             for (std::size_t j = 1, pos = distance; j < nintervals;
                  ++j, pos += distance)
             {
@@ -324,7 +319,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         for (std::uint32_t i = 0; i < nthreads; ++i)
         {
             Iter itaux = vmem_thread[i].begin();
-            for (std::uint32_t k = 0; k < (nintervals - 1); ++k)
+            for (std::uint32_t k = 0; k < nintervals - 1; ++k)
             {
                 Iter it2 = std::upper_bound(
                     itaux, vmem_thread[i].end(), *vmilestone[k], comp);
@@ -356,7 +351,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
             for (std::uint32_t i = 0; i < nthreads; ++i)
             {
-                size_t nelem_range = vv_range_first[i][k].size();
+                size_t const nelem_range = vv_range_first[i][k].size();
                 if (nelem_range != 0)
                 {
                     vv_range_it[k].push_back(vv_range_first[i][k]);
@@ -380,7 +375,7 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         std::size_t chunk_size)
     {
         using sample_sort_helper_t =
-            sample_sort_helper<Iter, Sent, typename std::decay<Compare>::type>;
+            sample_sort_helper<Iter, Sent, std::decay_t<Compare>>;
 
         sample_sort_helper_t sorter(HPX_FORWARD(Compare, comp), num_threads);
         sorter(HPX_FORWARD(Exec, exec), first, last, paux, naux, chunk_size);
@@ -393,8 +388,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         using value_type = typename std::iterator_traits<Iter>::value_type;
 
         return sample_sort(HPX_FORWARD(Exec, exec), first, last,
-            HPX_FORWARD(Compare, comp), num_threads, (value_type*) nullptr,
-            std::size_t(0), std::size_t(sample_sort_limit_per_task));
+            HPX_FORWARD(Compare, comp), num_threads,
+            static_cast<value_type*>(nullptr), static_cast<std::size_t>(0),
+            static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
     template <typename Exec, typename Iter, typename Sent, typename Compare>
@@ -422,8 +418,9 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
         using compare = std::less<value_type>;
 
         return sample_sort(HPX_FORWARD(Exec, exec), first, last, compare{},
-            num_threads, (value_type*) nullptr, std::size_t(0),
-            std::size_t(sample_sort_limit_per_task));
+            num_threads, static_cast<value_type*>(nullptr),
+            static_cast<std::size_t>(0),
+            static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
     template <typename Exec, typename Iter, typename Sent>
@@ -434,8 +431,8 @@ namespace hpx { namespace parallel { inline namespace v1 { namespace detail {
 
         return sample_sort(HPX_FORWARD(Exec, exec), first, last, compare{},
             (std::uint32_t) hpx::threads::hardware_concurrency(),
-            (value_type*) nullptr, std::size_t(0),
-            std::size_t(sample_sort_limit_per_task));
+            static_cast<value_type*>(nullptr), static_cast<std::size_t>(0),
+            static_cast<std::size_t>(sample_sort_limit_per_task));
     }
 
-}}}}    // namespace hpx::parallel::v1::detail
+}    // namespace hpx::parallel::detail

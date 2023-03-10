@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Thomas Heller
-//  Copyright (c) 2013-2022 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2019 Agustin Berge
 //  Copyright (c) 2017 Google
 //
@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/functional/detail/basic_function.hpp>
 #include <hpx/functional/detail/vtable/function_vtable.hpp>
 #include <hpx/functional/detail/vtable/vtable.hpp>

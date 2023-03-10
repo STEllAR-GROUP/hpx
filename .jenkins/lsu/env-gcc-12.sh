@@ -24,7 +24,9 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI_BACKEND=ibv"
-configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=STD_EXPERIMENTAL_SIMD"
+configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
+configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
+configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

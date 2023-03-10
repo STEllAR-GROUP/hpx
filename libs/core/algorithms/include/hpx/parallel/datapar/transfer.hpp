@@ -30,9 +30,9 @@ namespace hpx { namespace parallel { namespace util {
         {
             template <typename InIter, typename OutIter>
             HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-                iterators_datapar_compatible<InIter, OutIter>::value &&
-                    iterator_datapar_compatible<InIter>::value &&
-                    iterator_datapar_compatible<OutIter>::value,
+                iterators_datapar_compatible_v<InIter, OutIter> &&
+                    iterator_datapar_compatible_v<InIter> &&
+                    iterator_datapar_compatible_v<OutIter>,
                 in_out_result<InIter, OutIter>>::type
             call(InIter first, std::size_t count, OutIter dest)
             {
@@ -46,9 +46,9 @@ namespace hpx { namespace parallel { namespace util {
 
             template <typename InIter, typename OutIter>
             HPX_HOST_DEVICE HPX_FORCEINLINE static typename std::enable_if<
-                !iterators_datapar_compatible<InIter, OutIter>::value ||
-                    !iterator_datapar_compatible<InIter>::value ||
-                    !iterator_datapar_compatible<OutIter>::value,
+                !iterators_datapar_compatible_v<InIter, OutIter> ||
+                    !iterator_datapar_compatible_v<InIter> ||
+                    !iterator_datapar_compatible_v<OutIter>,
                 in_out_result<InIter, OutIter>>::type
             call(InIter first, std::size_t count, OutIter dest)
             {
@@ -59,11 +59,11 @@ namespace hpx { namespace parallel { namespace util {
     }    // namespace detail
 
     template <typename ExPolicy, typename InIter, typename OutIter>
-    HPX_HOST_DEVICE HPX_FORCEINLINE typename std::enable_if<
-        hpx::is_vectorpack_execution_policy<ExPolicy>::value,
-        in_out_result<InIter, OutIter>>::type
-    tag_invoke(hpx::parallel::util::copy_n_t<ExPolicy>, InIter first,
-        std::size_t count, OutIter dest)
+    HPX_HOST_DEVICE HPX_FORCEINLINE
+        typename std::enable_if<hpx::is_vectorpack_execution_policy_v<ExPolicy>,
+            in_out_result<InIter, OutIter>>::type
+        tag_invoke(hpx::parallel::util::copy_n_t<ExPolicy>, InIter first,
+            std::size_t count, OutIter dest)
     {
         return detail::datapar_copy_n<InIter>::call(first, count, dest);
     }

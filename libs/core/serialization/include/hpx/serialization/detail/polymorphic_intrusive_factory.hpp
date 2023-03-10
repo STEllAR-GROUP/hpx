@@ -40,10 +40,11 @@ namespace hpx::serialization::detail {
         HPX_CORE_EXPORT void register_class(
             std::string const& name, ctor_type fun);
 
-        HPX_CORE_EXPORT void* create(std::string const& name) const;
+        [[nodiscard]] HPX_CORE_EXPORT void* create(
+            std::string const& name) const;
 
         template <typename T>
-        T* create(std::string const& name) const
+        [[nodiscard]] T* create(std::string const& name) const
         {
             return static_cast<T*>(create(name));
         }
@@ -61,7 +62,7 @@ namespace hpx::serialization::detail {
                 T::hpx_serialization_get_name_impl(), &factory_function);
         }
 
-        static void* factory_function()
+        [[nodiscard]] static void* factory_function()
         {
             return new T;
         }

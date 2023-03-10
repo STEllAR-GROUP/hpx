@@ -7,7 +7,7 @@
 //                 See accompanying file LICENSE.txt or copy at
 //                     http://www.boost.org/LICENSE_1_0.txt
 //==============================================================================
-// modified to fit HPX macro nameing scheme
+// modified to fit HPX macro naming scheme
 
 // hpxinspect:noinclude:HPX_PP_STRIP_PARENS
 

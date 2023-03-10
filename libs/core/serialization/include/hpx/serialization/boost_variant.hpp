@@ -10,6 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 
@@ -77,7 +78,7 @@ namespace hpx::serialization {
     template <typename... T>
     void save(output_archive& ar, boost::variant<T...> const& v, unsigned)
     {
-        int which = v.which();
+        int const which = v.which();
         ar << which;
         detail::boost_variant_save_visitor visitor(ar);
         v.apply_visitor(visitor);

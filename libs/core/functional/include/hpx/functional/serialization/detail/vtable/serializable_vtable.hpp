@@ -42,8 +42,8 @@ namespace hpx::util::detail {
 
         template <typename T>
         explicit constexpr serializable_vtable(construct_vtable<T>) noexcept
-          : save_object(&serializable_vtable::template _save_object<T>)
-          , load_object(&serializable_vtable::template _load_object<T>)
+          : save_object(&serializable_vtable::_save_object<T>)
+          , load_object(&serializable_vtable::_load_object<T>)
         {
         }
     };

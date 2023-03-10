@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2021 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,8 +12,8 @@
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/naming/credit_handling.hpp>
-#include <hpx/serialization/detail/extra_archive_data.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/type_support/extra_data.hpp>
 
 #include <cstddef>
 #include <map>
@@ -124,13 +124,19 @@ namespace hpx::serialization::detail {
         mutable mutex_type mtx_;
         split_gids_map split_gids_;
     };
+}    // namespace hpx::serialization::detail
+
+namespace hpx::util {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
     template <>
-    struct extra_archive_data_helper<preprocess_gid_types>
+    struct extra_data_helper<serialization::detail::preprocess_gid_types>
     {
-        HPX_EXPORT static extra_archive_data_id_type id() noexcept;
-        static constexpr void reset(preprocess_gid_types*) noexcept {}
+        HPX_EXPORT static extra_data_id_type id() noexcept;
+        static constexpr void reset(
+            serialization::detail::preprocess_gid_types*) noexcept
+        {
+        }
     };
-}    // namespace hpx::serialization::detail
+}    // namespace hpx::util

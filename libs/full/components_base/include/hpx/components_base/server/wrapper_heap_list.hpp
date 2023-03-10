@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/components_base/generate_unique_ids.hpp>
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -15,7 +14,7 @@
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // list of managed_component heaps
@@ -33,7 +32,7 @@ namespace hpx { namespace components { namespace detail {
             // default initial number of elements
             heap_capacity = 0xFFF,
             // Alignment of one element
-            heap_element_alignment = std::alignment_of_v<value_type>,
+            heap_element_alignment = std::alignment_of_v<value_type>,    //-V103
             // size of one element in the heap
             heap_element_size = sizeof(storage_type)
         };
@@ -62,22 +61,13 @@ namespace hpx { namespace components { namespace detail {
                 if ((*it)->did_alloc(p))
                 {
                     unlock_guard ul(guard);
-                    return (*it)->get_gid(id_range_, p, type_);
+                    return (*it)->get_gid(p, type_);
                 }
             }
             return naming::invalid_gid;
         }
 
-        void set_range(
-            naming::gid_type const& lower, naming::gid_type const& upper)
-        {
-            std::scoped_lock guard(this->mtx_);
-            id_range_.set_range(lower, upper);
-        }
-
     private:
-        util::unique_id_ranges id_range_;
         components::component_type type_;
     };
-
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail
