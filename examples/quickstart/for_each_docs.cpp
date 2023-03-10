@@ -12,6 +12,7 @@
 #include <hpx/execution.hpp>
 #include <hpx/local/init.hpp>
 #include <iostream>
+#include <vector>
 
 int hpx_main()
 {

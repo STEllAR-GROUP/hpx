@@ -729,15 +729,6 @@ C++ Extensions for Parallelism), |cpp17_n4755|_ (Task Blocks), and
 Using parallel algorithms
 -------------------------
 
-.. |sequenced_execution_policy| replace:: :cpp:class:`hpx::execution::sequenced_policy`
-.. |sequenced_task_execution_policy| replace:: :cpp:class:`hpx::execution::sequenced_task_policy`
-.. |parallel_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_policy`
-.. |parallel_unsequenced_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_unsequenced_policy`
-.. |parallel_task_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_task_policy`
-.. |execution_policy| replace:: :cpp:class:`hpx::parallel::execution_policy`
-.. |exception_list| replace:: :cpp:class:`hpx::exception_list`
-.. |for_each| replace:: :cpp:class:`hpx::for_each`
-
 A parallel algorithm is a function template declared in the namespace
 ``hpx::parallel``.
 
@@ -749,13 +740,13 @@ manner in which the execution of these algorithms may be parallelized and the
 manner in which they apply user-provided function objects.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type |sequenced_execution_policy| or
-|sequenced_task_execution_policy| execute in sequential order. For
-|sequenced_execution_policy| the execution happens in the calling thread.
+execution policy object of type :cpp:class:`hpx::execution::sequenced_policy` or
+:cpp:class:`hpx::execution::sequenced_task_policy` execute in sequential order. For
+:cpp:class:`hpx::execution::sequenced_policy` the execution happens in the calling thread.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type |parallel_execution_policy| or
-|parallel_task_execution_policy| are permitted to execute in an unordered
+execution policy object of type :cpp:class:`hpx::execution::parallel_policy` or
+:cpp:class:`hpx::execution::parallel_task_policy` are permitted to execute in an unordered
 fashion in unspecified threads, and are indeterminately sequenced within each
 thread.
 
@@ -763,6 +754,23 @@ thread.
 
    It is the caller's responsibility to ensure correctness, such as making sure that the
    invocation does not introduce data races or deadlocks.
+
+The example below demonstrates how to perform a sequential and parallel :cpp:func:`hpx::for_each` \
+loop on a vector of integers.
+
+.. literalinclude:: ../../examples/quickstart/for_each_docs.cpp
+   :language: c++
+   :start-after: //[for_each_docs
+   :end-before: //]
+
+The above code uses ``hpx::for_each`` to print the elements of the vector ``v{1, 2, 3, 4, 5}``.
+At first, ``hpx::for_each()`` is called without an execution policy, which means that it applies
+the lambda function ``print`` to each element in the vector sequentially. Hence, the elements are
+printed in order.
+
+Next, ``hpx::for_each()`` is called with the ``hpx::execution::par`` execution policy,
+which applies the lambda function ``print`` to each element in the vector in parallel. Therefore,
+the output order of the elements in the vector is not deterministic and may vary from run to run.
 
 Parallel exceptions
 -------------------
@@ -777,18 +785,18 @@ program is determined by the type of execution policy used to invoke the
 algorithm:
 
 * If the execution policy object is of type
-  |parallel_unsequenced_execution_policy|, :cpp:func:`hpx::terminate` shall
+  :cpp:class:`hpx::execution::parallel_unsequenced_policy`, :cpp:func:`hpx::terminate` shall
   be called.
-* If the execution policy object is of type |sequenced_execution_policy|,
-  |sequenced_task_execution_policy|, |parallel_execution_policy|, or
-  |parallel_task_execution_policy|, the execution of the algorithm terminates
-  with an |exception_list| exception. All uncaught exceptions thrown during the
+* If the execution policy object is of type :cpp:class:`hpx::execution::sequenced_policy`,
+  :cpp:class:`hpx::execution::sequenced_task_policy`, :cpp:class:`hpx::execution::parallel_policy`, or
+  :cpp:class:`hpx::execution::parallel_task_policy`, the execution of the algorithm terminates
+  with an :cpp:class:`hpx::exception_list` exception. All uncaught exceptions thrown during the
   application of user-provided function objects shall be contained in the
-  |exception_list|.
+  :cpp:class:`hpx::exception_list`.
 
 For example, the number of invocations of the user-provided function object in
-for_each is unspecified. When |for_each| is executed sequentially, only one
-exception will be contained in the |exception_list| object.
+for_each is unspecified. When :cpp:class:`hpx::for_each` is executed sequentially, only one
+exception will be contained in the :cpp:class:`hpx::exception_list` object.
 
 These guarantees imply that, unless the algorithm has failed to allocate memory
 and terminated with ``std::bad_alloc``, all exceptions thrown during the
@@ -799,7 +807,7 @@ capturing a user exception.
 The algorithm may terminate with the ``std::bad_alloc`` exception even if one or
 more user-provided function objects have terminated with an exception. For
 example, this can happen when an algorithm fails to allocate memory while
-creating or adding elements to the |exception_list| object.
+creating or adding elements to the :cpp:class:`hpx::exception_list` object.
 
 Parallel algorithms
 -------------------
@@ -1008,6 +1016,8 @@ Parallel algorithms
    * * :cpp:func:`hpx::make_heap`
      * Constructs a max heap in the range [first, last).
      * :cppreference-algorithm:`make_heap`
+
+|
 
 .. list-table:: Minimum/maximum operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
