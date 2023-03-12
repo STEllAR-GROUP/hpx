@@ -7,6 +7,7 @@
 // hpxinspect:noascii
 
 #include <algorithm>
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <string>
@@ -23,7 +24,6 @@
 
 #include <CL/sycl.hpp>
 
-// TODO Add triad
 constexpr size_t vectorsize = 200000000;
 constexpr size_t num_bytes = vectorsize * sizeof(float);
 

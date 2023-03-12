@@ -25,6 +25,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
 
+#include <exception>
 #include <memory>
 #include <string>
 #include <type_traits>
