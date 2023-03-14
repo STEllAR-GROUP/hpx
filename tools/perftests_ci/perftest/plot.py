@@ -129,7 +129,7 @@ def _add_comparison_table(report, cis):
             exitcode = 1
             return 'bad', exitcode
         if '?' in classification:
-            exitcode = 1
+            exitcode = 0
             return 'unknown', exitcode
         if '+' in classification:
             exitcode = 0

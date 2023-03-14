@@ -67,7 +67,7 @@ ${perftests_dir}/driver.py -v -l $logfile perftest plot compare --references \
     ${references_files[@]} --results ${result_files[@]} \
     -o ${build_dir}/reports/reference-comparison ||
     {
-        echo 'Plotting failed: performance drop or unknown'
+        echo 'Plotting failed: performance drop'
         plot_errors=1
         exit 1
     }
