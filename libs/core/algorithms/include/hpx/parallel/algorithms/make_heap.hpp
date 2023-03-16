@@ -293,6 +293,29 @@ namespace hpx::parallel {
             }
         }
 
+        template <typename RndIter, typename Comp, typename Proj>
+        constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
+            typename std::iterator_traits<RndIter>::difference_type len,
+            RndIter start, std::size_t count, /*is_unsequenced_policy*/ std::false_type)
+        {
+            for (std::size_t i = 0; i != count; ++i)
+            {
+                sift_down(first, comp, proj, len, start - i);
+            }
+        }
+
+        template <typename RndIter, typename Comp, typename Proj>
+        constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
+            typename std::iterator_traits<RndIter>::difference_type len,
+            RndIter start, std::size_t count, /*is_unsequenced_policy*/ std::true_type)
+        {
+            HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+            for (std::size_t i = 0; i != count; ++i)
+            {
+                sift_down(first, comp, proj, len, start - i);
+            }
+        }
+
         template <typename Iter, typename Sent, typename Comp, typename Proj>
         constexpr Iter sequential_make_heap(
             Iter first, Sent last, Comp&& comp, Proj&& proj)
@@ -303,6 +326,45 @@ namespace hpx::parallel {
             difference_type n = last - first;
             if (n > 1)
             {
+                for (difference_type start = (n - 2) / 2; start >= 0; --start)
+                {
+                    sift_down(first, comp, proj, n, first + start);
+                }
+                return first + n;
+            }
+            return first;
+        }
+
+        template <typename Iter, typename Sent, typename Comp, typename Proj>
+        constexpr Iter sequential_make_heap(
+            Iter first, Sent last, Comp&& comp, Proj&& proj, /*is_unsequenced_policy*/std::false_type)
+        {
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+
+            difference_type n = last - first;
+            if (n > 1)
+            {
+                for (difference_type start = (n - 2) / 2; start >= 0; --start)
+                {
+                    sift_down(first, comp, proj, n, first + start);
+                }
+                return first + n;
+            }
+            return first;
+        }
+
+        template <typename Iter, typename Sent, typename Comp, typename Proj>
+        constexpr Iter sequential_make_heap(
+            Iter first, Sent last, Comp&& comp, Proj&& proj, /*is_unsequenced_policy*/ std::true_type)
+        {
+            using difference_type =
+                typename std::iterator_traits<Iter>::difference_type;
+
+            difference_type n = last - first;
+            if (n > 1)
+            {
+                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                 for (difference_type start = (n - 2) / 2; start >= 0; --start)
                 {
                     sift_down(first, comp, proj, n, first + start);
@@ -324,10 +386,11 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename RndIter, typename Sent,
                 typename Comp, typename Proj>
             static constexpr RndIter sequential(
-                ExPolicy, RndIter first, Sent last, Comp&& comp, Proj&& proj)
+                ExPolicy&& policy, RndIter first, Sent last, Comp&& comp, Proj&& proj)
             {
+                using is_unseq = hpx::is_unsequenced_execution_policy<ExPolicy>;
                 return sequential_make_heap(first, last,
-                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj), is_unseq());
             }
 
             template <typename ExPolicy, typename RndIter, typename Sent,
@@ -360,10 +423,12 @@ namespace hpx::parallel {
 
                 using tuple_type = hpx::tuple<RndIter, std::size_t>;
 
+                using is_unseq = hpx::is_unsequenced_execution_policy<ExPolicy>;
+
                 auto op = [=](tuple_type const& t) {
                     sift_down_range(first, comp, proj,
                         static_cast<std::size_t>(n), hpx::get<0>(t),
-                        hpx::get<1>(t));
+                        hpx::get<1>(t), is_unseq());
                 };
 
                 std::size_t const cores =
