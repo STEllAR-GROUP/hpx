@@ -444,7 +444,7 @@ hpx_option(
 )
 hpx_option(
   HPX_WITH_PARALLEL_LINK_JOBS STRING
-  "Number of Parallel link jobs while building hpx (only for Ninja as generator) (default Any)" "2"
+  "Number of Parallel link jobs while building hpx (only for Ninja as generator) (default 2)" "2"
   CATEGORY "Build Targets"
 )
 
