@@ -50,8 +50,10 @@ namespace hpx::threads::policies {
       , background_thread_count_(0)
       , polling_function_mpi_(&null_polling_function)
       , polling_function_cuda_(&null_polling_function)
+      , polling_function_sycl_(&null_polling_function)
       , polling_work_count_function_mpi_(&null_polling_work_count_function)
       , polling_work_count_function_cuda_(&null_polling_work_count_function)
+      , polling_work_count_function_sycl_(&null_polling_work_count_function)
     {
         scheduler_base::set_scheduler_mode(mode);
 
@@ -464,6 +466,23 @@ namespace hpx::threads::policies {
             &null_polling_work_count_function, std::memory_order_relaxed);
     }
 
+    void scheduler_base::set_sycl_polling_functions(
+        polling_function_ptr sycl_func,
+        polling_work_count_function_ptr sycl_work_count_func)
+    {
+        polling_function_sycl_.store(sycl_func, std::memory_order_relaxed);
+        polling_work_count_function_sycl_.store(
+            sycl_work_count_func, std::memory_order_relaxed);
+    }
+
+    void scheduler_base::clear_sycl_polling_function()
+    {
+        polling_function_sycl_.store(
+            &null_polling_function, std::memory_order_relaxed);
+        polling_work_count_function_sycl_.store(
+            &null_polling_work_count_function, std::memory_order_relaxed);
+    }
+
     detail::polling_status scheduler_base::custom_polling_function() const
     {
         detail::polling_status status = detail::polling_status::idle;
@@ -476,6 +495,13 @@ namespace hpx::threads::policies {
 #endif
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
         if ((*polling_function_cuda_.load(std::memory_order_relaxed))() ==
+            detail::polling_status::busy)
+        {
+            status = detail::polling_status::busy;
+        }
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+        if ((*polling_function_sycl_.load(std::memory_order_relaxed))() ==
             detail::polling_status::busy)
         {
             status = detail::polling_status::busy;
@@ -494,6 +520,10 @@ namespace hpx::threads::policies {
 #if defined(HPX_HAVE_MODULE_ASYNC_CUDA)
         work_count +=
             polling_work_count_function_cuda_.load(std::memory_order_relaxed)();
+#endif
+#if defined(HPX_HAVE_MODULE_ASYNC_SYCL)
+        work_count +=
+            polling_work_count_function_sycl_.load(std::memory_order_relaxed)();
 #endif
         return work_count;
     }
