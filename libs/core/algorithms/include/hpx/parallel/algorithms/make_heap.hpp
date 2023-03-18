@@ -386,7 +386,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename RndIter, typename Sent,
                 typename Comp, typename Proj>
             static constexpr RndIter sequential(
-                ExPolicy&& policy, RndIter first, Sent last, Comp&& comp, Proj&& proj)
+                ExPolicy&&, RndIter first, Sent last, Comp&& comp, Proj&& proj)
             {
                 using is_unseq = hpx::is_unsequenced_execution_policy<ExPolicy>;
                 return sequential_make_heap(first, last,
