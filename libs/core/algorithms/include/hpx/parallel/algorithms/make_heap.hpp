@@ -296,7 +296,8 @@ namespace hpx::parallel {
         template <typename RndIter, typename Comp, typename Proj>
         constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
-            RndIter start, std::size_t count, /*is_unsequenced_policy*/ std::false_type)
+            RndIter start, std::size_t count,
+            /*is_unsequenced_policy*/ std::false_type)
         {
             for (std::size_t i = 0; i != count; ++i)
             {
@@ -307,13 +308,16 @@ namespace hpx::parallel {
         template <typename RndIter, typename Comp, typename Proj>
         constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
-            RndIter start, std::size_t count, /*is_unsequenced_policy*/ std::true_type)
+            RndIter start, std::size_t count,
+            /*is_unsequenced_policy*/ std::true_type)
         {
+            // clang-format off
             HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
             for (std::size_t i = 0; i != count; ++i)
             {
                 sift_down(first, comp, proj, len, start - i);
             }
+            // clang-format on
         }
 
         template <typename Iter, typename Sent, typename Comp, typename Proj>
@@ -336,8 +340,8 @@ namespace hpx::parallel {
         }
 
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        constexpr Iter sequential_make_heap(
-            Iter first, Sent last, Comp&& comp, Proj&& proj, /*is_unsequenced_policy*/std::false_type)
+        constexpr Iter sequential_make_heap(Iter first, Sent last, Comp&& comp,
+            Proj&& proj, /*is_unsequenced_policy*/ std::false_type)
         {
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
@@ -355,8 +359,8 @@ namespace hpx::parallel {
         }
 
         template <typename Iter, typename Sent, typename Comp, typename Proj>
-        constexpr Iter sequential_make_heap(
-            Iter first, Sent last, Comp&& comp, Proj&& proj, /*is_unsequenced_policy*/ std::true_type)
+        constexpr Iter sequential_make_heap(Iter first, Sent last, Comp&& comp,
+            Proj&& proj, /*is_unsequenced_policy*/ std::true_type)
         {
             using difference_type =
                 typename std::iterator_traits<Iter>::difference_type;
@@ -364,11 +368,13 @@ namespace hpx::parallel {
             difference_type n = last - first;
             if (n > 1)
             {
+                // clang-format off
                 HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                 for (difference_type start = (n - 2) / 2; start >= 0; --start)
                 {
                     sift_down(first, comp, proj, n, first + start);
                 }
+                // clang-format on
                 return first + n;
             }
             return first;
@@ -390,7 +396,8 @@ namespace hpx::parallel {
             {
                 using is_unseq = hpx::is_unsequenced_execution_policy<ExPolicy>;
                 return sequential_make_heap(first, last,
-                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj), is_unseq());
+                    HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj),
+                    is_unseq());
             }
 
             template <typename ExPolicy, typename RndIter, typename Sent,
