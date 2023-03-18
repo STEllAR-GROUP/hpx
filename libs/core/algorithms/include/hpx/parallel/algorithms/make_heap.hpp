@@ -285,17 +285,6 @@ namespace hpx::parallel {
         template <typename RndIter, typename Comp, typename Proj>
         constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
             typename std::iterator_traits<RndIter>::difference_type len,
-            RndIter start, std::size_t count)
-        {
-            for (std::size_t i = 0; i != count; ++i)
-            {
-                sift_down(first, comp, proj, len, start - i);
-            }
-        }
-
-        template <typename RndIter, typename Comp, typename Proj>
-        constexpr void sift_down_range(RndIter first, Comp&& comp, Proj&& proj,
-            typename std::iterator_traits<RndIter>::difference_type len,
             RndIter start, std::size_t count,
             /*is_unsequenced_policy*/ std::false_type)
         {
@@ -318,25 +307,6 @@ namespace hpx::parallel {
                 sift_down(first, comp, proj, len, start - i);
             }
             // clang-format on
-        }
-
-        template <typename Iter, typename Sent, typename Comp, typename Proj>
-        constexpr Iter sequential_make_heap(
-            Iter first, Sent last, Comp&& comp, Proj&& proj)
-        {
-            using difference_type =
-                typename std::iterator_traits<Iter>::difference_type;
-
-            difference_type n = last - first;
-            if (n > 1)
-            {
-                for (difference_type start = (n - 2) / 2; start >= 0; --start)
-                {
-                    sift_down(first, comp, proj, n, first + start);
-                }
-                return first + n;
-            }
-            return first;
         }
 
         template <typename Iter, typename Sent, typename Comp, typename Proj>
