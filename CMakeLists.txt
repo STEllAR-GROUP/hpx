@@ -1116,7 +1116,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.3"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.4"
     CATEGORY "Build Targets"
     ADVANCED
   )
