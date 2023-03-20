@@ -147,7 +147,7 @@ namespace hpx::threads::coroutines::detail::posix::ucontext {
 
         // makecontext can't fail.
         using ctx_main = void (*)();
-        ::makecontext(ctx, static_cast<ctx_main>(startfunc), 1, startarg);
+        ::makecontext(ctx, reinterpret_cast<ctx_main>(startfunc), 1, startarg);
         return 0;
     }
 }    // namespace hpx::threads::coroutines::detail::posix::ucontext
