@@ -103,8 +103,17 @@ namespace hpx { namespace util {
 
     void query_counters::start()
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         if (print_counters_locally_ && destination_ != "cout")
+        {
             destination_ += "." + std::to_string(hpx::get_locality_id());
+        }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         find_counters();
 

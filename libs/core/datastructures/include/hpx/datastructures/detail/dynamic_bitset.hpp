@@ -2163,8 +2163,16 @@ namespace hpx::detail {
 
         if (extra_bits != 0)
         {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
             // NOLINTNEXTLINE(stringop-overflow=)
             highest_block() &= (Block(1) << extra_bits) - 1;
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
     }
 

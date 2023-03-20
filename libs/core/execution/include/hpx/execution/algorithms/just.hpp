@@ -57,6 +57,10 @@ namespace hpx::execution::experimental {
             just_sender& operator=(just_sender&&) = default;
             just_sender& operator=(just_sender const&) = default;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             template <typename Receiver>
             struct operation_state
             {
@@ -92,6 +96,9 @@ namespace hpx::execution::experimental {
                         });
                 }
             };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
             template <typename Receiver>
             friend auto tag_invoke(

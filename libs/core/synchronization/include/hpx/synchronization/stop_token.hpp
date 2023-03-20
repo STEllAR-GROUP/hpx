@@ -699,10 +699,17 @@ namespace hpx::p2300_stop_token {
         {
             state_.add_source_count();
         }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         ~in_place_stop_source()
         {
             state_.remove_source_count();
         }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         in_place_stop_source(in_place_stop_source const&) = delete;
         in_place_stop_source(in_place_stop_source&&) noexcept = delete;

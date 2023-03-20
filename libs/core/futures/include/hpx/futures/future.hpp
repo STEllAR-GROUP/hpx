@@ -34,6 +34,7 @@
 #include <hpx/serialization/exception_ptr.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 #include <hpx/type_support/decay.hpp>
 
 #include <exception>

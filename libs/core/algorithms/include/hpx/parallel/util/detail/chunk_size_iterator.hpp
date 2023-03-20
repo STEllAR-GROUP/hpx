@@ -8,10 +8,12 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/iterator_support/iterator_facade.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/traits/is_range.hpp>
 #include <hpx/util/min.hpp>
 
 #include <algorithm>
@@ -22,12 +24,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::util::detail {
 
-    template <typename Iterator, typename Enable = void>
+    template <typename IterOrR, typename Enable = void>
     struct chunk_size_iterator_category;
 
-    template <typename Iterator>
-    struct chunk_size_iterator_category<Iterator,
-        std::enable_if_t<std::is_integral_v<Iterator>>>
+    template <typename IterOrR>
+    struct chunk_size_iterator_category<IterOrR,
+        std::enable_if_t<std::is_integral_v<IterOrR>>>
     {
         using type = std::random_access_iterator_tag;
     };
@@ -36,30 +38,78 @@ namespace hpx::parallel::util::detail {
     struct chunk_size_iterator_category<Iterator,
         std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
     {
-        using type = typename std::iterator_traits<Iterator>::iterator_category;
+        using type = hpx::traits::iter_category_t<Iterator>;
+    };
+
+    template <typename Range>
+    struct chunk_size_iterator_category<Range,
+        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+    {
+        using type = hpx::traits::range_category_t<Range>;
+    };
+
+    template <typename Range>
+    struct chunk_size_iterator_category<Range,
+        std::enable_if_t<hpx::traits::is_range_generator_v<Range>>>
+    {
+        using type = std::random_access_iterator_tag;
+    };
+
+    template <typename IterOrR>
+    using chunk_size_iterator_category_t =
+        typename chunk_size_iterator_category<IterOrR>::type;
+
+    template <typename IterOrR, typename Enable = void>
+    struct iterator_type;
+
+    template <typename T>
+    struct iterator_type<T,
+        std::enable_if_t<std::is_integral_v<T> ||
+            hpx::traits::is_range_generator_v<T>>>
+    {
+        using type = T;
     };
 
     template <typename Iterator>
-    using chunk_size_iterator_category_t =
-        typename chunk_size_iterator_category<Iterator>::type;
+    struct iterator_type<Iterator,
+        std::enable_if_t<hpx::traits::is_iterator_v<Iterator>>>
+    {
+        using type = Iterator;
+    };
+
+    template <typename Range>
+    struct iterator_type<Range,
+        std::enable_if_t<hpx::traits::is_range_v<Range>>>
+    {
+        using type = hpx::traits::range_iterator_t<Range>;
+    };
+
+    template <typename IterOrR>
+    using iterator_type_t = typename iterator_type<IterOrR>::type;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
+    template <typename IterOrR>
     struct chunk_size_iterator
-      : public hpx::util::iterator_facade<chunk_size_iterator<Iterator>,
-            hpx::tuple<Iterator, std::size_t> const,
-            chunk_size_iterator_category_t<Iterator>>
+      : hpx::util::iterator_facade<chunk_size_iterator<IterOrR>,
+            hpx::tuple<IterOrR, std::size_t> const,
+            chunk_size_iterator_category_t<IterOrR>>
     {
     private:
-        using base_type =
-            hpx::util::iterator_facade<chunk_size_iterator<Iterator>,
-                hpx::tuple<Iterator, std::size_t> const,
-                chunk_size_iterator_category_t<Iterator>>;
+        using base_type = hpx::util::iterator_facade<chunk_size_iterator,
+            hpx::tuple<IterOrR, std::size_t> const,
+            chunk_size_iterator_category_t<IterOrR>>;
+
+        static_assert(std::is_integral_v<IterOrR> ||
+            hpx::traits::is_iterator_v<IterOrR> ||
+            hpx::traits::is_range_v<IterOrR> ||
+            hpx::traits::is_range_generator_v<IterOrR>);
+
+        static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
 
         HPX_HOST_DEVICE static constexpr std::size_t get_last_chunk_size(
             std::size_t count, std::size_t chunk_size) noexcept
         {
-            std::ptrdiff_t const remainder =
+            auto const remainder =
                 static_cast<std::ptrdiff_t>(count % chunk_size);
             if (remainder != 0)
             {
@@ -77,22 +127,40 @@ namespace hpx::parallel::util::detail {
     public:
         HPX_HOST_DEVICE chunk_size_iterator() = default;
 
-        HPX_HOST_DEVICE chunk_size_iterator(Iterator it, std::size_t chunk_size,
+        HPX_HOST_DEVICE chunk_size_iterator(IterOrR it, std::size_t chunk_size,
             std::size_t count = 0, std::size_t current = 0) noexcept
-          : data_(it, (hpx::detail::min)(chunk_size, count))
-          , chunk_size_(chunk_size)
+          : data_(it, 0)
+          , chunk_size_((hpx::detail::min)(chunk_size, count))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))
         {
+            if (current_ >= count_)
+            {
+                // reached the end of the sequence
+                target() = next(target(), 0, 0);
+                chunk() = 0;
+            }
+            else if (current_ == count_ - last_chunk_size_)
+            {
+                // reached last chunk
+                target() = next(target(), 0, last_chunk_size_);
+                chunk() = last_chunk_size_;
+            }
+            else
+            {
+                // normal chunk
+                target() = next(target(), 0, chunk_size_);
+                chunk() = chunk_size_;
+            }
         }
 
     private:
-        HPX_HOST_DEVICE Iterator& iterator() noexcept
+        HPX_HOST_DEVICE IterOrR& target() noexcept
         {
             return hpx::get<0>(data_);
         }
-        HPX_HOST_DEVICE constexpr Iterator iterator() const noexcept
+        HPX_HOST_DEVICE constexpr IterOrR target() const noexcept
         {
             return hpx::get<0>(data_);
         }
@@ -109,11 +177,11 @@ namespace hpx::parallel::util::detail {
     protected:
         friend class hpx::util::iterator_core_access;
 
+        template <typename IterOrR1>
         HPX_HOST_DEVICE constexpr bool equal(
-            chunk_size_iterator const& other) const noexcept
+            chunk_size_iterator<IterOrR1> const& other) const noexcept
         {
-            return iterator() == other.iterator() &&
-                chunk_size_ == other.chunk_size_ && current_ == other.current_;
+            return current_ == other.current_;
         }
 
         HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
@@ -122,29 +190,42 @@ namespace hpx::parallel::util::detail {
             return data_;
         }
 
+    private:
+        static constexpr IterOrR next(IterOrR const& target, std::size_t first,
+            [[maybe_unused]] std::size_t size)
+        {
+            if constexpr (is_iterator || std::is_integral_v<IterOrR>)
+            {
+                return parallel::detail::next(target, first);
+            }
+            else
+            {
+                return hpx::util::subrange(target, first, size);
+            }
+        }
+
+    protected:
         HPX_HOST_DEVICE void increment(std::size_t offset) noexcept
         {
             current_ += offset + chunk_size_;
             if (current_ >= count_)
             {
                 // reached the end of the sequence
-                iterator() = parallel::detail::next(
-                    iterator(), offset + last_chunk_size_);
+                target() = next(target(), offset + last_chunk_size_, 0);
                 chunk() = 0;
             }
             else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk
-                iterator() =
-                    parallel::detail::next(iterator(), offset + chunk_size_);
+                target() =
+                    next(target(), offset + chunk_size_, last_chunk_size_);
                 chunk() = last_chunk_size_;
             }
             else
             {
                 // normal chunk
                 HPX_ASSERT(current_ < count_ - last_chunk_size_);
-                iterator() =
-                    parallel::detail::next(iterator(), offset + chunk_size_);
+                target() = next(target(), offset + chunk_size_, chunk_size_);
                 chunk() = chunk_size_;
             }
         }
@@ -175,23 +256,25 @@ namespace hpx::parallel::util::detail {
                 chunk() = chunk_size_;
             }
 
-            iterator() = parallel::detail::next(
-                iterator(), -static_cast<std::ptrdiff_t>(offset + chunk()));
+            target() = next(target(),
+                -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_bidirectional_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -205,19 +288,20 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
-                (rhs.iterator() - iterator() + chunk_size_ - 1) / chunk_size_);
+                (rhs.current_ - current_ + chunk_size_ - 1) / chunk_size_);
         }
 
     private:
-        hpx::tuple<Iterator, std::size_t> data_;
+        hpx::tuple<IterOrR, std::size_t> data_;
         std::size_t chunk_size_ = 0;
         std::size_t last_chunk_size_ = 0;
         std::size_t count_ = 0;
@@ -225,22 +309,28 @@ namespace hpx::parallel::util::detail {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Iterator>
+    template <typename IterOrR>
     struct chunk_size_idx_iterator
-      : public hpx::util::iterator_facade<chunk_size_idx_iterator<Iterator>,
-            hpx::tuple<Iterator, std::size_t, std::size_t> const,
-            chunk_size_iterator_category_t<Iterator>>
+      : hpx::util::iterator_facade<chunk_size_idx_iterator<IterOrR>,
+            hpx::tuple<IterOrR, std::size_t, std::size_t> const,
+            chunk_size_iterator_category_t<IterOrR>>
     {
     private:
-        using base_type =
-            hpx::util::iterator_facade<chunk_size_idx_iterator<Iterator>,
-                hpx::tuple<Iterator, std::size_t, std::size_t> const,
-                chunk_size_iterator_category_t<Iterator>>;
+        using base_type = hpx::util::iterator_facade<chunk_size_idx_iterator,
+            hpx::tuple<IterOrR, std::size_t, std::size_t> const,
+            chunk_size_iterator_category_t<IterOrR>>;
+
+        static_assert(std::is_integral_v<IterOrR> ||
+            hpx::traits::is_iterator_v<IterOrR> ||
+            hpx::traits::is_range_v<IterOrR> ||
+            hpx::traits::is_range_generator_v<IterOrR>);
+
+        static constexpr bool is_iterator = hpx::traits::is_iterator_v<IterOrR>;
 
         HPX_HOST_DEVICE static constexpr std::size_t get_last_chunk_size(
             std::size_t count, std::size_t chunk_size) noexcept
         {
-            std::ptrdiff_t const remainder =
+            auto const remainder =
                 static_cast<std::ptrdiff_t>(count % chunk_size);
             if (remainder != 0)
             {
@@ -258,23 +348,42 @@ namespace hpx::parallel::util::detail {
     public:
         HPX_HOST_DEVICE chunk_size_idx_iterator() = default;
 
-        HPX_HOST_DEVICE chunk_size_idx_iterator(Iterator it,
+        HPX_HOST_DEVICE chunk_size_idx_iterator(IterOrR it,
             std::size_t chunk_size, std::size_t count = 0,
             std::size_t current = 0, std::size_t base_idx = 0)
-          : data_(it, (hpx::detail::min)(chunk_size, count), base_idx)
-          , chunk_size_(chunk_size)
+          : data_(it, 0, base_idx)
+          , chunk_size_((hpx::detail::min)(chunk_size, count))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))
         {
+            if (current_ >= count_)
+            {
+                // reached the end of the sequence
+                target() = next(target(), 0, 0);
+                chunk() = 0;
+            }
+            else if (current_ == count_ - last_chunk_size_)
+            {
+                // reached last chunk
+                target() = next(target(), 0, last_chunk_size_);
+                chunk() = last_chunk_size_;
+            }
+            else
+            {
+                // normal chunk
+                HPX_ASSERT(current_ < count_ - last_chunk_size_);
+                target() = next(target(), 0, chunk_size_);
+                chunk() = chunk_size_;
+            }
         }
 
     private:
-        HPX_HOST_DEVICE Iterator& iterator() noexcept
+        HPX_HOST_DEVICE IterOrR& target() noexcept
         {
             return hpx::get<0>(data_);
         }
-        HPX_HOST_DEVICE constexpr Iterator iterator() const noexcept
+        HPX_HOST_DEVICE constexpr IterOrR target() const noexcept
         {
             return hpx::get<0>(data_);
         }
@@ -301,11 +410,11 @@ namespace hpx::parallel::util::detail {
     protected:
         friend class hpx::util::iterator_core_access;
 
+        template <typename IterOrR1>
         HPX_HOST_DEVICE constexpr bool equal(
-            chunk_size_idx_iterator const& other) const noexcept
+            chunk_size_idx_iterator<IterOrR1> const& other) const noexcept
         {
-            return iterator() == other.iterator() &&
-                chunk_size_ == other.chunk_size_ && current_ == other.current_;
+            return current_ == other.current_;
         }
 
         HPX_HOST_DEVICE constexpr typename base_type::reference dereference()
@@ -314,6 +423,21 @@ namespace hpx::parallel::util::detail {
             return data_;
         }
 
+    private:
+        static constexpr IterOrR next(IterOrR const& target, std::size_t first,
+            [[maybe_unused]] std::size_t size)
+        {
+            if constexpr (is_iterator || std::is_integral_v<IterOrR>)
+            {
+                return parallel::detail::next(target, first);
+            }
+            else
+            {
+                return hpx::util::subrange(target, first, size);
+            }
+        }
+
+    protected:
         HPX_HOST_DEVICE void increment(std::size_t offset) noexcept
         {
             base_index() += offset + chunk_size_;
@@ -321,23 +445,21 @@ namespace hpx::parallel::util::detail {
             if (current_ >= count_)
             {
                 // reached the end of the sequence
-                iterator() = parallel::detail::next(
-                    iterator(), offset + last_chunk_size_);
+                target() = next(target(), offset + last_chunk_size_, 0);
                 chunk() = 0;
             }
             else if (current_ == count_ - last_chunk_size_)
             {
                 // reached last chunk
-                iterator() =
-                    parallel::detail::next(iterator(), offset + chunk_size_);
+                target() =
+                    next(target(), offset + chunk_size_, last_chunk_size_);
                 chunk() = last_chunk_size_;
             }
             else
             {
                 // normal chunk
                 HPX_ASSERT(current_ < count_ - last_chunk_size_);
-                iterator() =
-                    parallel::detail::next(iterator(), offset + chunk_size_);
+                target() = next(target(), offset + chunk_size_, chunk_size_);
                 chunk() = chunk_size_;
             }
         }
@@ -370,23 +492,25 @@ namespace hpx::parallel::util::detail {
                 chunk() = chunk_size_;
             }
 
-            iterator() = parallel::detail::next(
-                iterator(), -static_cast<std::ptrdiff_t>(offset + chunk()));
+            target() = next(target(),
+                -static_cast<std::ptrdiff_t>(offset + chunk()), chunk());
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_bidirectional_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_bidirectional_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE void decrement() noexcept
         {
             decrement(0);
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE void advance(std::ptrdiff_t n) noexcept
         {
             // prepare next value
@@ -400,19 +524,20 @@ namespace hpx::parallel::util::detail {
             }
         }
 
-        template <typename Iter = Iterator,
-            typename Enable = std::enable_if_t<
-                hpx::traits::is_random_access_iterator_v<Iter> ||
-                std::is_integral_v<Iter>>>
+        template <typename Iter = IterOrR,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<
+                                      iterator_type_t<Iter>> ||
+                hpx::traits::is_range_generator_v<Iter> ||
+                std::is_integral_v<Iter>)>
         HPX_HOST_DEVICE constexpr std::ptrdiff_t distance_to(
             chunk_size_idx_iterator const& rhs) const noexcept
         {
             return static_cast<std::ptrdiff_t>(
-                (rhs.iterator() - iterator() + chunk_size_ - 1) / chunk_size_);
+                (rhs.current_ - current_ + chunk_size_ - 1) / chunk_size_);
         }
 
     private:
-        hpx::tuple<Iterator, std::size_t, std::size_t> data_;
+        hpx::tuple<IterOrR, std::size_t, std::size_t> data_;
         std::size_t chunk_size_ = 0;
         std::size_t last_chunk_size_ = 0;
         std::size_t count_ = 0;

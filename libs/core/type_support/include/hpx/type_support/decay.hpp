@@ -22,12 +22,24 @@ namespace hpx::util {
         struct decay_unwrap_impl
         {
             using type = TD;
+
+            template <typename T>
+            constexpr static T call(T&& t) noexcept
+            {
+                return std::forward<T>(t);
+            }
         };
 
         template <typename X>
         struct decay_unwrap_impl<::std::reference_wrapper<X>>
         {
             using type = X&;
+
+            constexpr static decltype(auto) call(
+                ::std::reference_wrapper<X> ref) noexcept
+            {
+                return ref.get();
+            }
         };
     }    // namespace detail
 

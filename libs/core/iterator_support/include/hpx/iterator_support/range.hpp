@@ -7,9 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/iterator_support/traits/is_sentinel_for.hpp>
 
 #include <cstddef>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace hpx::util {
@@ -76,6 +78,24 @@ namespace hpx::util {
             return c.empty();
         }
 
+        template <typename C,
+            typename R = decltype(std::declval<C&>().subrange(
+                std::declval<std::ptrdiff_t>(), std::declval<std::size_t>()))>
+        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R subrange_impl(
+            C& c, std::ptrdiff_t delta, std::size_t size,
+            long) noexcept(noexcept(c.subrange(delta, size)))
+        {
+            return c.subrange(delta, size);
+        }
+
+        template <typename C,
+            typename R = decltype(std::declval<C&>().iterate())>
+        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R iterate_impl(
+            C& c, long) noexcept(noexcept(c.iterate()))
+        {
+            return c.iterate();
+        }
+
         ///////////////////////////////////////////////////////////////////////
         namespace range_impl {
 
@@ -106,23 +126,99 @@ namespace hpx::util {
             {
                 return end(c);
             }
+
+            fallback subrange(fallback, std::ptrdiff_t, std::size_t);
+
+            // clang-format off
+            template <typename C,
+                typename R = decltype(
+                    subrange(std::declval<C&>(), std::declval<std::ptrdiff_t>(),
+                        std::declval<std::size_t>()))>
+            // clang-format on
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
+            subrange_impl(C& c, std::ptrdiff_t delta, std::size_t size,
+                int) noexcept(noexcept(subrange(c, delta, size)))
+            {
+                return subrange(c, delta, size);
+            }
+
+            fallback empty(fallback);
+
+            template <typename C,
+                typename R = decltype(empty(std::declval<C&>()))>
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
+            empty_impl(C& c) noexcept(noexcept(empty(c)))
+            {
+                return empty(c);
+            }
+
+            fallback size(fallback);
+
+            template <typename C,
+                typename R = decltype(size(std::declval<C&>()))>
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R size_impl(
+                C& c) noexcept(noexcept(size(c)))
+            {
+                return size(c);
+            }
+
+            fallback iterate(fallback);
+
+            template <typename C,
+                typename R = decltype(iterate(std::declval<C&>()))>
+            [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R
+            iterate_impl(C& c, int) noexcept(noexcept(iterate(c)))
+            {
+                return iterate(c);
+            }
         }    // namespace range_impl
 
         using range_impl::begin_impl;
         using range_impl::end_impl;
+        using range_impl::iterate_impl;
+        using range_impl::subrange_impl;
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T, typename Enable = void>
+        inline constexpr bool has_size_v = false;
+
+        template <typename T>
+        inline constexpr bool has_size_v<T,
+            std::void_t<decltype(size(std::declval<T const&>()))>> = true;
 
         template <typename C>
-        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::size_t
+        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::ptrdiff_t
         size_impl(C const& c, int)
         {
-            return std::distance(begin_impl(c, 0L), end_impl(c, 0L));
+            if constexpr (has_size_v<C>)
+            {
+                return range_impl::size_impl(c);
+            }
+            else
+            {
+                return std::distance(begin_impl(c, 0L), end_impl(c, 0L));
+            }
         }
+
+        template <typename T, typename Enable = void>
+        inline constexpr bool has_empty_v = false;
+
+        template <typename T>
+        inline constexpr bool has_empty_v<T,
+            std::void_t<decltype(empty(std::declval<T const&>()))>> = true;
 
         template <typename C>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty_impl(
             C const& c, int)
         {
-            return begin_impl(c, 0L) == end_impl(c, 0L);
+            if constexpr (has_empty_v<C>)
+            {
+                return range_impl::empty_impl(c);
+            }
+            else
+            {
+                return begin_impl(c, 0L) == end_impl(c, 0L);
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -160,6 +256,65 @@ namespace hpx::util {
         struct sentinel<T, range_impl::fallback>
         {
         };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct result_of_subrange
+        {
+            using type = decltype(detail::subrange_impl(std::declval<T&>(),
+                std::declval<std::ptrdiff_t>(), std::declval<std::size_t>(),
+                0L));
+        };
+
+        template <typename T, typename R = typename result_of_subrange<T>::type>
+        struct subrange
+        {
+            using type = R;
+        };
+
+        template <typename T>
+        struct subrange<T, range_impl::fallback>
+        {
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename T>
+        struct result_of_iterate
+        {
+            using type = decltype(detail::iterate_impl(std::declval<T&>(), 0L));
+        };
+
+        template <typename T, typename R = typename result_of_iterate<T>::type>
+        struct iterate
+        {
+            using type = R;
+        };
+
+        template <typename T>
+        struct iterate<T, range_impl::fallback>
+        {
+        };
+
+        ///////////////////////////////////////////////////////////////////////////
+        template <typename T, typename Enable = void>
+        struct is_range : std::false_type
+        {
+        };
+
+        template <typename T>
+        inline constexpr bool is_range_v = is_range<T>::value;
+
+        ///////////////////////////////////////////////////////////////////////////
+        // return whether a given type is a range generator (i.e. exposes supports
+        // an iterate function that returns a range
+        template <typename T, typename Enable = void>
+        struct is_range_generator : std::false_type
+        {
+        };
+
+        template <typename T>
+        inline constexpr bool is_range_generator_v =
+            is_range_generator<T>::value;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -198,8 +353,8 @@ namespace hpx::util {
         }
 
         template <typename C,
-            typename Iterator = typename detail::iterator<C const>::type,
-            typename Sentinel = typename detail::sentinel<C const>::type>
+            typename Enable = std::enable_if_t<detail::is_range_v<C> ||
+                detail::is_range_generator_v<C>>>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE std::size_t
         size(C const& c) noexcept(noexcept(detail::size_impl(c, 0L)))
         {
@@ -207,14 +362,51 @@ namespace hpx::util {
         }
 
         template <typename C,
-            typename Iterator = typename detail::iterator<C const>::type,
-            typename Sentinel = typename detail::sentinel<C const>::type>
+            typename Enable = std::enable_if_t<detail::is_range_v<C> ||
+                detail::is_range_generator_v<C>>>
         [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE bool empty(
             C const& c) noexcept(noexcept(detail::empty_impl(c, 0L)))
         {
             return detail::empty_impl(c, 0L);
         }
+
+        template <typename C,
+            typename Range = typename detail::subrange<C const>::type>
+        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE Range subrange(
+            C const& c, std::ptrdiff_t delta,
+            std::size_t size) noexcept(noexcept(detail::subrange_impl(c,
+            static_cast<std::ptrdiff_t>(0), static_cast<std::size_t>(0), 0L)))
+        {
+            return detail::subrange_impl(c, delta, size, 0L);
+        }
+
+        template <typename C,
+            typename R = typename detail::iterate<C const>::type>
+        [[nodiscard]] HPX_HOST_DEVICE constexpr HPX_FORCEINLINE R iterate(
+            C const& c) noexcept(noexcept(detail::iterate_impl(c, 0L)))
+        {
+            return detail::iterate_impl(c, 0L);
+        }
     }    // namespace range_adl
 
     using namespace range_adl;
+
+    namespace detail {
+
+        template <typename T>
+        struct is_range<T,
+            std::enable_if_t<hpx::traits::is_sentinel_for_v<
+                typename util::detail::sentinel<T>::type,
+                typename util::detail::iterator<T>::type>>> : std::true_type
+        {
+        };
+
+        template <typename T>
+        struct is_range_generator<T,
+            std::enable_if_t<
+                is_range_v<decltype(hpx::util::iterate(std::declval<T&>()))>>>
+          : std::true_type
+        {
+        };
+    }    // namespace detail
 }    // namespace hpx::util

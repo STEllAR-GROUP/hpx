@@ -264,8 +264,15 @@ namespace hpx::debug {
                 int const rank = guess_rank();
                 if (rank != -1)
                 {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
                     std::string const temp =
                         "(" + std::to_string(guess_rank()) + ")";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
                     std::strcat(hostname_, temp.c_str());
                 }
             }

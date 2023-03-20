@@ -35,10 +35,10 @@ static_assert(hpx::traits::is_paren_constructible<A, 3>(),
 
 static_assert(hpx::traits::detail::arity<A>().value == 3,
     "hpx::traits::detail::arity<A>() == size<3>{}");
-static_assert(hpx::serialization::has_struct_serialization<A>::value,
+static_assert(hpx::traits::has_struct_serialization<A>::value,
     "has_struct_serialization<A>::value");
-static_assert(!hpx::serialization::has_serialize_adl<A>::value,
-    "!has_serialize_adl<A>::value");
+static_assert(
+    !hpx::traits::has_serialize_adl<A>::value, "!has_serialize_adl<A>::value");
 
 bool operator==(const A& a1, const A& a2)
 {
@@ -67,10 +67,10 @@ static_assert(hpx::traits::is_paren_constructible<B, 2>(),
 
 static_assert(hpx::traits::detail::arity<B>().value == 2,
     "hpx::traits::detail::arity<B>() == size<2>{}");
-static_assert(hpx::serialization::has_struct_serialization<B>::value,
+static_assert(hpx::traits::has_struct_serialization<B>::value,
     "has_struct_serialization<B>::value");
-static_assert(!hpx::serialization::has_serialize_adl<B>::value,
-    "!has_serialize_adl<B>::value");
+static_assert(
+    !hpx::traits::has_serialize_adl<B>::value, "!has_serialize_adl<B>::value");
 
 bool operator==(const B& b1, const B& b2)
 {

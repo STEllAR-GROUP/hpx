@@ -239,17 +239,17 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_ind_t, hpx::execution::unsequenced_policy,
+        hpx::parallel::util::loop_ind_t<hpx::execution::unsequenced_policy>,
         Begin HPX_RESTRICT begin, End HPX_RESTRICT end, F&& f)
     {
         return detail::unseq_loop_ind::call(begin, end, HPX_FORWARD(F, f));
     }
 
-    template <typename Begin, typename End, typename F>
+    template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_ind_t,
-        hpx::execution::unsequenced_task_policy, Begin HPX_RESTRICT begin,
-        End HPX_RESTRICT end, F&& f)
+        hpx::parallel::util::loop_ind_t<
+            hpx::execution::unsequenced_task_policy>,
+        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, F&& f)
     {
         return detail::unseq_loop_ind::call(begin, end, HPX_FORWARD(F, f));
     }

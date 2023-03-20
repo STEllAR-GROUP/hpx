@@ -32,206 +32,221 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx::execution::experimental { namespace detail {
+namespace hpx::execution::experimental {
 
-    template <typename Data>
-    struct future_receiver_base
-    {
-        hpx::intrusive_ptr<Data> data;
+    // enforce proper formatting
+    namespace detail {
 
-    protected:
-        template <typename U>
-        void set_value(U&& u) && noexcept
+        template <typename Data>
+        struct future_receiver_base
         {
-            hpx::detail::try_catch_exception_ptr(
-                [&]() { data->set_value(HPX_FORWARD(U, u)); },
-                [&](std::exception_ptr ep) {
-                    data->set_exception(HPX_MOVE(ep));
-                });
-            data.reset();
-        }
+            hpx::intrusive_ptr<Data> data;
 
-    private:
-        friend void tag_invoke(set_error_t, future_receiver_base&& r,
-            std::exception_ptr ep) noexcept
+        protected:
+            template <typename U>
+            void set_value(U&& u) && noexcept
+            {
+                hpx::detail::try_catch_exception_ptr(
+                    [&]() { data->set_value(HPX_FORWARD(U, u)); },
+                    [&](std::exception_ptr ep) {
+                        data->set_exception(HPX_MOVE(ep));
+                    });
+                data.reset();
+            }
+
+        private:
+            friend void tag_invoke(set_error_t, future_receiver_base&& r,
+                std::exception_ptr ep) noexcept
+            {
+                r.data->set_exception(HPX_MOVE(ep));
+                r.data.reset();
+            }
+
+            friend void tag_invoke(
+                set_stopped_t, future_receiver_base&&) noexcept
+            {
+                std::terminate();
+            }
+        };
+
+        template <typename T>
+        struct future_receiver
+          : future_receiver_base<hpx::lcos::detail::future_data_base<T>>
         {
-            r.data->set_exception(HPX_MOVE(ep));
-            r.data.reset();
-        }
+        private:
+            template <typename U>
+            friend void tag_invoke(
+                set_value_t, future_receiver&& r, U&& u) noexcept
+            {
+                HPX_MOVE(r).set_value(HPX_FORWARD(U, u));
+            }
+        };
 
-        friend void tag_invoke(set_stopped_t, future_receiver_base&&) noexcept
+        template <>
+        struct future_receiver<void>
+          : future_receiver_base<hpx::lcos::detail::future_data_base<void>>
         {
-            std::terminate();
-        }
-    };
+        private:
+            friend void tag_invoke(set_value_t, future_receiver&& r) noexcept
+            {
+                HPX_MOVE(r).set_value(hpx::util::unused);
+            }
+        };
 
-    template <typename T>
-    struct future_receiver
-      : future_receiver_base<hpx::lcos::detail::future_data_base<T>>
-    {
-    private:
-        template <typename U>
-        friend void tag_invoke(set_value_t, future_receiver&& r, U&& u) noexcept
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
+        template <typename T, typename Allocator, typename OperationState,
+            typename Derived = void>
+        struct future_data
+          : hpx::lcos::detail::future_data_allocator<T, Allocator,
+                std::conditional_t<std::is_void_v<Derived>,
+                    future_data<T, Allocator, OperationState, Derived>,
+                    Derived>>
         {
-            HPX_MOVE(r).set_value(HPX_FORWARD(U, u));
-        }
-    };
+            HPX_NON_COPYABLE(future_data);
 
-    template <>
-    struct future_receiver<void>
-      : future_receiver_base<hpx::lcos::detail::future_data_base<void>>
-    {
-    private:
-        friend void tag_invoke(set_value_t, future_receiver&& r) noexcept
+            using derived_type = std::conditional_t<std::is_void_v<Derived>,
+                future_data, Derived>;
+            using base_type = hpx::lcos::detail::future_data_allocator<T,
+                Allocator, derived_type>;
+            using operation_state_type = std::decay_t<OperationState>;
+            using init_no_addref = typename base_type::init_no_addref;
+            using other_allocator = typename std::allocator_traits<
+                Allocator>::template rebind_alloc<future_data>;
+
+            operation_state_type op_state;
+
+            template <typename Sender>
+            future_data(init_no_addref no_addref, other_allocator const& alloc,
+                Sender&& sender)
+              : base_type(no_addref, alloc)
+              , op_state(hpx::execution::experimental::connect(
+                    HPX_FORWARD(Sender, sender),
+                    detail::future_receiver<T>{{this}}))
+            {
+                hpx::execution::experimental::start(op_state);
+            }
+        };
+
+        template <typename T, typename Allocator, typename OperationState>
+        struct future_data_with_run_loop
+          : future_data<T, Allocator, OperationState,
+                future_data_with_run_loop<T, Allocator, OperationState>>
         {
-            HPX_MOVE(r).set_value(hpx::util::unused);
-        }
-    };
+            hpx::execution::experimental::run_loop& loop;
 
-    template <typename T, typename Allocator, typename OperationState,
-        typename Derived = void>
-    struct future_data
-      : hpx::lcos::detail::future_data_allocator<T, Allocator,
-            std::conditional_t<std::is_void_v<Derived>,
-                future_data<T, Allocator, OperationState, Derived>, Derived>>
-    {
-        HPX_NON_COPYABLE(future_data);
+            using base_type = future_data<T, Allocator, OperationState,
+                future_data_with_run_loop>;
+            using init_no_addref = typename base_type::init_no_addref;
+            using other_allocator = typename base_type::other_allocator;
 
-        using derived_type =
-            std::conditional_t<std::is_void_v<Derived>, future_data, Derived>;
-        using base_type = hpx::lcos::detail::future_data_allocator<T, Allocator,
-            derived_type>;
-        using operation_state_type = std::decay_t<OperationState>;
-        using init_no_addref = typename base_type::init_no_addref;
-        using other_allocator = typename std::allocator_traits<
-            Allocator>::template rebind_alloc<future_data>;
+            template <typename Sender>
+            future_data_with_run_loop(init_no_addref no_addref,
+                other_allocator const& alloc,
+                hpx::execution::experimental::run_loop_scheduler const& sched,
+                Sender&& sender)
+              : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
+              , loop(sched.get_run_loop())
+            {
+                this->set_on_completed([this]() { loop.finish(); });
+            }
 
-        operation_state_type op_state;
+            hpx::util::unused_type* get_result_void(
+                error_code& ec = throws) override
+            {
+                execute_deferred(ec);
+                return this->base_type::get_result_void(ec);
+            }
 
-        template <typename Sender>
-        future_data(init_no_addref no_addref, other_allocator const& alloc,
-            Sender&& sender)
-          : base_type(no_addref, alloc)
-          , op_state(hpx::execution::experimental::connect(
-                HPX_FORWARD(Sender, sender),
-                detail::future_receiver<T>{{this}}))
+            void execute_deferred(error_code& = throws) override
+            {
+                loop.run();
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Sender, typename Allocator>
+        auto make_future(Sender&& sender, Allocator const& allocator)
         {
-            hpx::execution::experimental::start(op_state);
+            using allocator_type = Allocator;
+
+            using value_types = hpx::execution::experimental::value_types_of_t<
+                std::decay_t<Sender>, hpx::execution::experimental::empty_env,
+                meta::pack, meta::pack>;
+
+            using result_type =
+                std::decay_t<detail::single_result_t<value_types>>;
+            using operation_state_type = hpx::util::invoke_result_t<
+                hpx::execution::experimental::connect_t, Sender,
+                detail::future_receiver<result_type>>;
+
+            using shared_state =
+                future_data<result_type, allocator_type, operation_state_type>;
+            using init_no_addref = typename shared_state::init_no_addref;
+            using other_allocator = typename std::allocator_traits<
+                allocator_type>::template rebind_alloc<shared_state>;
+            using allocator_traits = std::allocator_traits<other_allocator>;
+            using unique_ptr = std::unique_ptr<shared_state,
+                util::allocator_deleter<other_allocator>>;
+
+            other_allocator alloc(allocator);
+            unique_ptr p(allocator_traits::allocate(alloc, 1),
+                hpx::util::allocator_deleter<other_allocator>{alloc});
+
+            allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+                HPX_FORWARD(Sender, sender));
+
+            return hpx::traits::future_access<future<result_type>>::create(
+                p.release(), false);
         }
-    };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
-    template <typename T, typename Allocator, typename OperationState>
-    struct future_data_with_run_loop
-      : future_data<T, Allocator, OperationState,
-            future_data_with_run_loop<T, Allocator, OperationState>>
-    {
-        hpx::execution::experimental::run_loop& loop;
-
-        using base_type = future_data<T, Allocator, OperationState,
-            future_data_with_run_loop>;
-        using init_no_addref = typename base_type::init_no_addref;
-        using other_allocator = typename base_type::other_allocator;
-
-        template <typename Sender>
-        future_data_with_run_loop(init_no_addref no_addref,
-            other_allocator const& alloc,
+        ///////////////////////////////////////////////////////////////////////
+        template <typename Sender, typename Allocator>
+        auto make_future_with_run_loop(
             hpx::execution::experimental::run_loop_scheduler const& sched,
-            Sender&& sender)
-          : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
-          , loop(sched.get_run_loop())
+            Sender&& sender, Allocator const& allocator)
         {
-            this->set_on_completed([this]() { loop.finish(); });
+            using allocator_type = Allocator;
+
+            using value_types = hpx::execution::experimental::value_types_of_t<
+                std::decay_t<Sender>, hpx::execution::experimental::empty_env,
+                meta::pack, meta::pack>;
+
+            using result_type =
+                std::decay_t<detail::single_result_t<value_types>>;
+            using operation_state_type = hpx::util::invoke_result_t<
+                hpx::execution::experimental::connect_t, Sender,
+                detail::future_receiver<result_type>>;
+
+            using shared_state = future_data_with_run_loop<result_type,
+                allocator_type, operation_state_type>;
+            using init_no_addref = typename shared_state::init_no_addref;
+            using other_allocator = typename std::allocator_traits<
+                allocator_type>::template rebind_alloc<shared_state>;
+            using allocator_traits = std::allocator_traits<other_allocator>;
+            using unique_ptr = std::unique_ptr<shared_state,
+                util::allocator_deleter<other_allocator>>;
+
+            other_allocator alloc(allocator);
+            unique_ptr p(allocator_traits::allocate(alloc, 1),
+                hpx::util::allocator_deleter<other_allocator>{alloc});
+
+            allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
+                sched, HPX_FORWARD(Sender, sender));
+
+            return hpx::traits::future_access<future<result_type>>::create(
+                p.release(), false);
         }
+    }    // namespace detail
+}    // namespace hpx::execution::experimental
 
-        hpx::util::unused_type* get_result_void(
-            error_code& ec = throws) override
-        {
-            execute_deferred(ec);
-            return this->base_type::get_result_void(ec);
-        }
-
-        void execute_deferred(error_code& = throws) override
-        {
-            loop.run();
-        }
-    };
-
-    ///////////////////////////////////////////////////////////////////////
-    template <typename Sender, typename Allocator>
-    auto make_future(Sender&& sender, Allocator const& allocator)
-    {
-        using allocator_type = Allocator;
-
-        using value_types =
-            hpx::execution::experimental::value_types_of_t<std::decay_t<Sender>,
-                hpx::execution::experimental::empty_env, meta::pack,
-                meta::pack>;
-
-        using result_type = std::decay_t<detail::single_result_t<value_types>>;
-        using operation_state_type =
-            hpx::util::invoke_result_t<hpx::execution::experimental::connect_t,
-                Sender, detail::future_receiver<result_type>>;
-
-        using shared_state =
-            future_data<result_type, allocator_type, operation_state_type>;
-        using init_no_addref = typename shared_state::init_no_addref;
-        using other_allocator = typename std::allocator_traits<
-            allocator_type>::template rebind_alloc<shared_state>;
-        using allocator_traits = std::allocator_traits<other_allocator>;
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(allocator);
-        unique_ptr p(allocator_traits::allocate(alloc, 1),
-            hpx::util::allocator_deleter<other_allocator>{alloc});
-
-        allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-            HPX_FORWARD(Sender, sender));
-
-        return hpx::traits::future_access<future<result_type>>::create(
-            p.release(), false);
-    }
-
-    ///////////////////////////////////////////////////////////////////////
-    template <typename Sender, typename Allocator>
-    auto make_future_with_run_loop(
-        hpx::execution::experimental::run_loop_scheduler const& sched,
-        Sender&& sender, Allocator const& allocator)
-    {
-        using allocator_type = Allocator;
-
-        using value_types =
-            hpx::execution::experimental::value_types_of_t<std::decay_t<Sender>,
-                hpx::execution::experimental::empty_env, meta::pack,
-                meta::pack>;
-
-        using result_type = std::decay_t<detail::single_result_t<value_types>>;
-        using operation_state_type =
-            hpx::util::invoke_result_t<hpx::execution::experimental::connect_t,
-                Sender, detail::future_receiver<result_type>>;
-
-        using shared_state = future_data_with_run_loop<result_type,
-            allocator_type, operation_state_type>;
-        using init_no_addref = typename shared_state::init_no_addref;
-        using other_allocator = typename std::allocator_traits<
-            allocator_type>::template rebind_alloc<shared_state>;
-        using allocator_traits = std::allocator_traits<other_allocator>;
-        using unique_ptr = std::unique_ptr<shared_state,
-            util::allocator_deleter<other_allocator>>;
-
-        other_allocator alloc(allocator);
-        unique_ptr p(allocator_traits::allocate(alloc, 1),
-            hpx::util::allocator_deleter<other_allocator>{alloc});
-
-        allocator_traits::construct(alloc, p.get(), init_no_addref{}, alloc,
-            sched, HPX_FORWARD(Sender, sender));
-
-        return hpx::traits::future_access<future<result_type>>::create(
-            p.release(), false);
-    }
-}}    // namespace hpx::execution::experimental::detail
-
-namespace hpx { namespace traits { namespace detail {
+namespace hpx::traits::detail {
 
     template <typename T, typename Allocator, typename OperationState,
         typename NewAllocator>
@@ -254,7 +269,7 @@ namespace hpx { namespace traits { namespace detail {
             hpx::execution::experimental::detail::future_data_with_run_loop<T,
                 NewAllocator, OperationState>;
     };
-}}}    // namespace hpx::traits::detail
+}    // namespace hpx::traits::detail
 
 namespace hpx::execution::experimental {
 

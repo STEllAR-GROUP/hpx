@@ -482,8 +482,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIterB, typename InIterE,
                 typename F>
             static constexpr InIterB sequential(
-                [[maybe_unused]] ExPolicy&& policy, InIterB first, InIterE last,
-                F&& f, hpx::identity)
+                ExPolicy&&, InIterB first, InIterE last, F&& f, hpx::identity)
             {
                 if constexpr (hpx::traits::is_random_access_iterator_v<InIterB>)
                 {
@@ -493,8 +492,8 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    return util::loop_ind(HPX_FORWARD(ExPolicy, policy), first,
-                        last, HPX_FORWARD(F, f));
+                    return util::loop_ind<std::decay_t<ExPolicy>>(
+                        first, last, HPX_FORWARD(F, f));
                 }
             }
 

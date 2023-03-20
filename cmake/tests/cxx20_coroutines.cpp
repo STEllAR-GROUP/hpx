@@ -9,18 +9,18 @@
 #if defined(__has_include)
 #if __has_include(<coroutine>)
 #include <coroutine>
-namespace hpx { namespace coro {
+namespace hpx {
     using std::coroutine_handle;
     using std::suspend_always;
     using std::suspend_never;
-}}    // namespace hpx::coro
+}    // namespace hpx
 #else
 #include <experimental/coroutine>
-namespace hpx { namespace coro {
+namespace hpx {
     using std::experimental::coroutine_handle;
     using std::experimental::suspend_always;
     using std::experimental::suspend_never;
-}}    // namespace hpx::coro
+}    // namespace hpx
 #endif
 #endif
 
@@ -36,12 +36,12 @@ struct resumable
             return {};
         }
 
-        hpx::coro::suspend_never initial_suspend() const noexcept
+        hpx::suspend_never initial_suspend() const noexcept
         {
             return {};
         }
 
-        hpx::coro::suspend_never final_suspend() const noexcept
+        hpx::suspend_never final_suspend() const noexcept
         {
             return {};
         }
@@ -58,7 +58,7 @@ struct resumable
     {
         return 42;
     }
-    void await_suspend(hpx::coro::coroutine_handle<promise_type>) const noexcept
+    void await_suspend(hpx::coroutine_handle<promise_type>) const noexcept
     {
     }
 };

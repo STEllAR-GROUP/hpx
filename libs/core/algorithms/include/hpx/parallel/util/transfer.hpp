@@ -91,7 +91,15 @@ namespace hpx::parallel::util {
                 char const* const first_ch = to_const_ptr(first);
                 char* const dest_ch = to_ptr(dest);
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wstringop-overread"
+#endif
                 std::memmove(dest_ch, first_ch, count * sizeof(data_type));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
                 std::advance(first, count);
                 std::advance(dest, count);

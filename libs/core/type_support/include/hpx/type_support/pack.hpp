@@ -164,7 +164,7 @@ namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct empty
+        struct empty_helper
         {
         };
 
@@ -173,7 +173,7 @@ namespace hpx::util {
     (defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA) &&                       \
         defined(HPX_COMPUTE_DEVICE_CODE))
         template <std::size_t I, typename Ts, bool InBounds = (I < Ts::size)>
-        struct at_index_impl : empty
+        struct at_index_impl : empty_helper
         {
         };
 
@@ -199,7 +199,7 @@ namespace hpx::util {
         };
 
         template <std::size_t J>
-        static constexpr empty at_index_check(...);
+        static constexpr empty_helper at_index_check(...);
 
         template <std::size_t J, typename T>
         static constexpr indexed<J, T> at_index_check(indexed<J, T> const&);

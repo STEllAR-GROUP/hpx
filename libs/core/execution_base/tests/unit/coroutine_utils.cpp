@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/coroutines_support.hpp>
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 
 #include "coroutine_task.hpp"
 
@@ -39,15 +39,15 @@ using dependent = hpx::execution::experimental::dependent_completion_signatures<
 template <typename Awaiter>
 struct promise
 {
-    hpx::coro::coroutine_handle<promise> get_return_object()
+    hpx::coroutine_handle<promise> get_return_object()
     {
-        return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
+        return {hpx::coroutine_handle<promise>::from_promise(*this)};
     }
-    hpx::coro::suspend_always initial_suspend() noexcept
+    hpx::suspend_always initial_suspend() noexcept
     {
         return {};
     }
-    hpx::coro::suspend_always final_suspend() noexcept
+    hpx::suspend_always final_suspend() noexcept
     {
         return {};
     }
@@ -67,7 +67,7 @@ struct awaiter
     {
         return true;
     }
-    bool await_suspend(hpx::coro::coroutine_handle<>)
+    bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
     }
@@ -88,7 +88,7 @@ struct awaitable_sender_1
 
 struct awaitable_sender_2
 {
-    using promise_type = promise<hpx::coro::suspend_always>;
+    using promise_type = promise<hpx::suspend_always>;
 
 private:
     friend dependent operator co_await(awaitable_sender_2);
@@ -104,7 +104,7 @@ private:
 
 struct awaitable_sender_4
 {
-    using promise_type = promise<hpx::coro::suspend_always>;
+    using promise_type = promise<hpx::suspend_always>;
 
 private:
     template <typename Promise>
@@ -174,37 +174,40 @@ task<int> async_answer(S1 s1, S2 s2)
     // clang-format on
 }
 
+// clang-format off
 template <class Sender>
 inline constexpr bool is_sender_with_env_v =
-    hpx::execution::experimental::is_sender_v<Sender>&&
-        hpx::is_invocable_v<hpx::execution::experimental::get_env_t, Sender>;
+    hpx::execution::experimental::is_sender_v<Sender> &&
+    hpx::is_invocable_v<hpx::execution::experimental::get_env_t, Sender>;
+// clang-format on
 
 int main()
 {
     using namespace hpx::execution::experimental;
 
+    // clang-format off
     {
         // clang-format off
-            static_assert(
-                std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
-                                   signature_all(std::exception_ptr(), int()))>>,
-                    int>);
-            static_assert(
-                std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
-                                   signature_all(std::exception_ptr()))>>,
-                    void>);
+        static_assert(
+            std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
+                               signature_all(std::exception_ptr(), int()))>>,
+                int>);
+        static_assert(
+            std::is_same_v<single_sender_value_t<non_awaitable_sender<decltype(
+                               signature_all(std::exception_ptr()))>>,
+                void>);
         // clang-format on
     }
+    // clang-format on
 
     // single sender value
     {
         static_assert(
             std::is_same_v<single_sender_value_t<awaitable_sender_1<awaiter>>,
                 bool>);
-        static_assert(
-            std::is_same_v<single_sender_value_t<
-                               awaitable_sender_1<hpx::coro::suspend_always>>,
-                void>);
+        static_assert(std::is_same_v<
+            single_sender_value_t<awaitable_sender_1<hpx::suspend_always>>,
+            void>);
     }
 
     // connect awaitable
@@ -250,8 +253,8 @@ int main()
         static_assert(!is_awaitable_v<awaitable_sender_4>);
         static_assert(!is_awaitable_v<awaitable_sender_5>);
 
-        static_assert(is_awaitable_v<awaitable_sender_2,
-            ::promise<hpx::coro::suspend_always>>);
+        static_assert(
+            is_awaitable_v<awaitable_sender_2, ::promise<hpx::suspend_always>>);
         static_assert(is_awaitable_v<awaitable_sender_3, ::promise<awaiter>>);
         static_assert(is_awaitable_v<awaitable_sender_4, ::promise<awaiter>>);
         static_assert(is_awaitable_v<awaitable_sender_5, ::promise<awaiter>>);
