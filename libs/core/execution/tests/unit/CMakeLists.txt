@@ -26,6 +26,7 @@ set(tests
     algorithm_transfer_when_all
     algorithm_when_all
     algorithm_when_all_vector
+    algorithm_on
     bulk_async
     environment_queries
     executor_parameters
