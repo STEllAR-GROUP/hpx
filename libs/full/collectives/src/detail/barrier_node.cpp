@@ -62,8 +62,8 @@ namespace hpx { namespace distributed { namespace detail {
             get_config_entry("hpx.lcos.collectives.cut_off", std::size_t(-1))))
       , local_barrier_(num)
     {
-        LAPP_(info).format("creating barrier_node: base_name({}), num({}), "
-                           "rank({}), cutoff({}), arity({})",
+        LRT_(info).format("creating barrier_node: base_name({}), num({}), "
+                          "rank({}), cutoff({}), arity({})",
             base_name, num, rank, cut_off_, arity_);
 
         if (num_ >= cut_off_)
@@ -92,7 +92,7 @@ namespace hpx { namespace distributed { namespace detail {
 
     hpx::future<void> barrier_node::wait(bool async)
     {
-        LAPP_(info).format(
+        LRT_(info).format(
             "barrier_node::wait: async({}), rank_({})", async, rank_);
 
         hpx::intrusive_ptr<barrier_node> this_(this);
@@ -126,7 +126,7 @@ namespace hpx { namespace distributed { namespace detail {
             // keep everything alive until future has become ready
             traits::detail::get_shared_state(result)->set_on_completed(
                 [this_ = HPX_MOVE(this_)] {
-                    LAPP_(info).format(
+                    LRT_(info).format(
                         "barrier_node::wait: rank_({}): waiting done",
                         this_->rank_);
                 });
@@ -167,8 +167,7 @@ namespace hpx { namespace distributed { namespace detail {
 
         traits::detail::get_shared_state(result)->set_on_completed(
             [this_ = HPX_MOVE(this_)] {
-                LAPP_(info).format(
-                    "barrier_node::wait: rank_({}): waiting done",
+                LRT_(info).format("barrier_node::wait: rank_({}): waiting done",
                     this_->rank_);
             });
 
@@ -179,15 +178,15 @@ namespace hpx { namespace distributed { namespace detail {
     {
         hpx::intrusive_ptr<barrier_node> this_(this);
 
-        LAPP_(info).format("barrier_node::do_wait: rank_({})", rank_);
+        LRT_(info).format("barrier_node::do_wait: rank_({})", rank_);
 
         if (rank_ == 0)
         {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
             hpx::future<void> result =
                 future.then(hpx::launch::sync, [this_](hpx::future<void>&& f) {
-                    LAPP_(info).format("barrier_node::do_wait: rank_({}): "
-                                       "entering barrier done",
+                    LRT_(info).format("barrier_node::do_wait: rank_({}): "
+                                      "entering barrier done",
                         this_->rank_);
 
                     // Trigger possible errors...
@@ -210,7 +209,7 @@ namespace hpx { namespace distributed { namespace detail {
 
             traits::detail::get_shared_state(result)->set_on_completed(
                 [this_ = HPX_MOVE(this_)] {
-                    LAPP_(info).format(
+                    LRT_(info).format(
                         "barrier_node::do_wait: rank_({}): alldone",
                         this_->rank_);
                 });
@@ -224,7 +223,7 @@ namespace hpx { namespace distributed { namespace detail {
 
         hpx::future<void> result =
             future.then(hpx::launch::sync, [this_](hpx::future<void>&& f) {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::do_wait: rank_({}): entering barrier done",
                     this_->rank_);
 
@@ -241,7 +240,7 @@ namespace hpx { namespace distributed { namespace detail {
         // keep everything alive until future has become ready
         traits::detail::get_shared_state(result)->set_on_completed(
             [this_ = HPX_MOVE(this_)] {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::do_wait: rank_({}): all done", this_->rank_);
             });
 
@@ -251,7 +250,7 @@ namespace hpx { namespace distributed { namespace detail {
     hpx::future<void> barrier_node::gather()
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        LAPP_(info).format(
+        LRT_(info).format(
             "barrier_node::gather: rank_({}): recursively gather", rank_);
 
         // We recursively gather the information that everyone entered the
@@ -272,7 +271,7 @@ namespace hpx { namespace distributed { namespace detail {
         // flag ourself
         hpx::future<void> result = hpx::when_all(futures).then(
             hpx::launch::sync, [this_](hpx::future<void>&& f) {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::gather: rank_({}): recursive gather done",
                     this_->rank_);
 
@@ -284,7 +283,7 @@ namespace hpx { namespace distributed { namespace detail {
         // keep everything alive until future has become ready
         traits::detail::get_shared_state(result)->set_on_completed(
             [this_ = HPX_MOVE(this_)] {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::gather: rank_({}): all done", this_->rank_);
             });
 
@@ -299,20 +298,20 @@ namespace hpx { namespace distributed { namespace detail {
     {
         if (num_ < cut_off_)
         {
-            LAPP_(info).format(
+            LRT_(info).format(
                 "barrier_node::set_event: rank_({}): entering local barrier",
                 rank_);
 
             local_barrier_.arrive_and_wait();
 
-            LAPP_(info).format(
+            LRT_(info).format(
                 "barrier_node::set_event: rank_({}): exiting local barrier",
                 rank_);
             return;
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        LAPP_(info).format(
+        LRT_(info).format(
             "barrier_node::set_event: rank_({}): recursively broadcast", rank_);
 
         // We recursively broadcast the information that everyone entered the
@@ -331,7 +330,7 @@ namespace hpx { namespace distributed { namespace detail {
         hpx::intrusive_ptr<barrier_node> this_(this);
         hpx::future<void> result = hpx::when_all(futures).then(
             hpx::launch::sync, [this_](hpx::future<void>&& f) {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::set_event: rank_({}): mark ourselves ready",
                     this_->rank_);
 
@@ -343,7 +342,7 @@ namespace hpx { namespace distributed { namespace detail {
         // keep everything alive until future has become ready
         traits::detail::get_shared_state(result)->set_on_completed(
             [this_ = HPX_MOVE(this_)] {
-                LAPP_(info).format(
+                LRT_(info).format(
                     "barrier_node::set_event: rank_({}): all done",
                     this_->rank_);
             });
