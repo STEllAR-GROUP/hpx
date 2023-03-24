@@ -1582,8 +1582,8 @@ endif()
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
-# If compiling for riscv64, automatically bake in Boost.Context
-if(${__target_arch} STREQUAL "riscv64")
+# If compiling for riscv64 or arm64, automatically bake in Boost.Context
+if(${__target_arch} STREQUAL "riscv64" OR ${__target_arch} STREQUAL "arm64")
   set(__use_generic_coroutine_context ON)
 endif()
 
