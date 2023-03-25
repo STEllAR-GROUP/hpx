@@ -27,7 +27,6 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <utility>
 
@@ -45,14 +44,15 @@ namespace hpx::threads::detail {
         {
         }
 
-        void collect_exec_time(std::int64_t timestamp) noexcept
+        void collect_exec_time(std::uint64_t timestamp) const noexcept
         {
-            exec_time_ += util::hardware::timestamp() - timestamp;
+            exec_time_ += static_cast<std::int64_t>(
+                util::hardware::timestamp() - timestamp);
         }
 
         void take_snapshot() noexcept
         {
-            if (tfunc_time_ == std::int64_t(-1))
+            if (tfunc_time_ == static_cast<std::int64_t>(-1))
             {
                 start_timestamp_ = util::hardware::timestamp();
                 tfunc_time_ = 0;
@@ -60,11 +60,12 @@ namespace hpx::threads::detail {
             }
             else
             {
-                tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+                tfunc_time_ = static_cast<std::int64_t>(
+                    util::hardware::timestamp() - start_timestamp_);
             }
         }
 
-        std::int64_t start_timestamp_;
+        std::uint64_t start_timestamp_;
 
         std::int64_t& tfunc_time_;
         std::int64_t& exec_time_;
@@ -77,12 +78,19 @@ namespace hpx::threads::detail {
           , idle_rate_(idle_rate)
         {
         }
+
+        exec_time_wrapper(exec_time_wrapper const&) = delete;
+        exec_time_wrapper(exec_time_wrapper&&) = delete;
+
+        exec_time_wrapper& operator=(exec_time_wrapper const&) = delete;
+        exec_time_wrapper& operator=(exec_time_wrapper&&) = delete;
+
         ~exec_time_wrapper()
         {
             idle_rate_.collect_exec_time(timestamp_);
         }
 
-        std::int64_t timestamp_;
+        std::uint64_t timestamp_;
         idle_collect_rate& idle_rate_;
     };
 
@@ -93,6 +101,13 @@ namespace hpx::threads::detail {
           : idle_rate_(idle_rate)
         {
         }
+
+        tfunc_time_wrapper(tfunc_time_wrapper const&) = delete;
+        tfunc_time_wrapper(tfunc_time_wrapper&&) = delete;
+
+        tfunc_time_wrapper& operator=(tfunc_time_wrapper const&) = delete;
+        tfunc_time_wrapper& operator=(tfunc_time_wrapper&&) = delete;
+
         ~tfunc_time_wrapper()
         {
             idle_rate_.take_snapshot();
@@ -128,6 +143,13 @@ namespace hpx::threads::detail {
         {
             is_active = true;
         }
+
+        is_active_wrapper(is_active_wrapper const&) = delete;
+        is_active_wrapper(is_active_wrapper&&) = delete;
+
+        is_active_wrapper& operator=(is_active_wrapper const&) = delete;
+        is_active_wrapper& operator=(is_active_wrapper&&) = delete;
+
         ~is_active_wrapper()
         {
             is_active_ = false;
@@ -144,10 +166,10 @@ namespace hpx::threads::detail {
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::stack_context ctx;    // helper for itt support
-        util::itt::thread_domain thread_domain;
+        util::itt::thread_domain const thread_domain;
         util::itt::id threadid(thread_domain, &scheduler);
-        util::itt::string_handle task_id("task_id");
-        util::itt::string_handle task_phase("task_phase");
+        util::itt::string_handle const task_id("task_id");
+        util::itt::string_handle const task_phase("task_phase");
         // util::itt::frame_context fctx(thread_domain);
 #endif
 
@@ -178,7 +200,7 @@ namespace hpx::threads::detail {
             context_storage =
                 hpx::execution_base::this_thread::detail::get_agent_storage();
 
-        std::size_t added = std::size_t(-1);
+        auto added = static_cast<std::size_t>(-1);
         thread_id_ref_type next_thrd;
         while (true)
         {
@@ -189,9 +211,11 @@ namespace hpx::threads::detail {
             bool running = this_state.load(std::memory_order_relaxed) <
                 hpx::state::pre_sleep;
 
-            // extract the stealing mode once per loop iteration
-            bool enable_stealing = scheduler.has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing);
+            // extract the stealing mode once per loop iteration (except during
+            // shutdown)
+            bool enable_stealing = !may_exit &&
+                scheduler.has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing);
 
             // stealing staged threads is enabled if:
             // - fast idle mode is on: same as normal stealing
@@ -202,7 +226,7 @@ namespace hpx::threads::detail {
                 !scheduler.has_scheduler_mode(
                     policies::scheduler_mode::fast_idle_mode))
             {
-                enable_stealing_staged =
+                enable_stealing_staged = !may_exit &&
                     idle_loop_count > params.max_idle_loop_count_ / 2;
             }
 
@@ -210,8 +234,6 @@ namespace hpx::threads::detail {
                     scheduler.get_next_thread(
                         num_thread, running, thrd, enable_stealing)))
             {
-                [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(
-                    idle_rate);
                 HPX_ASSERT(get_thread_id_data(thrd)->get_scheduler_base() ==
                     &scheduler);
 
@@ -245,7 +267,7 @@ namespace hpx::threads::detail {
                                 thread_schedule_state::active);
 
                             [[maybe_unused]] tfunc_time_wrapper
-                                tfunc_time_collector(idle_rate);
+                                tfunc_time_collector_inner(idle_rate);
 
                             // thread returns new required state store the
                             // returned state in the thread
@@ -477,7 +499,7 @@ namespace hpx::threads::detail {
                                     *background_running = false;    //-V522
 
                                     // do background work in parcel layer and in agas
-                                    [[maybe_unused]] bool has_exited =
+                                    [[maybe_unused]] bool const has_exited =
                                         call_background_thread(
                                             background_thread, next_thrd,
                                             scheduler, num_thread,
@@ -512,7 +534,7 @@ namespace hpx::threads::detail {
                 {
                     // speed up idle suspend if no work was stolen
                     idle_loop_count += params.max_idle_loop_count_ / 1024;
-                    added = std::size_t(-1);
+                    added = static_cast<std::size_t>(-1);
                 }
 
                 // if stealing yielded a new task, run it first
@@ -584,7 +606,7 @@ namespace hpx::threads::detail {
                         *background_running = false;
 
                         // do background work in parcel layer and in agas
-                        [[maybe_unused]] bool has_exited =
+                        [[maybe_unused]] bool const has_exited =
                             call_background_thread(background_thread, next_thrd,
                                 scheduler, num_thread, bg_work_exec_time_init,
                                 context_storage);
@@ -597,7 +619,7 @@ namespace hpx::threads::detail {
                     }
                     else
                     {
-                        bool can_exit = !running &&
+                        bool const can_exit = !running &&
                             scheduler.SchedulingPolicy::cleanup_terminated(
                                 true) &&
                             scheduler.SchedulingPolicy::get_thread_count(

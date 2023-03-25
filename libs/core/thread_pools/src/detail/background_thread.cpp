@@ -9,7 +9,6 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
-#include <hpx/thread_pools/detail/scheduling_counters.hpp>
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
@@ -23,11 +22,11 @@ namespace hpx::threads::detail {
     ///////////////////////////////////////////////////////////////////////////
     thread_id_ref_type create_background_thread(
         threads::policies::scheduler_base& scheduler_base,
-        std::size_t num_thread, scheduling_callbacks& callbacks,
+        std::size_t num_thread, scheduling_callbacks const& callbacks,
         std::shared_ptr<bool>& background_running,
         std::int64_t& idle_loop_count)
     {
-        threads::thread_schedule_hint schedulehint(
+        threads::thread_schedule_hint const schedulehint(
             static_cast<std::int16_t>(num_thread));
 
         thread_id_ref_type background_thread;
@@ -53,8 +52,7 @@ namespace hpx::threads::detail {
                     hpx::execution_base::this_thread::yield("background_work");
                 }
 
-                return thread_result_type(
-                    thread_schedule_state::terminated, invalid_thread_id);
+                return {thread_schedule_state::terminated, invalid_thread_id};
             },
             hpx::threads::thread_description("background_work"),
             thread_priority::high_recursive, schedulehint,
@@ -89,6 +87,14 @@ namespace hpx::threads::detail {
                     prev_state_, orig_state_, std::memory_order_relaxed))
         {
         }
+
+        switch_status_background(switch_status_background const&) = delete;
+        switch_status_background(switch_status_background&&) = delete;
+
+        switch_status_background& operator=(
+            switch_status_background const&) = delete;
+        switch_status_background& operator=(
+            switch_status_background&&) = delete;
 
         ~switch_status_background()
         {
@@ -248,7 +254,7 @@ namespace hpx::threads::detail {
         std::size_t num_thread, background_work_exec_time& exec_time,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage,
-        scheduling_callbacks& callbacks, std::shared_ptr<bool>& running,
+        scheduling_callbacks const& callbacks, std::shared_ptr<bool>& running,
         std::int64_t& idle_loop_count)
     {
         if (!call_background_thread(background_thread, next_thrd,
