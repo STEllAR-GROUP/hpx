@@ -47,7 +47,7 @@ namespace hpx::threads::detail {
     // Create a new background thread
     HPX_CORE_EXPORT thread_id_ref_type create_background_thread(
         threads::policies::scheduler_base& scheduler_base,
-        std::size_t num_thread, scheduling_callbacks& callbacks,
+        std::size_t num_thread, scheduling_callbacks const& callbacks,
         std::shared_ptr<bool>& background_running,
         std::int64_t& idle_loop_count);
 
@@ -72,6 +72,6 @@ namespace hpx::threads::detail {
         std::size_t num_thread, background_work_exec_time& exec_time,
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage,
-        scheduling_callbacks& callbacks, std::shared_ptr<bool>& running,
+        scheduling_callbacks const& callbacks, std::shared_ptr<bool>& running,
         std::int64_t& idle_loop_count);
 }    // namespace hpx::threads::detail
