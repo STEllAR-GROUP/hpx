@@ -206,6 +206,8 @@ namespace hpx::execution::experimental {
                 {
                 }
 
+                type(type&&) = delete;
+
                 Scheduler scheduler;
                 Sender sndr;
                 Receiver rcvr;
@@ -240,18 +242,6 @@ namespace hpx::execution::experimental {
                 Scheduler scheduler;
                 Sender sndr;
 
-                template <typename Self, typename on_receiver,
-                    typename = std::enable_if_t<is_receiver_v<on_receiver>>,
-                    typename = std::enable_if_t<
-                        is_sender_to_v<schedule_result_t<Scheduler>,
-                            Receiver_t<hpx::meta::get_id_t<on_receiver>>>>>
-                friend auto tag_invoke(connect_t, Self&& self, on_receiver rcvr)
-                    -> on_operation_t<hpx::meta::get_id_t<on_receiver>>
-                {
-                    return {(HPX_FORWARD(Self, self)).scheduler,
-                        (HPX_FORWARD(Self, self)).sndr, (on_receiver &&) rcvr};
-                }
-
                 friend auto tag_invoke(get_env_t, const type& self) noexcept(
                     hpx::is_nothrow_invocable_v<get_env_t, const Sender&>)
                     -> hpx::util::invoke_result_t<get_env_t, const Sender&>
@@ -259,16 +249,39 @@ namespace hpx::execution::experimental {
                     return get_env(self.sndr);
                 }
 
+                template <typename Sender, typename Env>
+                struct generate_completion_signatures
+                {
+                    template <typename...>
+                    using value_types = completion_signatures<>;
+
+                    template <template <typename...> typename Variant>
+                    using error_types = hpx::util::detail::unique_concat_t<
+                        error_types_of_t<Sender, Env, Variant>,
+                        Variant<std::exception_ptr>>;
+
+                    static constexpr bool sends_stopped = false;
+                };
+
                 template <typename Self, typename Env>
                 friend auto tag_invoke(get_completion_signatures_t, Self&&, Env)
-                    -> make_completion_signatures<schedule_result_t<Scheduler>,
-                        Env,
-                        make_completion_signatures<Self,
-                            make_env_t<get_scheduler_t, Scheduler, Env>,
-                            completion_signatures<set_error_t(
-                                std::exception_ptr)>>>;
+                    -> generate_completion_signatures<
+                        schedule_result_t<Scheduler>, Env>;
+
+                template <typename Self, typename ReceiverOn,
+                    typename = std::enable_if_t<is_receiver_v<ReceiverOn> &&
+                        is_sender_to_v<schedule_result_t<Scheduler>,
+                            Receiver_t<hpx::meta::get_id_t<ReceiverOn>>>>>
+                friend auto tag_invoke(connect_t, Self&& self, ReceiverOn rcvr)
+                {
+                    return on_operation_t<hpx::meta::get_id_t<ReceiverOn>>{
+                        (HPX_FORWARD(Self, self)).scheduler,
+                        (HPX_FORWARD(Self, self)).sndr,
+                        HPX_FORWARD(ReceiverOn, rcvr)};
+                }
             };
         };
+
     }    // namespace detail
 
     inline constexpr struct on_t : hpx::functional::detail::tag_fallback<on_t>
