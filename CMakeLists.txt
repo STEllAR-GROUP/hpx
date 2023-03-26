@@ -442,6 +442,28 @@ hpx_option(
   "Create build system support for fail compile HPX tests (default ON)" ON
   CATEGORY "Build Targets"
 )
+hpx_option(
+  HPX_WITH_PARALLEL_LINK_JOBS
+  STRING
+  "Number of Parallel link jobs while building hpx (only for Ninja as generator) (default 2)"
+  "2"
+  CATEGORY "Build Targets"
+)
+
+if(CMAKE_GENERATOR MATCHES "Ninja")
+  if(NOT HPX_WITH_PARALLEL_LINK_JOBS)
+    set(HPX_WITH_PARALLEL_LINK_JOBS "2")
+  endif()
+  if(HPX_WITH_PARALLEL_LINK_JOBS)
+    set_property(
+      GLOBAL APPEND PROPERTY JOB_POOLS
+                             link_job_pool=${HPX_WITH_PARALLEL_LINK_JOBS}
+    )
+    set(CMAKE_JOB_POOL_LINK link_job_pool)
+  endif()
+elseif(HPX_WITH_PARALLEL_LINK_JOBS)
+  hpx_warn("Job pooling is only available with Ninja generators.")
+endif()
 
 # disable all tests if HPX_WITH_TESTS=OFF
 if(NOT HPX_WITH_TESTS)
@@ -922,7 +944,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.1"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.2"
     CATEGORY "Profiling"
   )
 endif()
