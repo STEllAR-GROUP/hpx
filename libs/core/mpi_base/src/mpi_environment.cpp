@@ -31,15 +31,15 @@ namespace hpx { namespace util {
             // MPI environment
             return true;
 #else
-            std::string mpi_environment_strings =
+            std::string const mpi_environment_strings =
                 cfg.get_entry("hpx.parcel.mpi.env", default_env);
 
             hpx::string_util::char_separator sep(";,: ");
-            hpx::string_util::tokenizer tokens(mpi_environment_strings, sep);
+            hpx::string_util::tokenizer const tokens(
+                mpi_environment_strings, sep);
             for (auto const& tok : tokens)
             {
-                char* env = std::getenv(tok.c_str());
-                if (env)
+                if (char* env = std::getenv(tok.c_str()))
                 {
                     LBT_(debug)
                         << "Found MPI environment variable: " << tok << "="
@@ -135,6 +135,22 @@ namespace hpx { namespace util {
             }
             has_called_init_ = true;
         }
+        else
+        {
+            // ask what MPI threading mode is active
+            retval = MPI_Query_thread(&provided);
+            if (MPI_SUCCESS != retval)
+            {
+                return retval;
+            }
+
+            if (provided < minimal)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "hpx::util::mpi_environment::init",
+                    "MPI doesn't provide minimal requested thread level");
+            }
+        }
         return retval;
     }
 
@@ -179,7 +195,7 @@ namespace hpx { namespace util {
 
 #endif
 
-        int retval =
+        int const retval =
             init(argc, argv, required, required, provided_threading_flag_);
         if (MPI_SUCCESS != retval && MPI_ERR_OTHER != retval)
         {
