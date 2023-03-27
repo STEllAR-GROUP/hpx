@@ -154,8 +154,6 @@ namespace hpx::traits {
             using type = general_pointer_tag;
         };
 
-        // Would it make more sense to create a relocate_category instead or
-        // a pointer_relocate_category, that does not involve iterators?
         template <typename Source, typename Dest>
         struct pointer_relocate_category<Source, Dest, false>
         {
