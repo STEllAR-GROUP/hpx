@@ -30,7 +30,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -38,8 +37,6 @@
 #include <hpx/functional/function.hpp>
 
 #include <cstddef>
-#include <exception>
-#include <limits>
 #include <utility>
 
 namespace hpx::threads::coroutines::detail {
@@ -58,6 +55,12 @@ namespace hpx::threads::coroutines::detail {
             {
                 set_self(self->next_self_);
             }
+
+            reset_self_on_exit(reset_self_on_exit const&) = delete;
+            reset_self_on_exit(reset_self_on_exit&&) = delete;
+
+            reset_self_on_exit& operator=(reset_self_on_exit const&) = delete;
+            reset_self_on_exit& operator=(reset_self_on_exit&&) = delete;
 
             ~reset_self_on_exit()
             {
@@ -182,6 +185,12 @@ namespace hpx::threads::coroutines::detail {
         {
             coroutine_self::set_self(val);
         }
+
+        reset_self_on_exit(reset_self_on_exit const&) = delete;
+        reset_self_on_exit(reset_self_on_exit&&) = delete;
+
+        reset_self_on_exit& operator=(reset_self_on_exit const&) = delete;
+        reset_self_on_exit& operator=(reset_self_on_exit&&) = delete;
 
         ~reset_self_on_exit()
         {

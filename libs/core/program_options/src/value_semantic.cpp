@@ -1,8 +1,8 @@
-//  Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt
-//  or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/datastructures/any.hpp>
@@ -22,7 +22,7 @@ namespace hpx::program_options {
     inline std::string strip_prefixes(std::string const& text)
     {
         // "--foo-bar" -> "foo-bar"
-        std::string::size_type i = text.find_first_not_of("-/");
+        std::string::size_type const i = text.find_first_not_of("-/");
         if (i == std::string::npos)
         {
             return text;
@@ -129,7 +129,7 @@ namespace hpx::program_options {
 
     typed_value<bool>* bool_switch(bool* v)
     {
-        typed_value<bool>* r = new typed_value<bool>(v);
+        auto* r = new typed_value(v);
         r->default_value(false);
         r->zero_tokens();
 
@@ -149,14 +149,22 @@ namespace hpx::program_options {
         std::string s(get_single_string(xs, true));
 
         for (char& i : s)
-            i = char(std::tolower(i));
+        {
+            i = static_cast<char>(std::tolower(i));
+        }
 
         if (s.empty() || s == "on" || s == "yes" || s == "1" || s == "true")
+        {
             v = hpx::any_nonser(true);
+        }
         else if (s == "off" || s == "no" || s == "0" || s == "false")
+        {
             v = hpx::any_nonser(false);
+        }
         else
+        {
             throw invalid_bool_value(s);
+        }
     }
 
     // This is blatant copy-paste. However, templating this will cause a problem,
@@ -171,14 +179,22 @@ namespace hpx::program_options {
         std::wstring s(get_single_string(xs, true));
 
         for (wchar_t& i : s)
-            i = wchar_t(tolower(i));
+        {
+            i = static_cast<wchar_t>(tolower(i));
+        }
 
         if (s.empty() || s == L"on" || s == L"yes" || s == L"1" || s == L"true")
+        {
             v = hpx::any_nonser(true);
+        }
         else if (s == L"off" || s == L"no" || s == L"0" || s == L"false")
+        {
             v = hpx::any_nonser(false);
+        }
         else
+        {
             throw invalid_bool_value(convert_value(s));
+        }
     }
 
     HPX_CORE_EXPORT
@@ -255,7 +271,7 @@ namespace hpx::program_options {
     {
         for (;;)
         {
-            std::size_t pos = m_message.find(from);
+            std::size_t const pos = m_message.find(from);
             // not found: all replaced
             if (pos == std::string::npos)
                 return;
@@ -277,17 +293,19 @@ namespace hpx::program_options {
             return "--";
         case 0:
             return "";
+        default:
+            break;
         }
         throw std::logic_error(
-            "error_with_option_name::m_option_style can only be "
-            "one of [0, allow_dash_for_short, allow_slash_for_short, "
-            "allow_long_disguise or allow_long]");
+            "error_with_option_name::m_option_style can only be one of [0, "
+            "allow_dash_for_short, allow_slash_for_short, allow_long_disguise "
+            "or allow_long]");
     }
 
     std::string error_with_option_name::get_canonical_option_name() const
     {
-        auto option_it = m_substitutions.find("option");
-        auto original_it = m_substitutions.find("original_token");
+        auto const option_it = m_substitutions.find("option");
+        auto const original_it = m_substitutions.find("original_token");
         if (option_it != m_substitutions.end() && !option_it->second.length())
         {
             return original_it != m_substitutions.end() ? original_it->second :
@@ -361,9 +379,8 @@ namespace hpx::program_options {
 
         std::string error_template = original_error_template;
         // remove duplicates using std::set
-        std::set<std::string> alternatives_set(
-            m_alternatives.begin(), m_alternatives.end());
-        std::vector<std::string> alternatives_vec(
+        std::set alternatives_set(m_alternatives.begin(), m_alternatives.end());
+        std::vector const alternatives_vec(
             alternatives_set.begin(), alternatives_set.end());
 
         error_template += " and matches ";
@@ -413,6 +430,7 @@ namespace hpx::program_options {
             break;
         default:
             msg = "unknown error";
+            break;
         }
         return msg;
     }

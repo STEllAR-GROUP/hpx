@@ -122,7 +122,7 @@ void test_unknown_option()
     catch (unknown_option& e)
     {
         HPX_TEST_EQ(e.get_option_name(), "-f");
-        HPX_TEST_EQ(string(e.what()), "unrecognised option '-f'");
+        HPX_TEST_EQ(string(e.what()), "unrecognized option '-f'");
     }
 }
 

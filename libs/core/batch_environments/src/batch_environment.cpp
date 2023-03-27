@@ -30,9 +30,9 @@ namespace hpx::util {
     batch_environment::batch_environment(std::vector<std::string>& nodelist,
         bool have_mpi, bool debug, bool enable)
       : agas_node_num_(0)
-      , node_num_(std::size_t(-1))
-      , num_threads_(std::size_t(-1))
-      , num_localities_(std::size_t(-1))
+      , node_num_(static_cast<std::size_t>(-1))
+      , num_threads_(static_cast<std::size_t>(-1))
+      , num_localities_(static_cast<std::size_t>(-1))
       , debug_(debug)
     {
         if (!enable)
@@ -44,6 +44,12 @@ namespace hpx::util {
               : env_(env)
             {
             }
+
+            onexit(onexit const&) = delete;
+            onexit(onexit&&) = delete;
+
+            onexit& operator=(onexit const&) = delete;
+            onexit& operator=(onexit&&) = delete;
 
             ~onexit()
             {
@@ -64,7 +70,7 @@ namespace hpx::util {
 
         onexit _(*this);
 
-        batch_environments::alps_environment alps_env(nodelist, debug);
+        batch_environments::alps_environment const alps_env(nodelist, debug);
         if (alps_env.valid())
         {
             batch_name_ = "ALPS";
@@ -74,7 +80,8 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::pjm_environment pjm_env(nodelist, have_mpi, debug);
+        batch_environments::pjm_environment const pjm_env(
+            nodelist, have_mpi, debug);
         if (pjm_env.valid())
         {
             batch_name_ = "PJM";
@@ -84,7 +91,7 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::slurm_environment slurm_env(nodelist, debug);
+        batch_environments::slurm_environment const slurm_env(nodelist, debug);
         if (slurm_env.valid())
         {
             batch_name_ = "SLURM";
@@ -94,7 +101,8 @@ namespace hpx::util {
             return;
         }
 
-        batch_environments::pbs_environment pbs_env(nodelist, have_mpi, debug);
+        batch_environments::pbs_environment const pbs_env(
+            nodelist, have_mpi, debug);
         if (pbs_env.valid())
         {
             batch_name_ = "PBS";
@@ -178,7 +186,7 @@ namespace hpx::util {
             }
 
             std::cerr << "Nodes from nodelist:" << std::endl;
-            node_map_type::const_iterator end = nodes_.end();
+            node_map_type::const_iterator const end = nodes_.end();
             for (node_map_type::const_iterator it = nodes_.begin(); it != end;
                  ++it)
             {

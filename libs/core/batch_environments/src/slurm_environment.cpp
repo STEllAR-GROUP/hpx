@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0

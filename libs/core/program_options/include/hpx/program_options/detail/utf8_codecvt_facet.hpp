@@ -1,6 +1,7 @@
 // Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
 // Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
-//  SPDX-License-Identifier: BSL-1.0
+//
+// SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See accompany-
 // ing file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -25,7 +26,7 @@
 // - this requires review process first
 // - in the case, when linking the a library which uses utf8
 //   (say 'program_options'), user should also link to the utf8 library.
-//   This seems inconvenient, and asking a user to link to an unrevieved
+//   This seems inconvenient, and asking a user to link to an unreviewed
 //   library is strange.
 // Until the above points are fixed, a library which wants to use utf8 must:
 // - include this header in one of it's headers or sources
@@ -114,12 +115,12 @@ namespace hpx::program_options::detail {
             wchar_t const*& from_next, char* to, char* to_end,
             char*& to_next) const override;
 
-        bool invalid_continuing_octet(unsigned char octet_1) const noexcept
+        static bool invalid_continuing_octet(unsigned char octet_1) noexcept
         {
             return (octet_1 < 0x80 || 0xbf < octet_1);
         }
 
-        bool invalid_leading_octet(unsigned char octet_1) const noexcept
+        static bool invalid_leading_octet(unsigned char octet_1) noexcept
         {
             return (0x7f < octet_1 && octet_1 < 0xc0) || (octet_1 > 0xfd);
         }
@@ -152,7 +153,7 @@ namespace hpx::program_options::detail {
 
         int do_encoding() const noexcept override
         {
-            int const variable_byte_external_encoding = 0;
+            constexpr int variable_byte_external_encoding = 0;
             return variable_byte_external_encoding;
         }
 

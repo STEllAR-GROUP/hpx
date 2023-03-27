@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,8 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     barrier::barrier(std::size_t number_of_threads)
       : number_of_threads_(number_of_threads)
       , total_(barrier_flag)
@@ -66,4 +67,4 @@ namespace hpx { namespace util {
             }
         }
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

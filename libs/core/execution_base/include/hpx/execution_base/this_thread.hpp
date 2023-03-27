@@ -10,16 +10,15 @@
 #include <hpx/config.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
-#include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/modules/type_support.hpp>
 #include <hpx/timing/high_resolution_timer.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/meta.hpp>
 
 #ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/errors/throw_exception.hpp>
+#include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
 #endif
 
 #include <chrono>
@@ -46,6 +45,11 @@ namespace hpx::execution_base {
         {
             explicit reset_agent(agent_base& impl);
             reset_agent(detail::agent_storage*, agent_base& impl);
+
+            reset_agent(reset_agent const&) = delete;
+            reset_agent(reset_agent&&) = delete;
+            reset_agent& operator=(reset_agent const&) = delete;
+            reset_agent& operator=(reset_agent&&) = delete;
 
             ~reset_agent();
 
@@ -225,7 +229,7 @@ namespace hpx::util {
             using duration_type = std::chrono::duration<double>;
 
             // Initialize timer only if needed
-            bool use_timeout = timeout >= duration_type(0.0);
+            bool const use_timeout = timeout >= duration_type(0.0);
             hpx::chrono::high_resolution_timer t(
                 hpx::chrono::high_resolution_timer::init::no_init);
 

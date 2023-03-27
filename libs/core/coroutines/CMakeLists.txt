@@ -58,6 +58,7 @@ set(coroutines_sources
     detail/tss.cpp
     swapcontext.cpp
     thread_enums.cpp
+    thread_id_type.cpp
     signal_handler_debugging.cpp
 )
 

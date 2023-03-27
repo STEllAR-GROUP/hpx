@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,17 +22,17 @@ namespace hpx::execution_base {
     {
     public:
         agent_ref() = default;
+        ~agent_ref() = default;
 
-        constexpr agent_ref(agent_base* impl) noexcept
+        explicit constexpr agent_ref(agent_base* impl) noexcept
           : impl_(impl)
         {
         }
 
-        constexpr agent_ref(agent_ref const&) noexcept = default;
-        constexpr agent_ref& operator=(agent_ref const&) noexcept = default;
-
-        constexpr agent_ref(agent_ref&&) noexcept = default;
-        constexpr agent_ref& operator=(agent_ref&&) noexcept = default;
+        agent_ref(agent_ref const&) = default;
+        agent_ref& operator=(agent_ref const&) = default;
+        agent_ref(agent_ref&&) = default;
+        agent_ref& operator=(agent_ref&&) = default;
 
         explicit constexpr operator bool() const noexcept
         {
@@ -43,14 +44,16 @@ namespace hpx::execution_base {
             impl_ = impl;
         }
 
-        void yield(char const* desc = "hpx::execution_base::agent_ref::yield");
+        void yield(
+            char const* desc = "hpx::execution_base::agent_ref::yield") const;
         void yield_k(std::size_t k,
-            char const* desc = "hpx::execution_base::agent_ref::yield_k");
+            char const* desc = "hpx::execution_base::agent_ref::yield_k") const;
         void suspend(
-            char const* desc = "hpx::execution_base::agent_ref::suspend");
+            char const* desc = "hpx::execution_base::agent_ref::suspend") const;
         void resume(
-            char const* desc = "hpx::execution_base::agent_ref::resume");
-        void abort(char const* desc = "hpx::execution_base::agent_ref::abort");
+            char const* desc = "hpx::execution_base::agent_ref::resume") const;
+        void abort(
+            char const* desc = "hpx::execution_base::agent_ref::abort") const;
 
         template <typename Rep, typename Period>
         void sleep_for(std::chrono::duration<Rep, Period> const& sleep_duration,
@@ -67,7 +70,7 @@ namespace hpx::execution_base {
             sleep_until(hpx::chrono::steady_time_point{sleep_time}, desc);
         }
 
-        agent_base& ref() noexcept
+        [[nodiscard]] agent_base& ref() const noexcept
         {
             return *impl_;
         }
@@ -81,9 +84,9 @@ namespace hpx::execution_base {
         agent_base* impl_ = nullptr;
 
         void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
-            char const* desc);
-        void sleep_until(
-            hpx::chrono::steady_time_point const& sleep_time, char const* desc);
+            char const* desc) const;
+        void sleep_until(hpx::chrono::steady_time_point const& sleep_time,
+            char const* desc) const;
 
         friend constexpr bool operator==(
             agent_ref const& lhs, agent_ref const& rhs) noexcept

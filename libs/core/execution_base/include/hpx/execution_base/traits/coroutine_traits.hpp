@@ -184,7 +184,7 @@ namespace hpx::execution::experimental {
     // member then the awaitable is the awaited value itself.
     //
     // The awaitable concept simply checks whether the type supports applying
-    // the co_await operator to avalue of that type. If the object has either a
+    // the co_await operator to a value of that type. If the object has either a
     // member or non-member operator co_await() then its return value must
     // satisfy the Awaiter concept. Otherwise, the Awaitable object must satisfy
     // the Awaiter concept itself.

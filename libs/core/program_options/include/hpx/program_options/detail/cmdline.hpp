@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -86,7 +86,7 @@ namespace hpx::program_options::detail {
          *
          *      This is mainly used for the diagnostic messages in exceptions
          */
-        int get_canonical_option_prefix() noexcept;
+        [[nodiscard]] int get_canonical_option_prefix() const noexcept;
 
         void allow_unregistered() noexcept;
 
@@ -96,14 +96,18 @@ namespace hpx::program_options::detail {
 
         std::vector<option> run();
 
-        std::vector<option> parse_long_option(std::vector<std::string>& args);
-        std::vector<option> parse_short_option(std::vector<std::string>& args);
-        std::vector<option> parse_dos_option(std::vector<std::string>& args);
+        std::vector<option> parse_long_option(
+            std::vector<std::string>& args) const;
+        std::vector<option> parse_short_option(
+            std::vector<std::string>& args) const;
+        std::vector<option> parse_dos_option(
+            std::vector<std::string>& args) const;
         std::vector<option> parse_disguised_long_option(
+            std::vector<std::string>& args) const;
+        static std::vector<option> parse_terminator(
             std::vector<std::string>& args);
-        std::vector<option> parse_terminator(std::vector<std::string>& args);
         std::vector<option> handle_additional_parser(
-            std::vector<std::string>& args);
+            std::vector<std::string>& args) const;
 
         /// Set additional parser. This will be called for each token of command
         /// line. If first string in pair is not empty, then the token is
@@ -115,22 +119,22 @@ namespace hpx::program_options::detail {
 
         void extra_style_parser(style_parser s) noexcept;
 
-        void check_style(int style) const;
+        static void check_style(int style);
 
-        bool is_style_active(style_t style) const noexcept;
+        [[nodiscard]] bool is_style_active(style_t style) const noexcept;
 
         void init(std::vector<std::string> const& args);
 
         void finish_option(option& opt, std::vector<std::string>& other_tokens,
-            std::vector<style_parser> const& style_parsers);
+            std::vector<style_parser> const& style_parsers) const;
 
         // Copies of input.
         std::vector<std::string> m_args;
-        style_t m_style;
-        bool m_allow_unregistered;
+        style_t m_style = command_line_style::default_style;
+        bool m_allow_unregistered = false;
 
-        options_description const* m_desc;
-        positional_options_description const* m_positional;
+        options_description const* m_desc = nullptr;
+        positional_options_description const* m_positional = nullptr;
 
         additional_parser m_additional_parser;
         style_parser m_style_parser;

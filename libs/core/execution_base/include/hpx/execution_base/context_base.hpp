@@ -7,9 +7,6 @@
 #pragma once
 
 #include <hpx/execution_base/resource_base.hpp>
-#include <hpx/timing/steady_clock.hpp>
-
-#include <cstdint>
 
 namespace hpx::execution_base {
 

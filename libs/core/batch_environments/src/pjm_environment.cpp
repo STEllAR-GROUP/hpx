@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 #include <hpx/string_util/tokenizer.hpp>
 #include <hpx/util/from_string.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <string>
@@ -35,7 +34,7 @@ namespace hpx::util::batch_environments {
       , num_localities_(0)
       , valid_(false)
     {
-        char* num_nodes = std::getenv("PJM_NODE");
+        char const* num_nodes = std::getenv("PJM_NODE");
         valid_ = num_nodes != nullptr;
         if (valid_)
         {
@@ -45,7 +44,7 @@ namespace hpx::util::batch_environments {
             if (have_mpi)
             {
                 // Initialize our node number, if available
-                char* var = std::getenv("PMIX_RANK");
+                char const* var = std::getenv("PMIX_RANK");
                 if (var != nullptr)
                 {
                     node_num_ = from_string<std::size_t>(var);

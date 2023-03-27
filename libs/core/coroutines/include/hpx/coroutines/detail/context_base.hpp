@@ -30,14 +30,6 @@
 
 #pragma once
 
-/*
- * Currently asio can, in some cases. call copy constructors and
- * operator= from different threads, even if in the
- * one-thread-per-service model. (i.e. from the resolver thread)
- * This will be corrected in future versions, but for now
- * we will play it safe and use an atomic count. The overhead shouldn't
- * be big.
- */
 #include <hpx/config.hpp>
 
 // This needs to be first for building on Macs
@@ -48,11 +40,9 @@
 #include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <limits>
 #include <utility>
 
 namespace hpx::threads::coroutines::detail {
@@ -89,12 +79,18 @@ namespace hpx::threads::coroutines::detail {
           , libcds_dynamic_hazard_pointer_data_(0)
 #endif
           , m_type_info()
-          , m_thread_id(id)
+          , m_thread_id(HPX_MOVE(id))
           , continuation_recursion_count_(0)
         {
         }
 
-        void reset_tss()
+        context_base(context_base const&) = delete;
+        context_base(context_base&&) = delete;
+
+        context_base& operator=(context_base const&) = delete;
+        context_base& operator=(context_base&&) = delete;
+
+        void reset_tss() const
         {
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
             delete_tss_storage(m_thread_data);
@@ -243,14 +239,14 @@ namespace hpx::threads::coroutines::detail {
 #endif
 
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
-        std::size_t set_thread_data(std::size_t data)
+        std::size_t set_thread_data(std::size_t data) const
         {
             return set_tss_thread_data(m_thread_data, data);
         }
 #else
-        std::size_t set_thread_data(std::size_t data) noexcept
+        std::size_t set_thread_data(std::size_t data) const noexcept
         {
-            std::size_t olddata = m_thread_data;
+            std::size_t const olddata = m_thread_data;
             m_thread_data = data;
             return olddata;
         }
@@ -335,7 +331,7 @@ namespace hpx::threads::coroutines::detail {
         {
             HPX_ASSERT(!running());
 
-            m_thread_id = id;
+            m_thread_id = HPX_MOVE(id);
             m_state = context_state::ready;
             m_exit_state = context_exit_state::not_requested;
             m_exit_status = context_exit_status::not_exited;

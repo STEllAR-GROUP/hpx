@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Shreyas Atre
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,18 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-
-#include <hpx/assert.hpp>
-#include <hpx/datastructures/variant.hpp>
-#include <hpx/execution_base/completion_signatures.hpp>
-#include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/traits/coroutine_traits.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/type_support/meta.hpp>
-
-#include <exception>
-#include <system_error>
-#include <utility>
 
 namespace hpx::execution::experimental {
 
@@ -33,14 +23,14 @@ namespace hpx::execution::experimental {
     // E names the type decltype((e)) and P names the type decltype((p)),
     // as_awaitable(e, p) is expression-equivalent to the following:
     //
-    //      1. tag_invoke(as_awaitable, e, p)
-    //         if that expression is well-formed.
-    //         -- Mandates: is-awaitable<A> is true,
-    //          where A is the type of the tag_invoke expression above.
-    //      2. Otherwise, e if is-awaitable<E> is true.
-    //      3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P>
+    //   1. tag_invoke(as_awaitable, e, p)
+    //      if that expression is well-formed.
+    //      -- Mandates: is-awaitable<A> is true,
+    //       where A is the type of the tag_invoke expression above.
+    //   2. Otherwise, e if is-awaitable<E> is true.
+    //   3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P>
     //      is true.
-    //      4. Otherwise, e.
+    //   4. Otherwise, e.
     struct as_awaitable_t;
 
     struct connect_awaitable_t;

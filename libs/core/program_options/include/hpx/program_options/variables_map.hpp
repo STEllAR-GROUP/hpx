@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -123,7 +123,7 @@ namespace hpx::program_options {
 
             - if there's a non-defaulted value, returns it.
         */
-        variable_value const& operator[](std::string const& name) const;
+        virtual variable_value const& operator[](std::string const& name) const;
 
         /** Sets next variable map, which will be used to find
            variables not found in *this. */
@@ -151,7 +151,7 @@ namespace hpx::program_options {
         explicit variables_map(abstract_variables_map const* next);
 
         // Resolve conflict between inherited operators.
-        variable_value const& operator[](std::string const& name) const
+        variable_value const& operator[](std::string const& name) const override
         {
             return abstract_variables_map::operator[](name);
         }
@@ -184,23 +184,23 @@ namespace hpx::program_options {
     /*
      * Templates/inlines
      */
-
-    inline bool variable_value::empty() const noexcept
+    [[nodiscard]] inline bool variable_value::empty() const noexcept
     {
         return !v.has_value();
     }
 
-    inline bool variable_value::defaulted() const noexcept
+    [[nodiscard]] inline bool variable_value::defaulted() const noexcept
     {
         return m_defaulted;
     }
 
-    inline hpx::any_nonser const& variable_value::value() const noexcept
+    [[nodiscard]] inline hpx::any_nonser const& variable_value::value()
+        const noexcept
     {
         return v;
     }
 
-    inline hpx::any_nonser& variable_value::value() noexcept
+    [[nodiscard]] inline hpx::any_nonser& variable_value::value() noexcept
     {
         return v;
     }

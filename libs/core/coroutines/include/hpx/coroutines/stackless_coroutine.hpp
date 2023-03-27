@@ -11,14 +11,16 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
-#include <hpx/coroutines/detail/tss.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/type_support/unused.hpp>
+#if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
+#include <hpx/coroutines/detail/tss.hpp>
+#endif
 
 #include <cstddef>
+#include <limits>
 #include <utility>
 
 namespace hpx::threads::coroutines {
@@ -60,7 +62,7 @@ namespace hpx::threads::coroutines {
             std::ptrdiff_t /*stack_size*/ = default_stack_size) noexcept
           : f_(HPX_MOVE(f))
           , state_(context_state::ready)
-          , id_(id)
+          , id_(HPX_MOVE(id))
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
           , phase_(0)
 #endif
@@ -118,9 +120,9 @@ namespace hpx::threads::coroutines {
             return detail::set_tss_thread_data(thread_data_, data);
         }
 #else
-        std::size_t set_thread_data(std::size_t data) noexcept
+        std::size_t set_thread_data(std::size_t data) const noexcept
         {
-            std::size_t olddata = thread_data_;
+            std::size_t const olddata = thread_data_;
             thread_data_ = data;
             return olddata;
         }
@@ -175,7 +177,7 @@ namespace hpx::threads::coroutines {
             HPX_ASSERT(exited());
 
             f_ = HPX_MOVE(f);
-            id_ = id;
+            id_ = HPX_MOVE(id);
 
 #if defined(HPX_HAVE_THREAD_PHASE_INFORMATION)
             phase_ = 0;
@@ -194,7 +196,7 @@ namespace hpx::threads::coroutines {
             detail::delete_tss_storage(thread_data_);
         }
 #else
-        void reset_tss() noexcept
+        void reset_tss() const noexcept
         {
             thread_data_ = 0;
         }
@@ -215,12 +217,17 @@ namespace hpx::threads::coroutines {
     private:
         struct reset_on_exit
         {
-            explicit constexpr reset_on_exit(
-                stackless_coroutine& this__) noexcept
-              : this_(this__)
+            explicit constexpr reset_on_exit(stackless_coroutine& that) noexcept
+              : this_(that)
             {
                 this_.state_ = context_state::running;
             }
+
+            reset_on_exit(reset_on_exit const&) = delete;
+            reset_on_exit(reset_on_exit&&) = delete;
+
+            reset_on_exit& operator=(reset_on_exit const&) = delete;
+            reset_on_exit& operator=(reset_on_exit&&) = delete;
 
             ~reset_on_exit()
             {
@@ -244,7 +251,7 @@ namespace hpx::threads::coroutines {
             return state_ == context_state::ready;
         }
 
-        constexpr std::ptrdiff_t get_available_stack_space() const noexcept
+        static constexpr std::ptrdiff_t get_available_stack_space() noexcept
         {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
         }
@@ -294,9 +301,7 @@ namespace hpx::threads::coroutines {
             detail::reset_self_on_exit on_self_exit(&self, nullptr);
 
             {
-                reset_on_exit on_exit{*this};
-
-                HPX_UNUSED(on_exit);
+                [[maybe_unused]] reset_on_exit const on_exit{*this};
 
                 result = f_(arg);    // invoke wrapped function
 

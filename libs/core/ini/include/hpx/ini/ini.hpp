@@ -1,5 +1,5 @@
 //  Copyright (c) 2005-2007 Andre Merzky
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -73,7 +73,7 @@ namespace hpx::util {
 
     protected:
         void line_msg(std::string msg, std::string const& file, int lnum = 0,
-            std::string const& line = "");
+            std::string const& line = "") const;
 
         section& clone_from(section const& rhs, section* root = nullptr);
 
@@ -104,7 +104,7 @@ namespace hpx::util {
         std::string get_entry(
             std::unique_lock<mutex_type>& l, std::string const& key) const;
         std::string get_entry(std::unique_lock<mutex_type>& l,
-            std::string const& key, std::string const& dflt) const;
+            std::string const& key, std::string const& default_val) const;
 
         void add_notification_callback(std::unique_lock<mutex_type>& l,
             std::string const& key, entry_changed_func const& callback);
@@ -132,7 +132,7 @@ namespace hpx::util {
         }
 
         void read(std::string const& filename);
-        void merge(std::string const& second);
+        void merge(std::string const& filename);
         void merge(section& second);
         void dump(int ind = 0) const;
         void dump(int ind, std::ostream& strm) const;
@@ -229,7 +229,7 @@ namespace hpx::util {
 
     private:
         std::string expand(
-            std::unique_lock<mutex_type>& l, std::string in) const;
+            std::unique_lock<mutex_type>& l, std::string value) const;
 
         void expand(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
@@ -238,8 +238,8 @@ namespace hpx::util {
         void expand_brace(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type) const;
 
-        std::string expand_only(std::unique_lock<mutex_type>& l, std::string in,
-            std::string const& expand_this) const;
+        std::string expand_only(std::unique_lock<mutex_type>& l,
+            std::string value, std::string const& expand_this) const;
 
         void expand_only(std::unique_lock<mutex_type>& l, std::string&,
             std::string::size_type, std::string const& expand_this) const;
@@ -266,9 +266,8 @@ namespace hpx::util {
             root_ = r;
             if (recursive)
             {
-                section_map::iterator send = sections_.end();
-                for (section_map::iterator si = sections_.begin(); si != send;
-                     ++si)
+                auto const send = sections_.end();
+                for (auto si = sections_.begin(); si != send; ++si)
                     si->second.set_root(r, true);
             }
         }

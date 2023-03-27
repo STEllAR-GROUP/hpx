@@ -1,9 +1,8 @@
 //  Copyright Vladimir Prus 2002-2004.
 //
 //  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt
-//  or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
@@ -168,19 +167,20 @@ namespace hpx::program_options {
     {
         variable_value const& v = get(name);
         if (v.empty() && m_next)
+        {
             return (*m_next)[name];
-        else if (v.defaulted() && m_next)
-        {
-            variable_value const& v2 = (*m_next)[name];
-            if (!v2.empty() && !v2.defaulted())
-                return v2;
-            else
-                return v;
         }
-        else
+
+        if (v.defaulted() && m_next)
         {
+            if (variable_value const& v2 = (*m_next)[name];
+                !v2.empty() && !v2.defaulted())
+            {
+                return v2;
+            }
             return v;
         }
+        return v;
     }
 
     void abstract_variables_map::next(abstract_variables_map* next)
@@ -188,7 +188,7 @@ namespace hpx::program_options {
         m_next = next;
     }
 
-    variables_map::variables_map() {}
+    variables_map::variables_map() = default;
 
     variables_map::variables_map(abstract_variables_map const* next)
       : abstract_variables_map(next)
@@ -204,26 +204,25 @@ namespace hpx::program_options {
 
     variable_value const& variables_map::get(std::string const& name) const
     {
-        static variable_value empty;
-        const_iterator i = this->find(name);
-        if (i == this->end())
+        if (auto const i = this->find(name); i == this->end())
+        {
+            static variable_value empty;
             return empty;
+        }
         else
+        {
             return i->second;
+        }
     }
 
     void variables_map::notify()
     {
         // This checks if all required options occur
-        for (std::map<std::string, std::string>::const_iterator r =
-                 m_required.begin();
-             r != m_required.end(); ++r)
+        for (const auto& r : m_required)
         {
-            std::string const& opt = r->first;
-            std::string const& display_opt = r->second;
-            std::map<std::string, variable_value>::const_iterator iter =
-                find(opt);
-            if (iter == end() || iter->second.empty())
+            std::string const& opt = r.first;
+            std::string const& display_opt = r.second;
+            if (auto iter = find(opt); iter == end() || iter->second.empty())
             {
                 throw required_option(display_opt);
             }
@@ -236,7 +235,7 @@ namespace hpx::program_options {
                that are not parsed, and therefore will not have value_semantics
                defined. Do not crash on such values. In multi-module programs,
                one module might add custom values, and the 'notify' function
-               will be called after that, so we check that value_sematics is
+               will be called after that, so we check that value_semantics is
                not NULL. See:
                    https://svn.boost.org/trac/boost/ticket/2782
             */
