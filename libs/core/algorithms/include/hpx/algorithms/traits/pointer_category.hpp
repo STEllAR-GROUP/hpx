@@ -138,19 +138,21 @@ namespace hpx::traits {
                 general_pointer_tag>;
         };
 
-        // relocatabillity is true in almost all cases, 
+        // relocatabillity is true in almost all cases,
         // an exception is std::mutex.
-        template<typename T> struct is_relocatable {
-            static constexpr bool value = 
-                std::is_move_constructible_v<T> &&
-                std::is_destructible_v<T>;
+        template <typename T>
+        struct is_relocatable
+        {
+            static constexpr bool value =
+                std::is_move_constructible_v<T> && std::is_destructible_v<T>;
         };
 
+        template <typename T>
         inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
 
         template <typename Source, typename Dest,
             bool NonContiguous = !iterators_are_contiguous_v<Source, Dest>>
-        struct pointer_relocate_category 
+        struct pointer_relocate_category
         {
             using type = general_pointer_tag;
         };
@@ -160,9 +162,8 @@ namespace hpx::traits {
         {
             using type = std::conditional_t<
                 std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
-                is_relocatable_v<iter_value_t<Source>>,
-                relocatable_pointer_tag,
-                general_pointer_tag>;
+                    is_relocatable_v<iter_value_t<Source>>,
+                relocatable_pointer_tag, general_pointer_tag>;
         };
     }    // namespace detail
 
@@ -191,7 +192,8 @@ namespace hpx::traits {
     template <typename Source, typename Dest, typename Enable = void>
     struct pointer_relocate_category
     {
-        using type = typename detail::pointer_relocate_category<Source, Dest>::type;
+        using type =
+            typename detail::pointer_relocate_category<Source, Dest>::type;
     };
 
     template <typename Source, typename Dest>
