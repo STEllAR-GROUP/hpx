@@ -138,7 +138,8 @@ namespace hpx::traits {
                 general_pointer_tag>;
         };
 
-        // check if a type is relocatable
+        // relocatabillity is true in almost all cases, 
+        // an exception is std::mutex.
         template<typename T> struct is_relocatable {
             static constexpr bool value = 
                 std::is_move_constructible_v<T> &&
@@ -159,7 +160,7 @@ namespace hpx::traits {
         {
             using type = std::conditional_t<
                 std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
-                detail::is_relocatable_v<iter_value_t<Source>>,
+                is_relocatable_v<iter_value_t<Source>>,
                 relocatable_pointer_tag,
                 general_pointer_tag>;
         };
