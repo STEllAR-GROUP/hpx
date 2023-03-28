@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -40,6 +40,7 @@ namespace hpx::parcelset {
     /// This returns true/false based on the background work.
     ///
     /// \param num_thread this represents the number of threads.
+    /// \param mode
     ///
     HPX_EXPORT bool do_background_work(std::size_t num_thread = 0,
         parcelport_background_mode mode = parcelport_background_mode_all);

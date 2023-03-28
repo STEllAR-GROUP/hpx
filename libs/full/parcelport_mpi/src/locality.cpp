@@ -10,8 +10,9 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/util.hpp>
-
 #include <hpx/parcelport_mpi/locality.hpp>
+
+#include <ostream>
 
 namespace hpx::parcelset::policies::mpi {
 

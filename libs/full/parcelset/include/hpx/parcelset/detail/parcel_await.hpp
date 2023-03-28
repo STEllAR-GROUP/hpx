@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace hpx { namespace parcelset { namespace detail {
+namespace hpx::parcelset::detail {
 
     using put_parcel_type = hpx::move_only_function<void(
         parcelset::parcel&&, write_handler_type&&)>;
@@ -32,6 +32,6 @@ namespace hpx { namespace parcelset { namespace detail {
     void HPX_EXPORT parcels_await_apply(std::vector<parcelset::parcel>&& p,
         std::vector<write_handler_type>&& f, std::uint32_t archive_flags,
         put_parcels_type pp);
-}}}    // namespace hpx::parcelset::detail
+}    // namespace hpx::parcelset::detail
 
 #endif

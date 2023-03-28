@@ -1,5 +1,5 @@
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,19 +12,18 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/assert.hpp>
 #include <hpx/modules/mpi_base.hpp>
-#include <hpx/modules/timing.hpp>
-
 #include <hpx/parcelport_mpi/header.hpp>
 #include <hpx/parcelset/decode_parcels.hpp>
 #include <hpx/parcelset/parcel_buffer.hpp>
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+#include <hpx/modules/timing.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <utility>
 #include <vector>
-
-#include <mpi.h>
 
 namespace hpx::parcelset::policies::mpi {
 
@@ -45,7 +44,7 @@ namespace hpx::parcelset::policies::mpi {
         using buffer_type = parcel_buffer<data_type, data_type>;
 
     public:
-        receiver_connection(int src, header h, Parcelport& pp) noexcept
+        receiver_connection(int src, header const& h, Parcelport& pp) noexcept
           : state_(initialized)
           , src_(src)
           , tag_(h.tag())
@@ -93,9 +92,9 @@ namespace hpx::parcelset::policies::mpi {
         bool receive_transmission_chunks(std::size_t num_thread = -1)
         {
             // determine the size of the chunk buffer
-            std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
+            auto const num_zero_copy_chunks = static_cast<std::size_t>(
                 static_cast<std::uint32_t>(buffer_.num_chunks_.first));
-            std::size_t num_non_zero_copy_chunks = static_cast<std::size_t>(
+            auto const num_non_zero_copy_chunks = static_cast<std::size_t>(
                 static_cast<std::uint32_t>(buffer_.num_chunks_.second));
             buffer_.transmission_chunks_.resize(
                 num_zero_copy_chunks + num_non_zero_copy_chunks);
@@ -104,11 +103,15 @@ namespace hpx::parcelset::policies::mpi {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
                     util::mpi_environment::scoped_lock l;
-                    MPI_Irecv(buffer_.transmission_chunks_.data(),
+
+                    [[maybe_unused]] int const ret = MPI_Irecv(
+                        buffer_.transmission_chunks_.data(),
                         static_cast<int>(buffer_.transmission_chunks_.size() *
                             sizeof(buffer_type::transmission_chunk_type)),
                         MPI_BYTE, src_, tag_,
                         util::mpi_environment::communicator(), &request_);
+                    HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
                     request_ptr_ = &request_;
                 }
             }
@@ -125,18 +128,20 @@ namespace hpx::parcelset::policies::mpi {
                 return false;
             }
 
-            char* piggy_back = header_.piggy_back();
-            if (piggy_back)
+            if (char const* piggy_back = header_.piggy_back())
             {
                 std::memcpy(
-                    &buffer_.data_[0], piggy_back, buffer_.data_.size());
+                    buffer_.data_.data(), piggy_back, buffer_.data_.size());
             }
             else
             {
                 util::mpi_environment::scoped_lock l;
-                MPI_Irecv(buffer_.data_.data(),
+
+                [[maybe_unused]] int const ret = MPI_Irecv(buffer_.data_.data(),
                     static_cast<int>(buffer_.data_.size()), MPI_BYTE, src_,
                     tag_, util::mpi_environment::communicator(), &request_);
+                HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
                 request_ptr_ = &request_;
             }
 
@@ -154,17 +159,20 @@ namespace hpx::parcelset::policies::mpi {
                     return false;
                 }
 
-                std::size_t idx = chunks_idx_++;
-                std::size_t chunk_size =
+                std::size_t const idx = chunks_idx_++;
+                std::size_t const chunk_size =
                     buffer_.transmission_chunks_[idx].second;
 
                 data_type& c = buffer_.chunks_[idx];
                 c.resize(chunk_size);
                 {
                     util::mpi_environment::scoped_lock l;
-                    MPI_Irecv(c.data(), static_cast<int>(c.size()), MPI_BYTE,
-                        src_, tag_, util::mpi_environment::communicator(),
-                        &request_);
+
+                    [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
+                        static_cast<int>(c.size()), MPI_BYTE, src_, tag_,
+                        util::mpi_environment::communicator(), &request_);
+                    HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
                     request_ptr_ = &request_;
                 }
             }
@@ -180,14 +188,18 @@ namespace hpx::parcelset::policies::mpi {
             {
                 return false;
             }
+
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
             {
                 util::mpi_environment::scoped_lock l;
-                MPI_Isend(&tag_, 1, MPI_INT, src_, 1,
-                    util::mpi_environment::communicator(), &request_);
+
+                [[maybe_unused]] int const ret = MPI_Isend(&tag_, 1, MPI_INT,
+                    src_, 1, util::mpi_environment::communicator(), &request_);
+                HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
                 request_ptr_ = &request_;
             }
 
@@ -217,10 +229,10 @@ namespace hpx::parcelset::policies::mpi {
             }
 
             int completed = 0;
-            int ret = 0;
-            ret = MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
-            HPX_ASSERT(ret == MPI_SUCCESS);
-            (void) ret;
+            [[maybe_unused]] int const ret =
+                MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
+            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
             if (completed)
             {
                 request_ptr_ = nullptr;

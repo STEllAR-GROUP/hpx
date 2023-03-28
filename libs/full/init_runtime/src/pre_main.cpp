@@ -196,7 +196,7 @@ namespace hpx { namespace detail {
             // all user code, including startup functions, are only run after the
             // component tables are populated.
             distributed::barrier::synchronize();
-            lbt_ << "(5th stage) pre_main: passed 4th stage boot barrier";
+            lbt_ << "(5th stage) pre_main: passed 5th stage boot barrier";
         }
 
         // Enable logging. Even if we terminate at this point we will see all

@@ -63,7 +63,8 @@ namespace hpx::local::detail {
             hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
 
-        void enable_logging_settings(hpx::program_options::variables_map& vm,
+        static void enable_logging_settings(
+            hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
 
         void store_command_line(int argc, char** argv);
@@ -85,8 +86,8 @@ namespace hpx::local::detail {
             hpx::program_options::variables_map& prevm);
 
         void handle_high_priority_threads(
-            hpx::program_options::variables_map& vm,
-            std::vector<std::string>& ini_config);
+            hpx::program_options::variables_map const& vm,
+            std::vector<std::string>& ini_config) const;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -98,8 +99,9 @@ namespace hpx::local::detail {
 
     HPX_CORE_EXPORT std::string convert_to_log_file(std::string const& dest);
 
-    HPX_CORE_EXPORT std::size_t handle_num_cores(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t num_threads,
+    HPX_CORE_EXPORT std::size_t handle_num_cores_default(
+        util::manage_config& cfgmap,
+        hpx::program_options::variables_map const& vm, std::size_t num_threads,
         std::size_t num_default_cores);
 
     HPX_CORE_EXPORT std::size_t get_number_of_default_threads(

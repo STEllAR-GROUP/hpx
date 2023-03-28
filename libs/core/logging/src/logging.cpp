@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,13 +8,12 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_LOGGING)
+#include <hpx/logging/config/defines.hpp>
+
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/util/from_string.hpp>
 
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
 #include <string>
 #include <utility>
 #include <vector>
@@ -22,8 +21,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    HPX_DEFINE_LOG(agas, disable_all)
-    HPX_DEFINE_LOG(agas_console, disable_all)
     HPX_DEFINE_LOG(app, disable_all)
     HPX_DEFINE_LOG(app_console, disable_all)
     HPX_DEFINE_LOG(app_error, fatal)
@@ -33,10 +30,15 @@ namespace hpx::util {
     HPX_DEFINE_LOG(hpx, disable_all)
     HPX_DEFINE_LOG(hpx_console, disable_all)
     HPX_DEFINE_LOG(hpx_error, fatal)
+
+#if defined(HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS)
+    HPX_DEFINE_LOG(agas, disable_all)
+    HPX_DEFINE_LOG(agas_console, disable_all)
     HPX_DEFINE_LOG(parcel, disable_all)
     HPX_DEFINE_LOG(parcel_console, disable_all)
     HPX_DEFINE_LOG(timing, disable_all)
     HPX_DEFINE_LOG(timing_console, disable_all)
+#endif
 
     namespace detail {
 
@@ -45,7 +47,7 @@ namespace hpx::util {
         {
             try
             {
-                int env_val = hpx::util::from_string<int>(env);
+                int const env_val = hpx::util::from_string<int>(env);
                 if (env_val < 0)
                     return hpx::util::logging::level::disable_all;
 
@@ -81,7 +83,7 @@ namespace hpx::util {
 
 namespace hpx::util::logging {
 
-    void logger::turn_cache_off()
+    void logger::turn_cache_off() const
     {
         if (m_is_caching_off)
             return;    // already turned off

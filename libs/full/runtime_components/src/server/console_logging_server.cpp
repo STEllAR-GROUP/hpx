@@ -61,6 +61,7 @@ namespace hpx { namespace components { namespace server {
 
             switch (dest)
             {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             case logging_destination::hpx:
                 LHPX_CONSOLE_(level) << s;
                 break;

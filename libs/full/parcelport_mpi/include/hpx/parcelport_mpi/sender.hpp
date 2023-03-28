@@ -14,7 +14,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/synchronization.hpp>
-
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/parcelport_mpi/sender_connection.hpp>
 #include <hpx/parcelport_mpi/tag_provider.hpp>
 
@@ -24,8 +24,6 @@
 #include <memory>
 #include <mutex>
 #include <utility>
-
-#include <mpi.h>
 
 namespace hpx::parcelset::policies::mpi {
 
@@ -46,7 +44,8 @@ namespace hpx::parcelset::policies::mpi {
 
         void run() noexcept
         {
-            get_next_free_tag();
+            util::mpi_environment::scoped_lock l;
+            get_next_free_tag(l);
         }
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)
@@ -70,7 +69,7 @@ namespace hpx::parcelset::policies::mpi {
             // Check if sending has been completed....
             if (connection->send())
             {
-                error_code ec(throwmode::lightweight);
+                error_code const ec(throwmode::lightweight);
                 hpx::move_only_function<void(error_code const&,
                     parcelset::locality const&, connection_ptr)>
                     postprocess_handler;
@@ -89,7 +88,7 @@ namespace hpx::parcelset::policies::mpi {
         {
             connection_ptr connection;
             {
-                std::unique_lock l(connections_mtx_, std::try_to_lock);
+                std::unique_lock const l(connections_mtx_, std::try_to_lock);
                 if (l && !connections_.empty())
                 {
                     connection = HPX_MOVE(connections_.front());
@@ -117,7 +116,7 @@ namespace hpx::parcelset::policies::mpi {
                 std::unique_lock l(next_free_tag_mtx_, std::try_to_lock);
                 if (l.owns_lock())
                 {
-                    next_free = next_free_tag_locked();
+                    next_free = next_free_tag_locked(l);
                 }
             }
 
@@ -128,30 +127,39 @@ namespace hpx::parcelset::policies::mpi {
             }
         }
 
-        int next_free_tag_locked() noexcept
+        template <typename Lock>
+        int next_free_tag_locked([[maybe_unused]] Lock& lock) noexcept
         {
+            HPX_ASSERT_OWNS_LOCK(lock);
+
             util::mpi_environment::scoped_try_lock l;
             if (l.locked)
             {
-                MPI_Status status;
                 int completed = 0;
-                int ret =
-                    MPI_Test(&next_free_tag_request_, &completed, &status);
+                [[maybe_unused]] int const ret = MPI_Test(
+                    &next_free_tag_request_, &completed, MPI_STATUS_IGNORE);
                 HPX_ASSERT(ret == MPI_SUCCESS);
-                (void) ret;
-                if (completed)    // && status->MPI_ERROR != MPI_ERR_PENDING)
+
+                if (completed)
                 {
-                    return get_next_free_tag();
+                    return get_next_free_tag(l);
                 }
             }
             return -1;
         }
 
-        int get_next_free_tag() noexcept
+        template <typename Lock>
+        int get_next_free_tag([[maybe_unused]] Lock& l) noexcept
         {
-            int next_free = next_free_tag_;
-            MPI_Irecv(&next_free_tag_, 1, MPI_INT, MPI_ANY_SOURCE, 1,
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            int const next_free = next_free_tag_;
+
+            [[maybe_unused]] int const ret = MPI_Irecv(&next_free_tag_, 1,
+                MPI_INT, MPI_ANY_SOURCE, 1,
                 util::mpi_environment::communicator(), &next_free_tag_request_);
+            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
             return next_free;
         }
 

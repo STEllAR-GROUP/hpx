@@ -20,12 +20,12 @@ namespace hpx::parcelset::policies::mpi {
 
     struct tag_provider
     {
-        tag_provider() noexcept
+        tag_provider()
           : next_tag_(2)
         {
         }
 
-        int acquire() noexcept
+        [[nodiscard]] int acquire() noexcept
         {
             int tag = -1;
             std::lock_guard l(mtx_);

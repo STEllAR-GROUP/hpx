@@ -1348,19 +1348,22 @@ namespace hpx {
             if (call_startup)
             {
                 call_startup_functions(true);
-                lbt_ << "(3rd stage) run_helper: ran pre-startup functions";
+                lbt_ << "(3rd stage, local) runtime::run_helper: ran "
+                        "pre-startup functions";
 
                 call_startup_functions(false);
-                lbt_ << "(4th stage) run_helper: ran startup functions";
+                lbt_ << "(4th stage, local) runtime::run_helper: ran startup "
+                        "functions";
             }
 
-            lbt_ << "(4th stage) runtime::run_helper: bootstrap complete";
+            lbt_
+                << "(4th stage, local) runtime::run_helper: bootstrap complete";
             set_state(hpx::state::running);
 
             // Now, execute the user supplied thread function (hpx_main)
             if (!!func)
             {
-                lbt_ << "(last stage) runtime::run_helper: about to "
+                lbt_ << "(last stage, local) runtime::run_helper: about to "
                         "invoke hpx_main";
 
                 // Change our thread description, as we're about to call hpx_main

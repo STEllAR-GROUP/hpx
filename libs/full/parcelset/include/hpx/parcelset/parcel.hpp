@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,7 +42,7 @@ namespace hpx::parcelset::detail {
         inline parcel_data& operator=(parcel_data&& rhs) noexcept;
 
         void serialize(serialization::input_archive& ar, unsigned);
-        void serialize(serialization::output_archive& ar, unsigned);
+        void serialize(serialization::output_archive& ar, unsigned) const;
 
         naming::gid_type source_id_;
         naming::gid_type dest_;
@@ -149,7 +149,8 @@ namespace hpx::parcelset::detail {
         void load(serialization::input_archive& ar, unsigned) override;
         void save(serialization::output_archive& ar, unsigned) const override;
 
-        std::pair<naming::address_type, naming::component_type> determine_lva();
+        std::pair<naming::address_type, naming::component_type> determine_lva()
+            const;
 
         detail::parcel_data data_;
         std::unique_ptr<actions::base_action> action_;
