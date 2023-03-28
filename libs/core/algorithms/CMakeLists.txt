@@ -6,6 +6,7 @@
 
 set(algorithms_headers
     hpx/algorithms/traits/is_pair.hpp
+    hpx/algorithms/traits/is_relocatable.hpp
     hpx/algorithms/traits/is_value_proxy.hpp
     hpx/algorithms/traits/pointer_category.hpp
     hpx/algorithms/traits/projected.hpp
@@ -227,6 +228,7 @@ set(algorithms_compat_headers
     hpx/algorithms.hpp => hpx/algorithm.hpp
     hpx/parallel/traits/projected.hpp => hpx/algorithms/traits/projected.hpp
     hpx/parallel/traits/projected_range.hpp => hpx/algorithms/traits/projected_range.hpp
+    hpx/traits/is_relocatable.hpp => hpx/algorithms/traits/is_relocatable.hpp
     hpx/traits/is_value_proxy.hpp => hpx/algorithms/traits/is_value_proxy.hpp
     hpx/traits/pointer_category.hpp => hpx/algorithms/traits/pointer_category.hpp
     hpx/traits/segmented_iterator_traits.hpp => hpx/algorithms/traits/segmented_iterator_traits.hpp
