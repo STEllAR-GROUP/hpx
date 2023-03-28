@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/bit_cast.hpp>
 
 #include <cstddef>
 #include <new>
@@ -191,9 +192,10 @@ namespace hpx {
 
         ///////////////////////////////////////////////////////////////////////////
         template <typename T>
-        constexpr inline auto align_up(T value, std::size_t alignment) noexcept
+        constexpr auto align_up(T value, std::size_t alignment) noexcept
         {
-            return T(std::size_t(value + (alignment - 1)) & ~(alignment - 1));
+            return T(hpx::bit_cast<std::size_t>(value + (alignment - 1)) &
+                ~(alignment - 1));
         }
     }    // namespace util
 

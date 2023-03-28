@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,7 +28,13 @@ namespace hpx::util {
             << (CHAR_BIT * sizeof(std::size_t) - 1);
 
     public:
-        barrier(std::size_t number_of_threads);
+        explicit barrier(std::size_t number_of_threads);
+
+        barrier(barrier const&) = delete;
+        barrier(barrier&&) = delete;
+        barrier& operator=(barrier const&) = delete;
+        barrier& operator=(barrier&&) = delete;
+
         ~barrier();
 
         void wait();

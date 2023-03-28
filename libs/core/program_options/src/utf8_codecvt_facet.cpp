@@ -68,7 +68,7 @@ namespace hpx::program_options::detail {
 
             // The unsigned char conversion is necessary in case char is
             // signed   (I learned this the hard way)
-            wchar_t ucs_result = (unsigned char) (*from++) -
+            wchar_t ucs_result = static_cast<unsigned char>(*from++) -
                 octet1_modifier_table[cont_octet_count];
 
             // Invariants   :
@@ -90,7 +90,7 @@ namespace hpx::program_options::detail {
 
                 // each continuing character has an extra (10xxxxxx)b attached to
                 // it that must be removed.
-                ucs_result += (unsigned char) (*from++) - 0x80;
+                ucs_result += static_cast<unsigned char>(*from++) - 0x80;
                 ++i;
             }
 
@@ -131,14 +131,14 @@ namespace hpx::program_options::detail {
                 return std::codecvt_base::error;
             }
 
-            int cont_octet_count = get_cont_octet_out_count(*from);
+            int const cont_octet_count = get_cont_octet_out_count(*from);
 
             // RG  - comment this formula better
             int shift_exponent = (cont_octet_count) *6;
 
             // Process the first character
             *to++ = static_cast<char>(octet1_modifier_table[cont_octet_count] +
-                (unsigned char) (*from / (1 << shift_exponent)));
+                static_cast<unsigned char>(*from / (1 << shift_exponent)));
 
             // Process the continuation characters
             // Invariants: At   the start of the loop:
@@ -252,7 +252,7 @@ namespace hpx::program_options::detail {
 
             // Note that the following code will generate warnings on some platforms
             // where wchar_t is defined as UCS2.  The warnings are superfluous as the
-            // specialization is never instantitiated with such compilers, but this
+            // specialization is never instantiated with such compilers, but this
             // can cause problems if warnings are being treated as errors, so we guard
             // against that.  Including <boost/detail/utf8_codecvt_facet.hpp> as we do
             // should be enough to get WCHAR_MAX defined.
@@ -274,7 +274,6 @@ namespace hpx::program_options::detail {
                 return 4;
             }
             return 5;
-
 #else
             return 2;
 #endif

@@ -1,5 +1,5 @@
 //  Copyright (C) 2008-2013 Tim Blechmann
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -149,10 +149,12 @@ namespace hpx::lockfree {
             using size_type = std::size_t;
         };
 
-        queue(queue const&) = delete;
-        queue& operator=(queue const&) = delete;
-
     public:
+        queue(queue const&) = delete;
+        queue(queue&&) = delete;
+        queue& operator=(queue const&) = delete;
+        queue& operator=(queue&&) = delete;
+
         using value_type = T;
         using allocator = typename implementation_defined::allocator;
         using size_type = typename implementation_defined::size_type;
@@ -168,7 +170,7 @@ namespace hpx::lockfree {
          *       need to test every internal node, which is impossible if further
          *       nodes will be allocated from the operating system.
          */
-        constexpr bool is_lock_free() const noexcept
+        [[nodiscard]] constexpr bool is_lock_free() const noexcept
         {
             return head_.is_lock_free() && tail_.is_lock_free() &&
                 pool.is_lock_free();
@@ -295,7 +297,7 @@ namespace hpx::lockfree {
          *       queue. Therefore it is rarely practical to use this value in
          *       program logic.
          */
-        bool empty() const noexcept
+        [[nodiscard]] bool empty() const noexcept
         {
             return pool.get_handle(head_.load()) ==
                 pool.get_handle(tail_.load());
@@ -595,7 +597,7 @@ namespace hpx::lockfree {
         bool consume_one(F&& f)
         {
             T element;
-            bool success = pop(element);
+            bool const success = pop(element);
             if (success)
                 f(element);
 

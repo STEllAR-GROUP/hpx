@@ -47,8 +47,8 @@
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
-// include unist.d conditionally to check for POSIX version. Not all OSs have the
-// unistd header...
+// include unistd.h conditionally to check for POSIX version. Not all OSs have
+// the unistd header...
 #if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
 #endif

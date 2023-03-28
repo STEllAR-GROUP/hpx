@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -250,7 +250,7 @@ namespace hpx::program_options {
     public:
         explicit unknown_option(std::string const& original_token = "")
           : error_with_no_option_name(
-                "unrecognised option '%canonical_option%'", original_token)
+                "unrecognized option '%canonical_option%'", original_token)
         {
         }
     };
@@ -259,10 +259,10 @@ namespace hpx::program_options {
     class HPX_ALWAYS_EXPORT ambiguous_option : public error_with_no_option_name
     {
     public:
-        explicit ambiguous_option(std::vector<std::string> const& xalternatives)
+        explicit ambiguous_option(std::vector<std::string> xalternatives)
           : error_with_no_option_name(
                 "option '%canonical_option%' is ambiguous")
-          , m_alternatives(xalternatives)
+          , m_alternatives(HPX_MOVE(xalternatives))
         {
         }
 
@@ -281,9 +281,10 @@ namespace hpx::program_options {
         std::vector<std::string> m_alternatives;
     };
 
-    /** Class thrown when there's syntax error either for command
-     *  line or config file options. See derived children for
-     *  concrete classes. */
+    /**
+     * Class thrown when there's syntax error either for command
+     *  line or config file options. See derived children for concrete classes.
+     */
     class HPX_ALWAYS_EXPORT invalid_syntax : public error_with_option_name
     {
     public:
@@ -320,7 +321,7 @@ namespace hpx::program_options {
 
     protected:
         /** Used to convert kind_t to a related error text */
-        std::string get_template(kind_t kind);
+        static std::string get_template(kind_t kind);
         kind_t m_kind;
     };
 
@@ -334,10 +335,10 @@ namespace hpx::program_options {
         }
 
         /** Convenience functions for backwards compatibility */
-        std::string tokens() const override
+        [[nodiscard]] std::string tokens() const override
         {
-            auto it = m_substitutions.find("invalid_line");
-            if (it != m_substitutions.end())
+            if (auto const it = m_substitutions.find("invalid_line");
+                it != m_substitutions.end())
             {
                 return it->second;
             }
@@ -387,7 +388,7 @@ namespace hpx::program_options {
 
     protected:
         /** Used to convert kind_t to a related error text */
-        std::string get_template(kind_t kind);
+        static std::string get_template(kind_t kind);
         kind_t m_kind;
     };
 

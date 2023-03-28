@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -14,7 +14,6 @@
 #include <functional>
 #include <limits>
 #include <string>
-#include <typeinfo>
 #include <vector>
 
 namespace hpx::program_options {
@@ -358,17 +357,15 @@ namespace hpx::program_options {
             'default_value', stores that value into 'value_store'.
             Returns true if default value was stored.
         */
-        virtual bool apply_default(hpx::any_nonser& value_store) const override
+        bool apply_default(hpx::any_nonser& value_store) const override
         {
             if (!m_default_value.has_value())
             {
                 return false;
             }
-            else
-            {
-                value_store = m_default_value;
-                return true;
-            }
+
+            value_store = m_default_value;
+            return true;
         }
 
         /** If an address of variable to store value was specified

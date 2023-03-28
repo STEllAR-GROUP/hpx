@@ -26,15 +26,14 @@ namespace hpx::threads::detail {
         using thread_state_ex_type = std::int8_t;
         using tag_type = std::int64_t;
 
-        static constexpr std::size_t const state_shift = 56;       // 8th byte
-        static constexpr std::size_t const state_ex_shift = 48;    // 7th byte
+        static constexpr std::size_t state_shift = 56;       // 8th byte
+        static constexpr std::size_t state_ex_shift = 48;    // 7th byte
 
-        static constexpr tagged_state_type const state_mask = 0xffull;
-        static constexpr tagged_state_type const state_ex_mask = 0xffull;
+        static constexpr tagged_state_type state_mask = 0xffull;
+        static constexpr tagged_state_type state_ex_mask = 0xffull;
 
         // (1L << 48L) - 1;
-        static constexpr tagged_state_type const tag_mask =
-            0x0000ffffffffffffull;
+        static constexpr tagged_state_type tag_mask = 0x0000ffffffffffffull;
 
         static constexpr tag_type extract_tag(tagged_state_type i) noexcept
         {
@@ -44,21 +43,22 @@ namespace hpx::threads::detail {
         static constexpr thread_state_type extract_state(
             tagged_state_type i) noexcept
         {
-            return (i >> state_shift) & state_mask;
+            return static_cast<thread_state_type>(
+                (i >> state_shift) & state_mask);
         }
 
         static constexpr thread_state_ex_type extract_state_ex(
             tagged_state_type i) noexcept
         {
-            return (i >> state_ex_shift) & state_ex_mask;
+            return static_cast<thread_state_ex_type>(
+                (i >> state_ex_shift) & state_ex_mask);
         }
 
         static tagged_state_type pack_state(
             T1 state_, T2 state_ex_, tag_type tag) noexcept
         {
-            tagged_state_type state = static_cast<tagged_state_type>(state_);
-            tagged_state_type state_ex =
-                static_cast<tagged_state_type>(state_ex_);
+            auto const state = static_cast<tagged_state_type>(state_);
+            auto const state_ex = static_cast<tagged_state_type>(state_ex_);
 
             HPX_ASSERT(!(state & ~state_mask));
             HPX_ASSERT(!(state_ex & ~state_ex_mask));
@@ -91,12 +91,12 @@ namespace hpx::threads::detail {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        bool operator==(combined_tagged_state const& p) const
+        constexpr bool operator==(combined_tagged_state const& p) const noexcept
         {
             return state_ == p.state_;
         }
 
-        bool operator!=(combined_tagged_state const& p) const
+        constexpr bool operator!=(combined_tagged_state const& p) const noexcept
         {
             return !operator==(p);
         }

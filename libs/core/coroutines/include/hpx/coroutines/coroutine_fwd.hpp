@@ -30,8 +30,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 namespace hpx::threads::coroutines {
 
     namespace detail {

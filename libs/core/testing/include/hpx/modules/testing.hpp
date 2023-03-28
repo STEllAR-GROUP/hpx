@@ -53,9 +53,9 @@ namespace hpx::util {
             {
             }
 
-            HPX_CORE_EXPORT void increment(counter_type c) noexcept;
+            HPX_CORE_EXPORT static void increment(counter_type c) noexcept;
 
-            HPX_CORE_EXPORT std::size_t get(counter_type c) const noexcept;
+            HPX_CORE_EXPORT static std::size_t get(counter_type c) noexcept;
 
             template <typename T>
             bool check_(char const* file, int line, char const* function,

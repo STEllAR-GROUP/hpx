@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2022 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,9 +14,9 @@
 
 namespace hpx::threads::coroutines::detail::posix {
 
-    ///////////////////////////////////////////////////////////////////////
-    // this global (urghhh) variable is used to control whether guard pages
-    // will be used or not
+    ///////////////////////////////////////////////////////////////////////////
+    // this global variable is used to control whether guard pages will be used
+    // or not
     bool use_guard_pages = true;
 }    // namespace hpx::threads::coroutines::detail::posix
 

@@ -55,7 +55,7 @@ namespace hpx::util {
             HPX_ASSERT(false);
         }
 
-        std::size_t fixture::get(counter_type c) const noexcept
+        std::size_t fixture::get(counter_type c) noexcept
         {
             switch (c)
             {
@@ -67,7 +67,7 @@ namespace hpx::util {
                 break;
             }
             HPX_ASSERT(false);
-            return std::size_t(-1);
+            return static_cast<std::size_t>(-1);
         }
 
         fixture& global_fixture() noexcept
@@ -85,25 +85,24 @@ namespace hpx::util {
 
     int report_errors(std::ostream& stream)
     {
-        std::size_t sanity = detail::global_fixture().get(counter_type::sanity),
-                    test = detail::global_fixture().get(counter_type::test);
+        std::size_t const sanity =
+            detail::global_fixture().get(counter_type::sanity);
+        std::size_t const test =
+            detail::global_fixture().get(counter_type::test);
         if (sanity == 0 && test == 0)
             return 0;
 
-        else
-        {
-            hpx::util::ios_flags_saver ifs(stream);
-            stream << sanity << " sanity check"    //-V128
-                   << ((sanity == 1) ? " and " : "s and ") << test << " test"
-                   << ((test == 1) ? " failed." : "s failed.") << std::endl;
-            return 1;
-        }
+        hpx::util::ios_flags_saver ifs(stream);
+        stream << sanity << " sanity check"    //-V128
+               << ((sanity == 1) ? " and " : "s and ") << test << " test"
+               << ((test == 1) ? " failed." : "s failed.") << std::endl;
+        return 1;
     }
 
     void print_cdash_timing(char const* name, double time)
     {
         // use format followed by single cout for better multi-threaded output
-        std::string temp =
+        std::string const temp =
             hpx::util::format("<DartMeasurement name=\"{}\" "
                               "type=\"numeric/double\">{}</DartMeasurement>",
                 name, time);
@@ -112,6 +111,6 @@ namespace hpx::util {
 
     void print_cdash_timing(char const* name, std::uint64_t time)
     {
-        print_cdash_timing(name, time / 1e9);
+        print_cdash_timing(name, static_cast<double>(time) / 1e9);
     }
 }    // namespace hpx::util

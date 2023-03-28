@@ -15,7 +15,7 @@
 
 namespace hpx::execution_base {
 
-    void agent_ref::yield(const char* desc)
+    void agent_ref::yield(const char* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -24,7 +24,7 @@ namespace hpx::execution_base {
         impl_->yield(desc);
     }
 
-    void agent_ref::yield_k(std::size_t k, const char* desc)
+    void agent_ref::yield_k(std::size_t k, const char* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -33,7 +33,7 @@ namespace hpx::execution_base {
         impl_->yield_k(k, desc);
     }
 
-    void agent_ref::suspend(const char* desc)
+    void agent_ref::suspend(const char* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
 
@@ -42,27 +42,29 @@ namespace hpx::execution_base {
         impl_->suspend(desc);
     }
 
-    void agent_ref::resume(const char* desc)
+    void agent_ref::resume(const char* desc) const
     {
         HPX_ASSERT(*this != hpx::execution_base::this_thread::agent());
         impl_->resume(desc);
     }
 
-    void agent_ref::abort(const char* desc)
+    void agent_ref::abort(const char* desc) const
     {
         HPX_ASSERT(*this != hpx::execution_base::this_thread::agent());
         impl_->abort(desc);
     }
 
     void agent_ref::sleep_for(
-        hpx::chrono::steady_duration const& sleep_duration, const char* desc)
+        hpx::chrono::steady_duration const& sleep_duration,
+        const char* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_for(sleep_duration, desc);
     }
 
     void agent_ref::sleep_until(
-        hpx::chrono::steady_time_point const& sleep_time, const char* desc)
+        hpx::chrono::steady_time_point const& sleep_time,
+        const char* desc) const
     {
         HPX_ASSERT(*this == hpx::execution_base::this_thread::agent());
         impl_->sleep_until(sleep_time, desc);

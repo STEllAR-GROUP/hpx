@@ -1,13 +1,12 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
 #include <hpx/program_options/config.hpp>
-
 #include <hpx/iterator_support/iterator_facade.hpp>
 
 #include <iterator>
@@ -76,7 +75,7 @@ namespace hpx { namespace program_options {
             static_cast<Derived&>(*this).get();
         }
 
-        bool equal(eof_iterator const& other) const noexcept
+        [[nodiscard]] bool equal(eof_iterator const& other) const noexcept
         {
             return m_at_eof && other.m_at_eof;
         }

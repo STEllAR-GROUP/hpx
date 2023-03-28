@@ -34,7 +34,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/detail/context_base.hpp>
-#include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/move_only_function.hpp>
@@ -65,7 +64,7 @@ namespace hpx::threads::coroutines::detail {
 
         coroutine_impl(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size) noexcept
-          : context_base(stack_size, id)
+          : context_base(stack_size, HPX_MOVE(id))
           , m_result(thread_schedule_state::unknown, invalid_thread_id)
           , m_arg(nullptr)
           , m_fun(HPX_MOVE(f))
@@ -80,7 +79,7 @@ namespace hpx::threads::coroutines::detail {
         HPX_CORE_EXPORT void operator()() noexcept;
 
     public:
-        void bind_result(result_type res) noexcept
+        void bind_result(result_type const& res) noexcept
         {
             HPX_ASSERT(m_result.first != thread_schedule_state::terminated);
             m_result = res;
@@ -90,11 +89,11 @@ namespace hpx::threads::coroutines::detail {
         {
             return m_result;
         }
-        arg_type* args() noexcept
+        arg_type* args() const noexcept
         {
             HPX_ASSERT(m_arg);
             return m_arg;
-        };
+        }
 
         void bind_args(arg_type* arg) noexcept
         {
@@ -134,7 +133,7 @@ namespace hpx::threads::coroutines::detail {
                 result_type(thread_schedule_state::unknown, invalid_thread_id);
             m_arg = nullptr;
             m_fun = HPX_MOVE(f);
-            this->super_type::rebind_base(id);
+            this->super_type::rebind_base(HPX_MOVE(id));
         }
 
     private:

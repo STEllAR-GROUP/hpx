@@ -144,6 +144,8 @@ function(hpx_perform_cxx_feature_tests)
     hpx_check_for_cxx20_std_default_sentinel(
       DEFINITIONS HPX_HAVE_CXX20_STD_DEFAULT_SENTINEL
     )
+
+    hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
   endif()
 
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
