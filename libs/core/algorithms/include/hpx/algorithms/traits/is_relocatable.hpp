@@ -10,14 +10,13 @@
 
 namespace hpx::traits {
 
-        template <typename T>
-        struct is_relocatable
-        {
-            static constexpr bool value =
-                std::is_move_constructible_v<T> && std::is_destructible_v<T>;
-        };
+    template <typename T>
+    struct is_relocatable
+    {
+        static constexpr bool value =
+            std::is_move_constructible_v<T> && std::is_destructible_v<T>;
+    };
 
-        template <typename T>
-        inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
+    template <typename T>
+    inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
 }    // namespace hpx::traits
-
