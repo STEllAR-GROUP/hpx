@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/algorithms/traits/is_relocatable.hpp>
 
 #include <type_traits>
 
@@ -137,18 +138,6 @@ namespace hpx::traits {
         {
             using type = general_pointer_tag;
         };
-
-        // relocatabillity is true in almost all cases,
-        // an exception is std::mutex.
-        template <typename T>
-        struct is_relocatable
-        {
-            static constexpr bool value =
-                std::is_move_constructible_v<T> && std::is_destructible_v<T>;
-        };
-
-        template <typename T>
-        inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
 
         template <typename Source, typename Dest,
             bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
