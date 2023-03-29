@@ -307,6 +307,9 @@ namespace hpx::threads::policies {
         void set_cuda_polling_functions(polling_function_ptr cuda_func,
             polling_work_count_function_ptr cuda_work_count_func);
         void clear_cuda_polling_function();
+        void set_sycl_polling_functions(polling_function_ptr sycl_func,
+            polling_work_count_function_ptr sycl_work_count_func);
+        void clear_sycl_polling_function();
         detail::polling_status custom_polling_function() const;
         std::size_t get_polling_work_count() const;
 
@@ -344,10 +347,13 @@ namespace hpx::threads::policies {
 
         std::atomic<polling_function_ptr> polling_function_mpi_;
         std::atomic<polling_function_ptr> polling_function_cuda_;
+        std::atomic<polling_function_ptr> polling_function_sycl_;
         std::atomic<polling_work_count_function_ptr>
             polling_work_count_function_mpi_;
         std::atomic<polling_work_count_function_ptr>
             polling_work_count_function_cuda_;
+        std::atomic<polling_work_count_function_ptr>
+            polling_work_count_function_sycl_;
 
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
     public:

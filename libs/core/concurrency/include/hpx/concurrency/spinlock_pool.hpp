@@ -1,4 +1,4 @@
-//  Copyright (c) 2012 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //
 //  taken from:
 //  boost/detail/spinlock_pool.hpp
@@ -21,7 +21,7 @@
 
 #include <cstddef>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 #if HPX_HAVE_ITTNOTIFY != 0
@@ -56,6 +56,7 @@ namespace hpx { namespace util {
 
 #if HPX_HAVE_ITTNOTIFY != 0
     namespace detail {
+
         template <typename Tag, std::size_t N>
         itt_spinlock_init<Tag, N>::itt_spinlock_init() noexcept
         {
@@ -79,5 +80,4 @@ namespace hpx { namespace util {
     template <typename Tag, std::size_t N>
     util::detail::itt_spinlock_init<Tag, N> spinlock_pool<Tag, N>::init_;
 #endif
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

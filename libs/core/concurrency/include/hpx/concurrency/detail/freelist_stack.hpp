@@ -1,5 +1,5 @@
 //  Copyright (C) 2008-2016 Tim Blechmann
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/concurrency/detail/tagged_ptr.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/type_support/bit_cast.hpp>
 
 #include <array>
 #include <atomic>
@@ -56,7 +57,7 @@ namespace hpx::lockfree::detail {
             for (std::size_t i = 0; i != count; ++i)
             {
                 T* node = Alloc::allocate(1);
-                std::memset((void*) node, 0, sizeof(T));
+                std::memset(static_cast<void*>(node), 0, sizeof(T));
                 deallocate<ThreadSafe>(node);
             }
         }
@@ -94,7 +95,7 @@ namespace hpx::lockfree::detail {
                 freelist_node* current_ptr = current.get_ptr();
                 if (current_ptr)
                     current = current_ptr->next;
-                Alloc::deallocate((T*) current_ptr, 1);
+                Alloc::deallocate(hpx::bit_cast<T*>(current_ptr), 1);
             }
         }
 
@@ -155,7 +156,7 @@ namespace hpx::lockfree::detail {
                     if constexpr (!Bounded)
                     {
                         T* ptr = Alloc::allocate(1);
-                        std::memset((void*) ptr, 0, sizeof(T));
+                        std::memset(static_cast<void*>(ptr), 0, sizeof(T));
                         return ptr;
                     }
                     else
@@ -170,7 +171,7 @@ namespace hpx::lockfree::detail {
                 if (pool_.compare_exchange_weak(old_pool, new_pool))
                 {
                     void* ptr = old_pool.get_ptr();
-                    return reinterpret_cast<T*>(ptr);
+                    return static_cast<T*>(ptr);
                 }
             }
         }
@@ -185,7 +186,7 @@ namespace hpx::lockfree::detail {
                 if constexpr (!Bounded)
                 {
                     T* ptr = Alloc::allocate(1);
-                    std::memset((void*) ptr, 0, sizeof(T));
+                    std::memset(static_cast<void*>(ptr), 0, sizeof(T));
                     return ptr;
                 }
                 else
@@ -199,7 +200,7 @@ namespace hpx::lockfree::detail {
 
             pool_.store(new_pool, std::memory_order_relaxed);
             void* ptr = old_pool.get_ptr();
-            return reinterpret_cast<T*>(ptr);
+            return static_cast<T*>(ptr);
         }
 
     protected:
@@ -221,8 +222,7 @@ namespace hpx::lockfree::detail {
         {
             void* node = n;
             tagged_node_ptr old_pool = pool_.load(std::memory_order_consume);
-            freelist_node* new_pool_ptr =
-                reinterpret_cast<freelist_node*>(node);
+            auto* new_pool_ptr = static_cast<freelist_node*>(node);
 
             for (;;)
             {
@@ -238,8 +238,7 @@ namespace hpx::lockfree::detail {
         {
             void* node = n;
             tagged_node_ptr old_pool = pool_.load(std::memory_order_relaxed);
-            freelist_node* new_pool_ptr =
-                reinterpret_cast<freelist_node*>(node);
+            auto* new_pool_ptr = static_cast<freelist_node*>(node);
 
             tagged_node_ptr new_pool(new_pool_ptr, old_pool.get_tag());
             new_pool->next.set_ptr(old_pool.get_ptr());
@@ -303,7 +302,8 @@ namespace hpx::lockfree::detail {
 
         constexpr tag_t get_next_tag() const noexcept
         {
-            tag_t next = (get_tag() + 1u) & (std::numeric_limits<tag_t>::max)();
+            tag_t const next =
+                (get_tag() + 1u) & (std::numeric_limits<tag_t>::max)();
             return next;
         }
 
@@ -358,7 +358,7 @@ namespace hpx::lockfree::detail {
                 data_pointer, hpx::threads::get_cache_line_size()));
         }
 
-        constexpr std::size_t node_count() const noexcept
+        static constexpr std::size_t node_count() noexcept
         {
             return Size;
         }
@@ -393,7 +393,7 @@ namespace hpx::lockfree::detail {
                     "of 65535 objects");
             }
             nodes_ = allocator_type::allocate(count);
-            std::memset((void*) nodes_, 0, sizeof(T) * count);
+            std::memset(static_cast<void*>(nodes_), 0, sizeof(T) * count);
         }
 
         ~runtime_sized_freelist_storage()
@@ -548,10 +548,10 @@ namespace hpx::lockfree::detail {
                     return index;
 
                 T* old_node = NodeStorage::nodes() + index;
-                tagged_index* next_index =
+                tagged_index const* next_index =
                     reinterpret_cast<tagged_index*>(old_node);
 
-                tagged_index new_pool(
+                tagged_index const new_pool(
                     next_index->get_index(), old_pool.get_next_tag());
 
                 if (pool_.compare_exchange_weak(old_pool, new_pool))
@@ -561,17 +561,17 @@ namespace hpx::lockfree::detail {
 
         index_t allocate_impl_unsafe()
         {
-            tagged_index old_pool = pool_.load(std::memory_order_consume);
+            tagged_index const old_pool = pool_.load(std::memory_order_consume);
 
             index_t index = old_pool.get_index();
             if (index == null_handle())
                 return index;
 
             T* old_node = NodeStorage::nodes() + index;
-            tagged_index* next_index =
+            tagged_index const* next_index =
                 reinterpret_cast<tagged_index*>(old_node);
 
-            tagged_index new_pool(
+            tagged_index const new_pool(
                 next_index->get_index(), old_pool.get_next_tag());
 
             pool_.store(new_pool, std::memory_order_relaxed);
@@ -599,7 +599,7 @@ namespace hpx::lockfree::detail {
 
             for (;;)
             {
-                tagged_index new_pool(index, old_pool.get_tag());
+                tagged_index const new_pool(index, old_pool.get_tag());
                 new_pool_node->next.set_index(old_pool.get_index());
 
                 if (pool_.compare_exchange_weak(old_pool, new_pool))
@@ -611,9 +611,9 @@ namespace hpx::lockfree::detail {
         {
             freelist_node* new_pool_node =
                 reinterpret_cast<freelist_node*>(NodeStorage::nodes() + index);
-            tagged_index old_pool = pool_.load(std::memory_order_consume);
+            tagged_index const old_pool = pool_.load(std::memory_order_consume);
 
-            tagged_index new_pool(index, old_pool.get_tag());
+            tagged_index const new_pool(index, old_pool.get_tag());
             new_pool_node->next.set_index(old_pool.get_index());
 
             pool_.store(new_pool);
@@ -643,6 +643,6 @@ namespace hpx::lockfree::detail {
             std::conditional_t<IsNodeBased, tagged_ptr<T>, tagged_index>;
 
         using handle_type =
-            std::conditional_t<IsNodeBased, T*, typename tagged_index::index_t>;
+            std::conditional_t<IsNodeBased, T*, tagged_index::index_t>;
     };
 }    // namespace hpx::lockfree::detail

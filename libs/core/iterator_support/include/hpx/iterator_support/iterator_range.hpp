@@ -80,6 +80,10 @@ namespace hpx::util {
     iterator_range(Range const& r)
         -> iterator_range<hpx::traits::range_iterator_t<Range const>>;
 
+    template <typename Iterator, typename Sentinel>
+    iterator_range(Iterator it, Sentinel sent)
+        -> iterator_range<Iterator, Sentinel>;
+
     template <typename Range,
         typename Iterator = traits::range_iterator_t<Range>,
         typename Sentinel = traits::range_iterator_t<Range>>

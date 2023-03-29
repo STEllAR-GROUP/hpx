@@ -618,7 +618,14 @@ namespace hpx::util::detail {
     void resume_traversal_callable<Frame, State>::operator()()
     {
         auto hierarchy = hpx::tuple_cat(hpx::make_tuple(frame_), state_);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
         hpx::invoke_fused(resume_state_callable{}, HPX_MOVE(hierarchy));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
     }
 
     /// Gives access to types related to the traversal frame

@@ -18,9 +18,9 @@ namespace hpx::execution_base {
     {
         virtual ~agent_base() = default;
 
-        virtual std::string description() const = 0;
+        [[nodiscard]] virtual std::string description() const = 0;
 
-        virtual context_base const& context() const noexcept = 0;
+        [[nodiscard]] virtual context_base const& context() const noexcept = 0;
 
         virtual void yield(char const* desc) = 0;
         virtual void yield_k(std::size_t k, char const* desc) = 0;

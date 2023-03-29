@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -66,7 +66,7 @@ namespace hpx::program_options {
     basic_command_line_parser<Char>&
     basic_command_line_parser<Char>::extra_parser(ext_parser ext)
     {
-        detail::cmdline::set_additional_parser(ext);
+        detail::cmdline::set_additional_parser(HPX_MOVE(ext));
         return *this;
     }
 
@@ -82,7 +82,7 @@ namespace hpx::program_options {
     basic_command_line_parser<Char>&
     basic_command_line_parser<Char>::extra_style_parser(style_parser s)
     {
-        detail::cmdline::extra_style_parser(s);
+        detail::cmdline::extra_style_parser(HPX_MOVE(s));
         return *this;
     }
 

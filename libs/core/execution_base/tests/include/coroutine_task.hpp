@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/config/coroutines_support.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/execution/queries/get_stop_token.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -14,6 +13,7 @@
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/synchronization/stop_token.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 #include <hpx/type_support/meta.hpp>
 
 #include <any>
@@ -305,8 +305,8 @@ private:
         {
             return {};
         }
-        static hpx::coro::coroutine_handle<> await_suspend(
-            hpx::coro::coroutine_handle<_promise> h) noexcept
+        static hpx::coroutine_handle<> await_suspend(
+            hpx::coroutine_handle<_promise> h) noexcept
         {
             return h.promise().continuation();
         }
@@ -320,9 +320,9 @@ private:
         basic_task get_return_object() noexcept
         {
             return basic_task(
-                hpx::coro::coroutine_handle<_promise>::from_promise(*this));
+                hpx::coroutine_handle<_promise>::from_promise(*this));
         }
-        hpx::coro::suspend_always initial_suspend() noexcept
+        hpx::suspend_always initial_suspend() noexcept
         {
             return {};
         }
@@ -347,7 +347,7 @@ private:
     template <typename ParentPromise = void>
     struct task_awaitable
     {
-        hpx::coro::coroutine_handle<_promise> coro_;
+        hpx::coroutine_handle<_promise> coro_;
         std::optional<awaiter_context_t<_promise, ParentPromise>> context_{};
 
         ~task_awaitable()
@@ -364,8 +364,8 @@ private:
         }
 
         template <typename ParentPromise2>
-        hpx::coro::coroutine_handle<> await_suspend(
-            hpx::coro::coroutine_handle<ParentPromise2> parent) noexcept
+        hpx::coroutine_handle<> await_suspend(
+            hpx::coroutine_handle<ParentPromise2> parent) noexcept
         {
             static_assert(
                 hpx::meta::one_of<ParentPromise, ParentPromise2, void>::value);
@@ -421,13 +421,12 @@ private:
         const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
         task_traits_t<>, task_traits_t<T>>;
 
-    explicit basic_task(
-        hpx::coro::coroutine_handle<promise_type> hcoro) noexcept
+    explicit basic_task(hpx::coroutine_handle<promise_type> hcoro) noexcept
       : coro_(hcoro)
     {
     }
 
-    hpx::coro::coroutine_handle<promise_type> coro_;
+    hpx::coroutine_handle<promise_type> coro_;
 };
 
 template <typename T, typename Context = default_task_context<T>>

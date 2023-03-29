@@ -187,46 +187,50 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    struct loop_ind_t final : hpx::functional::detail::tag_fallback<loop_ind_t>
+    template <typename ExPolicy>
+    struct loop_ind_t final
+      : hpx::functional::detail::tag_fallback<loop_ind_t<ExPolicy>>
     {
     private:
-        template <typename ExPolicy, typename Begin, typename End, typename F>
+        template <typename Begin, typename End, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t<ExPolicy>,
             Begin begin, End end, F&& f)
         {
-            return detail::loop_ind<Begin>::call(begin, end, HPX_FORWARD(F, f));
+            return detail::loop_ind<std::decay_t<Begin>>::call(
+                begin, end, HPX_FORWARD(F, f));
         }
 
-        template <typename ExPolicy, typename Begin, typename End,
-            typename CancelToken, typename F>
+        template <typename Begin, typename End, typename CancelToken,
+            typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(hpx::parallel::util::loop_ind_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_ind_t<ExPolicy>,
             Begin begin, End end, CancelToken& tok, F&& f)
         {
-            return detail::loop_ind<Begin>::call(
+            return detail::loop_ind<std::decay_t<Begin>>::call(
                 begin, end, tok, HPX_FORWARD(F, f));
         }
     };
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-    inline constexpr loop_ind_t loop_ind = loop_ind_t{};
+    template <typename ExPolicy>
+    inline constexpr loop_ind_t loop_ind = loop_ind_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
-        ExPolicy&& policy, Begin begin, End end, F&& f)
+        Begin begin, End end, F&& f)
     {
-        return hpx::parallel::util::loop_ind_t{}(
-            HPX_FORWARD(ExPolicy, policy), begin, end, HPX_FORWARD(F, f));
+        return hpx::parallel::util::loop_ind_t<ExPolicy>{}(
+            begin, end, HPX_FORWARD(F, f));
     }
 
     template <typename ExPolicy, typename Begin, typename End,
         typename CancelToken, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(
-        ExPolicy&& policy, Begin begin, End end, CancelToken& tok, F&& f)
+        Begin begin, End end, CancelToken& tok, F&& f)
     {
-        return hpx::parallel::util::loop_ind_t{}(
-            HPX_FORWARD(ExPolicy, policy), begin, end, tok, HPX_FORWARD(F, f));
+        return hpx::parallel::util::loop_ind_t<ExPolicy>{}(
+            begin, end, tok, HPX_FORWARD(F, f));
     }
 #endif
 

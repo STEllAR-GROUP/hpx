@@ -244,7 +244,14 @@ namespace hpx::plugins::parcel {
                 return f(cinfo, ec) && !ec;
             }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
             p.parameters_ = "*";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
 
         std::string parameters = p.parameters_;

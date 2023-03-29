@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 Thomas Heller
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,9 +20,7 @@
 
 #include <cstddef>
 #include <exception>
-#include <memory>
 #include <type_traits>
-#include <utility>
 
 namespace hpx::execution::experimental {
 
@@ -126,12 +124,12 @@ namespace hpx::execution::experimental {
             }
 
             template <typename E_>
-            [[noreturn]] void set_error(E_&&) noexcept
+            [[noreturn]] static void set_error(E_&&) noexcept
             {
                 std::terminate();
             }
 
-            constexpr void set_stopped() noexcept {}
+            static constexpr void set_stopped() noexcept {}
         };
     }    // namespace detail
 

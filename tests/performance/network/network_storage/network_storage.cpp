@@ -408,10 +408,17 @@ namespace Storage {
                     [](char* p) { release_storage_lock(p); }, return_allocator);
             });
 #else
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmismatched-new-delete"
+#endif
         return hpx::make_ready_future<transfer_buffer_type>(
             transfer_buffer_type(
                 local_buffer.get(), length, transfer_buffer_type::take,
                 [](char* p) { release_storage_lock(p); }, return_allocator));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 #endif
     }
 }    // namespace Storage

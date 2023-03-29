@@ -109,8 +109,15 @@ namespace hpx { namespace lcos {
                     std::size_t rank = std::distance(images.begin(), image_it);
                     std::string suffix;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
                     for (std::size_t s : images)
                         suffix += ("_" + std::to_string(s));
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
                     table_it = barriers_
                                    .insert({images,

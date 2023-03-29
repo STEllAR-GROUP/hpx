@@ -33,10 +33,10 @@ namespace hpx { namespace parallel { namespace detail {
         template <typename InIterB, typename InIterE, typename T,
             typename Reduce>
         HPX_HOST_DEVICE HPX_FORCEINLINE static T call(
-            ExPolicy&& policy, InIterB first, InIterE last, T init, Reduce&& r)
+            ExPolicy&&, InIterB first, InIterE last, T init, Reduce&& r)
         {
-            util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, &r](auto const& val) mutable {
+            util::loop_ind<ExPolicy>(
+                first, last, [&init, &r](auto const& val) mutable {
                     T partial_res = hpx::parallel::traits::reduce(r, val);
                     init = r(init, partial_res);
                 });
@@ -57,11 +57,11 @@ namespace hpx { namespace parallel { namespace detail {
 
         template <typename Iter, typename Sent, typename T, typename Reduce,
             typename Convert>
-        HPX_HOST_DEVICE HPX_FORCEINLINE static T call(ExPolicy&& policy,
-            Iter first, Sent last, T init, Reduce&& r, Convert&& conv)
+        HPX_HOST_DEVICE HPX_FORCEINLINE static T call(ExPolicy&&, Iter first,
+            Sent last, T init, Reduce&& r, Convert&& conv)
         {
-            util::loop_ind(HPX_FORWARD(ExPolicy, policy), first, last,
-                [&init, &r, &conv](auto const& v) mutable {
+            util::loop_ind<ExPolicy>(
+                first, last, [&init, &r, &conv](auto const& v) mutable {
                     T partial_res = hpx::parallel::traits::reduce(r, conv(v));
                     init = r(init, partial_res);
                 });

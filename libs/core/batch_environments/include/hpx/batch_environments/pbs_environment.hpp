@@ -49,6 +49,6 @@ namespace hpx::util::batch_environments {
         HPX_CORE_EXPORT void read_nodefile(
             std::vector<std::string>& nodelist, bool have_mpi, bool debug);
         HPX_CORE_EXPORT void read_nodelist(
-            std::vector<std::string>& nodelist, bool debug);
+            std::vector<std::string> const& nodelist, bool debug);
     };
 }    // namespace hpx::util::batch_environments

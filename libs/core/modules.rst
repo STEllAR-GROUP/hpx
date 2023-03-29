@@ -24,6 +24,7 @@ Core modules
    /libs/core/async_cuda/docs/index.rst
    /libs/core/async_local/docs/index.rst
    /libs/core/async_mpi/docs/index.rst
+   /libs/core/async_sycl/docs/index.rst
    /libs/core/batch_environments/docs/index.rst
    /libs/core/cache/docs/index.rst
    /libs/core/command_line_handling_local/docs/index.rst

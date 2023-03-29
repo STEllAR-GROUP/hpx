@@ -15,6 +15,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/equality.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -165,7 +166,7 @@ namespace hpx::util {
             }
 
         public:
-            HPX_HOST_DEVICE constexpr reference operator*() const
+            HPX_HOST_DEVICE constexpr decltype(auto) operator*() const
                 noexcept(noexcept(iterator_core_access::dereference<reference>(
                     std::declval<Derived>())))
             {
@@ -556,12 +557,12 @@ namespace hpx::util {
     }
 
     namespace detail {
-        template <typename Facade1, typename Facade2, typename Return>
-        struct enable_operator_interoperable
-          : std::enable_if<std::is_convertible_v<Facade1, Facade2> ||
-                    std::is_convertible_v<Facade2, Facade1>,
-                Return>
+        template <typename Facade1, typename Facade2, typename Return,
+            typename = std::void_t<decltype(iterator_core_access::equal(
+                std::declval<Facade1>(), std::declval<Facade2>()))>>
+        struct enable_operator_equal_interoperable
         {
+            using type = Return;
         };
 
         template <typename Facade1, typename Facade2, typename Return,
@@ -581,8 +582,8 @@ namespace hpx::util {
         typename Derived2, typename T2, typename Category2,                    \
         typename Reference2, typename Distance2, typename Pointer2>            \
     HPX_HOST_DEVICE prefix                                                     \
-        typename hpx::util::detail::enable_operator_interoperable<Derived1,    \
-            Derived2, result_type>::type                                       \
+        typename hpx::util::detail::enable_operator_equal_interoperable<       \
+            Derived1, Derived2, result_type>::type                             \
         operator op(iterator_facade<Derived1, T1, Category1, Reference1,       \
                         Distance1, Pointer1> const& lhs,                       \
             iterator_facade<Derived2, T2, Category2, Reference2, Distance2,    \

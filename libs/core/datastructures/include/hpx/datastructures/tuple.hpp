@@ -738,6 +738,9 @@ namespace hpx {
     };
 #endif
 
+    template <std::size_t I, typename T>
+    using tuple_element_t = typename tuple_element<I, T>::type;
+
     // 20.4.2.6, element access
     namespace adl_barrier {
 

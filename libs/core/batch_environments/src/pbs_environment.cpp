@@ -21,17 +21,18 @@ namespace hpx::util::batch_environments {
 
     pbs_environment::pbs_environment(
         std::vector<std::string>& nodelist, bool have_mpi, bool debug)
-      : node_num_(std::size_t(-1))
-      , num_localities_(std::size_t(-1))
-      , num_threads_(std::size_t(-1))
+      : node_num_(static_cast<std::size_t>(-1))
+      , num_localities_(static_cast<std::size_t>(-1))
+      , num_threads_(static_cast<std::size_t>(-1))
       , valid_(false)
     {
-        char* node_num = std::getenv("PBS_NODENUM");
+        char const* node_num = std::getenv("PBS_NODENUM");
         valid_ = node_num != nullptr;
         if (valid_)
         {
             // Initialize our node number
-            node_num_ = from_string<std::size_t>(node_num, std::size_t(1));
+            node_num_ =
+                from_string<std::size_t>(node_num, static_cast<std::size_t>(1));
 
             if (nodelist.empty())
             {
@@ -46,12 +47,12 @@ namespace hpx::util::batch_environments {
                 read_nodelist(nodelist, debug);
             }
 
-            char* thread_num = std::getenv("PBS_NUM_PPN");
+            char const* thread_num = std::getenv("PBS_NUM_PPN");
             if (thread_num != nullptr)
             {
                 // Initialize number of cores to run on
-                num_threads_ =
-                    from_string<std::size_t>(thread_num, std::size_t(-1));
+                num_threads_ = from_string<std::size_t>(
+                    thread_num, static_cast<std::size_t>(-1));
             }
         }
     }
@@ -70,12 +71,14 @@ namespace hpx::util::batch_environments {
         if (ifs.is_open())
         {
             std::set<std::string> nodes;
-            typedef std::set<std::string>::iterator nodes_iterator;
+            using nodes_iterator = std::set<std::string>::iterator;
 
-            bool fill_nodelist = nodelist.empty();
+            bool const fill_nodelist = nodelist.empty();
 
             if (debug)
+            {
                 std::cerr << "opened: " << node_file << std::endl;
+            }
 
             std::string line;
             while (std::getline(ifs, line))
@@ -98,7 +101,9 @@ namespace hpx::util::batch_environments {
         else
         {
             if (debug)
+            {
                 std::cerr << "failed opening: " << node_file << std::endl;
+            }
 
             // if MPI is active we can ignore the missing node-file
             if (have_mpi)
@@ -113,7 +118,7 @@ namespace hpx::util::batch_environments {
     }
 
     void pbs_environment::read_nodelist(
-        std::vector<std::string>& nodelist, bool debug)
+        std::vector<std::string> const& nodelist, bool debug)
     {
         if (nodelist.empty())
         {
@@ -122,17 +127,18 @@ namespace hpx::util::batch_environments {
         }
 
         std::set<std::string> nodes;
-        typedef std::set<std::string>::iterator nodes_iterator;
+        using nodes_iterator = std::set<std::string>::iterator;
 
         if (debug)
+        {
             std::cerr << "parsing nodelist" << std::endl;
+        }
 
         for (std::string const& s : nodelist)
         {
             if (!s.empty())
             {
-                nodes_iterator it = nodes.find(s);
-                if (it == nodes.end())
+                if (nodes_iterator it = nodes.find(s); it == nodes.end())
                 {
                     nodes.insert(s);
                 }

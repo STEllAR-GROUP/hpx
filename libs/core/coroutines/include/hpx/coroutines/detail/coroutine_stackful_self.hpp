@@ -10,11 +10,9 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
 #include <cstddef>
-#include <exception>
 #include <limits>
 #include <utility>
 

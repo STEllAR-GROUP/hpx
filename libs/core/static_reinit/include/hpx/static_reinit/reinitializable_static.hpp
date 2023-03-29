@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2006 Joao Abecasis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -87,7 +87,7 @@ namespace hpx::util {
             value_construct(*pv);
             reinit_register(
                 hpx::bind_front(
-                    &reinitializable_static::template value_construct<U>, *pv),
+                    &reinitializable_static::value_construct<U>, *pv),
                 &reinitializable_static::destruct);
         }
 
@@ -110,8 +110,7 @@ namespace hpx::util {
 #if !defined(__CUDACC__)
             // do not rely on ADL to find the proper call_once
             std::call_once(constructed_,
-                hpx::bind_front(
-                    &reinitializable_static::template value_constructor<U>,
+                hpx::bind_front(&reinitializable_static::value_constructor<U>,
                     const_cast<U const*>(std::addressof(val))));
 #else
             HPX_UNUSED(val);
@@ -148,7 +147,7 @@ namespace hpx::util {
         }
 
         using storage_type = std::aligned_storage_t<sizeof(value_type),
-            std::alignment_of<value_type>::value>;
+            std::alignment_of_v<value_type>>;
 
         static storage_type data_[N];
         static std::once_flag constructed_;

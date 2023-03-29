@@ -21,6 +21,7 @@ set(include_headers
     hpx/execution.hpp
     hpx/functional.hpp
     hpx/future.hpp
+    hpx/generator.hpp
     hpx/hpx.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp

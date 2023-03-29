@@ -38,10 +38,10 @@ set(tests
     find_end_range2
     find_first_of_range
     find_first_of_range2
-    for_loop_range
     for_loop_exception_range
     for_loop_induction_range
     for_loop_induction_async_range
+    for_loop_range
     for_loop_reduction_range
     for_loop_reduction_async_range
     for_loop_strided_range
@@ -123,6 +123,10 @@ set(tests
     unique_range
     unique_copy_range
 )
+
+if(HPX_WITH_CXX20_COROUTINES)
+  set(tests ${tests} for_loop_range_generator)
+endif()
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

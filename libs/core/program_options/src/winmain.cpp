@@ -1,8 +1,8 @@
 //  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-//  Distributed under the Boost Software License, Version 1.0.
-//  (See accompanying file LICENSE_1_0.txt
-//  or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
 
@@ -27,7 +27,8 @@ namespace hpx::program_options {
     {
         std::vector<std::string> result;
 
-        std::string::const_iterator i = input.begin(), e = input.end();
+        auto i = input.begin();
+        auto const e = input.end();
         for (/**/; i != e; ++i)
             if (!isspace((unsigned char) *i))
                 break;
@@ -106,9 +107,13 @@ namespace hpx::program_options {
     std::vector<std::wstring> split_winmain(std::wstring const& cmdline)
     {
         std::vector<std::wstring> result;
-        std::vector<std::string> aux = split_winmain(to_internal(cmdline));
+        std::vector<std::string> const aux =
+            split_winmain(to_internal(cmdline));
+        result.reserve(aux.size());
         for (auto const& i : aux)
+        {
             result.emplace_back(from_utf8(i));
+        }
         return result;
     }
 }    // namespace hpx::program_options

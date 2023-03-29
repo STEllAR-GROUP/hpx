@@ -476,7 +476,7 @@ namespace hpx::parallel::util {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_ind_t, hpx::execution::simd_policy,
+        hpx::parallel::util::loop_ind_t<hpx::execution::simd_policy>,
         Begin begin, End end, F&& f)
     {
         return detail::datapar_loop_ind<Begin>::call(
@@ -485,7 +485,7 @@ namespace hpx::parallel::util {
 
     template <typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_ind_t, hpx::execution::simd_task_policy,
+        hpx::parallel::util::loop_ind_t<hpx::execution::simd_task_policy>,
         Begin begin, End end, F&& f)
     {
         return detail::datapar_loop_ind<Begin>::call(
