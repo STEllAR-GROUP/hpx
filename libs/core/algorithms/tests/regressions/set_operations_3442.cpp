@@ -10,10 +10,13 @@
 #include <hpx/parallel/algorithms/set_intersection.hpp>
 
 #include <algorithm>
-#include <execution>
 #include <random>
 #include <string>
 #include <vector>
+
+#ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
+#include <execution>
+#endif
 
 // returns random integer in range (rangeMin, rangeMax]
 struct RandomIntInRange
