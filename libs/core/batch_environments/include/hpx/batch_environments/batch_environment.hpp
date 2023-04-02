@@ -12,7 +12,6 @@
 #include <asio/ip/tcp.hpp>
 
 #include <cstddef>
-#include <cstdlib>
 #include <map>
 #include <string>
 #include <utility>

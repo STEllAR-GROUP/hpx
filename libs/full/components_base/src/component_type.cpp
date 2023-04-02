@@ -177,6 +177,10 @@ namespace hpx { namespace components {
             result = "component";
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         if (type == get_base_type(type) || component_invalid == type)
         {
             result += "[" + std::to_string(type) + "]";
@@ -187,6 +191,9 @@ namespace hpx { namespace components {
                 std::to_string(static_cast<int>(get_derived_type(type))) + "(" +
                 std::to_string(static_cast<int>(get_base_type(type))) + ")]";
         }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         return result;
     }
 

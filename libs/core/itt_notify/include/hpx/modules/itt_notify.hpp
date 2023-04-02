@@ -167,10 +167,10 @@ HPX_CORE_EXPORT void itt_metadata_add(___itt_domain* domain, ___itt_id* id,
     ___itt_string_handle* key, void const* data) noexcept;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx::util {
+namespace hpx::threads {
 
     struct thread_description;
-}    // namespace hpx::util
+}    // namespace hpx::threads
 
 namespace hpx::util::itt {
 

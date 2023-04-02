@@ -22,11 +22,18 @@ namespace hpx::detail {
     template <typename Future>
     void rethrow_if_needed(Future const& f)
     {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
         auto shared_state = hpx::traits::detail::get_shared_state(f);
         if (shared_state->has_exception())
         {
             shared_state->get_result_void();    // throws stored exception
         }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
     }
 
     template <typename Future,

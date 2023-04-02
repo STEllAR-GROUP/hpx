@@ -9,11 +9,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 #include <hpx/execution_base/detail/spinlock_deadlock_detection.hpp>
 
 #include <cstddef>
-
-#ifdef HPX_HAVE_SPINLOCK_DEADLOCK_DETECTION
 
 namespace hpx::util::detail {
 
@@ -41,4 +41,5 @@ namespace hpx::util::detail {
         return spinlock_deadlock_detection_limit;
     }
 }    // namespace hpx::util::detail
+
 #endif

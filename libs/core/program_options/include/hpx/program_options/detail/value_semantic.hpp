@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -170,7 +170,7 @@ namespace hpx { namespace program_options {
         validators::check_first_occurrence(v);
         validators::get_single_string(s);
         hpx::any_nonser a;
-        validate(a, s, (T*) nullptr, 0);
+        validate(a, s, static_cast<T*>(nullptr), 0);
         v = hpx::any_nonser(hpx::optional<T>(hpx::any_cast<T>(a)));
     }
 
@@ -182,9 +182,13 @@ namespace hpx { namespace program_options {
         // value, then assign the implicit value as the stored value;
         // otherwise, validate the user-provided token(s).
         if (new_tokens.empty() && m_implicit_value.has_value())
+        {
             value_store = m_implicit_value;
+        }
         else
-            validate(value_store, new_tokens, (T*) nullptr, 0);
+        {
+            validate(value_store, new_tokens, static_cast<T*>(nullptr), 0);
+        }
     }
 
     template <typename T>
@@ -198,7 +202,6 @@ namespace hpx { namespace program_options {
     typed_value<T>* value(T* v)
     {
         typed_value<T>* r = new typed_value<T>(v);
-
         return r;
     }
 
@@ -212,7 +215,6 @@ namespace hpx { namespace program_options {
     typed_value<T, wchar_t>* wvalue(T* v)
     {
         typed_value<T, wchar_t>* r = new typed_value<T, wchar_t>(v);
-
         return r;
     }
 

@@ -12,9 +12,9 @@
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
-#include <hpx/execution_base/traits/coroutine_traits.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -24,6 +24,8 @@
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/operation_state.hpp>
+#include <hpx/execution_base/traits/coroutine_traits.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 
 #include <exception>
 #include <system_error>
@@ -243,11 +245,35 @@ namespace hpx::execution::experimental {
     using completion_signatures = meta::type<
         detail::generate_completion_signatures<meta::pack<Signatures...>>>;
 
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+    struct as_awaitable_t;
+#endif
+
     namespace detail {
 
         struct completion_signals_of_sender_depend_on_execution_environment
         {
         };
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+        // https://github.com/NVIDIA/stdexec/pull/733#issue-1537242117
+        //
+        // We were inconsistent about whether promise types were directly
+        // queryable, or whether they implemented get_env. Now we expect
+        // promise types to implement get_env, and if they don't they are
+        // implicitly given an empty environment.
+        //
+        // In get_completion_signatures, we were testing for awaitability
+        // using the Env arg as a promise type, which was picking up stray
+        // await_transform functions that connect would not use,
+        // leading to an inconsistency.
+        //
+        // -- Eric Niebler
+        //
+        // To be kept in sync with the promise type used in connect_awaitable
+        template <typename Env>
+        struct env_promise;
+#endif
 
         template <typename Env>
         struct dependent_completion_signatures
@@ -262,6 +288,13 @@ namespace hpx::execution::experimental {
                 completion_signals_of_sender_depend_on_execution_environment;
 
             static constexpr bool sends_stopped = false;
+
+#if defined(HPX_HAVE_CXX20_COROUTINES)
+            bool await_ready() = delete;
+            void await_suspend(
+                hpx::coroutine_handle<env_promise<Env>>) = delete;
+            dependent_completion_signatures await_resume() = delete;
+#endif
         };
 
         template <>
@@ -269,8 +302,8 @@ namespace hpx::execution::experimental {
         {
 #if defined(HPX_HAVE_CXX20_COROUTINES)
             bool await_ready();
-            void await_suspend(hpx::coro::coroutine_handle<no_env> const&);
-            dependent_completion_signatures<no_env> await_resume();
+            void await_suspend(hpx::coroutine_handle<env_promise<no_env>>);
+            dependent_completion_signatures await_resume();
 #endif
         };
     }    // namespace detail
@@ -301,6 +334,33 @@ namespace hpx::execution::experimental {
         struct no_completion_signatures
         {
         };
+
+        // sender<T> only checks if T is an awaitable if enable_sender<T> is
+        // false. Then it checks for awaitability with a promise type that
+        // doesn't have any environment queries, but that does have an
+        // await_transform that pipes the T through
+        // std::execution::as_awaitable. So you have two options for opting into
+        // the sender concept if you type is not generally awaitable: (1)
+        // specialize enable_sender, or (2) customize as_awaitable for T.
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(is_sender)
+
+#ifdef HPX_HAVE_CXX20_COROUTINES
+        template <typename Sender, typename = void>
+        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
+
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v<Sender,
+            std::enable_if_t<
+                std::is_move_constructible_v<std::decay_t<Sender>> &&
+                std::is_class_v<std::decay_t<Sender>> &&
+                hpx::util::is_detected_v<is_awaitable, Sender,
+                    env_promise<no_env>>>> =
+            is_awaitable_v<Sender, env_promise<no_env>> ||
+            has_is_sender_v<Sender>;
+#else
+        template <typename Sender>
+        inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
+#endif
     }    // namespace detail
 
     // execution::get_completion_signatures is a customization point object. Let
@@ -358,23 +418,32 @@ namespace hpx::execution::experimental {
                     Sender>::completion_signatures{};
             }
 #if defined(HPX_HAVE_CXX20_COROUTINES)
-            // TODO: Handle a case where is_awaitable_v<Sender,Promise> where
-            // Promise type is not void.
-            else if constexpr (is_awaitable_v<Sender>)
+            else if constexpr (is_awaitable_v<Sender, detail::env_promise<Env>>)
             {
-                using result_type = await_result_t<Sender>;
-                if constexpr (std::is_void_v<result_type>)
+                using result_type =
+                    await_result_t<Sender, detail::env_promise<Env>>;
+                if constexpr (std::is_same_v<result_type,
+                                  detail::dependent_completion_signatures<
+                                      no_env>>)
                 {
-                    return completion_signatures<set_value_t(),
-                        set_error_t(std::exception_ptr)>{};
+                    return detail::dependent_completion_signatures<no_env>{};
                 }
                 else
                 {
-                    return completion_signatures<set_value_t(result_type),
+                    return completion_signatures<
+                        hpx::meta::invoke<
+                            hpx::meta::remove<void,
+                                hpx::meta::compose_func<set_value_t>>,
+                            result_type>,
                         set_error_t(std::exception_ptr)>{};
                 }
             }
 #endif
+            else if constexpr (std::is_same_v<Env, no_env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>)
+            {
+                return detail::dependent_completion_signatures<no_env>{};
+            }
             else
             {
                 return detail::no_completion_signatures{};
@@ -626,13 +695,21 @@ namespace hpx::execution::experimental {
                         Receiver const&>>
         {
         };
+
+        // This concept has been introduced to increase atomicity of concepts
+        // clang-format off
+        template <typename Sender, typename Env>
+        inline constexpr bool is_sender_plain_v =
+            std::is_move_constructible_v<std::decay_t<Sender>> &&
+            std::is_class_v<std::decay_t<Sender>>;
+        // clang-format on
     }    // namespace detail
 
     template <typename Sender, typename Env>
     struct is_sender
       : std::integral_constant<bool,
-            std::is_move_constructible_v<std::decay_t<Sender>> &&
-                std::is_class_v<std::decay_t<Sender>> &&
+            !!(detail::is_sender_plain_v<Sender, Env> &&
+                detail::is_enable_sender_v<std::decay_t<Sender>>) ||
                 meta::value<detail::provides_completion_signatures<
                     std::decay_t<Sender>, Env>>>
     {
@@ -806,9 +883,7 @@ namespace hpx::execution::experimental {
     inline constexpr bool has_convertible_unhandled_stopped<Promise,
         std::enable_if_t<std::is_convertible_v<
             decltype(std::declval<Promise>().unhandled_stopped()),
-            hpx::coro::coroutine_handle<>>>> = true;
-
-    struct as_awaitable_t;
+            hpx::coroutine_handle<>>>> = true;
 
     namespace detail {
 
@@ -829,6 +904,10 @@ namespace hpx::execution::experimental {
         template <typename Value>
         using coroutine_expected_result_t = hpx::variant<hpx::monostate,
             value_or_void_t<Value>, std::exception_ptr>;
+
+        template <typename Promise>
+        using coroutine_env_t = hpx::util::detected_or<exec_envs::empty_env,
+            hpx::functional::tag_invoke_result_t, get_env_t, Promise>;
 
         template <typename Value>
         struct receiver_base
@@ -860,48 +939,64 @@ namespace hpx::execution::experimental {
                 else if constexpr (decays_to<Error, std::error_code>)
                 {
                     self.result->template emplace<2>(
-                        make_exception_ptr(system_error(err)));
+                        std::make_exception_ptr(std::system_error(err)));
                 }
                 else
                 {
                     self.result->template emplace<2>(
-                        make_exception_ptr(HPX_FORWARD(Error, err)));
+                        std::make_exception_ptr(HPX_FORWARD(Error, err)));
                 }
                 self.continuation.resume();
             }
 
             coroutine_expected_result_t<Value>* result;
-            hpx::coro::coroutine_handle<> continuation;
+            hpx::coroutine_handle<> continuation;
         };
+
+        template <typename PromiseId, typename Value>
+        struct receiver
+        {
+            using Promise = hpx::meta::type<PromiseId>;
+            struct type : receiver_base<Value>
+            {
+                using id = receiver;
+                friend void tag_invoke(set_stopped_t, type&& self) noexcept
+                {
+                    auto continuation =
+                        hpx::coroutine_handle<Promise>::from_address(
+                            self.continuation.address());
+                    hpx::coroutine_handle<> stopped_continuation =
+                        continuation.promise().unhandled_stopped();
+                    stopped_continuation.resume();
+                }
+                friend coroutine_env_t<Promise&> tag_invoke(
+                    get_env_t, type const& self)
+                {
+                    if constexpr (hpx::functional::is_tag_invocable_v<get_env_t,
+                                      Promise&>)
+                    {
+                        auto continuation =
+                            hpx::coroutine_handle<Promise>::from_address(
+                                self.continuation.address());
+                        return get_env(continuation.promise());
+                    }
+                    else
+                    {
+                        return no_env{};
+                    }
+                }
+            };
+        };
+
+        template <typename Sender, typename Promise>
+        using receiver_t =
+            hpx::meta::type<receiver<hpx::meta::get_id_t<Promise>,
+                single_sender_value_t<Sender, coroutine_env_t<Promise>>>>;
 
         template <typename PromiseId, typename Value>
         struct sender_awaitable_base
         {
-            using Promise = hpx::meta::hidden<PromiseId>;
-            struct receiver : receiver_base<Value>
-            {
-                friend void tag_invoke(set_stopped_t, receiver&& self) noexcept
-                {
-                    auto continuation =
-                        hpx::coro::coroutine_handle<Promise>::from_address(
-                            self.continuation.address());
-                    hpx::coro::coroutine_handle<> stopped_continuation =
-                        continuation.promise().unhandled_stopped();
-                    stopped_continuation.resume();
-                }
-
-                // Forward get_env query to the coroutine promise
-                friend auto tag_invoke(get_env_t, receiver const& self)
-                    -> env_of_t<Promise>
-                {
-                    auto continuation =
-                        hpx::coro::coroutine_handle<Promise>::from_address(
-                            self.continuation.address());
-                    return get_env(continuation.promise());
-                }
-            };
-
-            constexpr bool await_ready() const noexcept
+            static constexpr bool await_ready() noexcept
             {
                 return false;
             }
@@ -910,6 +1005,8 @@ namespace hpx::execution::experimental {
             {
                 switch (result.index())
                 {
+                default:
+                    [[fallthrough]];
                 case 0:    // receiver contract not satisfied
                     HPX_ASSERT_MSG(0, "_Should never get here");
                     break;
@@ -938,13 +1035,9 @@ namespace hpx::execution::experimental {
         struct sender_awaitable;
 
         template <typename Promise, typename Sender>
-        using sender_awaitable_t = sender_awaitable<hpx::meta::hidden<Promise>,
-            hpx::meta::hidden<Sender>>;
-
-        template <typename Sender, typename Promise>
-        using receiver =
-            typename sender_awaitable_base<hpx::meta::hidden<Promise>,
-                single_sender_value_t<Sender, env_of_t<Promise>>>::receiver;
+        using sender_awaitable_t =
+            hpx::meta::type<sender_awaitable<hpx::meta::get_id_t<Promise>,
+                hpx::meta::get_id_t<Sender>>>;
 
         // clang-format off
         template <typename Sender, typename Env = no_env>
@@ -955,8 +1048,8 @@ namespace hpx::execution::experimental {
 
         template <typename Sender, typename Promise>
         inline constexpr bool is_awaitable_sender_v =
-            is_single_typed_sender_v<Sender, env_of_t<Promise>> &&
-            is_sender_to_v<Sender, receiver<Sender, Promise>> &&
+            is_single_typed_sender_v<Sender, coroutine_env_t<Promise>> &&
+            is_sender_to_v<Sender, receiver_t<Sender, Promise>> &&
             has_unhandled_stopped<Promise>;
         // clang-format on
     }    // namespace detail
@@ -964,39 +1057,56 @@ namespace hpx::execution::experimental {
     inline constexpr struct as_awaitable_t
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
-        // static to call this function without creating an object
         template <typename T, typename Promise>
-        static constexpr bool is_noexcept() noexcept
+        static constexpr auto select_impl() noexcept
         {
-            if constexpr (is_awaitable_v<T>)
+            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t, T,
+                              Promise&>)
             {
-                return true;
+                using result_type =
+                    hpx::functional::tag_invoke_result_t<as_awaitable_t, T,
+                        Promise&>;
+                constexpr bool Nothrow =
+                    hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
+                        T, Promise&>;
+                return static_cast<result_type (*)() noexcept(Nothrow)>(
+                    nullptr);
+            }
+            else if constexpr (is_awaitable_v<T>)
+            {
+                // NOT awaitable<T, Promise> !!
+                using func_type = T && (*) () noexcept;
+                return static_cast<func_type>(nullptr);
             }
             else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
-                using Sender = detail::sender_awaitable_t<Promise, T>;
-                return std::is_nothrow_constructible_v<Sender, T,
-                    hpx::coro::coroutine_handle<Promise>>;
+                using result_type = detail::sender_awaitable_t<Promise, T>;
+                constexpr bool Nothrow =
+                    std::is_nothrow_constructible_v<result_type, T,
+                        hpx::coroutine_handle<Promise>>;
+                return static_cast<result_type (*)() noexcept(Nothrow)>(
+                    nullptr);
             }
             else
             {
-                return true;
+                using func_type = T && (*) () noexcept;
+                return static_cast<func_type>(nullptr);
             }
         }
 
         template <typename T, typename Promise>
-        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
-            as_awaitable_t, T&& t,
-            Promise& promise) noexcept(is_noexcept<T, Promise>())
+        using select_impl_t = decltype(select_impl<T, Promise>());
+
+        template <typename T, typename Promise>
+        friend HPX_FORCEINLINE auto
+        tag_fallback_invoke(as_awaitable_t, T&& t, Promise& promise) noexcept(
+            hpx::is_nothrow_invocable_v<select_impl_t<T, Promise>>)
+            -> hpx::util::invoke_result_t<select_impl_t<T, Promise>>
         {
-            if constexpr (is_awaitable_v<T>)
-            {
-                return HPX_FORWARD(T, t);
-            }
-            else if constexpr (detail::is_awaitable_sender_v<T, Promise>)
+            if constexpr (detail::is_awaitable_sender_v<T, Promise>)
             {
                 auto hcoro =
-                    hpx::coro::coroutine_handle<Promise>::from_promise(promise);
+                    hpx::coroutine_handle<Promise>::from_promise(promise);
                 return detail::sender_awaitable_t<Promise, T>{
                     HPX_FORWARD(T, t), hcoro};
             }
@@ -1009,25 +1119,54 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
+        template <typename Env>
+        struct env_promise
+        {
+            template <typename Ty,
+                typename =
+                    std::enable_if_t<!hpx::functional::is_tag_invocable_v<
+                        as_awaitable_t, Ty, env_promise&>>>
+            Ty&& await_transform(Ty&& value) noexcept
+            {
+                return HPX_FORWARD(Ty, value);
+            }
+
+            template <typename Ty,
+                typename = std::enable_if_t<hpx::functional::is_tag_invocable_v<
+                    as_awaitable_t, Ty, env_promise&>>>
+            auto await_transform(Ty&& value) noexcept(
+                hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t, Ty,
+                    env_promise&>)
+                -> hpx::functional::tag_invoke_result_t<as_awaitable_t, Ty,
+                    env_promise&>
+            {
+                return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
+            }
+
+            template <typename T>
+            friend auto tag_invoke(get_env_t, env_promise<T> const&) noexcept
+                -> T const&;
+        };
+
         struct with_awaitable_senders_base
         {
             with_awaitable_senders_base() = default;
 
             template <typename OtherPromise>
             void set_continuation(
-                hpx::coro::coroutine_handle<OtherPromise> hcoro) noexcept
+                hpx::coroutine_handle<OtherPromise> hcoro) noexcept
             {
                 static_assert(!std::is_void_v<OtherPromise>);
 
                 continuation_handle = hcoro;
                 if constexpr (has_unhandled_stopped<OtherPromise>)
                 {
-                    stopped_callback = [](void* address) noexcept
-                        -> hpx::coro::coroutine_handle<> {
+                    stopped_callback =
+                        [](void* address) noexcept -> hpx::coroutine_handle<> {
                         // This causes the rest of the coroutine (the part after
                         // the co_await of the sender) to be skipped and invokes
                         // the calling coroutine's stopped handler.
-                        return hpx::coro::coroutine_handle<
+                        return hpx::coroutine_handle<
                             OtherPromise>::from_address(address)
                             .promise()
                             .unhandled_stopped();
@@ -1040,20 +1179,20 @@ namespace hpx::execution::experimental {
                 // is called.
             }
 
-            hpx::coro::coroutine_handle<> continuation() const noexcept
+            hpx::coroutine_handle<> continuation() const noexcept
             {
                 return continuation_handle;
             }
 
-            hpx::coro::coroutine_handle<> unhandled_stopped() noexcept
+            hpx::coroutine_handle<> unhandled_stopped() const noexcept
             {
                 return (*stopped_callback)(continuation_handle.address());
             }
 
         private:
-            hpx::coro::coroutine_handle<> continuation_handle{};
-            hpx::coro::coroutine_handle<> (*stopped_callback)(void*) noexcept =
-                [](void*) noexcept -> hpx::coro::coroutine_handle<> {
+            hpx::coroutine_handle<> continuation_handle{};
+            hpx::coroutine_handle<> (*stopped_callback)(void*) noexcept =
+                [](void*) noexcept -> hpx::coroutine_handle<> {
                 std::terminate();
             };
         };
@@ -1062,7 +1201,7 @@ namespace hpx::execution::experimental {
     // clang-format off
     template <typename A, typename B>
     inline constexpr bool is_derived_from_v = std::is_base_of_v<B, A> &&
-        std::is_convertible_v<const volatile A*, const volatile B*>;
+        std::is_convertible_v<A const volatile*, B const volatile*>;
     // clang-format on
 
     template <typename Promise>
@@ -1080,22 +1219,22 @@ namespace hpx::execution::experimental {
 
     struct promise_base
     {
-        constexpr hpx::coro::suspend_always initial_suspend() noexcept
+        static constexpr hpx::suspend_always initial_suspend() noexcept
         {
             return {};
         }
 
-        [[noreturn]] hpx::coro::suspend_always final_suspend() noexcept
+        [[noreturn]] static hpx::suspend_always final_suspend() noexcept
         {
             std::terminate();
         }
 
-        [[noreturn]] void unhandled_exception() noexcept
+        [[noreturn]] static void unhandled_exception() noexcept
         {
             std::terminate();
         }
 
-        [[noreturn]] void return_void() noexcept
+        [[noreturn]] static void return_void() noexcept
         {
             std::terminate();
         }
@@ -1107,12 +1246,12 @@ namespace hpx::execution::experimental {
             {
                 Fun&& fun;
 
-                bool await_ready() noexcept
+                static constexpr bool await_ready() noexcept
                 {
                     return false;
                 }
 
-                void await_suspend(hpx::coro::coroutine_handle<>) noexcept(
+                void await_suspend(hpx::coroutine_handle<>) noexcept(
                     std::is_nothrow_invocable_v<Fun>)
                 {
                     // If this throws, the runtime catches the exception,
@@ -1122,7 +1261,7 @@ namespace hpx::execution::experimental {
                     HPX_FORWARD(Fun, fun)();
                 }
 
-                [[noreturn]] void await_resume() noexcept
+                [[noreturn]] static void await_resume() noexcept
                 {
                     std::terminate();
                 }
@@ -1132,18 +1271,26 @@ namespace hpx::execution::experimental {
         }
     };
 
-    struct operation_base : hpx::functional::tag<operation_base>
+    struct operation_base
     {
-        hpx::coro::coroutine_handle<> coro_handle;
+        hpx::coroutine_handle<> coro_handle;
 
-        explicit operation_base(hpx::coro::coroutine_handle<> hcoro) noexcept
+        explicit operation_base(hpx::coroutine_handle<> hcoro) noexcept
           : coro_handle(hcoro)
         {
         }
 
+        operation_base(operation_base const& other) = delete;
         operation_base(operation_base&& other) noexcept
           : coro_handle(std::exchange(other.coro_handle, {}))
         {
+        }
+
+        operation_base& operator=(operation_base const&) = delete;
+        operation_base& operator=(operation_base&& rhs) noexcept
+        {
+            coro_handle = std::exchange(rhs.coro_handle, {});
+            return *this;
         }
 
         ~operation_base()
@@ -1162,77 +1309,112 @@ namespace hpx::execution::experimental {
     struct promise;
 
     template <typename ReceiverId>
-    struct operation : operation_base
+    struct operation
     {
-        using promise_type = promise<ReceiverId>;
-        using operation_base::operation_base;
+        struct type : operation_base
+        {
+            using promise_type = hpx::meta::type<promise<ReceiverId>>;
+            using operation_base::operation_base;
+        };
     };
 
     template <typename ReceiverId>
-    struct promise : promise_base
+    struct promise
     {
         using Receiver = hpx::meta::type<ReceiverId>;
-
-        explicit promise(auto&, Receiver& rcvr_) noexcept
-          : rcvr(rcvr_)
+        struct type : promise_base
         {
-        }
-
-        hpx::coro::coroutine_handle<> unhandled_stopped() noexcept
-        {
-            set_stopped(std::move(rcvr));
-            // Returning noop_coroutine here causes the __connect_awaitable
-            // coroutine to never resume past the point where it co_await's
-            // the awaitable.
-            return hpx::coro::noop_coroutine();
-        }
-
-        operation<ReceiverId> get_return_object() noexcept
-        {
-            return operation<ReceiverId>{
-                hpx::coro::coroutine_handle<promise>::from_promise(*this)};
-        }
-
-        template <typename Awaitable>
-        auto await_transform(Awaitable&& await) noexcept(
-            hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
-                Awaitable, promise&> ||
-            !hpx::functional::is_tag_invocable_v<as_awaitable_t, Awaitable,
-                promise&>)
-
-        {
-            if constexpr (hpx::functional::is_tag_invocable_v<as_awaitable_t,
-                              Awaitable, promise&>)
+            using id = promise;
+            explicit type(auto&, Receiver& rcvr_) noexcept
+              : rcvr(rcvr_)
             {
-                return as_awaitable(HPX_FORWARD(Awaitable, await), *this);
             }
-            else
+
+            hpx::coroutine_handle<> unhandled_stopped() noexcept
             {
-                return HPX_FORWARD(Awaitable, await);
+                set_stopped(std::move(rcvr));
+                // Returning noop_coroutine here causes the __connect_awaitable
+                // coroutine to never resume past the point where it co_await's
+                // the awaitable.
+                return hpx::noop_coroutine();
             }
-        }
 
-        // Pass through the get_env receiver query
-        friend auto tag_invoke(get_env_t, promise const& self)
-            -> env_of_t<Receiver>
-        {
-            return get_env(self.rcvr);
-        }
+            hpx::meta::type<operation<ReceiverId>> get_return_object() noexcept
+            {
+                return hpx::meta::type<operation<ReceiverId>>{
+                    hpx::coroutine_handle<type>::from_promise(*this)};
+            }
 
-        Receiver& rcvr;
+            template <typename Awaitable>
+            auto await_transform(Awaitable&& await) noexcept(
+                hpx::functional::is_nothrow_tag_invocable_v<as_awaitable_t,
+                    Awaitable, promise&> ||
+                !hpx::functional::is_tag_invocable_v<as_awaitable_t, Awaitable,
+                    promise&>)
+
+            {
+                if constexpr (hpx::functional::is_tag_invocable_v<
+                                  as_awaitable_t, Awaitable, promise&>)
+                {
+                    return as_awaitable(HPX_FORWARD(Awaitable, await), *this);
+                }
+                else
+                {
+                    return HPX_FORWARD(Awaitable, await);
+                }
+            }
+
+            // Pass through the get_env receiver query
+            friend auto tag_invoke(get_env_t, type const& self)
+                -> env_of_t<Receiver>
+            {
+                return get_env(self.rcvr);
+            }
+
+            Receiver& rcvr;
+        };
     };
 
     template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
-    using promise_t = promise<hpx::meta::hidden<Receiver>>;
+    using promise_t = hpx::meta::type<promise<hpx::meta::get_id_t<Receiver>>>;
 
     template <typename Receiver,
         typename = std::enable_if_t<is_receiver_v<Receiver>>>
-    using operation_t = operation<hpx::meta::hidden<Receiver>>;
+    using operation_t =
+        hpx::meta::type<operation<hpx::meta::get_id_t<Receiver>>>;
 
     inline constexpr struct connect_awaitable_t
     {
     private:
+        template <typename Fun, typename... Ts>
+        static auto co_call(Fun fun, Ts&&... as) noexcept
+        {
+            auto fn = [&, fun]() noexcept { fun(HPX_FORWARD(Ts, as)...); };
+
+            struct awaiter
+            {
+                decltype(fn) fn_;
+
+                static constexpr bool await_ready() noexcept
+                {
+                    return false;
+                }
+
+                void await_suspend(hpx::coroutine_handle<>) noexcept
+                {
+                    fn_();
+                }
+
+                [[noreturn]] static void await_resume() noexcept
+                {
+                    std::terminate();
+                }
+            };
+
+            return awaiter{fn};
+        }
+
         template <typename Awaitable, typename Receiver>
         static operation_t<Receiver> impl(Awaitable await, Receiver rcvr)
         {
@@ -1240,29 +1422,17 @@ namespace hpx::execution::experimental {
             std::exception_ptr eptr;
             try
             {
-                // This is a bit mind bending control-flow wise. We are first
-                // evaluating the co_await expression. Then the result of that
-                // is passed into a lambda that curries a reference to the
-                // result into another lambda which is then returned to
-                // 'co_yield'. The 'co_yield' expression then invokes this
-                // lambda after the coroutine is suspended so that it is safe
-                // for the receiver to destroy the coroutine.
-                auto fun = [&](auto&&... as) noexcept {
-                    return [&]() noexcept -> void {
-                        set_value(HPX_FORWARD(Receiver, rcvr),
-                            (std::add_rvalue_reference_t<result_t>) as...);
-                    };
-                };
-
                 if constexpr (std::is_void_v<result_t>)
                 {
                     // clang-format off
-                    co_yield (co_await HPX_FORWARD(Awaitable, await), fun());
+                    co_await (co_await HPX_FORWARD(Awaitable, await),
+                        co_call(set_value, HPX_FORWARD(Receiver, rcvr)));
                     // clang-format on
                 }
                 else
                 {
-                    co_yield fun(co_await HPX_FORWARD(Awaitable, await));
+                    co_await co_call(set_value, HPX_FORWARD(Receiver, rcvr),
+                        co_await HPX_FORWARD(Awaitable, await));
                 }
             }
             catch (...)
@@ -1270,10 +1440,11 @@ namespace hpx::execution::experimental {
                 eptr = std::current_exception();
             }
 
-            co_yield [&]() noexcept -> void {
-                set_error(HPX_FORWARD(Receiver, rcvr),
+            if (eptr)
+            {
+                co_await co_call(set_error, HPX_FORWARD(Receiver, rcvr),
                     HPX_FORWARD(std::exception_ptr, eptr));
-            };
+            }
         }
 
         template <typename Receiver, typename Awaitable,
@@ -1290,8 +1461,7 @@ namespace hpx::execution::experimental {
                 is_awaitable_v<Awaitable, promise_t<Receiver>>>,
             typename = std::enable_if_t<
                 is_receiver_of_v<Receiver, completions_t<Receiver, Awaitable>>>>
-        operation_t<Receiver> operator()(
-            Awaitable&& await, Receiver&& rcvr) const
+        operation_t<Receiver> operator()(Awaitable&& await, Receiver rcvr) const
         {
             return impl(
                 HPX_FORWARD(Awaitable, await), HPX_FORWARD(Receiver, rcvr));
@@ -1337,34 +1507,32 @@ namespace hpx::execution::experimental {
 
         template <typename PromiseId, typename SenderId>
         struct sender_awaitable
-          : sender_awaitable_base<PromiseId,
-                single_sender_value_t<hpx::meta::type<SenderId>,
-                    env_of_t<hpx::meta::type<PromiseId>>>>
         {
-        private:
-            using Promise = hpx::meta::type<PromiseId>;
-            using Sender = hpx::meta::type<SenderId>;
-            using Env = env_of_t<Promise>;
-            using Value = single_sender_value_t<Sender, Env>;
-            using Base = sender_awaitable_base<PromiseId, Value>;
-            using receiver = typename Base::receiver;
+            using promise_type = hpx::meta::type<PromiseId>;
+            using sender_type = hpx::meta::type<SenderId>;
+            using env_type = env_of_t<promise_type>;
+            using value_type = single_sender_value_t<sender_type, env_type>;
 
-            connect_result_t<Sender, receiver> op_state_;
-
-        public:
-            sender_awaitable(Sender&& sender,
-                hpx::coro::coroutine_handle<Promise>
-                    hcoro) noexcept(has_nothrow_connect<Sender,
-                receiver>::value)
-              : op_state_(connect(HPX_FORWARD(Sender, sender),
-                    receiver{{&this->result, hcoro}}))
+            struct type : sender_awaitable_base<PromiseId, value_type>
             {
-            }
+                // clang-format off
+                type(sender_type&& sender, hpx::coroutine_handle<promise_type> hcoro)
+                    noexcept(has_nothrow_connect<sender_type, receiver>::value)
+                  : op_state_(connect(HPX_FORWARD(sender_type, sender),
+                        receiver{{&this->result, hcoro}}))
+                {
+                }
+                // clang-format on
 
-            void await_suspend(hpx::coro::coroutine_handle<Promise>) noexcept
-            {
-                start(op_state_);
-            }
+                void await_suspend(hpx::coroutine_handle<promise_type>) noexcept
+                {
+                    start(op_state_);
+                }
+
+            private:
+                using receiver = receiver_t<sender_type, promise_type>;
+                connect_result_t<sender_type, receiver> op_state_;
+            };
         };
     }     // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES

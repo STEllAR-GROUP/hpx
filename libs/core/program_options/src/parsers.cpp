@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/debugging/environ.hpp>
@@ -42,13 +42,15 @@ namespace hpx::program_options {
             result.unregistered = opt.unregistered;
 
             std::transform(opt.value.begin(), opt.value.end(),
-                back_inserter(result.value),
-                std::bind(from_utf8, std::placeholders::_1));
+                back_inserter(result.value), [](auto&& arg) {
+                    return from_utf8(std::forward<decltype(arg)>(arg));
+                });
 
             std::transform(opt.original_tokens.begin(),
                 opt.original_tokens.end(),
-                back_inserter(result.original_tokens),
-                std::bind(from_utf8, std::placeholders::_1));
+                back_inserter(result.original_tokens), [](auto&& arg) {
+                    return from_utf8(std::forward<decltype(arg)>(arg));
+                });
             return result;
         }
     }    // namespace
@@ -167,7 +169,7 @@ namespace hpx::program_options {
             {
             }
 
-            std::string operator()(std::string const& s)
+            std::string operator()(std::string const& s) const
             {
                 std::string result;
                 if (s.find(prefix) == 0)
@@ -175,9 +177,9 @@ namespace hpx::program_options {
                     for (std::string::size_type n = prefix.size(); n < s.size();
                          ++n)
                     {
-                        // Intel-Win-7.1 does not understand
-                        // push_back on string.
-                        result += static_cast<char>(tolower(s[n]));
+                        // Intel-Win-7.1 does not understand push_back on
+                        // string.
+                        result += static_cast<char>(std::tolower(s[n]));
                     }
                 }
                 return result;

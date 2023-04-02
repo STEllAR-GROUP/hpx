@@ -118,8 +118,8 @@ namespace hpx::detail {
         void serialize(Archive& ar, unsigned int const /*version*/)
         {
             // clang-format off
-                ar & _f;
-                ar & _args;
+            ar & _f;
+            ar & _args;
             // clang-format on
         }
 

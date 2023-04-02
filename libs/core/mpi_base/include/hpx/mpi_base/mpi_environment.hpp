@@ -20,13 +20,14 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     struct HPX_CORE_EXPORT mpi_environment
     {
         static bool check_mpi_environment(runtime_configuration const& cfg);
 
-        static int init(int* argc, char*** argv, const int minimal,
-            const int required, int& provided);
+        static int init(int* argc, char*** argv, int const minimal,
+            int const required, int& provided);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
         static void finalize();
 
@@ -44,23 +45,35 @@ namespace hpx { namespace util {
         struct HPX_CORE_EXPORT scoped_lock
         {
             scoped_lock();
+
             scoped_lock(scoped_lock const&) = delete;
+            scoped_lock(scoped_lock&&) = delete;
+
             scoped_lock& operator=(scoped_lock const&) = delete;
+            scoped_lock& operator=(scoped_lock&&) = delete;
+
             ~scoped_lock();
-            void unlock();
+
+            static void unlock();
         };
 
         struct HPX_CORE_EXPORT scoped_try_lock
         {
             scoped_try_lock();
+
             scoped_try_lock(scoped_try_lock const&) = delete;
+            scoped_try_lock(scoped_try_lock&&) = delete;
+
             scoped_try_lock& operator=(scoped_try_lock const&) = delete;
+            scoped_try_lock& operator=(scoped_try_lock&&) = delete;
+
             ~scoped_try_lock();
+
             void unlock();
             bool locked;
         };
 
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     private:
         static mutex_type mtx_;
@@ -72,7 +85,7 @@ namespace hpx { namespace util {
 
         static int is_initialized_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -36,6 +36,7 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
+            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;

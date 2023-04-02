@@ -9,9 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/serialization/config/defines.hpp>
 #include <hpx/serialization/brace_initializable_fwd.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/brace_initializable_traits.hpp>
+#include <hpx/serialization/traits/is_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
+#include <hpx/serialization/traits/is_serializable.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 
 #include <string>
@@ -38,51 +42,6 @@ namespace hpx::serialization {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // This trait must live outside of 'class access' below as otherwise MSVC
-    // will find the serialize() function in 'class access' as a dependent class
-    // (which is an MS extension)
-    template <typename T>
-    class has_serialize_adl
-    {
-        template <typename T1>
-        static std::false_type test(...);
-
-        template <typename T1,
-            typename = decltype(
-                serialize(std::declval<hpx::serialization::output_archive&>(),
-                    std::declval<std::remove_const_t<T1>&>(), 0u))>
-        static std::true_type test(int);
-
-    public:
-        static constexpr bool value = decltype(test<T>(0))::value;
-    };
-
-    template <typename T>
-    inline constexpr bool has_serialize_adl_v = has_serialize_adl<T>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    class has_struct_serialization
-    {
-        template <typename T1>
-        static std::false_type test(...);
-
-        template <typename T1,
-            typename = decltype(serialize_struct(
-                std::declval<hpx::serialization::output_archive&>(),
-                std::declval<std::remove_const_t<T1>&>(), 0u,
-                hpx::traits::detail::arity<T1>()))>
-        static std::true_type test(int);
-
-    public:
-        static constexpr bool value = decltype(test<T>(0))::value;
-    };
-
-    template <typename T>
-    inline constexpr bool has_struct_serialization_v =
-        has_struct_serialization<T>::value;
-
-    ///////////////////////////////////////////////////////////////////////////
     class access
     {
     public:
@@ -97,12 +56,14 @@ namespace hpx::serialization {
             // detection would have been much easier to implement if there
             // hadn't been an issue with gcc:
             // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82478
+            // clang-format off
             template <typename T1,
-                typename = decltype(
-                    std::declval<std::remove_const_t<T1>&>().serialize(
+                typename =
+                    decltype(std::declval<std::remove_const_t<T1>&>().serialize(
                         std::declval<hpx::serialization::output_archive&>(),
                         0u))>
             static std::true_type test(int);
+            // clang-format on
 
         public:
             static constexpr bool value = decltype(test<T>(0))::value;
@@ -115,7 +76,8 @@ namespace hpx::serialization {
         template <typename Archive, typename T>
         static void serialize(Archive& ar, T& t, unsigned)
         {
-            if constexpr (hpx::traits::is_intrusive_polymorphic_v<T>)
+            using dT = std::decay_t<T>;
+            if constexpr (hpx::traits::is_intrusive_polymorphic_v<dT>)
             {
                 // intrusive_polymorphic: the following template function is
                 // viable to call the right overloaded function according to T
@@ -123,16 +85,16 @@ namespace hpx::serialization {
                 // serialize function
                 t.serialize(ar, 0);
             }
-            else if constexpr (has_serialize_v<T>)
+            else if constexpr (has_serialize_v<dT>)
             {
                 // intrusive_usual: cast it to let it be run for templated
                 // member functions
-                const_cast<std::decay_t<T>&>(t).serialize(ar, 0);
+                const_cast<dT&>(t).serialize(ar, 0);
             }
-            else if constexpr (!std::is_empty_v<T>)
+            else if constexpr (!std::is_empty_v<dT>)
             {
                 // non_intrusive
-                if constexpr (has_serialize_adl_v<T>)
+                if constexpr (hpx::traits::has_serialize_adl_v<dT>)
                 {
                     // this additional indirection level is needed to force ADL
                     // on the second phase of template lookup. call of serialize
@@ -140,17 +102,26 @@ namespace hpx::serialization {
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
-                else if constexpr (has_struct_serialization_v<T>)
+                else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {
                     // This is automatic serialization for types that are simple
                     // (brace-initializable) structs, what that means every
                     // struct's field has to be serializable and public.
                     serialize_struct(ar, t, 0);
                 }
+                else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
+                {
+                    // bitwise serializable types can be directly dispatched to
+                    // the archive functions
+                    ar.invoke(t);
+                }
                 else
                 {
-                    static_assert(
-                        has_serialize_adl_v<T> || has_struct_serialization_v<T>,
+                    static_assert(hpx::traits::has_serialize_adl_v<dT> ||
+                            hpx::traits::has_struct_serialization_v<dT> ||
+                            hpx::traits::is_bitwise_serializable_v<dT> ||
+                            !hpx::traits::is_not_bitwise_serializable_v<dT>,
                         "No serialization method found");
                 }
             }
@@ -181,3 +152,18 @@ namespace hpx::serialization {
         }
     };
 }    // namespace hpx::serialization
+
+#if defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
+namespace hpx::traits {
+
+    // the case when hpx::serialization::access::has_serialize_v<T> is true has
+    // to be handled separately to avoid circular dependencies
+    template <typename T>
+    struct is_not_bitwise_serializable<T,
+        std::enable_if_t<!std::is_abstract_v<T> &&
+            !hpx::traits::has_serialize_adl_v<T> &&
+            hpx::serialization::access::has_serialize_v<T>>> : std::true_type
+    {
+    };
+}    // namespace hpx::traits
+#endif

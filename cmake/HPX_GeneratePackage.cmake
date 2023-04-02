@@ -66,10 +66,13 @@ configure_file(
   @ONLY
 )
 set(HPX_CONF_PREFIX ${CMAKE_INSTALL_PREFIX})
-configure_file(
-  cmake/templates/hpxcxx.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx" @ONLY
-)
+if(HPX_WITH_PKGCONFIG)
+  configure_file(
+    cmake/templates/hpxcxx.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx" @ONLY
+  )
+endif()
+
 # Build dir
 configure_file(
   cmake/templates/${HPX_PACKAGE_NAME}Config.cmake.in
@@ -78,9 +81,11 @@ configure_file(
   @ONLY
 )
 set(HPX_CONF_PREFIX ${PROJECT_BINARY_DIR})
-configure_file(
-  cmake/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
-)
+if(HPX_WITH_PKGCONFIG)
+  configure_file(
+    cmake/templates/hpxcxx.in "${CMAKE_CURRENT_BINARY_DIR}/bin/hpxcxx" @ONLY
+  )
+endif()
 
 # Configure macros for the install dir ...
 set(HPX_CMAKE_MODULE_PATH "\${CMAKE_CURRENT_LIST_DIR}")
@@ -108,21 +113,21 @@ install(
   COMPONENT cmake
 )
 
-install(
-  FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT compiler_wrapper
-  PERMISSIONS
-    OWNER_READ
-    OWNER_WRITE
-    OWNER_EXECUTE
-    GROUP_READ
-    GROUP_EXECUTE
-    WORLD_READ
-    WORLD_EXECUTE
-)
-
 if(HPX_WITH_PKGCONFIG)
+  install(
+    FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT compiler_wrapper
+    PERMISSIONS
+      OWNER_READ
+      OWNER_WRITE
+      OWNER_EXECUTE
+      GROUP_READ
+      GROUP_EXECUTE
+      WORLD_READ
+      WORLD_EXECUTE
+  )
+
   add_library(hpx_pkgconfig_application INTERFACE)
   target_link_libraries(
     hpx_pkgconfig_application INTERFACE hpx hpx_wrap hpx_init

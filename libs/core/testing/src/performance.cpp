@@ -58,13 +58,13 @@ namespace hpx::util {
                 if (outputs)
                     strm << ",";
                 strm << "\n    {\n";
-                strm << "      \"name\" : \"" << std::get<0>(item.first)
+                strm << R"(      "name" : ")" << std::get<0>(item.first)
                      << "\",\n";
-                strm << "      \"executor\" : \"" << std::get<1>(item.first)
+                strm << R"(      "executor" : ")" << std::get<1>(item.first)
                      << "\",\n";
-                strm << "      \"series\" : [";
+                strm << R"(      "series" : [)";
                 int series = 0;
-                for (auto val : item.second)
+                for (auto const val : item.second)
                 {
                     if (series)
                         strm << ", ";
@@ -90,7 +90,7 @@ namespace hpx::util {
     }    // namespace detail
 
     void perftests_report(std::string const& name, std::string const& exec,
-        std::size_t const steps, hpx::function<void(void)>&& test)
+        std::size_t const steps, hpx::function<void()>&& test)
     {
         if (steps == 0)
             return;
@@ -98,12 +98,11 @@ namespace hpx::util {
         // First iteration to cache the data
         test();
         using timer = std::chrono::high_resolution_clock;
-        timer::time_point start;
         for (size_t i = 0; i != steps; ++i)
         {
             // For now we don't flush the cache
             //flush_cache();
-            start = timer::now();
+            timer::time_point start = timer::now();
             test();
             // default is in seconds
             auto time =

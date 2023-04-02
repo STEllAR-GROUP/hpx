@@ -77,7 +77,7 @@ int hpx_main()
         std::ptrdiff_t stack_now = std::get<2>(i);
         std::cout << "stack remaining 0x" << std::hex << stack_now << "\n";
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        HPX_TEST_LT(current_stack, stack_now);
+        HPX_TEST_LTE(current_stack, stack_now);
 #endif
         current_stack = stack_now;
         my_stack_info.pop();

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,10 +33,6 @@ set(config_headers
     hpx/config/warnings_suffix.hpp
     hpx/config/weak_symbol.hpp
 )
-
-if(HPX_WITH_CXX20_COROUTINES)
-  set(config_headers ${config_headers} hpx/config/coroutines_support.hpp)
-endif()
 
 # Default location is $HPX_ROOT/libs/config/src
 set(config_sources version.cpp)

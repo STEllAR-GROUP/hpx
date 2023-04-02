@@ -189,7 +189,7 @@ namespace hpx::threads::coroutines::detail::posix {
      * mmap (might be required on some systems) and/or
      * using a pooling allocator.
      * NOTE: the SuSv3 documentation explicitly allows
-     * the use of malloc to allocate stacks for makectx.
+     * the use of malloc to allocate stacks for makecontext.
      * We use new/delete for guaranteed alignment.
      */
     inline void* alloc_stack(std::size_t size)

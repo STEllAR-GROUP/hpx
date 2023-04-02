@@ -21,7 +21,7 @@ namespace hpx::util::batch_environments {
       , num_localities_(0)
       , valid_(false)
     {
-        char* node_num = std::getenv("ALPS_APP_PE");
+        char const* node_num = std::getenv("ALPS_APP_PE");
         valid_ = node_num != nullptr;
         if (valid_)
         {
@@ -29,7 +29,7 @@ namespace hpx::util::batch_environments {
             node_num_ = from_string<std::size_t>(node_num);
 
             // Get the number of threads
-            char* num_threads = std::getenv("ALPS_APP_DEPTH");
+            char const* num_threads = std::getenv("ALPS_APP_DEPTH");
             if (!num_threads)
             {
                 valid_ = false;
@@ -38,7 +38,7 @@ namespace hpx::util::batch_environments {
             num_threads_ = from_string<std::size_t>(num_threads);
 
             // Get the number of localities
-            char* total_num_threads = std::getenv("PBS_NP");
+            char const* total_num_threads = std::getenv("PBS_NP");
             if (!total_num_threads)
             {
                 valid_ = false;

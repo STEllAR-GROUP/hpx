@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2017 Hartmut Kaiser
+//  Copyright (c) 2011-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -138,7 +138,7 @@ namespace hpx {
             "(A general purpose parallel C++ runtime system for distributed "
             "applications\n"
             "of any scale).\n\n"
-            "Copyright (c) 2007-2022, The STE||AR Group,\n"
+            "Copyright (c) 2007-2023, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar-group.org\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"

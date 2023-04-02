@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config/coroutines_support.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 
 #include <exception>
 #include <utility>
@@ -324,15 +324,15 @@ void test_sender3()
 template <typename Awaiter>
 struct promise
 {
-    hpx::coro::coroutine_handle<promise> get_return_object()
+    hpx::coroutine_handle<promise> get_return_object()
     {
-        return {hpx::coro::coroutine_handle<promise>::from_promise(*this)};
+        return {hpx::coroutine_handle<promise>::from_promise(*this)};
     }
-    hpx::coro::suspend_always initial_suspend() noexcept
+    hpx::suspend_always initial_suspend() noexcept
     {
         return {};
     }
-    hpx::coro::suspend_always final_suspend() noexcept
+    hpx::suspend_always final_suspend() noexcept
     {
         return {};
     }
@@ -349,7 +349,7 @@ struct promise
 struct awaiter
 {
     void await_ready() {}
-    bool await_suspend(hpx::coro::coroutine_handle<>)
+    bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
     }
@@ -367,7 +367,7 @@ struct awaitable_sender_1
 
 struct awaitable_sender_2
 {
-    using promise_type = promise<hpx::coro::suspend_always>;
+    using promise_type = promise<hpx::suspend_always>;
 };
 
 struct awaitable_sender_3
@@ -412,7 +412,7 @@ void test_awaitable_sender2(Signatures)
     // static_assert(ex::is_sender_v<awaitable_sender_2>);
 
     // static_assert(ex::is_awaitable_v<awaitable_sender_2,
-    //     promise<hpx::coro::suspend_always>>);
+    //     promise<hpx::suspend_always>>);
 
     // awaitable_sender_2 s;
     // static_assert(!hpx::meta::value<
@@ -550,7 +550,7 @@ int main()
 
     {
         test_awaitable_sender1(signature_error_values(std::exception_ptr()),
-            hpx::coro::suspend_always{});
+            hpx::suspend_always{});
         test_awaitable_sender1(
             signature_error_values(std::exception_ptr(), bool()), awaiter{});
 

@@ -17,6 +17,25 @@
 
 namespace hpx::execution::experimental {
 
+    // 11.3.1. queryable concept [exec.queries.queryable]
+    // 1. A query object is a customization point object
+    //    ([customization.point.object]) that accepts as its first argument
+    //    a queryable object, and for each such invocation that is valid,
+    //    produces a value of the corresponding property of the object.
+    // 2. Unless otherwise specified, given a queryable object e, a query
+    //    object Q, and a pack of subexpressions args, the value returned
+    //    by the expression Q(e, args...) is valid as long as e is valid.
+    //
+    //    Let e be an object of type E. The type E models queryable if for
+    //    each callable object Q and a pack of subexpressions args, if
+    //    requires { Q(e, args...) } is true then Q(e, args...) meets any
+    //    semantic requirements imposed by Q.
+    //
+    // Reference implementation avoids using libstdc++'s object concepts
+    // because they instantiate a lot of templates.
+    template <typename T>
+    inline constexpr bool is_queryable_v = std::is_destructible_v<T>;
+
     namespace detail {
 
         // checks whether tag_invoke(CPO, Args...) is contextually convertible
@@ -63,6 +82,9 @@ namespace hpx::execution::experimental {
         //  -- end note]
         struct no_env
         {
+            using type = no_env;
+            using id = no_env;
+
             template <typename Tag, typename Env>
             friend std::enable_if_t<std::is_same_v<no_env, std::decay_t<Env>>>
                 tag_invoke(Tag, Env) = delete;
@@ -70,40 +92,47 @@ namespace hpx::execution::experimental {
 
         struct empty_env
         {
+            using type = empty_env;
+            using id = empty_env;
         };
 
-        template <typename Tag, typename Value,
-            typename BaseEnvId = meta::hidden<empty_env>>
+        template <typename Tag, typename Value, typename BaseEnv = empty_env>
         struct env
         {
-            using BaseEnv = meta::type<BaseEnvId>;
-
-            HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
-            HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
-
-            // Forward only the receiver queries
-            template <typename Tag2, typename... Args,
-                typename = std::enable_if_t<functional::is_tag_invocable_v<Tag2,
-                    BaseEnv const&, Args...>>>
-            friend constexpr auto tag_invoke(
-                Tag2 tag, env const& self, Args&&... args) noexcept
-                -> functional::tag_invoke_result_t<Tag2, BaseEnv const&,
-                    Args...>
+            struct type
             {
-                return HPX_FORWARD(Tag2, tag)(
-                    self.base_env_, HPX_FORWARD(Args, args)...);
-            }
+                using id = env;
 
-            template <typename... Args>
-            friend constexpr auto
-            tag_invoke(Tag, env const& self, Args&&...) noexcept(
-                std::is_nothrow_copy_constructible_v<
-                    util::unwrap_reference_t<Value>>)
-                -> util::unwrap_reference_t<Value>
-            {
-                return self.value_;
-            }
+                HPX_NO_UNIQUE_ADDRESS util::unwrap_reference_t<Value> value_;
+                HPX_NO_UNIQUE_ADDRESS BaseEnv base_env_{};
+
+                // Forward only the receiver queries
+                template <typename Tag2, typename... Args,
+                    typename = std::enable_if_t<functional::is_tag_invocable_v<
+                        Tag2, BaseEnv const&, Args...>>>
+                friend constexpr auto tag_invoke(
+                    Tag2 tag, type const& self, Args&&... args) noexcept
+                    -> functional::tag_invoke_result_t<Tag2, BaseEnv const&,
+                        Args...>
+                {
+                    return HPX_FORWARD(Tag2, tag)(
+                        self.base_env_, HPX_FORWARD(Args, args)...);
+                }
+
+                template <typename... Args>
+                friend constexpr auto
+                tag_invoke(Tag, type const& self, Args&&...) noexcept(
+                    std::is_nothrow_copy_constructible_v<
+                        util::unwrap_reference_t<Value>>)
+                    -> util::unwrap_reference_t<Value>
+                {
+                    return self.value_;
+                }
+            };
         };
+
+        template <typename Tag, typename Value, typename BaseEnv = empty_env>
+        using env_t = std::decay_t<hpx::meta::type<env<Tag, Value, BaseEnv>>>;
 
         template <typename Tag>
         struct make_env_t
@@ -112,18 +141,17 @@ namespace hpx::execution::experimental {
             constexpr auto operator()(Value&& value) const
                 noexcept(std::is_nothrow_copy_constructible_v<
                     util::unwrap_reference_t<std::decay_t<Value>>>)
-                    -> env<Tag, std::decay_t<Value>>
+                    -> env_t<Tag, std::decay_t<Value>>
             {
                 return {HPX_FORWARD(Value, value)};
             }
 
-            template <typename Value, typename BaseEnv>
-            constexpr auto operator()(Value&& value, BaseEnv&& base_env) const
-                -> env<Tag, std::decay_t<Value>,
-                    meta::hidden<std::decay_t<BaseEnv>>>
+            template <typename Value, typename BaseEnvId>
+            constexpr auto operator()(Value&& value, BaseEnvId&& base_env) const
+                -> env_t<Tag, std::decay_t<Value>, std::decay_t<BaseEnvId>>
             {
-                return {
-                    HPX_FORWARD(Value, value), HPX_FORWARD(BaseEnv, base_env)};
+                return {HPX_FORWARD(Value, value),
+                    HPX_FORWARD(BaseEnvId, base_env)};
             }
         };
 
@@ -206,4 +234,8 @@ namespace hpx::execution::experimental {
             return false;
         }
     } forwarding_env_query{};
+
+    template <typename T>
+    inline constexpr bool is_environment_provider_v =
+        std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental

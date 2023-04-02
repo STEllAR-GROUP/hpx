@@ -182,6 +182,7 @@ namespace hpx::execution::experimental {
         template <typename... Senders>
         struct when_all_sender
         {
+            using is_sender = void;
             using senders_type =
                 hpx::util::member_pack_for<std::decay_t<Senders>...>;
             senders_type senders;
@@ -229,6 +230,10 @@ namespace hpx::execution::experimental {
                 std::size_t I = num_predecessors - 1>
             struct operation_state;
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             template <typename Receiver, typename SendersPack>
             struct operation_state<Receiver, SendersPack, 0>
             {
@@ -420,6 +425,9 @@ namespace hpx::execution::experimental {
                     hpx::execution::experimental::start(op_state);
                 }
             };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
             template <typename Receiver, typename SendersPack>
             friend void tag_invoke(start_t,

@@ -6,29 +6,18 @@
 
 #pragma once
 
+#include <hpx/config/defines.hpp>
+
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
-#include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 #include <hpx/type_support/meta.hpp>
 
 #include <type_traits>
 #include <utility>
 
 namespace hpx::execution::experimental {
-
-    template <typename Promise, typename Awaiter>
-    decltype(auto) await_suspend(Awaiter&& await)
-    {
-        if constexpr (!std::is_void_v<Promise>)
-        {
-            return await.await_suspend(hpx::coro::coroutine_handle<Promise>{});
-        }
-        else
-        {
-            return;
-        }
-    }
 
     namespace detail {
 
@@ -42,9 +31,9 @@ namespace hpx::execution::experimental {
         inline constexpr bool is_instance_of = is_instance_of_<T, F>;
 
         template <typename T>
-        inline constexpr bool is_await_suspend_result_v =
+        inline constexpr bool is_await_suspend_result_t_v =
             meta::value<meta::one_of<T, void, bool>> ||
-            is_instance_of<T, hpx::coro::coroutine_handle>;
+            is_instance_of<T, hpx::coroutine_handle>;
 
         template <typename, typename = void>
         inline constexpr bool has_await_ready = false;
@@ -60,32 +49,32 @@ namespace hpx::execution::experimental {
         inline constexpr bool has_await_resume<T,
             std::void_t<decltype(std::declval<T>().await_resume())>> = true;
 
-        template <typename, typename, typename = void>
-        inline constexpr bool has_await_suspend_coro_handle = false;
+        HPX_HAS_MEMBER_XXX_TRAIT_DEF(await_suspend);
 
-        template <typename T, typename Ts>
-        inline constexpr bool has_await_suspend_coro_handle<T, Ts,
-            std::void_t<decltype(std::declval<T>().await_suspend(
-                hpx::coro::coroutine_handle<Ts>{}))>> = true;
-
-        template <bool await_ready, typename Awaiter, typename Promise>
-        struct is_awaiter_impl;
-
-        template <typename Awaiter, typename Promise>
-        struct is_awaiter_impl<false, Awaiter, Promise> : std::false_type
-        {
-        };
-
-        // different versions of clang-format disagree
         // clang-format off
-        template <typename Awaiter, typename Promise>
-        struct is_awaiter_impl<true, Awaiter, Promise>
-          : std::integral_constant<bool,
-                is_await_suspend_result_v<decltype(await_suspend<Promise>(
-                    std::declval<Awaiter>()))>>
+        template <typename T, typename Ts>
+        using await_suspend_coro_handle_t = decltype(
+            std::declval<T>().await_suspend(hpx::coroutine_handle<Ts>{}));
         // clang-format on
-        {
-        };
+
+        template <typename Awaiter, typename Promise>
+        inline constexpr bool is_await_suspend_result_v =
+            is_await_suspend_result_t_v<
+                await_suspend_coro_handle_t<Awaiter, Promise>>;
+
+        template <typename Awaiter, typename Promise, typename = void>
+        inline constexpr bool is_with_await_suspend_v = false;
+
+        template <typename Awaiter, typename Promise>
+        inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
+            std::enable_if_t<has_await_suspend_v<Awaiter> &&
+                (!std::is_same_v<Promise, void>)>> =
+            is_await_suspend_result_v<Awaiter, Promise>;
+
+        template <typename Awaiter, typename Promise>
+        inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
+            std::enable_if_t<std::is_same_v<Promise, void>>> = true;
+
     }    // namespace detail
 
     // An Awaiter type is a type that implements the three special methods that
@@ -104,10 +93,10 @@ namespace hpx::execution::experimental {
     //
     template <typename Awaiter, typename Promise = void>
     struct is_awaiter
-      : detail::is_awaiter_impl<detail::has_await_ready<Awaiter> &&
+      : std::integral_constant<bool,
+            detail::has_await_ready<Awaiter> &&
                 detail::has_await_resume<Awaiter> &&
-                detail::has_await_suspend_coro_handle<Awaiter, Promise>,
-            Awaiter, Promise>
+                detail::is_with_await_suspend_v<Awaiter, Promise>>
     {
     };
 
@@ -195,7 +184,7 @@ namespace hpx::execution::experimental {
     // member then the awaitable is the awaited value itself.
     //
     // The awaitable concept simply checks whether the type supports applying
-    // the co_await operator to avalue of that type. If the object has either a
+    // the co_await operator to a value of that type. If the object has either a
     // member or non-member operator co_await() then its return value must
     // satisfy the Awaiter concept. Otherwise, the Awaitable object must satisfy
     // the Awaiter concept itself.

@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2012-2022 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2009 Oliver Kowalke
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,10 +13,12 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
 #include <hpx/util/get_and_reset_value.hpp>
+#endif
 
-// include unist.d conditionally to check for POSIX version. Not all OSs have the
-// unistd header...
+// include unistd.h conditionally to check for POSIX version. Not all OSs have
+// the unistd header...
 #if defined(HPX_HAVE_UNISTD_H)
 #include <unistd.h>
 #endif
@@ -29,15 +31,17 @@
 #endif
 
 #include <boost/context/detail/fcontext.hpp>
-#include <boost/version.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <limits>
 #include <stdexcept>
 #include <utility>
+
+#if !defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+#include <limits>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 #if defined(HPX_GENERIC_CONTEXT_USE_SEGMENTED_STACKS)
@@ -93,7 +97,7 @@ namespace hpx::threads::coroutines {
                 return HPX_SMALL_STACK_SIZE;
             }
 
-            void* allocate(std::size_t size) const
+            static void* allocate(std::size_t size)
             {
                 // Condition excludes MacOS/M1 from using posix mmap
 #if defined(HPX_USE_POSIX_STACK_UTILITIES)
@@ -107,7 +111,7 @@ namespace hpx::threads::coroutines {
                 return static_cast<char*>(limit) + size;
             }
 
-            void deallocate(void* vp, std::size_t size) const noexcept
+            static void deallocate(void* vp, std::size_t size) noexcept
             {
                 HPX_ASSERT(vp);
                 void* limit = static_cast<char*>(vp) - size;
@@ -169,7 +173,7 @@ namespace hpx::threads::coroutines {
         template <typename T>
         [[noreturn]] void trampoline(boost::context::detail::transfer_t tr)
         {
-            auto arg = static_cast<
+            auto const arg = static_cast<
                 std::pair<void*, boost::context::detail::fcontext_t*>*>(
                 tr.data);
 
@@ -197,10 +201,11 @@ namespace hpx::threads::coroutines {
             explicit fcontext_context_impl(std::ptrdiff_t stack_size = -1)
               : cb_(std::make_pair(static_cast<void*>(this), nullptr))
               , funp_(&trampoline<CoroutineImpl>)
-              , ctx_(0)
+              , ctx_(nullptr)
               , alloc_()
-              , stack_size_((stack_size == -1) ? alloc_.minimum_stacksize() :
-                                                 std::size_t(stack_size))
+              , stack_size_((stack_size == -1) ?
+                        alloc_.minimum_stacksize() :
+                        static_cast<std::size_t>(stack_size))
               , stack_pointer_(nullptr)
             {
             }
@@ -247,7 +252,7 @@ namespace hpx::threads::coroutines {
                 return (std::numeric_limits<std::ptrdiff_t>::max)();
             }
 #endif
-            void reset_stack()
+            void reset_stack() const
             {
                 if (ctx_)
                 {

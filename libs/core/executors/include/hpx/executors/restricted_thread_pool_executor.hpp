@@ -152,6 +152,18 @@ namespace hpx::parallel::execution {
                 tag, exec.generate_executor(exec.get_current_thread_num()));
         }
 
+        friend constexpr std::size_t tag_invoke(
+            hpx::parallel::execution::processing_units_count_t tag,
+            restricted_policy_executor const& exec,
+            hpx::chrono::steady_duration const& duration =
+                hpx::chrono::null_duration,
+            std::size_t num_tasks = 0)
+        {
+            return hpx::functional::tag_invoke(tag,
+                exec.generate_executor(exec.get_current_thread_num()), duration,
+                num_tasks);
+        }
+
         // executor API
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(

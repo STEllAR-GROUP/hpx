@@ -37,7 +37,6 @@
 #include <hpx/coroutines/detail/coroutine_accessor.hpp>
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
-#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 
 #include <cstddef>
@@ -64,7 +63,7 @@ namespace hpx::threads::coroutines {
 
         coroutine(functor_type&& f, thread_id_type id,
             std::ptrdiff_t stack_size = detail::default_stack_size)
-          : impl_(HPX_MOVE(f), id, stack_size)
+          : impl_(HPX_MOVE(f), HPX_MOVE(id), stack_size)
         {
             HPX_ASSERT(impl_.is_ready());
         }
@@ -73,6 +72,8 @@ namespace hpx::threads::coroutines {
         coroutine& operator=(coroutine const& src) = delete;
         coroutine(coroutine&& src) = delete;
         coroutine& operator=(coroutine&& src) = delete;
+
+        ~coroutine() = default;
 
         constexpr thread_id_type get_thread_id() const noexcept
         {
@@ -91,7 +92,7 @@ namespace hpx::threads::coroutines {
             return impl_.get_thread_data();
         }
 
-        std::size_t set_thread_data(std::size_t data) noexcept
+        std::size_t set_thread_data(std::size_t data) const noexcept
         {
             return impl_.set_thread_data(data);
         }
@@ -102,7 +103,7 @@ namespace hpx::threads::coroutines {
             return impl_.get_libcds_data();
         }
 
-        std::size_t set_libcds_data(std::size_t data)
+        std::size_t set_libcds_data(std::size_t data) const
         {
             return impl_.set_libcds_data(data);
         }
@@ -112,7 +113,7 @@ namespace hpx::threads::coroutines {
             return impl_.get_libcds_hazard_pointer_data();
         }
 
-        std::size_t set_libcds_hazard_pointer_data(std::size_t data)
+        std::size_t set_libcds_hazard_pointer_data(std::size_t data) const
         {
             return impl_.set_libcds_hazard_pointer_data(data);
         }
@@ -122,7 +123,8 @@ namespace hpx::threads::coroutines {
             return impl_.get_libcds_dynamic_hazard_pointer_data();
         }
 
-        std::size_t set_libcds_dynamic_hazard_pointer_data(std::size_t data)
+        std::size_t set_libcds_dynamic_hazard_pointer_data(
+            std::size_t data) const
         {
             return impl_.set_libcds_dynamic_hazard_pointer_data(data);
         }
@@ -135,7 +137,7 @@ namespace hpx::threads::coroutines {
 
         void rebind(functor_type&& f, thread_id_type id)
         {
-            impl_.rebind(HPX_MOVE(f), id);
+            impl_.rebind(HPX_MOVE(f), HPX_MOVE(id));
         }
 
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type())
@@ -160,7 +162,7 @@ namespace hpx::threads::coroutines {
             return impl_.get_available_stack_space();
         }
 #else
-        std::ptrdiff_t get_available_stack_space() const noexcept
+        static std::ptrdiff_t get_available_stack_space() noexcept
         {
             return (std::numeric_limits<std::ptrdiff_t>::max)();
         }

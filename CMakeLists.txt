@@ -442,6 +442,28 @@ hpx_option(
   "Create build system support for fail compile HPX tests (default ON)" ON
   CATEGORY "Build Targets"
 )
+hpx_option(
+  HPX_WITH_PARALLEL_LINK_JOBS
+  STRING
+  "Number of Parallel link jobs while building hpx (only for Ninja as generator) (default 2)"
+  "2"
+  CATEGORY "Build Targets"
+)
+
+if(CMAKE_GENERATOR MATCHES "Ninja")
+  if(NOT HPX_WITH_PARALLEL_LINK_JOBS)
+    set(HPX_WITH_PARALLEL_LINK_JOBS "2")
+  endif()
+  if(HPX_WITH_PARALLEL_LINK_JOBS)
+    set_property(
+      GLOBAL APPEND PROPERTY JOB_POOLS
+                             link_job_pool=${HPX_WITH_PARALLEL_LINK_JOBS}
+    )
+    set(CMAKE_JOB_POOL_LINK link_job_pool)
+  endif()
+elseif(HPX_WITH_PARALLEL_LINK_JOBS)
+  hpx_warn("Job pooling is only available with Ninja generators.")
+endif()
 
 # disable all tests if HPX_WITH_TESTS=OFF
 if(NOT HPX_WITH_TESTS)
@@ -544,6 +566,18 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
+
+# ##############################################################################
+# HPX SYCL configuration
+# ##############################################################################
+set(SYCL_OPTION_STRING "Enable support for Sycl (default: OFF)")
+hpx_option(HPX_WITH_SYCL BOOL "${SYCL_OPTION_STRING}" OFF ADVANCED)
+set(SYCL_OPTION_STRING
+    "Sycl compile flags for selecting specific targets (default: empty)"
+)
+hpx_option(HPX_WITH_SYCL_FLAGS STRING "${SYCL_OPTION_STRING}" "" ADVANCED)
+set(HIPSYCL_OPTION_STRING "Use hipsycl cmake integration (default: OFF)")
+hpx_option(HPX_WITH_HIPSYCL BOOL "${HIPSYCL_OPTION_STRING}" OFF ADVANCED)
 
 # ##############################################################################
 # pkgconfig file generation
@@ -910,7 +944,7 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.1"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.2"
     CATEGORY "Profiling"
   )
 endif()
@@ -1104,7 +1138,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.2"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.4"
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1570,8 +1604,8 @@ endif()
 if("${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   set(__use_generic_coroutine_context ON)
 endif()
-# If compiling for riscv64, automatically bake in Boost.Context
-if(${__target_arch} STREQUAL "riscv64")
+# If compiling for riscv64 or arm64, automatically bake in Boost.Context
+if(${__target_arch} STREQUAL "riscv64" OR ${__target_arch} STREQUAL "arm64")
   set(__use_generic_coroutine_context ON)
 endif()
 
@@ -1807,12 +1841,13 @@ if(HPX_WITH_COMPILER_WARNINGS)
     hpx_add_compile_flag_if_available(-Wno-attributes)
     hpx_add_compile_flag_if_available(-Wno-cast-align)
 
-    # gcc V12.1 and above complain about possible ABI incompatibilities caused
-    # by the use of std::destructive_interference_size
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-       AND "${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1"
-    )
-      hpx_add_compile_flag_if_available(-Wno-interference-size)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+      hpx_add_compile_flag_if_available(-Wno-use-after-free)
+      if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.1")
+        # gcc V12.1 and above complain about possible ABI incompatibilities
+        # caused by the use of std::destructive_interference_size
+        hpx_add_compile_flag_if_available(-Wno-interference-size)
+      endif()
     endif()
 
     # We do not in general guarantee ABI compatibility between C++ standards, so
@@ -2083,6 +2118,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
 endif()
 
 # Setup packages and subprojects
+include(HPX_SetupSYCL)
 include(HPX_SetupHIP)
 include(HPX_SetupApex)
 include(HPX_SetupPapi)
@@ -2243,15 +2279,15 @@ add_subdirectory(components)
 # ##############################################################################
 # Tests
 # ##############################################################################
+find_package(PythonInterp)
+
+if(NOT PYTHONINTERP_FOUND)
+  hpx_warn(
+    "A python interpreter could not be found. The test suite can not be run automatically."
+  )
+endif()
+
 if(HPX_WITH_TESTS)
-  find_package(PythonInterp)
-
-  if(NOT PYTHONINTERP_FOUND)
-    hpx_warn(
-      "A python interpreter could not be found. The test suite can not be run automatically."
-    )
-  endif()
-
   # pseudo_target added above
   add_subdirectory(tests)
 endif()
@@ -2274,10 +2310,12 @@ if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 # Configure hpxrun.py
-configure_file(
-  "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
-  "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
-)
+if(PYTHONINTERP_FOUND)
+  configure_file(
+    "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
+    "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
+  )
+endif()
 
 # Set up precompiled headers
 if(HPX_WITH_PRECOMPILED_HEADERS)
@@ -2397,19 +2435,21 @@ endif()
 # ##############################################################################
 # installation instructions
 # ##############################################################################
-install(
-  FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
-  DESTINATION ${CMAKE_INSTALL_BINDIR}
-  COMPONENT core
-  PERMISSIONS
-    OWNER_READ
-    OWNER_WRITE
-    OWNER_EXECUTE
-    GROUP_READ
-    GROUP_EXECUTE
-    WORLD_READ
-    WORLD_EXECUTE
-)
+if(PYTHONINTERP_FOUND)
+  install(
+    FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT core
+    PERMISSIONS
+      OWNER_READ
+      OWNER_WRITE
+      OWNER_EXECUTE
+      GROUP_READ
+      GROUP_EXECUTE
+      WORLD_READ
+      WORLD_EXECUTE
+  )
+endif()
 
 install(
   # install all hpx header files

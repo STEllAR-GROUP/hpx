@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/coroutines_support.hpp>
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
@@ -15,6 +14,7 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/memory.hpp>
+#include <hpx/type_support/coroutines_support.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -26,8 +26,8 @@
 namespace hpx::lcos::detail {
 
     template <typename Promise = void>
-    using coroutine_handle = coro::coroutine_handle<Promise>;
-    using suspend_never = coro::suspend_never;
+    using coroutine_handle = hpx::coroutine_handle<Promise>;
+    using suspend_never = hpx::suspend_never;
 
     ///////////////////////////////////////////////////////////////////////////
     // this was removed from the TS, so we define our own
@@ -58,7 +58,10 @@ namespace hpx::lcos::detail {
         return f.is_ready();
     }
 
-    template <typename T, typename Promise>
+    HPX_HAS_MEMBER_XXX_TRAIT_DEF(set_exception);
+
+    template <typename T, typename Promise,
+        typename = std::enable_if_t<has_set_exception_v<Promise>>>
     HPX_FORCEINLINE void await_suspend(
         hpx::future<T>& f, coroutine_handle<Promise> rh)
     {
@@ -100,7 +103,8 @@ namespace hpx::lcos::detail {
         return f.is_ready();
     }
 
-    template <typename T, typename Promise>
+    template <typename T, typename Promise,
+        typename = std::enable_if_t<has_set_exception_v<Promise>>>
     HPX_FORCEINLINE void await_suspend(
         hpx::shared_future<T>& f, coroutine_handle<Promise> rh)
     {

@@ -87,6 +87,13 @@ used CMake options.
    Enable the TCP parcelport. Enables the use of TCP for networking in the runtime. The default value is ``ON``.
    However, it's only recommended for debugging purposes, as it is slower than the MPI parcelport.
 
+.. option:: HPX_WITH_PARCELPORT_LCI
+
+   Enable the LCI parcelport. This enables the use of LCI for the networking operations in the HPX runtime.
+   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. However,
+   this experimental parcelport may provide better performance than the MPI parcelport. Please refer to
+   :ref:`using_the_lci_parcelport` for more information about the LCI parcelport.
+
 .. option:: HPX_WITH_APEX
 
    Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|

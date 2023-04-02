@@ -23,6 +23,7 @@ double func(double x1, double, double, double, double, double, double)
 int hpx_main()
 {
     hpx::shared_future<double> f = hpx::make_ready_future(1.0);
+
     f = hpx::dataflow(
         hpx::launch::sync, hpx::unwrapping(&func), f, f, f, f, f, f, f);
     return hpx::local::finalize();

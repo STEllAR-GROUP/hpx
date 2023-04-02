@@ -76,13 +76,13 @@ namespace hpx::parcelset::policies::mpi {
 
         void reset() noexcept
         {
-            std::memset(&data_[0], -1, data_size_);
+            std::memset(&data_[0], static_cast<char>(-1), data_size_);
             data_[pos_piggy_back_flag] = 1;
         }
 
         bool valid() const noexcept
         {
-            return data_[0] != -1;
+            return data_[0] != static_cast<char>(-1);
         }
 
         void assert_valid() const noexcept

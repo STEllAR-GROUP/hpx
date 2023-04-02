@@ -1,5 +1,5 @@
 //  Copyright (c) 2021 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -101,13 +101,13 @@ namespace hpx::detail {
             return fits_storage && sufficiently_aligned;
         }
 
-        bool using_embedded_storage() const noexcept
+        [[nodiscard]] bool using_embedded_storage() const noexcept
         {
             return object ==
                 reinterpret_cast<base_type const*>(&data.embedded_storage);
         }
 
-        bool empty() const noexcept
+        [[nodiscard]] bool empty() const noexcept
         {
             return get().empty();
         }
@@ -193,12 +193,12 @@ namespace hpx::detail {
         movable_sbo_storage(movable_sbo_storage const&) = delete;
         movable_sbo_storage& operator=(movable_sbo_storage const&) = delete;
 
-        base_type const& get() const noexcept
+        [[nodiscard]] base_type const& get() const noexcept
         {
             return *object;
         }
 
-        base_type& get() noexcept
+        [[nodiscard]] base_type& get() noexcept
         {
             return *object;
         }
@@ -268,6 +268,7 @@ namespace hpx::detail {
         using storage_base_type::store;
 
         copyable_sbo_storage() = default;
+        ~copyable_sbo_storage() = default;
 
         copyable_sbo_storage(copyable_sbo_storage&&) = default;
         copyable_sbo_storage& operator=(copyable_sbo_storage&&) = default;
@@ -299,7 +300,7 @@ namespace hpx::execution::experimental::detail {
     {
         virtual ~any_operation_state_base() = default;
 
-        virtual bool empty() const noexcept
+        [[nodiscard]] virtual bool empty() const noexcept
         {
             return false;
         }
@@ -309,21 +310,18 @@ namespace hpx::execution::experimental::detail {
     struct HPX_CORE_EXPORT empty_any_operation_state final
       : any_operation_state_base
     {
-        bool empty() const noexcept override;
+        [[nodiscard]] bool empty() const noexcept override;
         void start() & noexcept override;
     };
 }    // namespace hpx::execution::experimental::detail
 
-namespace hpx::detail {
-
-    template <>
-    struct empty_vtable_type<
-        hpx::execution::experimental::detail::any_operation_state_base>
-    {
-        using type =
-            hpx::execution::experimental::detail::empty_any_operation_state;
-    };
-}    // namespace hpx::detail
+template <>
+struct hpx::detail::empty_vtable_type<
+    hpx::execution::experimental::detail::any_operation_state_base>
+{
+    using type =
+        hpx::execution::experimental::detail::empty_any_operation_state;
+};    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
 
@@ -383,7 +381,7 @@ namespace hpx::execution::experimental::detail {
         virtual void set_value(Ts... ts) && = 0;
         virtual void set_error(std::exception_ptr ep) && noexcept = 0;
         virtual void set_stopped() && noexcept = 0;
-        virtual bool empty() const noexcept
+        [[nodiscard]] virtual bool empty() const noexcept
         {
             return false;
         }
@@ -400,7 +398,7 @@ namespace hpx::execution::experimental::detail {
             HPX_UNREACHABLE;
         }
 
-        bool empty() const noexcept override
+        [[nodiscard]] bool empty() const noexcept override
         {
             return true;
         }
@@ -422,16 +420,13 @@ namespace hpx::execution::experimental::detail {
     };
 }    // namespace hpx::execution::experimental::detail
 
-namespace hpx::detail {
-
-    template <typename... Ts>
-    struct empty_vtable_type<
-        hpx::execution::experimental::detail::any_receiver_base<Ts...>>
-    {
-        using type =
-            hpx::execution::experimental::detail::empty_any_receiver<Ts...>;
-    };
-}    // namespace hpx::detail
+template <typename... Ts>
+struct hpx::detail::empty_vtable_type<
+    hpx::execution::experimental::detail::any_receiver_base<Ts...>>
+{
+    using type =
+        hpx::execution::experimental::detail::empty_any_receiver<Ts...>;
+};    // namespace hpx::detail
 
 namespace hpx::execution::experimental::detail {
 
@@ -551,7 +546,7 @@ namespace hpx::execution::experimental::detail {
         virtual void move_into(void* p) = 0;
         virtual any_operation_state connect(
             any_receiver<Ts...>&& receiver) && = 0;
-        virtual bool empty() const noexcept
+        [[nodiscard]] virtual bool empty() const noexcept
         {
             return false;
         }
@@ -576,7 +571,7 @@ namespace hpx::execution::experimental::detail {
             HPX_UNREACHABLE;
         }
 
-        bool empty() const noexcept override
+        [[nodiscard]] bool empty() const noexcept override
         {
             return true;
         }
@@ -606,7 +601,7 @@ namespace hpx::execution::experimental::detail {
             HPX_UNREACHABLE;
         }
 
-        bool empty() const noexcept override
+        [[nodiscard]] bool empty() const noexcept override
         {
             return true;
         }

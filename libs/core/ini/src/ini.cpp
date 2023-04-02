@@ -56,11 +56,11 @@ namespace hpx::util {
         {
             typedef std::string::size_type size_type;
 
-            size_type first = s.find_first_not_of(" \t\r\n");
+            size_type const first = s.find_first_not_of(" \t\r\n");
             if (std::string::npos == first)
                 return (std::string());
 
-            size_type last = s.find_last_not_of(" \t\r\n");
+            size_type const last = s.find_last_not_of(" \t\r\n");
             return s.substr(first, last - first + 1);
         }
 
@@ -101,13 +101,13 @@ namespace hpx::util {
       , parent_name_(in.get_parent_name())
     {
         entry_map const& e = in.get_entries();
-        entry_map::const_iterator end = e.end();
-        for (entry_map::const_iterator i = e.begin(); i != end; ++i)
+        auto const end = e.end();
+        for (auto i = e.begin(); i != end; ++i)
             add_entry(i->first, i->second);
 
         section_map s = in.get_sections();
-        section_map::iterator send = s.end();
-        for (section_map::iterator si = s.begin(); si != send; ++si)
+        auto const send = s.end();
+        for (auto si = s.begin(); si != send; ++si)
             add_section(si->first, si->second, get_root());
     }
 
@@ -122,13 +122,13 @@ namespace hpx::util {
             name_ = rhs.get_name();
 
             entry_map const& e = rhs.get_entries();
-            entry_map::const_iterator end = e.end();
-            for (entry_map::const_iterator i = e.begin(); i != end; ++i)
+            auto const end = e.end();
+            for (auto i = e.begin(); i != end; ++i)
                 add_entry(l, i->first, i->first, i->second);
 
             section_map s = rhs.get_sections();
-            section_map::iterator send = s.end();
-            for (section_map::iterator si = s.begin(); si != send; ++si)
+            auto const send = s.end();
+            for (auto si = s.begin(); si != send; ++si)
                 add_section(l, si->first, si->second, get_root());
         }
         return *this;
@@ -145,13 +145,13 @@ namespace hpx::util {
             name_ = rhs.get_name();
 
             entry_map const& e = rhs.get_entries();
-            entry_map::const_iterator end = e.end();
-            for (entry_map::const_iterator i = e.begin(); i != end; ++i)
+            auto const end = e.end();
+            for (auto i = e.begin(); i != end; ++i)
                 add_entry(l, i->first, i->first, i->second);
 
             section_map s = rhs.get_sections();
-            section_map::iterator send = s.end();
-            for (section_map::iterator si = s.begin(); si != send; ++si)
+            auto const send = s.end();
+            for (auto si = s.begin(); si != send; ++si)
                 add_section(l, si->first, si->second, get_root());
         }
         return *this;
@@ -187,7 +187,7 @@ namespace hpx::util {
 
     bool force_entry(std::string& str)
     {
-        std::string::size_type p = str.find_last_of('!');
+        std::string::size_type const p = str.find_last_of('!');
         if (p != std::string::npos &&
             str.find_first_not_of(" \t", p + 1) == std::string::npos)
         {
@@ -207,9 +207,8 @@ namespace hpx::util {
 
         std::regex regex_comment(pattern_comment, std::regex_constants::icase);
 
-        std::vector<std::string>::const_iterator end = lines.end();
-        for (std::vector<std::string>::const_iterator it = lines.begin();
-             it != end; ++it)
+        auto const end = lines.end();
+        for (auto it = lines.begin(); it != end; ++it)
         {
             ++linenum;
 
@@ -233,17 +232,17 @@ namespace hpx::util {
                         continue;
                 }
             }
-            // no comments anymore: line is either section, key=val,
-            // or garbage/empty
+            // no comments anymore: line is either section, key=val, or
+            // garbage/empty
 
-            // Check if we have a section.
-            // Example: [sec.ssec]
+            // Check if we have a section. Example: [sec.ssec]
             if (line.front() == '[' && line.back() == ']')
             {
                 current = this;    // start adding sections at the root
 
-                // got the section name. It might be hierarchical, so split it up, and
-                // for each elem, check if we have it.  If not, create it, and add
+                // got the section name. It might be hierarchical, so split it
+                // up, and for each elem, check if we have it. If not, create
+                // it, and add
                 std::string sec_name(line.substr(1, line.size() - 2));
                 std::string::size_type pos = 0;
                 for (std::string::size_type pos1 = sec_name.find_first_of('.');
@@ -348,15 +347,15 @@ namespace hpx::util {
     bool section::has_section(
         std::unique_lock<mutex_type>& l, std::string const& sec_name) const
     {
-        std::string::size_type i = sec_name.find('.');
+        std::string::size_type const i = sec_name.find('.');
         if (i != std::string::npos)
         {
-            std::string cor_sec_name = sec_name.substr(0, i);
+            std::string const cor_sec_name = sec_name.substr(0, i);
 
-            section_map::const_iterator it = sections_.find(cor_sec_name);
+            auto const it = sections_.find(cor_sec_name);
             if (it != sections_.end())
             {
-                std::string sub_sec_name = sec_name.substr(i + 1);
+                std::string const sub_sec_name = sec_name.substr(i + 1);
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.has_section(sub_sec_name);
             }
@@ -368,14 +367,14 @@ namespace hpx::util {
     section* section::get_section(
         std::unique_lock<mutex_type>& l, std::string const& sec_name)
     {
-        std::string::size_type i = sec_name.find('.');
+        std::string::size_type const i = sec_name.find('.');
         if (i != std::string::npos)
         {
-            std::string cor_sec_name = sec_name.substr(0, i);
-            section_map::iterator it = sections_.find(cor_sec_name);
+            std::string const cor_sec_name = sec_name.substr(0, i);
+            auto const it = sections_.find(cor_sec_name);
             if (it != sections_.end())
             {
-                std::string sub_sec_name = sec_name.substr(i + 1);
+                std::string const sub_sec_name = sec_name.substr(i + 1);
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
@@ -387,29 +386,27 @@ namespace hpx::util {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "section::get_section", "No such section ({}) in section: {}",
                 sec_name, name);
-            return nullptr;
         }
 
-        section_map::iterator it = sections_.find(sec_name);
+        auto const it = sections_.find(sec_name);
         if (it != sections_.end())
             return &((*it).second);
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_section",
             "No such section ({}) in section: {}", sec_name, get_name());
-        return nullptr;
     }
 
     section const* section::get_section(
         std::unique_lock<mutex_type>& l, std::string const& sec_name) const
     {
-        std::string::size_type i = sec_name.find('.');
+        std::string::size_type const i = sec_name.find('.');
         if (i != std::string::npos)
         {
-            std::string cor_sec_name = sec_name.substr(0, i);
-            section_map::const_iterator it = sections_.find(cor_sec_name);
+            std::string const cor_sec_name = sec_name.substr(0, i);
+            auto const it = sections_.find(cor_sec_name);
             if (it != sections_.end())
             {
-                std::string sub_sec_name = sec_name.substr(i + 1);
+                std::string const sub_sec_name = sec_name.substr(i + 1);
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*it).second.get_section(sub_sec_name);
             }
@@ -421,32 +418,30 @@ namespace hpx::util {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "section::get_section", "No such section ({}) in section: {}",
                 sec_name, name);
-            return nullptr;
         }
 
-        section_map::const_iterator it = sections_.find(sec_name);
+        auto const it = sections_.find(sec_name);
         if (it != sections_.end())
             return &((*it).second);
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_section",
             "No such section ({}) in section: {}", sec_name, get_name());
-        return nullptr;
     }
 
     void section::add_entry(std::unique_lock<mutex_type>& l,
         std::string const& fullkey, std::string const& key, std::string val)
     {
         // first expand the full property name in the value (avoids infinite recursion)
-        expand_only(
-            l, val, std::string::size_type(-1), get_full_name() + "." + key);
+        expand_only(l, val, static_cast<std::string::size_type>(-1),
+            get_full_name() + "." + key);
 
-        std::string::size_type i = key.find_last_of('.');
+        std::string::size_type const i = key.find_last_of('.');
         if (i != std::string::npos)
         {
             section* current = root_;
 
             // make sure all sections in key exist
-            std::string sec_name = key.substr(0, i);
+            std::string const sec_name = key.substr(0, i);
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
@@ -464,15 +459,15 @@ namespace hpx::util {
         }
         else
         {
-            entry_map::iterator it = entries_.find(key);
+            auto const it = entries_.find(key);
             if (it != entries_.end())
             {
                 auto& e = it->second;
                 e.first = HPX_MOVE(val);
                 if (!e.second.empty())
                 {
-                    std::string value = e.first;
-                    entry_changed_func f = e.second;
+                    std::string const value = e.first;
+                    entry_changed_func const f = e.second;
 
                     hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
@@ -490,13 +485,13 @@ namespace hpx::util {
         std::string const& fullkey, std::string const& key,
         entry_type const& val)
     {
-        std::string::size_type i = key.find_last_of('.');
+        std::string::size_type const i = key.find_last_of('.');
         if (i != std::string::npos)
         {
             section* current = root_;
 
             // make sure all sections in key exist
-            std::string sec_name = key.substr(0, i);
+            std::string const sec_name = key.substr(0, i);
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
@@ -514,15 +509,15 @@ namespace hpx::util {
         }
         else
         {
-            entry_map::iterator it = entries_.find(key);
+            auto const it = entries_.find(key);
             if (it != entries_.end())
             {
                 auto& second = it->second;
                 second = val;
                 if (!second.second.empty())
                 {
-                    std::string value = second.first;
-                    entry_changed_func f = second.second;
+                    std::string const value = second.first;
+                    entry_changed_func const f = second.second;
 
                     hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                     f(fullkey, value);
@@ -531,19 +526,19 @@ namespace hpx::util {
             else
             {
                 // just add this entry to the section
-                std::pair<entry_map::iterator, bool> p =
+                std::pair<entry_map::iterator, bool> const p =
                     entries_.emplace(key, val);
                 HPX_ASSERT(p.second);
 
-                auto& second = p.first->second;
+                auto const& second = p.first->second;
                 if (!second.second.empty())
                 {
-                    std::string key = p.first->first;
-                    std::string value = second.first;
-                    entry_changed_func f = second.second;
+                    std::string const k = p.first->first;
+                    std::string const value = second.first;
+                    entry_changed_func const f = second.second;
 
                     hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                    f(key, value);
+                    f(k, value);
                 }
             }
         }
@@ -591,13 +586,13 @@ namespace hpx::util {
     void section::add_notification_callback(std::unique_lock<mutex_type>& l,
         std::string const& key, entry_changed_func const& callback)
     {
-        std::string::size_type i = key.find_last_of('.');
+        std::string::size_type const i = key.find_last_of('.');
         if (i != std::string::npos)
         {
             section* current = root_;
 
             // make sure all sections in key exist
-            std::string sec_name = key.substr(0, i);
+            std::string const sec_name = key.substr(0, i);
 
             std::string::size_type pos = 0;
             for (std::string::size_type pos1 = sec_name.find_first_of('.');
@@ -616,7 +611,7 @@ namespace hpx::util {
         else
         {
             // just add this entry to the section
-            entry_map::iterator it = entries_.find(key);
+            auto const it = entries_.find(key);
             if (it != entries_.end())
             {
                 it->second.second =
@@ -632,14 +627,14 @@ namespace hpx::util {
     bool section::has_entry(
         std::unique_lock<mutex_type>& l, std::string const& key) const
     {
-        std::string::size_type i = key.find('.');
+        std::string::size_type const i = key.find('.');
         if (i != std::string::npos)
         {
-            std::string sub_sec = key.substr(0, i);
+            std::string const sub_sec = key.substr(0, i);
             if (has_section(l, sub_sec))
             {
-                std::string sub_key = key.substr(i + 1, key.size() - i);
-                section_map::const_iterator cit = sections_.find(sub_sec);
+                std::string const sub_key = key.substr(i + 1, key.size() - i);
+                auto const cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.has_entry(sub_key);    //-V783
@@ -652,14 +647,14 @@ namespace hpx::util {
     std::string section::get_entry(
         std::unique_lock<mutex_type>& l, std::string const& key) const
     {
-        std::string::size_type i = key.find('.');
-        if (i != std::string::npos)
+        if (std::string::size_type const i = key.find('.');
+            i != std::string::npos)
         {
-            std::string sub_sec = key.substr(0, i);
+            std::string const sub_sec = key.substr(0, i);
             if (has_section(l, sub_sec))
             {
-                std::string sub_key = key.substr(i + 1, key.size() - i);
-                section_map::const_iterator cit = sections_.find(sub_sec);
+                std::string const sub_key = key.substr(i + 1, key.size() - i);
+                auto const cit = sections_.find(sub_sec);
                 HPX_ASSERT(cit != sections_.end());
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
                 return (*cit).second.get_entry(sub_key);    //-V783
@@ -667,19 +662,17 @@ namespace hpx::util {
 
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_entry",
                 "No such key ({}) in section: {}", key, get_name());
-            return "";
         }
 
         if (entries_.find(key) != entries_.end())
         {
-            entry_map::const_iterator cit = entries_.find(key);
+            auto const cit = entries_.find(key);
             HPX_ASSERT(cit != entries_.end());
             return expand(l, (*cit).second.first);    //-V783
         }
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "section::get_entry",
             "No such section ({}) in section: {}", key, get_name());
-        return "";
     }
 
     std::string section::get_entry(std::unique_lock<mutex_type>& l,
@@ -691,22 +684,19 @@ namespace hpx::util {
         hpx::string_util::split(
             split_key, key, hpx::string_util::is_any_of("."));
 
-        std::string sk = split_key.back();
+        std::string const sk = split_key.back();
         split_key.pop_back();
 
         section const* cur_section = this;
-        for (string_vector::const_iterator iter = split_key.begin(),
-                                           end = split_key.end();
-             iter != end; ++iter)
+        for (const auto& iter : split_key)
         {
-            section_map::const_iterator next =
-                cur_section->sections_.find(*iter);
+            auto next = cur_section->sections_.find(iter);
             if (cur_section->sections_.end() == next)
                 return expand(l, default_val);
             cur_section = &next->second;
         }
 
-        entry_map::const_iterator entry = cur_section->entries_.find(sk);
+        auto const entry = cur_section->entries_.find(sk);
         if (cur_section->entries_.end() == entry)
             return expand(l, default_val);
 
@@ -747,8 +737,8 @@ namespace hpx::util {
             }
         }
 
-        entry_map::const_iterator eend = entries_.end();
-        for (entry_map::const_iterator i = entries_.begin(); i != eend; ++i)
+        auto const eend = entries_.end();
+        for (auto i = entries_.begin(); i != eend; ++i)
         {
             indent(ind, strm);
 
@@ -769,8 +759,8 @@ namespace hpx::util {
             }
         }
 
-        section_map::const_iterator send = sections_.end();
-        for (section_map::const_iterator i = sections_.begin(); i != send; ++i)
+        auto const send = sections_.end();
+        for (auto i = sections_.begin(); i != send; ++i)
         {
             indent(ind, strm);
             strm << "[" << i->first << "]\n";
@@ -795,13 +785,13 @@ namespace hpx::util {
 
         // merge entries: keep own entries, and add other entries
         entry_map const& s_entries = second.get_entries();
-        entry_map::const_iterator end = s_entries.end();
-        for (entry_map::const_iterator i = s_entries.begin(); i != end; ++i)
+        auto const end = s_entries.end();
+        for (auto i = s_entries.begin(); i != end; ++i)
             entries_[i->first] = i->second;
 
         // merge subsection known in first section
-        section_map::iterator send = sections_.end();
-        for (section_map::iterator i = sections_.begin(); i != send; ++i)
+        auto const send = sections_.end();
+        for (auto i = sections_.begin(); i != send; ++i)
         {
             // is there something to merge with?
             if (second.has_section(l, i->first))
@@ -810,8 +800,8 @@ namespace hpx::util {
 
         // merge subsection known in second section
         section_map s = second.get_sections();
-        section_map::iterator secend = s.end();
-        for (section_map::iterator i = s.begin(); i != secend; ++i)
+        auto const secend = s.end();
+        for (auto i = s.begin(); i != secend; ++i)
         {
             // if THIS knows the section, we already merged it above
             if (!has_section(l, i->first))
@@ -824,7 +814,7 @@ namespace hpx::util {
 
     /////////////////////////////////////////////////////////////////////////////////
     void section::line_msg(std::string msg, std::string const& file, int lnum,
-        std::string const& line)
+        std::string const& line) const
     {
         msg += " " + file;
         if (lnum > 0)
@@ -874,11 +864,11 @@ namespace hpx::util {
         expand(l, value, begin);
 
         // now expand the key itself
-        std::string::size_type end = find_next("]", value, begin + 1);
+        std::string::size_type const end = find_next("]", value, begin + 1);
         if (end != std::string::npos)
         {
             std::string to_expand = value.substr(begin + 2, end - begin - 2);
-            std::string::size_type colon = find_next(":", to_expand);
+            std::string::size_type const colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
                 value = detail::replace_substr(value, begin, end - begin + 1,
@@ -900,20 +890,20 @@ namespace hpx::util {
         expand(l, value, begin);
 
         // now expand the key itself
-        std::string::size_type end = find_next("}", value, begin + 1);
+        std::string::size_type const end = find_next("}", value, begin + 1);
         if (end != std::string::npos)
         {
             std::string to_expand = value.substr(begin + 2, end - begin - 2);
-            std::string::size_type colon = find_next(":", to_expand);
+            std::string::size_type const colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
-                char* env = getenv(to_expand.c_str());
+                char const* env = std::getenv(to_expand.c_str());
                 value = detail::replace_substr(
                     value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
-                char* env = getenv(to_expand.substr(0, colon).c_str());
+                char* env = std::getenv(to_expand.substr(0, colon).c_str());
                 value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));
@@ -924,7 +914,7 @@ namespace hpx::util {
     std::string section::expand(
         std::unique_lock<mutex_type>& l, std::string value) const
     {
-        expand(l, value, std::string::size_type(-1));
+        expand(l, value, static_cast<std::string::size_type>(-1));
         return value;
     }
 
@@ -952,11 +942,11 @@ namespace hpx::util {
         expand_only(l, value, begin, expand_this);
 
         // now expand the key itself
-        std::string::size_type end = find_next("]", value, begin + 1);
+        std::string::size_type const end = find_next("]", value, begin + 1);
         if (end != std::string::npos)
         {
             std::string to_expand = value.substr(begin + 2, end - begin - 2);
-            std::string::size_type colon = find_next(":", to_expand);
+            std::string::size_type const colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
                 if (to_expand == expand_this)
@@ -983,20 +973,20 @@ namespace hpx::util {
         expand_only(l, value, begin, expand_this);
 
         // now expand the key itself
-        std::string::size_type end = find_next("}", value, begin + 1);
+        std::string::size_type const end = find_next("}", value, begin + 1);
         if (end != std::string::npos)
         {
             std::string to_expand = value.substr(begin + 2, end - begin - 2);
-            std::string::size_type colon = find_next(":", to_expand);
+            std::string::size_type const colon = find_next(":", to_expand);
             if (colon == std::string::npos)
             {
-                char* env = getenv(to_expand.c_str());
+                char const* env = std::getenv(to_expand.c_str());
                 value = detail::replace_substr(
                     value, begin, end - begin + 1, nullptr != env ? env : "");
             }
             else
             {
-                char* env = getenv(to_expand.substr(0, colon).c_str());
+                char* env = std::getenv(to_expand.substr(0, colon).c_str());
                 value = detail::replace_substr(value, begin, end - begin + 1,
                     nullptr != env ? std::string(env) :
                                      to_expand.substr(colon + 1));
@@ -1007,7 +997,8 @@ namespace hpx::util {
     std::string section::expand_only(std::unique_lock<mutex_type>& l,
         std::string value, std::string const& expand_this) const
     {
-        expand_only(l, value, std::string::size_type(-1), expand_this);
+        expand_only(
+            l, value, static_cast<std::string::size_type>(-1), expand_this);
         return value;
     }
 
@@ -1040,7 +1031,7 @@ namespace hpx::util {
         entries_.clear();
         for (std::size_t i = 0; i < size; ++i)
         {
-            using value_type = typename entry_map::value_type;
+            using value_type = entry_map::value_type;
 
             value_type v;
             ar >> const_cast<std::string&>(v.first);

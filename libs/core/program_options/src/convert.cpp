@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/functional/bind_front.hpp>
@@ -35,10 +35,11 @@ namespace hpx::program_options::detail {
     {
         std::basic_string<ToChar> result;
 
-        std::mbstate_t state = std::mbstate_t();
+        auto state = std::mbstate_t();
 
         FromChar const* from = s.data();
         FromChar const* from_end = s.data() + s.size();
+
         // The interface of cvt is not really iterator-like, and it's
         // not possible the tell the required output size without the conversion.
         // All we can is convert data by pieces.
@@ -51,11 +52,12 @@ namespace hpx::program_options::detail {
             ToChar* to_next = buffer;
             // Need variable because std::bind doesn't work with rvalues.
             ToChar* to_end = buffer + 32;
-            std::codecvt_base::result r =
+            std::codecvt_base::result const r =
                 fun(state, from, from_end, from, buffer, to_end, to_next);
 
             if (r == std::codecvt_base::error)
                 throw std::logic_error("character conversion failed");
+
             // 'partial' is not an error, it just means not all source
             // characters were converted. However, we need to check that at
             // least one new target character was produced. If not, it means

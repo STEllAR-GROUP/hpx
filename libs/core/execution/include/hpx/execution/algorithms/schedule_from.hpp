@@ -37,6 +37,7 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Scheduler>
         struct schedule_from_sender
         {
+            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> predecessor_sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
 
@@ -88,6 +89,10 @@ namespace hpx::execution::experimental {
 
             // TODO: add forwarding_sender_query
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
             template <typename Receiver>
             struct operation_state
             {
@@ -305,6 +310,9 @@ namespace hpx::execution::experimental {
                     hpx::execution::experimental::start(os.sender_os);
                 }
             };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
             template <typename Receiver>
             friend operation_state<Receiver> tag_invoke(

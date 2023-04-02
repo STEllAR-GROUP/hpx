@@ -28,6 +28,10 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         template <typename Receiver, typename F>
         struct then_receiver
         {
@@ -90,10 +94,15 @@ namespace hpx::execution::experimental {
                 HPX_MOVE(r).set_value_helper(HPX_FORWARD(Ts, ts)...);
             }
         };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         template <typename Sender, typename F>
         struct then_sender
         {
+            using is_sender = void;
+
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 

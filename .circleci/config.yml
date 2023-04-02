@@ -787,6 +787,7 @@ jobs:
           when: always
       - run:
           name: Testing installed HPX
+          shell: /bin/bash
           command: |
               hello_world_distributed --hpx:bind=none
               ldconfig
@@ -794,6 +795,7 @@ jobs:
               ./hello_world_distributed_test_build --hpx:bind=none
               hpxrun.py -l 2 -t 1 ./hello_world_distributed_test_build -- --hpx:bind=none
           working_directory: /hpx/build
+          no_output_timeout: 10m
           when: always
       - run:
           name: Create Docker Image
@@ -805,6 +807,7 @@ jobs:
               mv /tmp/docker/* /usr/bin
               docker build -t ${TARGET_IMAGE_NAME} .
           working_directory: /usr/local
+          when: always
       - run:
           name: Test Docker Image
           command: |
