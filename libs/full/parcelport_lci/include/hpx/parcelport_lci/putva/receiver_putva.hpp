@@ -73,11 +73,7 @@ namespace hpx::parcelset::policies::lci {
                 HPX_ASSERT(request.type == LCI_IOVEC);
                 buffer_type buffer;
                 decode_iovec(request.data.iovec, buffer);
-<<<<<<< HEAD:libs/full/parcelport_lci/include/hpx/parcelport_lci/putva/receiver_putva.hpp
                 handle_received_parcels(decode_parcels(*pp_, HPX_MOVE(buffer)));
-=======
-                handle_received_parcels(decode_parcels(pp_, HPX_MOVE(buffer)));
->>>>>>> dc79fabedf (Adding zero-copy support on the receiving end of the TCP parcel port):libs/full/parcelport_lci/include/hpx/parcelport_lci/receiver.hpp
             }
         }
 
