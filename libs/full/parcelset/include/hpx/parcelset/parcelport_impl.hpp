@@ -546,7 +546,7 @@ namespace hpx::parcelset {
                         std::make_move_iterator(ps),
                         std::make_move_iterator(ps + encoded_parcels)));
 
-            if (ConnectionHandler::sender_type::send(
+            if (connection_handler().send_immediate(
                     this, dest_, HPX_MOVE(buffer), HPX_MOVE(callback_fn)))
             {
                 // we don't propagate errors for now

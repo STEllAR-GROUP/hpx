@@ -39,7 +39,8 @@
 #include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
-#include <hpx/parcelport_lci/receiver.hpp>
+#include <hpx/parcelport_lci/receiver_base.hpp>
+#include <hpx/parcelport_lci/sender_base.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -50,30 +51,15 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    struct sender_connection;
-    struct sender
+    struct sender_connection_putva;
+    struct sender_putva : public sender_base
     {
-        using connection_type = sender_connection;
-        using connection_ptr = std::shared_ptr<connection_type>;
-
-        sender() noexcept {}
-
-        void run() noexcept {}
+        explicit sender_putva(parcelport* pp) noexcept
+          : sender_base(pp)
+        {
+        }
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp);
-
-        bool background_work(size_t num_thread) noexcept;
-
-        // connectionless interface
-        using buffer_type = std::vector<char>;
-        using chunk_type = serialization::serialization_chunk;
-        using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
-        using callback_fn_type =
-            hpx::move_only_function<void(error_code const&)>;
-
-        static bool send(parcelset::parcelport* pp,
-            parcelset::locality const& dest, parcel_buffer_type buffer,
-            callback_fn_type&& callbackFn);
     };
 
 }    // namespace hpx::parcelset::policies::lci

@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
 #include <hpx/assert.hpp>
-#include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/receiver_base.hpp>
 #include <hpx/parcelset/decode_parcels.hpp>
 
 #include <algorithm>
@@ -28,105 +28,29 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    struct buffer_wrapper
+    struct receiver_putva : public receiver_base
     {
-        struct fake_allocator
-        {
-        };
-        using allocator_type = fake_allocator;
-        void* ptr;
-        size_t length;
-        buffer_wrapper() = default;
-        buffer_wrapper(const buffer_wrapper& wrapper) = default;
-        buffer_wrapper& operator=(const buffer_wrapper& wrapper) = default;
-        buffer_wrapper(const allocator_type& alloc)
-        {
-            HPX_UNUSED(alloc);
-            ptr = nullptr;
-            length = 0;
-        }
-        buffer_wrapper(
-            const buffer_wrapper& wrapper, const allocator_type& alloc)
-        {
-            HPX_UNUSED(alloc);
-            ptr = wrapper.ptr;
-            length = wrapper.length;
-        }
-        char& operator[](size_t i) const
-        {
-            HPX_ASSERT(i < length);
-            char* p = (char*) ptr;
-            return p[i];
-        }
-        void* data() const
-        {
-            return ptr;
-        }
-        size_t size() const
-        {
-            return length;
-        }
-    };
-
-    struct request_wrapper_t
-    {
-        LCI_request_t request;
-        request_wrapper_t()
-        {
-            request.flag = LCI_ERR_RETRY;
-        }
-        ~request_wrapper_t()
-        {
-            if (request.flag == LCI_OK)
-            {
-                if (request.type == LCI_IOVEC)
-                {
-                    for (int j = 0; j < request.data.iovec.count; ++j)
-                    {
-                        LCI_lbuffer_free(request.data.iovec.lbuffers[j]);
-                    }
-                    free(request.data.iovec.lbuffers);
-                    free(request.data.iovec.piggy_back.address);
-                }
-                else
-                {
-                    HPX_ASSERT(request.type = LCI_MEDIUM);
-                    LCI_mbuffer_free(request.data.mbuffer);
-                }
-            }
-            else
-            {
-                HPX_ASSERT(request.flag == LCI_ERR_RETRY);
-            }
-        }
-    };
-
-    template <typename Parcelport>
-    struct receiver
-    {
-        using buffer_type = parcel_buffer<buffer_wrapper, buffer_wrapper>;
-
-        explicit receiver(Parcelport& pp) noexcept
-          : pp_(pp)
+        explicit receiver_putva(parcelport* pp) noexcept
+          : receiver_base(pp)
         {
         }
-
-        void run() noexcept {}
 
         bool background_work() noexcept
         {
             // We first try to accept a new connection
             request_wrapper_t request;
-            LCI_queue_pop(util::lci_environment::get_rcq(), &request.request);
+            request.request = pp_->recv_new_completion_manager->poll();
 
             if (request.request.flag == LCI_OK)
             {
+                HPX_ASSERT(request.request.flag == LCI_OK);
                 process_request(request.request);
                 return true;
             }
             return false;
         }
 
+    private:
         void process_request(LCI_request_t request)
         {
             if (request.type == LCI_MEDIUM)
@@ -139,7 +63,7 @@ namespace hpx::parcelset::policies::lci {
                         (char*) request.data.mbuffer.address + consumed,
                         buffer);
                     handle_received_parcels(
-                        decode_parcels(pp_, HPX_MOVE(buffer)));
+                        decode_parcels(*pp_, HPX_MOVE(buffer)));
                 }
                 HPX_ASSERT(consumed == request.data.mbuffer.length);
             }
@@ -149,7 +73,7 @@ namespace hpx::parcelset::policies::lci {
                 HPX_ASSERT(request.type == LCI_IOVEC);
                 buffer_type buffer;
                 decode_iovec(request.data.iovec, buffer);
-                handle_received_parcels(decode_parcels(pp_, HPX_MOVE(buffer)));
+                handle_received_parcels(decode_parcels(*pp_, HPX_MOVE(buffer)));
             }
         }
 
@@ -158,7 +82,6 @@ namespace hpx::parcelset::policies::lci {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             hpx::chrono::high_resolution_timer timer_;
             parcelset::data_point& data = buffer.data_point_;
-            data.time_ = timer_.elapsed_nanoseconds();
 #endif
             // decode header
             header header_ = header((char*) address);
@@ -240,20 +163,17 @@ namespace hpx::parcelset::policies::lci {
                     std::size_t chunk_size =
                         buffer.transmission_chunks_[j].second;
                     HPX_ASSERT(iovec.lbuffers[i].length == chunk_size);
-                    buffer_wrapper& c = buffer.chunks_[j];
-                    c.length = chunk_size;
-                    c.ptr = iovec.lbuffers[i].address;
+                    buffer.chunks_[j] = serialization::create_pointer_chunk(
+                        iovec.lbuffers[i].address, chunk_size);
                     ++i;
                 }
             }
             HPX_ASSERT(i == iovec.count);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
-            data.time_ = timer_.elapsed_nanoseconds() - data.time_;
+            data.time_ = timer_.elapsed_nanoseconds();
 #endif
         }
-
-        Parcelport& pp_;
     };
 
 }    // namespace hpx::parcelset::policies::lci
