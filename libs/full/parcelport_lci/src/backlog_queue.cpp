@@ -10,13 +10,14 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
+#include <hpx/assert.hpp>
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/backlog_queue.hpp>
+#include <hpx/parcelport_lci/completion_manager_base.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
-#include <hpx/parcelport_lci/receiver.hpp>
-#include <hpx/parcelport_lci/sender.hpp>
-#include <hpx/parcelport_lci/sender_connection.hpp>
+#include <hpx/parcelport_lci/receiver_base.hpp>
+#include <hpx/parcelport_lci/sender_connection_base.hpp>
 
 namespace hpx::parcelset::policies::lci::backlog_queue {
     thread_local backlog_queue_t tls_backlog_queue;
@@ -32,7 +33,10 @@ namespace hpx::parcelset::policies::lci::backlog_queue {
         {
             bool succeed = message_queue.back()->tryMerge(message);
             if (succeed)
+            {
+                message->done();
                 return;
+            }
         }
         tls_backlog_queue.messages[message->dst_rank].push_back(
             HPX_MOVE(message));
@@ -48,7 +52,8 @@ namespace hpx::parcelset::policies::lci::backlog_queue {
         return ret;
     }
 
-    bool background_work(size_t num_thread) noexcept
+    bool background_work(
+        completion_manager_base* completion_manager, size_t num_thread) noexcept
     {
         bool did_some_work = false;
         for (size_t i = 0; i < tls_backlog_queue.messages.size(); ++i)
@@ -58,19 +63,24 @@ namespace hpx::parcelset::policies::lci::backlog_queue {
                 !tls_backlog_queue.messages[idx].empty())
             {
                 message_ptr message = tls_backlog_queue.messages[idx].front();
-                //                bool needCallDone = message->isEager();
-                bool isSent = message->send();
-                if (isSent)
+                auto ret = message->send_nb();
+                if (ret.status == sender_connection_base::return_status_t::done)
+                {
+                    tls_backlog_queue.messages[idx].pop_front();
+                    message->done();
+                    did_some_work = true;
+                }
+                else if (ret.status ==
+                    sender_connection_base::return_status_t::wait)
                 {
                     tls_backlog_queue.messages[idx].pop_front();
                     did_some_work = true;
-                    //                    if (needCallDone) {
-                    //                        message->done();
-                    // it can context switch to another thread at this point
-                    //                    }
+                    completion_manager->enqueue_completion(ret.completion);
                 }
                 else
                 {
+                    HPX_ASSERT(ret.status ==
+                        sender_connection_base::return_status_t::retry);
                     break;
                 }
             }

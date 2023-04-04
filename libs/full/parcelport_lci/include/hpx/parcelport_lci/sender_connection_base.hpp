@@ -10,7 +10,7 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
-#include <hpx/parcelport_lci/sender.hpp>
+#include <hpx/parcelset/parcelport_connection.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -20,31 +20,42 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    struct sender;
-    struct sender_connection
-      : parcelset::parcelport_connection<sender_connection, std::vector<char>>
+    struct sender_connection_base
+      : public parcelset::parcelport_connection<sender_connection_base,
+            std::vector<char>>
     {
-    private:
-        using sender_type = sender;
+    protected:
         using write_handler_type =
             hpx::function<void(std::error_code const&, parcel const&)>;
         using data_type = std::vector<char>;
         using base_type =
-            parcelset::parcelport_connection<sender_connection, data_type>;
+            parcelset::parcelport_connection<sender_connection_base, data_type>;
         using handler_type = hpx::move_only_function<void(error_code const&)>;
         using postprocess_handler_type = hpx::move_only_function<void(
             error_code const&, parcelset::locality const&,
-            std::shared_ptr<sender_connection>)>;
+            std::shared_ptr<sender_connection_base>)>;
 
     public:
-        sender_connection(int dst, parcelset::parcelport* pp)
+        enum class return_status_t
+        {
+            done,     // This connection is done. No need to call send anymore.
+            retry,    // Need to call send on this connection to make progress.
+            wait      // Wait for the completion object and then call send to
+                      // make progress.
+        };
+        struct return_t
+        {
+            return_status_t status;
+            LCI_comp_t completion;
+        };
+        sender_connection_base(int dst, parcelset::parcelport* pp)
           : dst_rank(dst)
-          , pp_(pp)
+          , pp_((lci::parcelport*) pp)
           , there_(parcelset::locality(locality(dst_rank)))
         {
         }
 
-        ~sender_connection() {}
+        virtual ~sender_connection_base() {}
 
         parcelset::locality const& destination() const noexcept
         {
@@ -58,27 +69,20 @@ namespace hpx::parcelset::policies::lci {
 
         void async_write(handler_type&& handler,
             postprocess_handler_type&& parcel_postprocess);
-
-        bool can_be_eager_message(size_t max_header_size);
-
-        void load(handler_type&& handler,
-            postprocess_handler_type&& parcel_postprocess);
-
-        bool isEager();
-        bool send();
-
-        void done();
-
-        bool tryMerge(const std::shared_ptr<sender_connection>& other);
+        virtual void load(handler_type&& handler,
+            postprocess_handler_type&& parcel_postprocess) = 0;
+        return_t send();
+        virtual return_t send_nb() = 0;
+        virtual void done() = 0;
+        virtual bool tryMerge(
+            const std::shared_ptr<sender_connection_base>& other_base) = 0;
+        void profile_start_hook(const header& header_);
+        void profile_end_hook();
 
         int dst_rank;
         handler_type handler_;
         postprocess_handler_type postprocess_handler_;
-        bool is_eager;
-        LCI_mbuffer_t mbuffer;
-        LCI_iovec_t iovec;
-        std::shared_ptr<sender_connection>* sharedPtr_p;    // for LCI_putva
-        parcelset::parcelport* pp_;
+        parcelport* pp_;
         parcelset::locality there_;
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         parcelset::data_point data_point_;

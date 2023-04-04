@@ -11,21 +11,43 @@ endif()
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(parcelport_lci_headers
+    hpx/parcelport_lci/config.hpp
     hpx/parcelport_lci/header.hpp
     hpx/parcelport_lci/locality.hpp
-    hpx/parcelport_lci/receiver.hpp
-    hpx/parcelport_lci/sender.hpp
-    hpx/parcelport_lci/sender_connection.hpp
+    hpx/parcelport_lci/receiver_base.hpp
+    hpx/parcelport_lci/sender_base.hpp
+    hpx/parcelport_lci/sender_connection_base.hpp
     hpx/parcelport_lci/backlog_queue.hpp
     hpx/parcelport_lci/parcelport_lci.hpp
+    hpx/parcelport_lci/putva/sender_putva.hpp
+    hpx/parcelport_lci/putva/sender_connection_putva.hpp
+    hpx/parcelport_lci/putva/receiver_putva.hpp
+    hpx/parcelport_lci/sendrecv/sender_sendrecv.hpp
+    hpx/parcelport_lci/sendrecv/sender_connection_sendrecv.hpp
+    hpx/parcelport_lci/sendrecv/receiver_sendrecv.hpp
+    hpx/parcelport_lci/sendrecv/receiver_connection_sendrecv.hpp
+    hpx/parcelport_lci/completion_manager_base.hpp
+    hpx/parcelport_lci/completion_manager/completion_manager_queue.hpp
+    hpx/parcelport_lci/completion_manager/completion_manager_sync.hpp
 )
 
 # cmake-format: off
 set(parcelport_lci_compat_headers)
 # cmake-format: on
 
-set(parcelport_lci_sources locality.cpp parcelport_lci.cpp sender.cpp
-                           sender_connection.cpp backlog_queue.cpp
+set(parcelport_lci_sources
+    config.cpp
+    locality.cpp
+    parcelport_lci.cpp
+    backlog_queue.cpp
+    sender_connection_base.cpp
+    sender_base.cpp
+    putva/sender_putva.cpp
+    putva/sender_connection_putva.cpp
+    sendrecv/sender_sendrecv.cpp
+    sendrecv/sender_connection_sendrecv.cpp
+    sendrecv/receiver_sendrecv.cpp
+    sendrecv/receiver_connection_sendrecv.cpp
 )
 
 include(HPX_SetupLCI)

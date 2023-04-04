@@ -15,9 +15,10 @@
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    struct sender_connection;
+    struct completion_manager_base;
+    struct sender_connection_base;
     namespace backlog_queue {
-        using message_type = sender_connection;
+        using message_type = sender_connection_base;
         using message_ptr = std::shared_ptr<message_type>;
         struct backlog_queue_t
         {
@@ -27,7 +28,8 @@ namespace hpx::parcelset::policies::lci {
 
         void push(message_ptr message);
         bool empty(int dst_rank);
-        bool background_work(size_t num_thread) noexcept;
+        bool background_work(completion_manager_base* completion_manager,
+            size_t num_thread) noexcept;
         void free();
     }    // namespace backlog_queue
 }    // namespace hpx::parcelset::policies::lci

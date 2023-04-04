@@ -28,21 +28,23 @@ namespace hpx::parcelset::policies::lci {
         {
             // siguature for assert_valid
             pos_signature = 0,
+            // tag
+            pos_tag = 1 * sizeof(value_type),
             // non-zero-copy chunk size
-            pos_numbytes_nonzero_copy = 1 * sizeof(value_type),
+            pos_numbytes_nonzero_copy = 2 * sizeof(value_type),
             // transmission chunk size
-            pos_numbytes_tchunk = 2 * sizeof(value_type),
+            pos_numbytes_tchunk = 3 * sizeof(value_type),
             // how many bytes in total (including zero-copy and non-zero-copy chunks)
-            pos_numbytes = 3 * sizeof(value_type),
+            pos_numbytes = 4 * sizeof(value_type),
             // zero-copy chunk number
-            pos_numchunks_zero_copy = 4 * sizeof(value_type),
+            pos_numchunks_zero_copy = 5 * sizeof(value_type),
             // non-zero-copy chunk number
-            pos_numchunks_nonzero_copy = 5 * sizeof(value_type),
+            pos_numchunks_nonzero_copy = 6 * sizeof(value_type),
             // whether piggyback data
-            pos_piggy_back_flag_data = 6 * sizeof(value_type),
+            pos_piggy_back_flag_data = 7 * sizeof(value_type),
             // whether piggyback transmission chunk
-            pos_piggy_back_flag_tchunk = 6 * sizeof(value_type) + 1,
-            pos_piggy_back_address = 6 * sizeof(value_type) + 2
+            pos_piggy_back_flag_tchunk = 7 * sizeof(value_type) + 1,
+            pos_piggy_back_address = 7 * sizeof(value_type) + 2
         };
 
         template <typename buffer_type, typename ChunkType>
@@ -51,6 +53,7 @@ namespace hpx::parcelset::policies::lci {
         {
             HPX_ASSERT(max_header_size >= pos_piggy_back_address);
             data_ = header_buffer;
+            memset(data_, 0, pos_piggy_back_address);
             std::int64_t size = static_cast<std::int64_t>(buffer.data_.size());
             std::int64_t numbytes =
                 static_cast<std::int64_t>(buffer.data_size_);
@@ -136,6 +139,16 @@ namespace hpx::parcelset::policies::lci {
         value_type signature() const noexcept
         {
             return get<pos_signature>();
+        }
+
+        void set_tag(LCI_tag_t tag) noexcept
+        {
+            set<pos_tag>(static_cast<value_type>(tag));
+        }
+
+        value_type get_tag() const noexcept
+        {
+            return get<pos_tag>();
         }
 
         value_type numbytes_nonzero_copy() const noexcept
