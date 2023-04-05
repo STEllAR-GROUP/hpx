@@ -74,12 +74,12 @@ namespace hpx::parallel::detail {
 
     struct set_chunk_data
     {
-        static const std::size_t uninit_start = static_cast<std::size_t>(-1);
-        static const std::size_t uninit_len = static_cast<std::size_t>(0);
-        static const std::size_t uninit_start_index =
+        static constexpr std::size_t uninit_start = static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_len = static_cast<std::size_t>(0);
+        static constexpr std::size_t uninit_start_index =
             static_cast<std::size_t>(-1);
-        static const std::size_t uninit_first1 = static_cast<std::size_t>(-1);
-        static const std::size_t uninit_first2 = static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_first1 = static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_first2 = static_cast<std::size_t>(-1);
 
         std::size_t start = uninit_start;
         std::size_t len = uninit_len;
