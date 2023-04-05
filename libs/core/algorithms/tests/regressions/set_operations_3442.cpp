@@ -10,6 +10,7 @@
 #include <hpx/parallel/algorithms/set_intersection.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <random>
 #include <string>
 #include <vector>
@@ -40,7 +41,7 @@ void set_difference_randomized(int rounds, int maxLen)
 
         int rangeMin = 0;
         // rangeMax is set to increase probability of common elements
-        int rangeMax = std::min(len_a, len_b) * 2;
+        int rangeMax = (std::min)(len_a, len_b) * 2;
 
 #ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
         std::generate(std::execution::par_unseq, set_a.begin(), set_a.end(),
@@ -63,15 +64,15 @@ void set_difference_randomized(int rounds, int maxLen)
         set_b.resize(len_b);
 
         // rand always gives non negative values, rangeMin >= 0
-        std::vector<int> perfect(std::max(len_a, len_b), -1);
-        std::vector<int> a_minus_b(std::max(len_a, len_b), -1);
+        std::vector<int> perfect((std::max)(len_a, len_b), -1);
+        std::vector<int> a_minus_b((std::max)(len_a, len_b), -1);
 
         std::set_difference(set_a.begin(), set_a.end(), set_b.begin(),
             set_b.end(), perfect.begin());
 
         hpx::set_difference(hpx::execution::par, set_a.begin(), set_a.end(),
             set_b.begin(), set_b.end(), a_minus_b.begin());
-        assert(perfect == a_minus_b);
+        HPX_TEST(perfect == a_minus_b);
     }
 }
 
