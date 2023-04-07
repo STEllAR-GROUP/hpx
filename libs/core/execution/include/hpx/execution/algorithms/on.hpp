@@ -184,7 +184,8 @@ namespace hpx::execution::experimental {
 
                 template <typename SetValue,
                     typename std::enable_if_t<
-                        std::is_same_v<std::decay_t<SetValue>, set_value_t>>,
+                        std::is_same_v<std::decay_t<SetValue>, set_value_t> &&
+                        has_set_value_v<Derived>>,
                     typename... As>
                 friend auto tag_invoke(
                     SetValue, Derived&& self, As&&... as) noexcept
@@ -201,9 +202,9 @@ namespace hpx::execution::experimental {
                     typename = std::enable_if_t<
                         std::is_same_v<std::decay_t<SetValue>, set_value_t> &&
                         hpx::util::all_of_v<std::integral_constant<bool,
-                            (has_set_value_v<D> &&
-                                hpx::functional::is_tag_invocable_v<set_value_t,
-                                    base_t<D>, As>)>...>>>
+                            ((!has_set_value_v<D>) &&hpx::functional::
+                                    is_tag_invocable_v<set_value_t, base_t<D>,
+                                        As>)>...>>>
                 friend void tag_invoke(
                     SetValue, Derived&& self, As&&... as) noexcept
                 {
@@ -213,7 +214,8 @@ namespace hpx::execution::experimental {
 
                 template <typename SetError, typename Error,
                     typename = std::enable_if_t<
-                        std::is_same_v<std::decay_t<SetError>, set_error_t>>>
+                        std::is_same_v<std::decay_t<SetError>, set_error_t> &&
+                        has_set_error_v<Derived>>>
                 friend auto tag_invoke(
                     SetError, Derived&& self, Error&& err) noexcept
                     -> decltype(call_set_error(
@@ -228,9 +230,8 @@ namespace hpx::execution::experimental {
                     typename D = Derived,
                     typename = std::enable_if_t<
                         std::is_same_v<std::decay_t<SetError>, set_error_t> &&
-                        has_set_error_v<D> &&
-                        hpx::functional::is_tag_invocable_v<set_error_t,
-                            base_t<D>>>>
+                        (!has_set_error_v<D>) &&hpx::functional::
+                            is_tag_invocable_v<set_error_t, base_t<D>>>>
                 friend void tag_invoke(
                     SetError, Derived&& self, Error&& err) noexcept
                 {
@@ -239,22 +240,24 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename SetStopped, typename D = Derived,
-                    typename = std::enable_if_t<std::is_same_v<
-                        std::decay_t<SetStopped>, set_stopped_t>>>
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetStopped>,
+                            set_stopped_t> &&
+                        has_set_stopped_v<D>>>
                 friend auto tag_invoke(SetStopped, Derived&& self) noexcept
                     -> decltype(call_set_stopped((D &&) self))
                 {
-                    static_assert(noexcept(call_set_stopped((D &&) self)));
-                    call_set_stopped((D &&) self);
+                    static_assert(
+                        noexcept(call_set_stopped((Derived &&) self)));
+                    call_set_stopped((Derived &&) self);
                 }
 
                 template <typename SetStopped, typename D = Derived,
                     typename = std::enable_if_t<
                         std::is_same_v<std::decay_t<SetStopped>,
                             set_stopped_t> &&
-                        has_set_stopped_v<D> &&
-                        hpx::functional::is_tag_invocable_v<set_stopped_t,
-                            base_t<D>>>>
+                        (!has_set_stopped_v<D>) &&hpx::functional::
+                            is_tag_invocable_v<set_stopped_t, base_t<D>>>>
                 friend void tag_invoke(SetStopped, Derived&& self) noexcept
                 {
                     hpx::execution::experimental::set_stopped(
@@ -264,7 +267,8 @@ namespace hpx::execution::experimental {
                 // Pass through the get_env receiver query
                 template <typename GetEnv, typename D = Derived,
                     typename = std::enable_if_t<
-                        std::is_same_v<std::decay_t<GetEnv>, get_env_t>>>
+                        std::is_same_v<std::decay_t<GetEnv>, get_env_t> &&
+                        has_get_env_v<D>>>
                 friend auto tag_invoke(GetEnv, const Derived& self)
                     -> decltype(call_get_env((const D&) self))
                 {
@@ -274,7 +278,7 @@ namespace hpx::execution::experimental {
                 template <typename GetEnv, typename D = Derived,
                     typename = std::enable_if_t<
                         std::is_same_v<std::decay_t<GetEnv>, get_env_t> &&
-                        has_get_env_v<D>>>
+                        (!has_get_env_v<D>)>>
                 friend auto tag_invoke(GetEnv, const Derived& self)
                     -> hpx::util::invoke_result_t<get_env_t, base_t<const D&>>
                 {
