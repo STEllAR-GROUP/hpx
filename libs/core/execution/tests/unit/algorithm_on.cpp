@@ -15,7 +15,7 @@
 
 namespace ex = hpx::execution::experimental;
 
-template <class S>
+template <typename S>
 struct scheduler_env
 {
     template <typename CPO>
@@ -38,7 +38,8 @@ struct inline_scheduler
 
         friend void tag_invoke(ex::start_t, operation& self) noexcept
         {
-            ex::set_value((R &&) self.recv_);
+            // set_value(self.recv_);
+            ex::set_value(HPX_FORWARD(R, self.recv_));
         }
     };
 
@@ -51,7 +52,7 @@ struct inline_scheduler
         template <typename R>
         friend operation<R> tag_invoke(ex::connect_t, my_sender, R&& r)
         {
-            return {{}, (R &&) r};
+            return {HPX_FORWARD(R, r)};
         }
 
         friend scheduler_env<inline_scheduler> tag_invoke(
@@ -77,13 +78,13 @@ struct inline_scheduler
     }
 };
 
-template <class _Env = ex::empty_env>
+template <typename Env = ex::empty_env>
 class base_expect_receiver
 {
     std::atomic<bool> called_{false};
-    _Env env_{};
+    Env env_{};
 
-    friend _Env tag_invoke(
+    friend Env tag_invoke(
         ex::get_env_t, const base_expect_receiver& self) noexcept
     {
         return self.env_;
@@ -98,7 +99,7 @@ public:
         // CHECK(called_.load());
     }
 
-    explicit base_expect_receiver(_Env env)
+    explicit base_expect_receiver(Env env)
       : env_(std::move(env))
     {
     }
@@ -126,7 +127,7 @@ struct env_tag
 {
 };
 
-template <class Env = ex::empty_env, typename... Ts>
+template <typename Env = ex::empty_env, typename... Ts>
 struct expect_value_receiver : base_expect_receiver<Env>
 {
     explicit(sizeof...(Ts) != 1) expect_value_receiver(Ts... vals)
@@ -143,7 +144,6 @@ struct expect_value_receiver : base_expect_receiver<Env>
     friend void tag_invoke(ex::set_value_t, expect_value_receiver&& self,
         const Ts&... vals) noexcept
     {
-        // CHECK(self.values_ == std::tie(vals...));
         HPX_ASSERT(self.values_ == std::tie(vals...));
         self.set_called();
     }
@@ -152,18 +152,18 @@ struct expect_value_receiver : base_expect_receiver<Env>
     friend void tag_invoke(
         ex::set_value_t, expect_value_receiver&&, const Us&...) noexcept
     {
-        // FAIL_CHECK("set_value called with wrong value types on expect_value_receiver");
+        HPX_ASSERT(0 && "Should never be called");
     }
 
     friend void tag_invoke(ex::set_stopped_t, expect_value_receiver&&) noexcept
     {
-        // FAIL_CHECK("set_stopped called on expect_value_receiver");
+        HPX_ASSERT(0 && "Should never be called");
     }
 
     template <typename E>
     friend void tag_invoke(ex::set_error_t, expect_value_receiver&&, E) noexcept
     {
-        // FAIL_CHECK("set_error called on expect_value_receiver");
+        HPX_ASSERT(0 && "Should never be called");
     }
 
 private:

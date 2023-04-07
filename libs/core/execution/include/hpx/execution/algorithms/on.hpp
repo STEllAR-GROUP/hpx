@@ -21,6 +21,282 @@
 #include <utility>
 
 namespace hpx::execution::experimental {
+
+    namespace adaptors {
+
+        HPX_HAS_XXX_TRAIT_DEF(set_value)
+        HPX_HAS_XXX_TRAIT_DEF(set_error)
+        HPX_HAS_XXX_TRAIT_DEF(set_stopped)
+        HPX_HAS_XXX_TRAIT_DEF(get_env)
+
+        // A derived-to-base cast that works even when the base is not
+        // accessible from derived.
+        template <typename T, typename U,
+            typename = std::enable_if_t<std::is_same_v<std::decay_t<T>, T>>>
+        hpx::meta::copy_cvref_t<U&&, T> c_cast(U&& u) noexcept
+        {
+            static_assert(std::is_reference_v<hpx::meta::copy_cvref_t<U&&, T>>);
+            static_assert(std::is_base_of_v<T, std::remove_reference_t<U>>);
+            return (hpx::meta::copy_cvref_t<U&&, T>) HPX_FORWARD(U, u);
+        }
+
+        namespace no {
+            struct nope
+            {
+            };
+
+            struct receiver : nope
+            {
+            };
+
+            void tag_invoke(set_error_t, receiver, std::exception_ptr) noexcept;
+            void tag_invoke(set_stopped_t, receiver) noexcept;
+            empty_env tag_invoke(get_env_t, receiver) noexcept;
+        }    // namespace no
+
+        using not_a_receiver = no::receiver;
+
+        template <typename Base, typename = void>
+        struct adaptor
+        {
+            struct type
+            {
+                type() = default;
+
+                template <typename T1,
+                    typename = std::enable_if_t<
+                        hpx::meta::is_constructible_from_v<Base, T1>>>
+                explicit type(T1&& _base)
+                  : base_((T1 &&) _base)
+                {
+                }
+
+            private:
+                HPX_NO_UNIQUE_ADDRESS Base base_;
+
+            protected:
+                Base& base() & noexcept
+                {
+                    return base_;
+                }
+
+                const Base& base() const& noexcept
+                {
+                    return base_;
+                }
+
+                Base&& base() && noexcept
+                {
+                    return HPX_FORWARD(Base, base_);
+                }
+            };
+        };
+
+        template <typename Base>
+        struct adaptor<Base,
+            std::enable_if_t<hpx::meta::is_derived_from_v<no::nope, Base>>>
+        {
+            struct type : no::nope
+            {
+            };
+        };
+
+        template <typename Base>
+        using adaptor_base = typename adaptor<Base>::type;
+
+        template <typename...>
+        inline constexpr bool __true = true;
+
+        template <typename _Cp>
+        inline constexpr bool __class = __true<int _Cp::*> &&
+            (!std::is_same_v<const _Cp, _Cp>);
+
+        template <typename Derived, typename Base,
+            typename = std::enable_if_t<__class<Derived>>>
+        struct receiver_adaptor
+        {
+            class type : adaptor_base<Base>
+            {
+                friend Derived;
+
+                template <typename Self, typename... Ts>
+                static auto call_set_value(Self&& self, Ts&&... ts) noexcept(
+                    noexcept(((Self &&) self).set_value((Ts &&) ts...)))
+                    -> decltype(((Self &&) self).set_value((Ts &&) ts...))
+                {
+                    return ((Self &&) self).set_value((Ts &&) ts...);
+                }
+                using set_value = void;
+
+                template <typename Self, typename... Ts>
+                static auto call_set_error(Self&& self, Ts&&... ts) noexcept(
+                    noexcept(((Self &&) self).set_error((Ts &&) ts...)))
+                    -> decltype(((Self &&) self).set_error((Ts &&) ts...))
+                {
+                    return ((Self &&) self).set_error((Ts &&) ts...);
+                }
+                using set_error = void;
+
+                template <typename Self, typename... Ts>
+                static auto call_set_stopped(Self&& self, Ts&&... ts) noexcept(
+                    noexcept(((Self &&) self).set_stopped((Ts &&) ts...)))
+                    -> decltype(((Self &&) self).set_stopped((Ts &&) ts...))
+                {
+                    return ((Self &&) self).set_stopped((Ts &&) ts...);
+                }
+                using set_stopped = void;
+
+                template <typename Self, typename... Ts>
+                static auto call_get_env(Self&& self, Ts&&... ts) noexcept(
+                    noexcept(((Self &&) self).get_env((Ts &&) ts...)))
+                    -> decltype(((Self &&) self).get_env((Ts &&) ts...))
+                {
+                    return ((Self &&) self).get_env((Ts &&) ts...);
+                }
+                using get_env = void;
+
+                static inline constexpr bool has_base_v =
+                    !hpx::meta::is_derived_from_v<Base, no::nope>;
+
+                template <typename T>
+                using base_from_derived_t = decltype(std::declval<T>().base());
+
+                using get_base_t = hpx::meta::if_<
+                    std::integral_constant<bool, has_base_v>,
+                    hpx::meta::bind_back1_func<hpx::meta::copy_cvref_t, Base>,
+                    hpx::meta::func1<base_from_derived_t>>;
+
+                template <typename D>
+                using base_t = hpx::meta::invoke1<get_base_t, D&&>;
+
+                template <typename D>
+                static base_t<D> get_base(D&& self) noexcept
+                {
+                    if constexpr (has_base_v)
+                    {
+                        return c_cast<type>((D &&) self).base();
+                    }
+                    else
+                    {
+                        return ((D &&) self).base();
+                    }
+                }
+
+                template <typename SetValue,
+                    typename std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetValue>, set_value_t>>,
+                    typename... As>
+                friend auto tag_invoke(
+                    SetValue, Derived&& self, As&&... as) noexcept
+                    -> decltype(call_set_value(
+                        (Derived &&) self, (As &&) as...))
+                {
+                    static_assert(noexcept(
+                        call_set_value((Derived &&) self, (As &&) as...)));
+                    call_set_value((Derived &&) self, (As &&) as...);
+                }
+
+                template <typename SetValue, typename D = Derived,
+                    typename... As,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetValue>, set_value_t> &&
+                        hpx::util::all_of_v<std::integral_constant<bool,
+                            (has_set_value_v<D> &&
+                                hpx::functional::is_tag_invocable_v<set_value_t,
+                                    base_t<D>, As>)>...>>>
+                friend void tag_invoke(
+                    SetValue, Derived&& self, As&&... as) noexcept
+                {
+                    hpx::execution::experimental::set_value(
+                        get_base((D &&) self), (As &&) as...);
+                }
+
+                template <typename SetError, typename Error,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetError>, set_error_t>>>
+                friend auto tag_invoke(
+                    SetError, Derived&& self, Error&& err) noexcept
+                    -> decltype(call_set_error(
+                        (Derived &&) self, (Error &&) err))
+                {
+                    static_assert(noexcept(
+                        call_set_error((Derived &&) self, (Error &&) err)));
+                    call_set_error((Derived &&) self, (Error &&) err);
+                }
+
+                template <typename SetError, typename Error,
+                    typename D = Derived,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetError>, set_error_t> &&
+                        has_set_error_v<D> &&
+                        hpx::functional::is_tag_invocable_v<set_error_t,
+                            base_t<D>>>>
+                friend void tag_invoke(
+                    SetError, Derived&& self, Error&& err) noexcept
+                {
+                    hpx::execution::experimental::set_error(
+                        get_base((Derived &&) self), (Error &&) err);
+                }
+
+                template <typename SetStopped, typename D = Derived,
+                    typename = std::enable_if_t<std::is_same_v<
+                        std::decay_t<SetStopped>, set_stopped_t>>>
+                friend auto tag_invoke(SetStopped, Derived&& self) noexcept
+                    -> decltype(call_set_stopped((D &&) self))
+                {
+                    static_assert(noexcept(call_set_stopped((D &&) self)));
+                    call_set_stopped((D &&) self);
+                }
+
+                template <typename SetStopped, typename D = Derived,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<SetStopped>,
+                            set_stopped_t> &&
+                        has_set_stopped_v<D> &&
+                        hpx::functional::is_tag_invocable_v<set_stopped_t,
+                            base_t<D>>>>
+                friend void tag_invoke(SetStopped, Derived&& self) noexcept
+                {
+                    hpx::execution::experimental::set_stopped(
+                        get_base((Derived &&) self));
+                }
+
+                // Pass through the get_env receiver query
+                template <typename GetEnv, typename D = Derived,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<GetEnv>, get_env_t>>>
+                friend auto tag_invoke(GetEnv, const Derived& self)
+                    -> decltype(call_get_env((const D&) self))
+                {
+                    return call_get_env(self);
+                }
+
+                template <typename GetEnv, typename D = Derived,
+                    typename = std::enable_if_t<
+                        std::is_same_v<std::decay_t<GetEnv>, get_env_t> &&
+                        has_get_env_v<D>>>
+                friend auto tag_invoke(GetEnv, const Derived& self)
+                    -> hpx::util::invoke_result_t<get_env_t, base_t<const D&>>
+                {
+                    return hpx::execution::experimental::get_env(
+                        get_base(self));
+                }
+
+            public:
+                type() = default;
+                using adaptor_base<Base>::adaptor_base;
+
+                using is_receiver = void;
+            };
+        };
+    }    // namespace adaptors
+
+    template <typename Derived, typename Base = adaptors::not_a_receiver,
+        typename =
+            std::enable_if_t<is_receiver_v<Base> && adaptors::__class<Derived>>>
+    using receiver_adaptor =
+        typename adaptors::receiver_adaptor<Derived, Base>::type;
+
     // 10.8.5.3. execution::on [exec.on]
     // 1. execution::on is used to adapt a sender into a sender that will
     //    start the input sender on an execution agent belonging to a
@@ -92,36 +368,59 @@ namespace hpx::execution::experimental {
     // completion_signatures<> for any set of types As...
 
     namespace detail {
+
+        template <typename Fn,
+            typename =
+                std::enable_if_t<std::is_nothrow_move_constructible_v<Fn>>>
+        struct conv
+        {
+            Fn fn;
+            using type = hpx::util::invoke_result_t<Fn>;
+
+            operator type() && noexcept(hpx::is_nothrow_invocable_v<Fn>)
+            {
+                return HPX_FORWARD(Fn, fn)();
+            }
+
+            type operator()() && noexcept(hpx::is_nothrow_invocable_v<Fn>)
+            {
+                return HPX_FORWARD(Fn, fn)();
+            }
+        };
+
+        template <typename Fn>
+        conv(Fn) -> conv<Fn>;
+
         template <typename SchedulerId, typename SenderId, typename ReceiverId>
         struct on_operation;
 
         template <typename SchedulerId, typename SenderId, typename ReceiverId>
-        struct Receiver_ref
+        struct on_receiver_ref
         {
             using Scheduler = hpx::meta::type<SchedulerId>;
             using Sender = hpx::meta::type<SenderId>;
-            using on_receiver = hpx::meta::type<ReceiverId>;
+            using on_receiver_t = hpx::meta::type<ReceiverId>;
 
-            struct type
+            struct type : receiver_adaptor<type>
             {
-                using id = Receiver_ref;
+                using id = on_receiver_ref;
                 hpx::meta::type<
                     on_operation<SchedulerId, SenderId, ReceiverId>>* op_state;
 
-                on_receiver&& base() && noexcept
+                on_receiver_t&& base() && noexcept
                 {
-                    return HPX_FORWARD(on_receiver, op_state->rcvr);
+                    return HPX_FORWARD(on_receiver_t, op_state->rcvr);
                 }
 
-                const on_receiver& base() const& noexcept
+                const on_receiver_t& base() const& noexcept
                 {
                     return op_state->rcvr;
                 }
 
-                friend auto tag_invoke(get_env_t, type&& r)
-                    -> env_of_t<std::decay_t<on_receiver>>
+                auto get_env() const -> make_env_t<get_scheduler_t, Scheduler,
+                    env_of_t<std::decay_t<on_receiver_t>>>
                 {
-                    return hpx::execution::experimental::get_env(r.base());
+                    return hpx::execution::experimental::get_env(this->base());
                 }
             };
         };
@@ -133,11 +432,11 @@ namespace hpx::execution::experimental {
             using Sender = hpx::meta::type<SenderId>;
             using Receiver = hpx::meta::type<ReceiverId>;
 
-            struct type
+            struct type : receiver_adaptor<type>
             {
                 using id = on_receiver;
-                using Receiver_ref_t = hpx::meta::type<
-                    Receiver_ref<SchedulerId, SenderId, ReceiverId>>;
+                using on_receiver_ref_t = hpx::meta::type<
+                    on_receiver_ref<SchedulerId, SenderId, ReceiverId>>;
                 hpx::meta::type<
                     on_operation<SchedulerId, SenderId, ReceiverId>>* op_state;
 
@@ -159,11 +458,11 @@ namespace hpx::execution::experimental {
                     {
                         // This line will invalidate *this:
                         start(op_state_local->data.template emplace<1>(
-                            [op_state_local] {
+                            conv{[op_state_local] {
                                 return connect(
                                     HPX_FORWARD(Sender, op_state_local->sndr),
-                                    Receiver_ref_t{{}, op_state_local});
-                            }));
+                                    on_receiver_ref_t{{}, op_state_local});
+                            }}));
                     }
                     catch (...)
                     {
@@ -184,10 +483,10 @@ namespace hpx::execution::experimental {
             struct type
             {
                 using id = on_operation;
-                using Receiver_t = hpx::meta::type<
+                using on_receiver_t = hpx::meta::type<
                     on_receiver<SchedulerId, SenderId, ReceiverId>>;
-                using Receiver_ref_t = hpx::meta::type<
-                    Receiver_ref<SchedulerId, SenderId, ReceiverId>>;
+                using on_receiver_ref_t = hpx::meta::type<
+                    on_receiver_ref<SchedulerId, SenderId, ReceiverId>>;
 
                 friend void tag_invoke(start_t, type& self) noexcept
                 {
@@ -199,10 +498,10 @@ namespace hpx::execution::experimental {
                   : scheduler(HPX_FORWARD(Scheduler, sched))
                   , sndr(HPX_FORWARD(Sender2, sndr))
                   , rcvr(HPX_FORWARD(Receiver2, rcvr))
-                  , data{std::in_place_index<0>, [this] {
+                  , data{std::in_place_index<0>, conv{[this] {
                              return connect(
-                                 schedule(scheduler), Receiver_t{{}, this});
-                         }}
+                                 schedule(scheduler), on_receiver_t{{}, this});
+                         }}}
                 {
                 }
 
@@ -211,9 +510,9 @@ namespace hpx::execution::experimental {
                 Scheduler scheduler;
                 Sender sndr;
                 Receiver rcvr;
-                std::variant<
-                    connect_result_t<schedule_result_t<Scheduler>, Receiver_t>,
-                    connect_result_t<Sender, Receiver_ref_t>>
+                std::variant<connect_result_t<schedule_result_t<Scheduler>,
+                                 on_receiver_t>,
+                    connect_result_t<Sender, on_receiver_ref_t>>
                     data;
             };
         };
@@ -230,10 +529,10 @@ namespace hpx::execution::experimental {
                 using is_sender = void;
 
                 template <typename ReceiverId>
-                using Receiver_ref_t = hpx::meta::type<
-                    Receiver_ref<SchedulerId, SenderId, ReceiverId>>;
+                using on_receiver_ref_t = hpx::meta::type<
+                    on_receiver_ref<SchedulerId, SenderId, ReceiverId>>;
                 template <typename ReceiverId>
-                using Receiver_t = hpx::meta::type<
+                using on_receiver_t = hpx::meta::type<
                     on_receiver<SchedulerId, SenderId, ReceiverId>>;
                 template <typename ReceiverId>
                 using on_operation_t = hpx::meta::type<
@@ -249,33 +548,55 @@ namespace hpx::execution::experimental {
                     return get_env(self.sndr);
                 }
 
-                template <typename Sender, typename Env>
-                struct generate_completion_signatures
-                {
-                    template <typename...>
-                    using value_types = completion_signatures<>;
+                template <typename...>
+                using value_types = completion_signatures<>;
 
-                    template <template <typename...> typename Variant>
-                    using error_types = hpx::util::detail::unique_concat_t<
-                        error_types_of_t<Sender, Env, Variant>,
-                        Variant<std::exception_ptr>>;
+                // template <typename Sender, typename Env>
+                // struct generate_completion_signatures
+                // {
+                //     template <typename...>
+                //     using value_types =
+                //         detail::value_types_of<schedule_result_t<Scheduler>,
+                //             Env>;
 
-                    static constexpr bool sends_stopped = false;
-                };
+                //     template <template <typename...> typename Variant>
+                //     using error_types =
+                //         completion_signatures<set_error_t(std::exception_ptr)>;
 
-                template <typename Self, typename Env>
+                //     static constexpr bool sends_stopped = false;
+                // };
+
+                template <typename Self, typename Env,
+                    std::enable_if_t<std::is_same_v<std::decay_t<Self>, type>>>
                 friend auto tag_invoke(get_completion_signatures_t, Self&&, Env)
-                    -> generate_completion_signatures<
-                        schedule_result_t<Scheduler>, Env>;
+                    // -> generate_completion_signatures<
+                    //     schedule_result_t<Scheduler>, Env>;
+                    -> make_completion_signatures<schedule_result_t<Scheduler>,
+                        Env,
+                        make_completion_signatures<
+                            hpx::meta::copy_cvref_t<Self, Sender>,
+                            make_env_t<get_scheduler_t, Scheduler, Env>,
+                            completion_signatures<set_error_t(
+                                std::exception_ptr)>>,
+                        value_types>;
 
+                // clang-format off
                 template <typename Self, typename ReceiverOn,
-                    typename = std::enable_if_t<is_receiver_v<ReceiverOn> &&
-                        is_sender_to_v<schedule_result_t<Scheduler>,
-                            Receiver_t<hpx::meta::get_id_t<ReceiverOn>>>>>
+                    HPX_CONCEPT_REQUIRES_(
+                        is_receiver_v<ReceiverOn>
+                        && std::is_same_v<std::decay_t<Self>, type>
+                        && hpx::meta::is_constructible_from_v<Sender,
+                                hpx::meta::copy_cvref_t<Self, Sender>>
+                        && is_sender_to_v<schedule_result_t<Scheduler>,
+                            on_receiver_t<hpx::meta::get_id_t<ReceiverOn>>>
+                        && is_sender_to_v<Sender, on_receiver_ref_t<
+                                        hpx::meta::get_id_t<ReceiverOn>>>
+                    )>
+                // clang-format on
                 friend auto tag_invoke(connect_t, Self&& self, ReceiverOn rcvr)
+                    -> on_operation_t<hpx::meta::get_id_t<ReceiverOn>>
                 {
-                    return on_operation_t<hpx::meta::get_id_t<ReceiverOn>>{
-                        (HPX_FORWARD(Self, self)).scheduler,
+                    return {(HPX_FORWARD(Self, self)).scheduler,
                         (HPX_FORWARD(Self, self)).sndr,
                         HPX_FORWARD(ReceiverOn, rcvr)};
                 }
@@ -287,8 +608,8 @@ namespace hpx::execution::experimental {
     inline constexpr struct on_t : hpx::functional::detail::tag_fallback<on_t>
     {
         template <typename Scheduler, typename Sender,
-            typename = std::enable_if_t<is_scheduler_v<Scheduler>>,
-            typename = std::enable_if_t<is_sender_v<Sender>>>
+            typename = std::enable_if_t<is_scheduler_v<Scheduler> &&
+                is_sender_v<Sender>>>
         friend auto tag_fallback_invoke(on_t, Scheduler&& sched, Sender&& sndr)
             -> hpx::meta::type<
                 detail::on_sender<hpx::meta::get_id_t<std::decay_t<Scheduler>>,

@@ -516,4 +516,65 @@ namespace hpx::meta {
         is_constructible_from_v<T, As...>&&
             std::is_nothrow_constructible_v<T, As...>;
 
+    namespace detail {
+        // For copying cvref from one type to another:
+        struct cp
+        {
+            template <typename T>
+            using apply = T;
+        };
+
+        struct cpc
+        {
+            template <typename T>
+            using apply = const T;
+        };
+
+        struct cplr
+        {
+            template <typename T>
+            using apply = T&;
+        };
+
+        struct cprr
+        {
+            template <typename T>
+            using apply = T&&;
+        };
+
+        struct cpclr
+        {
+            template <typename T>
+            using apply = const T&;
+        };
+
+        struct cpcrr
+        {
+            template <typename T>
+            using apply = const T&&;
+        };
+
+        template <typename>
+        extern cp cpcvr;
+        template <typename T>
+        extern cpc cpcvr<const T>;
+        template <typename T>
+        extern cplr cpcvr<T&>;
+        template <typename T>
+        extern cprr cpcvr<T&&>;
+        template <typename T>
+        extern cpclr cpcvr<const T&>;
+        template <typename T>
+        extern cpcrr cpcvr<const T&&>;
+        template <typename T>
+        using copy_cvref_fn = decltype(cpcvr<T>);
+    }    // namespace detail
+
+    template <typename From, typename To>
+    using copy_cvref_t = invoke<detail::copy_cvref_fn<From>, To>;
+
+    template <typename Derived, typename Base>
+    inline constexpr bool is_derived_from_v = std::is_base_of_v<Base, Derived>&&
+        std::is_convertible_v<const volatile Derived*, const volatile Base*>;
+
 }    // namespace hpx::meta

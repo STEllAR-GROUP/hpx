@@ -10,6 +10,7 @@
 #include <hpx/config/constexpr.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
+#include <hpx/modules/concepts.hpp>
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
@@ -134,6 +135,11 @@ namespace hpx::execution::experimental {
     ///////////////////////////////////////////////////////////////////////
     namespace detail {
 
+        HPX_HAS_XXX_TRAIT_DEF(is_receiver)
+
+        template <typename T>
+        inline constexpr bool enable_receiver_v = has_is_receiver_v<T>;
+
         template <bool ConstructionRequirements, typename T, typename E>
         struct is_receiver_impl;
 
@@ -145,8 +151,9 @@ namespace hpx::execution::experimental {
         template <typename T, typename E>
         struct is_receiver_impl<true, T, E>
           : std::integral_constant<bool,
-                hpx::is_invocable_v<set_stopped_t, std::decay_t<T>&&> &&
-                    hpx::is_invocable_v<set_error_t, std::decay_t<T>&&, E>>
+                enable_receiver_v<T> ||
+                    !!(hpx::is_invocable_v<set_stopped_t, std::decay_t<T>&&> &&
+                        hpx::is_invocable_v<set_error_t, std::decay_t<T>&&, E>)>
         {
         };
     }    // namespace detail
