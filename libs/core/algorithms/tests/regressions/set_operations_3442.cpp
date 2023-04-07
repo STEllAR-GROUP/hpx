@@ -39,9 +39,9 @@ void set_difference_randomized(int rounds, int maxLen)
         std::size_t len_a = rand() % maxLen, len_b = rand() % maxLen;
         std::vector<int> set_a(len_a), set_b(len_b);
 
-        int rangeMin = 0;
+        std::size_t rangeMin = 0;
         // rangeMax is set to increase probability of common elements
-        int rangeMax = (std::min)(len_a, len_b) * 2;
+        std::size_t rangeMax = (std::min)(len_a, len_b) * 2;
 
 #ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
         std::generate(std::execution::par_unseq, set_a.begin(), set_a.end(),
