@@ -130,7 +130,15 @@ struct env_tag
 template <typename Env = ex::empty_env, typename... Ts>
 struct expect_value_receiver : base_expect_receiver<Env>
 {
-    explicit(sizeof...(Ts) != 1) expect_value_receiver(Ts... vals)
+    template <typename T = hpx::util::pack<Ts...>,
+        typename = std::enable_if_t<!std::is_same_v<typename T::type, void>>>
+    expect_value_receiver(Ts... vals)
+      : values_(std::move(vals)...)
+    {
+    }
+
+    template <HPX_CONCEPT_REQUIRES_((sizeof...(Ts) != 1))>
+    explicit expect_value_receiver(Ts... vals)
       : values_(std::move(vals)...)
     {
     }
@@ -144,6 +152,7 @@ struct expect_value_receiver : base_expect_receiver<Env>
     friend void tag_invoke(ex::set_value_t, expect_value_receiver&& self,
         const Ts&... vals) noexcept
     {
+        HPX_UNUSED(hpx::util::pack<Ts...>(vals...));
         HPX_ASSERT(self.values_ == std::tie(vals...));
         self.set_called();
     }
