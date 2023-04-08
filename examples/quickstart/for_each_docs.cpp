@@ -7,10 +7,10 @@
 // This example is meant for inclusion in the documentation.
 
 //[for_each_docs
-
-#include <hpx/algorithm.hpp>
-#include <hpx/execution.hpp>
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
+
 #include <iostream>
 #include <vector>
 
@@ -35,5 +35,4 @@ int main(int argc, char* argv[])
 {
     return hpx::local::init(hpx_main, argc, argv);
 }
-
 //]
