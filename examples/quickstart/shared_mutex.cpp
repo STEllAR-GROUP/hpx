@@ -49,13 +49,16 @@ int hpx_main()
 
             for (int j = 0; j < cycles; ++j)
             {
-                std::unique_lock<hpx::shared_mutex> ul(stm);
+                // scope of unique_lock
+                {
+                    std::unique_lock<hpx::shared_mutex> ul(stm);
 
-                std::cout << "^^^ Writer " << i << " starting..." << std::endl;
-                hpx::this_thread::sleep_for(milliseconds(dist(urng)));
-                std::cout << "vvv Writer " << i << " finished." << std::endl;
-
-                ul.unlock();
+                    std::cout << "^^^ Writer " << i << " starting..."
+                              << std::endl;
+                    hpx::this_thread::sleep_for(milliseconds(dist(urng)));
+                    std::cout << "vvv Writer " << i << " finished."
+                              << std::endl;
+                }
 
                 hpx::this_thread::sleep_for(milliseconds(dist(urng)));
             }
@@ -76,14 +79,14 @@ int hpx_main()
 
             for (int j = 0; j < cycles; ++j)
             {
-                std::shared_lock<hpx::shared_mutex> sl(stm);
+                // scope of shared_lock
+                {
+                    std::shared_lock<hpx::shared_mutex> sl(stm);
 
-                std::cout << "Reader " << i << " starting..." << std::endl;
-                hpx::this_thread::sleep_for(milliseconds(dist(urng)));
-                std::cout << "Reader " << i << " finished." << std::endl;
-
-                sl.unlock();
-
+                    std::cout << "Reader " << i << " starting..." << std::endl;
+                    hpx::this_thread::sleep_for(milliseconds(dist(urng)));
+                    std::cout << "Reader " << i << " finished." << std::endl;
+                }
                 hpx::this_thread::sleep_for(milliseconds(dist(urng)));
             }
         });

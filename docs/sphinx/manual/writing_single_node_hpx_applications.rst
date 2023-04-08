@@ -137,9 +137,21 @@ is released. The code below shows the basic use of mutexes:
    :start-after: //[mutex_docs
    :end-before: //]
 
-In this example, two |hpx| threads created using ``hpx::async`` are acquiring a ``hpx::mutex m``. The ``m.lock()``
-function is called before accessing the shared resource, and ``m.unlock()`` is called after the access is complete.
-This ensures that only one thread can access the shared resource at a time.
+In this example, two |hpx| threads created using ``hpx::async`` are acquiring a ``hpx::mutex m``.
+``std::scoped_lock sl(m)`` is used to take ownership of the given mutex ``m``. When control leaves
+the scope in which the ``scoped_lock`` object was created, the ``scoped_lock`` is destructed and
+the mutex is released.
+
+.. attention::
+
+  A common way to acquire and release mutexes is by using the function ``m.lock()`` before accessing
+  the shared resource, and ``m.unlock()`` called after the access is complete. However, these functions
+  may lead to deadlocks in case of exception(s). That is, if an exception happens when the mutex is locked
+  then the code that unlocks the mutex will never be executed, the lock will remain held by the thread
+  that acquired it, and other threads will be unable to access the shared resource. This can cause a
+  deadlock if the other threads are also waiting to acquire the same lock. For this reason, we suggest
+  you use ``std::scoped_lock``, which prevents this issue by releasing the lock when control leaves the
+  scope in which the ``scoped_lock`` object was created.
 
 .. _shared_mutex:
 
@@ -175,9 +187,9 @@ Both the writer and reader threads use the ``hpx::shared_mutex`` object ``stm`` 
 resource.
 
 * For the writer threads, a ``unique_lock`` on the shared mutex is acquired before each write operation and is released
-  after the operation is complete.
+  after control leaves the scope in which the ``unique_lock`` object was created.
 * For the reader threads, a ``shared_lock`` on the shared mutex is acquired before each read operation and is released
-  after the operation is complete.
+  after control leaves the scope in which the ``shared_lock`` object was created.
 
 Before each operation, both the reader and writer threads sleep for a random time period, which is generated using
 a random number generator. The random time period simulates the processing time of the operation.
@@ -196,7 +208,7 @@ access to a shared resource. The two types of semaphores are:
   the counter by releasing the semaphore. Unlike ``hpx::mutex``, an ``hpx::counting_semaphore`` is not bound to a
   thread, which means that the acquire and release call of a semaphore can happen on different threads.
 * binary semaphore: it is an alias for a ``hpx::counting_semaphore<1>``. In this case, the least maximal value
-  is 1. ``hpx::binary_semaphores`` can be used to implement locks.
+  is 1. ``hpx::binary_semaphore`` can be used to implement locks.
 
 .. literalinclude:: ../../examples/quickstart/counting_semaphore_docs.cpp
    :language: c++
@@ -232,8 +244,8 @@ To call an application with a single guard, simply declare the guard and call
 
 If a single method needs to run with multiple guards, use a guard set::
 
-     boost::shared<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
-     boost::shared<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
+     std::shared_ptr<hpx::lcos::local::guard> gu1(new hpx::lcos::local::guard());
+     std::shared_ptr<hpx::lcos::local::guard> gu2(new hpx::lcos::local::guard());
      gs.add(*gu1);
      gs.add(*gu2);
      run_guarded(gs,task);
@@ -641,8 +653,8 @@ the ``wait()`` method to synchronize the tasks and wait for them to complete.
 
 .. note::
 
-   `task groups` and `task blocks`` are both ways to group and synchronize parallel tasks, but
-   `task groups`` are used to group multiple tasks together as a single unit, while `task blocks``
+   `task groups` and `task blocks` are both ways to group and synchronize parallel tasks, but
+   `task groups` are used to group multiple tasks together as a single unit, while `task blocks`
    are used to execute a loop in parallel, with each iteration of the loop executing in a separate
    task. If the difference is not clear yet, continue reading.
 
@@ -667,7 +679,7 @@ such as futures or shared data structures.
 The example below demonstrates how to launch multiple threads and synchronize them using a ``hpx::latch``
 object. It also shows how to query the state of threads and wait for futures to complete.
 
-.. literalinclude:: ../../examples/quickstart/task_group_docs.cpp
+.. literalinclude:: ../../examples/quickstart/enumerate_threads.cpp
    :language: c++
    :start-after: //[threads_docs
    :end-before: //]
@@ -717,25 +729,8 @@ C++ Extensions for Parallelism), |cpp17_n4755|_ (Task Blocks), and
 Using parallel algorithms
 -------------------------
 
-.. |sequenced_execution_policy| replace:: :cpp:class:`hpx::execution::sequenced_policy`
-.. |sequenced_task_execution_policy| replace:: :cpp:class:`hpx::execution::sequenced_task_policy`
-.. |parallel_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_policy`
-.. |parallel_unsequenced_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_unsequenced_policy`
-.. |parallel_task_execution_policy| replace:: :cpp:class:`hpx::execution::parallel_task_policy`
-.. |execution_policy| replace:: :cpp:class:`hpx::parallel::execution_policy`
-.. |exception_list| replace:: :cpp:class:`hpx::exception_list`
-.. |for_each| replace:: :cpp:class:`hpx::for_each`
-
-A parallel algorithm is a function template described by this document
-which is declared in the (inline) namespace ``hpx::parallel``.
-
-.. note::
-
-   For compilers that do not support inline namespaces, all of the ``namespace
-   v1`` is imported into the namespace ``hpx::parallel``. The effect is similar
-   to what inline namespaces would do, namely all names defined in
-   ``hpx::parallel`` are accessible from the namespace ``hpx::parallel`` as
-   well.
+A parallel algorithm is a function template declared in the namespace
+``hpx::parallel``.
 
 All parallel algorithms are very similar in semantics to their sequential
 counterparts (as defined in the ``namespace std``) with an additional formal
@@ -745,13 +740,13 @@ manner in which the execution of these algorithms may be parallelized and the
 manner in which they apply user-provided function objects.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type |sequenced_execution_policy| or
-|sequenced_task_execution_policy| execute in sequential order. For
-|sequenced_execution_policy| the execution happens in the calling thread.
+execution policy object of type :cpp:class:`hpx::execution::sequenced_policy` or
+:cpp:class:`hpx::execution::sequenced_task_policy` execute in sequential order. For
+:cpp:class:`hpx::execution::sequenced_policy` the execution happens in the calling thread.
 
 The applications of function objects in parallel algorithms invoked with an
-execution policy object of type |parallel_execution_policy| or
-|parallel_task_execution_policy| are permitted to execute in an unordered
+execution policy object of type :cpp:class:`hpx::execution::parallel_policy` or
+:cpp:class:`hpx::execution::parallel_task_policy` are permitted to execute in an unordered
 fashion in unspecified threads, and are indeterminately sequenced within each
 thread.
 
@@ -760,18 +755,22 @@ thread.
    It is the caller's responsibility to ensure correctness, such as making sure that the
    invocation does not introduce data races or deadlocks.
 
-The applications of function objects in parallel algorithms invoked with an
-execution policy of type |parallel_unsequenced_execution_policy| is, in |hpx|,
-equivalent to the use of the execution policy |parallel_execution_policy|.
+The example below demonstrates how to perform a sequential and parallel :cpp:func:`hpx::for_each` \
+loop on a vector of integers.
 
-Algorithms invoked with an execution policy object of type |execution_policy|
-execute internally as if invoked with the contained execution policy object. No
-exception is thrown when an |execution_policy| contains an execution policy of
-type |sequenced_task_execution_policy| or |parallel_task_execution_policy|
-(which normally turn the algorithm into its asynchronous version). In this case
-the execution is semantically equivalent to the case of passing a
-|sequenced_execution_policy| or |parallel_execution_policy| contained in the
-|execution_policy| object respectively.
+.. literalinclude:: ../../examples/quickstart/for_each_docs.cpp
+   :language: c++
+   :start-after: //[for_each_docs
+   :end-before: //]
+
+The above code uses ``hpx::for_each`` to print the elements of the vector ``v{1, 2, 3, 4, 5}``.
+At first, ``hpx::for_each()`` is called without an execution policy, which means that it applies
+the lambda function ``print`` to each element in the vector sequentially. Hence, the elements are
+printed in order.
+
+Next, ``hpx::for_each()`` is called with the ``hpx::execution::par`` execution policy,
+which applies the lambda function ``print`` to each element in the vector in parallel. Therefore,
+the output order of the elements in the vector is not deterministic and may vary from run to run.
 
 Parallel exceptions
 -------------------
@@ -786,18 +785,18 @@ program is determined by the type of execution policy used to invoke the
 algorithm:
 
 * If the execution policy object is of type
-  |parallel_unsequenced_execution_policy|, :cpp:func:`hpx::terminate` shall
+  :cpp:class:`hpx::execution::parallel_unsequenced_policy`, :cpp:func:`hpx::terminate` shall
   be called.
-* If the execution policy object is of type |sequenced_execution_policy|,
-  |sequenced_task_execution_policy|, |parallel_execution_policy|, or
-  |parallel_task_execution_policy|, the execution of the algorithm terminates
-  with an |exception_list| exception. All uncaught exceptions thrown during the
+* If the execution policy object is of type :cpp:class:`hpx::execution::sequenced_policy`,
+  :cpp:class:`hpx::execution::sequenced_task_policy`, :cpp:class:`hpx::execution::parallel_policy`, or
+  :cpp:class:`hpx::execution::parallel_task_policy`, the execution of the algorithm terminates
+  with an :cpp:class:`hpx::exception_list` exception. All uncaught exceptions thrown during the
   application of user-provided function objects shall be contained in the
-  |exception_list|.
+  :cpp:class:`hpx::exception_list`.
 
 For example, the number of invocations of the user-provided function object in
-for_each is unspecified. When |for_each| is executed sequentially, only one
-exception will be contained in the |exception_list| object.
+for_each is unspecified. When :cpp:class:`hpx::for_each` is executed sequentially, only one
+exception will be contained in the :cpp:class:`hpx::exception_list` object.
 
 These guarantees imply that, unless the algorithm has failed to allocate memory
 and terminated with ``std::bad_alloc``, all exceptions thrown during the
@@ -808,7 +807,7 @@ capturing a user exception.
 The algorithm may terminate with the ``std::bad_alloc`` exception even if one or
 more user-provided function objects have terminated with an exception. For
 example, this can happen when an algorithm fails to allocate memory while
-creating or adding elements to the |exception_list| object.
+creating or adding elements to the :cpp:class:`hpx::exception_list` object.
 
 Parallel algorithms
 -------------------
@@ -875,6 +874,8 @@ Parallel algorithms
    * * :cpp:func:`hpx::search_n`
      * Searches for a number consecutive copies of an element in a range.
      * :cppreference-algorithm:`search_n`
+
+|
 
 .. list-table:: Modifying parallel algorithms of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
@@ -968,6 +969,8 @@ Parallel algorithms
      * Copies the elements from one range to another in such a way that there are no consecutive equal elements.
      * :cppreference-algorithm:`unique_copy`
 
+|
+
 .. list-table:: Set operations on sorted sequences of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
@@ -996,6 +999,8 @@ Parallel algorithms
      * Computes the union of two sets.
      * :cppreference-algorithm:`set_union`
 
+|
+
 .. list-table:: Heap operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
@@ -1012,6 +1017,8 @@ Parallel algorithms
      * Constructs a max heap in the range [first, last).
      * :cppreference-algorithm:`make_heap`
 
+|
+
 .. list-table:: Minimum/maximum operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
 
@@ -1027,6 +1034,8 @@ Parallel algorithms
    * * :cpp:func:`hpx::minmax_element`
      * Returns the smallest and the largest element in a range.
      * :cppreference-algorithm:`minmax_element`
+
+|
 
 .. list-table:: Partitioning Operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
@@ -1049,6 +1058,8 @@ Parallel algorithms
    * * :cpp:func:`hpx::stable_partition`
      * Divides elements into two groups while preserving their relative order.
      * :cppreference-algorithm:`stable_partition`
+
+|
 
 .. list-table:: Sorting Operations of header :ref:`public_api_header_hpx_algorithm`
    :widths: 25 55 20
@@ -1078,6 +1089,8 @@ Parallel algorithms
      * Sorts one range of data using keys supplied in another range.
      *
 
+|
+
 .. list-table:: Numeric Parallel Algorithms of header :ref:`public_api_header_hpx_numeric`
    :widths: 25 55 20
 
@@ -1106,6 +1119,7 @@ Parallel algorithms
      * Sums up a range of elements after applying a function. Also, accumulates the inner products of two input ranges.
      * :cppreference-algorithm:`transform_reduce`
 
+|
 
 .. list-table:: Dynamic Memory Management of header :ref:`public_api_header_hpx_memory`
    :widths: 25 55 20
@@ -1149,6 +1163,8 @@ Parallel algorithms
    * * :cpp:func:`hpx::uninitialized_value_construct_n`
      * Constructs objects in an uninitialized area of memory.
      * :cppreference-memory:`uninitialized_value_construct_n`
+
+|
 
 .. list-table:: Index-based for-loops of header :ref:`public_api_header_hpx_algorithm`
 
@@ -1195,8 +1211,9 @@ number of cores ``num_cores`` and tasks to schedule is given by ``num_tasks``.
 The lambda function exposes a means of test-probing the execution of a single
 iteration for performance measurement purposes. The execution parameter type
 might dynamically determine the execution time of one or more tasks in order
-to calculate the chunk size; see :cpp:class:`hpx::execution::auto_chunk_size`
-for an example of this executor parameter type.
+to calculate the chunk size; see
+:cpp:class:`hpx::execution::experimental::auto_chunk_size` for an example of
+this executor parameter type.
 
 Other functions in the interface exist to discover whether an executor parameter
 type should be invoked once (i.e., it returns a static chunk size; see

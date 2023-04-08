@@ -6,28 +6,27 @@
 
 // This example is meant for inclusion in the documentation.
 
-//[mutex_docs
-#include <hpx/local/future.hpp>
+//[for_each_docs
+#include <hpx/local/algorithm.hpp>
+#include <hpx/local/execution.hpp>
 #include <hpx/local/init.hpp>
-#include <hpx/local/mutex.hpp>
 
 #include <iostream>
+#include <vector>
 
 int hpx_main()
 {
-    hpx::mutex m;
+    std::vector<int> v{1, 2, 3, 4, 5};
 
-    hpx::future<void> f1 = hpx::async([&m]() {
-        std::scoped_lock sl(m);
-        std::cout << "Thread 1 acquired the mutex" << std::endl;
-    });
+    auto print = [](const int& n) { std::cout << n << ' '; };
 
-    hpx::future<void> f2 = hpx::async([&m]() {
-        std::scoped_lock sl(m);
-        std::cout << "Thread 2 acquired the mutex" << std::endl;
-    });
+    std::cout << "Print sequential: ";
+    hpx::for_each(v.begin(), v.end(), print);
+    std::cout << '\n';
 
-    hpx::wait_all(f1, f2);
+    std::cout << "Print parallel: ";
+    hpx::for_each(hpx::execution::par, v.begin(), v.end(), print);
+    std::cout << '\n';
 
     return hpx::local::finalize();
 }
