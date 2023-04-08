@@ -32,6 +32,7 @@ install(
   NAMESPACE HPXInternal::
   FILE HPXInternalTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+  COMPONENT cmake
 )
 
 # Export HPXTargets in the build directory
@@ -56,6 +57,7 @@ install(
   NAMESPACE HPX::
   FILE HPXTargets.cmake
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+  COMPONENT cmake
 )
 
 # Install dir
@@ -117,7 +119,7 @@ if(HPX_WITH_PKGCONFIG)
   install(
     FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hpxcxx"
     DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT compiler_wrapper
+    COMPONENT runtime
     PERMISSIONS
       OWNER_READ
       OWNER_WRITE

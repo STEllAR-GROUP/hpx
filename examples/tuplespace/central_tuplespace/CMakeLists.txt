@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@ foreach(component ${components})
 
   add_hpx_component(
     ${component} INTERNAL_FLAGS NOEXPORT AUTOGLOB
+    INSTALL_COMPONENT examples
     HEADER_GLOB "${component}.h*"
     SOURCE_GLOB "${component}.c*"
     FOLDER "Examples/TupleSpace/${component}"

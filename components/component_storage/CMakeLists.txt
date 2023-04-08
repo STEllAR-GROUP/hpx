@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Hartmut Kaiser
+# Copyright (c) 2015-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,6 +32,7 @@ add_hpx_component(
   component_storage INTERNAL_FLAGS
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS PREPEND_HEADER_ROOT
+  INSTALL_COMPONENT runtime
   HEADER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/include
   HEADERS ${component_storage_headers}
   PREPEND_SOURCE_ROOT

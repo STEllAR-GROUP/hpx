@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -28,6 +28,7 @@ function(add_hpx_component name)
       HEADER_GLOB
       OUTPUT_SUFFIX
       INSTALL_SUFFIX
+      INSTALL_COMPONENT
       LANGUAGE
   )
   set(multi_value_args
@@ -191,12 +192,15 @@ function(add_hpx_component name)
       set(archive_install_destination ${${name}_INSTALL_SUFFIX})
       set(runtime_install_destination ${${name}_INSTALL_SUFFIX})
     endif()
+    if(${name}_INSTALL_COMPONENT)
+      set(install_component COMPONENT ${${name}_INSTALL_COMPONENT})
+    endif()
     # cmake-format: off
     set(_target_flags
         INSTALL INSTALL_FLAGS
-          LIBRARY DESTINATION ${library_install_destination}
-          ARCHIVE DESTINATION ${archive_install_destination}
-          RUNTIME DESTINATION ${runtime_install_destination}
+          LIBRARY DESTINATION ${library_install_destination} ${install_component}
+          ARCHIVE DESTINATION ${archive_install_destination} ${install_component}
+          RUNTIME DESTINATION ${runtime_install_destination} ${install_component}
     )
     # cmake-format: on
 
@@ -210,6 +214,7 @@ function(add_hpx_component name)
           ${_target_flags}
           INSTALL_PDB $<TARGET_PDB_FILE:${name}_component>
             DESTINATION ${runtime_install_destination}
+            ${install_component}
           CONFIGURATIONS Debug RelWithDebInfo
           OPTIONAL
       )

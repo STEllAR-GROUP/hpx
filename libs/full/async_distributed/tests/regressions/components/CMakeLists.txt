@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2014 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 add_hpx_component(
   action_move_semantics INTERNAL_FLAGS
+  INSTALL_COMPONENT tests
   FOLDER "Tests/Regressions/Modules/Full/AsyncDistributed/Actions"
   EXCLUDE_FROM_ALL AUTOGLOB
 )

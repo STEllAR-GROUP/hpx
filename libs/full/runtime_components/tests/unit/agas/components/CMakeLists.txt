@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2021 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -11,6 +11,7 @@ set(root
 
 add_hpx_component(
   simple_refcnt_checker INTERNAL_FLAGS
+  INSTALL_COMPONENT tests
   DEPENDENCIES iostreams_component
   HEADER_GLOB "${root}/simple_refcnt_checker.h*"
   SOURCE_GLOB "${root}/simple_refcnt_checker.c*"
@@ -20,6 +21,7 @@ add_hpx_component(
 
 add_hpx_component(
   managed_refcnt_checker INTERNAL_FLAGS
+  INSTALL_COMPONENT tests
   DEPENDENCIES iostreams_component
   HEADER_GLOB "${root}/managed_refcnt_checker.h*"
   SOURCE_GLOB "${root}/managed_refcnt_checker.c*"
@@ -29,6 +31,7 @@ add_hpx_component(
 
 add_hpx_component(
   simple_mobile_object INTERNAL_FLAGS
+  INSTALL_COMPONENT tests
   HEADER_GLOB "${root}/simple_mobile_object.h*"
   SOURCE_GLOB "${root}/simple_mobile_object.c*"
   FOLDER "Tests/Unit/Modules/Full/AGAS"

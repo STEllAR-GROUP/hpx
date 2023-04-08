@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2021 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 # Copyright (c) 2020 The STE||AR-Group
@@ -218,25 +218,25 @@ target_compile_definitions(
 set(hpx_targets hpx wrap_main plugin component)
 set(hpx_internal_targets hpx_full hpx_interface hpx_interface_wrap_main)
 
+# cmake-format: off
 install(
   TARGETS ${hpx_targets}
   EXPORT HPXTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          COMPONENT runtime
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
           ${_optional}
 )
 
 install(
   TARGETS ${hpx_internal_targets}
   EXPORT HPXInternalTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          COMPONENT runtime
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
           ${_optional}
 )
+# cmake-format: on
 
 # install PDB if needed
 if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
@@ -244,6 +244,7 @@ if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
     FILES $<TARGET_PDB_FILE:hpx_full>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     CONFIGURATIONS Debug RelWithDebInfo
+    COMPONENT runtime
     OPTIONAL
   )
 endif()
@@ -319,10 +320,21 @@ foreach(lib ${HPX_LIBS})
     install(
       TARGETS hpx_${lib}
       EXPORT HPXInternalTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${lib}
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime
+      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
     )
+
+    # install PDB if needed
+    if(MSVC AND NOT HPX_WITH_STATIC_LINKING)
+      install(
+        FILES $<TARGET_PDB_FILE:hpx_${lib}>
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        CONFIGURATIONS Debug RelWithDebInfo
+        COMPONENT runtime
+        OPTIONAL
+      )
+    endif()
 
     hpx_export_internal_targets(hpx_${lib})
   endif()

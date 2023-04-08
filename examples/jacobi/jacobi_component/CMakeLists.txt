@@ -6,6 +6,7 @@
 
 add_hpx_component(
   jacobi INTERNAL_FLAGS NOEXPORT AUTOGLOB
+  INSTALL_COMPONENT examples
   SOURCE_GLOB "*.c*"
   HEADER_GLOB "*.h*" ${jacobi_component_FLAGS}
   FOLDER "Examples/Jacobi"
