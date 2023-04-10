@@ -11,10 +11,10 @@
 // fibonacci_futures.cpp. This example is mainly intended to demonstrate async,
 // futures and get for the documentation.
 
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/format.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <cstdint>
 #include <iostream>

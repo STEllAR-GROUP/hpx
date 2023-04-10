@@ -7,8 +7,8 @@
 // Making sure the continuations of a shared_future are invoked in the same
 // order as they have been attached.
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

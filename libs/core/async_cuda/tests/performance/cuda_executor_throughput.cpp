@@ -25,15 +25,12 @@
 // Currently, nvcc does not handle lambda functions properly and it is simpler to use
 // cudaMalloc/cudaMemcpy etc, so we do not #define HPX_CUBLAS_DEMO_WITH_ALLOCATOR
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
-#include <hpx/parallel/algorithms/for_loop.hpp>
 
 #include <algorithm>
 #include <cmath>

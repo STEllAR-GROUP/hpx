@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/init.hpp>
-#include <hpx/local/task_block.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/runtime_local/custom_exception_info.hpp>
+#include <hpx/task_block.hpp>
 
 #include <iostream>
 #include <string>

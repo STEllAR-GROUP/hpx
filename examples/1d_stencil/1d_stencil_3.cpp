@@ -14,9 +14,9 @@
 // example is still fully serial, no parallelization is performed.
 
 #include <hpx/assert.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <cstddef>
 #include <cstdint>

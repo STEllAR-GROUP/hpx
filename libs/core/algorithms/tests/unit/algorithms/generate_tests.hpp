@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/generate.hpp>
 
 #include <cstddef>
 #include <iostream>

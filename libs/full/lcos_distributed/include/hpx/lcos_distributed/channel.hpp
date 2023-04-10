@@ -21,7 +21,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T = void>
@@ -557,5 +557,11 @@ namespace hpx { namespace lcos {
             return close(launch::sync, force_delete_entries);
         }
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
+
+namespace hpx::distributed {
+
+    using hpx::lcos::channel;
+}    // namespace hpx::distributed
+
 #endif

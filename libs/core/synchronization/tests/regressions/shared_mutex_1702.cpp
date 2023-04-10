@@ -7,9 +7,9 @@
 // This test case demonstrates the issue described in #1702: Shared_mutex does
 // not compile with no_mutex cond_var
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/shared_mutex.hpp>
+#include <hpx/shared_mutex.hpp>
 
 #include <mutex>
 #include <shared_mutex>

@@ -11,12 +11,11 @@
 #define HPX_SERIALIZATION_HAVE_ALLOW_CONST_TUPLE_MEMBERS
 
 #include <hpx/config.hpp>
-#include <hpx/datastructures/serialization/tuple.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/tuple.hpp>
 
 #include <hpx/modules/testing.hpp>
 

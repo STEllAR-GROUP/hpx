@@ -8,8 +8,9 @@
 
 //[task_group_docs
 
-#include <hpx/init.hpp>
 #include <hpx/experimental/task_group.hpp>
+#include <hpx/init.hpp>
+
 #include <iostream>
 
 void task1()

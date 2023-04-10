@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,14 +13,14 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init_params.hpp>
+#include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 
 #include <cstddef>
-#include <string>
-#include <vector>
+#include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx

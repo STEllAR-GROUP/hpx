@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -181,12 +181,12 @@ struct timer_hooks_parameters
     std::string name_;
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<timer_hooks_parameters> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 void test_combined_hooks()
 {

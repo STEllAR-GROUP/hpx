@@ -6,11 +6,11 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/datastructures/detail/small_vector.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/thread.hpp>
+#include <hpx/unwrap.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -22,7 +22,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // support unwrapping of hpx::detail::small_vector
     template <typename NewType, typename OldType, std::size_t Size,
@@ -41,7 +41,7 @@ namespace hpx { namespace traits {
             return hpx::detail::small_vector<NewType, Size, NewAllocator>();
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 template <typename T>
 using small_vector =

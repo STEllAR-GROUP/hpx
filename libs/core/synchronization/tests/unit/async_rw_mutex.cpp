@@ -5,11 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/mutex.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/async_rw_mutex.hpp>
+#include <hpx/mutex.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -201,10 +200,13 @@ void test_multiple_accesses(
     std::atomic<std::size_t> count{0};
 
     // Read-only and read-write access return senders of different types
+    // clang-format off
     using r_sender_type = std::decay_t<decltype(
         rwm.read() | transfer(exec) | then(checker{true, 0, count, 0}))>;
     using rw_sender_type = std::decay_t<decltype(
         rwm.readwrite() | transfer(exec) | then(checker{false, 0, count, 0}))>;
+    // clang-format on
+
     std::vector<r_sender_type> r_senders;
     std::vector<rw_sender_type> rw_senders;
 

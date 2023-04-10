@@ -7,10 +7,10 @@
 // This is a purely local version demonstrating different versions of making
 // the calculation of a fibonacci asynchronous.
 
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/format.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <cstddef>
 #include <cstdint>

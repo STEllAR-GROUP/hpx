@@ -11,6 +11,7 @@
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -406,7 +407,8 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it1, Iter2 it2, std::size_t count, T init, Reduce r,
             Convert conv)
         {
-            constexpr std::size_t block_size = HPX_LANE_SIZE / (sizeof(T) * 8);
+            constexpr std::size_t block_size = (std::max)(
+                HPX_LANE_SIZE / (sizeof(T) * 8), static_cast<std::size_t>(1));
 
             // To small, just run sequential
             if (count <= 2 * block_size)

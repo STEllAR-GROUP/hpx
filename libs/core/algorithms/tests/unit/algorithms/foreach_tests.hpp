@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <hpx/local/execution.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/for_each.hpp>
 
 #include <cstddef>
 #include <functional>

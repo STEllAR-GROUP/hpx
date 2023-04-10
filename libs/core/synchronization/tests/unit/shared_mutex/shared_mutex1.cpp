@@ -6,12 +6,12 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/async_local/post.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/shared_mutex.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/shared_mutex.hpp>
+#include <hpx/thread.hpp>
 
+#include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>

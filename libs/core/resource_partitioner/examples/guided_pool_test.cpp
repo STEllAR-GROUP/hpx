@@ -12,6 +12,8 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -72,7 +74,7 @@ std::string a_function(hpx::future<double>&& df)
     return "The number 2";
 }
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     struct guided_test_tag
     {
@@ -119,7 +121,7 @@ namespace hpx { namespace parallel { namespace execution {
             return 56;
         }
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 using namespace hpx::parallel::execution;
 

@@ -4,10 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -42,12 +42,12 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_get_chunk_size> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_chunk_size
 {
@@ -61,14 +61,14 @@ struct test_chunk_size
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
     template <>
     struct is_executor_parameters<test_chunk_size> : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_get_chunk_size()
@@ -136,12 +136,12 @@ struct test_executor_measure_iteration : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_measure_iteration> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_measure_iteration
 {
@@ -153,14 +153,14 @@ struct test_measure_iteration
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     /// \cond NOINTERNAL
     template <>
     struct is_executor_parameters<test_measure_iteration> : std::true_type
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_get_measure_iteration()
@@ -210,13 +210,13 @@ struct test_executor_maximal_number_of_chunks
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_maximal_number_of_chunks>
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_number_of_chunks
 {
@@ -229,12 +229,12 @@ struct test_number_of_chunks
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<test_number_of_chunks> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_maximal_number_of_chunks()
@@ -281,13 +281,13 @@ struct test_executor_reset_thread_distribution
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_reset_thread_distribution>
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_thread_distribution
 {
@@ -298,12 +298,12 @@ struct test_thread_distribution
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<test_thread_distribution> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_reset_thread_distribution()
@@ -351,13 +351,13 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_processing_units_count>
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_processing_units
 {
@@ -370,12 +370,12 @@ struct test_processing_units
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<test_processing_units> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_processing_units_count()
@@ -471,12 +471,12 @@ struct test_executor_begin_end : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_executor_begin_end> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_begin_end
 {
@@ -499,12 +499,12 @@ struct test_begin_end
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<test_begin_end> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_mark_begin_execution()

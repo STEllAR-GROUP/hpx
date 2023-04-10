@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/tuple.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/tuple.hpp>
 
 #include <iostream>
 

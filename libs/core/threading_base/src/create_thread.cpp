@@ -88,7 +88,6 @@ namespace hpx::threads::detail {
         // create the new thread
         scheduler->create_thread(data, &id, ec);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         LTM_(info)
             .format("create_thread: pool({}), scheduler({}), thread({}), "
                     "initial_state({}), run_now({})",

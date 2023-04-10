@@ -6,13 +6,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/thread.hpp>
+#include <hpx/unwrap.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -67,7 +67,7 @@ struct additional_argument_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_one_way_executor<additional_argument_executor> : std::true_type
     {
@@ -77,7 +77,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_two_way_executor<additional_argument_executor> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 std::atomic<std::uint32_t> void_f_count;
 std::atomic<std::uint32_t> int_f_count;

@@ -4,12 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/condition_variable.hpp>
+#include <hpx/exception.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/condition_variable.hpp>
-#include <hpx/local/exception.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/mutex.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/mutex.hpp>
 #include <hpx/runtime_local/run_as_hpx_thread.hpp>
 
 #include <functional>

@@ -7,9 +7,9 @@
 // This example demonstrates the use of a channel which is very similar to the
 // equally named feature in the Go language.
 
-#include <hpx/local/channel.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/channel.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 #include <numeric>

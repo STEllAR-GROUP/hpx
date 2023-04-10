@@ -10,10 +10,10 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include "worker_timed.hpp"
 
@@ -66,12 +66,12 @@ struct disable_stealing_parameter
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<disable_stealing_parameter> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 void measure_plain_for(std::vector<std::size_t> const& data_representation)

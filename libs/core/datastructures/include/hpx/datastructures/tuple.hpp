@@ -401,6 +401,7 @@ namespace hpx {
                 std::enable_if_t<!std::is_same_v<tuple, std::decay_t<UTuple>>>,
             typename EnableCompatible = std::enable_if_t<
                 hpx::detail::are_tuples_compatible<tuple, UTuple>::value>>
+        // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
         constexpr HPX_HOST_DEVICE tuple(UTuple&& other)
           : tuple(index_pack{}, HPX_FORWARD(UTuple, other))
         {

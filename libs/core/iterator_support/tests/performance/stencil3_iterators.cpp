@@ -4,11 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/init.hpp>
-#include <hpx/local/tuple.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/tuple.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -24,7 +24,7 @@ int test_count = 100;
 int partition_size = 10000;
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace experimental { namespace detail {
+namespace hpx::experimental::detail {
     template <typename Iterator>
     HPX_FORCEINLINE Iterator previous(Iterator it, std::false_type)
     {
@@ -60,11 +60,11 @@ namespace hpx { namespace experimental { namespace detail {
     {
         return next(it, hpx::traits::is_random_access_iterator<Iterator>());
     }
-}}}    // namespace hpx::experimental::detail
+}    // namespace hpx::experimental::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 // Version of stencil3_iterator which handles boundary elements internally
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator, typename IterBegin = Iterator,
         typename IterValueBegin = Iterator, typename IterEnd = IterBegin,
@@ -255,7 +255,7 @@ namespace hpx { namespace experimental {
             begin, begin, begin_val, detail::previous(end), end_val);
         return std::make_pair(b, make_stencil3_full_iterator<decltype(b)>(end));
     }
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental
 
 std::uint64_t bench_stencil3_iterator_full()
 {
@@ -281,7 +281,7 @@ std::uint64_t bench_stencil3_iterator_full()
 
 ///////////////////////////////////////////////////////////////////////////////
 // compare with unchecked stencil3_iterator (version 1)
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
     template <typename Iterator>
     class stencil3_iterator_v1
       : public util::detail::zip_iterator_base<
@@ -328,7 +328,7 @@ namespace hpx { namespace experimental {
         return std::make_pair(
             make_stencil3_iterator_v1(begin), make_stencil3_iterator_v1(end));
     }
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental
 
 std::uint64_t bench_stencil3_iterator_v1()
 {
@@ -358,7 +358,7 @@ std::uint64_t bench_stencil3_iterator_v1()
 
 ///////////////////////////////////////////////////////////////////////////////
 // compare with unchecked stencil3_iterator (version 2)
-namespace hpx { namespace experimental {
+namespace hpx::experimental {
     namespace detail {
         struct stencil_transformer_v2
         {
@@ -437,7 +437,7 @@ namespace hpx { namespace experimental {
         return std::make_pair(
             make_stencil3_iterator_v2(begin), make_stencil3_iterator_v2(end));
     }
-}}    // namespace hpx::experimental
+}    // namespace hpx::experimental
 
 std::uint64_t bench_stencil3_iterator_v2()
 {

@@ -9,7 +9,7 @@
 // intended for inclusion in the documentation.
 
 //[body
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 
 #include <iostream>

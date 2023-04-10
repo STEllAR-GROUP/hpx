@@ -6,18 +6,16 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 
-#include <hpx/config.hpp>
+#include <hpx/datastructures/serialization/serializable_any.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/testing.hpp>
+#include <hpx/serialization/serialize.hpp>
 
 #include <cstddef>
 #include <cstdio>    // remove
 #include <fstream>
 #include <typeinfo>
 #include <vector>
-
-#include <hpx/datastructures/serialization/serializable_any.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/modules/testing.hpp>
-#include <hpx/serialization/serialize.hpp>
 
 #include "small_big_object.hpp"
 

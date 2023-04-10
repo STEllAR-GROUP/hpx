@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/transform_reduce.hpp>
+#include <hpx/numeric.hpp>
 
 #include <algorithm>
 #include <cstddef>
