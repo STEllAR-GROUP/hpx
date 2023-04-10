@@ -6,8 +6,8 @@
 
 // This compile-only test case verifies that #2035 remains fixed
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <array>

@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #1623: hpx::wait_all()
 // invoked with two vector<future<T>> fails
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <vector>

@@ -7,10 +7,10 @@
 // This example was released to the public domain by Stephan T. Lavavej
 // (see: https://channel9.msdn.com/Shows/C9-GoingNative/GoingNative-40-Updated-STL-in-VS-2015-feat-STL)
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/shared_mutex.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/shared_mutex.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <atomic>

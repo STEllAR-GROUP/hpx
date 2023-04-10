@@ -10,13 +10,13 @@
 // Clang V11 ICE's on this test
 #if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) != 11
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/async_base.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/rotate.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <iostream>

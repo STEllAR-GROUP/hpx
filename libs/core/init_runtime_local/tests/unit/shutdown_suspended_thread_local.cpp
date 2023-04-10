@@ -7,11 +7,10 @@
 // This test checks that the runtime takes into account suspended threads before
 // initiating full shutdown.
 
-#include <hpx/config.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 

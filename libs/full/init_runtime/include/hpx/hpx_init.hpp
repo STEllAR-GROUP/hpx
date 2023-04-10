@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -14,6 +14,7 @@
 #include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init_params.hpp>
+#include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/resource_partitioner/partitioner_fwd.hpp>
@@ -23,9 +24,6 @@
 
 #include <cstddef>
 #include <functional>
-#include <memory>
-#include <string>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \namespace hpx

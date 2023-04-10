@@ -7,8 +7,8 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/chrono.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/chrono.hpp>
 
 #include "jacobi_component/grid.hpp"
 #include "jacobi_component/solver.hpp"

@@ -8,9 +8,9 @@
 // make_ready_future_after to orchestrate timed operations with 'normal'
 // asynchronous work.
 
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <chrono>
 #include <iostream>

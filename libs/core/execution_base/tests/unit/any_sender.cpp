@@ -4,11 +4,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution_base/any_sender.hpp>
-#include <hpx/execution_base/sender.hpp>
-#include <hpx/functional/bind_front.hpp>
-#include <hpx/functional/invoke_fused.hpp>
-#include <hpx/local/execution.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
 

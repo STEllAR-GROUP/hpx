@@ -9,13 +9,12 @@
 #pragma once
 
 #include <hpx/concepts/concepts.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/runtime.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/iterator_support.hpp>
+#include <hpx/runtime.hpp>
 
 #include <atomic>
 #include <cstddef>
-#include <iostream>
 #include <numeric>
 #include <random>
 #include <utility>

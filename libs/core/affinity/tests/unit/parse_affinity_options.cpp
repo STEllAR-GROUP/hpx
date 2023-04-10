@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/affinity/parse_affinity_options.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/modules/affinity.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>

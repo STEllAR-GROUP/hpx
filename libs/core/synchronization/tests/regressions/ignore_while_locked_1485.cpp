@@ -9,10 +9,10 @@
 // `ignore_all_while_checking` can be used instead to ignore all locks
 // (including the ones that are not supported by `ignore_while_checking`).
 
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <functional>

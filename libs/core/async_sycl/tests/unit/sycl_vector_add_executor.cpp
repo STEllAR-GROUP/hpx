@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Gregor Dai√ü
+//  Copyright (c) 2022 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,18 +6,19 @@
 //
 // hpxinspect:noascii
 
+#include <hpx/config.hpp>
+#include <hpx/future.hpp>
+#include <hpx/hpx_init.hpp>
+
+#if defined(HPX_HAVE_SYCL)
+#include <hpx/async_sycl/sycl_executor.hpp>
+#include <hpx/async_sycl/sycl_future.hpp>
+
 #include <algorithm>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <hpx/futures/future.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/local/future.hpp>
-#if defined(HPX_HAVE_SYCL)
-#include <hpx/async_sycl/sycl_executor.hpp>
-#include <hpx/async_sycl/sycl_future.hpp>
 
 #include "common/sycl_vector_add_test_utils.hpp"
 
@@ -249,7 +250,7 @@ void VectorAdd_test4(std::vector<size_t> const& a_vector,
     my_manual_fut.get();
 }
 
-int hpx_main(int, char**)
+int hpx_main(int, char*[])
 {
     static_assert(vector_size >= 6, "vector_size unreasonably small");
     // Enable polling for the future
@@ -303,6 +304,8 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv);
 }
 #else
+#include <iostream>
+
 // Handle none-sycl builds
 int main()
 {

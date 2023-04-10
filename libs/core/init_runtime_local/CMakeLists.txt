@@ -8,12 +8,22 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(init_runtime_local_headers
-    hpx/init_runtime_local/detail/init_logging.hpp
-    hpx/init_runtime_local/init_runtime_local.hpp hpx/local/init.hpp
+set(init_runtime_local_headers hpx/init_runtime_local/detail/init_logging.hpp
+                               hpx/init_runtime_local/init_runtime_local.hpp
 )
 
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(init_runtime_local_headers ${init_runtime_local_headers} hpx/init.hpp)
+endif()
+
 set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
+
+# The headers in hpx/local/ were deprecated in HPX V1.9.0
+# cmake-format: off
+set(init_runtime_local_compat_headers
+    hpx/local/init.hpp => hpx/init.hpp
+)
+# cmake-format: on
 
 include(HPX_AddModule)
 add_hpx_module(
@@ -21,6 +31,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
+  COMPAT_HEADERS ${init_runtime_local_compat_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
     hpx_command_line_handling_local

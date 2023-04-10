@@ -7,9 +7,9 @@
 // This example is meant for inclusion in the documentation.
 
 //[barrier_docs
-#include <hpx/local/barrier.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/barrier.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 

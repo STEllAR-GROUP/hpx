@@ -1,5 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,9 +27,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // One of these functions must be implemented by the application for the
 // console locality.
-int hpx_main();
-int hpx_main(int argc, char** argv);
-int hpx_main(hpx::program_options::variables_map& vm);
+//
+// int hpx_main();
+// int hpx_main(int argc, char* argv[]);
+// int hpx_main(hpx::program_options::variables_map& vm);
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////

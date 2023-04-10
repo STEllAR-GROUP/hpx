@@ -12,13 +12,13 @@
 #define NUMA_BINDING_ALLOCATOR_DEBUG true
 #define NUMA_BINDING_ALLOCATOR_INIT_MEMORY true
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/runtime.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/resource_partitioner/partitioner.hpp>
-#include <hpx/thread_pools/scheduled_thread_pool_impl.hpp>
-#include <hpx/topology/cpu_mask.hpp>
+#include <hpx/modules/thread_pools.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/runtime.hpp>
 
 #include <cmath>
 #include <cstddef>

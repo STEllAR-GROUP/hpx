@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/experimental/task_group.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/task_group.hpp>
 
 #include <cstddef>
 #include <iostream>

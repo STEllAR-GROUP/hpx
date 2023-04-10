@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/modules/iterator_support.hpp>
 
 #include <algorithm>

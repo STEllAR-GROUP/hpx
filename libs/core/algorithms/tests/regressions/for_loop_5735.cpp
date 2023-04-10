@@ -6,9 +6,9 @@
 
 // fixes #5735: hpx::for_loop executes without checking start and end bounds
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 

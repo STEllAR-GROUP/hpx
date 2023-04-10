@@ -5,10 +5,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/chrono.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/init.hpp>
 
 #include <cstddef>
 #include <cstdint>

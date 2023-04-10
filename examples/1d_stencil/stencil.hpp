@@ -6,11 +6,11 @@
 
 #pragma once
 
+#include <hpx/algorithm.hpp>
+#include <hpx/compute.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
-#include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/util.hpp>
 
 #include <algorithm>

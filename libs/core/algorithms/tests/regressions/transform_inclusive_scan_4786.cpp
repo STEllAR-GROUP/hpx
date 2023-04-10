@@ -7,9 +7,10 @@
 // see #4786: transform_inclusive_scan tries to implicitly convert between
 //            types, instead of using the provided `conv` function
 
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
+#include <hpx/numeric.hpp>
 
 #include <vector>
 

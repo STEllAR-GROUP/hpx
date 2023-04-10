@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/local/source_location.hpp>
+#include <hpx/parallel/task_group.hpp>

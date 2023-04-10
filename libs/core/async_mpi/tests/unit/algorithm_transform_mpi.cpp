@@ -4,14 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/datastructures/variant.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/executors.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/tuple.hpp>
 
 #include "algorithm_test_utils.hpp"
 

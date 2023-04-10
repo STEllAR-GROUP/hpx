@@ -4,13 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/executors/execution_policy.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/executors/datapar/execution_policy.hpp>
-#endif
-#include <hpx/local/init.hpp>
-#include <hpx/modules/program_options.hpp>
+#include <hpx/datapar.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/program_options.hpp>
 
 #include <type_traits>
 

@@ -6,4 +6,7 @@
 
 #pragma once
 
-#include <hpx/local/chrono.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/parallel/container_memory.hpp>
+#include <hpx/parallel/memory.hpp>
+#include <hpx/type_support/construct_at.hpp>

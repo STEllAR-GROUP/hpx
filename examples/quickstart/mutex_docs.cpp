@@ -7,9 +7,9 @@
 // This example is meant for inclusion in the documentation.
 
 //[mutex_docs
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/mutex.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/mutex.hpp>
 
 #include <iostream>
 

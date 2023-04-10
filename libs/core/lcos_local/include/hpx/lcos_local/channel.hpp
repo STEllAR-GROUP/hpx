@@ -1197,3 +1197,8 @@ namespace hpx::lcos::local {
     {
     }
 }    // namespace hpx::lcos::local
+
+namespace hpx {
+
+    using hpx::lcos::local::channel;
+}

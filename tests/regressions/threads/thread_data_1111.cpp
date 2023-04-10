@@ -7,8 +7,8 @@
 // This test illustrates #1111: hpx::threads::get_thread_data always returns zero
 
 #include <hpx/hpx_main.hpp>
-#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <iostream>

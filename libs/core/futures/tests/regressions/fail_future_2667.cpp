@@ -9,8 +9,8 @@
 //
 // This test is supposed to fail compiling.
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <chrono>
 #include <utility>

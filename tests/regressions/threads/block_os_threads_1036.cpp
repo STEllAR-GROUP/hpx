@@ -7,13 +7,13 @@
 // This test demonstrates the issue described in #1036: Scheduler hangs when
 // user code attempts to "block" OS-threads
 
-#include <hpx/functional/bind.hpp>
+#include <hpx/barrier.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/barrier.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/topology/topology.hpp>
+#include <hpx/modules/topology.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstdint>

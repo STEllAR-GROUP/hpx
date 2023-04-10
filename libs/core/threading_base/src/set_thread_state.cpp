@@ -45,7 +45,6 @@ namespace hpx::threads::detail {
         if (current_state.state() == previous_state.state() &&
             current_state != previous_state)
         {
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(warning).format(
                 "set_active_state: thread is still active, however it was "
                 "non-active since the original set_state request was issued, "
@@ -102,7 +101,6 @@ namespace hpx::threads::detail {
             // nothing to do here if the state doesn't change
             if (new_state == previous_state_val)
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LTM_(warning).format(
                     "set_thread_state: old thread state is the same as new "
                     "thread state, aborting state change, thread({}), "
@@ -125,7 +123,6 @@ namespace hpx::threads::detail {
                 if (retry_on_active)
                 {
                     // schedule a new thread to set the state
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(warning).format(
                         "set_thread_state: thread is currently active, "
                         "scheduling new thread, thread({}), description({}), "
@@ -150,7 +147,6 @@ namespace hpx::threads::detail {
                         k, "hpx::threads::detail::set_thread_state");
                     ++k;
 
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(warning).format(
                         "set_thread_state: thread is currently active, but not "
                         "scheduling new thread because retry_on_active = "
@@ -170,7 +166,6 @@ namespace hpx::threads::detail {
 
             case thread_schedule_state::terminated:
             {
-                // NOLINTNEXTLINE(bugprone-branch-clone)
                 LTM_(warning).format(
                     "set_thread_state: thread is terminated, aborting state "
                     "change, thread({}), description({}), new state({})",
@@ -200,7 +195,6 @@ namespace hpx::threads::detail {
                         thrd, get_thread_id_data(thrd)->get_description(),
                         new_state);
 
-                    // NOLINTNEXTLINE(bugprone-branch-clone)
                     LTM_(fatal) << str;
 
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -230,7 +224,6 @@ namespace hpx::threads::detail {
             // some point will ignore this thread by simply skipping it (if it's
             // not pending anymore).
 
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(info).format("set_thread_state: thread({}), description({}), "
                               "new state({}), old state({})",
                 thrd, get_thread_id_data(thrd)->get_description(),
@@ -245,7 +238,6 @@ namespace hpx::threads::detail {
             }
 
             // state has changed since we fetched it from the thread, retry
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             LTM_(warning).format(
                 "set_thread_state: state has been changed since it was "
                 "fetched, retrying, thread({}), description({}), new "

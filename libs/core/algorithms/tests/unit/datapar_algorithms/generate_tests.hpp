@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <hpx/execution/traits/vector_pack_type.hpp>
-#include <hpx/include/datapar.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/datapar.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/generate.hpp>
 
 #include <cstddef>
 #include <iostream>

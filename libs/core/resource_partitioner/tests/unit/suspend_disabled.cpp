@@ -6,11 +6,11 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/thread_pool_util/thread_pool_suspension_helpers.hpp>
+#include <hpx/modules/thread_pool_util.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <stdexcept>

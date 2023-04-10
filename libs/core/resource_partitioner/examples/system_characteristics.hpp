@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/local/runtime.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/runtime.hpp>
 
 #include <iostream>
 

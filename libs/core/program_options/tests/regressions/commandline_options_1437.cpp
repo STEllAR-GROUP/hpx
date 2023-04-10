@@ -6,7 +6,7 @@
 //
 // Demonstrating #1437: hpx::init() should strip HPX-related flags from argv
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 bool invoked_main = false;

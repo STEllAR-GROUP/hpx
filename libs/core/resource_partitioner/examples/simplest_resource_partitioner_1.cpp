@@ -8,7 +8,7 @@
 // intended for inclusion in the documentation.
 
 //[body
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 
 int hpx_main()
 {
