@@ -63,8 +63,8 @@ static_assert(hpx::is_relocatable_v<int&>);
 static_assert(hpx::is_relocatable_v<int&&>);
 static_assert(hpx::is_relocatable_v<int (&)()>);
 static_assert(hpx::is_relocatable_v<std::mutex&>);
-static_assert(std::relocatable<NotMoveConstructible&>);
-static_assert(std::relocatable<NotCopyConstructible&>);
-static_assert(std::relocatable<NotDestructible&>);
+static_assert(hpx::is_relocatable_v<NotMoveConstructible&>);
+static_assert(hpx::is_relocatable_v<NotCopyConstructible&>);
+static_assert(hpx::is_relocatable_v<NotDestructible&>);
 
 int main(int, char*[]) {}
