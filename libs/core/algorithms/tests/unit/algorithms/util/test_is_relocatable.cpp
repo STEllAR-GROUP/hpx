@@ -16,7 +16,7 @@
 static_assert(hpx::relocatable<int>);
 static_assert(hpx::relocatable<const int>);
 static_assert(hpx::relocatable<int*>);
-static_assert(hpx::relocatable<int(*)()>);
+static_assert(hpx::relocatable<int (*)()>);
 
 // Array types are not move-constructible and thus not relocatable
 static_assert(!hpx::relocatable<int[]>);
@@ -34,7 +34,8 @@ static_assert(!hpx::relocatable<const void>);
 // std::mutex is not relocatable
 static_assert(!hpx::relocatable<std::mutex>);
 
-struct NotDestructible {
+struct NotDestructible
+{
     NotDestructible(const NotDestructible&);
     NotDestructible(NotDestructible&&);
     ~NotDestructible() = delete;
@@ -42,14 +43,16 @@ struct NotDestructible {
 
 static_assert(!hpx::relocatable<NotDestructible>);
 
-struct NotMoveConstructible {
+struct NotMoveConstructible
+{
     NotMoveConstructible(const NotMoveConstructible&);
     NotMoveConstructible(NotMoveConstructible&&) = delete;
 };
 
 static_assert(!hpx::relocatable<NotMoveConstructible>);
 
-struct NotCopyConstructible {
+struct NotCopyConstructible
+{
     NotCopyConstructible(const NotCopyConstructible&) = delete;
     NotCopyConstructible(NotCopyConstructible&&);
 };
@@ -59,12 +62,10 @@ static_assert(hpx::relocatable<NotCopyConstructible>);
 // reference types are relocatable
 static_assert(hpx::relocatable<int&>);
 static_assert(hpx::relocatable<int&&>);
-static_assert(hpx::relocatable<int(&)()>);
+static_assert(hpx::relocatable<int (&)()>);
 static_assert(hpx::relocatable<std::mutex&>);
 static_assert(std::relocatable<NotMoveConstructible&>);
 static_assert(std::relocatable<NotCopyConstructible&>);
 static_assert(std::relocatable<NotDestructible&>);
 
-int main(int, char*[])
-{
-}
+int main(int, char*[]) {}
