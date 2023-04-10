@@ -1,5 +1,4 @@
-//  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2023 Isidoros Tsaousis Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
