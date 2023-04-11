@@ -577,4 +577,8 @@ namespace hpx::meta {
     inline constexpr bool is_derived_from_v = std::is_base_of_v<Base, Derived>&&
         std::is_convertible_v<const volatile Derived*, const volatile Base*>;
 
+    template <typename Ty>
+    inline constexpr bool is_nothrow_decay_copyable_v =
+        is_nothrow_constructible_from_v<std::decay_t<Ty>, Ty>;
+
 }    // namespace hpx::meta

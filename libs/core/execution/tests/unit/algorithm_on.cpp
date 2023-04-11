@@ -396,5 +396,32 @@ int main()
         HPX_ASSERT(recv_value == 13);
     }
 
+    {
+        bool called{false};
+        auto snd_base = ex::just()    //
+            | ex::then([&]() -> int {
+                  called = true;
+                  return 19;
+              });
+
+        int recv_value{0};
+        impulse_scheduler sched;
+        auto snd = ex::on(sched, std::move(snd_base));
+        // static_assert(std::is_same_v<int,decltype(snd)>);
+        auto op =
+            ex::connect(std::move(snd), expect_value_receiver_ex{recv_value});
+        ex::start(op);
+        // Up until this point, the scheduler didn't start any task
+        // The base sender shouldn't be started
+        HPX_ASSERT(called == false);
+
+        // Tell the scheduler to start executing one task
+        sched.start_next();
+
+        // Now the base sender is called, and a value is sent to the receiver
+        HPX_ASSERT(called);
+        HPX_ASSERT(recv_value == 19);
+    }
+
     return hpx::util::report_errors();
 }
