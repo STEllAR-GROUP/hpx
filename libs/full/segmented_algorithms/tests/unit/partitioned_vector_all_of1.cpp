@@ -29,9 +29,10 @@ void initialize(hpx::partitioned_vector<T>& xvalues)
     T init_array[SIZE] = {1, 2, 3, 4, 5, 1, 2, 3, 3, 5, 5, 3, 4, 2, 3, 2, 1, 2,
         3, 4, 5, 6, 5, 6, 1, 2, 3, 4, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 2, 3, 4,
         1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 7, 6, 5, 7, 5, 4, 2, 3, 4, 5, 2};
-    for (int i = 0; i < SIZE; i++)
+    typename hpx::partitioned_vector<T>::iterator it = xvalues.begin();
+    for (int i = 0; i < SIZE; i++, it++)
     {
-        xvalues.set_value(i, init_array[i]);
+        *it = init_array[i];
     }
 }
 
