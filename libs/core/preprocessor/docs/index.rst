@@ -13,11 +13,11 @@ preprocessor
 
 This library contains useful preprocessor macros:
 
-* :c:macro:`HPX_PP_CAT`
-* :c:macro:`HPX_PP_EXPAND`
-* :c:macro:`HPX_PP_NARGS`
-* :c:macro:`HPX_PP_STRINGIZE`
-* :c:macro:`HPX_PP_STRIP_PARENS`
+* :c:macro:`HPX_PP_CAT`: Concatenate two tokens
+* :c:macro:`HPX_PP_EXPAND`: Expands a preprocessor token
+* :c:macro:`HPX_PP_NARGS`: Determines the number of arguments passed to a variadic macro
+* :c:macro:`HPX_PP_STRINGIZE`: Turns a token into a string
+* :c:macro:`HPX_PP_STRIP_PARENS`: Strips parenthesis from a token
 
 See the :ref:`API reference <modules_preprocessor_api>` of the module for more
 details.
