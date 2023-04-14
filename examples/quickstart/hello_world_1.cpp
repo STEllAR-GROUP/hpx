@@ -19,6 +19,20 @@
 
 namespace ex = hpx::execution::experimental;
 
+auto sender_fib(std::uint64_t n)
+{
+    if (n < 2)
+        return ex::any_sender<>{ex::just(n)};
+
+    auto res1 = sender_fib(n - 1);
+    auto res2 = sender_fib(n - 2);
+
+    ex::any_sender<> total_res = ex::when_all(res1, res2);
+
+    return total_res;
+
+}
+
 std::uint64_t dummy_sender_fib(std::uint64_t n)
 {
     if (n < 2)
@@ -44,9 +58,12 @@ std::uint64_t future_fib(std::uint64_t n)
 int main()
 {
     // Say hello to the world!
-    future_fib(20);
-    //std::cout << dummy_sender_fib(20) << std::endl;
+    std::cout << future_fib(20)       << std::endl;
     std::cout << dummy_sender_fib(20) << std::endl;
+
+    //auto snd_fib = hpx::this_thread::experimental::sync_wait(sender_fib(20)).value();
+    sender_fib(20);
+    //std::cout << std::get<0>(snd_fib) << std::endl;
     return 0;
 }
 //]
