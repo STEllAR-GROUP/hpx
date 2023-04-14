@@ -38,7 +38,7 @@ void initialize(hpx::partitioned_vector<T>& xvalues)
 struct op5
 {
     template <typename T>
-    bool operator()(T& value)
+    bool operator()(T& value) const
     {
         return value > 5;
     }
@@ -47,7 +47,7 @@ struct op5
 struct op0
 {
     template <typename T>
-    bool operator()(T& value)
+    bool operator()(T& value) const
     {
         return value > 0;
     }
@@ -56,7 +56,7 @@ struct op0
 struct op8
 {
     template <typename T>
-    bool operator()(T& value)
+    bool operator()(T& value) const
     {
         return value > 8;
     }
