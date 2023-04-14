@@ -19,28 +19,15 @@
 
 namespace ex = hpx::execution::experimental;
 
-std::uint64_t sender_fib(std::uint64_t n)
+std::uint64_t dummy_sender_fib(std::uint64_t n)
 {
     if (n < 2)
         return n;
 
-    //std::vector<hpx::future<std::uint64_t>> senders;
+    auto res1 = hpx::this_thread::experimental::sync_wait(ex::just(dummy_sender_fib(n - 1))).value();
+    auto res2 = hpx::this_thread::experimental::sync_wait(ex::just(dummy_sender_fib(n - 2))).value();
 
-    std::vector<ex::any_sender<std::uint64_t>> senders;
-
-    senders.emplace_back(ex::just(sender_fib(n - 1)));
-    senders.emplace_back(ex::just(sender_fib(n - 2)));
-
-    //senders.emplace_back(ex::as_sender(hpx::async(sender_fib, n - 2)));
-
-    auto cont = ex::when_all_vector(std::move(senders));
-
-    //auto cont2 = hpx::execution::experimental::then(cont, [](auto... args) {return args; });
-    //auto s1 = hpx::execution::experimental::as_sender(hpx::async(sender_fib, n - 2));
-
-     ex::start_detached(cont);
-    // return std::get<0>(res);
-    return 42;
+    return std::get<0>(res1) + std::get<0>(res2);
 }
 
 std::uint64_t future_fib(std::uint64_t n)
@@ -57,9 +44,9 @@ std::uint64_t future_fib(std::uint64_t n)
 int main()
 {
     // Say hello to the world!
-    std::cout << future_fib(20) << std::endl;
-    //std::cout << sender_fib(20) << std::endl;
-    sender_fib(20);
+    future_fib(20);
+    //std::cout << dummy_sender_fib(20) << std::endl;
+    std::cout << dummy_sender_fib(20) << std::endl;
     return 0;
 }
 //]
