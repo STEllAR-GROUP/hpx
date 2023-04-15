@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2017 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2018 Nikunj Gupta
 #
@@ -83,15 +83,15 @@ endif()
 install(
   TARGETS hpx_init
   EXPORT HPXInternalTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT runtime
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT hpx_init
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT hpx_init
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT hpx_init
 )
 
 install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-  COMPONENT runtime
+  COMPONENT core
 )
 
 # install PDB if needed
@@ -103,6 +103,7 @@ if(MSVC)
       FILES ${_pdb_dir}/${_pdb_file}.pdb
       DESTINATION ${CMAKE_INSTALL_LIBDIR}
       CONFIGURATIONS ${cfg}
+      COMPONENT runtime
       OPTIONAL
     )
   endforeach()

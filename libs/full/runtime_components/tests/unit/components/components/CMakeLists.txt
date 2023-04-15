@@ -1,4 +1,4 @@
-# Copyright (c) 2016 Hartmut Kaiser
+# Copyright (c) 2016-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 add_hpx_component(
   launch_process_test_server INTERNAL_FLAGS
+  INSTALL_COMPONENT tests
   FOLDER "Tests/Unit/Modules/Full/Components"
   EXCLUDE_FROM_ALL AUTOGLOB
 )

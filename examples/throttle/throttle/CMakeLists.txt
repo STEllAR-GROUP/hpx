@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,6 +28,7 @@ source_group("Header Files\\Server" FILES ${server_headers})
 # ##############################################################################
 add_hpx_component(
   throttle INTERNAL_FLAGS NOEXPORT
+  INSTALL_COMPONENT examples
   SOURCES ${client_sources} ${server_sources}
   HEADERS ${headers}
   FOLDER "Examples/Throttle"

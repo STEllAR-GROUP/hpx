@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -180,9 +180,9 @@ function(add_hpx_library name)
     # cmake-format: off
     set(_target_flags
         INSTALL INSTALL_FLAGS
-          LIBRARY DESTINATION ${library_install_destination}
-          ARCHIVE DESTINATION ${archive_install_destination}
-          RUNTIME DESTINATION ${runtime_install_destination}
+          LIBRARY DESTINATION ${library_install_destination} COMPONENT runtime
+          ARCHIVE DESTINATION ${archive_install_destination} COMPONENT runtime
+          RUNTIME DESTINATION ${runtime_install_destination} COMPONENT runtime
     )
     # cmake-format: on
 
@@ -196,6 +196,7 @@ function(add_hpx_library name)
           ${_target_flags}
           INSTALL_PDB $<TARGET_PDB_FILE:${name}>
             DESTINATION ${runtime_install_destination}
+            COMPONENT runtime
           CONFIGURATIONS Debug RelWithDebInfo
           OPTIONAL
       )

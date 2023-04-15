@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -165,7 +165,9 @@ function(add_hpx_executable name)
     if(${name}_INSTALL_SUFFIX)
       set(install_destination ${${name}_INSTALL_SUFFIX})
     endif()
-    set(_target_flags INSTALL INSTALL_FLAGS DESTINATION ${install_destination})
+    set(_target_flags INSTALL INSTALL_FLAGS DESTINATION ${install_destination}
+                      COMPONENT executables
+    )
     # install PDB if needed
     if(MSVC
        AND NOT ${name}_STATIC
@@ -176,6 +178,7 @@ function(add_hpx_executable name)
           ${_target_flags}
           INSTALL_PDB $<TARGET_PDB_FILE:${name}>
             DESTINATION ${install_destination}
+            COMPONENT executables
           CONFIGURATIONS Debug RelWithDebInfo
           OPTIONAL
       )
