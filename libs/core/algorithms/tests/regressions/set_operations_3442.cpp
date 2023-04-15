@@ -15,9 +15,14 @@
 #include <string>
 #include <vector>
 
+#include "test_utils.hpp"
+
 #ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
 #include <execution>
 #endif
+
+int seed = std::random_device{}();
+std::mt19937 gen(seed);
 
 // returns random integer in range (rangeMin, rangeMax]
 struct RandomIntInRange
@@ -28,7 +33,7 @@ struct RandomIntInRange
       , rangeMax(rangeMax){};
     int operator()()
     {
-        return (rand() % (rangeMax - rangeMin + 1)) + rangeMin;
+        return (gen() % (rangeMax - rangeMin + 1)) + rangeMin;
     }
 };
 
@@ -36,7 +41,7 @@ void set_difference_randomized(int rounds, int maxLen)
 {
     while (rounds--)
     {
-        std::size_t len_a = rand() % maxLen, len_b = rand() % maxLen;
+        std::size_t len_a = gen() % maxLen, len_b = gen() % maxLen;
         std::vector<int> set_a(len_a), set_b(len_b);
 
         std::size_t rangeMin = 0;
