@@ -393,11 +393,18 @@ namespace hpx::parallel {
                     std::size_t start = (n - 2) / 2;
                     while (start > 0)
                     {
-                        // Index of start of level, and amount of items in level
+                        // Index of start of level, and amount of items in level above start
                         std::size_t const end_exclusive =
                             static_cast<std::size_t>(
-                                std::pow(2, std::floor(std::log2(start)))) -
-                            2;
+                                std::pow(2, std::floor(std::log2(start))));
+                        if (end_exclusive >= 2)
+                        {
+                            end_exclusive -= 2;
+                        }
+                        else
+                        {
+                            end_exclusive = 0;
+                        }
                         std::size_t level_items = start - end_exclusive;
 
                         // If we can't at least run two chunks in parallel,
