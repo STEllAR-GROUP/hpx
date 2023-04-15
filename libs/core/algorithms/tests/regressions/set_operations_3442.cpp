@@ -15,8 +15,6 @@
 #include <string>
 #include <vector>
 
-#include "test_utils.hpp"
-
 #ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
 #include <execution>
 #endif
