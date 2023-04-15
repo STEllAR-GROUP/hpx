@@ -394,16 +394,15 @@ namespace hpx::parallel {
                     while (start > 0)
                     {
                         // Index of start of level, and amount of items in level above start
-                        std::size_t const end_exclusive =
-                            static_cast<std::size_t>(
-                                std::pow(2, std::floor(std::log2(start))));
+                        std::size_t end_exclusive = static_cast<std::size_t>(
+                            std::pow(2, std::floor(std::log2(start))));
                         if (end_exclusive >= 2)
                         {
-                            end_exclusive -= 2;
+                            end_exclusive -= static_cast<std::size_t>(2);
                         }
                         else
                         {
-                            end_exclusive = 0;
+                            end_exclusive = static_cast<std::size_t>(0);
                         }
                         std::size_t level_items = start - end_exclusive;
 
