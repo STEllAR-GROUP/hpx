@@ -30,8 +30,8 @@ void test_make_heap_small1(IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t len = -1;
-    while (len++ < 15)
+    std::size_t len = 0;
+    while (len < 15)
     {
         std::vector<std::size_t> c(len);
         std::iota(hpx::util::begin(c), hpx::util::end(c), gen());
@@ -40,6 +40,7 @@ void test_make_heap_small1(IteratorTag)
             iterator(hpx::util::begin(c)), iterator(hpx::util::end(c)));
 
         HPX_TEST_EQ(std::is_heap(hpx::util::begin(c), hpx::util::end(c)), true);
+        len++;
     }
 }
 
@@ -66,8 +67,8 @@ void test_make_heap_small1(ExPolicy&& policy, IteratorTag)
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
-    std::size_t len = -1;
-    while (len++ < 15)
+    std::size_t len = 0;
+    while (len < 15)
     {
         std::vector<std::size_t> c(len);
         std::iota(hpx::util::begin(c), hpx::util::end(c), gen());
@@ -76,6 +77,7 @@ void test_make_heap_small1(ExPolicy&& policy, IteratorTag)
             policy, iterator(hpx::util::begin(c)), iterator(hpx::util::end(c)));
 
         HPX_TEST_EQ(std::is_heap(hpx::util::begin(c), hpx::util::end(c)), true);
+        len++;
     }
 }
 
