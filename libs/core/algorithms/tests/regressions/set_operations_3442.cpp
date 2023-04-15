@@ -187,6 +187,7 @@ void set_intersection_large_test(int rounds)
 void set_intersection_test(int rounds)
 {
     set_intersection_small_test1(rounds);
+    set_intersection_small_test2(rounds);
     set_intersection_medium_test(rounds);
     set_intersection_large_test(rounds);
 }
