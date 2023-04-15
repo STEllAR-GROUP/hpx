@@ -103,13 +103,31 @@ void set_difference_test(int rounds)
     set_difference_large_test(rounds);
 }
 
-void set_intersection_small_test(int rounds)
+void set_intersection_small_test1(int rounds)
 {
     std::vector<int> set_a{1, 2, 3, 4, 5};
     std::vector<int> set_b{1, 2, 7};
     std::vector<int> a_and_b(2);
 
     std::vector<int> perfect(2);
+    std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(),
+        set_b.end(), perfect.begin());
+
+    while (--rounds)
+    {
+        hpx::set_intersection(hpx::execution::par, set_a.begin(), set_a.end(),
+            set_b.begin(), set_b.end(), a_and_b.begin());
+        HPX_TEST(perfect == a_and_b);
+    }
+}
+
+void set_intersection_small_test2(int rounds)
+{
+    std::vector<int> set_a{-1, 1, 2, 3, 4, 5};
+    std::vector<int> set_b{0, 1, 2, 3, 8, 10};
+    std::vector<int> a_and_b(3);
+
+    std::vector<int> perfect(3);
     std::set_intersection(set_a.begin(), set_a.end(), set_b.begin(),
         set_b.end(), perfect.begin());
 
@@ -168,7 +186,7 @@ void set_intersection_large_test(int rounds)
 
 void set_intersection_test(int rounds)
 {
-    set_intersection_small_test(rounds);
+    set_intersection_small_test1(rounds);
     set_intersection_medium_test(rounds);
     set_intersection_large_test(rounds);
 }
