@@ -965,9 +965,7 @@ workflows:
             - tests.examples
             - tests.unit.algorithms
             - tests.unit.container_algorithms
-            # disable the dependency on the segmented algorithms
-            # temporarily to enable install to proceed
-            # - tests.unit.segmented_algorithms
+            - tests.unit.segmented_algorithms
             - tests.unit1
             - tests.unit2
             - tests.regressions
