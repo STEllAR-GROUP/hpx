@@ -389,11 +389,25 @@ namespace hpx::parallel {
 
                 try
                 {
-                    // Get workitems that are to be run in parallel
+                    // parent of last node
+                    // last node has index (n-1)
+                    // parent of x is floor of (x-1)/2
                     std::size_t start = (n - 2) / 2;
                     while (start > 0)
                     {
-                        // Index of start of level, and amount of items in level above start
+                        /*
+                            helps find number of elements
+                            in parent level of start
+                                    0
+                                1       2
+                              3   4   5   6
+                        
+                            (size of heap) n = 7 
+                            (parent of last element) start = 2 
+                            end_exclusive => 
+                                last element index in 
+                                    parent level of start
+                        */
                         std::size_t end_exclusive = static_cast<std::size_t>(
                             std::pow(2, std::floor(std::log2(start))));
                         if (end_exclusive >= 2)
