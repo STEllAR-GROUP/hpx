@@ -74,11 +74,21 @@ namespace hpx::parallel::detail {
 
     struct set_chunk_data
     {
-        std::size_t start = static_cast<std::size_t>(-1);
-        std::size_t len = static_cast<std::size_t>(-1);
-        std::size_t start_index = static_cast<std::size_t>(-1);
-        std::size_t first1 = static_cast<std::size_t>(-1);
-        std::size_t first2 = static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_start =
+            static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_len = static_cast<std::size_t>(0);
+        static constexpr std::size_t uninit_start_index =
+            static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_first1 =
+            static_cast<std::size_t>(-1);
+        static constexpr std::size_t uninit_first2 =
+            static_cast<std::size_t>(-1);
+
+        std::size_t start = uninit_start;
+        std::size_t len = uninit_len;
+        std::size_t start_index = uninit_start_index;
+        std::size_t first1 = uninit_first1;
+        std::size_t first2 = uninit_first2;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -246,9 +256,10 @@ namespace hpx::parallel::detail {
                     hpx::execution::par, chunks.get(), cores,
                     [buffer, dest](
                         set_chunk_data* ch, std::size_t, std::size_t) {
-                        if (ch->start == static_cast<std::size_t>(-1) ||
-                            ch->start_index == static_cast<std::size_t>(-1) ||
-                            ch->len == static_cast<std::size_t>(-1))
+                        if (ch->start == set_chunk_data::uninit_start ||
+                            ch->start_index ==
+                                set_chunk_data::uninit_start_index ||
+                            ch->len == set_chunk_data::uninit_len)
                         {
                             return;
                         }
