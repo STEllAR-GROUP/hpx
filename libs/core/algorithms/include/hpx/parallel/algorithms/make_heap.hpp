@@ -398,6 +398,9 @@ namespace hpx::parallel {
                         /*
                             helps find number of elements
                             in parent level of start
+                            The following are indexes of
+                            elements in the heap, not the
+                            value of the elements
                                     0
                                 1       2
                               3   4   5   6
