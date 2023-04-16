@@ -31,7 +31,7 @@ struct RandomIntInRange
       , rangeMax(rangeMax){};
     int operator()()
     {
-        return (gen() % (rangeMax - rangeMin + 1)) + rangeMin;
+        return (static_cast<int>(gen()) % (rangeMax - rangeMin + 1)) + rangeMin;
     }
 };
 
