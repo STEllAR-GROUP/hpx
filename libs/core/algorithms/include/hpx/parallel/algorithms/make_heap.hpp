@@ -404,11 +404,10 @@ namespace hpx::parallel {
                                     0
                                 1       2
                               3   4   5   6
-                        
-                            (size of heap) n = 7 
-                            (parent of last element) start = 2 
-                            end_exclusive => 
-                                last element index in 
+                            (size of heap) n = 7
+                            (parent of last element) start = 2
+                            end_exclusive =>
+                                last element index in
                                     parent level of start
                         */
                         std::size_t end_exclusive = static_cast<std::size_t>(
