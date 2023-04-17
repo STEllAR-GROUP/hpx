@@ -407,9 +407,9 @@ int main()
         int recv_value{0};
         impulse_scheduler sched;
         auto snd = ex::on(sched, std::move(snd_base));
-        // static_assert(std::is_same_v<int,decltype(snd)>);
         auto op =
             ex::connect(std::move(snd), expect_value_receiver_ex{recv_value});
+
         ex::start(op);
         // Up until this point, the scheduler didn't start any task
         // The base sender shouldn't be started

@@ -44,20 +44,10 @@ namespace hpx::execution::experimental {
                 using id = just_sender_operation_state;
                 using data_type = hpx::util::member_pack_for<Ts...>;
 
-                HPX_NO_UNIQUE_ADDRESS Receiver receiver;
+                type() = default;
+
                 HPX_NO_UNIQUE_ADDRESS data_type ts;
-
-                template <typename Receiver_>
-                type(Receiver_&& receiver, data_type ts)
-                  : receiver(HPX_FORWARD(Receiver_, receiver))
-                  , ts(HPX_MOVE(ts))
-                {
-                }
-
-                type(type&&) = delete;
-                type& operator=(type&&) = delete;
-                type(type const&) = delete;
-                type& operator=(type const&) = delete;
+                HPX_NO_UNIQUE_ADDRESS Receiver receiver;
 
                 friend void tag_invoke(start_t, type& os) noexcept
                 {
@@ -71,6 +61,9 @@ namespace hpx::execution::experimental {
                                 HPX_MOVE(os.receiver), HPX_MOVE(ep));
                         });
                 }
+
+            private:
+                type(type&&) = delete;
             };
         };
 
@@ -113,20 +106,20 @@ namespace hpx::execution::experimental {
 
                 template <typename Receiver>
                 friend auto
-                tag_invoke(connect_t, type&& s, Receiver&& receiver) noexcept(
+                tag_invoke(connect_t, type&& s, Receiver receiver) noexcept(
                     util::all_of_v<std::is_nothrow_move_constructible<Ts>...>)
                 {
                     return just_operation_t<Receiver>{
-                        HPX_FORWARD(Receiver, receiver), HPX_MOVE(s.ts)};
+                        HPX_MOVE(s.ts), HPX_FORWARD(Receiver, receiver)};
                 }
 
                 template <typename Receiver>
-                friend auto
-                tag_invoke(connect_t, type& s, Receiver&& receiver) noexcept(
-                    util::all_of_v<std::is_nothrow_copy_constructible<Ts>...>)
+                friend auto tag_invoke(
+                    connect_t, const type& s, Receiver receiver) noexcept(util::
+                        all_of_v<std::is_nothrow_copy_constructible<Ts>...>)
                 {
                     return just_operation_t<Receiver>{
-                        HPX_FORWARD(Receiver, receiver), s.ts};
+                        s.ts, HPX_FORWARD(Receiver, receiver)};
                 }
             };
         };
