@@ -186,12 +186,15 @@ namespace hpx::threads::detail {
 
         std::shared_ptr<bool> background_running;
         thread_id_ref_type background_thread;
-
-        if (scheduler.has_scheduler_mode(
+        bool const do_background_work =
+            scheduler.has_scheduler_mode(
                 policies::scheduler_mode::do_background_work) &&
             num_thread < params.max_background_threads_ &&
-            !params.background_.empty())
+            !params.background_.empty();
+
+        if (do_background_work)
         {
+            // do background work in parcel layer and in agas
             background_thread = create_background_thread(scheduler, num_thread,
                 params, background_running, idle_loop_count);
         }
@@ -543,11 +546,14 @@ namespace hpx::threads::detail {
                     continue;
                 }
 
-                // do background work in parcel layer and in agas
-                call_and_create_background_thread(background_thread, next_thrd,
-                    scheduler, num_thread, bg_work_exec_time_init,
-                    context_storage, params, background_running,
-                    idle_loop_count);
+                if (do_background_work)
+                {
+                    // do background work in parcel layer and in agas
+                    call_and_create_background_thread(background_thread,
+                        next_thrd, scheduler, num_thread,
+                        bg_work_exec_time_init, context_storage, params,
+                        background_running, idle_loop_count);
+                }
 
                 // call back into invoking context
                 if (!params.inner_.empty())
@@ -575,11 +581,14 @@ namespace hpx::threads::detail {
             {
                 busy_loop_count = 0;
 
-                // do background work in parcel layer and in agas
-                call_and_create_background_thread(background_thread, next_thrd,
-                    scheduler, num_thread, bg_work_exec_time_init,
-                    context_storage, params, background_running,
-                    idle_loop_count);
+                if (do_background_work)
+                {
+                    // do background work in parcel layer and in agas
+                    call_and_create_background_thread(background_thread,
+                        next_thrd, scheduler, num_thread,
+                        bg_work_exec_time_init, context_storage, params,
+                        background_running, idle_loop_count);
+                }
             }
             else if (idle_loop_count > params.max_idle_loop_count_ || may_exit)
             {
