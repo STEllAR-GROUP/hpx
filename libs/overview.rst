@@ -21,12 +21,11 @@ internal grouping and do not affect usage. They cannot be consumed individually
 at the moment.
 
 .. note::
-   There is a dependency report that displays useful information about the 
+   There is a dependency report that displays useful information about the
    structure of the code. It is available for each commit at |hpx_dependency_report|_.
 
 .. toctree::
    :maxdepth: 2
 
    /libs/core/modules.rst
-   /libs/parallelism/modules.rst
    /libs/full/modules.rst
