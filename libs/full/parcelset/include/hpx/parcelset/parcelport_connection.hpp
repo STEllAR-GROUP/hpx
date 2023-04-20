@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@
 #include <hpx/parcelset/parcel_buffer.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 
-#include <cstdint>
 #include <memory>
 #include <utility>
 

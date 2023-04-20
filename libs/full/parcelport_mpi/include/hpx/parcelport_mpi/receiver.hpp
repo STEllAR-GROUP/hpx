@@ -12,20 +12,17 @@
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/assert.hpp>
 #include <hpx/modules/mpi_base.hpp>
-
+#include <hpx/modules/thread_support.hpp>
 #include <hpx/parcelport_mpi/header.hpp>
 #include <hpx/parcelport_mpi/receiver_connection.hpp>
 
 #include <algorithm>
 #include <deque>
-#include <iterator>
 #include <list>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <utility>
-
-#include <mpi.h>
 
 namespace hpx::parcelset::policies::mpi {
 
@@ -47,7 +44,9 @@ namespace hpx::parcelset::policies::mpi {
         void run() noexcept
         {
             util::mpi_environment::scoped_lock l;
-            new_header();
+
+            [[maybe_unused]] header h;
+            new_header(l, h);
         }
 
         bool background_work() noexcept
@@ -59,7 +58,7 @@ namespace hpx::parcelset::policies::mpi {
             // already accepted ones.
             if (!connection)
             {
-                std::unique_lock l(connections_mtx_, std::try_to_lock);
+                std::unique_lock const l(connections_mtx_, std::try_to_lock);
                 if (l.owns_lock() && !connections_.empty())
                 {
                     connection = HPX_MOVE(connections_.front());
@@ -80,7 +79,7 @@ namespace hpx::parcelset::policies::mpi {
         {
             if (!connection->receive())
             {
-                std::unique_lock l(connections_mtx_);
+                std::unique_lock const l(connections_mtx_);
                 connections_.push_back(HPX_MOVE(connection));
             }
         }
@@ -98,7 +97,8 @@ namespace hpx::parcelset::policies::mpi {
         template <typename Lock>
         connection_ptr accept_locked(Lock& header_lock)
         {
-            connection_ptr res;
+            HPX_ASSERT_OWNS_LOCK(header_lock);
+
             util::mpi_environment::scoped_try_lock l;
 
             // Caller failing to hold lock 'header_lock' before calling function
@@ -110,14 +110,16 @@ namespace hpx::parcelset::policies::mpi {
             if (l.locked)
             {
                 MPI_Status status;
-                if (request_done_locked(hdr_request_, &status))
+                if (request_done_locked(l, hdr_request_, &status))
                 {
-                    header h = new_header();
+                    header h;
+                    new_header(l, h);
+
                     l.unlock();
                     header_lock.unlock();
 
-                    res.reset(new connection_type(status.MPI_SOURCE, h, pp_));
-                    return res;
+                    return std::make_shared<connection_type>(
+                        status.MPI_SOURCE, h, pp_);
                 }
             }
 
@@ -125,19 +127,21 @@ namespace hpx::parcelset::policies::mpi {
 #pragma warning(pop)
 #endif
 
-            return res;    //-V614
+            return {};
         }
 
-        header new_header() noexcept
+        template <typename Lock>
+        void new_header([[maybe_unused]] Lock& l, header& h) noexcept
         {
-            header h = rcv_header_;
+            HPX_ASSERT_OWNS_LOCK(l);
+
+            h = rcv_header_;
             rcv_header_.reset();
 
-            MPI_Irecv(rcv_header_.data(), rcv_header_.data_size_, MPI_BYTE,
-                MPI_ANY_SOURCE, 0, util::mpi_environment::communicator(),
-                &hdr_request_);
-
-            return h;
+            [[maybe_unused]] int const ret = MPI_Irecv(rcv_header_.data(),
+                header::data_size_, MPI_BYTE, MPI_ANY_SOURCE, 0,
+                util::mpi_environment::communicator(), &hdr_request_);
+            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
         }
 
         Parcelport& pp_;
@@ -152,17 +156,17 @@ namespace hpx::parcelset::policies::mpi {
         hpx::spinlock connections_mtx_;
         connection_list connections_;
 
-        bool request_done_locked(MPI_Request& r, MPI_Status* status) noexcept
+        template <typename Lock>
+        static bool request_done_locked([[maybe_unused]] Lock& l,
+            MPI_Request& r, MPI_Status* status) noexcept
         {
+            HPX_ASSERT_OWNS_LOCK(l);
+
             int completed = 0;
-            int ret = MPI_Test(&r, &completed, status);
-            HPX_ASSERT(ret == MPI_SUCCESS);
-            (void) ret;
-            if (completed)
-            {
-                return true;
-            }
-            return false;
+            [[maybe_unused]] int const ret = MPI_Test(&r, &completed, status);
+            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
+            return completed ? true : false;
         }
     };
 }    // namespace hpx::parcelset::policies::mpi

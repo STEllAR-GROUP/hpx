@@ -18,6 +18,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/type_support.hpp>
 
 #include <cstddef>
 #include <sstream>
@@ -28,14 +29,14 @@
 namespace hpx::util::logging {
 
     /**
-        @brief Optimizes the formatting for prepending and/or appending
+        @brief Optimizes the formatting for pre-pending and/or appending
         strings to the original message
 
         It keeps all the modified message in one string.
         Useful if some formatter needs to access the whole
         string at once.
 
-        reserve() - the size that is reserved for prepending
+        reserve() - the size that is reserved for pre-pending
         (similar to string::reserve function)
 
         Note : as strings are prepended, reserve() shrinks.
@@ -48,12 +49,13 @@ namespace hpx::util::logging {
         /**
             @param msg - the message that is originally cached
          */
-        explicit message([[maybe_unused]] std::stringstream msg) noexcept
+        explicit message(std::stringstream msg) noexcept
           : m_full_msg_computed(false)
 #if defined(HPX_COMPUTE_HOST_CODE)
           , m_str(HPX_MOVE(msg))
 #endif
         {
+            HPX_UNUSED(msg);
         }
 
         message(message&& other) noexcept

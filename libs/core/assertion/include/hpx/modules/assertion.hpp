@@ -67,7 +67,7 @@ namespace hpx::assertion {
 
 #define HPX_ASSERT_LOCKED_(l, expr, msg)                                       \
     (!!(expr) ? void() :                                                       \
-                (l.unlock(),                                                   \
+                ((l).unlock(),                                                 \
                     ::hpx::assertion::detail::handle_assert(                   \
                         HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr), \
                         msg))) /**/

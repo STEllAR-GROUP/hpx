@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +15,7 @@
 
 #if defined(HPX_HAVE_LOGGING)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     /// \cond NOINTERNAL
 
@@ -23,7 +23,8 @@ namespace hpx { namespace util {
     // custom log destination: send generated strings to console
     struct HPX_CORE_EXPORT console_local : logging::destination::manipulator
     {
-        console_local(logging::level level, logging_destination dest)
+        constexpr console_local(
+            logging::level level, logging_destination dest) noexcept
           : level_(level)
           , dest_(dest)
         {
@@ -31,8 +32,8 @@ namespace hpx { namespace util {
 
         void operator()(logging::message const& msg) override;
 
-        friend bool operator==(
-            console_local const& lhs, console_local const& rhs)
+        friend constexpr bool operator==(
+            console_local const& lhs, console_local const& rhs) noexcept
         {
             return lhs.dest_ == rhs.dest_;
         }
@@ -78,12 +79,12 @@ namespace hpx { namespace util {
         std::string logformat = "");
 
     /// Disable all logging for the given destination
-    HPX_CORE_EXPORT void disable_logging(logging_destination dest);
-}}    // namespace hpx::util
+    HPX_CORE_EXPORT void disable_logging(logging_destination dest) noexcept;
+}    // namespace hpx::util
 
 #else    // HPX_HAVE_LOGGING
 
-namespace hpx { namespace util {
+namespace hpx::util {
     namespace detail {
 
         HPX_CORE_EXPORT void warn_if_logging_requested(runtime_configuration&);
@@ -94,7 +95,7 @@ namespace hpx { namespace util {
         std::string const& lvl = "5", std::string logdest = "",
         std::string logformat = "");
 
-    HPX_CORE_EXPORT void disable_logging(logging_destination dest);
-}}    // namespace hpx::util
+    HPX_CORE_EXPORT void disable_logging(logging_destination dest) noexcept;
+}    // namespace hpx::util
 
 #endif    // HPX_HAVE_LOGGING

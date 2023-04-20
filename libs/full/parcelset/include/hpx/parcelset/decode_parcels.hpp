@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2021 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,6 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset_base/detail/data_point.hpp>
 #include <hpx/parcelset_base/detail/parcel_route_handler.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -55,20 +54,21 @@ namespace hpx::parcelset {
         data.num_zchunks_ += buffer.chunks_.size();
         data.num_zchunks_per_msg_max_ =
             (std::max)(data.num_zchunks_per_msg_max_,
-                (std::int64_t) buffer.chunks_.size());
+                static_cast<std::int64_t>(buffer.chunks_.size()));
         for (auto& chunk : buffer.chunks_)
         {
             data.size_zchunks_total_ += chunk.size();
-            data.size_zchunks_max_ =
-                (std::max)(data.size_zchunks_max_, (std::int64_t) chunk.size());
+            data.size_zchunks_max_ = (std::max)(data.size_zchunks_max_,
+                static_cast<std::int64_t>(chunk.size()));
         }
 #endif
 
         if (num_zero_copy_chunks != 0)
         {
             // decode chunk information
-            std::size_t num_non_zero_copy_chunks = static_cast<std::size_t>(
-                static_cast<std::uint32_t>(buffer.num_chunks_.second));
+            std::size_t const num_non_zero_copy_chunks =
+                static_cast<std::size_t>(
+                    static_cast<std::uint32_t>(buffer.num_chunks_.second));
 
             chunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
 
@@ -76,9 +76,9 @@ namespace hpx::parcelset {
             for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                std::size_t first = static_cast<std::size_t>(
+                auto const first = static_cast<std::size_t>(
                     static_cast<std::uint64_t>(c.first));
-                std::size_t second = static_cast<std::size_t>(
+                auto second = static_cast<std::size_t>(
                     static_cast<std::uint64_t>(c.second));
 
                 HPX_ASSERT(buffer.chunks_[i].size() == second);
@@ -92,9 +92,9 @@ namespace hpx::parcelset {
                  i != num_zero_copy_chunks + num_non_zero_copy_chunks; ++i)
             {
                 transmission_chunk_type& c = buffer.transmission_chunks_[i];
-                std::size_t first = static_cast<std::size_t>(
+                auto const first = static_cast<std::size_t>(
                     static_cast<std::uint64_t>(c.first));
-                std::size_t second = static_cast<std::size_t>(
+                auto const second = static_cast<std::size_t>(
                     static_cast<std::uint64_t>(c.second));
 
                 // find next free entry
@@ -126,7 +126,7 @@ namespace hpx::parcelset {
         std::vector<serialization::serialization_chunk>& chunks,
         std::size_t num_thread = -1)
     {
-        std::size_t inbound_data_size = static_cast<std::size_t>(
+        auto inbound_data_size = static_cast<std::size_t>(
             static_cast<std::uint64_t>(buffer.data_size_));
 
         // protect from unhandled exceptions bubbling up
@@ -136,7 +136,7 @@ namespace hpx::parcelset {
             {
                 // mark start of serialization
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-                hpx::chrono::high_resolution_timer timer;
+                hpx::chrono::high_resolution_timer const timer;
                 std::int64_t overall_add_parcel_time = 0;
                 parcelset::data_point& data = buffer.data_point_;
 #endif
@@ -161,8 +161,8 @@ namespace hpx::parcelset {
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                        std::size_t archive_pos = archive.current_pos();
-                        std::int64_t serialize_time =
+                        std::size_t const archive_pos = archive.current_pos();
+                        std::int64_t const serialize_time =
                             timer.elapsed_nanoseconds();
 #endif
                         // de-serialize parcel and add it to incoming parcel queue
@@ -173,11 +173,11 @@ namespace hpx::parcelset {
                         // one parcel to decode, deferred_schedule will be
                         // preset to false and the direct action will be called
                         // directly
-                        bool migrated = p.load_schedule(
+                        bool const migrated = p.load_schedule(
                             archive, num_thread, deferred_schedule);
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-                        std::int64_t add_parcel_time =
+                        std::int64_t const add_parcel_time =
                             timer.elapsed_nanoseconds();
 #endif
 
@@ -192,7 +192,7 @@ namespace hpx::parcelset {
                         pp.add_received_data(p.get_action_name(), action_data);
 #endif
                         // make sure this parcel ended up on the right locality
-                        std::uint32_t here = agas::get_locality_id();
+                        std::uint32_t const here = agas::get_locality_id();
                         if (hpx::get_runtime_ptr() &&
                             here != naming::invalid_locality_id &&
                             (naming::get_locality_id_from_gid(
@@ -203,7 +203,6 @@ namespace hpx::parcelset {
                                 "parcel destination does not match locality "
                                 "which received the parcel ({}), {}",
                                 here, p);
-                            return;
                         }
 
                         if (migrated)
@@ -235,11 +234,15 @@ namespace hpx::parcelset {
                         for (std::size_t i = 1; i != deferred_parcels.size();
                              ++i)
                         {
+                            LPT_(debug).format(
+                                "decode_message_with_chunks: received: {}",
+                                deferred_parcels[i].parcel_id());
+
                             auto f = [num_thread](parcelset::parcel&& p) {
                                 if (p.schedule_action(num_thread))
                                 {
-                                    // route this parcel as the object
-                                    // was migrated
+                                    // route this parcel as the object was
+                                    // migrated
                                     agas::route(HPX_MOVE(p),
                                         &parcelset::detail::
                                             parcel_route_handler,
@@ -248,7 +251,7 @@ namespace hpx::parcelset {
                             };
 
                             // schedule all but the first parcel on a new thread.
-                            hpx::threads::thread_init_data data(
+                            hpx::threads::thread_init_data init_data(
                                 hpx::threads::make_thread_function_nullary(
                                     util::deferred_call(HPX_MOVE(f),
                                         HPX_MOVE(deferred_parcels[i]))),
@@ -258,11 +261,15 @@ namespace hpx::parcelset {
                                     static_cast<std::int16_t>(num_thread)),
                                 threads::thread_stacksize::default_,
                                 threads::thread_schedule_state::pending, true);
-                            hpx::threads::register_thread(data);
+                            hpx::threads::register_thread(init_data);
                         }
 
                         // If we are the first deferred parcel, we don't need to spin
                         // up a new thread...
+                        LPT_(debug).format(
+                            "decode_message_with_chunks: received: {}",
+                            deferred_parcels[0].parcel_id());
+
                         if (deferred_parcels[0].schedule_action(num_thread))
                         {
                             // route this parcel as the object was migrated

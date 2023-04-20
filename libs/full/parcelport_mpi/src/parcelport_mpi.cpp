@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -21,7 +21,6 @@
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/parcelport_mpi/header.hpp>
 #include <hpx/parcelport_mpi/locality.hpp>
 #include <hpx/parcelport_mpi/receiver.hpp>
 #include <hpx/parcelport_mpi/sender.hpp>
@@ -31,10 +30,8 @@
 
 #include <atomic>
 #include <cstddef>
-#include <exception>
 #include <memory>
 #include <string>
-#include <system_error>
 #include <type_traits>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -121,7 +118,12 @@ namespace hpx::parcelset {
             {
             }
 
-            ~parcelport()
+            parcelport(parcelport const&) = delete;
+            parcelport(parcelport&&) = delete;
+            parcelport& operator=(parcelport const&) = delete;
+            parcelport& operator=(parcelport&&) = delete;
+
+            ~parcelport() override
             {
                 util::mpi_environment::finalize();
             }
@@ -134,8 +136,8 @@ namespace hpx::parcelset {
 
                 for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
                 {
-                    io_service_pool_.get_io_service(int(i)).post(
-                        hpx::bind(&parcelport::io_service_work, this));
+                    io_service_pool_.get_io_service(static_cast<int>(i))
+                        .post(hpx::bind(&parcelport::io_service_work, this));
                 }
                 return true;
             }
@@ -146,12 +148,22 @@ namespace hpx::parcelset {
                 while (do_background_work(0, parcelport_background_mode_all))
                 {
                     if (threads::get_self_ptr())
+                    {
                         hpx::this_thread::suspend(
                             hpx::threads::thread_schedule_state::pending,
                             "mpi::parcelport::do_stop");
+                    }
                 }
-                stopped_ = true;
-                MPI_Barrier(util::mpi_environment::communicator());
+
+                bool expected = false;
+                if (stopped_.compare_exchange_strong(expected, true))
+                {
+                    util::mpi_environment::scoped_lock l;
+
+                    [[maybe_unused]] int const ret =
+                        MPI_Barrier(util::mpi_environment::communicator());
+                    HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                }
             }
 
             /// Return the name of this locality
@@ -163,7 +175,7 @@ namespace hpx::parcelset {
             std::shared_ptr<sender_connection> create_connection(
                 parcelset::locality const& l, error_code&)
             {
-                int dest_rank = l.get<locality>().rank();
+                int const dest_rank = l.get<locality>().rank();
                 return sender_.create_connection(dest_rank, this);
             }
 
@@ -182,7 +194,8 @@ namespace hpx::parcelset {
             bool background_work(
                 std::size_t num_thread, parcelport_background_mode mode)
             {
-                if (stopped_ || num_thread >= background_threads_)
+                if (stopped_.load(std::memory_order_acquire) ||
+                    num_thread >= background_threads_)
                 {
                     return false;
                 }
@@ -235,69 +248,64 @@ namespace hpx::parcelset {
 
 #include <hpx/config/warnings_suffix.hpp>
 
-namespace hpx::traits {
-
-    // Inject additional configuration data into the factory registry for this
-    // type. This information ends up in the system wide configuration database
-    // under the plugin specific section:
-    //
-    //      [hpx.parcel.mpi]
-    //      ...
-    //      priority = 100
-    //
-    template <>
-    struct plugin_config_data<hpx::parcelset::policies::mpi::parcelport>
+// Inject additional configuration data into the factory registry for this
+// type. This information ends up in the system wide configuration database
+// under the plugin specific section:
+//
+//      [hpx.parcel.mpi]
+//      ...
+//      priority = 100
+//
+template <>
+struct hpx::traits::plugin_config_data<
+    hpx::parcelset::policies::mpi::parcelport>
+{
+    static constexpr char const* priority() noexcept
     {
-        static constexpr char const* priority() noexcept
-        {
-            return "100";
-        }
+        return "100";
+    }
 
-        static void init(
-            int* argc, char*** argv, util::command_line_handling& cfg)
-        {
-            util::mpi_environment::init(argc, argv, cfg.rtcfg_);
-            cfg.num_localities_ =
-                static_cast<std::size_t>(util::mpi_environment::size());
-            cfg.node_ = static_cast<std::size_t>(util::mpi_environment::rank());
-        }
+    static void init(int* argc, char*** argv, util::command_line_handling& cfg)
+    {
+        util::mpi_environment::init(argc, argv, cfg.rtcfg_);
+        cfg.num_localities_ =
+            static_cast<std::size_t>(util::mpi_environment::size());
+        cfg.node_ = static_cast<std::size_t>(util::mpi_environment::rank());
+    }
 
-        // by default no additional initialization using the resource
-        // partitioner is required
-        static constexpr void init(hpx::resource::partitioner&) noexcept {}
+    // by default no additional initialization using the resource
+    // partitioner is required
+    static constexpr void init(hpx::resource::partitioner&) noexcept {}
 
-        static void destroy()
-        {
-            util::mpi_environment::finalize();
-        }
+    static void destroy() noexcept
+    {
+        util::mpi_environment::finalize();
+    }
 
-        static constexpr char const* call() noexcept
-        {
-            return
+    static constexpr char const* call() noexcept
+    {
+        return
 #if defined(HPX_HAVE_PARCELPORT_MPI_ENV)
-                "env = "
-                "${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV
-                "}\n"
+            "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:" HPX_HAVE_PARCELPORT_MPI_ENV
+            "}\n"
 #else
-                "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
-                "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,"
-                "ALPS_APP_PE,PALS_NODEID"
-                "}\n"
+            "env = ${HPX_HAVE_PARCELPORT_MPI_ENV:"
+            "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,OMPI_COMM_WORLD_SIZE,"
+            "ALPS_APP_PE,PALS_NODEID}\n"
 #endif
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
-                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:1}\n"
+            "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:1}\n"
 #else
-                "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"
+            "multithreaded = ${HPX_HAVE_PARCELPORT_MPI_MULTITHREADED:0}\n"
 #endif
-                "max_connections = "
-                "${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
+            "max_connections = "
+            "${HPX_HAVE_PARCELPORT_MPI_MAX_CONNECTIONS:8192}\n"
 
-                // number of cores that do background work, default: all
-                "background_threads = "
-                "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n";
-        }
-    };
-}    // namespace hpx::traits
+            // number of cores that do background work, default: all
+            "background_threads = "
+            "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n";
+    }
+};    // namespace hpx::traits
 
 HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::mpi::parcelport, mpi)
 

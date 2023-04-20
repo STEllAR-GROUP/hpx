@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
 //  Copyright (c) 2007      Richard D Guidry Jr
 //  Copyright (c) 2011      Bryce Lelbach & Katelyn Kufahl
@@ -36,6 +36,7 @@
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset/static_parcelports.hpp>
+#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
 #include <hpx/plugin_factories/parcelport_factory_base.hpp>
 
@@ -82,7 +83,7 @@ namespace hpx::parcelset {
         sent_future.get();    // wait for the parcel to be sent
     }
 
-    parcelhandler::parcelhandler(util::runtime_configuration& cfg)
+    parcelhandler::parcelhandler(util::runtime_configuration const& cfg)
       : tm_(nullptr)
       , use_alternative_parcelports_(false)
       , enable_parcel_handling_(true)
@@ -102,7 +103,7 @@ namespace hpx::parcelset {
     parcelhandler::~parcelhandler() = default;
 
     void parcelhandler::set_notification_policies(
-        util::runtime_configuration& cfg, threads::threadmanager* tm,
+        util::runtime_configuration const& cfg, threads::threadmanager* tm,
         threads::policies::callback_notifier const& notifier)
     {
         is_networking_enabled_ = hpx::is_networking_enabled();
@@ -122,10 +123,10 @@ namespace hpx::parcelset {
 
     std::shared_ptr<parcelport> parcelhandler::get_bootstrap_parcelport() const
     {
-        std::string cfgkey("hpx.parcel.bootstrap");
+        std::string const cfgkey("hpx.parcel.bootstrap");
         if (!pports_.empty())
         {
-            auto it =
+            auto const it =
                 pports_.find(get_priority(get_config_entry(cfgkey, "tcp")));
             if (it != pports_.end() && it->first > 0)
             {
@@ -169,7 +170,7 @@ namespace hpx::parcelset {
             std::terminate();
         }
 
-        return std::shared_ptr<parcelport>();
+        return {};
     }
 
     void parcelhandler::initialize()
@@ -220,7 +221,7 @@ namespace hpx::parcelset {
                     agas::get_locality_id(), exceptions.get_message());
             }
 
-            // clean up parcelports that have failed initializtion
+            // clean up parcelports that have failed initialization
             std::cerr << "the following parcelports will be disabled:\n";
             for (int pp : failed_pps)
             {
@@ -285,7 +286,7 @@ namespace hpx::parcelset {
 
     int parcelhandler::get_priority(std::string const& name) const
     {
-        std::map<std::string, int>::const_iterator it = priority_.find(name);
+        auto const it = priority_.find(name);
         if (it == priority_.end())
             return 0;
         return it->second;
@@ -294,7 +295,7 @@ namespace hpx::parcelset {
     parcelport* parcelhandler::find_parcelport(
         std::string const& type, error_code&) const
     {
-        int priority = get_priority(type);
+        int const priority = get_priority(type);
         if (priority <= 0)
             return nullptr;
         HPX_ASSERT(pports_.find(priority) != pports_.end());
@@ -310,7 +311,8 @@ namespace hpx::parcelset {
 
         // add the new parcelport to the list of parcel-ports we care about
         int priority = pp->priority();
-        std::string cfgkey(std::string("hpx.parcel.") + pp->type() + ".enable");
+        std::string const cfgkey(
+            std::string("hpx.parcel.") + pp->type() + ".enable");
         if (get_config_entry(cfgkey, "0") != "1")
         {
             priority = -priority;
@@ -328,11 +330,11 @@ namespace hpx::parcelset {
     /// \brief Make sure the specified locality is not held by any
     /// connection caches anymore
     void parcelhandler::remove_from_connection_cache(
-        naming::gid_type const& gid, endpoints_type const& endpoints)
+        naming::gid_type const& gid, endpoints_type const& endpoints) const
     {
         for (endpoints_type::value_type const& loc : endpoints)
         {
-            for (pports_type::value_type& pp : pports_)
+            for (pports_type::value_type const& pp : pports_)
             {
                 if (std::string(pp.second->type()) == loc.second.type())
                 {
@@ -354,6 +356,10 @@ namespace hpx::parcelset {
             return did_some_work;
         }
 
+        LPT_(debug).format(
+            "parcelhandler::do_background_work: thread {}, mode {}", num_thread,
+            get_parcelport_background_mode_name(mode));
+
         // flush all parcel buffers
         if (0 == num_thread &&
             (mode & parcelport_background_mode_flush_buffers))
@@ -363,16 +369,15 @@ namespace hpx::parcelset {
             if (l.owns_lock())
             {
                 using parcelset::policies::message_handler;
-                message_handler::flush_mode flush_mode =
+                constexpr message_handler::flush_mode flush_mode =
                     message_handler::flush_mode_background_work;
 
-                message_handler_map::iterator end = handlers_.end();
-                for (message_handler_map::iterator it = handlers_.begin();
-                     it != end; ++it)
+                auto const end = handlers_.end();
+                for (auto it = handlers_.begin(); it != end; ++it)
                 {
                     if ((*it).second)
                     {
-                        std::shared_ptr<policies::message_handler> p(
+                        std::shared_ptr<policies::message_handler> const p(
                             (*it).second);
                         unlock_guard<std::unique_lock<mutex_type>> ul(l);
                         did_some_work = p->flush(flush_mode, stop_buffering) ||
@@ -383,7 +388,7 @@ namespace hpx::parcelset {
         }
 
         // make sure all pending parcels are being handled
-        for (pports_type::value_type& pp : pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             if (pp.first > 0)
             {
@@ -396,12 +401,12 @@ namespace hpx::parcelset {
         return did_some_work;
     }
 
-    void parcelhandler::flush_parcels()
+    void parcelhandler::flush_parcels() const
     {
         if (is_networking_enabled_)
         {
             // now flush all parcel ports to be shut down
-            for (pports_type::value_type& pp : pports_)
+            for (pports_type::value_type const& pp : pports_)
             {
                 if (pp.first > 0)
                 {
@@ -414,7 +419,7 @@ namespace hpx::parcelset {
     void parcelhandler::stop(bool blocking)
     {
         // now stop all parcel ports
-        for (pports_type::value_type& pp : pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             if (pp.first > 0)
             {
@@ -431,7 +436,7 @@ namespace hpx::parcelset {
         components::component_type type, error_code& ec) const
     {
         std::vector<naming::gid_type> allprefixes;
-        bool result = get_raw_localities(allprefixes, type, ec);
+        bool const result = get_raw_localities(allprefixes, type, ec);
         if (ec || !result)
             return false;
 
@@ -445,11 +450,11 @@ namespace hpx::parcelset {
         std::vector<naming::gid_type>& locality_ids,
         components::component_type type, error_code&) const
     {
-        std::vector<std::uint32_t> ids = agas::get_all_locality_ids(type);
+        std::vector<std::uint32_t> const ids = agas::get_all_locality_ids(type);
 
         locality_ids.clear();
         locality_ids.reserve(ids.size());
-        for (auto id : ids)
+        for (auto const& id : ids)
         {
             locality_ids.emplace_back(naming::get_gid_from_locality_id(id));
         }
@@ -467,18 +472,20 @@ namespace hpx::parcelset {
         {
             if (pp.first > 0)
             {
-                locality const& dest =
-                    find_endpoint(dest_endpoints, pp.second->type());
-                if (dest &&
+                if (locality const& dest =
+                        find_endpoint(dest_endpoints, pp.second->type());
+                    dest &&
                     pp.second->can_connect(dest, use_alternative_parcelports_))
+                {
                     return std::make_pair(pp.second, dest);
+                }
             }
         }
 
         std::ostringstream strm;
         strm << "target locality: " << dest_gid << "\n";
         strm << "available destination endpoints:\n" << dest_endpoints << "\n";
-        strm << "available partcelports:\n";
+        strm << "available parcelports:\n";
         for (auto const& pp : pports_)
         {
             list_parcelport(strm, pp.second->type(), pp.second->priority(),
@@ -491,23 +498,23 @@ namespace hpx::parcelset {
             "The locality gid cannot be resolved to a valid endpoint. "
             "No valid parcelport configured. Detailed information:\n{}",
             strm.str());
-        return std::pair<std::shared_ptr<parcelport>, locality>();
     }
 
     locality parcelhandler::find_endpoint(
         endpoints_type const& eps, std::string const& name)
     {
-        endpoints_type::const_iterator it = eps.find(name);
+        auto const it = eps.find(name);
         if (it != eps.end())
             return it->second;
-        return locality();
+        return {};
     }
 
     // Return the reference to an existing io_service
-    util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
+    util::io_service_pool* parcelhandler::get_thread_pool(
+        char const* name) const
     {
         util::io_service_pool* result = nullptr;
-        for (pports_type::value_type& pp : pports_)
+        for (pports_type::value_type const& pp : pports_)
         {
             result = pp.second->get_thread_pool(name);
             if (result)
@@ -517,8 +524,9 @@ namespace hpx::parcelset {
     }
 
     namespace detail {
+
         void parcel_sent_handler(
-            parcelhandler::write_handler_type& f,    //-V669
+            parcelhandler::write_handler_type const& f,    //-V669
             std::error_code const& ec, parcelset::parcel const& p)
         {
             // inform termination detection of a sent message
@@ -545,9 +553,15 @@ namespace hpx::parcelset {
 
     void parcelhandler::put_parcel(parcelset::parcel p)
     {
+        LPT_(debug).format(
+            "parcelhandler::put_parcel: submitted: {}", p.parcel_id());
+
         auto handler = [this](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
             invoke_write_handler(ec, p);
+
+            LPT_(debug).format(
+                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
         };
 
         put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
@@ -555,10 +569,17 @@ namespace hpx::parcelset {
 
     void parcelhandler::put_parcel(parcelset::parcel p, write_handler_type f)
     {
+        LPT_(debug).format(
+            "parcelhandler::put_parcel (with handler): submitted: {}",
+            p.parcel_id());
+
         auto handler = [this, f = HPX_MOVE(f)](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
             invoke_write_handler(ec, p);
             f(ec, p);
+
+            LPT_(debug).format(
+                "parcelhandler::put_parcel: handled: {}", p.parcel_id());
         };
 
         put_parcel_impl(HPX_MOVE(p), HPX_MOVE(handler));
@@ -578,10 +599,13 @@ namespace hpx::parcelset {
         if (!this_thread::has_sufficient_stack_space() &&
             hpx::threads::threadmanager_is(hpx::state::running))
         {
+            LPT_(debug).format("parcelhandler::put_parcel_impl: reschedule: {}",
+                p.parcel_id());
+
             {
                 // reschedule request as an HPX thread to avoid hangs
-                void (parcelhandler::*put_parcel_ptr)(parcel p,
-                    write_handler_type f) = &parcelhandler::put_parcel;
+                void (parcelhandler::*put_parcel_ptr)(
+                    parcel, write_handler_type) = &parcelhandler::put_parcel;
 
                 threads::thread_init_data data(
                     threads::make_thread_function_nullary(util::deferred_call(
@@ -617,15 +641,13 @@ namespace hpx::parcelset {
             // encapsulated action
             using destination_pair =
                 std::pair<std::shared_ptr<parcelport>, locality>;
-            destination_pair dest =
+            destination_pair const dest =
                 find_appropriate_destination(addr.locality_);
 
             if (load_message_handlers_ && !hpx::is_stopped_or_shutting_down())
             {
-                policies::message_handler* mh =
-                    p.get_message_handler(dest.second);
-
-                if (mh)
+                if (policies::message_handler* mh =
+                        p.get_message_handler(dest.second))
                 {
                     mh->put_parcel(
                         dest.second, HPX_MOVE(p), HPX_MOVE(wrapped_f));
@@ -647,9 +669,14 @@ namespace hpx::parcelset {
 
     void parcelhandler::put_parcels(std::vector<parcel> parcels)
     {
+        LPT_(debug).format("parcelhandler::put_parcels: submitted: {} parcels",
+            parcels.size());
+
         std::vector<write_handler_type> handlers(parcels.size(),
             [this](std::error_code const& ec, parcel const& p) -> void {
-                return invoke_write_handler(ec, p);
+                invoke_write_handler(ec, p);
+                LPT_(debug).format(
+                    "parcelhandler::put_parcels: handled: {}", p.parcel_id());
             });
 
         put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
@@ -658,17 +685,24 @@ namespace hpx::parcelset {
     void parcelhandler::put_parcels(
         std::vector<parcel> parcels, std::vector<write_handler_type> funcs)
     {
+        LPT_(debug).format(
+            "parcelhandler::put_parcels (with handlers): submitted: {} parcels",
+            parcels.size());
+
         std::vector<write_handler_type> handlers;
 
         handlers.reserve(parcels.size());
         for (std::size_t i = 0; i != parcels.size(); ++i)
         {
-            handlers.emplace_back(
-                [this, f = HPX_MOVE(funcs[i])](
-                    std::error_code const& ec, parcel const& p) -> void {
-                    invoke_write_handler(ec, p);
-                    f(ec, p);
-                });
+            handlers.emplace_back([this, f = HPX_MOVE(funcs[i])](
+                                      std::error_code const& ec,
+                                      parcel const& p) -> void {
+                invoke_write_handler(ec, p);
+                f(ec, p);
+
+                LPT_(debug).format(
+                    "parcelhandler::put_parcels: handled: {}", p.parcel_id());
+            });
         }
 
         put_parcels_impl(HPX_MOVE(parcels), HPX_MOVE(handlers));
@@ -684,13 +718,16 @@ namespace hpx::parcelset {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "parcelhandler::put_parcels",
                 "mismatched number of parcels and handlers");
-            return;
         }
 
         // if this isn't an HPX thread, the stack space check will return false
         if (!this_thread::has_sufficient_stack_space() &&
             hpx::threads::threadmanager_is(hpx::state::running))
         {
+            LPT_(debug).format(
+                "parcelhandler::put_parcels_impl: rescheduling: {}",
+                parcels.size());
+
             // reschedule request as an HPX thread to avoid hangs
             void (parcelhandler::*put_parcels_ptr)(std::vector<parcel>,
                 std::vector<write_handler_type>) = &parcelhandler::put_parcels;
@@ -709,7 +746,7 @@ namespace hpx::parcelset {
 
         // partition parcels depending on whether their destination can be
         // resolved locally
-        std::size_t num_parcels = parcels.size();
+        std::size_t const num_parcels = parcels.size();
 
         std::vector<parcel> resolved_parcels;
         resolved_parcels.reserve(num_parcels);
@@ -722,8 +759,9 @@ namespace hpx::parcelset {
         destination_pair resolved_dest;
 
         std::vector<parcel> nonresolved_parcels;
-        nonresolved_parcels.reserve(num_parcels);
         std::vector<write_handler_type> nonresolved_handlers;
+
+        nonresolved_parcels.reserve(num_parcels);
         nonresolved_handlers.reserve(num_parcels);
 
         for (std::size_t i = 0; i != num_parcels; ++i)
@@ -751,7 +789,6 @@ namespace hpx::parcelset {
                     "parcelhandler::put_parcels",
                     "mismatched destinations, all parcels are expected to "
                     "target the same locality");
-                return;
             }
 
             // If we were able to resolve the address(es) locally we would send
@@ -765,10 +802,8 @@ namespace hpx::parcelset {
 
                 if (load_message_handlers_)
                 {
-                    policies::message_handler* mh =
-                        p.get_message_handler(dest.second);
-
-                    if (mh)
+                    if (policies::message_handler* mh =
+                            p.get_message_handler(dest.second))
                     {
                         mh->put_parcel(dest.second, HPX_MOVE(p), HPX_MOVE(f));
                         continue;
@@ -793,7 +828,7 @@ namespace hpx::parcelset {
             }
         }
 
-        // handle parcel which have been locally resolved
+        // handle parcel that have been locally resolved
         if (!resolved_parcels.empty())
         {
             HPX_ASSERT(!!resolved_dest.first && !!resolved_dest.second);
@@ -814,7 +849,7 @@ namespace hpx::parcelset {
     void parcelhandler::invoke_write_handler(
         std::error_code const& ec, parcel const& p) const
     {
-        write_handler_type f = write_handler_;
+        write_handler_type const f = write_handler_;
         f(ec, p);
     }
 
@@ -858,7 +893,7 @@ namespace hpx::parcelset {
             }
 
             // all unhandled exceptions terminate the whole application
-            std::exception_ptr exception = hpx::detail::get_exception(
+            std::exception_ptr const exception = hpx::detail::get_exception(
                 hpx::exception(ec), "default_write_handler", __FILE__, __LINE__,
                 parcelset::dump_parcel(p));
 
@@ -878,9 +913,9 @@ namespace hpx::parcelset {
         }
 
         std::unique_lock<mutex_type> l(handlers_mtx_);
-        handler_key_type key(loc, action);
-        message_handler_map::iterator it = handlers_.find(key);
 
+        handler_key_type key(loc, action);
+        auto it = handlers_.find(key);
         if (it == handlers_.end())
         {
             std::shared_ptr<policies::message_handler> p;
@@ -889,8 +924,7 @@ namespace hpx::parcelset {
                 // Just ignore the handlers_mtx_ while checking. We need to hold
                 // the lock here to avoid multiple registrations that happens
                 // right now in the parcel coalescing plugin
-                hpx::util::ignore_while_checking il(&l);
-                HPX_UNUSED(il);
+                [[maybe_unused]] hpx::util::ignore_while_checking const il(&l);
 
                 p.reset(hpx::create_message_handler(message_handler_type,
                     action, find_parcelport(loc.type()), num_messages, interval,
@@ -904,7 +938,7 @@ namespace hpx::parcelset {
                 l.unlock();
                 if (&ec != &throws)
                 {
-                    if ((*it).second.get())
+                    if ((*it).second)
                         ec = make_success_code();
                     else
                         ec = make_error_code(
@@ -913,10 +947,10 @@ namespace hpx::parcelset {
                 return (*it).second.get();
             }
 
-            if (ec || !p.get())
+            if (ec || !p)
             {
-                // insert an empty entry into the map to avoid trying to
-                // create this handler again
+                // insert an empty entry into the map to avoid trying to create
+                // this handler again
                 p.reset();
                 std::pair<message_handler_map::iterator, bool> const r =
                     handlers_.emplace(key, p);
@@ -945,7 +979,7 @@ namespace hpx::parcelset {
             }
             it = r.first;
         }
-        else if (!(*it).second.get())
+        else if (!(*it).second)
         {
             l.unlock();
             if (&ec != &throws)

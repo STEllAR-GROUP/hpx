@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2021 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
 #include <hpx/assert.hpp>
-
+#include <hpx/modules/type_support.hpp>
 #include <hpx/parcelset/parcel_buffer.hpp>
 
 #include <array>
@@ -37,30 +37,35 @@ namespace hpx::parcelset::policies::mpi {
             pos_piggy_back_data = 5 * sizeof(value_type) + 1
         };
 
-        static constexpr int data_size_ = 512;
+        static constexpr std::int32_t data_size_ = 512;
 
         template <typename Buffer>
         header(Buffer const& buffer, int tag) noexcept
         {
-            std::int64_t size = static_cast<std::int64_t>(buffer.size_);
-            std::int64_t numbytes =
-                static_cast<std::int64_t>(buffer.data_size_);
+            init(buffer, tag);
+        }
+
+        template <typename Buffer>
+        void init(Buffer const& buffer, int tag) noexcept
+        {
+            auto const size = static_cast<std::int64_t>(buffer.size_);
+            auto const numbytes = static_cast<std::int64_t>(buffer.data_size_);
 
             HPX_ASSERT(size <= (std::numeric_limits<value_type>::max)());
             HPX_ASSERT(numbytes <= (std::numeric_limits<value_type>::max)());
 
-            set<pos_tag>(tag);
-            set<pos_size>(static_cast<value_type>(size));
-            set<pos_numbytes>(static_cast<value_type>(numbytes));
-            set<pos_numchunks_first>(
+            set(pos_tag, tag);
+            set(pos_size, static_cast<value_type>(size));
+            set(pos_numbytes, static_cast<value_type>(numbytes));
+            set(pos_numchunks_first,
                 static_cast<value_type>(buffer.num_chunks_.first));
-            set<pos_numchunks_second>(
+            set(pos_numchunks_second,
                 static_cast<value_type>(buffer.num_chunks_.second));
 
             if (buffer.data_.size() <= (data_size_ - pos_piggy_back_data))
             {
                 data_[pos_piggy_back_flag] = 1;
-                std::memcpy(&data_[pos_piggy_back_data], &buffer.data_[0],
+                std::memcpy(&data_[pos_piggy_back_data], buffer.data_.data(),
                     buffer.data_.size());
             }
             else
@@ -76,11 +81,11 @@ namespace hpx::parcelset::policies::mpi {
 
         void reset() noexcept
         {
-            std::memset(&data_[0], static_cast<char>(-1), data_size_);
+            std::memset(data_.data(), static_cast<char>(-1), data_size_);
             data_[pos_piggy_back_flag] = 1;
         }
 
-        bool valid() const noexcept
+        [[nodiscard]] constexpr bool valid() const noexcept
         {
             return data_[0] != static_cast<char>(-1);
         }
@@ -96,31 +101,32 @@ namespace hpx::parcelset::policies::mpi {
 
         constexpr char* data() noexcept
         {
-            return &data_[0];
+            return data_.data();
         }
 
-        value_type tag() const noexcept
+        [[nodiscard]] constexpr value_type tag() const noexcept
         {
-            return get<pos_tag>();
+            return get(pos_tag);
         }
 
-        value_type size() const noexcept
+        [[nodiscard]] constexpr value_type size() const noexcept
         {
-            return get<pos_size>();
+            return get(pos_size);
         }
 
-        value_type numbytes() const noexcept
+        [[nodiscard]] constexpr value_type numbytes() const noexcept
         {
-            return get<pos_numbytes>();
+            return get(pos_numbytes);
         }
 
-        std::pair<value_type, value_type> num_chunks() const noexcept
+        [[nodiscard]] constexpr std::pair<value_type, value_type> num_chunks()
+            const noexcept
         {
             return std::make_pair(
-                get<pos_numchunks_first>(), get<pos_numchunks_second>());
+                get(pos_numchunks_first), get(pos_numchunks_second));
         }
 
-        constexpr char* piggy_back() noexcept
+        [[nodiscard]] constexpr char* piggy_back() noexcept
         {
             if (data_[pos_piggy_back_flag])
                 return &data_[pos_piggy_back_data];
@@ -130,18 +136,14 @@ namespace hpx::parcelset::policies::mpi {
     private:
         std::array<char, data_size_> data_;
 
-        template <std::size_t Pos, typename T>
-        void set(T const& t) noexcept
+        constexpr void set(std::size_t Pos, value_type const& t) noexcept
         {
-            std::memcpy(&data_[Pos], &t, sizeof(t));
+            *hpx::bit_cast<value_type*>(&data_[Pos]) = t;
         }
 
-        template <std::size_t Pos>
-        value_type get() const noexcept
+        [[nodiscard]] constexpr value_type get(std::size_t Pos) const noexcept
         {
-            value_type res;
-            std::memcpy(&res, &data_[Pos], sizeof(res));
-            return res;
+            return *hpx::bit_cast<value_type const*>(&data_[Pos]);
         }
     };
 }    // namespace hpx::parcelset::policies::mpi

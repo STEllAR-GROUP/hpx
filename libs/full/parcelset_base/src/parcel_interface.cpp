@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -43,7 +43,7 @@ namespace hpx::parcelset {
 
     parcel::~parcel() = default;
 
-    void parcel::reset()
+    void parcel::reset() const
     {
         data_->reset();
     }
@@ -68,12 +68,12 @@ namespace hpx::parcelset {
         return data_->source_id();
     }
 
-    void parcel::set_source_id(hpx::id_type const& source_id)
+    void parcel::set_source_id(hpx::id_type const& source_id) const
     {
         data_->set_source_id(source_id);
     }
 
-    void parcel::set_destination_id(naming::gid_type&& dest)
+    void parcel::set_destination_id(naming::gid_type&& dest) const
     {
         data_->set_destination_id(HPX_MOVE(dest));
     }
@@ -108,7 +108,7 @@ namespace hpx::parcelset {
         return data_->start_time();
     }
 
-    void parcel::set_start_time(double time)
+    void parcel::set_start_time(double time) const
     {
         data_->set_start_time(time);
     }
@@ -166,7 +166,7 @@ namespace hpx::parcelset {
         return data_->move_split_gids();
     }
 
-    void parcel::set_split_gids(split_gids_type&& split_gids)
+    void parcel::set_split_gids(split_gids_type&& split_gids) const
     {
         data_->set_split_gids(HPX_MOVE(split_gids));
     }
@@ -191,7 +191,7 @@ namespace hpx::parcelset {
         return data_->size();
     }
 
-    bool parcel::schedule_action(std::size_t num_thread)
+    bool parcel::schedule_action(std::size_t num_thread) const
     {
         return data_->schedule_action(num_thread);
     }
@@ -224,6 +224,11 @@ namespace hpx::parcelset {
         result.set_lsb(++id);
         return result;
     }
+#else
+    naming::gid_type const& parcel::parcel_id() const
+    {
+        return naming::invalid_gid;
+    }
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
@@ -233,7 +238,7 @@ namespace hpx::parcelset {
         data_->load(ar, 0);
     }
 
-    void parcel::serialize(serialization::output_archive& ar, unsigned)
+    void parcel::serialize(serialization::output_archive& ar, unsigned) const
     {
         data_->save(ar, 0);
     }
