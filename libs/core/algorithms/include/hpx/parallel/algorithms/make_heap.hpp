@@ -389,15 +389,37 @@ namespace hpx::parallel {
 
                 try
                 {
-                    // Get workitems that are to be run in parallel
+                    // parent of last node
+                    // last node has index (n-1)
+                    // parent of x is floor of (x-1)/2
                     std::size_t start = (n - 2) / 2;
                     while (start > 0)
                     {
-                        // Index of start of level, and amount of items in level
-                        std::size_t const end_exclusive =
-                            static_cast<std::size_t>(
-                                std::pow(2, std::floor(std::log2(start)))) -
-                            2;
+                        /*
+                            helps find number of elements
+                            in parent level of start
+                            The following are indexes of
+                            elements in the heap, not the
+                            value of the elements
+                                    0
+                                1       2
+                              3   4   5   6
+                            (size of heap) n = 7
+                            (parent of last element) start = 2
+                            end_exclusive =>
+                                last element index in
+                                    parent level of start
+                        */
+                        std::size_t end_exclusive = static_cast<std::size_t>(
+                            std::pow(2, std::floor(std::log2(start))));
+                        if (end_exclusive >= 2)
+                        {
+                            end_exclusive -= static_cast<std::size_t>(2);
+                        }
+                        else
+                        {
+                            end_exclusive = static_cast<std::size_t>(0);
+                        }
                         std::size_t level_items = start - end_exclusive;
 
                         // If we can't at least run two chunks in parallel,
