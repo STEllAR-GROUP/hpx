@@ -28,7 +28,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<>>(s);
-        check_error_types<hpx::variant<>>(s);
+        check_error_types<hpx::variant<std::exception_ptr>>(s);
         check_sends_stopped<true>(s);
 
         auto r = expect_stopped_receiver{set_stopped_called};

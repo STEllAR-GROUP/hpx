@@ -26,7 +26,8 @@ namespace hpx::execution::experimental {
     namespace detail {
 
         template <typename CPO, typename... Ts>
-        using just_completion_signatures = completion_signatures<CPO(Ts...)>;
+        using just_completion_signatures =
+            completion_signatures<CPO(Ts...), set_error_t(std::exception_ptr)>;
 
         template <typename CPO, typename... Ts>
         struct just_sender_base;

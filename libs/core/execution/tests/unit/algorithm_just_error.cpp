@@ -28,7 +28,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<>>(s);
-        check_error_types<hpx::variant<std::runtime_error>>(s);
+        check_error_types<hpx::variant<std::runtime_error, std::exception_ptr>>(
+            s);
         check_sends_stopped<false>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{
