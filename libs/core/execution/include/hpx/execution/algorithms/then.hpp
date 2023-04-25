@@ -166,7 +166,7 @@ namespace hpx::execution::experimental {
                 using is_sender = void;
                 using id = then_sender;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
-                HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
+                HPX_NO_UNIQUE_ADDRESS F f;
 
                 template <typename Func, typename Pack>
                 struct undefined_set_value_signature;
