@@ -25,8 +25,11 @@ namespace hpx::execution::experimental {
 
     namespace detail {
 
-        template <typename CPO, typename Is, typename... Ts>
-        struct just_sender;
+        template <typename CPO, typename... Ts>
+        using just_completion_signatures = completion_signatures<CPO(Ts...)>;
+
+        template <typename CPO, typename... Ts>
+        struct just_sender_base;
 
         template <typename ReceiverId, typename CPO, typename Is,
             typename... Ts>
@@ -42,7 +45,7 @@ namespace hpx::execution::experimental {
             struct type
             {
                 using id = just_sender_operation_state;
-                using data_type = hpx::util::member_pack_for<Ts...>;
+                using data_type = std::tuple<Ts...>;
 
                 type() = default;
 
@@ -54,7 +57,7 @@ namespace hpx::execution::experimental {
                     hpx::detail::try_catch_exception_ptr(
                         [&]() {
                             CPO{}(HPX_FORWARD(Receiver, os.receiver),
-                                HPX_FORWARD(Ts, os.ts).template get<Is>()...);
+                                std::get<Is>(HPX_FORWARD(Ts, os.ts))...);
                         },
                         [&](std::exception_ptr ep) {
                             hpx::execution::experimental::set_error(
@@ -67,37 +70,26 @@ namespace hpx::execution::experimental {
             };
         };
 
-        template <typename CPO, std::size_t... Is, typename... Ts>
-        struct just_sender<CPO, hpx::util::index_pack<Is...>, Ts...>
+        template <typename CPO, typename... Ts>
+        struct just_sender_base
         {
+            using Is = hpx::util::make_index_pack_t<sizeof...(Ts)>;
+
             template <typename Receiver>
-            using just_operation_t = hpx::meta::type<
-                just_sender_operation_state<hpx::meta::get_id_t<Receiver>, CPO,
-                    hpx::util::index_pack<Is...>, Ts...>>;
+            using just_operation_t =
+                hpx::meta::type<just_sender_operation_state<
+                    hpx::meta::get_id_t<Receiver>, CPO, Is, Ts...>>;
 
             struct type
             {
                 using is_sender = void;
-                using id = just_sender;
+                using id = just_sender_base;
+                using completion_signatures =
+                    just_completion_signatures<CPO, Ts...>;
 
-                HPX_NO_UNIQUE_ADDRESS util::member_pack_for<Ts...> ts;
+                HPX_NO_UNIQUE_ADDRESS std::tuple<Ts...> ts;
 
                 constexpr type() = default;
-
-                template <typename T,
-                    typename = std::enable_if_t<
-                        !std::is_same_v<std::decay_t<T>, just_sender>>>
-                explicit constexpr type(T&& t)
-                  : ts(std::piecewise_construct, HPX_FORWARD(T, t))
-                {
-                }
-
-                template <typename T0, typename T1, typename... Ts_>
-                explicit constexpr type(T0&& t0, T1&& t1, Ts_&&... ts)
-                  : ts(std::piecewise_construct, HPX_FORWARD(T0, t0),
-                        HPX_FORWARD(T1, t1), HPX_FORWARD(Ts_, ts)...)
-                {
-                }
 
                 type(type&&) = default;
                 type(type const&) = default;
@@ -124,26 +116,35 @@ namespace hpx::execution::experimental {
             };
         };
 
-        template <typename Pack, typename... Ts, typename Env>
-        auto tag_invoke(get_completion_signatures_t,
-            just_sender<set_value_t, Pack, Ts...> const&, Env) noexcept
-            -> hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
+        template <typename... Values>
+        struct just_sender
+        {
+            using base =
+                hpx::meta::type<just_sender_base<set_value_t, Values...>>;
 
-        // different versions of clang-format disagree
-        // clang-format off
-        template <typename Pack, typename Error, typename Env>
-        auto tag_invoke(get_completion_signatures_t,
-            just_sender<set_error_t, Pack, Error> const&, Env) noexcept
-            -> hpx::execution::experimental::completion_signatures<
-                set_error_t(std::exception_ptr), set_error_t(Error)>;
-        // clang-format on
+            struct type : base
+            {
+                using id = just_sender;
+            };
+        };
 
-        template <typename Pack, typename... Ts, typename Env>
-        auto tag_invoke(get_completion_signatures_t,
-            just_sender<set_stopped_t, Pack, Ts...> const&, Env) noexcept
-            -> hpx::execution::experimental::completion_signatures<
-                set_stopped_t(), set_error_t(std::exception_ptr)>;
+        template <typename Error>
+        struct just_error_sender
+        {
+            using base = hpx::meta::type<just_sender_base<set_error_t, Error>>;
+
+            struct type : base
+            {
+                using id = just_error_sender;
+            };
+        };
+
+        struct just_stopped_sender
+          : hpx::meta::type<just_sender_base<set_stopped_t>>
+        {
+            using id = just_stopped_sender;
+            using type = just_stopped_sender;
+        };
     }    // namespace detail
 
     // Returns a sender with no completion schedulers, which sends the provided
@@ -156,11 +157,9 @@ namespace hpx::execution::experimental {
     {
         template <typename... Ts>
         constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
+            -> hpx::meta::type<detail::just_sender<std::decay_t<Ts>...>>
         {
-            return hpx::meta::type<
-                detail::just_sender<hpx::execution::experimental::set_value_t,
-                    hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>>{
-                HPX_FORWARD(Ts, ts)...};
+            return {{{HPX_FORWARD(Ts, ts)...}}};
         }
     } just{};
 
@@ -174,11 +173,9 @@ namespace hpx::execution::experimental {
     {
         template <typename Error>
         constexpr HPX_FORCEINLINE auto operator()(Error&& error) const
+            -> hpx::meta::type<detail::just_error_sender<std::decay_t<Error>>>
         {
-            return hpx::meta::type<
-                detail::just_sender<hpx::execution::experimental::set_error_t,
-                    hpx::util::make_index_pack_t<std::size_t(1)>, Error>>{
-                HPX_FORWARD(Error, error)};
+            return {{{HPX_FORWARD(Error, error)}}};
         }
     } just_error{};
 
@@ -187,12 +184,10 @@ namespace hpx::execution::experimental {
     inline constexpr struct just_stopped_t final
     {
         template <typename... Ts>
-        constexpr HPX_FORCEINLINE auto operator()(Ts&&... ts) const
+        constexpr HPX_FORCEINLINE auto operator()() const
+            -> hpx::meta::type<detail::just_stopped_sender>
         {
-            return hpx::meta::type<
-                detail::just_sender<hpx::execution::experimental::set_stopped_t,
-                    hpx::util::make_index_pack_t<sizeof...(Ts)>, Ts...>>{
-                HPX_FORWARD(Ts, ts)...};
+            return {{}};
         }
     } just_stopped{};
 }    // namespace hpx::execution::experimental

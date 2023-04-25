@@ -29,7 +29,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [] {};
@@ -47,7 +47,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
@@ -65,8 +65,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
-        check_value_types<hpx::variant<hpx::tuple<int&>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
@@ -85,7 +85,7 @@ int main()
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -104,9 +104,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<
-            hpx::variant<hpx::tuple<custom_type_non_default_constructible&>>>(
-            s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -126,7 +125,7 @@ int main()
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -146,7 +145,7 @@ int main()
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -164,7 +163,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](std::string s, int x) {
@@ -186,8 +185,8 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
-        check_value_types<hpx::variant<hpx::tuple<std::string&, int&>>>(s);
-        check_error_types<hpx::variant<std::exception_ptr>>(s);
+        check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
+        check_error_types<hpx::variant<>>(s);
         check_sends_stopped<false>(s);
 
         auto f = [](std::string str, int x) {

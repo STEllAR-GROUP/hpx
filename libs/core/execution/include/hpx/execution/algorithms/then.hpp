@@ -212,10 +212,6 @@ namespace hpx::execution::experimental {
                 friend auto tag_invoke(get_completion_signatures_t, type const&,
                     Env) -> generate_completion_signatures<Env>;
 
-                template <typename Env>
-                friend auto tag_invoke(get_completion_signatures_t, type const&,
-                    Env) -> dependent_completion_signatures<Env>;
-
                 // clang-format off
                 template <typename CPO,
                     HPX_CONCEPT_REQUIRES_(
