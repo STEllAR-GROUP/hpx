@@ -242,9 +242,8 @@ namespace hpx::execution::experimental {
                         hpx::meta::copy_cvref_t<Self, F>>)
                     -> operation<type, Receiver>
                 {
-                    return {HPX_FORWARD(Self, s).sender,
-                        HPX_FORWARD(Receiver, receiver),
-                        HPX_FORWARD(Self, s).f};
+                    return {HPX_FORWARD(Self, s.sender),
+                        HPX_FORWARD(Receiver, receiver), HPX_FORWARD(F, s.f)};
                 }
 
                 friend auto tag_invoke(get_env_t, const type& self)    //
