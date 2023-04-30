@@ -1,6 +1,6 @@
-//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2023      Christopher Taylor 
+//  Copyright (c) 2013-2021 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
-//  Copyright (c) 2023 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
 
 #include <hpx/parcelset/parcel_buffer.hpp>
@@ -22,9 +22,11 @@
 #include <utility>
 
 namespace hpx::parcelset::policies::gasnet {
+
     struct header
     {
         using value_type = int;
+
         enum data_pos
         {
             pos_tag = 0 * sizeof(value_type),

@@ -1,6 +1,5 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2023 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,13 +9,14 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
-
+#if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
-#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/modules/functional.hpp>
+#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/synchronization.hpp>
 
-#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/parcelport_gasnet/sender_connection.hpp>
+#include <hpx/parcelport_gasnet/tag_provider.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -25,18 +25,29 @@
 #include <mutex>
 #include <utility>
 
+#include <mpi.h>
+
 namespace hpx::parcelset::policies::gasnet {
+
     struct sender
     {
         using connection_type = sender_connection;
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-        using mutex_type = hpx::spinlock;
+        // different versions of clang-format disagree
+        // clang-format off
+        sender() noexcept
+          : next_free_tag_request_((MPI_Request) (-1))
+          , next_free_tag_(-1)
+        {
+        }
+        // clang-format on
 
-        sender() noexcept {}
-
-        void run() noexcept {}
+        void run() noexcept
+        {
+            get_next_free_tag();
+        }
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)
         {
@@ -45,8 +56,13 @@ namespace hpx::parcelset::policies::gasnet {
 
         void add(connection_ptr const& ptr)
         {
-            std::unique_lock<mutex_type> l(connections_mtx_);
+            std::unique_lock l(connections_mtx_);
             connections_.push_back(ptr);
+        }
+
+        int acquire_tag() noexcept
+        {
+            return tag_provider_.acquire();
         }
 
         void send_messages(connection_ptr connection)
@@ -64,7 +80,7 @@ namespace hpx::parcelset::policies::gasnet {
             }
             else
             {
-                std::unique_lock<mutex_type> l(connections_mtx_);
+                std::unique_lock l(connections_mtx_);
                 connections_.push_back(HPX_MOVE(connection));
             }
         }
@@ -73,9 +89,8 @@ namespace hpx::parcelset::policies::gasnet {
         {
             connection_ptr connection;
             {
-                std::unique_lock<mutex_type> l(
-                    connections_mtx_, std::try_to_lock);
-                if (l.owns_lock() && !connections_.empty())
+                std::unique_lock l(connections_mtx_, std::try_to_lock);
+                if (l && !connections_.empty())
                 {
                     connection = HPX_MOVE(connections_.front());
                     connections_.pop_front();
@@ -88,16 +103,60 @@ namespace hpx::parcelset::policies::gasnet {
                 send_messages(HPX_MOVE(connection));
                 has_work = true;
             }
-
+            next_free_tag();
             return has_work;
         }
 
     private:
+        tag_provider tag_provider_;
 
-        mutex_type connections_mtx_;
+        void next_free_tag() noexcept
+        {
+            int next_free = -1;
+            {
+                std::unique_lock l(next_free_tag_mtx_, std::try_to_lock);
+                if (l.owns_lock())
+                {
+                    next_free = next_free_tag_locked();
+                }
+            }
+
+            if (next_free != -1)
+            {
+                HPX_ASSERT(next_free > 1);
+                tag_provider_.release(next_free);
+            }
+        }
+
+        int next_free_tag_locked() noexcept
+        {
+            util::gasnet_environment::scoped_try_lock l;
+            if (l.locked)
+            {
+                return get_next_free_tag();
+            }
+            return -1;
+        }
+
+        int get_next_free_tag() noexcept
+        {
+            int next_free = next_free_tag_;
+  
+            util::mpi_environment::scoped_lock l;
+            std::memcpy(&next_free,
+                util::gasnet_environment::gasnet_buffer[self_],
+                sizeof(int));
+
+            return next_free;
+        }
+
+        hpx::spinlock connections_mtx_;
         connection_list connections_;
-    };
 
+        hpx::spinlock next_free_tag_mtx_;
+        MPI_Request next_free_tag_request_;
+        int next_free_tag_;
+    };
 }    // namespace hpx::parcelset::policies::gasnet
 
 #endif
