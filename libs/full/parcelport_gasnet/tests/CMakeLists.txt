@@ -8,35 +8,60 @@ include(HPX_Message)
 
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
+<<<<<<< HEAD
     add_hpx_pseudo_target(tests.unit.modules.parcelport_gasnet)
     add_hpx_pseudo_dependencies(
       tests.unit.modules tests.unit.modules.parcelport_gasnet
+=======
+    add_hpx_pseudo_target(tests.unit.modules.parcelport_lci)
+    add_hpx_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.parcelport_lci
+>>>>>>> 471497b530 (initial import of gasnet parcelport)
     )
     add_subdirectory(unit)
   endif()
 
   if(HPX_WITH_TESTS_REGRESSIONS)
+<<<<<<< HEAD
     add_hpx_pseudo_target(tests.regressions.modules.parcelport_gasnet)
     add_hpx_pseudo_dependencies(
       tests.regressions.modules tests.regressions.modules.parcelport_gasnet
+=======
+    add_hpx_pseudo_target(tests.regressions.modules.parcelport_lci)
+    add_hpx_pseudo_dependencies(
+      tests.regressions.modules tests.regressions.modules.parcelport_lci
+>>>>>>> 471497b530 (initial import of gasnet parcelport)
     )
     add_subdirectory(regressions)
   endif()
 
   if(HPX_WITH_TESTS_BENCHMARKS)
+<<<<<<< HEAD
     add_hpx_pseudo_target(tests.performance.modules.parcelport_gasnet)
     add_hpx_pseudo_dependencies(
       tests.performance.modules tests.performance.modules.parcelport_gasnet
+=======
+    add_hpx_pseudo_target(tests.performance.modules.parcelport_lci)
+    add_hpx_pseudo_dependencies(
+      tests.performance.modules tests.performance.modules.parcelport_lci
+>>>>>>> 471497b530 (initial import of gasnet parcelport)
     )
     add_subdirectory(performance)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
+<<<<<<< HEAD
       modules.parcelport_gasnet
       HEADERS ${parcelport_gasnet_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       DEPENDENCIES hpx_parcelport_gasnet
+=======
+      modules.parcelport_lci
+      HEADERS ${parcelport_lci_headers}
+      HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
+      DEPENDENCIES hpx_parcelport_lci
+>>>>>>> 471497b530 (initial import of gasnet parcelport)
     )
   endif()
 endif()

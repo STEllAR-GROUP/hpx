@@ -161,6 +161,7 @@ namespace hpx::parcelset::policies::gasnet {
         connection_list connections_;
         exp_backoff bo;
     };
+
 }    // namespace hpx::parcelset::policies::gasnet
 
 #endif
