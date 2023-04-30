@@ -203,7 +203,8 @@ namespace hpx::parcelset::policies::mpi {
                 request_ptr_ = &request_;
             }
 
-            decode_parcels(pp_, HPX_MOVE(buffer_), num_thread);
+            handle_received_parcels(
+                decode_parcels(pp_, HPX_MOVE(buffer_), num_thread), num_thread);
 
             state_ = sent_release_tag;
 

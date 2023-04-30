@@ -458,6 +458,14 @@ namespace hpx::parcelset::detail {
             return true;
         }
 
+        // schedule later if this is de-serialized with zero-copy semantics
+        if (ar.try_get_extra_data<
+                serialization::detail::allow_zero_copy_receive>() != nullptr)
+        {
+            action_->load(ar);
+            return false;
+        }
+
         // continuation support, this is handled in the transfer action
         action_->load_schedule(ar, HPX_MOVE(data_.dest_), p.first, p.second,
             num_thread, deferred_schedule);
@@ -474,7 +482,6 @@ namespace hpx::parcelset::detail {
             reinterpret_cast<std::uint64_t>(
                 action_->get_parent_thread_id().get()));
 #endif
-
         return false;
     }
 

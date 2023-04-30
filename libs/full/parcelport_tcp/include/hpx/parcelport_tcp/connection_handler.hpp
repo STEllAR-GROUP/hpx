@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -89,11 +89,11 @@ namespace hpx::parcelset {
             // Start the handling of connections.
             bool do_run();
 
-            // Stop the handling of connectons.
+            // Stop the handling of connections.
             void do_stop();
 
             // Return the name of this locality
-            std::string get_locality_name() const
+            std::string get_locality_name() const override
             {
                 return asio::ip::host_name();
             }
@@ -102,15 +102,15 @@ namespace hpx::parcelset {
                 parcelset::locality const& l, error_code& ec);
 
             parcelset::locality agas_locality(
-                util::runtime_configuration const& ini) const;
+                util::runtime_configuration const& ini) const override;
 
-            parcelset::locality create_locality() const;
+            parcelset::locality create_locality() const override;
 
         private:
             void handle_accept(std::error_code const& e,
                 std::shared_ptr<receiver> receiver_conn);
             void handle_read_completion(std::error_code const& e,
-                std::shared_ptr<receiver> receiver_conn);
+                std::shared_ptr<receiver> const& receiver_conn);
 
             /// Acceptor used to listen for incoming connections.
             asio::ip::tcp::acceptor* acceptor_;

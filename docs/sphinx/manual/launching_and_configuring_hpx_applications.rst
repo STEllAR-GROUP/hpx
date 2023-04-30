@@ -703,7 +703,7 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
      * This property defines the maximum allowed outbound coalesced message size
        that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
-   * * ``hpx.parcel.tcp.max_background_threads``
+   * * ``hpx.parcel.mpi.max_background_threads``
      * This property defines how many cores should be used to perform background
        operations. The default is taken from ``hpx.parcel.max_background_threads``.
 

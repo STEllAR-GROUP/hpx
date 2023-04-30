@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -24,7 +24,7 @@ namespace hpx::parcelset::policies::tcp {
     {
     public:
         locality() noexcept
-          : port_(std::uint16_t(-1))
+          : port_(static_cast<std::uint16_t>(-1))
         {
         }
 
@@ -51,7 +51,7 @@ namespace hpx::parcelset::policies::tcp {
 
         explicit constexpr operator bool() const noexcept
         {
-            return port_ != std::uint16_t(-1);
+            return port_ != static_cast<std::uint16_t>(-1);
         }
 
         HPX_EXPORT void save(serialization::output_archive& ar) const;
