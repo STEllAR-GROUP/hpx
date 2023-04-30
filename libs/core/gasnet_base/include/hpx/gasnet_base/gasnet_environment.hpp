@@ -9,11 +9,12 @@
 
 #include <hpx/config.hpp>
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET))
+#if (defined(HPX_HAVE_NETWORKING) && (defined(HPX_HAVE_PARCELPORT_GASNET_MPI) || defined(HPX_HAVE_PARCELPORT_GASNET_SMP)))
 
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/gasnet_base/gasnet.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/synchronization/mutex.hpp>
 
 #include <cstdlib>
 #include <string>
@@ -21,6 +22,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx { namespace util {
+
     struct HPX_CORE_EXPORT gasnet_environment
     {
         static bool check_gasnet_environment(runtime_configuration const& cfg);
@@ -38,6 +40,14 @@ namespace hpx { namespace util {
         static int size();
 
         static std::string get_processor_name();
+
+        static bool gettable(const int node, void* start, const size_t len);
+
+        template<typename T>
+        static void put(T * addr, const int rank, T * raddr, const std::size_t size);
+
+        template<typename T>
+        static void get(T * addr, const int rank, T * raddr, const std::size_t size);
 
         struct HPX_CORE_EXPORT scoped_lock
         {
@@ -60,8 +70,9 @@ namespace hpx { namespace util {
 
         typedef hpx::spinlock mutex_type;
 
-    private:
-        static mutex_type mtx_;
+    public:
+        static hpx::spinlock pollingLock;
+        static hpx::mutex mtx_;
 
         static bool enabled_;
         static bool has_called_init_;
@@ -69,8 +80,10 @@ namespace hpx { namespace util {
 
         static int is_initialized_;
 
-    public:
+        static hpx::mutex dshm_mut;
         static int init_val_;
+        static hpx::mutex* segment_mutex;
+        static gasnet_seginfo_t* segments;
     };
 }}    // namespace hpx::util
 
