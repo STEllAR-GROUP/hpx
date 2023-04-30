@@ -104,6 +104,7 @@ namespace hpx::parcelset::policies::gasnet {
                 has_work = true;
             }
             next_free_tag();
+
             return has_work;
         }
 
@@ -159,6 +160,7 @@ namespace hpx::parcelset::policies::gasnet {
         int next_free_tag_request_;
         int next_free_tag_;
     };
+
 }    // namespace hpx::parcelset::policies::gasnet
 
 #endif

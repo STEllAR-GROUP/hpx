@@ -1,16 +1,17 @@
-# Copyright (c)      2017 Thomas Heller
-# Copyright (c)      2023 Christopher Taylor
+# Copyright (c) 2019-2022 Ste||ar Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-#
+
+include(HPX_Message)
+include(FindGasnet)
 
 macro(hpx_setup_openshmem)
 
   if(NOT TARGET PkgConfig::OPENSHMEM)
 
-    find_package(PkgConfig REQUIRED QUIET COMPONENTS)
+    find_gasnet()
 
     hpx_info(
       "OpenSHMEM needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`"
@@ -699,5 +700,4 @@ macro(hpx_setup_openshmem)
     )
 
   endif()
-
 endmacro()
