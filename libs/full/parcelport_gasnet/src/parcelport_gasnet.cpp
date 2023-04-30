@@ -110,7 +110,7 @@ namespace hpx::parcelset {
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.gasnet.background_threads",
                     HPX_HAVE_PARCELPORT_GASNET_BACKGROUND_THREADS);
-*/
+                */
                 return 1UL;
             }
 
@@ -234,7 +234,6 @@ namespace hpx::parcelset {
             void io_service_work()
             {
                 std::size_t k = 0;
-
                 // We only execute work on the IO service while HPX is starting
                 while (hpx::is_starting())
                 {
