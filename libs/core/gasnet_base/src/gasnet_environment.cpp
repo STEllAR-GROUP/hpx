@@ -390,7 +390,6 @@ namespace hpx::util {
 
             char message[1024 + 1];
             std::snprintf(message, 1024 + 1, "%s\n", gasnet_ErrorDesc(retval));
-
             std::string msg("gasnet_environment::init: gasnet_init failed: ");
             msg = msg + message + ".";
             throw std::runtime_error(msg.c_str());
