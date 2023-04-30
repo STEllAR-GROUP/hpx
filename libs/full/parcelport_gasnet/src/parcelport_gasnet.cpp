@@ -1,7 +1,7 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2023      Christopher Taylor
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
-//  Copyright (c)      2023 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,10 +9,11 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -21,7 +22,6 @@
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelport_gasnet/receiver.hpp>
@@ -72,6 +72,11 @@ namespace hpx::parcelset {
 
     namespace policies::gasnet {
 
+        int acquire_tag(sender* s) noexcept
+        {
+            return s->acquire_tag();
+        }
+
         void add_connection(
             sender* s, std::shared_ptr<sender_connection> const& ptr)
         {
@@ -117,6 +122,7 @@ namespace hpx::parcelset {
             {
                 receiver_.run();
                 sender_.run();
+
                 for (std::size_t i = 0; i != io_service_pool_.size(); ++i)
                 {
                     io_service_pool_.get_io_service(int(i)).post(
@@ -128,6 +134,7 @@ namespace hpx::parcelset {
             // Stop the handling of connections.
             void do_stop()
             {
+                int retval;
                 while (do_background_work(0, parcelport_background_mode_all))
                 {
                     if (threads::get_self_ptr())
@@ -135,16 +142,23 @@ namespace hpx::parcelset {
                             hpx::threads::thread_schedule_state::pending,
                             "gasnet::parcelport::do_stop");
                 }
+
                 stopped_ = true;
-                LCI_barrier();
+                gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
+                if((retval = gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK) {
+                    // throw exception
+                    HPX_THROW_EXCEPTION(invalid_status,
+                       "hpx::util::gasnet_environment::init",
+                       "GASNET failed ", std::to_string(gasnetErrorName(retval)), " ",
+                       std::to_string(gasnetErrorDesc(retval)));
+                    gasnet_exit(retval);
+                }
             }
 
             /// Return the name of this locality
             std::string get_locality_name() const override
             {
-                // hostname-rank
-                return util::gasnet_environment::get_processor_name() + "-" +
-                    std::to_string(util::gasnet_environment::rank());
+                return util::gasnet_environment::get_processor_name();
             }
 
             std::shared_ptr<sender_connection> create_connection(
@@ -170,7 +184,9 @@ namespace hpx::parcelset {
                 std::size_t /* num_thread */, parcelport_background_mode mode)
             {
                 if (stopped_)
+                {
                     return false;
+                }
 
                 bool has_work = false;
                 if (mode & parcelport_background_mode_send)
@@ -185,8 +201,6 @@ namespace hpx::parcelset {
             }
 
         private:
-            using mutex_type = hpx::spinlock;
-
             std::atomic<bool> stopped_;
 
             sender sender_;
@@ -195,6 +209,7 @@ namespace hpx::parcelset {
             void io_service_work()
             {
                 std::size_t k = 0;
+
                 // We only execute work on the IO service while HPX is starting
                 while (hpx::is_starting())
                 {
@@ -232,63 +247,5 @@ namespace hpx::parcelset {
         };
     }    // namespace policies::gasnet
 }    // namespace hpx::parcelset
-
-#include <hpx/config/warnings_suffix.hpp>
-
-namespace hpx::traits {
-    // Inject additional configuration data into the factory registry for this
-    // type. This information ends up in the system wide configuration database
-    // under the plugin specific section:
-    //
-    //      [hpx.parcel.gasnet]
-    //      ...
-    //      priority = 200
-    //
-    template <>
-    struct plugin_config_data<hpx::parcelset::policies::gasnet::parcelport>
-    {
-        static constexpr char const* priority() noexcept
-        {
-            return "50";
-        }
-
-        static void init(
-            int* argc, char*** argv, util::command_line_handling& cfg)
-        {
-            util::gasnet_environment::init(argc, argv, cfg.rtcfg_);
-            cfg.num_localities_ =
-                static_cast<std::size_t>(util::gasnet_environment::size());
-            cfg.node_ = static_cast<std::size_t>(util::gasnet_environment::rank());
-        }
-
-        // TODO: implement creation of custom thread pool here
-        static void init(hpx::resource::partitioner&) noexcept {}
-
-        static void destroy()
-        {
-            util::gasnet_environment::finalize();
-        }
-
-        static constexpr char const* call() noexcept
-        {
-            return
-            // TODO: change these for LCI
-#if defined(HPX_HAVE_PARCELPORT_GASNET_ENV)
-                "env = "
-                "${HPX_HAVE_PARCELPORT_GASNET_ENV:" HPX_HAVE_PARCELPORT_GASNET_ENV
-                "}\n"
-#else
-                "env = ${HPX_HAVE_PARCELPORT_GASNET_ENV:"
-                "MV2_COMM_WORLD_RANK,PMIX_RANK,PMI_RANK,GASNET_COMM_WORLD_SIZE,"
-                "ALPS_APP_PE,PALS_NODEID"
-                "}\n"
-#endif
-                "max_connections = "
-                "${HPX_HAVE_PARCELPORT_GASNET_MAX_CONNECTIONS:8192}\n";
-        }
-    };
-}    // namespace hpx::traits
-
-HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::gasnet::parcelport, gasnet)
 
 #endif

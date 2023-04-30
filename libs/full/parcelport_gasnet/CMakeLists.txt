@@ -4,9 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(NOT (HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET))
-  return()
-endif()
+if(HPX_WITH_NETWORKING AND (HPX_WITH_PARCELPORT_GASNET_MPI OR HPX_WITH_PARCELPORT_GASNET_SMP OR HPX_WITH_PARCELPORT_UDP))
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -29,18 +27,48 @@ hpx_setup_gasnet()
 
 include(HPX_AddModule)
 
-add_hpx_module(
-  full parcelport_gasnet
-  GLOBAL_HEADER_GEN ON
-  SOURCES ${parcelport_gasnet_sources}
-  HEADERS ${parcelport_gasnet_headers}
-  COMPAT_HEADERS ${parcelport_gasnet_compat_headers}
-  DEPENDENCIES gasnet hpx_core
-  MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
-  CMAKE_SUBDIRS examples tests
-)
+if(GASNET_MPI_FOUND AND HPX_WITH_NETWORKING)
+   add_hpx_module(
+      full parcelport_gasnet
+      GLOBAL_HEADER_GEN ON
+      SOURCES ${parcelport_gasnet_sources}
+      HEADERS ${parcelport_gasnet_headers}
+      COMPAT_HEADERS ${parcelport_gasnet_compat_headers}
+      MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
+      DEPENDENCIES hpx_core gasnet-mpi-par Mpi::mpi
+      CMAKE_SUBDIRS examples tests
+   )
+else()
+   if(GASNET_UDP_FOUND AND HPX_WITH_NETWORKING)
+      add_hpx_module(
+         full parcelport_gasnet
+         GLOBAL_HEADER_GEN ON
+         SOURCES ${parcelport_gasnet_sources}
+         HEADERS ${parcelport_gasnet_headers}
+         COMPAT_HEADERS ${parcelport_gasnet_compat_headers}
+         MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
+         DEPENDENCIES hpx_core gasnet-udp-par
+         CMAKE_SUBDIRS examples tests
+      )
+   else()
+      add_hpx_module(
+         full parcelport_gasnet
+         GLOBAL_HEADER_GEN ON
+         SOURCES ${parcelport_gasnet_sources}
+         HEADERS ${parcelport_gasnet_headers}
+         COMPAT_HEADERS ${parcelport_gasnet_compat_headers}
+         MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
+         DEPENDENCIES hpx_core gasnet-smp-par
+         CMAKE_SUBDIRS examples tests
+      )
+   endif()
+endif()
 
 set(HPX_STATIC_PARCELPORT_PLUGINS
     ${HPX_STATIC_PARCELPORT_PLUGINS} parcelport_gasnet
     CACHE INTERNAL "" FORCE
 )
+
+else()
+   return()
+endif()

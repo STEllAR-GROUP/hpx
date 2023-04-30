@@ -1,6 +1,6 @@
+//  Copyright (c) 2023      Christopher Taylor
 //  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2013-2014 Thomas Heller
-//  Copyright (c) 2023 Christopher Taylor
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
@@ -32,7 +32,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         constexpr std::int32_t rank() const noexcept
         {
-            return rank_;
+            return static_cast<std::int32_t>(rank_);
         }
 
         static constexpr const char* type() noexcept
@@ -63,7 +63,7 @@ namespace hpx::parcelset::policies::gasnet {
         friend HPX_EXPORT std::ostream& operator<<(
             std::ostream& os, locality const& loc) noexcept;
 
-        std::int32_t rank_;
+        gasnet_node_t rank_;
     };
 }    // namespace hpx::parcelset::policies::gasnet
 
