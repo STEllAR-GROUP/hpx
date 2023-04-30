@@ -147,8 +147,10 @@ namespace hpx::parcelset::policies::libfabric {
             << hexpointer(this)
             << "calling parcel decode for complete NORMAL parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(
+        std::vector<parcelset::parcel> parcels = decode_message_with_chunks(
             *pp_, HPX_MOVE(buffer), 0, chunks_, num_thread);
+        handle_received_parcels(HPX_MOVE(parcels), num_thread);
+
         LOG_DEBUG_MSG("receiver "
             << hexpointer(this)
             << "parcel decode called for complete NORMAL (small) parcel");
@@ -482,8 +484,10 @@ namespace hpx::parcelset::policies::libfabric {
             << hexpointer(this)
             << "calling parcel decode for ZEROCOPY complete parcel");
         std::size_t num_thread = hpx::get_worker_thread_num();
-        decode_message_with_chunks(
+        std::vector<parcelset::parcel> parcels = decode_message_with_chunks(
             *pp_, HPX_MOVE(buffer), 0, chunks_, num_thread);
+        handle_received_parcels(HPX_MOVE(parcels), num_thread);
+
         LOG_DEBUG_MSG("receiver "
             << hexpointer(this)
             << "parcel decode called for ZEROCOPY complete parcel");

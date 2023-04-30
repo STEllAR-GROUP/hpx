@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/config/endian.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/serialization/detail/allow_zero_copy_receive.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
@@ -81,7 +82,12 @@ namespace hpx::serialization {
                 // try using chunking
                 if constexpr (std::is_same_v<Archive, input_archive>)
                 {
-                    ar.load_binary_chunk(m_t, m_element_count * sizeof(T));
+                    bool allow_zero_copy_receive =
+                        ar.template try_get_extra_data<
+                            detail::allow_zero_copy_receive>() != nullptr;
+
+                    ar.load_binary_chunk(m_t, m_element_count * sizeof(T),
+                        allow_zero_copy_receive);
                 }
                 else
                 {

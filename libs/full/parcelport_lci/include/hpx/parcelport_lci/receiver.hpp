@@ -1,5 +1,4 @@
-
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -139,7 +138,8 @@ namespace hpx::parcelset::policies::lci {
                     consumed += decode_eager(
                         (char*) request.data.mbuffer.address + consumed,
                         buffer);
-                    decode_parcels(pp_, HPX_MOVE(buffer), -1);
+                    handle_received_parcels(
+                        decode_parcels(pp_, HPX_MOVE(buffer)));
                 }
                 HPX_ASSERT(consumed == request.data.mbuffer.length);
             }
@@ -149,7 +149,7 @@ namespace hpx::parcelset::policies::lci {
                 HPX_ASSERT(request.type == LCI_IOVEC);
                 buffer_type buffer;
                 decode_iovec(request.data.iovec, buffer);
-                decode_parcels(pp_, HPX_MOVE(buffer), -1);
+                handle_received_parcels(decode_parcels(pp_, HPX_MOVE(buffer)));
             }
         }
 
