@@ -34,6 +34,7 @@ set(_hpx_full_modules
     parcelport_lci
     parcelport_libfabric
     parcelport_mpi
+    parcelport_gasnet
     parcelport_tcp
     parcelset
     parcelset_base
