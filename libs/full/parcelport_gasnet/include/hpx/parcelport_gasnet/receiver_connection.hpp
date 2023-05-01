@@ -29,21 +29,6 @@
 
 namespace hpx::parcelset::policies::gasnet {
 
-    struct ExpBackoff {
-        int numTries;
-        const static int maxRetries = 10;
-
-        void operator()() {
-           if(numTries <= maxRetries) {
-              gasnet_AMPoll();
-              hpx::this_thread::suspend(std::chrono::microseconds(1 << numTries));
-           }
-           else {
-              numTries = 0;
-           }
-        }
-    };
-
     template <typename Parcelport>
     struct receiver_connection
     {

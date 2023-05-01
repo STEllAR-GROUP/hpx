@@ -28,6 +28,21 @@
 
 namespace hpx::parcelset::policies::gasnet {
 
+    struct exp_backoff {
+        int numTries;
+        const static int maxRetries = 10;
+
+        void operator()() {
+           if(numTries <= maxRetries) {
+              gasnet_AMPoll();
+              hpx::this_thread::suspend(std::chrono::microseconds(1 << numTries));
+           }
+           else {
+              numTries = 0;
+           }
+        }
+    };
+
     template <typename Parcelport>
     struct receiver
     {
@@ -102,15 +117,14 @@ namespace hpx::parcelset::policies::gasnet {
 
             if (l.locked)
             {
-                if (request_done_locked(hdr_request_))
-                {
-                    header h = new_header();
-                    l.unlock();
-                    header_lock.unlock();
+                header h = new_header();
+                l.unlock();
+                header_lock.unlock();
 
-                    res.reset(new connection_type(h, pp_));
-                    return res;
-                }
+                // remote localities 'put' into the gasnet shared memory segment on this machine
+                //
+                res.reset(new connection_type(hpx::util::gasnet_environment::rank(), h, pp_));
+                return res;
             }
             return res;
         }
@@ -120,7 +134,7 @@ namespace hpx::parcelset::policies::gasnet {
             header h = rcv_header_;
             rcv_header_.reset();
 
-            ExpBackoff bo{0};
+            exp_backoff bo{0};
 
             while(rcv_header_.data() == 0) {
                gasnet_AMPoll();
@@ -140,19 +154,6 @@ namespace hpx::parcelset::policies::gasnet {
 
         hpx::spinlock connections_mtx_;
         connection_list connections_;
-
-        bool request_done_locked(MPI_Request& r, MPI_Status* status) noexcept
-        {
-            int completed = 0;
-            int ret = MPI_Test(&r, &completed, status);
-            HPX_ASSERT(ret == MPI_SUCCESS);
-            (void) ret;
-            if (completed)
-            {
-                return true;
-            }
-            return false;
-        }
     };
 }    // namespace hpx::parcelset::policies::gasnet
 
