@@ -367,36 +367,34 @@ namespace hpx::parcelset::policies::tcp {
 
                 parcels_ = decode_parcels_zero_copy(parcelport_, buffer_);
 
-                auto const num_non_zero_copy_chunks = static_cast<std::size_t>(
-                    static_cast<std::uint32_t>(buffer_.num_chunks_.second));
+                // note that at this point, buffer_.chunks_ will have
+                // entries for all chunks, including the non-zero-copy ones
+
+                [[maybe_unused]] auto const num_non_zero_copy_chunks =
+                    static_cast<std::size_t>(
+                        static_cast<std::uint32_t>(buffer_.num_chunks_.second));
 
                 HPX_ASSERT(num_zero_copy_chunks + num_non_zero_copy_chunks ==
                     buffer_.chunks_.size());
 
                 std::size_t zero_copy_chunks = 0;
-                for (std::size_t all_chunks = 0; all_chunks !=
-                     num_zero_copy_chunks + num_non_zero_copy_chunks;
-                     ++all_chunks)
+                for (auto& c : buffer_.chunks_)
                 {
-                    if (buffer_.chunks_[all_chunks].type_ ==
-                        serialization::chunk_type::chunk_type_index)
+                    if (c.type_ == serialization::chunk_type::chunk_type_index)
                     {
-                        continue;
+                        continue;    // skip non-zero-copy chunks
                     }
 
+                    auto const chunk_size = static_cast<std::size_t>(
+                        buffer_.transmission_chunks_[zero_copy_chunks++]
+                            .second);
+
                     HPX_ASSERT_MSG(
-                        buffer_.chunks_[all_chunks].data_.cpos_ != nullptr,
-                        "zero-copy chunk buffer should have been initialized "
+                        c.data() != nullptr && c.size() == chunk_size,
+                        "zero-copy chunk buffers should have been initialized "
                         "during de-serialization");
 
-                    auto const chunk_size = static_cast<std::size_t>(
-                        buffer_.transmission_chunks_[zero_copy_chunks].second);
-
-                    HPX_ASSERT(buffer_.chunks_[all_chunks].size_ == chunk_size);
-
-                    buffers.emplace_back(
-                        buffer_.chunks_[all_chunks].data_.pos_, chunk_size);
-                    ++zero_copy_chunks;
+                    buffers.emplace_back(c.data(), chunk_size);
                 }
                 HPX_ASSERT(zero_copy_chunks == num_zero_copy_chunks);
 
