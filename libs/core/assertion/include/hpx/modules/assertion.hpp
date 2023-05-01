@@ -15,6 +15,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assertion/evaluate_assert.hpp>
 #include <hpx/assertion/source_location.hpp>
+#include <hpx/modules/format.hpp>
 #include <hpx/preprocessor/stringize.hpp>
 
 #if defined(HPX_COMPUTE_DEVICE_CODE)
@@ -59,36 +60,37 @@ namespace hpx::assertion {
 #define HPX_ASSERT_MSG(expr, msg)
 #else
 /// \cond NOINTERNAL
-#define HPX_ASSERT_(expr, msg)                                                 \
+#define HPX_ASSERT_(expr, ...)                                                 \
     (!!(expr) ? void() :                                                       \
                 ::hpx::assertion::detail::handle_assert(                       \
                     HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr),     \
-                    msg)) /**/
+                    hpx::util::format(__VA_ARGS__))) /**/
 
-#define HPX_ASSERT_LOCKED_(l, expr, msg)                                       \
+#define HPX_ASSERT_LOCKED_(l, expr, ...)                                       \
     (!!(expr) ? void() :                                                       \
                 ((l).unlock(),                                                 \
                     ::hpx::assertion::detail::handle_assert(                   \
                         HPX_CURRENT_SOURCE_LOCATION(), HPX_PP_STRINGIZE(expr), \
-                        msg))) /**/
+                        hpx::util::format(__VA_ARGS__)))) /**/
 
 #if defined(HPX_DEBUG)
 #if defined(HPX_COMPUTE_DEVICE_CODE)
 #define HPX_ASSERT(expr) assert(expr)
-#define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT(expr)
+#define HPX_ASSERT_MSG(expr, ...) HPX_ASSERT(expr)
 #define HPX_ASSERT_LOCKED(l, expr) assert(expr)
-#define HPX_ASSERT_LOCKED_MSG(l, expr, msg) HPX_ASSERT(expr)
+#define HPX_ASSERT_LOCKED_MSG(l, expr, ...) HPX_ASSERT(expr)
 #else
-#define HPX_ASSERT(expr) HPX_ASSERT_(expr, std::string())
-#define HPX_ASSERT_MSG(expr, msg) HPX_ASSERT_(expr, msg)
-#define HPX_ASSERT_LOCKED(l, expr) HPX_ASSERT_LOCKED_(l, expr, std::string())
-#define HPX_ASSERT_LOCKED_MSG(l, expr, msg) HPX_ASSERT_LOCKED_(l, expr, msg)
+#define HPX_ASSERT(expr) HPX_ASSERT_(expr, "")
+#define HPX_ASSERT_MSG(expr, ...) HPX_ASSERT_(expr, __VA_ARGS__)
+#define HPX_ASSERT_LOCKED(l, expr) HPX_ASSERT_LOCKED_(l, expr, "")
+#define HPX_ASSERT_LOCKED_MSG(l, expr, ...)                                    \
+    HPX_ASSERT_LOCKED_(l, expr, __VA_ARGS__)
 #endif
 #else
 #define HPX_ASSERT(expr)
-#define HPX_ASSERT_MSG(expr, msg)
+#define HPX_ASSERT_MSG(expr, ...)
 #define HPX_ASSERT_LOCKED(l, expr)
-#define HPX_ASSERT_LOCKED_MSG(l, expr, msg)
+#define HPX_ASSERT_LOCKED_MSG(l, expr, ...)
 #endif
 
 #define HPX_UNREACHABLE                                                        \

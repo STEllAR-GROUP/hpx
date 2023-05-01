@@ -343,15 +343,17 @@ namespace hpx::parcelset {
                             here, p);
                     }
 
-                    if (migrated)
+                    if (migrated && !allow_zero_copy_receive)
                     {
+                        // route parcels to migrated targets, but only if we're
+                        // not zero-copy receiving
                         agas::route(HPX_MOVE(p),
                             &parcelset::detail::parcel_route_handler,
                             threads::thread_priority::normal);
                     }
                     else if (deferred_schedule || allow_zero_copy_receive)
                     {
-                        // If we got a direct action
+                        // store parcel if needed
                         deferred_parcels.emplace_back(HPX_MOVE(p));
                     }
 
