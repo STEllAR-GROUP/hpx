@@ -121,7 +121,7 @@ namespace hpx::parcelset::policies::gasnet {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    util::mpi_environment::scoped_lock l;
+                    util::gasnet_environment::scoped_lock l;
                     std::memcpy(buffer_.transmission_chunks_.data(),
                         util::gasnet_environment::gasnet_buffer[self_],
                         static_cast<int>(buffer_.transmission_chunks_.size() *
@@ -152,7 +152,7 @@ namespace hpx::parcelset::policies::gasnet {
             else
             {
                 auto self_ = util::gasnet_environment::rank();
-                util::mpi_environment::scoped_lock l;
+                util::gasnet_environment::scoped_lock l;
                 std::memcopy(buffer_.data_.data(), util::gasnet_environment::gasnet_buffer[self_], buffer_.data_.size());
                 request_ptr_ = true;
             }
@@ -180,7 +180,7 @@ namespace hpx::parcelset::policies::gasnet {
                 c.resize(chunk_size);
                 {
                     auto self_ = util::gasnet_environment::rank();
-                    util::mpi_environment::scoped_lock l;
+                    util::gasnet_environment::scoped_lock l;
                     std::memcopy(c.data(), data.util::gasnet_environment::gasnet_buffer[self_], c.size());
                     request_ptr_ = true;
                 }
