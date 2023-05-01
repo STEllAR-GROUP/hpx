@@ -159,6 +159,9 @@ namespace hpx::parcelset::policies::gasnet {
                 const std::size_t chunks[] = { header_.data_size_ / GASNET_PAGESIZE, header_.data_size_ % GASNET_PAGESIZE };
                 std::copy(chunks, sizeof(chunks), gasnet_buffer[hpx::util::gasnet_environment::rank()]);
 
+                // put from this localities gasnet shared memory segment
+                // into the remote locality (dst_)'s shared memory segment
+                //
                 hpx::util::gasnet_environment::put<std::uint8_t>(
                     gasnet_buffer[hpx::util::gasnet_environment::rank()],
                     dst_,
