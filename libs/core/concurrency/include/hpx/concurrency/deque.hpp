@@ -4,6 +4,7 @@
 //  Link: http://www.research.ibm.com/people/m/michael/europar-2003.pdf
 //
 //  C++ implementation - Copyright (C) 2011 Bryce Lelbach
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -166,26 +167,26 @@ namespace hpx::lockfree {
             return pair_.load(mo).get_right_tag();
         }
 
-        bool cas(deque_anchor& expected, deque_anchor const& desired,
+        bool cas(deque_anchor const& expected, deque_anchor const& desired,
             std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
-                expected.load(std::memory_order_acquire),
-                desired.load(std::memory_order_acquire), mo);
+                expected.lrs(std::memory_order_acquire),
+                desired.lrs(std::memory_order_acquire), mo);
         }
 
         bool cas(pair& expected, deque_anchor const& desired,
             std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
-                expected, desired.load(std::memory_order_acquire), mo);
+                expected, desired.lrs(std::memory_order_acquire), mo);
         }
 
-        bool cas(deque_anchor& expected, pair const& desired,
+        bool cas(deque_anchor const& expected, pair const& desired,
             std::memory_order mo = std::memory_order_acq_rel) noexcept
         {
             return pair_.compare_exchange_strong(
-                expected.load(std::memory_order_acquire), desired, mo);
+                expected.lrs(std::memory_order_acquire), desired, mo);
         }
 
         bool cas(pair& expected, pair const& desired,
@@ -229,7 +230,7 @@ namespace hpx::lockfree {
             return !(lhs == rhs);
         }
 
-        bool is_lock_free() const noexcept
+        [[nodiscard]] bool is_lock_free() const noexcept
         {
             return pair_.is_lock_free();
         }
@@ -417,7 +418,7 @@ namespace hpx::lockfree {
         // Not thread-safe.
         // Complexity: O(Processes)
         // FIXME: Should we check both pointers here?
-        bool empty() const noexcept
+        [[nodiscard]] bool empty() const noexcept
         {
             return anchor_.lrs(std::memory_order_relaxed).get_left_ptr() ==
                 nullptr;
@@ -425,7 +426,7 @@ namespace hpx::lockfree {
 
         // Thread-safe and non-blocking.
         // Complexity: O(1)
-        bool is_lock_free() const noexcept
+        [[nodiscard]] bool is_lock_free() const noexcept
         {
             return anchor_.is_lock_free();
         }

@@ -18,15 +18,13 @@ int hpx_main()
     hpx::mutex m;
 
     hpx::future<void> f1 = hpx::async([&m]() {
-        m.lock();
+        std::scoped_lock sl(m);
         std::cout << "Thread 1 acquired the mutex" << std::endl;
-        m.unlock();
     });
 
     hpx::future<void> f2 = hpx::async([&m]() {
-        m.lock();
+        std::scoped_lock sl(m);
         std::cout << "Thread 2 acquired the mutex" << std::endl;
-        m.unlock();
     });
 
     hpx::wait_all(f1, f2);

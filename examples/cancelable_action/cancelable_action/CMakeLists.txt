@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +6,7 @@
 
 add_hpx_component(
   cancelable_action INTERNAL_FLAGS NOEXPORT AUTOGLOB
+  INSTALL_COMPONENT examples
   HEADER_GLOB "cancelable_action.h*"
   SOURCE_GLOB "cancelable_action.c*"
   FOLDER "Examples/CancelableAction"

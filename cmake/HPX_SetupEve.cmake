@@ -60,6 +60,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
       NAMESPACE eve::
       FILE HPXEveTarget.cmake
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+      COMPONENT cmake
     )
 
     add_library(eve::eve ALIAS eve)

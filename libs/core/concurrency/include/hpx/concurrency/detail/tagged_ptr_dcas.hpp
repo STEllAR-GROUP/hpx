@@ -1,5 +1,5 @@
 //  Copyright (C) 2008, 2016 Tim Blechmann
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,11 +24,12 @@ namespace hpx::lockfree::detail {
         using index_t = T*;
 
         /** uninitialized constructor */
-        tagged_ptr() noexcept    //: ptr(0), tag(0)
+        constexpr tagged_ptr() noexcept    //: ptr(0), tag(0)
         {
         }
 
         tagged_ptr(tagged_ptr const& p) = default;
+        tagged_ptr(tagged_ptr&& p) = default;
 
         explicit constexpr tagged_ptr(T* p, tag_t t = 0) noexcept
           : ptr(p)
@@ -39,8 +40,11 @@ namespace hpx::lockfree::detail {
         /** unsafe set operation */
         /* @{ */
         tagged_ptr& operator=(tagged_ptr const& p) = default;
+        tagged_ptr& operator=(tagged_ptr&& p) = default;
 
-        void set(T* p, tag_t t) noexcept
+        ~tagged_ptr() = default;
+
+        constexpr void set(T* p, tag_t t) noexcept
         {
             ptr = p;
             tag = t;
@@ -67,7 +71,7 @@ namespace hpx::lockfree::detail {
             return ptr;
         }
 
-        void set_ptr(T* p) noexcept
+        constexpr void set_ptr(T* p) noexcept
         {
             ptr = p;
         }
@@ -82,11 +86,12 @@ namespace hpx::lockfree::detail {
 
         constexpr tag_t get_next_tag() const noexcept
         {
-            tag_t next = (get_tag() + 1) & (std::numeric_limits<tag_t>::max)();
+            tag_t const next =
+                (get_tag() + 1) & (std::numeric_limits<tag_t>::max)();
             return next;
         }
 
-        void set_tag(tag_t t) noexcept
+        constexpr void set_tag(tag_t t) noexcept
         {
             tag = t;
         }
@@ -106,7 +111,7 @@ namespace hpx::lockfree::detail {
 
         explicit constexpr operator bool() const noexcept
         {
-            return ptr != 0;
+            return ptr != nullptr;
         }
         /* @} */
 

@@ -17,25 +17,26 @@ namespace hpx::util {
 
     // set and query the prefix as configured at compile time
     HPX_CORE_EXPORT void set_hpx_prefix(const char* prefix) noexcept;
-    HPX_CORE_EXPORT char const* hpx_prefix() noexcept;
+    [[nodiscard]] HPX_CORE_EXPORT char const* hpx_prefix() noexcept;
 
     // return the installation path of the specified module
-    HPX_CORE_EXPORT std::string find_prefix(std::string const& library = "hpx");
+    [[nodiscard]] HPX_CORE_EXPORT std::string find_prefix(
+        std::string const& library = "hpx");
 
     // return a list of paths delimited by HPX_INI_PATH_DELIMITER
-    HPX_CORE_EXPORT std::string find_prefixes(
+    [[nodiscard]] HPX_CORE_EXPORT std::string find_prefixes(
         std::string const& suffix, std::string const& library = "hpx");
 
     // return the full path of the current executable
-    HPX_CORE_EXPORT std::string get_executable_filename(
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_executable_filename(
         char const* argv0 = nullptr);
-    HPX_CORE_EXPORT std::string get_executable_prefix(
+    [[nodiscard]] HPX_CORE_EXPORT std::string get_executable_prefix(
         char const* argv0 = nullptr);
 }    // namespace hpx::util
 
 // The HPX runtime needs to know where to look for the HPX ini files if no ini
 // path is specified by the user (default in $HPX_LOCATION/share/hpx-1.0.0/ini).
-// Also, the default component path is set within the same prefix
+// Also, the default component path is set within the same prefix.
 
 // clang-format off
 #define HPX_BASE_DIR_NAME                                                      \

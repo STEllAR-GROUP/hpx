@@ -32,7 +32,6 @@ void test_for_each_explicit_sender_direct(
     std::iota(std::begin(c), std::end(c), std::rand());
 
     namespace ex = hpx::execution::experimental;
-    namespace tt = hpx::this_thread::experimental;
 
     auto f = [](std::size_t& v) { v = 42; };
 

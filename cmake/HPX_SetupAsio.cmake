@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Hartmut Kaiser
+# Copyright (c) 2021-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -61,6 +61,7 @@ elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
     NAMESPACE Asio::
     FILE HPXAsioTarget.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+    COMPONENT cmake
   )
 
   add_library(Asio::asio ALIAS asio)

@@ -61,6 +61,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       NAMESPACE SVE::
       FILE HPXSVETarget.cmake
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+      COMPONENT cmake
     )
 
   else()

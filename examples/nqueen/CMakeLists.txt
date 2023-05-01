@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Lelbach
 # Copyright (c) 2011 Vinay C Amatya
 #
@@ -12,6 +12,7 @@ endif()
 
 add_hpx_component(
   nqueen INTERNAL_FLAGS NOEXPORT
+  INSTALL_COMPONENT examples
   SOURCE_GLOB "nqueen.cp*"
   HEADER_GLOB "nqueen.hp*"
   FOLDER "Examples/Applications/NQueen"

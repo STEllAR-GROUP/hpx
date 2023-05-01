@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011 Matt Anderson
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -24,6 +24,7 @@ source_group("Header Files\\Server" FILES ${server_headers})
 # ##############################################################################
 add_hpx_component(
   random_mem_access INTERNAL_FLAGS NOEXPORT MODULE random_mem_access
+  INSTALL_COMPONENT examples
   SOURCES ${client_sources}
   HEADERS ${headers}
   FOLDER "Examples/RandomMemoryAccess/random_mem_access"

@@ -8,7 +8,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/plugin.hpp>
@@ -69,7 +68,7 @@ namespace hpx::util {
 
             using hpx::filesystem::path;
 
-            std::string const prefix =
+            std::string prefix =
                 path(dll.get_directory(ec)).parent_path().string();
 
             if (ec || prefix.empty())
@@ -79,7 +78,7 @@ namespace hpx::util {
         }
         catch (std::logic_error const&)
         {
-            ;    // just ignore loader problems
+            // just ignore loader problems
         }
 #endif
         return hpx_prefix();
@@ -124,7 +123,7 @@ namespace hpx::util {
     std::string get_executable_prefix(char const* argv0)
     {
         using hpx::filesystem::path;
-        path p(get_executable_filename(argv0));
+        path const p(get_executable_filename(argv0));
 
         return p.parent_path().parent_path().string();
     }

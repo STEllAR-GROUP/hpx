@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,6 +30,7 @@ add_hpx_component(
   memory_counters INTERNAL_FLAGS
   FOLDER "Core/Components/Counters"
   INSTALL_HEADERS PLUGIN PREPEND_HEADER_ROOT
+  INSTALL_COMPONENT runtime
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${memory_headers}
   PREPEND_SOURCE_ROOT

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -479,7 +479,7 @@ namespace hpx::performance_counters {
             };
 
         performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types) / sizeof(counter_types[0]));
+            counter_types, std::size(counter_types));
 #else
         HPX_UNUSED(ph);
         HPX_UNUSED(pp_type);
@@ -586,8 +586,8 @@ namespace hpx::performance_counters {
                         HPX_MOVE(cache_reclaims), _2),
                     &performance_counters::locality_counter_discoverer, ""}};
 
-        performance_counters::install_counter_types(connection_cache_types,
-            sizeof(connection_cache_types) / sizeof(connection_cache_types[0]));
+        performance_counters::install_counter_types(
+            connection_cache_types, std::size(connection_cache_types));
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -643,7 +643,7 @@ namespace hpx::performance_counters {
                     &performance_counters::locality_counter_discoverer, ""}};
 
         performance_counters::install_counter_types(
-            counter_types, sizeof(counter_types) / sizeof(counter_types[0]));
+            counter_types, std::size(counter_types));
     }
 }    // namespace hpx::performance_counters
 

@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
@@ -35,11 +35,12 @@ namespace hpx::program_options::detail {
         {
             s.resize(s.size() - 1);
             bool bad_prefixes(false);
+
             // If 's' is a prefix of one of allowed suffix, then
             // lower_bound will return that element.
             // If some element is prefix of 's', then lower_bound will
             // return the next element.
-            std::set<std::string>::iterator i = allowed_prefixes.lower_bound(s);
+            auto i = allowed_prefixes.lower_bound(s);
             if (i != allowed_prefixes.end())
             {
                 if (i->find(s) == 0)
@@ -52,26 +53,25 @@ namespace hpx::program_options::detail {
                     bad_prefixes = true;
             }
             if (bad_prefixes)
+            {
                 throw error("options '" + std::string(name) + "' and '" + *i +
                     "*' will both match the same arguments from the "
                     "configuration file");
+            }
             allowed_prefixes.insert(s);
         }
     }
 
     namespace {
 
-        inline std::string trim_ws(std::string const& s)
+        std::string trim_ws(std::string const& s)
         {
-            std::string::size_type n, n2;
-            n = s.find_first_not_of(" \t\r\n");
+            std::string::size_type const n = s.find_first_not_of(" \t\r\n");
             if (n == std::string::npos)
                 return std::string();
-            else
-            {
-                n2 = s.find_last_not_of(" \t\r\n");
-                return s.substr(n, n2 - n + 1);
-            }
+
+            std::string::size_type const n2 = s.find_last_not_of(" \t\r\n");
+            return s.substr(n, n2 - n + 1);
         }
     }    // namespace
 
@@ -102,7 +102,7 @@ namespace hpx::program_options::detail {
                     std::string name = m_prefix + trim_ws(s.substr(0, n));
                     std::string value = trim_ws(s.substr(n + 1));
 
-                    bool registered = allowed_option(name);
+                    bool const registered = allowed_option(name);
                     if (!registered && !m_allow_unregistered)
                         throw unknown_option(name);
 
@@ -149,9 +149,10 @@ namespace hpx::program_options::detail {
     bool basic_config_file_iterator<wchar_t>::getline(std::string& s)
     {
         std::wstring ws;
-        // On Comeau, using two-argument version causes
-        // call to some internal function with std::wstring, and '\n'
-        // (not L'\n') and compile can't resolve that call.
+
+        // On Comeau, using two-argument version causes call to some internal
+        // function with std::wstring, and '\n' (not L'\n') and compile can't
+        // resolve that call.
 
         if (std::getline(*is, ws, L'\n'))
         {

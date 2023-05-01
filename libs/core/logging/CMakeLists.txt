@@ -1,10 +1,27 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Compatibility with various Boost types, introduced in V1.4.0
+hpx_option(
+  HPX_LOGGING_WITH_SEPARATE_DESTINATIONS
+  BOOL
+  "Enable separate logging channels for AGAS, timing, and parcel transport. (default: ON)"
+  ON
+  ADVANCED
+  CATEGORY "Modules"
+  MODULE LOGGING
+)
+
+if(HPX_LOGGING_WITH_SEPARATE_DESTINATIONS)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS NAMESPACE LOGGING
+  )
+endif()
 
 # Default location is $HPX_ROOT/libs/logging/include
 set(logging_headers
@@ -67,5 +84,6 @@ add_hpx_module(
     hpx_preprocessor
     hpx_timing
     hpx_thread_support
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Ste||ar Group
+# Copyright (c) 2019-2023 Ste||ar Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying

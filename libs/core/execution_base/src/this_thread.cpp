@@ -52,12 +52,13 @@ namespace hpx::execution_base {
         {
             default_agent();
 
-            std::string description() const override
+            [[nodiscard]] std::string description() const override
             {
                 return hpx::util::format("{}", id_);
             }
 
-            default_context const& context() const noexcept override
+            [[nodiscard]] default_context const& context()
+                const noexcept override
             {
                 return context_;
             }
@@ -199,7 +200,7 @@ namespace hpx::execution_base {
 
     namespace detail {
 
-        agent_base& get_default_agent()
+        [[nodiscard]] agent_base& get_default_agent()
         {
             static thread_local default_agent agent;
             return agent;
@@ -226,7 +227,7 @@ namespace hpx::execution_base {
                 agent_base* impl_;
             };
 
-            agent_storage* get_agent_storage()
+            [[nodiscard]] agent_storage* get_agent_storage()
             {
                 static thread_local agent_storage storage;
                 return &storage;
@@ -250,10 +251,9 @@ namespace hpx::execution_base {
             storage_->set(old_);
         }
 
-        hpx::execution_base::agent_ref agent()
+        [[nodiscard]] agent_ref agent()
         {
-            return hpx::execution_base::agent_ref(
-                detail::get_agent_storage()->impl_);
+            return agent_ref(detail::get_agent_storage()->impl_);
         }
 
         void yield(char const* desc)

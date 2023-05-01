@@ -29,16 +29,16 @@ namespace hpx::util {
         static int init(int* argc, char*** argv, int const minimal,
             int const required, int& provided);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
-        static void finalize();
+        static void finalize() noexcept;
 
-        static bool enabled();
-        static bool multi_threaded();
-        static bool has_called_init();
+        static bool enabled() noexcept;
+        static bool multi_threaded() noexcept;
+        static bool has_called_init() noexcept;
 
-        static int rank();
-        static int size();
+        static int rank() noexcept;
+        static int size() noexcept;
 
-        static MPI_Comm& communicator();
+        static MPI_Comm& communicator() noexcept;
 
         static std::string get_processor_name();
 
@@ -54,7 +54,13 @@ namespace hpx::util {
 
             ~scoped_lock();
 
-            static void unlock();
+            constexpr bool owns_lock() const noexcept
+            {
+                return locked;
+            }
+
+            void unlock();
+            bool locked;
         };
 
         struct HPX_CORE_EXPORT scoped_try_lock
@@ -68,6 +74,11 @@ namespace hpx::util {
             scoped_try_lock& operator=(scoped_try_lock&&) = delete;
 
             ~scoped_try_lock();
+
+            constexpr bool owns_lock() const noexcept
+            {
+                return locked;
+            }
 
             void unlock();
             bool locked;

@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -165,7 +165,7 @@ namespace hpx::program_options {
         and returns the result of calling the 'run' method.
      */
     template <typename Char>
-    basic_parsed_options<Char> parse_command_line(int argc,
+    [[nodiscard]] basic_parsed_options<Char> parse_command_line(int argc,
         Char const* const argv[], options_description const&, int style = 0,
         std::function<std::pair<std::string, std::string>(std::string const&)>
             ext = ext_parser());
@@ -175,7 +175,7 @@ namespace hpx::program_options {
         Read from given stream.
     */
     template <typename Char>
-    HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
+    [[nodiscard]] HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
         std::basic_istream<Char>&, options_description const&,
         bool allow_unregistered = false);
 
@@ -185,7 +185,7 @@ namespace hpx::program_options {
         passed to the file stream.
     */
     template <typename Char = char>
-    HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
+    [[nodiscard]] HPX_CORE_EXPORT basic_parsed_options<Char> parse_config_file(
         char const* filename, options_description const&,
         bool allow_unregistered = false);
 
@@ -204,7 +204,7 @@ namespace hpx::program_options {
         options.
     */
     template <typename Char>
-    std::vector<std::basic_string<Char>> collect_unrecognized(
+    [[nodiscard]] std::vector<std::basic_string<Char>> collect_unrecognized(
         std::vector<basic_option<Char>> const& options,
         enum collect_unrecognized_mode mode);
 
@@ -217,7 +217,8 @@ namespace hpx::program_options {
         This is done since naming of environment variables is typically
         different from the naming of command line options.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(options_description const&,
+    [[nodiscard]] HPX_CORE_EXPORT parsed_options parse_environment(
+        options_description const&,
         std::function<std::string(std::string)> const& name_mapper);
 
     /** Parse environment.
@@ -226,7 +227,7 @@ namespace hpx::program_options {
         name is obtained from variable name by removing the prefix and
         converting the remaining string into lower case.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(
+    [[nodiscard]] HPX_CORE_EXPORT parsed_options parse_environment(
         options_description const&, std::string const& prefix);
 
     /** @overload
@@ -234,7 +235,7 @@ namespace hpx::program_options {
         functions when second argument is of 'char*' type. There's implicit
         conversion to both std::function and string.
     */
-    HPX_CORE_EXPORT parsed_options parse_environment(
+    [[nodiscard]] HPX_CORE_EXPORT parsed_options parse_environment(
         options_description const&, char const* prefix);
 
     /** Splits a given string to a collection of single strings which
@@ -244,12 +245,12 @@ namespace hpx::program_options {
         Splitting is done in a unix style way, with respect to quotes '"'
         and escape characters '\'
     */
-    HPX_CORE_EXPORT std::vector<std::string> split_unix(
+    [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string> split_unix(
         std::string const& cmdline, std::string const& separator = " \t",
         std::string const& quote = "'\"", std::string const& escape = "\\");
 
     /** @overload */
-    HPX_CORE_EXPORT std::vector<std::wstring> split_unix(
+    [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring> split_unix(
         std::wstring const& cmdline, std::wstring const& separator = L" \t",
         std::wstring const& quote = L"'\"", std::wstring const& escape = L"\\");
 
@@ -260,11 +261,11 @@ namespace hpx::program_options {
         runtime library and if it always exists.
         This function is available only on Windows.
     */
-    HPX_CORE_EXPORT std::vector<std::string> split_winmain(
+    [[nodiscard]] HPX_CORE_EXPORT std::vector<std::string> split_winmain(
         std::string const& cmdline);
 
     /** @overload */
-    HPX_CORE_EXPORT std::vector<std::wstring> split_winmain(
+    [[nodiscard]] HPX_CORE_EXPORT std::vector<std::wstring> split_winmain(
         std::wstring const& cmdline);
 #endif
 }    // namespace hpx::program_options

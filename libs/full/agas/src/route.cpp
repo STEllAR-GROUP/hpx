@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Vinay C Amatya
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -43,6 +43,8 @@ namespace hpx::agas::server {
 
     void primary_namespace::route(parcelset::parcel&& p)
     {
+        LPT_(debug).format("primary_namespace::route: {}", p.parcel_id());
+
         util::scoped_timer<std::atomic<std::int64_t>> update(
             counter_data_.route_.time_, counter_data_.route_.enabled_);
         counter_data_.increment_route_count();
@@ -92,7 +94,7 @@ namespace hpx::agas::server {
             addr.address_ = g.lva();
         }
 
-        hpx::id_type source = p.source_id();
+        hpx::id_type const source = p.source_id();
 
         // either send the parcel on its way or execute actions locally
         if (naming::get_locality_id_from_gid(addr.locality_) ==
@@ -113,21 +115,21 @@ namespace hpx::agas::server {
             hpx::parcelset::put_parcel(HPX_MOVE(p));
         }
 
-        runtime& rt = get_runtime();
+        runtime const& rt = get_runtime();
         if (rt.get_state() < hpx::state::pre_shutdown)
         {
-            // asynchronously update cache on source locality
-            // update remote cache if the id is not flagged otherwise
+            // asynchronously update cache on source locality update remote
+            // cache if the id is not flagged otherwise
             naming::gid_type const& id = hpx::get<0>(cache_address);
             if (id && naming::detail::store_in_cache(id))
             {
                 gva const& g = hpx::get<1>(cache_address);
-                naming::address addr(g.prefix, g.type, g.lva());
+                naming::address address(g.prefix, g.type, g.lva());
 
                 HPX_ASSERT(naming::is_locality(source));
 
                 hpx::post<update_agas_cache_action>(
-                    source, id, addr, g.count, g.offset);
+                    source, id, address, g.count, g.offset);
             }
         }
     }

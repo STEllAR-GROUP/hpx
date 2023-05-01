@@ -25,17 +25,60 @@ std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
+void test_make_heap_small1(IteratorTag)
+{
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t len = 0;
+    while (len < 15)
+    {
+        std::vector<std::size_t> c(len);
+        std::iota(hpx::util::begin(c), hpx::util::end(c), gen());
+
+        hpx::make_heap(
+            iterator(hpx::util::begin(c)), iterator(hpx::util::end(c)));
+
+        HPX_TEST_EQ(std::is_heap(hpx::util::begin(c), hpx::util::end(c)), true);
+        len++;
+    }
+}
+
+template <typename IteratorTag>
 void test_make_heap1(IteratorTag)
 {
     typedef std::vector<std::size_t>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<std::size_t> c(10007);
-    std::iota(hpx::util::begin(c), hpx::util::end(c), 0);
+    std::iota(hpx::util::begin(c), hpx::util::end(c), gen());
 
     hpx::make_heap(iterator(hpx::util::begin(c)), iterator(hpx::util::end(c)));
 
     HPX_TEST_EQ(std::is_heap(hpx::util::begin(c), hpx::util::end(c)), true);
+}
+
+template <typename ExPolicy, typename IteratorTag>
+void test_make_heap_small1(ExPolicy&& policy, IteratorTag)
+{
+    static_assert(hpx::is_execution_policy<ExPolicy>::value,
+        "hpx::is_execution_policy<ExPolicy>::value");
+
+    typedef std::vector<std::size_t>::iterator base_iterator;
+    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
+
+    std::size_t len = 0;
+    while (len < 15)
+    {
+        std::vector<std::size_t> c(len);
+        std::iota(hpx::util::begin(c), hpx::util::end(c), gen());
+
+        hpx::make_heap(
+            policy, iterator(hpx::util::begin(c)), iterator(hpx::util::end(c)));
+
+        HPX_TEST_EQ(std::is_heap(hpx::util::begin(c), hpx::util::end(c)), true);
+        len++;
+    }
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -78,10 +121,15 @@ void test_make_heap1()
     using namespace hpx::execution;
 
     test_make_heap1(IteratorTag());
+    test_make_heap_small1(IteratorTag());
 
     test_make_heap1(seq, IteratorTag());
     test_make_heap1(par, IteratorTag());
     test_make_heap1(par_unseq, IteratorTag());
+
+    test_make_heap_small1(seq, IteratorTag());
+    test_make_heap_small1(par, IteratorTag());
+    test_make_heap_small1(par_unseq, IteratorTag());
 
     test_make_heap_async1(seq(task), IteratorTag());
     test_make_heap_async1(par(task), IteratorTag());

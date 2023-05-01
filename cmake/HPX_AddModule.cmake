@@ -1,4 +1,4 @@
-# Copyright (c) 2019 ETH Zurich
+# Copyright (c) 2019-2023 ETH Zurich
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -380,8 +380,8 @@ function(add_hpx_module libname modulename)
   install(
     TARGETS hpx_${modulename}
     EXPORT HPXInternalTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT ${modulename}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT ${modulename}
   )
   hpx_export_internal_targets(hpx_${modulename})
@@ -420,6 +420,7 @@ function(add_hpx_module libname modulename)
         FILES ${_pdb_dir}/${_pdb_file}.pdb
         DESTINATION ${CMAKE_INSTALL_LIBDIR}
         CONFIGURATIONS ${cfg}
+        COMPONENT ${modulename}
         OPTIONAL
       )
     endforeach()

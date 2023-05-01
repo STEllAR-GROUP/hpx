@@ -7,6 +7,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scoped_background_timer.hpp>
@@ -66,6 +67,11 @@ namespace hpx::threads::detail {
         HPX_ASSERT(background_thread);
 
         scheduler_base.increment_background_thread_count();
+
+        LTM_(debug).format("create_background_thread: pool({}), "
+                           "scheduler({}), worker_thread({}), thread({})",
+            scheduler_base.get_parent_pool(), scheduler_base, num_thread,
+            get_thread_id_data(background_thread));
 
         // We can now set the state to pending
         get_thread_id_data(background_thread)
@@ -180,7 +186,12 @@ namespace hpx::threads::detail {
         hpx::execution_base::this_thread::detail::agent_storage*
             context_storage)
     {
-        if (HPX_UNLIKELY(background_thread))
+        LTM_(debug).format("call_background_thread: pool({}), "
+                           "scheduler({}), worker_thread({}), thread({})",
+            scheduler_base.get_parent_pool(), scheduler_base, num_thread,
+            get_thread_id_data(background_thread));
+
+        if (HPX_LIKELY(background_thread))
         {
             auto* thrdptr = get_thread_id_data(background_thread);
             thread_state state = thrdptr->get_state();
@@ -236,11 +247,23 @@ namespace hpx::threads::detail {
             }
             else if (thread_schedule_state::terminated == state_val)
             {
+                LTM_(debug).format(
+                    "call_background_thread terminated: pool({}), "
+                    "scheduler({}), worker_thread({}), thread({})",
+                    scheduler_base.get_parent_pool(), scheduler_base,
+                    num_thread, get_thread_id_data(background_thread));
+
                 scheduler_base.decrement_background_thread_count();
                 background_thread = thread_id_type();
             }
             else if (thread_schedule_state::suspended == state_val)
             {
+                LTM_(debug).format(
+                    "call_background_thread suspended: pool({}), "
+                    "scheduler({}), worker_thread({}), thread({})",
+                    scheduler_base.get_parent_pool(), scheduler_base,
+                    num_thread, get_thread_id_data(background_thread));
+
                 return false;
             }
         }

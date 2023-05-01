@@ -1,8 +1,8 @@
-// Copyright Vladimir Prus 2002-2004.
+//  Copyright Vladimir Prus 2002-2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
 
@@ -66,6 +66,14 @@ namespace hpx::program_options::detail {
             std::set<std::string> const& allowed_options,
             bool allow_unregistered = false);
 
+        common_config_file_iterator(
+            common_config_file_iterator const&) = default;
+        common_config_file_iterator(common_config_file_iterator&&) = default;
+        common_config_file_iterator& operator=(
+            common_config_file_iterator const&) = default;
+        common_config_file_iterator& operator=(
+            common_config_file_iterator&&) = default;
+
         virtual ~common_config_file_iterator() = default;
 
     public:    // Method required by eof_iterator
@@ -94,7 +102,7 @@ namespace hpx::program_options::detail {
         void add_option(char const* name);
 
         // Returns true if 's' is a registered option name.
-        bool allowed_option(std::string const& s) const;
+        [[nodiscard]] bool allowed_option(std::string const& s) const;
 
         // That's probably too much data for iterator, since
         // it will be copied, but let's not bother for now.
@@ -148,7 +156,7 @@ namespace hpx::program_options::detail {
     // Specializing this function for wchar_t causes problems on borland and
     // vc7, as well as on metrowerks. On the first two I don't know a
     // workaround, so make use of 'to_internal' to avoid specialization.
-    template <class Char>
+    template <typename Char>
     bool basic_config_file_iterator<Char>::getline(std::string& s)
     {
         std::basic_string<Char> in;
@@ -157,10 +165,7 @@ namespace hpx::program_options::detail {
             s = to_internal(in);
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 }    // namespace hpx::program_options::detail
 

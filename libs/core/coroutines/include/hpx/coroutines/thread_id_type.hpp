@@ -10,8 +10,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
@@ -35,6 +33,8 @@ namespace hpx::threads {
 
         thread_id(thread_id const&) = default;
         thread_id& operator=(thread_id const&) = default;
+
+        ~thread_id() = default;
 
         constexpr thread_id(thread_id&& rhs) noexcept
           : thrd_(rhs.thrd_)
@@ -136,23 +136,10 @@ namespace hpx::threads {
             return !(rhs < lhs);
         }
 
-        template <typename Char, typename Traits>
-        friend std::basic_ostream<Char, Traits>& operator<<(
-            std::basic_ostream<Char, Traits>& os, thread_id const& id)
-        {
-            os << id.get();
-            return os;
-        }
-
-        friend void format_value(
-            std::ostream& os, std::string_view spec, thread_id const& id)
-        {
-            // propagate spec
-            char format[16];
-            std::snprintf(
-                format, 16, "{:%.*s}", (int) spec.size(), spec.data());
-            hpx::util::format_to(os, format, id.get());
-        }
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, thread_id const& id);
+        HPX_CORE_EXPORT friend void format_value(
+            std::ostream& os, std::string_view spec, thread_id const& id);
 
     private:
         thread_id_repr thrd_ = nullptr;
@@ -169,8 +156,10 @@ namespace hpx::threads {
 
         struct thread_data_reference_counting;
 
-        void intrusive_ptr_add_ref(thread_data_reference_counting* p) noexcept;
-        void intrusive_ptr_release(thread_data_reference_counting* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+            thread_data_reference_counting* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_release(
+            thread_data_reference_counting* p) noexcept;
 
         struct thread_data_reference_counting
         {
@@ -183,26 +172,23 @@ namespace hpx::threads {
             {
             }
 
+            thread_data_reference_counting(
+                thread_data_reference_counting const&) = delete;
+            thread_data_reference_counting(
+                thread_data_reference_counting&&) = delete;
+            thread_data_reference_counting& operator=(
+                thread_data_reference_counting const&) = delete;
+            thread_data_reference_counting& operator=(
+                thread_data_reference_counting&&) = delete;
+
             virtual ~thread_data_reference_counting() = default;
             virtual void destroy_thread() = 0;
 
             // reference counting
-            friend void intrusive_ptr_add_ref(
-                thread_data_reference_counting* p) noexcept
-            {
-                ++p->count_;
-            }
-
-            friend void intrusive_ptr_release(
-                thread_data_reference_counting* p) noexcept
-            {
-                HPX_ASSERT(p->count_ != 0);
-                if (--p->count_ == 0)
-                {
-                    // give this object back to the system
-                    p->destroy_thread();
-                }
-            }
+            HPX_CORE_EXPORT friend void intrusive_ptr_add_ref(
+                thread_data_reference_counting* p) noexcept;
+            HPX_CORE_EXPORT friend void intrusive_ptr_release(
+                thread_data_reference_counting* p) noexcept;
 
             util::atomic_count count_;
         };
@@ -223,6 +209,8 @@ namespace hpx::threads {
 
         thread_id_ref(thread_id_ref&& rhs) noexcept = default;
         thread_id_ref& operator=(thread_id_ref&& rhs) noexcept = default;
+
+        ~thread_id_ref() = default;
 
         explicit thread_id_ref(thread_id_repr const& thrd) noexcept
           : thrd_(thrd)
@@ -248,7 +236,7 @@ namespace hpx::threads {
 
         explicit thread_id_ref(thread_repr* thrd,
             thread_id_addref addref = thread_id_addref::yes) noexcept
-          : thrd_(thrd, addref == thread_id_addref::yes ? 1 : 0)
+          : thrd_(thrd, addref == thread_id_addref::yes)
         {
         }
 
@@ -287,21 +275,21 @@ namespace hpx::threads {
             return nullptr != thrd_;
         }
 
-        constexpr thread_id noref() const noexcept
+        [[nodiscard]] constexpr thread_id noref() const noexcept
         {
             return thread_id(thrd_.get());
         }
 
-        constexpr thread_id_repr& get() & noexcept
+        [[nodiscard]] constexpr thread_id_repr& get() & noexcept
         {
             return thrd_;
         }
-        thread_id_repr&& get() && noexcept
+        [[nodiscard]] thread_id_repr&& get() && noexcept
         {
             return HPX_MOVE(thrd_);
         }
 
-        constexpr thread_id_repr const& get() const& noexcept
+        [[nodiscard]] constexpr thread_id_repr const& get() const& noexcept
         {
             return thrd_;
         }
@@ -383,23 +371,10 @@ namespace hpx::threads {
             return !(rhs < lhs);
         }
 
-        template <typename Char, typename Traits>
-        friend std::basic_ostream<Char, Traits>& operator<<(
-            std::basic_ostream<Char, Traits>& os, thread_id_ref const& id)
-        {
-            os << id.get();
-            return os;
-        }
-
-        friend void format_value(
-            std::ostream& os, std::string_view spec, thread_id_ref const& id)
-        {
-            // propagate spec
-            char format[16];
-            std::snprintf(
-                format, 16, "{:%.*s}", (int) spec.size(), spec.data());
-            hpx::util::format_to(os, format, id.get());
-        }
+        HPX_CORE_EXPORT friend std::ostream& operator<<(
+            std::ostream& os, thread_id_ref const& id);
+        HPX_CORE_EXPORT friend void format_value(
+            std::ostream& os, std::string_view spec, thread_id_ref const& id);
 
     private:
         thread_id_repr thrd_;
@@ -422,7 +397,7 @@ namespace std {
         std::size_t operator()(
             ::hpx::threads::thread_id const& v) const noexcept
         {
-            std::hash<std::size_t> hasher_;
+            constexpr std::hash<std::size_t> hasher_;
             return hasher_(reinterpret_cast<std::size_t>(v.get()));
         }
     };
@@ -433,7 +408,7 @@ namespace std {
         std::size_t operator()(
             ::hpx::threads::thread_id_ref const& v) const noexcept
         {
-            std::hash<std::size_t> hasher_;
+            constexpr std::hash<std::size_t> hasher_;
             return hasher_(reinterpret_cast<std::size_t>(v.get().get()));
         }
     };

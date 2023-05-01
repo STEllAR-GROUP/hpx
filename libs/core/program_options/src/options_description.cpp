@@ -1,9 +1,9 @@
-// Copyright Vladimir Prus 2002-2004.
-// Copyright Bertolt Mildner 2004.
+//  Copyright Vladimir Prus 2002-2004.
+//  Copyright Bertolt Mildner 2004.
+//
 //  SPDX-License-Identifier: BSL-1.0
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt
-// or copy at http://www.boost.org/LICENSE_1_0.txt)
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/program_options/config.hpp>
 #include <hpx/assert.hpp>
@@ -66,17 +66,17 @@ namespace hpx::program_options {
         bool short_ignore_case) const
     {
         match_result result = no_match;
-        std::string local_option =
-            (long_ignore_case ? tolower_(option) : option);
+        std::string const local_option =
+            long_ignore_case ? tolower_(option) : option;
 
         for (auto const& long_name : m_long_names)
         {
             std::string local_long_name(
-                (long_ignore_case ? tolower_(long_name) : long_name));
+                long_ignore_case ? tolower_(long_name) : long_name);
 
             if (!local_long_name.empty())
             {
-                if ((result == no_match) && (*local_long_name.rbegin() == '*'))
+                if (result == no_match && *local_long_name.rbegin() == '*')
                 {
                     // The name ends with '*'. Any specified name with the given
                     // prefix is OK.
@@ -102,7 +102,7 @@ namespace hpx::program_options {
 
         if (result != full_match)
         {
-            std::string local_short_name(
+            std::string const local_short_name(
                 short_ignore_case ? tolower_(m_short_name) : m_short_name);
 
             if (local_short_name == local_option)
@@ -170,11 +170,11 @@ namespace hpx::program_options {
         const
     {
         // reinterpret_cast is to please msvc 10.
-        return (m_long_names.empty()) ?
+        return m_long_names.empty() ?
             std::pair<std::string const*, size_t>(
                 reinterpret_cast<std::string const*>(0), 0) :
             std::pair<std::string const*, size_t>(
-                &(*m_long_names.begin()), m_long_names.size());
+                &*m_long_names.begin(), m_long_names.size());
     }
 
     option_description& option_description::set_names(char const* _names)
@@ -189,14 +189,14 @@ namespace hpx::program_options {
         }
         HPX_ASSERT(!m_long_names.empty() && "No option names were specified");
 
-        bool try_interpreting_last_name_as_a_switch = m_long_names.size() > 1;
-        if (try_interpreting_last_name_as_a_switch)
+        if (m_long_names.size() > 1)
         {
             std::string const& last_name = *m_long_names.rbegin();
             if (last_name.length() == 1)
             {
                 m_short_name = '-' + last_name;
                 m_long_names.pop_back();
+
                 // The following caters to the (valid) input of ",c" for some
                 // character c, where the caller only wants this option to have
                 // a short name.
@@ -302,16 +302,14 @@ namespace hpx::program_options {
 
     void options_description::add(std::shared_ptr<option_description> desc)
     {
-        m_options.push_back(desc);
+        m_options.push_back(HPX_MOVE(desc));
         belong_to_group.push_back(0);
     }
 
     options_description& options_description::add(
         options_description const& desc)
     {
-        std::shared_ptr<options_description> d =
-            std::make_shared<options_description>(desc);
-        groups.push_back(HPX_MOVE(d));
+        groups.push_back(std::make_shared<options_description>(desc));
 
         for (auto const& option : desc.m_options)
         {
@@ -371,8 +369,7 @@ namespace hpx::program_options {
             }
             else
             {
-                // FIXME: the use of 'key' here might not
-                // be the best approach.
+                // FIXME: the use of 'key' here might not be the best approach.
                 approximate_matches.push_back(option->key(name));
                 if (!had_full_match)
                     found = option;
@@ -381,11 +378,10 @@ namespace hpx::program_options {
         if (full_matches.size() > 1)
             throw ambiguous_option(full_matches);
 
-        // If we have a full match, and an approximate match,
-        // ignore approximate match instead of reporting error.
-        // Say, if we have options "all" and "all-chroots", then
-        // "--all" on the command line should select the first one,
-        // without ambiguity.
+        // If we have a full match, and an approximate match, ignore approximate
+        // match instead of reporting error. Say, if we have options "all" and
+        // "all-chroots", then "--all" on the command line should select the
+        // first one, without ambiguity.
         if (full_matches.empty() && approximate_matches.size() > 1)
             throw ambiguous_option(approximate_matches);
 
@@ -402,7 +398,7 @@ namespace hpx::program_options {
     namespace {
 
         /* Given a string 'par', that contains no newline characters
-           outputs it to 'os' with wordwrapping, that is, as several
+           outputs it to 'os' with word wrapping, that is, as several
            line.
 
            Each output line starts with 'indent' space characters,
@@ -420,7 +416,7 @@ namespace hpx::program_options {
             line_length -= indent;
 
             // index of tab (if present) is used as additional indent relative
-            // to first_column_width if paragrapth is spanned over multiple
+            // to first_column_width if paragraph is spanned over multiple
             // lines if tab is not on first line it is ignored
             std::string::size_type par_indent = par.find('\t');
 
@@ -431,7 +427,7 @@ namespace hpx::program_options {
             else
             {
                 // only one tab per paragraph allowed
-                if (count(par.begin(), par.end(), '\t') > 1)
+                if (std::count(par.begin(), par.end(), '\t') > 1)
                 {
                     throw program_options::error(
                         "Only one tab per paragraph is allowed in the options "
@@ -467,46 +463,41 @@ namespace hpx::program_options {
                 {
                     if (!first_line)
                     {
-                        // If line starts with space, but second character
-                        // is not space, remove the leading space.
-                        // We don't remove double spaces because those
-                        // might be intentianal.
-                        if ((*line_begin == ' ') &&
-                            ((line_begin + 1 < par_end) &&
-                                (*(line_begin + 1) != ' ')))
+                        // If line starts with space, but second character is
+                        // not space, remove the leading space. We don't remove
+                        // double spaces because those might be intentional.
+                        if (*line_begin == ' ' &&
+                            (line_begin + 1 < par_end &&
+                                *(line_begin + 1) != ' '))
                         {
                             line_begin += 1;    // line_begin != line_end
                         }
                     }
 
-                    // Take care to never increment the iterator past
-                    // the end, since MSVC 8.0 (brokenly), assumes that
-                    // doing that, even if no access happens, is a bug.
+                    // Take care to never increment the iterator past the end,
+                    // since MSVC 8.0 (brokenly), assumes that doing that, even
+                    // if no access happens, is a bug.
                     auto remaining = static_cast<std::size_t>(
                         std::distance(line_begin, par_end));
-                    std::string::const_iterator line_end = line_begin +
-                        ((remaining < line_length) ? remaining : line_length);
+                    auto line_end = line_begin +
+                        (remaining < line_length ? remaining : line_length);
 
                     // prevent chopped words
                     // Is line_end between two non-space characters?
-                    if ((*(line_end - 1) != ' ') &&
-                        ((line_end < par_end) && (*line_end != ' ')))
+                    if (*(line_end - 1) != ' ' &&
+                        (line_end < par_end && *line_end != ' '))
                     {
                         // find last ' ' in the second half of the current paragraph line
-                        std::string::const_iterator last_space = find(
-                            std::reverse_iterator<std::string::const_iterator>(
-                                line_end),
-                            std::reverse_iterator<std::string::const_iterator>(
-                                line_begin),
-                            ' ')
-                                                                     .base();
+                        auto last_space = find(std::reverse_iterator(line_end),
+                            std::reverse_iterator(line_begin), ' ')
+                                              .base();
 
                         if (last_space != line_begin)
                         {
                             // is last_space within the second half ot the
                             // current line
                             if (static_cast<std::size_t>(std::distance(
-                                    last_space, line_end)) < (line_length / 2))
+                                    last_space, line_end)) < line_length / 2)
                             {
                                 line_end = last_space;
                             }
@@ -624,8 +615,7 @@ namespace hpx::program_options {
     {
         /* Find the maximum width of the option column */
         std::size_t width(23);
-        std::size_t i;    // vc6 has broken for loop scoping
-        for (i = 0; i < m_options.size(); ++i)
+        for (std::size_t i = 0; i < m_options.size(); ++i)
         {
             option_description const& opt = *m_options[i];
             std::stringstream ss;

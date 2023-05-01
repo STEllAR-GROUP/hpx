@@ -168,7 +168,7 @@ namespace hpx::util::logging {
         }
 
     public:
-        HPX_CORE_EXPORT void turn_cache_off();
+        HPX_CORE_EXPORT void turn_cache_off() const;
 
         // called after all data has been gathered
         void write(message msg) const

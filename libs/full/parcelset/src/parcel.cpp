@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -121,7 +121,8 @@ namespace hpx::parcelset::detail {
         ar >> has_continuation_;
     }
 
-    void parcel_data::serialize(serialization::output_archive& ar, unsigned)
+    void parcel_data::serialize(
+        serialization::output_archive& ar, unsigned) const
     {
         ar << source_id_;
         ar << dest_;
@@ -159,7 +160,7 @@ namespace hpx::parcelset::detail {
         // verify that the action targets the correct type
         if (action_ && data_.addr_.type_ != components::component_invalid)
         {
-            int type = action_->get_component_type();
+            int const type = action_->get_component_type();
             if (!components::types_are_compatible(type, data_.addr_.type_))
             {
                 return false;
@@ -218,8 +219,7 @@ namespace hpx::parcelset::detail {
 
     hpx::id_type parcel::source_id() const
     {
-        return hpx::id_type(
-            data_.source_id_, hpx::id_type::management_type::unmanaged);
+        return {data_.source_id_, hpx::id_type::management_type::unmanaged};
     }
 
     void parcel::set_source_id(hpx::id_type const& source_id)
@@ -329,7 +329,8 @@ namespace hpx::parcelset::detail {
 #if defined(HPX_HAVE_NETWORKING)
     serialization::binary_filter* parcel::get_serialization_filter() const
     {
-        hpx::optional<parcelset::parcel> p = action_->get_embedded_parcel();
+        hpx::optional<parcelset::parcel> const p =
+            action_->get_embedded_parcel();
         if (!p)
         {
             return action_->get_serialization_filter();
@@ -340,7 +341,8 @@ namespace hpx::parcelset::detail {
     policies::message_handler* parcel::get_message_handler(
         locality const& loc) const
     {
-        hpx::optional<parcelset::parcel> p = action_->get_embedded_parcel();
+        hpx::optional<parcelset::parcel> const p =
+            action_->get_embedded_parcel();
         if (!p)
         {
             return action_->get_message_handler(loc);
@@ -388,7 +390,7 @@ namespace hpx::parcelset::detail {
     }
 
     std::pair<naming::address_type, naming::component_type>
-    parcel::determine_lva()
+    parcel::determine_lva() const
     {
         int comptype = action_->get_component_type();
 
@@ -444,11 +446,11 @@ namespace hpx::parcelset::detail {
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
-        std::pair<naming::address_type, naming::component_type> p =
+        std::pair<naming::address_type, naming::component_type> const p =
             determine_lva();
 
         // make sure the target has not been migrated away
-        auto r = action_->was_object_migrated(data_.dest_, p.first);
+        auto const r = action_->was_object_migrated(data_.dest_, p.first);
         if (r.first)
         {
             // If the object was migrated, just load the action and return.
@@ -481,11 +483,11 @@ namespace hpx::parcelset::detail {
         // make sure this parcel destination matches the proper locality
         HPX_ASSERT(destination_locality() == data_.addr_.locality_);
 
-        std::pair<naming::address_type, naming::component_type> p =
+        std::pair<naming::address_type, naming::component_type> const p =
             determine_lva();
 
         // make sure the target has not been migrated away
-        auto r = action_->was_object_migrated(data_.dest_, p.first);
+        auto const r = action_->was_object_migrated(data_.dest_, p.first);
         if (r.first)
         {
             // If the object was migrated, just route.

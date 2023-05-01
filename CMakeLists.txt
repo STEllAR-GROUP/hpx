@@ -1,5 +1,5 @@
 # Copyright (c)      2020 Mikael Simberg
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
@@ -2439,7 +2439,7 @@ if(PYTHONINTERP_FOUND)
   install(
     FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
     DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT core
+    COMPONENT runtime
     PERMISSIONS
       OWNER_READ
       OWNER_WRITE
@@ -2484,18 +2484,6 @@ install(
   PATTERN "packaging" EXCLUDE
   PATTERN ".git" EXCLUDE
 )
-
-if("${HPX_PLATFORM_UC}" STREQUAL "XEONPHI")
-  # FIXME: push changes upstream
-  install(
-    DIRECTORY external/asio/boost
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/hpx/external
-    COMPONENT core
-    FILES_MATCHING
-    PATTERN "*.hpp"
-    PATTERN ".git" EXCLUDE
-  )
-endif()
 
 install(
   FILES "${PROJECT_SOURCE_DIR}/LICENSE_1_0.txt"
@@ -2581,12 +2569,13 @@ include(HPX_PrintSummary)
 create_configuration_summary("Configuration summary:\n--" "hpx")
 
 include(HPX_ExportTargets)
+
 # Modules can't link to this if not exported
 install(
   TARGETS hpx_base_libraries
   EXPORT HPXInternalTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT hpx_base_libraries
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT hpx_base_libraries
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT hpx_base_libraries
 )
 hpx_export_internal_targets(hpx_base_libraries)

@@ -13,6 +13,7 @@
 #include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
+#include <iosfwd>
 
 namespace hpx::parcelset::policies::mpi {
 
@@ -29,17 +30,17 @@ namespace hpx::parcelset::policies::mpi {
         {
         }
 
-        constexpr std::int32_t rank() const noexcept
+        [[nodiscard]] constexpr std::int32_t rank() const noexcept
         {
             return rank_;
         }
 
-        static constexpr const char* type() noexcept
+        [[nodiscard]] static constexpr const char* type() noexcept
         {
             return "mpi";
         }
 
-        explicit constexpr operator bool() const noexcept
+        [[nodiscard]] explicit constexpr operator bool() const noexcept
         {
             return rank_ != -1;
         }
@@ -48,13 +49,14 @@ namespace hpx::parcelset::policies::mpi {
         HPX_EXPORT void load(serialization::input_archive& ar);
 
     private:
-        friend bool operator==(
+        friend constexpr bool operator==(
             locality const& lhs, locality const& rhs) noexcept
         {
             return lhs.rank_ == rhs.rank_;
         }
 
-        friend bool operator<(locality const& lhs, locality const& rhs) noexcept
+        friend constexpr bool operator<(
+            locality const& lhs, locality const& rhs) noexcept
         {
             return lhs.rank_ < rhs.rank_;
         }

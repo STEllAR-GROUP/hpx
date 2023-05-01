@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Hartmut Kaiser
+# Copyright (c) 2020-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -238,6 +238,7 @@ with section("parse"):
                                        'HEADER_ROOT': 1,
                                        'INI': 1,
                                        'INSTALL_SUFFIX': 1,
+                                       'INSTALL_COMPONENT': 1,
                                        'LANGUAGE': 1,
                                        'LINK_FLAGS': '+',
                                        'OUTPUT_SUFFIX': 1,

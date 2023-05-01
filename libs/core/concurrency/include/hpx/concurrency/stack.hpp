@@ -1,5 +1,5 @@
 //  Copyright (C) 2008-2013 Tim Blechmann
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -113,10 +113,12 @@ namespace hpx::lockfree {
             using size_type = std::size_t;
         };
 
-        stack(stack const&) = delete;
-        stack& operator=(stack const&) = delete;
-
     public:
+        stack(stack const&) = delete;
+        stack(stack&&) = delete;
+        stack& operator=(stack const&) = delete;
+        stack& operator=(stack&&) = delete;
+
         using value_type = T;
         using allocator = typename implementation_defined::allocator;
         using size_type = typename implementation_defined::size_type;
@@ -132,7 +134,7 @@ namespace hpx::lockfree {
          *          to test every internal node, which is impossible if further
          *          nodes will be allocated from the operating system.
          */
-        constexpr bool is_lock_free() const noexcept
+        [[nodiscard]] constexpr bool is_lock_free() const noexcept
         {
             return tos.is_lock_free() && pool.is_lock_free();
         }

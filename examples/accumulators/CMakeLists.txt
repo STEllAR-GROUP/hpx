@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2016 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -26,6 +26,7 @@ foreach(example_program ${example_programs})
   # add example components
   add_hpx_component(
     ${example_program} INTERNAL_FLAGS NOEXPORT
+    INSTALL_COMPONENT examples
     SOURCES ${component_sources}
     HEADERS ${component_headers}
     FOLDER "Examples/Quickstart/Accumulators/${example_program}"

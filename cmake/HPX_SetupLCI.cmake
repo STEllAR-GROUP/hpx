@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Ste||ar Group
+# Copyright (c) 2021-2023 Ste||ar Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,13 +103,18 @@ macro(hpx_setup_lci)
         NAMESPACE LCI::
         FILE HPXLCITarget.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+        COMPONENT cmake
       )
 
-      install(FILES "${lci_SOURCE_DIR}/cmake_modules/FindIBV.cmake"
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+      install(
+        FILES "${lci_SOURCE_DIR}/cmake_modules/FindIBV.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+        COMPONENT cmake
       )
-      install(FILES "${lci_SOURCE_DIR}/cmake_modules/FindOFI.cmake"
-              DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+      install(
+        FILES "${lci_SOURCE_DIR}/cmake_modules/FindOFI.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+        COMPONENT cmake
       )
     endif()
   endif()
