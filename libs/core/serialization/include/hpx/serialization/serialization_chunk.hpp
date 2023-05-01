@@ -47,6 +47,11 @@ namespace hpx::serialization {
             HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
             return data_.cpos_;
         }
+        [[nodiscard]] constexpr void* data() noexcept
+        {
+            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
+            return data_.pos_;
+        }
         [[nodiscard]] constexpr std::size_t size() const noexcept
         {
             return size_;
