@@ -33,14 +33,6 @@ include(HPX_AddModule)
 # Default location is $HPX_ROOT/libs/gasnet_base/include
 set(gasnet_base_headers hpx/gasnet_base/gasnet.hpp hpx/gasnet_base/gasnet_environment.hpp)
 
-# Default location is $HPX_ROOT/libs/gasnet_base/include_compatibility
-# cmake-format: off
-set(gasnet_base_compat_headers
-    hpx/plugins/parcelport/gasnet/gasnet.hpp => hpx/modules/gasnet_base.hpp
-    hpx/plugins/parcelport/gasnet/gasnet_environment.hpp => hpx/modules/gasnet_base.hpp
-)
-# cmake-format: on
-
 set(gasnet_base_sources gasnet_environment.cpp)
 
 if(GASNET_MPI_FOUND AND HPX_WITH_NETWORKING)
