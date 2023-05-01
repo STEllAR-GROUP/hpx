@@ -12,7 +12,8 @@
 
 #if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/modules/serialization.hpp>
-#include <hpx/modules/gasnet_base.hpp>
+#include <hpx/gasnet_base/gasnet.hpp>
+#include <hpx/gasnet_base/gasnet_environment.hpp>
 
 #include <cstdint>
 

@@ -13,7 +13,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -26,6 +25,8 @@
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelport_gasnet/receiver.hpp>
 #include <hpx/parcelport_gasnet/sender.hpp>
+#include <hpx/gasnet_base/gasnet.hpp>
+#include <hpx/gasnet_base/gasnet_environment.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
