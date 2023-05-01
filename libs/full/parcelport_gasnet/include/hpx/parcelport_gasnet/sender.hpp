@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/synchronization.hpp>
 
 #include <hpx/parcelport_gasnet/sender_connection.hpp>
@@ -24,8 +24,6 @@
 #include <memory>
 #include <mutex>
 #include <utility>
-
-#include <mpi.h>
 
 namespace hpx::parcelset::policies::gasnet {
 
@@ -142,7 +140,7 @@ namespace hpx::parcelset::policies::gasnet {
         {
             int next_free = next_free_tag_;
   
-            util::mpi_environment::scoped_lock l;
+            util::gasnet_environment::scoped_lock l;
             std::memcpy(&next_free,
                 util::gasnet_environment::gasnet_buffer[self_],
                 sizeof(int));

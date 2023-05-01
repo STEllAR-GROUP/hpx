@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
-#include <hpx/modules/mpi_base.hpp>
+#include <hpx/modules/gasnet_base.hpp>
 
 #include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/receiver_connection.hpp>
@@ -26,9 +26,7 @@
 #include <utility>
 #include <chrono>
 
-#include <mpi.h>
-
-namespace hpx::parcelset::policies::mpi {
+namespace hpx::parcelset::policies::gasnet {
 
     template <typename Parcelport>
     struct receiver
@@ -100,18 +98,17 @@ namespace hpx::parcelset::policies::mpi {
         connection_ptr accept_locked(Lock& header_lock) noexcept
         {
             connection_ptr res;
-            util::mpi_environment::scoped_try_lock l;
+            util::gasnet_environment::scoped_try_lock l;
 
             if (l.locked)
             {
-                MPI_Status status;
-                if (request_done_locked(hdr_request_, &status))
+                if (request_done_locked(hdr_request_))
                 {
                     header h = new_header();
                     l.unlock();
                     header_lock.unlock();
 
-                    res.reset(new connection_type(status.MPI_SOURCE, h, pp_));
+                    res.reset(new connection_type(h, pp_));
                     return res;
                 }
             }
@@ -157,6 +154,6 @@ namespace hpx::parcelset::policies::mpi {
             return false;
         }
     };
-}    // namespace hpx::parcelset::policies::mpi
+}    // namespace hpx::parcelset::policies::gasnet
 
 #endif
