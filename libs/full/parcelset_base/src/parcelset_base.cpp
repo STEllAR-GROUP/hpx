@@ -25,7 +25,6 @@ namespace hpx::parcelset {
             "parcelport_background_mode_all",
         };
         // clang-format on
-
     }    // namespace strings
 
     char const* get_parcelport_background_mode_name(

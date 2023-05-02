@@ -1368,6 +1368,9 @@ namespace hpx::parcelset {
         ini_defs.emplace_back(
             "zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:"
             "$[hpx.parcel.array_optimization]}");
+        ini_defs.emplace_back("zero_copy_receive_optimization = "
+                              "${HPX_PARCEL_ZERO_COPY_RECEIVE_OPTIMIZATION:"
+                              "$[hpx.parcel.zero_copy_optimization]}");
         ini_defs.emplace_back(
             "async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}");
 #if defined(HPX_HAVE_PARCEL_COALESCING)

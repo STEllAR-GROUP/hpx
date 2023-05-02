@@ -112,6 +112,10 @@ namespace hpx::plugins {
                 "_ZERO_COPY_OPTIMIZATION:"
                 "$[hpx.parcel.zero_copy_optimization]}");
             fillini.emplace_back(
+                "zero_copy_receive_optimization = ${HPX_PARCEL_" + name_uc +
+                "_ZERO_COPY_RECEIVE_OPTIMIZATION:"
+                "$[hpx.parcel.zero_copy_receive_optimization]}");
+            fillini.emplace_back(
                 "zero_copy_serialization_threshold = ${HPX_PARCEL_" + name_uc +
                 "_ZERO_COPY_SERIALIZATION_THRESHOLD:"
                 "$[hpx.parcel.zero_copy_serialization_threshold]}");

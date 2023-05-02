@@ -103,6 +103,11 @@ namespace hpx::parcelset::policies::mpi {
             if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
+                if (!pp_.allow_zero_copy_receive_optimizations())
+                {
+                    chunk_buffers_.resize(num_zero_copy_chunks);
+                }
+
                 {
                     util::mpi_environment::scoped_lock l;
 
@@ -154,89 +159,127 @@ namespace hpx::parcelset::policies::mpi {
 
         bool receive_chunks(std::size_t num_thread = -1)
         {
-            if (!request_done())
-            {
-                return false;
-            }
-
-            // handle zero-copy receive, this should be done on the first entry
-            // to receive_chunks only
-            if (parcels_.empty())
-            {
-                HPX_ASSERT(zero_copy_chunks_idx_ == 0);
-
-                auto const num_zero_copy_chunks = static_cast<std::size_t>(
-                    static_cast<std::uint32_t>(buffer_.num_chunks_.first));
-                if (num_zero_copy_chunks != 0)
-                {
-                    HPX_ASSERT(buffer_.chunks_.size() == num_zero_copy_chunks);
-
-                    // De-serialize the parcels such that all data but the
-                    // zero-copy chunks are in place. This de-serialization also
-                    // allocates all zero-chunk buffers and stores those in the
-                    // chunks array for the subsequent networking to place the
-                    // received data directly.
-                    for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
-                    {
-                        auto const chunk_size = static_cast<std::size_t>(
-                            buffer_.transmission_chunks_[i].second);
-                        buffer_.chunks_[i] =
-                            serialization::create_pointer_chunk(
-                                nullptr, chunk_size);
-                    }
-
-                    parcels_ =
-                        decode_parcels_zero_copy(pp_, buffer_, num_thread);
-
-                    // note that at this point, buffer_.chunks_ will have
-                    // entries for all chunks, including the non-zero-copy ones
-                }
-
-                // we should have received at least one parcel if there are
-                // zero-copy chunks to be received
-                HPX_ASSERT(parcels_.empty() || !buffer_.chunks_.empty());
-            }
-
-            while (chunks_idx_ != buffer_.chunks_.size())
+            if (pp_.allow_zero_copy_receive_optimizations())
             {
                 if (!request_done())
                 {
                     return false;
                 }
 
-                auto& c = buffer_.chunks_[chunks_idx_++];
-                if (c.type_ == serialization::chunk_type::chunk_type_index)
+                // handle zero-copy receive, this should be done on the first entry
+                // to receive_chunks only
+                if (parcels_.empty())
                 {
-                    continue;    // skip non-zero-copy chunks
+                    HPX_ASSERT(zero_copy_chunks_idx_ == 0);
+
+                    auto const num_zero_copy_chunks = static_cast<std::size_t>(
+                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
+                    if (num_zero_copy_chunks != 0)
+                    {
+                        HPX_ASSERT(
+                            buffer_.chunks_.size() == num_zero_copy_chunks);
+
+                        // De-serialize the parcels such that all data but the
+                        // zero-copy chunks are in place. This de-serialization also
+                        // allocates all zero-chunk buffers and stores those in the
+                        // chunks array for the subsequent networking to place the
+                        // received data directly.
+                        for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
+                        {
+                            auto const chunk_size = static_cast<std::size_t>(
+                                buffer_.transmission_chunks_[i].second);
+                            buffer_.chunks_[i] =
+                                serialization::create_pointer_chunk(
+                                    nullptr, chunk_size);
+                        }
+
+                        parcels_ =
+                            decode_parcels_zero_copy(pp_, buffer_, num_thread);
+
+                        // note that at this point, buffer_.chunks_ will have
+                        // entries for all chunks, including the non-zero-copy ones
+                    }
+
+                    // we should have received at least one parcel if there are
+                    // zero-copy chunks to be received
+                    HPX_ASSERT(parcels_.empty() || !buffer_.chunks_.empty());
                 }
 
-                // the zero-copy chunks come first in the transmission_chunks_
-                // array
-                auto const chunk_size = static_cast<std::size_t>(
-                    buffer_.transmission_chunks_[zero_copy_chunks_idx_++]
-                        .second);
-
-                // the parcel de-serialization above should have allocated the
-                // correct amount of memory
-                HPX_ASSERT_MSG(c.data() != nullptr && c.size() == chunk_size,
-                    "zero-copy chunk buffers should have been initialized "
-                    "during de-serialization");
-
+                while (chunks_idx_ != buffer_.chunks_.size())
                 {
-                    util::mpi_environment::scoped_lock l;
+                    if (!request_done())
+                    {
+                        return false;
+                    }
 
-                    [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
-                        static_cast<int>(chunk_size), MPI_BYTE, src_, tag_,
-                        util::mpi_environment::communicator(), &request_);
-                    HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                    auto& c = buffer_.chunks_[chunks_idx_++];
+                    if (c.type_ == serialization::chunk_type::chunk_type_index)
+                    {
+                        continue;    // skip non-zero-copy chunks
+                    }
 
-                    request_ptr_ = &request_;
+                    // the zero-copy chunks come first in the transmission_chunks_
+                    // array
+                    auto const chunk_size = static_cast<std::size_t>(
+                        buffer_.transmission_chunks_[zero_copy_chunks_idx_++]
+                            .second);
+
+                    // the parcel de-serialization above should have allocated the
+                    // correct amount of memory
+                    HPX_ASSERT_MSG(
+                        c.data() != nullptr && c.size() == chunk_size,
+                        "zero-copy chunk buffers should have been initialized "
+                        "during de-serialization");
+
+                    {
+                        util::mpi_environment::scoped_lock l;
+
+                        [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
+                            static_cast<int>(chunk_size), MPI_BYTE, src_, tag_,
+                            util::mpi_environment::communicator(), &request_);
+                        HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
+                        request_ptr_ = &request_;
+                    }
+                }
+                HPX_ASSERT_MSG(
+                    zero_copy_chunks_idx_ == buffer_.num_chunks_.first,
+                    "observed: {}, expected {}", zero_copy_chunks_idx_,
+                    buffer_.num_chunks_.first);
+            }
+            else
+            {
+                HPX_ASSERT(chunk_buffers_.size() == buffer_.chunks_.size());
+                while (chunks_idx_ < buffer_.chunks_.size())
+                {
+                    if (!request_done())
+                    {
+                        return false;
+                    }
+
+                    std::size_t const idx = chunks_idx_++;
+                    std::size_t const chunk_size =
+                        buffer_.transmission_chunks_[idx].second;
+
+                    auto& c = chunk_buffers_[idx];
+                    c.resize(chunk_size);
+
+                    // store buffer for decode_parcels below
+                    buffer_.chunks_[idx] = serialization::create_pointer_chunk(
+                        c.data(), chunk_size);
+
+                    {
+                        util::mpi_environment::scoped_lock l;
+
+                        [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
+                            static_cast<int>(c.size()), MPI_BYTE, src_, tag_,
+                            util::mpi_environment::communicator(), &request_);
+                        HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+
+                        request_ptr_ = &request_;
+                    }
                 }
             }
-            HPX_ASSERT_MSG(zero_copy_chunks_idx_ == buffer_.num_chunks_.first,
-                "observed: {}, expected {}", zero_copy_chunks_idx_,
-                buffer_.num_chunks_.first);
-
             state_ = rcvd_chunks;
 
             return send_release_tag(num_thread);
@@ -266,15 +309,18 @@ namespace hpx::parcelset::policies::mpi {
             if (parcels_.empty())
             {
                 // decode and handle received data
-                HPX_ASSERT(buffer_.num_chunks_.first == 0);
+                HPX_ASSERT(buffer_.num_chunks_.first == 0 ||
+                    !pp_.allow_zero_copy_receive_optimizations());
                 handle_received_parcels(
                     decode_parcels(pp_, HPX_MOVE(buffer_), num_thread),
                     num_thread);
+                chunk_buffers_.clear();
             }
             else
             {
                 // handle the received zero-copy parcels.
-                HPX_ASSERT(buffer_.num_chunks_.first != 0);
+                HPX_ASSERT(buffer_.num_chunks_.first != 0 &&
+                    pp_.allow_zero_copy_receive_optimizations());
                 handle_received_parcels(HPX_MOVE(parcels_));
                 buffer_ = buffer_type{};
             }
@@ -333,6 +379,7 @@ namespace hpx::parcelset::policies::mpi {
         Parcelport& pp_;
 
         std::vector<parcelset::parcel> parcels_;
+        std::vector<std::vector<char>> chunk_buffers_;
     };
 }    // namespace hpx::parcelset::policies::mpi
 

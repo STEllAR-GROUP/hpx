@@ -95,6 +95,7 @@ namespace hpx::parcelset::policies::tcp {
             data.num_parcels_ = 0;
 #endif
             parcels_.clear();
+            chunk_buffers_.clear();
 
             // Issue a read operation to read the message size.
             using asio::buffer;
@@ -274,51 +275,74 @@ namespace hpx::parcelset::policies::tcp {
 
                 buffer_.chunks_.resize(num_zero_copy_chunks);
 
-                // De-serialize the parcels such that all data but the zero-copy
-                // chunks are in place. This de-serialization also allocates all
-                // zero-chunk buffers and stores those in the chunks array for
-                // the subsequent networking to place the received data
-                // directly.
-                for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
+                if (parcelport_.allow_zero_copy_receive_optimizations())
                 {
-                    auto const chunk_size = static_cast<std::size_t>(
-                        buffer_.transmission_chunks_[i].second);
-                    buffer_.chunks_[i] = serialization::create_pointer_chunk(
-                        nullptr, chunk_size);
-                }
-
-                parcels_ = decode_parcels_zero_copy(parcelport_, buffer_);
-
-                // note that at this point, buffer_.chunks_ will have
-                // entries for all chunks, including the non-zero-copy ones
-
-                [[maybe_unused]] auto const num_non_zero_copy_chunks =
-                    static_cast<std::size_t>(
-                        static_cast<std::uint32_t>(buffer_.num_chunks_.second));
-
-                HPX_ASSERT(num_zero_copy_chunks + num_non_zero_copy_chunks ==
-                    buffer_.chunks_.size());
-
-                std::size_t zero_copy_chunks = 0;
-                for (auto& c : buffer_.chunks_)
-                {
-                    if (c.type_ == serialization::chunk_type::chunk_type_index)
+                    // De-serialize the parcels such that all data but the
+                    // zero-copy chunks are in place. This de-serialization also
+                    // allocates all zero-chunk buffers and stores those in the
+                    // chunks array for the subsequent networking to place the
+                    // received data directly.
+                    for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                     {
-                        continue;    // skip non-zero-copy chunks
+                        auto const chunk_size = static_cast<std::size_t>(
+                            buffer_.transmission_chunks_[i].second);
+                        buffer_.chunks_[i] =
+                            serialization::create_pointer_chunk(
+                                nullptr, chunk_size);
                     }
 
-                    auto const chunk_size = static_cast<std::size_t>(
-                        buffer_.transmission_chunks_[zero_copy_chunks++]
-                            .second);
+                    parcels_ = decode_parcels_zero_copy(parcelport_, buffer_);
 
-                    HPX_ASSERT_MSG(
-                        c.data() != nullptr && c.size() == chunk_size,
-                        "zero-copy chunk buffers should have been initialized "
-                        "during de-serialization");
+                    // note that at this point, buffer_.chunks_ will have
+                    // entries for all chunks, including the non-zero-copy ones
 
-                    buffers.emplace_back(c.data(), chunk_size);
+                    [[maybe_unused]] auto const num_non_zero_copy_chunks =
+                        static_cast<std::size_t>(static_cast<std::uint32_t>(
+                            buffer_.num_chunks_.second));
+
+                    HPX_ASSERT(
+                        num_zero_copy_chunks + num_non_zero_copy_chunks ==
+                        buffer_.chunks_.size());
+
+                    std::size_t zero_copy_chunks = 0;
+                    for (auto& c : buffer_.chunks_)
+                    {
+                        if (c.type_ ==
+                            serialization::chunk_type::chunk_type_index)
+                        {
+                            continue;    // skip non-zero-copy chunks
+                        }
+
+                        auto const chunk_size = static_cast<std::size_t>(
+                            buffer_.transmission_chunks_[zero_copy_chunks++]
+                                .second);
+
+                        HPX_ASSERT_MSG(
+                            c.data() != nullptr && c.size() == chunk_size,
+                            "zero-copy chunk buffers should have been "
+                            "initialized during de-serialization");
+
+                        buffers.emplace_back(c.data(), chunk_size);
+                    }
+                    HPX_ASSERT(zero_copy_chunks == num_zero_copy_chunks);
                 }
-                HPX_ASSERT(zero_copy_chunks == num_zero_copy_chunks);
+                else
+                {
+                    chunk_buffers_.resize(num_zero_copy_chunks);
+                    for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
+                    {
+                        auto const chunk_size = static_cast<std::size_t>(
+                            buffer_.transmission_chunks_[i].second);
+
+                        chunk_buffers_[i].resize(chunk_size);
+                        buffers.emplace_back(
+                            chunk_buffers_[i].data(), chunk_size);
+
+                        buffer_.chunks_[i] =
+                            serialization::create_pointer_chunk(
+                                chunk_buffers_[i].data(), chunk_size);
+                    }
+                }
 
                 // Start an asynchronous call to receive the zero-copy data.
                 {
@@ -360,6 +384,7 @@ namespace hpx::parcelset::policies::tcp {
                 --operation_in_flight_;
                 buffer_ = parcel_buffer_type();
                 parcels_.clear();
+                chunk_buffers_.clear();
             }
             else
             {
@@ -375,14 +400,16 @@ namespace hpx::parcelset::policies::tcp {
                 if (parcels_.empty())
                 {
                     // decode and handle received data
-                    HPX_ASSERT(buffer_.num_chunks_.first == 0);
+                    HPX_ASSERT(buffer_.num_chunks_.first == 0 ||
+                        !parcelport_.allow_zero_copy_receive_optimizations());
                     handle_received_parcels(
                         decode_parcels(parcelport_, HPX_MOVE(buffer_)));
                 }
                 else
                 {
                     // handle the received zero-copy parcels.
-                    HPX_ASSERT(buffer_.num_chunks_.first != 0);
+                    HPX_ASSERT(buffer_.num_chunks_.first != 0 &&
+                        parcelport_.allow_zero_copy_receive_optimizations());
                     handle_received_parcels(HPX_MOVE(parcels_));
                 }
 
@@ -419,6 +446,7 @@ namespace hpx::parcelset::policies::tcp {
 
             buffer_ = parcel_buffer_type();
             parcels_.clear();
+            chunk_buffers_.clear();
 
             // Issue a read operation to read the next parcel.
             if (!e)
@@ -445,6 +473,7 @@ namespace hpx::parcelset::policies::tcp {
         hpx::util::atomic_count operation_in_flight_;
 
         std::vector<parcelset::parcel> parcels_;
+        std::vector<std::vector<char>> chunk_buffers_;
     };
 }    // namespace hpx::parcelset::policies::tcp
 
