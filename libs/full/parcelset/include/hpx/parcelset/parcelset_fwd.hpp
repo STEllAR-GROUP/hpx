@@ -62,7 +62,7 @@ namespace hpx::parcelset {
     HPX_EXPORT void sync_put_parcel(parcelset::parcel&& p);
 
     /// Return the maximally allowed size of an inbound message (in bytes)
-    HPX_EXPORT std::int64_t get_max_inbound_size(parcelport&);
+    HPX_EXPORT std::int64_t get_max_inbound_size(parcelport const&);
 }    // namespace hpx::parcelset
 
 #endif

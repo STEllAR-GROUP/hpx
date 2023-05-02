@@ -43,6 +43,11 @@ namespace hpx::parcelset {
 
     parcel::~parcel() = default;
 
+    parcel::parcel(parcel const&) = default;
+    parcel::parcel(parcel&&) noexcept = default;
+    parcel& parcel::operator=(parcel const&) = default;
+    parcel& parcel::operator=(parcel&&) noexcept = default;
+
     void parcel::reset() const
     {
         data_->reset();

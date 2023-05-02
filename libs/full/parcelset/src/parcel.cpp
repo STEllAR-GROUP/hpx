@@ -178,9 +178,7 @@ namespace hpx::parcelset::detail {
 #endif
 
     parcel::parcel()
-      : data_()
-      , action_()
-      , size_(0)
+      : size_(0)
       , num_chunks_(0)
     {
     }

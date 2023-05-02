@@ -19,7 +19,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
 
     locality::locality(locality const& other)
       : impl_(other.impl_ ? other.impl_->clone() : nullptr)
@@ -105,11 +105,10 @@ namespace hpx { namespace parcelset {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void locality::save(
-        serialization::output_archive& ar, const unsigned int) const
+    void locality::save(serialization::output_archive& ar, unsigned int) const
     {
 #if defined(HPX_HAVE_NETWORKING)
-        std::string t = type();
+        std::string const t = type();
         ar << t;
         if (t.empty())
         {
@@ -124,7 +123,7 @@ namespace hpx { namespace parcelset {
 #endif
     }
 
-    void locality::load(serialization::input_archive& ar, const unsigned int)
+    void locality::load(serialization::input_archive& ar, unsigned int)
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::string t;
@@ -156,4 +155,4 @@ namespace hpx { namespace parcelset {
 
         return os;
     }
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset

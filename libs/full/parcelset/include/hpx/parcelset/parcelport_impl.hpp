@@ -151,13 +151,12 @@ namespace hpx::parcelset {
             if (endian_out == "little")
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::endian_little);
+                    serialization::archive_flags::endian_little;
             }
             else if (endian_out == "big")
             {
-                archive_flags_ = archive_flags_ |
-                    static_cast<int>(serialization::archive_flags::endian_big);
+                archive_flags_ =
+                    archive_flags_ | serialization::archive_flags::endian_big;
             }
             else
             {
@@ -167,17 +166,23 @@ namespace hpx::parcelset {
             if (!this->allow_array_optimizations())
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(serialization::archive_flags::
-                            disable_array_optimization);
+                    serialization::archive_flags::disable_array_optimization;
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::disable_data_chunking);
+                    serialization::archive_flags::disable_data_chunking;
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
             }
             else if (!this->allow_zero_copy_optimizations())
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::disable_data_chunking);
+                    serialization::archive_flags::disable_data_chunking;
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
+            }
+            else if (!this->allow_zero_copy_receive_optimizations())
+            {
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
             }
         }
 

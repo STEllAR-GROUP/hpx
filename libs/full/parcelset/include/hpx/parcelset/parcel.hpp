@@ -24,7 +24,6 @@
 #include <iosfwd>
 #include <map>
 #include <memory>
-#include <string>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>

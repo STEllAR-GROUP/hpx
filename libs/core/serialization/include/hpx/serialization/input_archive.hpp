@@ -276,8 +276,9 @@ namespace hpx::serialization {
             }
             else
             {
-                buffer_->load_binary_chunk(
-                    address, count, allow_zero_copy_receive);
+                buffer_->load_binary_chunk(address, count,
+                    allow_zero_copy_receive &&
+                        !disable_receive_data_chunking());
             }
 
             size_ += count;

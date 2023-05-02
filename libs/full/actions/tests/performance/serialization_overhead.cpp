@@ -78,6 +78,9 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
             int(hpx::serialization::archive_flags::disable_array_optimization);
         out_archive_flags = out_archive_flags |
             int(hpx::serialization::archive_flags::disable_data_chunking);
+        out_archive_flags = out_archive_flags |
+            int(hpx::serialization::archive_flags::
+                    disable_receive_data_chunking);
     }
     else
     {
@@ -88,6 +91,22 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
         {
             out_archive_flags = out_archive_flags |
                 int(hpx::serialization::archive_flags::disable_data_chunking);
+            out_archive_flags = out_archive_flags |
+                int(hpx::serialization::archive_flags::
+                        disable_receive_data_chunking);
+        }
+        else
+        {
+            std::string zero_copy_receive_optimization = hpx::get_config_entry(
+                "hpx.parcel.zero_copy_receive_optimization", "1");
+            if (!zerocopy ||
+                hpx::util::from_string<int>(zero_copy_receive_optimization) ==
+                    0)
+            {
+                out_archive_flags = out_archive_flags |
+                    int(hpx::serialization::archive_flags::
+                            disable_receive_data_chunking);
+            }
         }
     }
 
