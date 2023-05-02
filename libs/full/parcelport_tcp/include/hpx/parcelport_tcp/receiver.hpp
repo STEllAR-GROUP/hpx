@@ -388,7 +388,6 @@ namespace hpx::parcelset::policies::tcp {
                 --operation_in_flight_;
                 buffer_ = parcel_buffer_type();
                 parcels_.clear();
-
                 chunk_buffers_.clear();
             }
             else
