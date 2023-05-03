@@ -11,7 +11,7 @@
 async_mpi
 =========
 
-The MPI library is intended to simplify the process of integrating MPI based
+The MPI library is intended to simplify the process of integrating |mpi|_ based
 codes with the |hpx| runtime. Any MPI function that is asynchronous and uses an
 ``MPI_Request`` may be converted into an ``hpx::future``.
 The syntax is designed to allow a simple replacement of the MPI call with a futurized

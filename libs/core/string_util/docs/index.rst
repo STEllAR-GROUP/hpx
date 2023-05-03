@@ -11,8 +11,7 @@
 string_util
 ===========
 
-This module contains string utilities inspired by the Boost string algorithms
-library.
+This module contains string utilities inspired by the |boost_string_algo|.
 
 See the :ref:`API reference <modules_string_util_api>` of this module for more
 details.
