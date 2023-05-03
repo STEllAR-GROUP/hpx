@@ -11,7 +11,7 @@
 mpi_base
 ========
 
-This module provides helper functionality for detecting MPI environments.
+This module provides helper functionality for detecting |mpi|_ environments.
 
 See the :ref:`API reference <modules_mpi_base_api>` of this module for more
 details.

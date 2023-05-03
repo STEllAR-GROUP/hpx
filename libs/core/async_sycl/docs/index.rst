@@ -11,7 +11,7 @@
 async_sycl
 ==========
 
-This module allows creating HPX futures using SYCL events, effectively integrating asynchronous SYCL kernels and
+This module allows creating HPX futures using |sycl|_ events, effectively integrating asynchronous SYCL kernels and
 memory transfers with HPX. Building on this integration, this module also contains a SYCL executor. This executor
 encapsulates a SYCL queue. When SYCL queue member functions are launched with this executor, the user can automatically
 obtain the HPX futures associated with them.

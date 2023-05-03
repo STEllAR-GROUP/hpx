@@ -29,7 +29,7 @@ This module provides the following local :term:`LCO`\ s:
 
 See :ref:`modules_lcos_distributed` for distributed LCOs. Basic synchronization
 primitives for use in |hpx| threads can be found in :ref:`modules_synchronization`.
-:ref:`async_combinators` contains useful utility functions for combining
+:ref:`modules_async_combinators` contains useful utility functions for combining
 futures.
 
 See the :ref:`API reference <modules_lcos_local_api>` of this module for more
