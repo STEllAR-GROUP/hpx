@@ -20,7 +20,8 @@
 // depending on whether the main executable defines this symbol or not.
 HPX_WEAK_SYMBOL int hpx_main()
 {
-    std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
+    std::string cmdline(
+        hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
     using namespace hpx::program_options;
 #if defined(HPX_WINDOWS)
@@ -38,7 +39,7 @@ HPX_WEAK_SYMBOL int hpx_main()
         (sizeof(hpx_positional) / sizeof(hpx_positional[0])) - 1;
 
     // Copy all arguments which are not hpx related to a temporary array
-    std::vector<char*> argv(args.size()+1);
+    std::vector<char*> argv(args.size() + 1);
     std::size_t argcount = 0;
     for (auto& arg : args)
     {
@@ -50,8 +51,9 @@ HPX_WEAK_SYMBOL int hpx_main()
             arg.compare(hpx_prefix_len, hpx_positional_len, hpx_positional))
         {
             std::string::size_type p = arg.find_first_of("=");
-            if (p != std::string::npos) {
-                arg = arg.substr(p+1);
+            if (p != std::string::npos)
+            {
+                arg = arg.substr(p + 1);
                 argv[argcount++] = const_cast<char*>(arg.data());
             }
         }
