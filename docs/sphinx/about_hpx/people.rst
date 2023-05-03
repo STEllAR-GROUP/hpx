@@ -112,8 +112,9 @@ Acknowledgements
 Thanks also to the following people who contributed directly or indirectly to
 the project through discussions, pull requests, documentation patches, etc.
 
+* Panos Syskakis for benchmarking and optimizing our parallel algorithms.
 * Shreyas Atre, for contributing fixes to our implementation of
-  senders/receivers.
+  senders/receivers and extending our coroutines integration with senders/receivers.
 * Alexander Neumann, for contributing fixes to the cmake build system.
 * Dimitra Karatza, for her work on refactoring the documentation and providing
   a new user-friendly environment during and after Google Season of Docs 2021.
