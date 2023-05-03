@@ -27,8 +27,6 @@ Core modules
    /libs/core/async_sycl/docs/index.rst
    /libs/core/batch_environments/docs/index.rst
    /libs/core/cache/docs/index.rst
-   /libs/core/command_line_handling_local/docs/index.rst
-   /libs/core/compute_local/docs/index.rst
    /libs/core/concepts/docs/index.rst
    /libs/core/concurrency/docs/index.rst
    /libs/core/config/docs/index.rst
@@ -47,8 +45,6 @@ Core modules
    /libs/core/hardware/docs/index.rst
    /libs/core/hashing/docs/index.rst
    /libs/core/include_local/docs/index.rst
-   /libs/core/ini/docs/index.rst
-   /libs/core/init_runtime_local/docs/index.rst
    /libs/core/io_service/docs/index.rst
    /libs/core/iterator_support/docs/index.rst
    /libs/core/itt_notify/docs/index.rst
@@ -67,13 +63,11 @@ Core modules
    /libs/core/resiliency/docs/index.rst
    /libs/core/resource_partitioner/docs/index.rst
    /libs/core/runtime_configuration/docs/index.rst
-   /libs/core/runtime_local/docs/index.rst
    /libs/core/schedulers/docs/index.rst
    /libs/core/serialization/docs/index.rst
    /libs/core/static_reinit/docs/index.rst
    /libs/core/string_util/docs/index.rst
    /libs/core/synchronization/docs/index.rst
-   /libs/core/tag_invoke/docs/index.rst
    /libs/core/testing/docs/index.rst
    /libs/core/thread_pool_util/docs/index.rst
    /libs/core/thread_pools/docs/index.rst
