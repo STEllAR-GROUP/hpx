@@ -190,7 +190,7 @@ system should be stopped after the scheduled work has been executed.
 
 This method of invoking |hpx| is useful for applications where the main thread
 is used for special operations, such a GUIs. The function :cpp:func:`hpx::stop`
-can be used to wait for the |hpx| runtime system to exit and should at least be 
+can be used to wait for the |hpx| runtime system to exit and should at least be
 used as the last function called in ``main()``. The value returned from
 ``hpx_main`` will be returned from :cpp:func:`hpx::stop` after the runtime
 system has stopped.
@@ -235,6 +235,44 @@ There are many additional overloads of :cpp:func:`hpx::start` available, such as
 the option for users to provide their own entry point function instead of ``hpx_main``.
 Please refer to the function documentation for more details (see:
 ``hpx/hpx_start.hpp``).
+
+.. _explicit_startup_function:
+
+Supply your own explicit startup function as the main |hpx| entry point
+=======================================================================
+
+There is also a way to specify any function (besides ``hpx_main``) to be used as
+the main entry point for your |hpx| application:
+
+.. code-block:: c++
+
+   #include <hpx/hpx_init.hpp>
+
+   int application_entry_point(int argc, char* argv[])
+   {
+       // Any HPX application logic goes here...
+       return hpx::finalize();
+   }
+
+   int main(int argc, char* argv[])
+   {
+       // Initialize HPX, run application_entry_point as the first HPX thread,
+       // and wait for hpx::finalize being called.
+       return hpx::init(&application_entry_point, argc, argv);
+   }
+
+.. note::
+
+   The function supplied to :cpp:func:`hpx::init` must have one of the following
+   prototypes:
+
+       int application_entry_point(int argc, char* argv[]);
+       int application_entry_point(hpx::program_options::variables_map& vm);
+
+.. note::
+
+   If ``nullptr`` is used as the function argument, |hpx| will not run any
+   startup function on this locality.
 
 .. _suspend_resume:
 
