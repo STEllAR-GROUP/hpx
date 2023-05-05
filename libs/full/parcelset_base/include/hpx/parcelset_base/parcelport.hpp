@@ -135,7 +135,7 @@ namespace hpx::parcelset {
         /// functions or function objects get invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param dest    [in] Where should the parcels be sent to
+        /// \param dest     [in] Where should the parcels be sent to
         /// \param parcels  [in] A reference to the list of parcels to send.
         /// \param handlers [in] A list of function objects to be invoked on
         ///                 successful completion or on errors. The signature of
