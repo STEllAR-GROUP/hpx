@@ -105,7 +105,8 @@ namespace hpx::parcelset {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void locality::save(serialization::output_archive& ar, unsigned int) const
+    void locality::save(
+        [[maybe_unused]] serialization::output_archive& ar, unsigned int) const
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::string const t = type();
@@ -119,11 +120,11 @@ namespace hpx::parcelset {
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "locality::save",
             "this shouldn't be called if networking is disabled");
-        HPX_UNUSED(ar);
 #endif
     }
 
-    void locality::load(serialization::input_archive& ar, unsigned int)
+    void locality::load(
+        [[maybe_unused]] serialization::input_archive& ar, unsigned int)
     {
 #if defined(HPX_HAVE_NETWORKING)
         std::string t;
@@ -139,7 +140,6 @@ namespace hpx::parcelset {
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "locality::load",
             "this shouldn't be called if networking is disabled");
-        HPX_UNUSED(ar);
 #endif
     }
 
