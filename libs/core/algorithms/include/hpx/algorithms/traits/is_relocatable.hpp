@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-namespace hpx::traits {
+namespace hpx {
 
     template <typename T>
     struct is_relocatable
@@ -19,4 +19,4 @@ namespace hpx::traits {
 
     template <typename T>
     inline constexpr bool is_relocatable_v = is_relocatable<T>::value;
-}    // namespace hpx::traits
+}    // namespace hpx
