@@ -5,12 +5,12 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_EXAMPLES)
-  add_hpx_pseudo_target(examples.modules.mpi_base)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.mpi_base)
+  add_hpx_pseudo_target(examples.modules.gasnet_base)
+  add_hpx_pseudo_dependencies(examples.modules examples.modules.gasnet_base)
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
-    add_hpx_pseudo_target(tests.examples.modules.mpi_base)
+    add_hpx_pseudo_target(tests.examples.modules.gasnet_base)
     add_hpx_pseudo_dependencies(
-      tests.examples.modules tests.examples.modules.mpi_base
+      tests.examples.modules tests.examples.modules.gasnet_base
     )
   endif()
 endif()

@@ -249,4 +249,48 @@ namespace hpx::parcelset {
     }    // namespace policies::gasnet
 }    // namespace hpx::parcelset
 
+namespace hpx::traits {
+
+    // Inject additional configuration data into the factory registry for this
+    // type. This information ends up in the system wide configuration database
+    // under the plugin specific section:
+    //
+    //      [hpx.parcel.gasnet]
+    //      ...
+    //      priority = 1
+    //
+    template <>
+    struct plugin_config_data<hpx::parcelset::policies::gasnet::parcelport>
+    {
+        static constexpr char const* priority() noexcept
+        {
+            return "1";
+        }
+
+        static void init(int* argc, char*** argv, util::command_line_handling& cfg)
+        {
+            util::gasnet_environment::init(argc, argv, cfg.rtcfg_);
+            cfg.num_localities_ =
+                static_cast<std::size_t>(util::gasnet_environment::size());
+            cfg.node_ = static_cast<std::size_t>(util::gasnet_environment::rank());
+        }
+
+        // by default no additional initialization using the resource
+        // partitioner is required
+        static constexpr void init(hpx::resource::partitioner&) noexcept {}
+
+        static void destroy() noexcept
+        {
+            util::gasnet_environment::finalize();
+        }
+
+        static constexpr char const* call() noexcept
+        {
+            return "";
+        }
+    };
+}    // namespace hpx::traits
+
+HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::gasnet::connection_handler, gasnet)
+
 #endif

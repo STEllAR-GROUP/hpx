@@ -17,7 +17,10 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
+#ifndef GASNET_PAR
 #define GASNET_PAR 1
+#endif
+
 #include <gasnet.h>
 
 #if defined(__clang__)

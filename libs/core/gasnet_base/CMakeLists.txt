@@ -6,27 +6,14 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET_MPI)
-  # setup GASNET, if necessary
-  include(HPX_SetupGASNET)
-  hpx_setup_gasnet()
-endif()
-
-if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET_UDP)
-  # setup GASNET, if necessary
-  include(HPX_SetupGASNET)
-  hpx_setup_gasnet()
-else()
+if(NOT (HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET AND (HPX_WITH_PARCELPORT_GASNET_MPI OR HPX_WITH_PARCELPORT_GASNET_SMP OR HPX_WITH_PARCELPORT_GASNET_UDP)))
+  message(STATUS "*** PARCELPORT_GASNET not set")
   return()
 endif()
 
-if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET_SMP)
-  # setup GASNET, if necessary
-  include(HPX_SetupGASNET)
-  hpx_setup_gasnet()
-else()
-  return()
-endif()
+# setup GASNET, if necessary
+include(HPX_SetupGASNET)
+hpx_setup_gasnet()
 
 include(HPX_AddModule)
 
@@ -35,43 +22,26 @@ set(gasnet_base_headers hpx/gasnet_base/gasnet.hpp hpx/gasnet_base/gasnet_enviro
 
 set(gasnet_base_sources gasnet_environment.cpp)
 
-if(GASNET_MPI_FOUND AND HPX_WITH_NETWORKING)
-  set(additional_dependencies Mpi::mpi gasnet-mpi-par)
+if(GASNET_MPI_FOUND AND HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+  set(additional_dependencies Mpi::mpi Gasnet::gasnet)
 
   add_hpx_module(
     core gasnet_base
     GLOBAL_HEADER_GEN ON
     SOURCES ${gasnet_base_sources}
     HEADERS ${gasnet_base_headers}
-    COMPAT_HEADERS ${gasnet_base_compat_headers}
-    MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
-    DEPENDENCIES ${additional_dependencies}
-    CMAKE_SUBDIRS examples tests
-  )
-elseif(GASNET_UDP_FOUND AND HPX_WITH_NETWORKING)
-  set(additional_dependencies gasnet-udp-par)
-
-  add_hpx_module(
-    core gasnet_base
-    GLOBAL_HEADER_GEN ON
-    SOURCES ${gasnet_base_sources}
-    HEADERS ${gasnet_base_headers}
-    COMPAT_HEADERS ${gasnet_base_compat_headers}
     MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
     DEPENDENCIES ${additional_dependencies}
     CMAKE_SUBDIRS examples tests
   )
 else()
-  set(additional_dependencies gasnet-smp-par)
-
   add_hpx_module(
     core gasnet_base
     GLOBAL_HEADER_GEN ON
     SOURCES ${gasnet_base_sources}
     HEADERS ${gasnet_base_headers}
-    COMPAT_HEADERS ${gasnet_base_compat_headers}
     MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_util
-    DEPENDENCIES ${additional_dependencies}
+    DEPENDENCIES Gasnet::gasnet
     CMAKE_SUBDIRS examples tests
   )
 endif()
