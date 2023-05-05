@@ -1152,6 +1152,30 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_MPI BOOL "Enable the GASNET-MPI based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_MPI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_MPI)
+  endif()
+
+  hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_SMP BOOL "Enable the GASNET-SMP based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_SMP)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_SMP)
+  endif()
+
+  hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_UDP BOOL "Enable the GASNET-UDP based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_UDP)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UDP)
+  endif()
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )
@@ -1188,7 +1212,7 @@ else(HPX_WITH_NETWORKING)
   )
 endif(HPX_WITH_NETWORKING)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
   # mpi parcelport settings
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_ENV
@@ -2133,7 +2157,7 @@ add_hpx_library_headers_noglob(hpx_external)
 # Setup plugins (set here cause if we include it inside plugins, it will not be
 # defined in src/CMakeLists.txt where we call add_static_parcelports)
 include(HPX_SetupMPI) # must come before APEX
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
   hpx_setup_mpi()
 endif()
 include(HPX_SetupLCI)

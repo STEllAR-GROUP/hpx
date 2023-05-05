@@ -34,6 +34,18 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   hpx_setup_lci()
   set(additional_dependencies ${additional_dependencies} LCI::LCI)
 endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
+  include(HPX_SetupGASNET)
+  hpx_setup_gasnet()
+
+  if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+    set(additional_dependencies Mpi::mpi Papi::papi)
+  elseif(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_UDP)
+    set(additional_dependencies Papi::papi)
+  elseif(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_SMP)
+    set(additional_dependencies Papi::papi)
+  endif()
+endif()
 
 include(HPX_AddModule)
 add_hpx_module(

@@ -21,6 +21,9 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_GASNET_BASE)
+#include <hpx/modules/gasnet_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>

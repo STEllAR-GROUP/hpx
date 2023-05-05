@@ -9,34 +9,34 @@ include(HPX_Option)
 
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
-    add_hpx_pseudo_target(tests.unit.modules.mpi_base)
-    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.mpi_base)
+    add_hpx_pseudo_target(tests.unit.modules.gasnet_base)
+    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.gasnet_base)
     add_subdirectory(unit)
   endif()
 
   if(HPX_WITH_TESTS_REGRESSIONS)
-    add_hpx_pseudo_target(tests.regressions.modules.mpi_base)
+    add_hpx_pseudo_target(tests.regressions.modules.gasnet_base)
     add_hpx_pseudo_dependencies(
-      tests.regressions.modules tests.regressions.modules.mpi_base
+      tests.regressions.modules tests.regressions.modules.gasnet_base
     )
     add_subdirectory(regressions)
   endif()
 
   if(HPX_WITH_TESTS_BENCHMARKS)
-    add_hpx_pseudo_target(tests.performance.modules.mpi_base)
+    add_hpx_pseudo_target(tests.performance.modules.gasnet_base)
     add_hpx_pseudo_dependencies(
-      tests.performance.modules tests.performance.modules.mpi_base
+      tests.performance.modules tests.performance.modules.gasnet_base
     )
     add_subdirectory(performance)
   endif()
 
   if(HPX_WITH_TESTS_HEADERS)
     add_hpx_header_tests(
-      modules.mpi_base
-      HEADERS ${mpi_base_headers}
+      modules.gasnet_base
+      HEADERS ${gasnet_base_headers}
       HEADER_ROOT ${PROJECT_SOURCE_DIR}/include
       NOLIBS
-      DEPENDENCIES hpx_mpi_base
+      DEPENDENCIES hpx_gasnet_base
     )
   endif()
 endif()

@@ -131,6 +131,16 @@ namespace hpx {
     }
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+    std::string gasnet_version()
+    {
+        std::ostringstream strm;
+        strm << "GASNET";
+        return strm.str();
+    }
+#endif
+
     std::string copyright()
     {
         char const* const copyright =
@@ -294,6 +304,10 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
                                                 "  LCI: {}\n"
 #endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+                                                "  GASNET: {}\n"
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
                                                 "  MPI: {}\n"
@@ -309,6 +323,10 @@ namespace hpx {
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
             lci_version(),
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+            gasnet_version(),
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
