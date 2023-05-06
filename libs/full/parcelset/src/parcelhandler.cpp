@@ -764,6 +764,7 @@ namespace hpx::parcelset {
         nonresolved_parcels.reserve(num_parcels);
         nonresolved_handlers.reserve(num_parcels);
 
+        naming::gid_type dest_locality;
         for (std::size_t i = 0; i != num_parcels; ++i)
         {
             parcel& p = parcels[i];
@@ -783,7 +784,11 @@ namespace hpx::parcelset {
                 &detail::parcel_sent_handler, HPX_MOVE(handlers[i]));
 
             // make sure all parcels go to the same locality
-            if (parcels[0].destination_locality() != p.destination_locality())
+            if (i == 0)
+            {
+                dest_locality = p.destination_locality();
+            }
+            else if (dest_locality != p.destination_locality())
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "parcelhandler::put_parcels",

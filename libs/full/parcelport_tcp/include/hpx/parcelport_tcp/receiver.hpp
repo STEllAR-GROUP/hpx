@@ -20,6 +20,7 @@
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/timing.hpp>
 
+#include <hpx/parcelport_tcp/connection_handler.hpp>
 #include <hpx/parcelset/decode_parcels.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset_base/detail/data_point.hpp>
