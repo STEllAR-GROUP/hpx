@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -40,28 +40,25 @@ foreach(test ${tests})
 endforeach()
 
 if(HPX_WITH_NETWORKING)
-  # run zero_copy_parcels_1001 with two additional configurations
+  # run zero_copy_parcels_1001 with three additional configurations
   add_hpx_regression_test(
-    "util"
-    zero_copy_parcels_1001_no_array_optimization
-    EXECUTABLE
-    zero_copy_parcels_1001
-    PSEUDO_DEPS_NAME
-    zero_copy_parcels_1001
-    ${zero_copy_parcels_1001_PARAMETERS}
-    ARGS
-    --hpx:ini=hpx.parcel.array_optimization=0
+    "util" zero_copy_parcels_1001_no_array_optimization
+    EXECUTABLE zero_copy_parcels_1001
+    PSEUDO_DEPS_NAME zero_copy_parcels_1001 ${zero_copy_parcels_1001_PARAMETERS}
+    ARGS --hpx:ini=hpx.parcel.array_optimization=0
   )
 
   add_hpx_regression_test(
-    "util"
-    zero_copy_parcels_1001_no_zero_copy_optimization
-    EXECUTABLE
-    zero_copy_parcels_1001
-    PSEUDO_DEPS_NAME
-    zero_copy_parcels_1001
-    ${zero_copy_parcels_1001_PARAMETERS}
-    ARGS
-    --hpx:ini=hpx.parcel.zero_copy_optimization=0
+    "util" zero_copy_parcels_1001_no_zero_copy_optimization
+    EXECUTABLE zero_copy_parcels_1001
+    PSEUDO_DEPS_NAME zero_copy_parcels_1001 ${zero_copy_parcels_1001_PARAMETERS}
+    ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0
+  )
+
+  add_hpx_regression_test(
+    "util" zero_copy_parcels_1001_no_zero_copy_receive_optimization
+    EXECUTABLE zero_copy_parcels_1001
+    PSEUDO_DEPS_NAME zero_copy_parcels_1001 ${zero_copy_parcels_1001_PARAMETERS}
+    ARGS --hpx:ini=hpx.parcel.zero_copy_receive_optimization=0
   )
 endif()

@@ -29,6 +29,6 @@ add_hpx_module(
   SOURCES ${format_sources}
   HEADERS ${format_headers}
   COMPAT_HEADERS ${format_compat_headers}
-  MODULE_DEPENDENCIES hpx_assertion hpx_config hpx_type_support
+  MODULE_DEPENDENCIES hpx_config
   CMAKE_SUBDIRS examples tests
 )

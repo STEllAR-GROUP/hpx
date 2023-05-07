@@ -29,10 +29,8 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <list>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <string>
 #include <system_error>
@@ -61,7 +59,7 @@ namespace hpx::parcelset {
             std::shared_ptr<std::vector<char>>, threads::thread_priority)>;
 
         /// Construct the parcelport on the given locality.
-        parcelport(util::runtime_configuration const& ini, locality const& here,
+        parcelport(util::runtime_configuration const& ini, locality here,
             std::string const& type,
             std::size_t zero_copy_serialization_threshold);
 
@@ -118,6 +116,7 @@ namespace hpx::parcelset {
         /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
+        /// \param dest     [in] Where should the parcel be sent to
         /// \param p        [in] A reference to the parcel to send.
         /// \param f        [in] A function object to be invoked on successful
         ///                 completion or on errors. The signature of this
@@ -136,6 +135,7 @@ namespace hpx::parcelset {
         /// functions or function objects get invoked on completion of the send
         /// operation or on any error.
         ///
+        /// \param dest     [in] Where should the parcels be sent to
         /// \param parcels  [in] A reference to the list of parcels to send.
         /// \param handlers [in] A list of function objects to be invoked on
         ///                 successful completion or on errors. The signature of
@@ -145,12 +145,13 @@ namespace hpx::parcelset {
         ///      void handler(std::error_code const& err,
         ///                   std::size_t bytes_written);
         /// \endcode
-        virtual void put_parcels(locality const& dests,
+        virtual void put_parcels(locality const& dest,
             std::vector<parcel> parcels,
             std::vector<write_handler_type> handlers) = 0;
 
         /// Send an early parcel through the TCP parcelport
         ///
+        /// \param dest     [in] Where should the parcels be sent to
         /// \param p        [in, out] A reference to the parcel to send. The
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
@@ -317,11 +318,15 @@ namespace hpx::parcelset {
         /// Return whether it is allowed to apply zero copy optimizations
         bool allow_zero_copy_optimizations() const noexcept;
 
+        /// Return whether it is allowed to apply zero copy optimizations on the
+        /// receiving end
+        bool allow_zero_copy_receive_optimizations() const noexcept;
+
         bool async_serialization() const noexcept;
 
         // callback while bootstrap the parcel layer
         void early_pending_parcel_handler(
-            std::error_code const& ec, parcel const& p);
+            std::error_code const& ec, parcel const& p) const;
 
     protected:
         // mutex for all of the member data
@@ -359,6 +364,7 @@ namespace hpx::parcelset {
         /// serialization is allowed to use array optimization
         bool allow_array_optimizations_;
         bool allow_zero_copy_optimizations_;
+        bool allow_zero_copy_receive_optimizations_;
 
         /// async serialization of parcels
         bool async_serialization_;

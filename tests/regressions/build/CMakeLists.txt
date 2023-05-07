@@ -31,7 +31,8 @@ if(NOT HPX_WITH_STATIC_LINKING)
   )
 
   add_hpx_regression_test(
-    "build" test_client_1950 EXECUTABLE "$<TARGET_FILE:test_client_1950_test>"
+    "build" test_client_1950
+    EXECUTABLE "$<TARGET_FILE:test_client_1950_test>"
     PSEUDO_DEPS_NAME test_client_1950
   )
 endif()

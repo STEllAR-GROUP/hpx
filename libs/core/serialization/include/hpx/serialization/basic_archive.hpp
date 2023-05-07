@@ -36,10 +36,28 @@ namespace hpx::serialization {
         endian_little = 0x00008000,
         disable_array_optimization = 0x00010000,
         disable_data_chunking = 0x00020000,
-        archive_is_saving = 0x00040000,
-        archive_is_preprocessing = 0x00080000,
-        all_archive_flags = 0x000fe000    // all of the above
+        disable_receive_data_chunking = 0x00040000,
+        archive_is_saving = 0x00080000,
+        archive_is_preprocessing = 0x00100000,
+        all_archive_flags = 0x001fe000    // all of the above
     };
+
+    constexpr archive_flags operator|(
+        archive_flags lhs, archive_flags rhs) noexcept
+    {
+        return static_cast<archive_flags>(
+            static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
+    }
+    constexpr std::uint32_t operator|(
+        std::uint32_t lhs, archive_flags rhs) noexcept
+    {
+        return lhs | static_cast<std::uint32_t>(rhs);
+    }
+    constexpr std::uint32_t operator&(
+        std::uint32_t lhs, archive_flags rhs) noexcept
+    {
+        return lhs & static_cast<std::uint32_t>(rhs);
+    }
 
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
     HPX_FORCEINLINE void reverse_bytes(std::size_t size, char* address)
@@ -74,26 +92,23 @@ namespace hpx::serialization {
 
         [[nodiscard]] constexpr bool archive_is_saving() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(archive_flags::archive_is_saving));
+            return static_cast<bool>(flags_ & archive_flags::archive_is_saving);
         }
 
         [[nodiscard]] constexpr bool enable_compression() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(archive_flags::enable_compression));
+            return static_cast<bool>(
+                flags_ & archive_flags::enable_compression);
         }
 
         [[nodiscard]] constexpr bool endian_big() const noexcept
         {
-            return static_cast<bool>(
-                flags_ & static_cast<std::uint32_t>(archive_flags::endian_big));
+            return static_cast<bool>(flags_ & archive_flags::endian_big);
         }
 
         [[nodiscard]] constexpr bool endian_little() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(archive_flags::endian_little));
+            return static_cast<bool>(flags_ & archive_flags::endian_little);
         }
 
 #if defined(HPX_SERIALIZATION_HAVE_SUPPORTS_ENDIANESS)
@@ -111,16 +126,23 @@ namespace hpx::serialization {
 
         [[nodiscard]] constexpr bool disable_array_optimization() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(
-                    archive_flags::disable_array_optimization));
+            return static_cast<bool>(
+                flags_ & archive_flags::disable_array_optimization);
         }
 
         [[nodiscard]] constexpr bool disable_data_chunking() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(
-                    archive_flags::disable_data_chunking));
+            return disable_array_optimization() ||
+                static_cast<bool>(
+                    flags_ & archive_flags::disable_data_chunking);
+        }
+
+        [[nodiscard]] constexpr bool disable_receive_data_chunking()
+            const noexcept
+        {
+            return disable_data_chunking() ||
+                static_cast<bool>(
+                    flags_ & archive_flags::disable_receive_data_chunking);
         }
 
         [[nodiscard]] constexpr std::uint32_t flags() const noexcept
@@ -133,9 +155,8 @@ namespace hpx::serialization {
         // during serialization/de-serialization.
         [[nodiscard]] constexpr bool is_preprocessing() const noexcept
         {
-            return static_cast<bool>(flags_ &
-                static_cast<std::uint32_t>(
-                    archive_flags::archive_is_preprocessing));
+            return static_cast<bool>(
+                flags_ & archive_flags::archive_is_preprocessing);
         }
 
         [[nodiscard]] constexpr std::size_t current_pos() const noexcept
@@ -168,7 +189,7 @@ namespace hpx::serialization {
 
         // try accessing extra data stored, might return nullptr
         template <typename T>
-        T* try_get_extra_data() const noexcept
+        [[nodiscard]] T* try_get_extra_data() const noexcept
         {
             return extra_data_.try_get<T>();
         }

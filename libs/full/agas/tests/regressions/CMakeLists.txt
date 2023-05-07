@@ -33,12 +33,8 @@ foreach(test ${tests})
 endforeach()
 
 add_hpx_regression_test(
-  ""
-  id_type_ref_counting_1032_4
-  EXECUTABLE
-  id_type_ref_counting_1032
-  PSEUDO_DEPS_NAME
-  id_type_ref_counting_1032
-  THREADS_PER_LOCALITY
-  4
+  "" id_type_ref_counting_1032_4
+  EXECUTABLE id_type_ref_counting_1032
+  PSEUDO_DEPS_NAME id_type_ref_counting_1032
+  THREADS_PER_LOCALITY 4
 )

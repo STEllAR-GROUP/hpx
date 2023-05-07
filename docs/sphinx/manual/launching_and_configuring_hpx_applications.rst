@@ -465,6 +465,7 @@ The ``hpx.parcel`` configuration section
     max_outbound_message_size = ${HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE:<hpx_parcel_max_outbound_message_size>}
     array_optimization = ${HPX_PARCEL_ARRAY_OPTIMIZATION:1}
     zero_copy_optimization = ${HPX_PARCEL_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
+    zero_copy_receive_optimization = ${HPX_PARCEL_ZERO_COPY_RECEIVE_OPTIMIZATION:$[hpx.parcel.array_optimization]}
     async_serialization = ${HPX_PARCEL_ASYNC_SERIALIZATION:1}
     message_handlers = ${HPX_PARCEL_MESSAGE_HANDLERS:0}
 
@@ -520,6 +521,11 @@ The ``hpx.parcel`` configuration section
      * This property defines whether this :term:`locality` is allowed to utilize
        zero copy optimizations during serialization of :term:`parcel` data. The default
        is the same value as set for ``hpx.parcel.array_optimization``.
+   * * ``hpx.parcel.zero_copy_receive_optimization``
+     * This property defines whether this :term:`locality` is allowed to utilize
+       zero copy optimizations on the receiving end during de-serialization of
+       :term:`parcel` data. The default is the same value as set for
+       ``hpx.parcel.zero_copy_optimization``.
    * * ``hpx.parcel.zero_copy_serialization_threshold``
      * This property defines the threshold value (in bytes) starting at which the
        serialization layer will apply zero-copy optimizations for serialized
@@ -544,6 +550,7 @@ The following settings relate to the TCP/IP parcelport.
    enable = ${HPX_HAVE_PARCELPORT_TCP:$[hpx.parcel.enabled]}
    array_optimization = ${HPX_PARCEL_TCP_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
    zero_copy_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+   zero_copy_receive_optimization = ${HPX_PARCEL_TCP_ZERO_COPY_RECEIVE_OPTIMIZATION:$[hpx.parcel.zero_copy_receive_optimization]}
    zero_copy_serialization_threshold =  ${HPX_PARCEL_TCP_ZERO_COPY_SERIALIZATION_THRESHOLD:$[hpx.parcel.zero_copy_serialization_threshold]}
    async_serialization = ${HPX_PARCEL_TCP_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
    parcel_pool_size = ${HPX_PARCEL_TCP_PARCEL_POOL_SIZE:$[hpx.threadpools.parcel_pool_size]}
@@ -571,9 +578,14 @@ The following settings relate to the TCP/IP parcelport.
        ``hpx.parcel.array_optimization``.
    * * ``hpx.parcel.tcp.zero_copy_optimization``
      * This property defines whether this :term:`locality` is allowed to utilize
-       zero copy optimizations in the TCP/IP parcelport during serialization of
+       zero copy optimizations during serialization of
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
+   * * ``hpx.parcel.tcp.zero_copy_receive_optimization``
+     * This property defines whether this :term:`locality` is allowed to utilize
+       zero copy optimizations on the receiving end in the TCP/IP parcelport during
+       de-serialization of :term:`parcel` data. The default is the same value as set
+       for ``hpx.parcel.zero_copy_optimization``.
    * * ``hpx.parcel.tcp.zero_copy_serialization_threshold``
      * This property defines the threshold value (in bytes) starting at which the
        serialization layer will apply zero-copy optimizations for serialized
@@ -623,6 +635,7 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
    processor_name = <MPI_processor_name>
    array_optimization = ${HPX_HAVE_PARCEL_MPI_ARRAY_OPTIMIZATION:$[hpx.parcel.array_optimization]}
    zero_copy_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_OPTIMIZATION:$[hpx.parcel.zero_copy_optimization]}
+   zero_copy_receive_optimization = ${HPX_HAVE_PARCEL_MPI_ZERO_COPY_RECEIVE_OPTIMIZATION:$[hpx.parcel.zero_copy_receive_optimization]}
    zero_copy_serialization_threshold =  ${HPX_PARCEL_MPI_ZERO_COPY_SERIALIZATION_THRESHOLD:$[hpx.parcel.zero_copy_serialization_threshold]}
    use_io_pool = ${HPX_HAVE_PARCEL_MPI_USE_IO_POOL:$1}
    async_serialization = ${HPX_HAVE_PARCEL_MPI_ASYNC_SERIALIZATION:$[hpx.parcel.async_serialization]}
@@ -670,6 +683,11 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
        zero copy optimizations in the MPI parcelport during serialization of
        parcel data. The default is the same value as set for
        ``hpx.parcel.zero_copy_optimization``.
+   * * ``hpx.parcel.mpi.zero_copy_receive_optimization``
+     * This property defines whether this :term:`locality` is allowed to utilize
+       zero copy optimizations on the receiving end in the MPI parcelport during
+       de-serialization of :term:`parcel` data. The default is the same value as
+       set for ``hpx.parcel.zero_copy_optimization``.
    * * ``hpx.parcel.mpi.zero_copy_serialization_threshold``
      * This property defines the threshold value (in bytes) starting at which the
        serialization layer will apply zero-copy optimizations for serialized
@@ -703,7 +721,7 @@ equivalent CMake variable is ``HPX_WITH_PARCELPORT_MPI`` and has to be set to
      * This property defines the maximum allowed outbound coalesced message size
        that will be transferrable through the :term:`parcel` layer. The default is
        taken from ``hpx.parcel.max_outbound_connections``.
-   * * ``hpx.parcel.tcp.max_background_threads``
+   * * ``hpx.parcel.mpi.max_background_threads``
      * This property defines how many cores should be used to perform background
        operations. The default is taken from ``hpx.parcel.max_background_threads``.
 

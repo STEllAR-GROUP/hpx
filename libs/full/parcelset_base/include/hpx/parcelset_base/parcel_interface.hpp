@@ -40,6 +40,13 @@ namespace hpx::parcelset::detail {
         using split_gids_type =
             std::map<naming::gid_type const*, naming::gid_type>;
 
+        parcel_base() = default;
+
+        parcel_base(parcel_base const&) = delete;
+        parcel_base(parcel_base&&) = delete;
+        parcel_base& operator=(parcel_base const&) = delete;
+        parcel_base& operator=(parcel_base&&) = delete;
+
         virtual ~parcel_base() = default;
 
         virtual bool is_valid() const = 0;
@@ -72,12 +79,10 @@ namespace hpx::parcelset::detail {
         virtual threads::thread_id_type get_parent_thread_id() const = 0;
         virtual std::uint64_t get_parent_thread_phase() const = 0;
 
-#if defined(HPX_HAVE_NETWORKING)
         virtual serialization::binary_filter* get_serialization_filter()
             const = 0;
         virtual policies::message_handler* get_message_handler(
             locality const& loc) const = 0;
-#endif
 
         virtual bool does_termination_detection() const = 0;
 
@@ -104,7 +109,7 @@ namespace hpx::parcelset::detail {
         virtual naming::gid_type& parcel_id() = 0;
 #endif
 
-        HPX_SERIALIZATION_SPLIT_MEMBER();
+        HPX_SERIALIZATION_SPLIT_MEMBER()
     };
 }    // namespace hpx::parcelset::detail
 
@@ -120,6 +125,11 @@ namespace hpx::parcelset {
     public:
         parcel();
         explicit parcel(detail::parcel_base* p);
+
+        parcel(parcel const&);
+        parcel(parcel&&) noexcept;
+        parcel& operator=(parcel const&);
+        parcel& operator=(parcel&&) noexcept;
 
         ~parcel();
 
@@ -158,11 +168,9 @@ namespace hpx::parcelset {
         naming::gid_type& parcel_id();
 #endif
 
-#if defined(HPX_HAVE_NETWORKING)
         serialization::binary_filter* get_serialization_filter() const;
         policies::message_handler* get_message_handler(
             locality const& loc) const;
-#endif
 
         [[nodiscard]] bool does_termination_detection() const;
 

@@ -178,9 +178,7 @@ namespace hpx::parcelset::detail {
 #endif
 
     parcel::parcel()
-      : data_()
-      , action_()
-      , size_(0)
+      : size_(0)
       , num_chunks_(0)
     {
     }
@@ -456,6 +454,14 @@ namespace hpx::parcelset::detail {
             // If the object was migrated, just load the action and return.
             action_->load(ar);
             return true;
+        }
+
+        // schedule later if this is de-serialized with zero-copy semantics
+        if (ar.try_get_extra_data<
+                serialization::detail::allow_zero_copy_receive>() != nullptr)
+        {
+            action_->load(ar);
+            return false;
         }
 
         // continuation support, this is handled in the transfer action

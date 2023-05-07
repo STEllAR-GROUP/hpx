@@ -26,7 +26,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace parcelset {
+namespace hpx::parcelset {
 
     //////////////////////////////////////////////////////////////////////////
     class locality
@@ -123,12 +123,12 @@ namespace hpx { namespace parcelset {
         // serialization support
         friend class hpx::serialization::access;
 
-        void save(serialization::output_archive& ar,
-            const unsigned int version) const;
+        void save(
+            serialization::output_archive& ar, unsigned int version) const;
 
-        void load(serialization::input_archive& ar, const unsigned int version);
+        void load(serialization::input_archive& ar, unsigned int version);
 
-        HPX_SERIALIZATION_SPLIT_MEMBER();
+        HPX_SERIALIZATION_SPLIT_MEMBER()
 
         std::unique_ptr<impl_base> impl_;
 
@@ -202,6 +202,6 @@ namespace hpx { namespace parcelset {
 
     HPX_EXPORT std::ostream& operator<<(
         std::ostream& os, endpoints_type const& endpoints);
-}}    // namespace hpx::parcelset
+}    // namespace hpx::parcelset
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -6,9 +6,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -17,6 +15,7 @@
 #include <limits>
 #include <ostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -34,7 +33,7 @@ namespace hpx::util::detail {
 
         char const* first = buffer;
         char* last = buffer;
-        std::size_t r = std::strtoull(first, &last, 10);
+        std::size_t const r = std::strtoull(first, &last, 10);
         if (pos != nullptr)
             *pos = last - first;
         return r;
@@ -58,7 +57,7 @@ namespace hpx::util::detail {
     inline format_field parse_field(std::string_view field) noexcept
     {
         std::size_t const sep = field.find(':');
-        if (sep != field.npos)
+        if (sep != std::string_view::npos)
         {
             std::string_view const arg_id = format_substr(field, 0, sep);
             std::string_view const spec = format_substr(field, sep + 1);
@@ -87,17 +86,24 @@ namespace hpx::util::detail {
                 }
                 else
                 {
-                    HPX_ASSERT(format_str[0] != '}');
+                    if (format_str[0] == '}')
+                    {
+                        throw std::runtime_error("bad format string");
+                    }
                     std::size_t const end = format_str.find('}');
-                    std::string_view field_str =
+                    std::string_view const field_str =
                         format_substr(format_str, 1, end);
                     format_field const field = parse_field(field_str);
                     format_str.remove_prefix(end - 1);
 
                     std::size_t const id =
                         field.arg_id ? field.arg_id - 1 : index;
-                    HPX_ASSERT(id < count);
-                    HPX_UNUSED(count);
+                    if (id >= count)
+                    {
+                        throw std::runtime_error(
+                            "bad format string (wrong number of arguments)");
+                    }
+
                     args[id](os, field.spec);
                     ++index;
                 }
@@ -106,11 +112,11 @@ namespace hpx::util::detail {
             else
             {
                 std::size_t const next = format_str.find_first_of("{}");
-                std::size_t const count =
-                    next != format_str.npos ? next : format_str.size();
+                std::size_t const cnt =
+                    next != std::string_view::npos ? next : format_str.size();
 
-                os.write(format_str.data(), count);
-                format_str.remove_prefix(count);
+                os.write(format_str.data(), cnt);
+                format_str.remove_prefix(cnt);
             }
         }
     }
