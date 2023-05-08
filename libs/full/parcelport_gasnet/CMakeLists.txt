@@ -37,7 +37,7 @@ if(GASNET_MPI_FOUND AND HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
       HEADERS ${parcelport_gasnet_headers}
       COMPAT_HEADERS ${parcelport_gasnet_compat_headers}
       MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
-      DEPENDENCIES hpx_core gasnet-mpi-par Mpi::mpi
+      DEPENDENCIES hpx_core Mpi::mpi Gasnet::gasnet
       CMAKE_SUBDIRS examples tests
    )
 elseif(GASNET_UDP_FOUND AND HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_UDP)
