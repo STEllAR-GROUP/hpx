@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +12,6 @@
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_stackful_self.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/execution_base/resource_base.hpp>

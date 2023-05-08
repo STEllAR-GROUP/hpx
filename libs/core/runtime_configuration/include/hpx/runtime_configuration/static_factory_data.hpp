@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,9 +51,12 @@ namespace hpx::components {
 }    // namespace hpx::components
 
 ////////////////////////////////////////////////////////////////////////////////
+// clang-format off
 #define HPX_DECLARE_FACTORY_STATIC(name, base)                                 \
     extern "C" HPX_PLUGIN_EXPORT_API std::map<std::string, hpx::any_nonser>*   \
-        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)() /**/
+        HPX_PLUGIN_API HPX_PLUGIN_LIST_NAME(name, base)()                      \
+    /**/
+// clang-format on
 
 #define HPX_DEFINE_FACTORY_STATIC(module, name, base)                          \
     {                                                                          \

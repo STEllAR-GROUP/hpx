@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -62,10 +62,9 @@ namespace hpx::threads {
             {
             }
 
-            spec_type(type t, std::int64_t min = all_entities(),
+            explicit spec_type(type t, std::int64_t min = all_entities(),
                 std::int64_t max = all_entities())
               : type_(t)
-              , index_bounds_()
             {
                 if (t != type::unknown)
                 {

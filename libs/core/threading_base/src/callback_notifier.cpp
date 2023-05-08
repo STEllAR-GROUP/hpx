@@ -15,12 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
-    callback_notifier::callback_notifier()
-      : on_start_thread_callbacks_()
-      , on_stop_thread_callbacks_()
-      , on_error_()
-    {
-    }
+    callback_notifier::callback_notifier() = default;
 
     void callback_notifier::on_start_thread(std::size_t local_thread_num,
         std::size_t global_thread_num, char const* pool_name,

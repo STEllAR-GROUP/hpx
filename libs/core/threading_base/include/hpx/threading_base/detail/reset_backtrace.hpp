@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,12 @@ namespace hpx::threads::detail {
     struct HPX_CORE_EXPORT reset_backtrace
     {
         explicit reset_backtrace(
-            threads::thread_id_type const& id, error_code& ec = throws);
+            threads::thread_id_type id, error_code& ec = throws);
+
+        reset_backtrace(reset_backtrace const&) = delete;
+        reset_backtrace(reset_backtrace&&) = delete;
+        reset_backtrace& operator=(reset_backtrace const&) = delete;
+        reset_backtrace& operator=(reset_backtrace&&) = delete;
 
         ~reset_backtrace();
 

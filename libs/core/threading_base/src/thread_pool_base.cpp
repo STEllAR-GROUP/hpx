@@ -1,15 +1,11 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/modules/errors.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
@@ -19,10 +15,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <mutex>
 #include <ostream>
-#include <string>
-#include <thread>
 
 namespace hpx::threads {
 
@@ -43,11 +36,11 @@ namespace hpx::threads {
         auto const& topo = create_topology();
         auto const sched = get_scheduler();
 
-        mask_type used_processing_units = mask_type();
+        auto used_processing_units = mask_type();
         threads::resize(used_processing_units,
             static_cast<std::size_t>(hardware_concurrency()));
 
-        std::size_t max_cores = get_os_thread_count();
+        std::size_t const max_cores = get_os_thread_count();
         for (std::size_t thread_num = 0;
              thread_num != max_cores && num_cores != 0; ++thread_num)
         {
@@ -90,7 +83,7 @@ namespace hpx::threads {
     hwloc_bitmap_ptr thread_pool_base::get_numa_domain_bitmap() const
     {
         auto const& topo = create_topology();
-        mask_type used_processing_units = get_used_processing_units();
+        mask_type const used_processing_units = get_used_processing_units();
         return topo.cpuset_to_nodeset(used_processing_units);
     }
 
@@ -115,8 +108,9 @@ namespace hpx::threads {
     void thread_pool_base::init_pool_time_scale()
     {
         // scale timestamps to nanoseconds
-        std::uint64_t base_timestamp = util::hardware::timestamp();
-        std::uint64_t base_time = hpx::chrono::high_resolution_clock::now();
+        std::uint64_t const base_timestamp = util::hardware::timestamp();
+        std::uint64_t const base_time =
+            hpx::chrono::high_resolution_clock::now();
         std::uint64_t curr_timestamp = util::hardware::timestamp();
         std::uint64_t curr_time = hpx::chrono::high_resolution_clock::now();
 
@@ -128,8 +122,8 @@ namespace hpx::threads {
 
         if (curr_timestamp - base_timestamp != 0)
         {
-            timestamp_scale_ = double(curr_time - base_time) /
-                double(curr_timestamp - base_timestamp);
+            timestamp_scale_ = static_cast<double>(curr_time - base_time) /
+                static_cast<double>(curr_timestamp - base_timestamp);
         }
     }
 
@@ -142,7 +136,7 @@ namespace hpx::threads {
     std::ostream& operator<<(
         std::ostream& os, thread_pool_base const& thread_pool)
     {
-        auto id = thread_pool.get_pool_id();
+        auto const id = thread_pool.get_pool_id();
         os << id.name() << "(" << static_cast<std::uint64_t>(id.index()) << ")";
 
         return os;

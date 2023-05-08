@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/affinity/affinity_data.hpp>
-#include <hpx/concurrency/barrier.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
@@ -24,13 +23,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <functional>
 #include <iosfwd>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
-#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -86,7 +83,7 @@ namespace hpx::threads {
             hpx::threads::detail::network_background_callback_type const&
                 network_background_callback =
                     hpx::threads::detail::network_background_callback_type(),
-            std::size_t max_background_threads = std::size_t(-1),
+            std::size_t max_background_threads = static_cast<std::size_t>(-1),
             std::size_t max_idle_loop_count = HPX_IDLE_LOOP_COUNT_MAX,
             std::size_t max_busy_loop_count = HPX_BUSY_LOOP_COUNT_MAX,
             std::size_t shutdown_check_count = 10)
@@ -116,6 +113,11 @@ namespace hpx::threads {
         /// \cond NOINTERNAL
         explicit thread_pool_base(thread_pool_init_parameters const& init);
 
+        thread_pool_base(thread_pool_base const&) = delete;
+        thread_pool_base(thread_pool_base&&) = delete;
+        thread_pool_base& operator=(thread_pool_base const&) = delete;
+        thread_pool_base& operator=(thread_pool_base&&) = delete;
+
         virtual ~thread_pool_base() = default;
 
         virtual void init(std::size_t num_threads, std::size_t threads_offset);
@@ -141,17 +143,23 @@ namespace hpx::threads {
         /// Suspends the given processing unit. Blocks until the processing unit
         /// has been suspended.
         ///
-        /// \param virt_core [in] The processing unit on the the pool to be
-        ///                  suspended. The processing units are indexed
-        ///                  starting from 0.
+        /// \param virt_core   [in] The processing unit on the the pool to be
+        ///                    suspended. The processing units are indexed
+        ///                    starting from 0.
+        /// \param ec [in,out] this represents the error status on exit, if this
+        ///           is pre-initialized to \a hpx#throws the function will
+        ///           throw on error instead.
         virtual void suspend_processing_unit_direct(
             std::size_t virt_core, error_code& ec = throws) = 0;
 
         /// Resumes the given processing unit. Blocks until the processing unit
         /// has been resumed.
         ///
-        /// \param virt_core [in] The processing unit on the the pool to be resumed.
-        ///                  The processing units are indexed starting from 0.
+        /// \param virt_core   [in] The processing unit on the the pool to be resumed.
+        ///                    The processing units are indexed starting from 0.
+        /// \param ec [in,out] this represents the error status on exit, if this
+        ///           is pre-initialized to \a hpx#throws the function will
+        ///           throw on error instead.
         virtual void resume_processing_unit_direct(
             std::size_t virt_core, error_code& ec = throws) = 0;
 
@@ -200,17 +208,17 @@ namespace hpx::threads {
             thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) = 0;
 
-        std::size_t get_pool_index() const noexcept
+        [[nodiscard]] std::size_t get_pool_index() const noexcept
         {
             return id_.index();
         }
 
-        std::string const& get_pool_name() const noexcept
+        [[nodiscard]] std::string const& get_pool_name() const noexcept
         {
             return id_.name();
         }
 
-        std::size_t get_thread_offset() const noexcept
+        [[nodiscard]] std::size_t get_thread_offset() const noexcept
         {
             return thread_offset_;
         }
@@ -474,13 +482,13 @@ namespace hpx::threads {
 
         virtual void do_some_work(std::size_t /*num_thread*/) {}
 
-        virtual void report_error(
+        virtual bool report_error(
             std::size_t global_thread_num, std::exception_ptr const& e)
         {
-            notifier_.on_error(global_thread_num, e);
+            return notifier_.on_error(global_thread_num, e);
         }
 
-        double timestamp_scale() const noexcept
+        [[nodiscard]] double timestamp_scale() const noexcept
         {
             return timestamp_scale_;
         }

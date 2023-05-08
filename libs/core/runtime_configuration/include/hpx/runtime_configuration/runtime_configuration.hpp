@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -43,15 +43,15 @@ namespace hpx::util {
     public:
         // initialize and load configuration information
         runtime_configuration(char const* argv0, runtime_mode mode,
-            std::vector<std::string> const& extra_static_ini_defs = {});
+            std::vector<std::string> extra_static_ini_defs = {});
 
         // re-initialize all entries based on the additional information from
         // the given configuration file
-        void reconfigure(std::string const& ini_file);
+        void reconfigure(std::string ini_file);
 
         // re-initialize all entries based on the additional information from
         // any explicit command line options
-        void reconfigure(std::vector<std::string> const& ini_defs);
+        void reconfigure(std::vector<std::string> ini_defs);
 
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>
         load_modules(
@@ -101,9 +101,6 @@ namespace hpx::util {
 
         // Enable lock detection during suspension
         bool enable_lock_detection() const;
-
-        // Enable global lock tracking
-        bool enable_global_lock_detection() const;
 
         // Enable minimal deadlock detection for HPX threads
         bool enable_minimal_deadlock_detection() const;

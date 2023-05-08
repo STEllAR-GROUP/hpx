@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,9 +20,14 @@ namespace hpx::threads::detail {
 
     struct HPX_CORE_EXPORT reset_lco_description
     {
-        reset_lco_description(threads::thread_id_type const& id,
+        reset_lco_description(threads::thread_id_type id,
             threads::thread_description const& description,
             error_code& ec = throws);
+
+        reset_lco_description(reset_lco_description const&) = delete;
+        reset_lco_description(reset_lco_description&&) = delete;
+        reset_lco_description& operator=(reset_lco_description const&) = delete;
+        reset_lco_description& operator=(reset_lco_description&&) = delete;
 
         ~reset_lco_description();
 

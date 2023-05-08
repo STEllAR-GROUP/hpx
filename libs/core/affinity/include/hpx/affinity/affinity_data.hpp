@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,12 @@ namespace hpx::threads::policies::detail {
     struct HPX_CORE_EXPORT affinity_data
     {
         affinity_data();
+
+        affinity_data(affinity_data const&);
+        affinity_data(affinity_data&&) noexcept;
+        affinity_data& operator=(affinity_data const&);
+        affinity_data& operator=(affinity_data&&) noexcept;
+
         ~affinity_data();
 
         void init(std::size_t num_threads = 1, std::size_t max_cores = 1,
@@ -56,7 +62,7 @@ namespace hpx::threads::policies::detail {
         }
 
         mask_type get_pu_mask(
-            threads::topology const& topo, std::size_t num_thread) const;
+            threads::topology const& topo, std::size_t global_thread_num) const;
 
         mask_type get_used_pus_mask(
             threads::topology const& topo, std::size_t pu_num) const;

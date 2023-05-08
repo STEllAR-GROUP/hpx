@@ -70,7 +70,7 @@ namespace hpx {
     /// argument, the program is ill-formed.
     ///
     /// \param f     Callable object to call
-    /// \param ts... parameters to pass to f
+    /// \param ts    parameters to pass to f
     ///
     /// \returns hpx::future referring to the shared state created by this call
     ///          to \a hpx::async.
