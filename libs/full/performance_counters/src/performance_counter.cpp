@@ -220,23 +220,23 @@ namespace hpx { namespace performance_counters {
         std::vector<performance_counter> counters;
 
         std::vector<counter_info> infos;
-        counter_status status = discover_counter_type(
+        counter_status const status = discover_counter_type(
             name, infos, discover_counters_mode::full, ec);
         if (!status_is_valid(status) || ec)
             return counters;
 
-        try
+        counters.reserve(infos.size());
+        for (counter_info const& info : infos)
         {
-            counters.reserve(infos.size());
-            for (counter_info const& info : infos)
+            try
             {
                 performance_counter counter(info.fullname_);
                 counters.push_back(counter);
             }
-        }
-        catch (hpx::exception const& e)
-        {
-            HPX_RETHROWS_IF(ec, e, "discover_counters");
+            catch (hpx::exception const& e)
+            {
+                HPX_RETHROWS_IF(ec, e, "discover_counters");
+            }
         }
 
         return counters;

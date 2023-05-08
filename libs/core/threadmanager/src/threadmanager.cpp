@@ -27,6 +27,7 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -1236,10 +1237,18 @@ namespace hpx { namespace threads {
 
     void threadmanager::wait()
     {
-        std::size_t shutdown_check_count = util::get_entry_as<std::size_t>(
+        auto const shutdown_check_count = util::get_entry_as<std::size_t>(
             rtcfg_, "hpx.shutdown_check_count", 10);
         hpx::util::detail::yield_while_count(
             [this]() { return is_busy(); }, shutdown_check_count);
+    }
+
+    bool threadmanager::wait_for(hpx::chrono::steady_duration const& rel_time)
+    {
+        auto const shutdown_check_count = util::get_entry_as<std::size_t>(
+            rtcfg_, "hpx.shutdown_check_count", 10);
+        return hpx::util::detail::yield_while_count_timeout(
+            [this]() { return is_busy(); }, shutdown_check_count, rel_time);
     }
 
     void threadmanager::suspend()

@@ -27,7 +27,7 @@
 #include <hpx/runtime_components/components_fwd.hpp>
 #include <hpx/runtime_configuration/static_factory_data.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/synchronization/latch.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -350,7 +350,7 @@ namespace hpx::components::server {
 #if defined(HPX_HAVE_NETWORKING)
         typedef hpx::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
-        hpx::condition_variable_any dijkstra_cond_;
+        std::unique_ptr<hpx::latch> dijkstra_cond_;
         bool dijkstra_color_;    // false: white, true: black
 #endif
 
@@ -512,7 +512,6 @@ namespace hpx::components::server {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component");
-            return naming::invalid_gid;
         }
         if (id != migrated_id)
         {
@@ -521,7 +520,6 @@ namespace hpx::components::server {
                 "runtime_support::migrate_component_to_here",
                 "could not create copy of given component (the new id is "
                 "different from the original id)");
-            return naming::invalid_gid;
         }
 
         LRT_(info).format(
@@ -693,25 +691,23 @@ namespace hpx::components::server {
     };
 }    // namespace hpx::components::server
 
-namespace hpx::traits {
 ///////////////////////////////////////////////////////////////////////////
 // Termination detection does not make this locality black
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
-    template <>
-    struct action_does_termination_detection<
-        hpx::components::server::runtime_support::dijkstra_termination_action>
+template <>
+struct hpx::traits::action_does_termination_detection<
+    hpx::components::server::runtime_support::dijkstra_termination_action>
+{
+    static constexpr bool call() noexcept
     {
-        static bool call()
-        {
-            return true;
-        }
-    };
+        return true;
+    }
+};
 #endif
 
-    // runtime_support is a (hand-rolled) component
-    template <>
-    struct is_component<components::server::runtime_support> : std::true_type
-    {
-    };
-}    // namespace hpx::traits
-// namespace hpx::traits
+// runtime_support is a (hand-rolled) component
+template <>
+struct hpx::traits::is_component<hpx::components::server::runtime_support>
+  : std::true_type
+{
+};

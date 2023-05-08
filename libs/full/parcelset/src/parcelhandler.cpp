@@ -276,7 +276,7 @@ namespace hpx::parcelset {
     {
         for (pports_type::value_type const& pp : pports_)
         {
-            if (!f(pp.second->type()))
+            if (pp.first > 0 && !f(pp.second->type()))
             {
                 return false;
             }
@@ -556,6 +556,12 @@ namespace hpx::parcelset {
         LPT_(debug).format(
             "parcelhandler::put_parcel: submitted: {}", p.parcel_id());
 
+        // inform termination detection of a sent message
+        if (!p.does_termination_detection())
+        {
+            hpx::detail::dijkstra_make_black();
+        }
+
         auto handler = [this](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
             invoke_write_handler(ec, p);
@@ -572,6 +578,12 @@ namespace hpx::parcelset {
         LPT_(debug).format(
             "parcelhandler::put_parcel (with handler): submitted: {}",
             p.parcel_id());
+
+        // inform termination detection of a sent message
+        if (!p.does_termination_detection())
+        {
+            hpx::detail::dijkstra_make_black();
+        }
 
         auto handler = [this, f = HPX_MOVE(f)](std::error_code const& ec,
                            parcelset::parcel const& p) -> void {
@@ -672,6 +684,16 @@ namespace hpx::parcelset {
         LPT_(debug).format("parcelhandler::put_parcels: submitted: {} parcels",
             parcels.size());
 
+        // inform termination detection of a sent message
+        for (auto const& p : parcels)
+        {
+            if (!p.does_termination_detection())
+            {
+                hpx::detail::dijkstra_make_black();
+                break;
+            }
+        }
+
         std::vector<write_handler_type> handlers(parcels.size(),
             [this](std::error_code const& ec, parcel const& p) -> void {
                 invoke_write_handler(ec, p);
@@ -688,6 +710,16 @@ namespace hpx::parcelset {
         LPT_(debug).format(
             "parcelhandler::put_parcels (with handlers): submitted: {} parcels",
             parcels.size());
+
+        // inform termination detection of a sent message
+        for (auto const& p : parcels)
+        {
+            if (!p.does_termination_detection())
+            {
+                hpx::detail::dijkstra_make_black();
+                break;
+            }
+        }
 
         std::vector<write_handler_type> handlers;
 

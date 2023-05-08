@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/actions/transfer_action.hpp>
 #include <hpx/actions_base/plain_action.hpp>
+#include <hpx/actions_base/traits/action_does_termination_detection.hpp>
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -23,16 +24,16 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
-    typedef hpx::tuple<logging_destination, std::size_t, std::string>
-        message_type;
+    using message_type =
+        hpx::tuple<logging_destination, std::size_t, std::string>;
 
-    typedef std::vector<message_type> messages_type;
-}}    // namespace hpx::components
+    using messages_type = std::vector<message_type>;
+}    // namespace hpx::components
 
 //////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     // console logging happens here
@@ -47,15 +48,14 @@ namespace hpx { namespace components { namespace server {
             console_logging, console_logging_action<Dummy>>
     {
     private:
-        typedef actions::direct_action<void (*)(messages_type const&),
-            console_logging, console_logging_action>
-            base_type;
+        using base_type = actions::direct_action<void (*)(messages_type const&),
+            console_logging, console_logging_action>;
 
     public:
         console_logging_action() = default;
 
         // construct an action from its arguments
-        console_logging_action(messages_type const& msgs)
+        explicit console_logging_action(messages_type const& msgs)
           : base_type(msgs)
         {
         }
@@ -78,12 +78,26 @@ namespace hpx { namespace components { namespace server {
             }
             catch (...)
             {
-                /**/;    // no logging!
+                // no logging!
             }
             return util::unused;
         }
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::console_logging_action<>, console_logging_action)
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
+///////////////////////////////////////////////////////////////////////////
+// Logging does not make this locality black
+template <>
+struct hpx::traits::action_does_termination_detection<
+    hpx::components::server::console_logging_action<>>
+{
+    static constexpr bool call() noexcept
+    {
+        return true;
+    }
+};    // namespace hpx::traits
+#endif
