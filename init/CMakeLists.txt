@@ -18,6 +18,7 @@ set(hpx_init_SOURCES
 list(
   APPEND
   hpx_init_SOURCES
+  hpx_init.cpp
   hpx_main.cpp
   hpx_main_argc_argv.cpp
   hpx_main_variables_map.cpp

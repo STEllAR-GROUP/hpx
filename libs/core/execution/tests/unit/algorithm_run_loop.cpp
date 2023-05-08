@@ -10,14 +10,14 @@
 // Clang V11 ICE's on this test
 #if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) != 11
 
-#include <hpx/local/condition_variable.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/mutex.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/condition_variable.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/preprocessor.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/mutex.hpp>
+#include <hpx/thread.hpp>
 
 #include "algorithm_test_utils.hpp"
 

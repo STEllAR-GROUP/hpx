@@ -104,6 +104,13 @@ set(HPX_CXX_COMPILER_VERSION
 # ##############################################################################
 # Setup the imported libraries (publicly linked) #
 
+# Propagate Amplifier settings, if needed
+if(HPX_WITH_ITTNOTIFY)
+  set(AMPLIFIER_INCLUDE_DIR "@AMPLIFIER_INCLUDE_DIR@")
+  set(AMPLIFIER_LIBRARY "@AMPLIFIER_LIBRARY@")
+  set(AMPLIFIER_ROOT "@AMPLIFIER_ROOT@")
+endif()
+
 # Allocator
 set(HPX_JEMALLOC_ROOT "@JEMALLOC_ROOT@")
 set(HPX_TCMALLOC_ROOT "@TCMALLOC_ROOT@")

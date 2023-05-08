@@ -142,7 +142,6 @@ namespace hpx::threads::detail {
         HPX_ASSERT(statex == thread_restart_state::abort ||
             statex == thread_restart_state::timeout);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (thread_restart_state::timeout != statex)    //-V601
         {
             triggered->store(true);

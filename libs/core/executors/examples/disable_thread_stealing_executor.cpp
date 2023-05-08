@@ -9,10 +9,10 @@
 // thread stealing for the duration of the execution of a parallel algorithm
 // it is used with.
 
+#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -76,7 +76,7 @@ namespace executor_example {
 
 ///////////////////////////////////////////////////////////////////////////////
 // simple forwarding implementations of executor traits
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     template <typename BaseExecutor>
     struct is_one_way_executor<
@@ -112,7 +112,7 @@ namespace hpx { namespace parallel { namespace execution {
       : is_bulk_two_way_executor<std::decay_t<BaseExecutor>>
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 int hpx_main()
 {

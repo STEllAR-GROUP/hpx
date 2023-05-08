@@ -6,8 +6,8 @@
 
 // #6184: Wrong processing_units_count of restricted_thread_pool_executor
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

@@ -4,10 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timed_execution.hpp>
 
 #include <algorithm>
 #include <array>
@@ -176,7 +175,7 @@ struct test_timed_sync_executor1 : test_sync_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_one_way_executor<test_sync_executor1> : std::true_type
     {
@@ -186,7 +185,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_one_way_executor<test_timed_sync_executor1> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_sync_executor2 : test_sync_executor1
 {
@@ -214,7 +213,7 @@ struct test_timed_sync_executor2 : test_sync_executor2
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_one_way_executor<test_sync_executor2> : std::true_type
     {
@@ -224,7 +223,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_one_way_executor<test_timed_sync_executor2> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

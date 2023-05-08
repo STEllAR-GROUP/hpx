@@ -8,9 +8,9 @@
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/chrono.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/chrono.hpp>
 
 #include <algorithm>
 #include <cstdint>

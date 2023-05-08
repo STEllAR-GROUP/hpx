@@ -6,8 +6,8 @@
 
 // sync_wait() did not compile when used with an lvalue sender involving bulk
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <atomic>

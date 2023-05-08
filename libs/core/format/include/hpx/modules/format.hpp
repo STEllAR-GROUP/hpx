@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <ctime>
+#include <ios>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -28,7 +29,7 @@ namespace hpx::util {
         template <typename T>
         struct type_specifier
         {
-            static char const* value() noexcept;
+            static char const* value() noexcept = delete;
         };
 
 #define DECL_TYPE_SPECIFIER(Type, Spec)                                        \
@@ -81,8 +82,13 @@ namespace hpx::util {
 
                 // copy spec to a null terminated buffer
                 char format[16];
-                std::sprintf(format, "%%%.*s%s", static_cast<int>(spec.size()),
-                    spec.data(), conv_spec);
+                int const len =
+                    std::snprintf(format, sizeof(format), "%%%.*s%s",
+                        static_cast<int>(spec.size()), spec.data(), conv_spec);
+                if (len < 0 || len >= static_cast<int>(sizeof(format)))
+                {
+                    throw std::runtime_error("Not a valid format specifier");
+                }
 
                 T const& value = *static_cast<T const*>(ptr);    //-V206
                 std::size_t length = std::snprintf(nullptr, 0, format, value);
@@ -138,8 +144,13 @@ namespace hpx::util {
                 {
                     // copy spec to a null terminated buffer
                     char format[16];
-                    std::sprintf(format, "%%%.*ss",
-                        static_cast<int>(spec.size()), spec.data());
+                    int const len = std::snprintf(format, sizeof(format),
+                        "%%%.*ss", static_cast<int>(spec.size()), spec.data());
+                    if (len <= 0 || len >= static_cast<int>(sizeof(format)))
+                    {
+                        throw std::runtime_error(
+                            "Not a valid format specifier");
+                    }
 
                     std::size_t length =
                         std::snprintf(nullptr, 0, format, value);
@@ -165,7 +176,8 @@ namespace hpx::util {
 
                 if (spec.empty() || spec == "s")
                 {
-                    os.write(value.data(), value.size());
+                    os.write(value.data(),
+                        static_cast<std::streamsize>(value.size()));
                 }
                 else
                 {
@@ -189,7 +201,7 @@ namespace hpx::util {
                 // copy spec to a null terminated buffer
                 std::string const format(spec);
 
-                std::size_t length = 0;
+                std::size_t length;
                 std::vector<char> buffer(1);
                 buffer.resize(buffer.capacity());
                 do

@@ -12,18 +12,15 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include "communicator.hpp"
-#include "stencil.hpp"
-
 #include <hpx/algorithm.hpp>
+#include <hpx/compute.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/async.hpp>
 #include <hpx/include/components.hpp>
-#include <hpx/include/compute.hpp>
 #include <hpx/include/lcos.hpp>
 #include <hpx/include/util.hpp>
 #include <hpx/iterator_support/counting_shape.hpp>
-#include <hpx/program_options/options_description.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <array>
@@ -31,6 +28,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "communicator.hpp"
+#include "stencil.hpp"
 
 using communication_type = double;
 

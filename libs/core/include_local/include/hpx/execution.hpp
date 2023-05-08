@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 ETH Zurich
+//  Copyright (c) 2020 ETH Zurich
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,4 +6,7 @@
 
 #pragma once
 
-#include <hpx/local/stop_token.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/timed_execution.hpp>

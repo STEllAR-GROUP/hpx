@@ -9,21 +9,17 @@
 #include <hpx/config.hpp>
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME) && !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/actions_base/plain_action.hpp>
-#include <hpx/async_distributed/continuation.hpp>
-#include <hpx/future.hpp>
-#include <hpx/runtime.hpp>
 #endif
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/format.hpp>
+#include <hpx/future.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <array>
 #include <atomic>
@@ -287,12 +283,12 @@ struct unlimited_number_of_chunks
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_executor_parameters<unlimited_number_of_chunks> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 template <typename Executor>
 void measure_function_futures_for_loop(std::uint64_t count, bool csv,

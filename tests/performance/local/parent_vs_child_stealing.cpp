@@ -6,11 +6,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/modules/program_options.hpp>
-#include <hpx/modules/timing.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/format.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>

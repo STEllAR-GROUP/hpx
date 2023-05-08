@@ -233,7 +233,6 @@ template <typename T>
 bootstrap_logging const& operator<<(
     bootstrap_logging const& l, T const& t)    //-V835
 {
-    // NOLINTNEXTLINE(bugprone-branch-clone)
     LBT_(info) << t;
     LPROGRESS_ << t;
     return l;

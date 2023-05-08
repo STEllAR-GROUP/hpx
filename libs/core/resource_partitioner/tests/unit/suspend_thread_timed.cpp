@@ -7,15 +7,14 @@
 // Simple test verifying basic resource_partitioner functionality.
 
 #include <hpx/assert.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <cstddef>

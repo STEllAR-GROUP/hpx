@@ -6,11 +6,10 @@
 
 // This test verifies that the destructor of a thread function may yield.
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading.hpp>
+#include <hpx/thread.hpp>
 
 #include <utility>
 

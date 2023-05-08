@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/collectives/barrier.hpp>
-#include <hpx/local/barrier.hpp>
+#include <hpx/synchronization/barrier.hpp>

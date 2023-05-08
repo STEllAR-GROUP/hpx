@@ -6,11 +6,11 @@
 
 //  This work is inspired by https://github.com/aprell/tasking-2.0
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/synchronization/channel_mpmc.hpp>
+#include <hpx/thread.hpp>
 
 #include <functional>
 #include <utility>

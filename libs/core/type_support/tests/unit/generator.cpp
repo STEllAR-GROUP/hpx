@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_CXX20_COROUTINES) &&                                      \
     (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000)
 
-#include <hpx/local/generator.hpp>
+#include <hpx/generator.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>

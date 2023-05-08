@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,12 +15,16 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
+int hpx_main(int argc, char* argv[]);
+
+//////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_main, if necessary. This has to be in a separate
 // translation unit to ensure the linker can pick or ignore this function,
 // depending on whether the main executable defines this symbol or not.
 HPX_WEAK_SYMBOL int hpx_main()
 {
-    std::string cmdline(hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
+    std::string cmdline(
+        hpx::get_config_entry("hpx.reconstructed_cmd_line", ""));
 
     using namespace hpx::program_options;
 #if defined(HPX_WINDOWS)
@@ -29,30 +33,30 @@ HPX_WEAK_SYMBOL int hpx_main()
     std::vector<std::string> args = split_unix(cmdline);
 #endif
 
-    constexpr char const hpx_prefix[] = "--hpx:";
-    constexpr char const hpx_prefix_len =
-        (sizeof(hpx_prefix) / sizeof(hpx_prefix[0])) - 1;
+    constexpr char hpx_prefix[] = "--hpx:";
+    constexpr std::size_t hpx_prefix_len = std::size(hpx_prefix) - 1;
 
-    constexpr char const hpx_positional[] = "positional";
-    constexpr char const hpx_positional_len =
-        (sizeof(hpx_positional) / sizeof(hpx_positional[0])) - 1;
+    constexpr char hpx_positional[] = "positional";
+    constexpr std::size_t hpx_positional_len = std::size(hpx_positional) - 1;
 
     // Copy all arguments which are not hpx related to a temporary array
-    std::vector<char*> argv(args.size()+1);
+    std::vector<char*> argv(args.size() + 1);
     std::size_t argcount = 0;
-    for (auto& arg : args)
+    for (auto& argument : args)
     {
-        if (0 != arg.compare(0, hpx_prefix_len, hpx_prefix))
+        if (0 != argument.compare(0, hpx_prefix_len, hpx_prefix))
         {
-            argv[argcount++] = const_cast<char*>(arg.data());
+            argv[argcount++] = const_cast<char*>(argument.data());
         }
         else if (0 ==
-            arg.compare(hpx_prefix_len, hpx_positional_len, hpx_positional))
+            argument.compare(
+                hpx_prefix_len, hpx_positional_len, hpx_positional))
         {
-            std::string::size_type p = arg.find_first_of("=");
-            if (p != std::string::npos) {
-                arg = arg.substr(p+1);
-                argv[argcount++] = const_cast<char*>(arg.data());
+            std::string::size_type const p = argument.find_first_of('=');
+            if (p != std::string::npos)
+            {
+                argument = argument.substr(p + 1);
+                argv[argcount++] = const_cast<char*>(argument.data());
             }
         }
     }

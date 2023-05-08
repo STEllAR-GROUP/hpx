@@ -10,11 +10,10 @@
 // thread_stacksize::minimal and thread_stacksize::maximal when a thread has been
 // created.
 
-#include <hpx/local/init.hpp>
-
+#include <hpx/init.hpp>
 #include <hpx/modules/async_local.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading_base.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <iostream>

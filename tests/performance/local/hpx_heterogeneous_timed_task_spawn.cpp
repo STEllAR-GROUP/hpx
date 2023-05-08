@@ -7,11 +7,11 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/functional.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/format.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/modules/timing.hpp>
 
 #include <cstdint>
 #include <functional>

@@ -6,10 +6,10 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #if !defined(JACOBI_SMP_NO_HPX)
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #endif
 
-#include <hpx/modules/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <boost/phoenix.hpp>
 #include <boost/spirit/include/qi_action.hpp>

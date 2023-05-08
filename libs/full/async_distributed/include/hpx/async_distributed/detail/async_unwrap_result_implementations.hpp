@@ -42,7 +42,6 @@ namespace hpx { namespace detail {
         typedef typename hpx::traits::extract_action<Action>::type action_type;
         typedef typename action_type::local_result_type result_type;
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (policy == launch::sync || action_type::direct_execution::value)
         {
             return hpx::detail::sync_local_invoke_direct<action_type,

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
+
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx_init_params.hpp>

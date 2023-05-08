@@ -5,12 +5,16 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
-#include <hpx/local/runtime.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/program_options.hpp>
+#include <hpx/runtime.hpp>
 
 #include <utility>
 
 static bool ran_hpx_main;
+
+// forward declare only (is defined in hpx_init)
+int hpx_main(hpx::program_options::variables_map&);
 
 int hpx_main()
 {

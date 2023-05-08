@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <hpx/local/chrono.hpp>
+#include <hpx/chrono.hpp>
 
 #include <cstddef>
 #include <cstdint>

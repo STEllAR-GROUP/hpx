@@ -9,10 +9,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
+#include <hpx/unwrap.hpp>
 
 // define large action
 double func(double x1, double, double, double, double, double, double)

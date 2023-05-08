@@ -7,7 +7,7 @@
 // The purpose of this demo is to show how it is possible to start HPX without
 // blocking the main thread.
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 
