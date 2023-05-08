@@ -59,7 +59,7 @@
 #if (HPX_VERSION_FULL >= 0x011000) && (HPX_HAVE_DEPRECATION_WARNINGS_V1_10 != 0)
 #define HPX_DEPRECATED_MSG_V1_10                                               \
     "This functionality is deprecated starting HPX V1.10 and will be removed " \
-    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_9=0 to "   \
+    "in the future. You can define HPX_HAVE_DEPRECATION_WARNINGS_V1_10=0 to "  \
     "acknowledge that you have received this warning."
 #define HPX_DEPRECATED_V1_10(x)                                                \
     [[deprecated(x " (" HPX_PP_EXPAND(HPX_DEPRECATED_MSG_V1_10) ")")]]
