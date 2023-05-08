@@ -1,15 +1,13 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
-#include <cstdint>
 #include <tuple>
 #include <utility>
 
@@ -20,7 +18,8 @@ namespace hpx::threads::detail {
         thread_nums& thread_nums_tss()
         {
             static thread_local thread_nums thread_nums_tss_ = {
-                std::size_t(-1), std::size_t(-1), std::size_t(-1)};
+                static_cast<std::size_t>(-1), static_cast<std::size_t>(-1),
+                static_cast<std::size_t>(-1)};
             return thread_nums_tss_;
         }
     }    // namespace

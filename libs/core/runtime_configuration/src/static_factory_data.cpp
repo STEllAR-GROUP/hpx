@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2014 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -63,7 +63,7 @@ namespace hpx::components {
             std::map<std::string, util::plugin::get_plugins_list_type>;
 
         map_type const& m = get_static_factory_data();
-        map_type::const_iterator it = m.find(instance);
+        auto const it = m.find(instance);
         if (it == m.end())
             return false;
 
@@ -96,7 +96,7 @@ namespace hpx::components {
             std::map<std::string, util::plugin::get_plugins_list_type>;
 
         map_type const& m = get_static_commandline_data();
-        map_type::const_iterator it = m.find(instance);
+        auto const it = m.find(instance);
         if (it == m.end())
             return false;
 
@@ -130,7 +130,7 @@ namespace hpx::components {
             std::map<std::string, util::plugin::get_plugins_list_type>;
 
         map_type const& m = get_static_startup_shutdown_data();
-        map_type::const_iterator it = m.find(instance);
+        auto const it = m.find(instance);
         if (it == m.end())
             return false;
 

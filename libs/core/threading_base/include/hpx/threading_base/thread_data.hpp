@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
@@ -20,7 +19,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -40,9 +38,10 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     namespace detail {
+
         using get_locality_id_type = std::uint32_t(hpx::error_code&);
         HPX_CORE_EXPORT void set_get_locality_id(get_locality_id_type* f);
         HPX_CORE_EXPORT std::uint32_t get_locality_id(hpx::error_code&);
@@ -58,22 +57,21 @@ namespace hpx { namespace threads {
     HPX_CORE_EXPORT thread_data* get_self_id_data() noexcept;
 
     ////////////////////////////////////////////////////////////////////////////
-    /// A \a thread is the representation of a ParalleX thread. It's a first
-    /// class object in ParalleX. In our implementation this is a user level
-    /// thread running on top of one of the OS threads spawned by the \a
-    /// thread-manager.
+    /// A \a thread is the representation of a HPX thread. It's a first class
+    /// object in HPX. In our implementation this is a user level thread running
+    /// on top of one of the OS threads spawned by the \a thread-manager.
     ///
     /// A \a thread encapsulates:
     ///  - A thread status word (see the functions \a thread#get_state and
     ///    \a thread#set_state)
     ///  - A function to execute (the thread function)
-    ///  - A frame (in this implementation this is a block of memory used as
-    ///    the threads stack)
+    ///  - A frame (in this implementation this is a block of memory used as the
+    ///    threads stack)
     ///  - A block of registers (not implemented yet)
     ///
     /// Generally, \a threads are not created or executed directly. All
-    /// functionality related to the management of \a threads is
-    /// implemented by the thread-manager.
+    /// functionality related to the management of \a threads is implemented by
+    /// the thread-manager.
     class thread_data : public detail::thread_data_reference_counting
     {
     public:
@@ -102,7 +100,10 @@ namespace hpx { namespace threads {
 
         /// The set_state function changes the state of this thread instance.
         ///
-        /// \param newstate [in] The new state to be set for the thread.
+        /// \param state    [in] The new state to be set for the thread.
+        /// \param state_ex       [in]
+        /// \param load_order     [in]
+        /// \param exchange_order [in]
         ///
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
@@ -116,7 +117,7 @@ namespace hpx { namespace threads {
             thread_restart_state state_ex = thread_restart_state::unknown,
             std::memory_order load_order = std::memory_order_acquire,
             std::memory_order exchange_order =
-                std::memory_order_seq_cst) noexcept
+                std::memory_order_seq_cst) const noexcept
         {
             thread_state prev_state = current_state_.load(load_order);
 
@@ -143,9 +144,9 @@ namespace hpx { namespace threads {
         }
 
         bool set_state_tagged(thread_schedule_state newstate,
-            thread_state& prev_state, thread_state& new_tagged_state,
+            thread_state const& prev_state, thread_state& new_tagged_state,
             std::memory_order exchange_order =
-                std::memory_order_seq_cst) noexcept
+                std::memory_order_seq_cst) const noexcept
         {
             new_tagged_state = thread_state(
                 newstate, prev_state.state_ex(), prev_state.tag() + 1);
@@ -161,9 +162,11 @@ namespace hpx { namespace threads {
         /// as the second parameter. Otherwise it won't touch the thread state
         /// of this instance.
         ///
-        /// \param newstate [in] The new state to be set for the thread.
-        /// \param oldstate [in] The old state of the thread which still has to
+        /// \param new_state [in] The new state to be set for the thread.
+        /// \param old_state [in] The old state of the thread which still has to
         ///                 be the current state.
+        /// \param load_order    [in]
+        /// \param load_exchange [in]
         ///
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
@@ -179,11 +182,11 @@ namespace hpx { namespace threads {
         bool restore_state(thread_state new_state, thread_state old_state,
             std::memory_order load_order = std::memory_order_relaxed,
             std::memory_order load_exchange =
-                std::memory_order_seq_cst) noexcept
+                std::memory_order_seq_cst) const noexcept
         {
             // ignore the state_ex while compare-exchanging
-            thread_state current_state = current_state_.load(load_order);
-            thread_restart_state state_ex = current_state.state_ex();
+            thread_state const current_state = current_state_.load(load_order);
+            thread_restart_state const state_ex = current_state.state_ex();
 
             // ABA prevention for state only (not for state_ex)
             std::int64_t tag = current_state.tag();
@@ -191,7 +194,7 @@ namespace hpx { namespace threads {
                 ++tag;
 
             thread_state old_tmp(old_state.state(), state_ex, old_state.tag());
-            thread_state new_tmp(new_state.state(), state_ex, tag);
+            thread_state const new_tmp(new_state.state(), state_ex, tag);
 
             return current_state_.compare_exchange_strong(
                 old_tmp, new_tmp, load_exchange);
@@ -200,7 +203,7 @@ namespace hpx { namespace threads {
         bool restore_state(thread_schedule_state new_state,
             thread_restart_state state_ex, thread_state old_state,
             std::memory_order load_exchange =
-                std::memory_order_seq_cst) noexcept
+                std::memory_order_seq_cst) const noexcept
         {
             // ABA prevention for state only (not for state_ex)
             std::int64_t tag = old_state.tag();
@@ -215,14 +218,14 @@ namespace hpx { namespace threads {
         /// The set_state function changes the extended state of this
         /// thread instance.
         ///
-        /// \param newstate [in] The new extended state to be set for the
+        /// \param new_state [in] The new extended state to be set for the
         ///                 thread.
         ///
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager.
         thread_restart_state set_state_ex(
-            thread_restart_state new_state) noexcept
+            thread_restart_state new_state) const noexcept
         {
             thread_state prev_state =
                 current_state_.load(std::memory_order_acquire);
@@ -243,8 +246,8 @@ namespace hpx { namespace threads {
 
     public:
         /// Return the id of the component this thread is running in
-        constexpr std::uint64_t    // same as naming::address_type
-        get_component_id() const noexcept
+        static constexpr std::uint64_t    // same as naming::address_type
+        get_component_id() noexcept
         {
             return 0;
         }
@@ -354,20 +357,21 @@ namespace hpx { namespace threads {
 #if !defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
 
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
-        constexpr char const* get_backtrace() const noexcept
+        static constexpr char const* get_backtrace() noexcept
         {
             return nullptr;
         }
-        char const* set_backtrace(char const*) noexcept
+        static char const* set_backtrace(char const*) noexcept
         {
             return nullptr;
         }
 #else
-        constexpr util::backtrace const* get_backtrace() const noexcept
+        static constexpr util::backtrace const* get_backtrace() noexcept
         {
             return nullptr;
         }
-        util::backtrace const* set_backtrace(util::backtrace const*) noexcept
+        static util::backtrace const* set_backtrace(
+            util::backtrace const*) noexcept
         {
             return nullptr;
         }
@@ -471,7 +475,6 @@ namespace hpx { namespace threads {
                 HPX_THROW_EXCEPTION(hpx::error::thread_not_interruptable,
                     "thread_data::interrupt",
                     "interrupts are disabled for this thread");
-                return;
             }
             requested_interrupt_ = flag;
         }
@@ -718,14 +721,14 @@ namespace hpx { namespace threads {
     /// \note This function will return a meaningful value only if the code was
     ///       compiled with HPX_HAVE_THREAD_TARGET_ADDRESS being defined.
     HPX_CORE_EXPORT std::uint64_t get_self_component_id() noexcept;
-}}    // namespace hpx::threads
+}    // namespace hpx::threads
 
 #include <hpx/config/warnings_suffix.hpp>
 
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     HPX_FORCEINLINE coroutine_type::result_type thread_data::operator()(
         hpx::execution_base::this_thread::detail::agent_storage* agent_storage)
@@ -736,4 +739,4 @@ namespace hpx { namespace threads {
         }
         return static_cast<thread_data_stackful*>(this)->call(agent_storage);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

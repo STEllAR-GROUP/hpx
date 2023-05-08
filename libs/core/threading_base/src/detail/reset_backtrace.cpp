@@ -19,9 +19,8 @@
 
 namespace hpx::threads::detail {
 
-    reset_backtrace::reset_backtrace(
-        threads::thread_id_type const& id, error_code& ec)
-      : id_(id)
+    reset_backtrace::reset_backtrace(threads::thread_id_type id, error_code& ec)
+      : id_(HPX_MOVE(id))
       , backtrace_(new hpx::util::backtrace())
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
       , full_backtrace_(backtrace_->trace())
@@ -34,6 +33,7 @@ namespace hpx::threads::detail {
         threads::set_thread_backtrace(id_, backtrace_.get(), ec_);
 #endif
     }
+
     reset_backtrace::~reset_backtrace()
     {
         threads::set_thread_backtrace(id_, 0, ec_);

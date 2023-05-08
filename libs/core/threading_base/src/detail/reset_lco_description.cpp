@@ -15,10 +15,9 @@
 
 namespace hpx::threads::detail {
 
-    reset_lco_description::reset_lco_description(
-        threads::thread_id_type const& id,
+    reset_lco_description::reset_lco_description(threads::thread_id_type id,
         threads::thread_description const& description, error_code& ec)
-      : id_(id)
+      : id_(HPX_MOVE(id))
       , ec_(ec)
     {
         old_desc_ = threads::set_thread_lco_description(id_, description, ec_);

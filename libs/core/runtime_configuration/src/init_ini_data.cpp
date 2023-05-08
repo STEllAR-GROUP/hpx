@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2017 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,7 +30,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
     ///////////////////////////////////////////////////////////////////////////
     bool handle_ini_file(section& ini, std::string const& loc)
     {
@@ -110,8 +110,8 @@ namespace hpx { namespace util {
         }
 
         // look in the current directory first
-        std::string cwd = fs::current_path().string() + "/.hpx.ini";
         {
+            std::string cwd = fs::current_path().string() + "/.hpx.ini";
             bool result2 = handle_ini_file(ini, cwd);
             if (result2)
             {
@@ -140,9 +140,7 @@ namespace hpx { namespace util {
 
         if (!hpx_ini_file.empty())
         {
-            namespace fs = filesystem;
-            std::error_code ec;
-            if (!fs::exists(hpx_ini_file, ec) || ec)
+            if (std::error_code ec; !fs::exists(hpx_ini_file, ec) || ec)
             {
                 std::cerr
                     << "hpx::init: command line warning: file specified using "
@@ -183,9 +181,8 @@ namespace hpx { namespace util {
             ini_paths.push_back(*it);
 
         // have all path elements, now find ini files in there...
-        std::vector<std::string>::iterator ini_end = ini_paths.end();
-        for (std::vector<std::string>::iterator it = ini_paths.begin();
-             it != ini_end; ++it)
+        auto ini_end = ini_paths.end();
+        for (auto it = ini_paths.begin(); it != ini_end; ++it)
         {
             try
             {
@@ -211,13 +208,11 @@ namespace hpx { namespace util {
                     }
                     catch (hpx::exception const& /*e*/)
                     {
-                        ;
                     }
                 }
             }
             catch (fs::filesystem_error const& /*e*/)
             {
-                ;
             }
         }
     }
@@ -227,11 +222,11 @@ namespace hpx { namespace util {
     // default ini settings assuming all of those are components
     std::vector<std::shared_ptr<components::component_registry_base>>
     load_component_factory_static(util::section& ini, std::string name,
-        hpx::util::plugin::get_plugins_list_type get_factory, error_code& ec)
+        hpx::util::plugin::get_plugins_list_type const get_factory,
+        error_code& ec)
     {
         hpx::util::plugin::static_plugin_factory<
-            components::component_registry_base>
-            pf(get_factory);
+            components::component_registry_base> const pf(get_factory);
         std::vector<std::shared_ptr<components::component_registry_base>>
             registries;
 
@@ -271,7 +266,7 @@ namespace hpx { namespace util {
                     continue;
 
                 registry->get_component_info(ini_data, "", true);
-                registries.push_back(registry);
+                registries.push_back(HPX_MOVE(registry));
             }
         }
 
@@ -287,8 +282,8 @@ namespace hpx { namespace util {
             component_registries,
         std::string name, error_code& ec)
     {
-        hpx::util::plugin::plugin_factory<components::component_registry_base>
-            pf(d, "registry");
+        hpx::util::plugin::plugin_factory<
+            components::component_registry_base> const pf(d, "registry");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
@@ -325,7 +320,7 @@ namespace hpx { namespace util {
                     return;
 
                 registry->get_component_info(ini_data, curr);
-                component_registries.push_back(registry);
+                component_registries.push_back(HPX_MOVE(registry));
             }
         }
 
@@ -340,12 +335,12 @@ namespace hpx { namespace util {
         std::string const& /* curr */, std::string const& /* name */,
         error_code& ec)
     {
-        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
-            plugin_list_type;
+        using plugin_list_type =
+            std::vector<std::shared_ptr<plugins::plugin_registry_base>>;
 
         plugin_list_type plugin_registries;
-        hpx::util::plugin::plugin_factory<plugins::plugin_registry_base> pf(
-            d, "plugin");
+        hpx::util::plugin::plugin_factory<plugins::plugin_registry_base> const
+            pf(d, "plugin");
 
         // retrieve the names of all known registries
         std::vector<std::string> names;
@@ -366,7 +361,7 @@ namespace hpx { namespace util {
                     continue;
 
                 registry->get_plugin_info(ini_data);
-                plugin_registries.push_back(registry);
+                plugin_registries.push_back(HPX_MOVE(registry));
             }
         }
 
@@ -402,8 +397,8 @@ namespace hpx { namespace util {
     {
         namespace fs = filesystem;
 
-        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base>>
-            plugin_list_type;
+        using plugin_list_type =
+            std::vector<std::shared_ptr<plugins::plugin_registry_base>>;
 
         plugin_list_type plugin_registries;
 
@@ -444,8 +439,8 @@ namespace hpx { namespace util {
                 if (0 == name.find("lib"))
                     name = name.substr(3);
 #endif
-#if defined(__APPLE__)    // shared library version is added berfore extension
-                const std::string version = hpx::full_version_as_string();
+#if defined(__APPLE__)    // shared library version is added before extension
+                std::string const version = hpx::full_version_as_string();
                 std::string::size_type i = name.find(version);
                 if (i != std::string::npos)
                     name.erase(
@@ -554,4 +549,4 @@ namespace hpx { namespace util {
         }
         return plugin_registries;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -13,7 +13,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/stackless_coroutine.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
@@ -29,22 +28,21 @@
 namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
-    /// A \a thread is the representation of a ParalleX thread. It's a first
-    /// class object in ParalleX. In our implementation this is a user level
-    /// thread running on top of one of the OS threads spawned by the \a
-    /// thread-manager.
+    /// A \a thread is the representation of a HPX thread. It's a first class
+    /// object in HPX. In our implementation this is a user level thread running
+    /// on top of one of the OS threads spawned by the \a thread-manager.
     ///
     /// A \a thread encapsulates:
     ///  - A thread status word (see the functions \a thread#get_state and
     ///    \a thread#set_state)
     ///  - A function to execute (the thread function)
-    ///  - A frame (in this implementation this is a block of memory used as
-    ///    the threads stack)
+    ///  - A frame (in this implementation this is a block of memory used as the
+    ///    threads stack)
     ///  - A block of registers (not implemented yet)
     ///
     /// Generally, \a threads are not created or executed directly. All
-    /// functionality related to the management of \a threads is
-    /// implemented by the thread-manager.
+    /// functionality related to the management of \a threads is implemented by
+    /// the thread-manager.
     class HPX_CORE_EXPORT thread_data_stackless : public thread_data
     {
     private:
@@ -141,6 +139,11 @@ namespace hpx::threads {
         {
             HPX_ASSERT(coroutine_.is_ready());
         }
+
+        thread_data_stackless(thread_data_stackless const&) = delete;
+        thread_data_stackless(thread_data_stackless&&) = delete;
+        thread_data_stackless& operator=(thread_data_stackless const&) = delete;
+        thread_data_stackless& operator=(thread_data_stackless&&) = delete;
 
         ~thread_data_stackless();
 

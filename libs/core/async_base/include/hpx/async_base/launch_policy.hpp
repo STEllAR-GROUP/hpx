@@ -548,7 +548,7 @@ namespace hpx {
                 return pred_();
             }
 
-            constexpr bool is_valid() const noexcept
+            static constexpr bool is_valid() noexcept
             {
                 return true;
             }
@@ -883,7 +883,7 @@ namespace hpx {
     namespace detail {
         HPX_FORCEINLINE constexpr bool has_async_policy(launch p) noexcept
         {
-            return bool(static_cast<int>(p.get_policy()) &
+            return static_cast<bool>(static_cast<int>(p.get_policy()) &
                 static_cast<int>(detail::launch_policy::async_policies));
         }
 
@@ -891,7 +891,7 @@ namespace hpx {
         HPX_FORCEINLINE constexpr bool has_async_policy(
             detail::policy_holder<F> const& p) noexcept
         {
-            return bool(static_cast<int>(p.policy()) &
+            return static_cast<bool>(static_cast<int>(p.policy()) &
                 static_cast<int>(detail::launch_policy::async_policies));
         }
     }    // namespace detail

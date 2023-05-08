@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,6 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
-#include <exception>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -58,7 +57,7 @@ namespace hpx::threads::policies {
         scheduler_base::set_scheduler_mode(mode);
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
-        double max_time = thread_queue_init.max_idle_backoff_time_;
+        double const max_time = thread_queue_init.max_idle_backoff_time_;
 
         wait_counts_.resize(num_threads);
         for (auto&& data : wait_counts_)
@@ -86,10 +85,11 @@ namespace hpx::threads::policies {
             // Exponential back-off with a maximum sleep time.
             static constexpr std::int64_t const max_exponent =
                 std::numeric_limits<double>::max_exponent;
-            double exponent =
-                (std::min)(double(data.wait_count_), double(max_exponent - 1));
+            double const exponent =
+                (std::min)(static_cast<double>(data.wait_count_),
+                    static_cast<double>(max_exponent - 1));
 
-            std::chrono::milliseconds period(std::lround((std::min)(
+            std::chrono::milliseconds const period(std::lround((std::min)(
                 data.max_idle_backoff_time_, std::pow(2.0, exponent))));
 
             ++data.wait_count_;
@@ -141,7 +141,7 @@ namespace hpx::threads::policies {
 
     void scheduler_base::resume(std::size_t num_thread)
     {
-        if (num_thread == std::size_t(-1))
+        if (num_thread == static_cast<std::size_t>(-1))
         {
             for (std::condition_variable& c : suspend_conds_)
             {
@@ -176,7 +176,7 @@ namespace hpx::threads::policies {
 
                     for (std::size_t offset = 0; offset < states_size; ++offset)
                     {
-                        std::size_t num_thread_local =
+                        std::size_t const num_thread_local =
                             (num_thread + offset) % states_size;
 
                         {
@@ -228,10 +228,10 @@ namespace hpx::threads::policies {
             }
 
             // Try all pus only once if fallback is allowed
-            HPX_ASSERT(num_thread != std::size_t(-1));
+            HPX_ASSERT(num_thread != static_cast<std::size_t>(-1));
             for (std::size_t offset = 0; offset < states_size; ++offset)
             {
-                std::size_t num_thread_local =
+                std::size_t const num_thread_local =
                     (num_thread + offset) % states_size;
 
                 std::unique_lock<pu_mutex_type> l(
@@ -324,26 +324,26 @@ namespace hpx::threads::policies {
     {
         // distribute the same value across all cores
         mode_.data_.store(mode, std::memory_order_release);
-        do_some_work(std::size_t(-1));
+        do_some_work(static_cast<std::size_t>(-1));
     }
 
     void scheduler_base::add_scheduler_mode(scheduler_mode mode) noexcept
     {
         // distribute the same value across all cores
-        mode = scheduler_mode(get_scheduler_mode() | mode);
+        mode = static_cast<scheduler_mode>(get_scheduler_mode() | mode);
         set_scheduler_mode(mode);
     }
 
     void scheduler_base::remove_scheduler_mode(scheduler_mode mode) noexcept
     {
-        mode = scheduler_mode(get_scheduler_mode() & ~mode);
+        mode = static_cast<scheduler_mode>(get_scheduler_mode() & ~mode);
         set_scheduler_mode(mode);
     }
 
     void scheduler_base::add_remove_scheduler_mode(
         scheduler_mode to_add_mode, scheduler_mode to_remove_mode) noexcept
     {
-        scheduler_mode mode = scheduler_mode(
+        scheduler_mode const mode = static_cast<scheduler_mode>(
             (get_scheduler_mode() | to_add_mode) & ~to_remove_mode);
         set_scheduler_mode(mode);
     }
@@ -431,6 +431,42 @@ namespace hpx::threads::policies {
         }
     }
 #endif
+
+    std::ptrdiff_t scheduler_base::get_stack_size(
+        threads::thread_stacksize stacksize) const noexcept
+    {
+        if (stacksize == thread_stacksize::current)
+        {
+            stacksize = get_self_stacksize_enum();
+        }
+
+        HPX_ASSERT(stacksize != thread_stacksize::current);
+
+        switch (stacksize)
+        {
+        case thread_stacksize::small_:
+            return thread_queue_init_.small_stacksize_;
+
+        case thread_stacksize::medium:
+            return thread_queue_init_.medium_stacksize_;
+
+        case thread_stacksize::large:
+            return thread_queue_init_.large_stacksize_;
+
+        case thread_stacksize::huge:
+            return thread_queue_init_.huge_stacksize_;
+
+        case thread_stacksize::nostack:
+            return (std::numeric_limits<std::ptrdiff_t>::max)();
+
+        default:
+            HPX_ASSERT_MSG(
+                false, util::format("Invalid stack size {1}", stacksize));
+            break;
+        }
+
+        return thread_queue_init_.small_stacksize_;
+    }
 
     void scheduler_base::set_mpi_polling_functions(
         polling_function_ptr mpi_func,

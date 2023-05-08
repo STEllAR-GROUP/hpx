@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Mikael Simberg
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,25 +19,26 @@ namespace hpx::threads::policies {
     struct thread_queue_init_parameters
     {
         explicit thread_queue_init_parameters(
-            std::int64_t max_thread_count = std::int64_t(
+            std::int64_t max_thread_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MAX_THREAD_COUNT),
-            std::int64_t min_tasks_to_steal_pending = std::int64_t(
+            std::int64_t min_tasks_to_steal_pending = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_PENDING),
-            std::int64_t min_tasks_to_steal_staged = std::int64_t(
+            std::int64_t min_tasks_to_steal_staged = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MIN_TASKS_TO_STEAL_STAGED),
-            std::int64_t min_add_new_count = std::int64_t(
+            std::int64_t min_add_new_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MIN_ADD_NEW_COUNT),
-            std::int64_t max_add_new_count = std::int64_t(
+            std::int64_t max_add_new_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MAX_ADD_NEW_COUNT),
-            std::int64_t min_delete_count = std::int64_t(
+            std::int64_t min_delete_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MIN_DELETE_COUNT),
-            std::int64_t max_delete_count = std::int64_t(
+            std::int64_t max_delete_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MAX_DELETE_COUNT),
-            std::int64_t max_terminated_threads = std::int64_t(
+            std::int64_t max_terminated_threads = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_MAX_TERMINATED_THREADS),
-            std::int64_t init_threads_count = std::int64_t(
+            std::int64_t init_threads_count = static_cast<std::int64_t>(
                 HPX_THREAD_QUEUE_INIT_THREADS_COUNT),
-            double max_idle_backoff_time = double(HPX_IDLE_BACKOFF_TIME_MAX),
+            double max_idle_backoff_time = static_cast<double>(
+                HPX_IDLE_BACKOFF_TIME_MAX),
             std::ptrdiff_t small_stacksize = HPX_SMALL_STACK_SIZE,
             std::ptrdiff_t medium_stacksize = HPX_MEDIUM_STACK_SIZE,
             std::ptrdiff_t large_stacksize = HPX_LARGE_STACK_SIZE,

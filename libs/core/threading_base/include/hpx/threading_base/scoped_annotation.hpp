@@ -56,7 +56,7 @@ namespace hpx {
         explicit scoped_annotation(char const* name)
           : task_(thread_domain_, hpx::util::itt::string_handle(name))
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 desc_ = threads::get_thread_id_data(self->get_thread_id())
@@ -69,7 +69,7 @@ namespace hpx {
                 hpx::util::itt::string_handle(
                     detail::store_function_annotation(name)))
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 char const* name_c_str =
@@ -87,7 +87,7 @@ namespace hpx {
                 hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
                     f))
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 desc_ =
@@ -98,7 +98,7 @@ namespace hpx {
 
         ~scoped_annotation()
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 threads::get_thread_id_data(self->get_thread_id())
@@ -118,7 +118,7 @@ namespace hpx {
 
         explicit scoped_annotation(char const* name)
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 desc_ = threads::get_thread_id_data(self->get_thread_id())
@@ -134,7 +134,7 @@ namespace hpx {
 
         explicit scoped_annotation(std::string name)
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 char const* name_c_str =
@@ -159,7 +159,7 @@ namespace hpx {
                 std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
         explicit scoped_annotation(F&& f)
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 desc_ =
@@ -175,7 +175,7 @@ namespace hpx {
 
         ~scoped_annotation()
         {
-            auto* self = hpx::threads::get_self_ptr();
+            auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
             {
                 threads::get_thread_id_data(self->get_thread_id())
@@ -191,7 +191,7 @@ namespace hpx {
     /// \brief scoped_annotation associates a \c name with a section of code
     ///        (scope). It can be used to visualize code execution in profiling
     ///        tools like \a Intel \a VTune, \a Apex \a Profiler, etc. That
-    ///        allows analysing performance to figure out which part(s) of code
+    ///        allows analyzing performance to figure out which part(s) of code
     ///        is (are) responsible for performance degradation, etc.
     struct [[nodiscard]] scoped_annotation
     {
