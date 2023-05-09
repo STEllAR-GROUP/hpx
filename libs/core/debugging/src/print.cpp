@@ -31,6 +31,9 @@
 #if defined(__FreeBSD__)
 HPX_CORE_EXPORT char** freebsd_environ = nullptr;
 #endif
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 
 // ------------------------------------------------------------
 /// \cond NODETAIL

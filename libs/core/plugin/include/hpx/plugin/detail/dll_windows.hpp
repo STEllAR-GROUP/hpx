@@ -18,7 +18,7 @@
 #include <utility>
 
 #include <Shlwapi.h>
-#include <windows.h>
+#include <libloaderapi.h>
 
 #if !defined(HPX_MSVC) && !defined(HPX_MINGW)
 #error                                                                         \

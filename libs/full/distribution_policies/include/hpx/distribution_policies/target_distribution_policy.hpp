@@ -16,7 +16,6 @@
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
-#include <hpx/async_distributed/packaged_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>

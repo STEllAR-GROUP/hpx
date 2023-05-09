@@ -17,8 +17,9 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/string_util.hpp>
 
-#include <shellapi.h>
 #include <windows.h>
+
+#include <shellapi.h>
 
 #include <array>
 #include <cstdlib>

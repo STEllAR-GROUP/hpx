@@ -10,11 +10,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/concurrency/barrier.hpp>
-#include <hpx/functional/function.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/io_context.hpp>
 
 // The boost asio support includes termios.h. The termios.h file on ppc64le
@@ -35,26 +37,27 @@
 namespace hpx::util {
 
     /// A pool of io_service objects.
-    class HPX_CORE_EXPORT io_service_pool
+    class io_service_pool
     {
     public:
         HPX_NON_COPYABLE(io_service_pool);
 
     public:
         /// \brief Construct the io_service pool.
-        /// \param pool_size
-        ///                 [in] The number of threads to run to serve incoming
-        ///                 requests
-        /// \param start_thread
-        ///                 [in]
+        /// \param pool_size [in] The number of threads to run to serve incoming
+        ///                  requests
+        /// \param notifier     [in]
+        /// \param pool_name    [in]
+        /// \param name_postfix [in]
         explicit io_service_pool(std::size_t pool_size = 2,
             threads::policies::callback_notifier const& notifier =
                 threads::policies::callback_notifier(),
             char const* pool_name = "", char const* name_postfix = "");
 
         /// \brief Construct the io_service pool.
-        /// \param start_thread
-        ///                 [in]
+        /// \param notifier     [in]
+        /// \param pool_name    [in]
+        /// \param name_postfix [in]
         explicit io_service_pool(
             threads::policies::callback_notifier const& notifier,
             char const* pool_name = "", char const* name_postfix = "");
@@ -117,24 +120,12 @@ namespace hpx::util {
 
     private:
         using io_service_ptr = std::unique_ptr<asio::io_context>;
-
-// FIXME: Intel compilers don't like this
-#if defined(HPX_NATIVE_MIC)
         using work_type = std::unique_ptr<asio::io_context::work>;
-#else
-        using work_type = asio::io_context::work;
-#endif
 
         HPX_FORCEINLINE work_type initialize_work(asio::io_context& io_service)
         {
             return work_type(
-// FIXME: Intel compilers don't like this
-#if defined(HPX_NATIVE_MIC)
-                new asio::io_context::work(io_service)
-#else
-                io_service
-#endif
-            );
+                std::make_unique<asio::io_context::work>(io_service));
         }
 
         std::mutex mtx_;

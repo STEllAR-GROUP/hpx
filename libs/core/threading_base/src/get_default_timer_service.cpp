@@ -11,6 +11,9 @@
 #include <hpx/errors/exception.hpp>
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/io_context.hpp>
 
 namespace hpx::threads::detail {

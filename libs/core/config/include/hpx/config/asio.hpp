@@ -10,5 +10,10 @@
 // On Windows, make sure winsock.h is not included even if windows.h is included
 // before winsock2.h
 #define _WINSOCKAPI_
-#include <winsock2.h>
 #endif
+
+namespace asio {
+
+    // forward declaration
+    class io_context;
+}    // namespace asio

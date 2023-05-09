@@ -10,10 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/functional/function.hpp>
-
-#include <asio/io_context.hpp>
 
 namespace hpx::threads::detail {
 

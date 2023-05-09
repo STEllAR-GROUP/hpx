@@ -14,6 +14,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>

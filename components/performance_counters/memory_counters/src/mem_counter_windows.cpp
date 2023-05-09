@@ -11,48 +11,46 @@
 #include <hpx/modules/errors.hpp>
 
 #include <cstdint>
-#include <cstring>
 #include <string>
 
-#include <psapi.h>
 #include <windows.h>    // this must go before psapi.h
 
-namespace hpx { namespace performance_counters { namespace memory {
+#include <psapi.h>
+
+namespace hpx::performance_counters::memory {
+
     ///////////////////////////////////////////////////////////////////////////
     // returns virtual memory value
     std::uint64_t read_psm_virtual(bool)
     {
-        PROCESS_MEMORY_COUNTERS_EX pmc;
-        std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
+        PROCESS_MEMORY_COUNTERS_EX pmc = {};
         pmc.cb = sizeof(PROCESS_MEMORY_COUNTERS_EX);
 
         if (!GetProcessMemoryInfo(GetCurrentProcess(),
                 reinterpret_cast<PPROCESS_MEMORY_COUNTERS>(&pmc),
                 sizeof(PROCESS_MEMORY_COUNTERS_EX)))
         {
-            HRESULT hr = GetLastError();
-            LPVOID buffer = 0;
+            HRESULT const hr = GetLastError();
+            LPVOID buffer = nullptr;
             if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                         FORMAT_MESSAGE_FROM_SYSTEM |
                         FORMAT_MESSAGE_IGNORE_INSERTS,
                     nullptr, hr,
                     MAKELANGID(
                         LANG_NEUTRAL, SUBLANG_DEFAULT),    // Default language
-                    (LPTSTR) &buffer, 0, nullptr))
+                    reinterpret_cast<LPTSTR>(&buffer), 0, nullptr))
             {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::performance_counters::memory::read_psm_virtual",
                     "format message failed with {:x} (while retrieving message "
                     "for {:x})",
                     GetLastError(), hr);
-                return std::uint64_t(-1);
             }
 
-            std::string msg(static_cast<char*>(buffer));
+            std::string const msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::performance_counters::memory::read_psm_virtual", msg);
-            return std::uint64_t(-1);
         }
 
         return pmc.WorkingSetSize;
@@ -62,37 +60,34 @@ namespace hpx { namespace performance_counters { namespace memory {
     // returns resident memory value
     std::uint64_t read_psm_resident(bool)
     {
-        PROCESS_MEMORY_COUNTERS_EX pmc;
-        std::memset(&pmc, '\0', sizeof(PROCESS_MEMORY_COUNTERS_EX));
+        PROCESS_MEMORY_COUNTERS_EX pmc = {};
         pmc.cb = sizeof(PROCESS_MEMORY_COUNTERS_EX);
 
         if (!GetProcessMemoryInfo(GetCurrentProcess(),
                 reinterpret_cast<PPROCESS_MEMORY_COUNTERS>(&pmc),
                 sizeof(PROCESS_MEMORY_COUNTERS_EX)))
         {
-            HRESULT hr = GetLastError();
-            LPVOID buffer = 0;
+            HRESULT const hr = GetLastError();
+            LPVOID buffer = nullptr;
             if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                         FORMAT_MESSAGE_FROM_SYSTEM |
                         FORMAT_MESSAGE_IGNORE_INSERTS,
                     nullptr, hr,
                     MAKELANGID(
                         LANG_NEUTRAL, SUBLANG_DEFAULT),    // Default language
-                    (LPTSTR) &buffer, 0, nullptr))
+                    reinterpret_cast<LPTSTR>(&buffer), 0, nullptr))
             {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::performance_counters::memory::read_psm_resident",
                     "format message failed with {:x} (while retrieving message "
                     "for {:x})",
                     GetLastError(), hr);
-                return std::uint64_t(-1);
             }
 
-            std::string msg(static_cast<char*>(buffer));
+            std::string const msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::performance_counters::memory::read_psm_resident", msg);
-            return std::uint64_t(-1);
         }
 
         return pmc.PrivateUsage;
@@ -101,39 +96,36 @@ namespace hpx { namespace performance_counters { namespace memory {
     // Returns total available memory
     std::uint64_t read_total_mem_avail(bool)
     {
-        MEMORYSTATUSEX mem_status;
-        std::memset(&mem_status, '\0', sizeof(MEMORYSTATUSEX));
+        MEMORYSTATUSEX mem_status = {};
         mem_status.dwLength = sizeof(MEMORYSTATUSEX);
 
         if (!GlobalMemoryStatusEx(&mem_status))
         {
-            HRESULT hr = GetLastError();
-            LPVOID buffer = 0;
+            HRESULT const hr = GetLastError();
+            LPVOID buffer = nullptr;
             if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                         FORMAT_MESSAGE_FROM_SYSTEM |
                         FORMAT_MESSAGE_IGNORE_INSERTS,
                     nullptr, hr,
                     MAKELANGID(
                         LANG_NEUTRAL, SUBLANG_DEFAULT),    // Default language
-                    (LPTSTR) &buffer, 0, nullptr))
+                    reinterpret_cast<LPTSTR>(&buffer), 0, nullptr))
             {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::performance_counters::memory::read_total_mem_avail",
                     "format message failed with {:x} (while "
                     "retrieving message for {:x})",
                     GetLastError(), hr);
-                return std::uint64_t(-1);
             }
 
-            std::string msg(static_cast<char*>(buffer));
+            std::string const msg(static_cast<char*>(buffer));
             LocalFree(buffer);
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::performance_counters::memory::read_total_mem_avail", msg);
-            return std::uint64_t(-1);
         }
 
         return mem_status.ullAvailPhys;
     }
-}}}    // namespace hpx::performance_counters::memory
+}    // namespace hpx::performance_counters::memory
 
 #endif

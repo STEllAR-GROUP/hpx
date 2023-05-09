@@ -10,11 +10,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
-
-#include <asio/io_context.hpp>
 
 #include <cstddef>
 #include <string>
