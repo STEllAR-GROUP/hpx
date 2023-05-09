@@ -73,7 +73,7 @@ namespace hpx::threads {
       , ran_exit_funcs_(false)
       , is_stackless_(is_stackless)
       , scheduler_base_(init_data.scheduler_base)
-      , last_worker_thread_num_(std::size_t(-1))
+      , last_worker_thread_num_(static_cast<std::size_t>(-1))
       , stacksize_(stacksize)
       , stacksize_enum_(init_data.stacksize)
       , queue_(queue)
@@ -220,7 +220,7 @@ namespace hpx::threads {
         ran_exit_funcs_ = false;
         exit_funcs_.clear();
         scheduler_base_ = init_data.scheduler_base;
-        last_worker_thread_num_ = std::size_t(-1);
+        last_worker_thread_num_ = static_cast<std::size_t>(-1);
 
         // We explicitly set the logical stack size again as it can be different
         // from what the previous use required. However, the physical stack size
@@ -237,8 +237,7 @@ namespace hpx::threads {
         // purposes
         if (parent_thread_id_ == nullptr)
         {
-            thread_self* self = get_self_ptr();
-            if (self)
+            if (thread_self const* self = get_self_ptr())
             {
                 parent_thread_id_ = threads::get_self_id();
                 parent_thread_phase_ = self->get_thread_phase();
@@ -307,32 +306,34 @@ namespace hpx::threads {
 
     thread_id_type get_self_id() noexcept
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        if (thread_self const* self = get_self_ptr();
+            HPX_LIKELY(nullptr != self))
+        {
             return self->get_thread_id();
-
+        }
         return threads::invalid_thread_id;
     }
 
     thread_data* get_self_id_data() noexcept
     {
-        thread_self* self = get_self_ptr();
-        if (HPX_LIKELY(nullptr != self))
+        if (thread_self const* self = get_self_ptr();
+            HPX_LIKELY(nullptr != self))
+        {
             return get_thread_id_data(self->get_thread_id());
-
+        }
         return nullptr;
     }
 
     std::ptrdiff_t get_self_stacksize() noexcept
     {
-        thread_data* thrd_data = get_self_id_data();
+        thread_data const* thrd_data = get_self_id_data();
         return thrd_data ? thrd_data->get_stack_size() : 0;
     }
 
     thread_stacksize get_self_stacksize_enum() noexcept
     {
-        thread_data* thrd_data = get_self_id_data();
-        thread_stacksize stacksize = thrd_data ?
+        thread_data const* thrd_data = get_self_id_data();
+        thread_stacksize const stacksize = thrd_data ?
             thrd_data->get_stack_size_enum() :
             thread_stacksize::default_;
         HPX_ASSERT(stacksize != thread_stacksize::current);
@@ -358,8 +359,8 @@ namespace hpx::threads {
 #else
     thread_id_type get_parent_id() noexcept
     {
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data const* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_parent_thread_id();
         }
@@ -368,8 +369,8 @@ namespace hpx::threads {
 
     std::size_t get_parent_phase() noexcept
     {
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data const* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_parent_thread_phase();
         }
@@ -378,8 +379,8 @@ namespace hpx::threads {
 
     std::uint32_t get_parent_locality_id() noexcept
     {
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data const* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_parent_locality_id();
         }
@@ -394,8 +395,8 @@ namespace hpx::threads {
 #ifndef HPX_HAVE_THREAD_TARGET_ADDRESS
         return 0;
 #else
-        thread_data* thrd_data = get_self_id_data();
-        if (HPX_LIKELY(nullptr != thrd_data))
+        if (thread_data const* thrd_data = get_self_id_data();
+            HPX_LIKELY(nullptr != thrd_data))
         {
             return thrd_data->get_component_id();
         }
@@ -423,7 +424,6 @@ namespace hpx::threads {
         {
             thrd_data->set_timer_data(data);
         }
-        return;
     }
 #endif
 }    // namespace hpx::threads

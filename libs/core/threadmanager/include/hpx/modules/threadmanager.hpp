@@ -223,7 +223,8 @@ namespace hpx { namespace threads {
         /// raised. The exception will be routed through the notifier and the
         /// scheduler (which will result in it being passed to the runtime
         /// object, which in turn will report it to the console, etc.).
-        void report_error(std::size_t num_thread, std::exception_ptr const& e)
+        void report_error(
+            std::size_t num_thread, std::exception_ptr const& e) const
         {
             // propagate the error reporting to all pools, which in turn
             // will propagate to schedulers

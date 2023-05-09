@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,13 @@
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/functional/move_only_function.hpp>
-#include <hpx/modules/errors.hpp>
 
-#include <cstddef>
-#include <cstdint>
-#include <functional>
-#include <memory>
 #include <utility>
 
 #if defined(HPX_HAVE_APEX)
+#include <memory>
+
 namespace hpx::util::external_timer {
 
     struct task_wrapper;
@@ -62,7 +58,7 @@ namespace hpx::threads {
 
 #if defined(HPX_HAVE_APEX)
     HPX_CORE_EXPORT std::shared_ptr<hpx::util::external_timer::task_wrapper>
-    get_self_timer_data(void);
+    get_self_timer_data();
     HPX_CORE_EXPORT void set_self_timer_data(
         std::shared_ptr<hpx::util::external_timer::task_wrapper> data);
 #endif

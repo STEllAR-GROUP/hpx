@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,19 +6,18 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/coroutines/coroutine.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/create_work.hpp>
 #include <hpx/threading_base/register_thread.hpp>
+#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/set_thread_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <cstddef>
-#include <functional>
 #include <string>
 #include <utility>
 
@@ -34,13 +33,12 @@ namespace hpx::threads::detail {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::set_active_state",
                 "null thread id encountered");
-            return thread_result_type(
-                thread_schedule_state::terminated, invalid_thread_id);
         }
 
         // make sure that the thread has not been suspended and set active again
         // in the meantime
-        thread_state current_state = get_thread_id_data(thrd)->get_state();
+        thread_state const current_state =
+            get_thread_id_data(thrd)->get_state();
 
         if (current_state.state() == previous_state.state() &&
             current_state != previous_state)
@@ -52,8 +50,7 @@ namespace hpx::threads::detail {
                 "state({})",
                 thrd, get_thread_id_data(thrd)->get_description(),
                 get_thread_state_name(newstate));
-            return thread_result_type(
-                thread_schedule_state::terminated, invalid_thread_id);
+            return {thread_schedule_state::terminated, invalid_thread_id};
         }
 
         // just retry, set_state will create new thread if target is still active
@@ -61,8 +58,7 @@ namespace hpx::threads::detail {
         detail::set_thread_state(thrd.noref(), newstate, newstate_ex, priority,
             thread_schedule_hint(), true, ec);
 
-        return thread_result_type(
-            thread_schedule_state::terminated, invalid_thread_id);
+        return {thread_schedule_state::terminated, invalid_thread_id};
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -76,8 +72,8 @@ namespace hpx::threads::detail {
             HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
-            return thread_state(
-                thread_schedule_state::unknown, thread_restart_state::unknown);
+            return {
+                thread_schedule_state::unknown, thread_restart_state::unknown};
         }
 
         // set_state can't be used to force a thread into active state
@@ -86,8 +82,8 @@ namespace hpx::threads::detail {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "threads::detail::set_thread_state", "invalid new state: {}",
                 new_state);
-            return thread_state(
-                thread_schedule_state::unknown, thread_restart_state::unknown);
+            return {
+                thread_schedule_state::unknown, thread_restart_state::unknown};
         }
 
         thread_state previous_state;
@@ -111,7 +107,7 @@ namespace hpx::threads::detail {
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return thread_state(new_state, previous_state.state_ex());
+                return {new_state, previous_state.state_ex()};
             }
 
             // the thread to set the state for is currently running, so we
@@ -162,7 +158,6 @@ namespace hpx::threads::detail {
 
                 return previous_state;    // done
             }
-            break;
 
             case thread_schedule_state::terminated:
             {
@@ -179,7 +174,6 @@ namespace hpx::threads::detail {
                 // pending nothing has to be done anymore.
                 return previous_state;
             }
-            break;
 
             case thread_schedule_state::pending:
                 [[fallthrough]];
@@ -199,14 +193,17 @@ namespace hpx::threads::detail {
 
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "threads::detail::set_thread_state", str);
-                    return thread_state(thread_schedule_state::unknown,
-                        thread_restart_state::unknown);
+                    return {thread_schedule_state::unknown,
+                        thread_restart_state::unknown};
                 }
                 break;
 
             case thread_schedule_state::suspended:
                 break;    // fine, just set the new state
 
+            case thread_schedule_state::unknown:
+            case thread_schedule_state::depleted:
+            case thread_schedule_state::staged:
             case thread_schedule_state::pending_do_not_schedule:
                 [[fallthrough]];
             default:
@@ -248,7 +245,7 @@ namespace hpx::threads::detail {
                 get_thread_state_name(previous_state_val));
         } while (true);
 
-        thread_schedule_state previous_state_val = previous_state.state();
+        thread_schedule_state const previous_state_val = previous_state.state();
         if (!(previous_state_val == thread_schedule_state::pending ||
                 previous_state_val == thread_schedule_state::pending_boost) &&
             (new_state == thread_schedule_state::pending ||
@@ -257,7 +254,7 @@ namespace hpx::threads::detail {
             // REVIEW: Passing a specific target thread may interfere with the
             // round robin queuing.
 
-            auto* thrd_data = get_thread_id_data(thrd);
+            auto const* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();
             scheduler->schedule_thread(
                 thrd, schedulehint, false, thrd_data->get_priority());

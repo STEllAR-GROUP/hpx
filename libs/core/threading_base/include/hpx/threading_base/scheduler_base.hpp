@@ -63,7 +63,8 @@ namespace hpx::threads::policies {
     public:
         using pu_mutex_type = std::mutex;
 
-        scheduler_base(std::size_t num_threads, char const* description = "",
+        explicit scheduler_base(std::size_t num_threads,
+            char const* description = "",
             thread_queue_init_parameters const& thread_queue_init =
                 thread_queue_init_parameters{},
             scheduler_mode mode = scheduler_mode::nothing_special);
@@ -82,17 +83,17 @@ namespace hpx::threads::policies {
             parent_pool_ = p;
         }
 
-        inline std::size_t global_to_local_thread_index(std::size_t n)
+        std::size_t global_to_local_thread_index(std::size_t n) const
         {
             return n - parent_pool_->get_thread_offset();
         }
 
-        inline std::size_t local_to_global_thread_index(std::size_t n)
+        std::size_t local_to_global_thread_index(std::size_t n) const
         {
             return n + parent_pool_->get_thread_offset();
         }
 
-        char const* get_description() const noexcept
+        constexpr char const* get_description() const noexcept
         {
             return description_;
         }
@@ -161,18 +162,6 @@ namespace hpx::threads::policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        // domain management
-        std::size_t domain_from_local_thread_index(std::size_t n);
-
-        // assumes queues use index 0..N-1 and correspond to the pool cores
-        std::size_t num_domains(std::size_t const workers);
-
-        // either threads in same domain, or not in same domain
-        // depending on the predicate
-        std::vector<std::size_t> domain_threads(std::size_t local_id,
-            std::vector<std::size_t> const& ts,
-            hpx::function<bool(std::size_t, std::size_t)> pred);
-
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
         virtual std::uint64_t get_creation_time(bool reset) = 0;
         virtual std::uint64_t get_cleanup_time(bool reset) = 0;
@@ -195,12 +184,12 @@ namespace hpx::threads::policies {
 #endif
 
         virtual std::int64_t get_queue_length(
-            std::size_t num_thread = std::size_t(-1)) const = 0;
+            std::size_t num_thread = static_cast<std::size_t>(-1)) const = 0;
 
         virtual std::int64_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
-            std::size_t num_thread = std::size_t(-1),
+            std::size_t num_thread = static_cast<std::size_t>(-1),
             bool reset = false) const = 0;
 
         // Queries whether a given core is idle
@@ -253,40 +242,7 @@ namespace hpx::threads::policies {
         virtual void reset_thread_distribution() {}
 
         std::ptrdiff_t get_stack_size(
-            threads::thread_stacksize stacksize) const noexcept
-        {
-            if (stacksize == thread_stacksize::current)
-            {
-                stacksize = get_self_stacksize_enum();
-            }
-
-            HPX_ASSERT(stacksize != thread_stacksize::current);
-
-            switch (stacksize)
-            {
-            case thread_stacksize::small_:
-                return thread_queue_init_.small_stacksize_;
-
-            case thread_stacksize::medium:
-                return thread_queue_init_.medium_stacksize_;
-
-            case thread_stacksize::large:
-                return thread_queue_init_.large_stacksize_;
-
-            case thread_stacksize::huge:
-                return thread_queue_init_.huge_stacksize_;
-
-            case thread_stacksize::nostack:
-                return (std::numeric_limits<std::ptrdiff_t>::max)();
-
-            default:
-                HPX_ASSERT_MSG(
-                    false, util::format("Invalid stack size {1}", stacksize));
-                break;
-            }
-
-            return thread_queue_init_.small_stacksize_;
-        }
+            threads::thread_stacksize stacksize) const noexcept;
 
         using polling_function_ptr = detail::polling_status (*)();
         using polling_work_count_function_ptr = std::size_t (*)();
@@ -310,6 +266,7 @@ namespace hpx::threads::policies {
         void set_sycl_polling_functions(polling_function_ptr sycl_func,
             polling_work_count_function_ptr sycl_work_count_func);
         void clear_sycl_polling_function();
+
         detail::polling_status custom_polling_function() const;
         std::size_t get_polling_work_count() const;
 

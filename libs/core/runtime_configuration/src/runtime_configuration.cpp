@@ -1,4 +1,4 @@
-//  Copyright (c) 2005-2020 Hartmut Kaiser
+//  Copyright (c) 2005-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -65,7 +65,7 @@
 #include <limits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -368,7 +368,7 @@ namespace hpx { namespace util {
     void runtime_configuration::pre_initialize_logging_ini()
     {
 #if defined(HPX_HAVE_LOGGING)
-        std::vector<std::string> lines = {
+        std::vector<std::string> const lines = {
         // clang-format off
 #define HPX_TIMEFORMAT "$hh:$mm.$ss.$mili"
 #define HPX_LOGFORMAT "(T%locality%/%hpxthread%.%hpxphase%/%hpxcomponent%) "
@@ -531,7 +531,7 @@ namespace hpx { namespace util {
 
         // invoke last reconfigure
         reconfigure();
-        for (auto& registry : registries)
+        for (auto const& registry : registries)
         {
             registry->register_component_type();
         }
@@ -554,20 +554,19 @@ namespace hpx { namespace util {
 
         if (!path.empty())
         {
-            fs::path this_p(path);
+            fs::path const this_p(path);
             std::error_code fsec;
             fs::path canonical_p =
                 fs::canonical(this_p, fs::initial_path(), fsec);
             if (fsec)
                 canonical_p = this_p;
 
-            std::pair<std::set<std::string>::iterator, bool> p =
-                component_paths.emplace(canonical_p.string());
-
-            if (p.second)
+            if (auto const [it, ok] =
+                    component_paths.emplace(canonical_p.string());
+                ok)
             {
                 // have all path elements, now find ini files in there...
-                fs::path this_path(*p.first);
+                fs::path const this_path(*it);
                 if (fs::exists(this_path, fsec) && !fsec)
                 {
                     plugin_list_type tmp_regs =
@@ -643,9 +642,9 @@ namespace hpx { namespace util {
         plugin_list_type plugin_registries;
 
         // load plugin paths from component_base_paths and suffixes
-        std::string component_base_paths(
+        std::string const component_base_paths(
             get_entry("hpx.component_base_paths", HPX_DEFAULT_COMPONENT_PATH));
-        std::string component_path_suffixes(
+        std::string const component_path_suffixes(
             get_entry("hpx.component_path_suffixes", "/lib/hpx"));
 
         load_component_paths(plugin_registries, component_registries,
@@ -653,7 +652,7 @@ namespace hpx { namespace util {
             basenames);
 
         // load additional explicit plugin paths from plugin_paths key
-        std::string plugin_paths(get_entry("hpx.component_paths", ""));
+        std::string const plugin_paths(get_entry("hpx.component_paths", ""));
         load_component_paths(plugin_registries, component_registries,
             plugin_paths, "", component_paths, basenames);
 
@@ -678,9 +677,8 @@ namespace hpx { namespace util {
 
     ///////////////////////////////////////////////////////////////////////////
     runtime_configuration::runtime_configuration(char const* argv0_,
-        runtime_mode mode,
-        std::vector<std::string> const& extra_static_ini_defs_)
-      : extra_static_ini_defs(extra_static_ini_defs_)
+        runtime_mode mode, std::vector<std::string> extra_static_ini_defs_)
+      : extra_static_ini_defs(HPX_MOVE(extra_static_ini_defs_))
       , mode_(mode)
       , num_localities(0)
       , num_os_threads(0)
@@ -711,16 +709,15 @@ namespace hpx { namespace util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void runtime_configuration::reconfigure(std::string const& hpx_ini_file_)
+    void runtime_configuration::reconfigure(std::string ini_file)
     {
-        hpx_ini_file = hpx_ini_file_;
+        hpx_ini_file = HPX_MOVE(ini_file);
         reconfigure();
     }
 
-    void runtime_configuration::reconfigure(
-        std::vector<std::string> const& cmdline_ini_defs_)
+    void runtime_configuration::reconfigure(std::vector<std::string> ini_defs)
     {
-        cmdline_ini_defs = cmdline_ini_defs_;
+        cmdline_ini_defs = HPX_MOVE(ini_defs);
         reconfigure();
     }
 
@@ -884,7 +881,8 @@ namespace hpx { namespace util {
                 *sec, "local_cache_size", cache_size);
         }
 
-        if (cache_size != std::size_t(~0x0ul) && cache_size < 16ul)
+        if ((cache_size != static_cast<std::size_t>(~0x0ul)) &&
+            cache_size < 16ul)
         {
             cache_size = 16;    // limit lower bound
         }
@@ -1010,7 +1008,7 @@ namespace hpx { namespace util {
         }
         return HPX_SPINLOCK_DEADLOCK_DETECTION_LIMIT;
 #else
-        return std::size_t(-1);
+        return static_cast<std::size_t>(-1);
 #endif
     }
 
@@ -1079,9 +1077,10 @@ namespace hpx { namespace util {
         if (util::section const* sec = get_section("hpx.stacks");
             nullptr != sec)
         {
-            std::string entry = sec->get_entry(entryname, defaultvaluestr);
+            std::string const entry =
+                sec->get_entry(entryname, defaultvaluestr);
             char* endptr = nullptr;
-            std::ptrdiff_t val =
+            std::ptrdiff_t const val =
                 std::strtoll(entry.c_str(), &endptr, /*base:*/ 0);
             return endptr != entry.c_str() ? val : defaultvalue;
         }
@@ -1133,10 +1132,13 @@ namespace hpx { namespace util {
         if (util::section const* sec = get_section("hpx.parcel");
             nullptr != sec)
         {
-            std::uint64_t maxsize = hpx::util::get_entry_as<std::uint64_t>(
-                *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
-            if (maxsize > 0)
+            if (std::uint64_t const maxsize =
+                    hpx::util::get_entry_as<std::uint64_t>(
+                        *sec, "max_message_size", HPX_PARCEL_MAX_MESSAGE_SIZE);
+                maxsize > 0)
+            {
                 return maxsize;
+            }
         }
         return HPX_PARCEL_MAX_MESSAGE_SIZE;    // default is 1GByte
     }
@@ -1146,11 +1148,14 @@ namespace hpx { namespace util {
         if (util::section const* sec = get_section("hpx.parcel");
             nullptr != sec)
         {
-            std::uint64_t maxsize = hpx::util::get_entry_as<std::uint64_t>(*sec,
-                "max_outbound_message_size",
-                HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
-            if (maxsize > 0)
+            if (std::uint64_t const maxsize =
+                    hpx::util::get_entry_as<std::uint64_t>(*sec,
+                        "max_outbound_message_size",
+                        HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE);
+                maxsize > 0)
+            {
                 return maxsize;
+            }
         }
         return HPX_PARCEL_MAX_OUTBOUND_MESSAGE_SIZE;    // default is 1GByte
     }
@@ -1196,10 +1201,13 @@ namespace hpx { namespace util {
         case threads::thread_stacksize::nostack:
             return (std::numeric_limits<std::ptrdiff_t>::max)();
 
+        case threads::thread_stacksize::unknown:
+        case threads::thread_stacksize::current:
         default:
+            [[fallthrough]];
         case threads::thread_stacksize::small_:
             break;
         }
         return small_stacksize;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

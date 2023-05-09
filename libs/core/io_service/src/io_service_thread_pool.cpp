@@ -71,9 +71,10 @@ namespace hpx::threads::detail {
         return id;
     }
 
-    void io_service_thread_pool::report_error(
+    bool io_service_thread_pool::report_error(
         std::size_t /* num */, std::exception_ptr const& /* e */)
     {
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
