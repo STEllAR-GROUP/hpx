@@ -58,7 +58,8 @@ are completed to avoid confusion.
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
 
-#. Change version references in CITATION.cff. There are two occurrences.
+#. Change version references in CITATION.cff. There are two occurrences. Change
+   year in the copyright file under ``/libs/core/version/src/version.cpp``.
 
 #. This step does not apply to patch releases. Remove features which have been
    deprecated for at least 2 releases. This involves removing build options
@@ -79,7 +80,7 @@ are completed to avoid confusion.
    keep them around in case (like Vc for example).
 
 #. Update the minimum required versions if necessary (compilers, dependencies,
-   etc.) in ``building_hpx.rst``.
+   etc.) in ``prerequisites.rst``.
 
 #. Verify that the Jenkins setups for the release branch on Rostam and Piz Daint
    are running and do not display any errors.
@@ -161,7 +162,7 @@ are completed to avoid confusion.
 
 #. Announce the release on hpx-users@stellar-group.org, stellar@cct.lsu.edu,
    allcct@cct.lsu.edu, faculty@csc.lsu.edu, faculty@ece.lsu.edu,
-   xpress@crest.iu.edu, the |hpx| Slack channel, the IRC channel,
+   the |hpx| Slack channel, the IRC channel,
    our list of external collaborators, isocpp.org, reddit.com, HPC Wire, Inside
    HPC, Heise Online, and a CCT press release.
 

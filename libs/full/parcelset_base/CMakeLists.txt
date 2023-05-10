@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,6 +42,7 @@ set(parcelset_base_sources
     locality_interface.cpp
     parcelport.cpp
     parcel_interface.cpp
+    parcelset_base.cpp
     set_parcel_write_handler.cpp
 )
 

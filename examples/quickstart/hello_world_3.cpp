@@ -9,11 +9,11 @@
 // explicitly and execute a HPX-thread printing "Hello World!" once. That's all.
 
 //[hello_world_3_getting_started
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 
-int hpx_main(int, char**)
+int hpx_main(int, char*[])
 {
     // Say hello to the world!
     std::cout << "Hello World!\n" << std::flush;

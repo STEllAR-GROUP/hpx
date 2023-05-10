@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <hpx/local/execution.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/is_sorted.hpp>
 
 #include <cstddef>
 #include <functional>

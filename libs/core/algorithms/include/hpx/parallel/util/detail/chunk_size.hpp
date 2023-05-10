@@ -135,6 +135,12 @@ namespace hpx::parallel::util::detail {
     get_bulk_iteration_shape(ExPolicy&& policy, IterOrR& it_or_r,
         std::size_t& count, Stride s = Stride(1))
     {
+        if (count == 0)
+        {
+            auto it = chunk_size_iterator(it_or_r, 1);
+            return hpx::util::iterator_range(it, it);
+        }
+
         std::size_t const cores =
             execution::processing_units_count(policy.parameters(),
                 policy.executor(), hpx::chrono::null_duration, count);
@@ -172,6 +178,12 @@ namespace hpx::parallel::util::detail {
     get_bulk_iteration_shape(ExPolicy&& policy, std::vector<Future>& workitems,
         F1&& f1, IterOrR& it_or_r, std::size_t& count, Stride s = Stride(1))
     {
+        if (count == 0)
+        {
+            auto it = chunk_size_iterator(it_or_r, 1);
+            return hpx::util::iterator_range(it, it);
+        }
+
         Stride stride = parallel::detail::abs(s);
 
         auto test_function = [&](std::size_t test_chunk_size) -> std::size_t {
@@ -242,6 +254,12 @@ namespace hpx::parallel::util::detail {
         std::size_t& count, Stride s = Stride(1))
     {
         using tuple_type = hpx::tuple<IterOrR, std::size_t>;
+        std::vector<tuple_type> shape;
+
+        if (count == 0)
+        {
+            return shape;
+        }
 
         std::size_t const cores =
             execution::processing_units_count(policy.parameters(),
@@ -251,7 +269,6 @@ namespace hpx::parallel::util::detail {
             policy.parameters(), policy.executor(), cores, count);
         HPX_ASSERT(0 != max_chunks);
 
-        std::vector<tuple_type> shape;
         Stride stride = parallel::detail::abs(s);
 
         // different versions of clang-format do different things
@@ -346,6 +363,15 @@ namespace hpx::parallel::util::detail {
     get_bulk_iteration_shape_idx(ExPolicy&& policy, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
+        using iterator =
+            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
+
+        if (count == 0)
+        {
+            auto it = iterator(begin, 1);
+            return hpx::util::iterator_range(it, it);
+        }
+
         std::size_t const cores =
             execution::processing_units_count(policy.parameters(),
                 policy.executor(), hpx::chrono::null_duration, count);
@@ -371,9 +397,6 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
-        using iterator =
-            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
-
         iterator shape_begin(begin, chunk_size, count, 0, 0);
         iterator shape_end(last, chunk_size, count, count, 0);
 
@@ -388,6 +411,15 @@ namespace hpx::parallel::util::detail {
         std::vector<Future>& workitems, F1&& f1, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
+        using iterator =
+            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
+
+        if (count == 0)
+        {
+            auto it = iterator(begin, 1);
+            return hpx::util::iterator_range(it, it);
+        }
+
         Stride stride = parallel::detail::abs(s);
 
         std::size_t base_idx = 0;
@@ -443,9 +475,6 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
-        using iterator =
-            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
-
         iterator shape_begin(begin, chunk_size, count, 0, base_idx);
         iterator shape_end(last, chunk_size, count, count, base_idx);
 
@@ -459,6 +488,12 @@ namespace hpx::parallel::util::detail {
         std::size_t count, Stride s = Stride(1))
     {
         using tuple_type = hpx::tuple<FwdIter, std::size_t, std::size_t>;
+        std::vector<tuple_type> shape;
+
+        if (count == 0)
+        {
+            return shape;
+        }
 
         std::size_t const cores =
             execution::processing_units_count(policy.parameters(),
@@ -467,7 +502,6 @@ namespace hpx::parallel::util::detail {
         std::size_t max_chunks = execution::maximal_number_of_chunks(
             policy.parameters(), policy.executor(), cores, count);
 
-        std::vector<tuple_type> shape;
         Stride stride = parallel::detail::abs(s);
 
         // different versions of clang-format do different things

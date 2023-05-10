@@ -98,10 +98,10 @@ namespace hpx::serialization {
         static constexpr std::uint32_t make_flags(std::uint32_t flags,
             std::vector<serialization_chunk> const* chunks) noexcept
         {
-            return flags |
-                static_cast<std::uint32_t>(archive_flags::archive_is_saving) |
-                static_cast<std::uint32_t>(chunks == nullptr ?
-                        archive_flags::disable_data_chunking :
+            return flags | archive_flags::archive_is_saving |
+                (chunks == nullptr ?
+                        (archive_flags::disable_data_chunking |
+                            archive_flags::disable_receive_data_chunking) :
                         archive_flags::no_archive_flags);
         }
 
@@ -123,9 +123,8 @@ namespace hpx::serialization {
             // the buffer repeatedly
             if (buffer_->is_preprocessing())
             {
-                flags_ = flags_ |
-                    static_cast<std::uint32_t>(
-                        archive_flags::archive_is_preprocessing);
+                flags_ = static_cast<std::uint32_t>(
+                    flags_ | archive_flags::archive_is_preprocessing);
             }
 
             // endianness needs to be saved separately as it is needed to

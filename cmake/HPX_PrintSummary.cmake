@@ -77,7 +77,7 @@ function(create_configuration_summary message module_name)
         if(NOT ${__pos} EQUAL -1)
           set(hpx_config_information
               "${hpx_config_information}"
-              "\n        \"${_variableName}=${_value}\","
+              "\n            \"${_variableName}=${_value}\","
           )
         elseif(NOT ${_variableName}Category STREQUAL "Generic"
                AND NOT ${_variableName}Category STREQUAL "Build Targets"
@@ -88,8 +88,9 @@ function(create_configuration_summary message module_name)
             PROPERTY TYPE
           )
           if(_type STREQUAL "BOOL")
-            set(hpx_config_information "${hpx_config_information}"
-                                       "\n        \"${_variableName}=OFF\","
+            set(hpx_config_information
+                "${hpx_config_information}"
+                "\n            \"${_variableName}=OFF\","
             )
           endif()
         endif()

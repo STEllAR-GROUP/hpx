@@ -6,13 +6,13 @@
 
 // Simple test verifying basic resource_partitioner functionality.
 
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <string>

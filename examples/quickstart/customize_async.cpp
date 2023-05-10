@@ -9,9 +9,9 @@
 // processing unit) for a thread which is created by calling hpx::post() or
 // hpx::async().
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 
 #include <algorithm>
 #include <iostream>

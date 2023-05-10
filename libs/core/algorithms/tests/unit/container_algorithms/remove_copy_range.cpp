@@ -5,11 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/tests/iter_sent.hpp>
-#include <hpx/local/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/remove_copy.hpp>
 
 #include <cstddef>
 #include <cstdint>

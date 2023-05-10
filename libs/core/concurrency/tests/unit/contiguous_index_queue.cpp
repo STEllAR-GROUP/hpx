@@ -7,12 +7,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/barrier.hpp>
 #include <hpx/concurrency/detail/contiguous_index_queue.hpp>
-#include <hpx/local/barrier.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/optional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/optional.hpp>
 #include <hpx/program_options.hpp>
 
 #include <algorithm>

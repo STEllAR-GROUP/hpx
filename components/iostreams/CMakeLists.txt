@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c)      2011 Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -35,6 +35,7 @@ add_hpx_component(
   iostreams INTERNAL_FLAGS
   FOLDER "Core/Components/IO"
   INSTALL_HEADERS PREPEND_HEADER_ROOT
+  INSTALL_COMPONENT runtime
   HEADER_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/include"
   HEADERS ${iostreams_headers}
   PREPEND_SOURCE_ROOT

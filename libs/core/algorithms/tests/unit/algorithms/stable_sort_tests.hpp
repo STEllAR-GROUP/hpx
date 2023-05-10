@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/format.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/stable_sort.hpp>
 
 #include <cstddef>
 #include <cstdint>

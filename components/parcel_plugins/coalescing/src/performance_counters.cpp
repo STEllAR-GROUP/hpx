@@ -92,7 +92,6 @@ namespace hpx::plugins::parcel {
     {
         switch (info.type_)
         {
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         case performance_counters::counter_type::monotonically_increasing:
         {
             performance_counters::counter_path_elements paths;
@@ -176,7 +175,6 @@ namespace hpx::plugins::parcel {
     {
         switch (info.type_)
         {
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         case performance_counters::counter_type::monotonically_increasing:
         {
             performance_counters::counter_path_elements paths;
@@ -261,7 +259,6 @@ namespace hpx::plugins::parcel {
     {
         switch (info.type_)
         {
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         case performance_counters::counter_type::average_count:
         {
             performance_counters::counter_path_elements paths;

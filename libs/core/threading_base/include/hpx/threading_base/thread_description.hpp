@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/errors/error_code.hpp>
 #include <hpx/functional/traits/get_action_name.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
@@ -42,13 +43,27 @@ namespace hpx::threads {
         };
 
     private:
-        union data
+        struct data
         {
-            char const* desc_;    //-V117
-            std::size_t addr_;    //-V117
+            union
+            {
+                char const* desc_;    //-V117
+                std::size_t addr_;    //-V117
+            };
+            data_type type_;
+
+            constexpr data() noexcept
+              : desc_(nullptr)
+              , type_(data_type_description)
+            {
+            }
+            explicit constexpr data(char const* str) noexcept
+              : desc_(str)
+              , type_(data_type_description)
+            {
+            }
         };
 
-        data_type type_;
         data data_;
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         util::itt::string_handle desc_itt_;
@@ -57,56 +72,47 @@ namespace hpx::threads {
         HPX_CORE_EXPORT void init_from_alternative_name(char const* altname);
 
     public:
-        thread_description() noexcept
-          : type_(data_type_description)
+        constexpr thread_description() noexcept
+          : data_("<unknown>")
         {
-            data_.desc_ = "<unknown>";
         }
 
-        thread_description(char const* desc) noexcept
-          : type_(data_type_description)
+        constexpr thread_description(char const* desc) noexcept
+          : data_(desc ? desc : "<unknown>")
         {
-            data_.desc_ = desc ? desc : "<unknown>";
         }
 
         explicit thread_description(std::string desc)
-          : type_(data_type_description)
+          : data_(hpx::detail::store_function_annotation(HPX_MOVE(desc)))
         {
-            data_.desc_ =
-                hpx::detail::store_function_annotation(HPX_MOVE(desc));
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
         thread_description(
-            char const* desc, util::itt::string_handle const& sh) noexcept
-          : type_(data_type_description)
+            char const* desc, util::itt::string_handle sh) noexcept
+          : data_(desc ? desc : "<unknown>")
+          , desc_itt_(HPX_MOVE(sh))
         {
-            data_.desc_ = desc ? desc : "<unknown>";
-            desc_itt_ = sh;
         }
 
-        thread_description(std::string desc, util::itt::string_handle const& sh)
-          : type_(data_type_description)
+        thread_description(std::string desc, util::itt::string_handle sh)
+          : data_(hpx::detail::store_function_annotation(HPX_MOVE(desc)))
+          , desc_itt_(HPX_MOVE(sh))
         {
-            data_.desc_ =
-                hpx::detail::store_function_annotation(HPX_MOVE(desc));
-            desc_itt_ = sh;
         }
 #endif
 
-        /* The priority of description is name, altname, address */
+        // The priority of description is name, altname, address
         template <typename F,
-            typename = typename std::enable_if<
-                !std::is_same<F, thread_description>::value &&
-                !traits::is_action<F>::value>::type>
+            typename =
+                std::enable_if_t<!std::is_same_v<F, thread_description> &&
+                    !traits::is_action_v<F>>>
         explicit thread_description(
             F const& f, char const* altname = nullptr) noexcept
-          : type_(data_type_description)
         {
-            char const* name = traits::get_function_annotation<F>::call(f);
-
             // If a name exists, use it, not the altname.
-            if (name != nullptr)    // -V547
+            if (char const* name = traits::get_function_annotation<F>::call(f);
+                name != nullptr)    // -V547
             {
                 altname = name;
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
@@ -121,7 +127,7 @@ namespace hpx::threads {
             }
             else
             {
-                type_ = data_type_address;
+                data_.type_ = data_type_address;
                 data_.addr_ = traits::get_function_address<F>::call(f);
             }
 #else
@@ -137,77 +143,74 @@ namespace hpx::threads {
         }
 
         template <typename Action,
-            typename =
-                typename std::enable_if<traits::is_action<Action>::value>::type>
+            typename = std::enable_if_t<traits::is_action_v<Action>>>
         explicit thread_description(
             Action, char const* /* altname */ = nullptr) noexcept
-          : type_(data_type_description)
-        {
-            data_.desc_ = hpx::actions::detail::get_action_name<Action>();
+          : data_(hpx::actions::detail::get_action_name<Action>())
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-            desc_itt_ = hpx::actions::detail::get_action_name_itt<Action>();
+          , desc_itt_(hpx::actions::detail::get_action_name_itt<Action>())
 #endif
+        {
         }
 
-        constexpr data_type kind() const noexcept
+        [[nodiscard]] constexpr data_type kind() const noexcept
         {
-            return type_;
+            return data_.type_;
         }
 
-        char const* get_description() const noexcept
+        [[nodiscard]] constexpr char const* get_description() const noexcept
         {
-            HPX_ASSERT(type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type_description);
             return data_.desc_;
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        util::itt::string_handle get_description_itt() const noexcept
+        [[nodiscard]] util::itt::string_handle get_description_itt()
+            const noexcept
         {
-            HPX_ASSERT(type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type_description);
             return desc_itt_ ? desc_itt_ :
                                util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(
+        [[nodiscard]] util::itt::task get_task_itt(
             util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
             case threads::thread_description::data_type_description:
-                return util::itt::task(domain, get_description_itt());
-                break;
+                return {domain, get_description_itt()};
 
             case threads::thread_description::data_type_address:
-                return util::itt::task(
-                    domain, util::itt::string_handle("address"), get_address());
-                break;
+                return {
+                    domain, util::itt::string_handle("address"), get_address()};
 
             default:
                 HPX_ASSERT(false);
                 break;
             }
 
-            return util::itt::task(domain, util::itt::string_handle("<error>"));
+            return {domain, util::itt::string_handle("<error>")};
         }
 #endif
 
-        std::size_t get_address() const noexcept
+        [[nodiscard]] constexpr std::size_t get_address() const noexcept
         {
-            HPX_ASSERT(type_ == data_type_address);
+            HPX_ASSERT(data_.type_ == data_type_address);
             return data_.addr_;
         }
 
-        explicit operator bool() const noexcept
+        [[nodiscard]] explicit constexpr operator bool() const noexcept
         {
             return valid();
         }
 
-        bool valid() const noexcept
+        [[nodiscard]] constexpr bool valid() const noexcept
         {
-            if (type_ == data_type_description)
+            if (data_.type_ == data_type_description)
                 return nullptr != data_.desc_;
 
-            HPX_ASSERT(type_ == data_type_address);
+            HPX_ASSERT(data_.type_ == data_type_address);
             return 0 != data_.addr_;
         }
     };
@@ -236,72 +239,70 @@ namespace hpx::threads {
         }
 
         template <typename F,
-            typename = typename std::enable_if<
-                !std::is_same<F, thread_description>::value &&
-                !traits::is_action<F>::value>::type>
+            typename =
+                std::enable_if_t<!std::is_same_v<F, thread_description> &&
+                    !traits::is_action_v<F>>>
         explicit constexpr thread_description(
             F const& /*f*/, char const* /*altname*/ = nullptr) noexcept
         {
         }
 
         template <typename Action,
-            typename =
-                typename std::enable_if<traits::is_action<Action>::value>::type>
+            typename = std::enable_if_t<traits::is_action_v<Action>>>
         explicit constexpr thread_description(
             Action, char const* /*altname*/ = nullptr) noexcept
         {
         }
 
-        constexpr data_type kind() const noexcept
+        [[nodiscard]] constexpr data_type kind() const noexcept
         {
             return data_type_description;
         }
 
-        constexpr char const* get_description() const noexcept
+        [[nodiscard]] constexpr char const* get_description() const noexcept
         {
             return "<unknown>";
         }
 
 #if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
-        util::itt::string_handle get_description_itt() const noexcept
+        [[nodiscard]] util::itt::string_handle get_description_itt()
+            const noexcept
         {
-            HPX_ASSERT(type_ == data_type_description);
+            HPX_ASSERT(data_.type_ == data_type_description);
             return util::itt::string_handle(get_description());
         }
 
-        util::itt::task get_task_itt(
+        [[nodiscard]] util::itt::task get_task_itt(
             util::itt::domain const& domain) const noexcept
         {
             switch (kind())
             {
             case threads::thread_description::data_type_description:
-                return util::itt::task(domain, get_description_itt());
-                break;
+                return {domain, get_description_itt()};
 
             case threads::thread_description::data_type_address:
-                return util::itt::task(domain, "address", get_address());
-                break;
+                return {domain, "address", get_address()};
 
             default:
                 HPX_ASSERT(false);
                 break;
             }
 
-            return util::itt::task(domain, "<error>");
+            return {domain, "<error>"};
         }
 #endif
 
-        constexpr std::size_t get_address() const noexcept
+        [[nodiscard]] static constexpr std::size_t get_address() noexcept
         {
             return 0;
         }
 
-        explicit constexpr operator bool() const noexcept
+        [[nodiscard]] explicit constexpr operator bool() const noexcept
         {
             return valid();
         }
 
-        constexpr bool valid() const noexcept
+        [[nodiscard]] static constexpr bool valid() noexcept
         {
             return true;
         }

@@ -63,7 +63,6 @@ namespace hpx::lcos::detail {
 
         future_state state = future_state::invalid;
         ar >> state;
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (state == future_state::has_value)
         {
             if constexpr (std::is_default_constructible_v<value_type>)
@@ -92,7 +91,6 @@ namespace hpx::lcos::detail {
                 f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
             }
         }
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         else if (state == future_state::has_exception)
         {
             std::exception_ptr exception;
@@ -103,7 +101,6 @@ namespace hpx::lcos::detail {
 
             f = hpx::traits::future_access<Future>::create(HPX_MOVE(p));
         }
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         else if (state == future_state::invalid)
         {
             f = Future();

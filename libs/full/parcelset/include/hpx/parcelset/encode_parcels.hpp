@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011-2015 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2011 Bryce Lelbach
@@ -46,9 +46,9 @@ namespace hpx::parcelset {
 
 #if defined(HPX_HAVE_LOGGING)
         ///////////////////////////////////////////////////////////////////
-        inline constexpr char to_digit(int number) noexcept
+        constexpr char to_digit(int number) noexcept
         {
-            char number_tmp = static_cast<char>(number);
+            char const number_tmp = static_cast<char>(number);
             if (number >= 0 && number <= 9)
             {
                 return static_cast<char>(number_tmp + '0');
@@ -56,11 +56,11 @@ namespace hpx::parcelset {
             return static_cast<char>(number_tmp - 10 + 'A');
         }
 
-        inline constexpr void convert_byte(
+        constexpr void convert_byte(
             std::uint8_t b, char* buffer, char const* /* end */) noexcept
         {
             *buffer++ = to_digit((b & 0xF0) >> 4);
-            *buffer++ = to_digit(b & 0x0F);
+            *buffer = to_digit(b & 0x0F);
         }
 
         template <typename Buffer>
@@ -70,7 +70,7 @@ namespace hpx::parcelset {
             if (LPT_ENABLED(debug))
             {
                 result.reserve(buffer.data_.size() * 2 + 1);
-                for (std::uint8_t byte : buffer.data_)
+                for (std::uint8_t const byte : buffer.data_)
                 {
                     char b[3] = {0};
                     convert_byte(byte, &b[0], &b[3]);
@@ -122,13 +122,14 @@ namespace hpx::parcelset {
                         buffer.chunks_.size() - chunks.size()));
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.num_zchunks_ += chunks.size();
-            data.num_zchunks_per_msg_max_ = (std::max)(
-                data.num_zchunks_per_msg_max_, (std::int64_t) chunks.size());
+            data.num_zchunks_per_msg_max_ =
+                (std::max)(data.num_zchunks_per_msg_max_,
+                    static_cast<std::int64_t>(chunks.size()));
             for (auto& chunk : chunks)
             {
                 data.size_zchunks_total_ += chunk.second;
-                data.size_zchunks_max_ = (std::max)(
-                    data.size_zchunks_max_, (std::int64_t) chunk.second);
+                data.size_zchunks_max_ = (std::max)(data.size_zchunks_max_,
+                    static_cast<std::int64_t>(chunk.second));
             }
 #endif
 
@@ -159,7 +160,7 @@ namespace hpx::parcelset {
         std::size_t parcels_sent = 0;
         std::size_t parcels_size = 1;
 
-        if (num_parcels != std::size_t(-1))
+        if (num_parcels != static_cast<std::size_t>(-1))
         {
             arg_size = sizeof(std::int64_t);
             parcels_size = num_parcels;
@@ -170,14 +171,15 @@ namespace hpx::parcelset {
         {
             try
             {
-                std::unique_ptr<serialization::binary_filter> filter(
+                std::unique_ptr<serialization::binary_filter> const filter(
                     ps[0].get_serialization_filter());
 
                 int archive_flags = archive_flags_;
-                if (filter.get() != nullptr)
+                if (filter)
                 {
                     archive_flags = archive_flags |
-                        int(serialization::archive_flags::enable_compression);
+                        static_cast<int>(
+                            serialization::archive_flags::enable_compression);
                 }
 
                 // preallocate data
@@ -195,7 +197,7 @@ namespace hpx::parcelset {
 
                 // mark start of serialization
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-                hpx::chrono::high_resolution_timer timer;
+                hpx::chrono::high_resolution_timer const timer;
 #endif
                 {
                     // Serialize the data
@@ -208,15 +210,15 @@ namespace hpx::parcelset {
                         archive_flags, &buffer.chunks_, filter.get(),
                         pp.get_zero_copy_serialization_threshold());
 
-                    if (num_parcels != std::size_t(-1))
+                    if (num_parcels != static_cast<std::size_t>(-1))
                         archive << parcels_sent;    //-V128
 
                     for (std::size_t i = 0; i != parcels_sent; ++i)
                     {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
-                        std::size_t archive_pos = archive.current_pos();
-                        std::int64_t serialize_time =
+                        std::size_t const archive_pos = archive.current_pos();
+                        std::int64_t const serialize_time =
                             timer.elapsed_nanoseconds();
 #endif
                         LPT_(debug) << ps[i];
@@ -240,8 +242,6 @@ namespace hpx::parcelset {
                             timer.elapsed_nanoseconds() - serialize_time;
                         action_data.num_parcels_ = 1;
                         pp.add_sent_data(ps[i].get_action_name(), action_data);
-#else
-                        HPX_UNUSED(pp);
 #endif
                     }
                     archive.flush();
@@ -279,11 +279,10 @@ namespace hpx::parcelset {
             catch (std::exception const& e)
             {
                 // We have to repackage all exceptions thrown by the
-                // serialization library as otherwise we will loose the
-                // e.what() description of the problem, due to slicing.
+                // serialization library as otherwise we will loose the e.what()
+                // description of the problem, due to slicing.
                 hpx::throw_with_info(
                     hpx::exception(hpx::error::serialization_error, e.what()));
-                return 0;
             }
         }
         catch (...)

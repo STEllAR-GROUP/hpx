@@ -12,7 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/iostream.hpp>
 
-int hpx_main(int, char**)
+int hpx_main(int, char*[])
 {
     // Say hello to the world!
     hpx::cout << "Hello World!\n" << std::flush;

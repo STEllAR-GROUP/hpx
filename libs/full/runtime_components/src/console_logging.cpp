@@ -47,6 +47,7 @@ namespace hpx { namespace components {
             message_type const& msg = msgs[i];
             switch (get<0>(msg))
             {
+            // NOLINTNEXTLINE(bugprone-branch-clone)
             default:
             case logging_destination::hpx:
                 LHPX_CONSOLE_(get<1>(msg)) << fail_msg << get<2>(msg);

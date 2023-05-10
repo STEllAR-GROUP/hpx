@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/ini/ini.hpp>
-
 #include <hpx/modules/program_options.hpp>
 
-#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <string>

@@ -1,13 +1,13 @@
 //  Copyright (c) 2013-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //  Copyright (c)      2022 Patrick Diehl
+//  Copyright (c)      2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -16,10 +16,12 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <map>
+#include <stdexcept>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -39,7 +41,7 @@ namespace hpx { namespace util {
                 mpi_environment_strings, sep);
             for (auto const& tok : tokens)
             {
-                if (char* env = std::getenv(tok.c_str()))
+                if (char const* env = std::getenv(tok.c_str()))
                 {
                     LBT_(debug)
                         << "Found MPI environment variable: " << tok << "="
@@ -91,12 +93,12 @@ namespace hpx { namespace util {
         return false;
 #endif
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     mpi_environment::mutex_type mpi_environment::mtx_;
     bool mpi_environment::enabled_ = false;
@@ -107,8 +109,23 @@ namespace hpx { namespace util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
+    [[noreturn]] static void throw_wrong_mpi_mode(int required, int provided)
+    {
+        std::map<int, char const*> levels = {
+            {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
+            {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
+            {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
+            {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
+
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::util::mpi_environment::init",
+            "MPI doesn't implement minimal requested thread level, required "
+            "{}, provided {}",
+            levels[required], levels[provided]);
+    }
+
     int mpi_environment::init(
-        int*, char***, const int minimal, const int required, int& provided)
+        int*, char***, int const minimal, int const required, int& provided)
     {
         has_called_init_ = false;
 
@@ -119,6 +136,7 @@ namespace hpx { namespace util {
         {
             return retval;
         }
+
         if (!is_initialized)
         {
             retval = MPI_Init_thread(nullptr, nullptr, required, &provided);
@@ -129,9 +147,7 @@ namespace hpx { namespace util {
 
             if (provided < minimal)
             {
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::util::mpi_environment::init",
-                    "MPI doesn't provide minimal requested thread level");
+                throw_wrong_mpi_mode(required, provided);
             }
             has_called_init_ = true;
         }
@@ -146,9 +162,7 @@ namespace hpx { namespace util {
 
             if (provided < minimal)
             {
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::util::mpi_environment::init",
-                    "MPI doesn't provide minimal requested thread level");
+                throw_wrong_mpi_mode(required, provided);
             }
         }
         return retval;
@@ -174,12 +188,12 @@ namespace hpx { namespace util {
 
         rtcfg.add_entry("hpx.parcel.bootstrap", "mpi");
 
-        int required = MPI_THREAD_SINGLE;
+        int required = MPI_THREAD_SERIALIZED;
 #if defined(HPX_HAVE_PARCELPORT_MPI_MULTITHREADED)
         required =
             (get_entry_as(rtcfg, "hpx.parcel.mpi.multithreaded", 1) != 0) ?
             MPI_THREAD_MULTIPLE :
-            MPI_THREAD_SINGLE;
+            MPI_THREAD_SERIALIZED;
 
 #if defined(MVAPICH2_VERSION) && defined(_POSIX_SOURCE)
         // This enables multi threading support in MVAPICH2 if requested.
@@ -192,7 +206,6 @@ namespace hpx { namespace util {
         if (required == MPI_THREAD_MULTIPLE)
             setenv("MPICH_MAX_THREAD_SAFETY", "multiple", 1);
 #endif
-
 #endif
 
         int const retval =
@@ -209,16 +222,16 @@ namespace hpx { namespace util {
             MPI_Error_string(retval, message, &msglen);
             message[msglen] = '\0';
 
-            std::string msg("mpi_environment::init: MPI_Init_thread failed: ");
-            msg = msg + message + ".";
-            throw std::runtime_error(msg.c_str());
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::util::mpi_environment::init",
+                "MPI_Init_thread failed: {}.", message);
         }
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
-        if (provided_threading_flag_ < MPI_THREAD_SERIALIZED)
+        // explicitly disable multi-threaded mpi if needed
+        if (provided_threading_flag_ <= MPI_THREAD_SERIALIZED)
         {
-            // explicitly disable mpi if not run by mpirun
             rtcfg.add_entry("hpx.parcel.mpi.multithreaded", "0");
         }
 
@@ -226,11 +239,12 @@ namespace hpx { namespace util {
         {
             enabled_ = false;
             has_called_init_ = false;
-            throw std::runtime_error(
-                "mpi_environment::init: MPI_Init_thread: "
-                "The underlying MPI implementation only supports "
-                "MPI_THREAD_FUNNELED. This mode is not supported by HPX. "
-                "Please pass -Ihpx.parcel.mpi.multithreaded=0 to explicitly "
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::util::mpi_environment::init",
+                "MPI_Init_thread: The underlying MPI implementation only "
+                "supports MPI_THREAD_FUNNELED. This mode is not supported "
+                "by HPX. Please pass "
+                "--hpx:ini=hpx.parcel.mpi.multithreaded=0 to explicitly "
                 "disable MPI multi-threading.");
         }
 
@@ -257,17 +271,21 @@ namespace hpx { namespace util {
 
     std::string mpi_environment::get_processor_name()
     {
+        scoped_lock l;
+
         char name[MPI_MAX_PROCESSOR_NAME + 1] = {'\0'};
         int len = 0;
         MPI_Get_processor_name(name, &len);
 
-        return name;
+        return {name};
     }
 
-    void mpi_environment::finalize()
+    void mpi_environment::finalize() noexcept
     {
         if (enabled() && has_called_init())
         {
+            scoped_lock l;
+
             int is_finalized = 0;
             MPI_Finalized(&is_finalized);
             if (!is_finalized)
@@ -277,58 +295,73 @@ namespace hpx { namespace util {
         }
     }
 
-    bool mpi_environment::enabled()
+    bool mpi_environment::enabled() noexcept
     {
         return enabled_;
     }
 
-    bool mpi_environment::multi_threaded()
+    bool mpi_environment::multi_threaded() noexcept
     {
-        return provided_threading_flag_ >= MPI_THREAD_SERIALIZED;
+        return provided_threading_flag_ > MPI_THREAD_SERIALIZED;
     }
 
-    bool mpi_environment::has_called_init()
+    bool mpi_environment::has_called_init() noexcept
     {
         return has_called_init_;
     }
 
-    int mpi_environment::size()
+    int mpi_environment::size() noexcept
     {
         int res(-1);
         if (enabled())
+        {
+            scoped_lock l;
             MPI_Comm_size(communicator(), &res);
+        }
         return res;
     }
 
-    int mpi_environment::rank()
+    int mpi_environment::rank() noexcept
     {
         int res(-1);
         if (enabled())
+        {
+            scoped_lock l;
             MPI_Comm_rank(communicator(), &res);
+        }
         return res;
     }
 
-    MPI_Comm& mpi_environment::communicator()
+    MPI_Comm& mpi_environment::communicator() noexcept
     {
         return communicator_;
     }
 
     mpi_environment::scoped_lock::scoped_lock()
+      : locked(true)
     {
         if (!multi_threaded())
+        {
             mtx_.lock();
+        }
     }
 
     mpi_environment::scoped_lock::~scoped_lock()
     {
         if (!multi_threaded())
+        {
+            locked = false;
             mtx_.unlock();
+        }
     }
 
     void mpi_environment::scoped_lock::unlock()
     {
         if (!multi_threaded())
+        {
+            locked = false;
             mtx_.unlock();
+        }
     }
 
     mpi_environment::scoped_try_lock::scoped_try_lock()
@@ -343,7 +376,10 @@ namespace hpx { namespace util {
     mpi_environment::scoped_try_lock::~scoped_try_lock()
     {
         if (!multi_threaded() && locked)
+        {
+            locked = false;
             mtx_.unlock();
+        }
     }
 
     void mpi_environment::scoped_try_lock::unlock()
@@ -354,6 +390,6 @@ namespace hpx { namespace util {
             mtx_.unlock();
         }
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

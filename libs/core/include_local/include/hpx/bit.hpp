@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,4 +6,5 @@
 
 #pragma once
 
-#include <hpx/local/system_error.hpp>
+#include <hpx/config.hpp>    // for endian support
+#include <hpx/type_support/bit_cast.hpp>

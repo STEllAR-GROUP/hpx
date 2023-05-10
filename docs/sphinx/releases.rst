@@ -11,6 +11,9 @@
 Releases
 ========
 
+List of releases
+================
+
 .. toctree::
    :maxdepth: 1
 
@@ -41,3 +44,12 @@ Releases
    releases/whats_new_0_8_1
    releases/whats_new_0_8_0
    releases/whats_new_0_7_0
+
+
+Namespace changes
+=================
+
+.. toctree::
+   :maxdepth: 1
+
+   releases/new_namespaces_1_9_0

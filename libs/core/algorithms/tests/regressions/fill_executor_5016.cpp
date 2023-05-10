@@ -9,10 +9,10 @@
 // suppress deprecation warnings for algorithms
 #define HPX_HAVE_DEPRECATION_WARNINGS_V1_6 0
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/fill.hpp>
 
 #include <algorithm>
 #include <vector>

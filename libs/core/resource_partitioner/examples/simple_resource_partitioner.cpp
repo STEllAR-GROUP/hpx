@@ -7,13 +7,13 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/runtime.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/thread_pools.hpp>
 #include <hpx/modules/topology.hpp>
+#include <hpx/runtime.hpp>
 
 #include <cmath>
 #include <cstddef>

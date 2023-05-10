@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,30 +9,27 @@
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
-#include <hpx/util/from_string.hpp>
 
-#include <cctype>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace local { namespace detail {
+namespace hpx::local::detail {
 
     ///////////////////////////////////////////////////////////////////////
     std::string trim_whitespace(std::string const& s)
     {
         using size_type = std::string::size_type;
 
-        size_type first = s.find_first_not_of(" \t");
+        size_type const first = s.find_first_not_of(" \t");
         if (std::string::npos == first)
-            return std::string();
+            return {};
 
-        size_type last = s.find_last_not_of(" \t");
+        size_type const last = s.find_last_not_of(" \t");
         return s.substr(first, last - first + 1);
     }
 
@@ -178,7 +175,7 @@ namespace hpx { namespace local { namespace detail {
             using hpx::local::detail::trim_whitespace;
 
             // skip empty lines
-            std::string::size_type pos = line.find_first_not_of(" \t");
+            std::string::size_type const pos = line.find_first_not_of(" \t");
             if (pos == std::string::npos)
                 continue;
 
@@ -188,7 +185,7 @@ namespace hpx { namespace local { namespace detail {
             // skip comment lines
             if ('#' != line[0])
             {
-                std::string::size_type p1 = line.find_first_of(" \t");
+                std::string::size_type const p1 = line.find_first_of(" \t");
                 if (p1 != std::string::npos)
                 {
                     // rebuild the line connecting the parts with a '='
@@ -217,9 +214,9 @@ namespace hpx { namespace local { namespace detail {
             using hpx::program_options::store;
             using hpx::program_options::command_line_style::unix_style;
 
-            util::commandline_error_mode mode =
+            util::commandline_error_mode const mode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
-            util::commandline_error_mode notmode =
+            util::commandline_error_mode const notmode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
 
             store(get_commandline_parser(
@@ -248,22 +245,21 @@ namespace hpx { namespace local { namespace detail {
             return;
 
         filesystem::path dir(filesystem::initial_path());
-        filesystem::path app(appname);
+        filesystem::path const app(appname);
         appname = filesystem::basename(app.filename());
 
         // walk up the hierarchy, trying to find a file <appname>.cfg
         while (!dir.empty())
         {
             filesystem::path filename = dir / (appname + ".cfg");
-            util::commandline_error_mode mode = error_mode &
+            util::commandline_error_mode const mode = error_mode &
                 ~util::commandline_error_mode::report_missing_config_file;
 
             std::vector<std::string> options =
                 read_config_file_options(filename.string(), mode);
 
-            bool result = handle_config_file_options(
-                options, desc_cfgfile, vm, ini, mode);
-            if (result)
+            if (handle_config_file_options(
+                    options, desc_cfgfile, vm, ini, mode))
             {
                 break;    // break on the first options file found
             }
@@ -291,7 +287,7 @@ namespace hpx { namespace local { namespace detail {
         using hpx::program_options::options_description;
         if (vm.count("hpx:options-file"))
         {
-            std::vector<std::string> const& cfg_files =
+            auto const& cfg_files =
                 vm["hpx:options-file"].as<std::vector<std::string>>();
 
             for (std::string const& cfg_file : cfg_files)
@@ -310,7 +306,7 @@ namespace hpx { namespace local { namespace detail {
     {
         for (auto const& opt : opts)
         {
-            std::string::size_type p = opt.find("--hpx:");
+            std::string::size_type const p = opt.find("--hpx:");
             if (p != std::string::npos)
             {
                 throw hpx::detail::command_line_error(
@@ -356,19 +352,19 @@ namespace hpx { namespace local { namespace detail {
             pd.add("hpx:positional", -1);
 
             // parse command line, allow for unregistered options this point
-            util::commandline_error_mode mode =
+            util::commandline_error_mode const mode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
-            util::commandline_error_mode notmode =
+            util::commandline_error_mode const notmode =
                 error_mode & ~util::commandline_error_mode::ignore_aliases;
 
-            parsed_options opts(get_commandline_parser(
+            parsed_options const opts(get_commandline_parser(
                 command_line_parser(args)
                     .options(all_options[options_type::desc_cmdline])
                     .positional(pd)
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                    .run());
+                                          .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)
@@ -386,18 +382,18 @@ namespace hpx { namespace local { namespace detail {
         else
         {
             // parse command line, allow for unregistered options this point
-            util::commandline_error_mode mode =
+            util::commandline_error_mode const mode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
-            util::commandline_error_mode notmode =
+            util::commandline_error_mode const notmode =
                 error_mode & ~util::commandline_error_mode::ignore_aliases;
 
-            parsed_options opts(get_commandline_parser(
+            parsed_options const opts(get_commandline_parser(
                 command_line_parser(args)
                     .options(all_options[options_type::desc_cmdline])
                     .style(unix_style)
                     .extra_parser(option_parser(rtcfg, as_bool(mode))),
                 notmode)
-                                    .run());
+                                          .run());
 
             // collect unregistered options, if needed
             if (unregistered_options)
@@ -604,8 +600,9 @@ namespace hpx { namespace local { namespace detail {
 
             compose_all_options(app_options, all_options);
 
-            bool result = parse_commandline(rtcfg, all_options, app_options,
-                args, vm, error_mode, visible, unregistered_options);
+            bool const result =
+                parse_commandline(rtcfg, all_options, app_options, args, vm,
+                    error_mode, visible, unregistered_options);
 
             handle_generic_config_options(arg0, vm,
                 all_options[options_type::desc_cfgfile], rtcfg, error_mode);
@@ -631,7 +628,7 @@ namespace hpx { namespace local { namespace detail {
 
         std::string extract_arg0(std::string const& cmdline)
         {
-            std::string::size_type p = cmdline.find_first_of(" \t");
+            std::string::size_type const p = cmdline.find_first_of(" \t");
             if (p != std::string::npos)
             {
                 return cmdline.substr(0, p);
@@ -661,7 +658,8 @@ namespace hpx { namespace local { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     std::string embed_in_quotes(std::string const& s)
     {
-        char quote = (s.find_first_of('"') != std::string::npos) ? '\'' : '"';
+        char const quote =
+            (s.find_first_of('"') != std::string::npos) ? '\'' : '"';
 
         if (s.find_first_of("\t ") != std::string::npos)
             return quote + s + quote;
@@ -718,4 +716,4 @@ namespace hpx { namespace local { namespace detail {
         }
         return command_line;
     }
-}}}    // namespace hpx::local::detail
+}    // namespace hpx::local::detail

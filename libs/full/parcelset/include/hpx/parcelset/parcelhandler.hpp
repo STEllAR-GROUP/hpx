@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,8 +21,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/naming_base/gid_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
@@ -58,14 +57,8 @@ namespace hpx::parcelset {
         parcelhandler& operator=(parcelhandler&&) = delete;
 
     private:
-        void parcel_sink(parcel const& p);
-
-        threads::thread_schedule_state decode_parcel(parcelport& pp,
-            std::shared_ptr<std::vector<char>> parcel_data,
-            parcelset::data_point receive_data);
-
         // make sure the parcel has been properly initialized
-        void init_parcel(parcel& p);
+        static void init_parcel(parcel& p);
 
         using mutex_type = hpx::spinlock;
 
@@ -78,11 +71,11 @@ namespace hpx::parcelset {
         using write_handler_type = parcelport::write_handler_type;
 
         /// Construct a new \a parcelhandler.
-        parcelhandler(util::runtime_configuration& cfg);
+        explicit parcelhandler(util::runtime_configuration const& cfg);
 
         ~parcelhandler();
 
-        void set_notification_policies(util::runtime_configuration& cfg,
+        void set_notification_policies(util::runtime_configuration const& cfg,
             threads::threadmanager* tm,
             threads::policies::callback_notifier const& notifier);
 
@@ -90,7 +83,7 @@ namespace hpx::parcelset {
 
         void initialize();
 
-        void flush_parcels();
+        void flush_parcels() const;
 
         /// \brief Stop all parcel ports associated with this parcelhandler
         void stop(bool blocking = true);
@@ -105,10 +98,11 @@ namespace hpx::parcelset {
         /// Return the list of all remote localities supporting the given
         /// component type
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
-        ///                 by the function.
+        /// \param locality_ids [in/out] The reference to a vector of id_types
+        ///                 filled by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
+        /// \param ec       [in/out]
         ///
         /// \returns The function returns \a true if there is at least one
         ///          remote locality known by AGAS
@@ -121,10 +115,11 @@ namespace hpx::parcelset {
         /// Return the list of all localities supporting the given
         /// component type
         ///
-        /// \param prefixes [out] The reference to a vector of id_types filled
-        ///                 by the function.
+        /// \param locality_ids [in/out] The reference to a vector of id_types
+        ///                 filled by the function.
         /// \param type     [in] The type of the component which needs to exist
         ///                 on the returned localities.
+        /// \param ec       [in/out]
         ///
         /// \returns The function returns \a true if there is at least one
         ///          locality known by AGAS
@@ -188,8 +183,8 @@ namespace hpx::parcelset {
         /// function or function object gets invoked on completion of the send
         /// operation or on any error.
         ///
-        /// \param p        [in] The parcels to send.
-        /// \param f        [in] The function objects to be invoked on
+        /// \param parcels   [in] The parcels to send.
+        /// \param funcs     [in] The function objects to be invoked on
         ///                 successful completion or on errors. The signature
         ///                 of these function object are expected to be:
         ///
@@ -201,14 +196,14 @@ namespace hpx::parcelset {
         ///                       \a size is the number of successfully
         ///                              transferred bytes.
         void put_parcels(
-            std::vector<parcel> p, std::vector<write_handler_type> f);
+            std::vector<parcel> parcels, std::vector<write_handler_type> funcs);
 
         /// This put_parcel() function overload is asynchronous, but no
         /// callback is provided by the user.
         ///
         /// \note   The function \a put_parcel() is asynchronous.
         ///
-        /// \param p        [in, out] A reference to the parcel to send. The
+        /// \param parcels  [in, out] A reference to the parcel to send. The
         ///                 parcel \a p will be modified in place, as it will
         ///                 get set the resolved destination address and parcel
         ///                 id (if not already set).
@@ -225,16 +220,10 @@ namespace hpx::parcelset {
         /// parcelport
         std::string get_locality_name() const;
 
-        ///////////////////////////////////////////////////////////////////////
-        /// The function register_counter_types() is called during startup to
-        /// allow the registration of all performance counter types for this
-        /// parcel-handler instance.
-        void register_counter_types();
-
         /// \brief Make sure the specified locality is not held by any
         /// connection caches anymore
         void remove_from_connection_cache(
-            naming::gid_type const& gid, endpoints_type const& endpoints);
+            naming::gid_type const& gid, endpoints_type const& endpoints) const;
 
         /// \brief return the endpoints associated with this parcelhandler
         /// \returns all connection information for the enabled parcelports
@@ -254,7 +243,7 @@ namespace hpx::parcelset {
         }
 
         /// Return the reference to an existing io_service
-        util::io_service_pool* get_thread_pool(char const* name);
+        util::io_service_pool* get_thread_pool(char const* name) const;
 
         ///////////////////////////////////////////////////////////////////////
         policies::message_handler* get_message_handler(char const* action,
@@ -399,8 +388,8 @@ namespace hpx::parcelset {
             std::string const& ppname, int priority, bool bootstrap) const;
 
         void put_parcel_impl(parcel&& p, write_handler_type&& f);
-        void put_parcels_impl(
-            std::vector<parcel>&& p, std::vector<write_handler_type>&& f);
+        void put_parcels_impl(std::vector<parcel>&& parcels,
+            std::vector<write_handler_type>&& handlers);
 
         // manage default exception handler
         void invoke_write_handler(
@@ -421,7 +410,7 @@ namespace hpx::parcelset {
     protected:
         std::pair<std::shared_ptr<parcelport>, locality>
         find_appropriate_destination(naming::gid_type const& dest_gid);
-        locality find_endpoint(
+        static locality find_endpoint(
             endpoints_type const& eps, std::string const& name);
 
     private:

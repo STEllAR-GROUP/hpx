@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -11,33 +11,17 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/detail/get_default_pool.hpp>
-#include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
-#include <cstddef>
 #include <cstdint>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::threads {
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief Create a new \a thread using the given function as the work to be
-    ///        executed.
-    ///
-    /// \param func       [in] The function to be executed as the
-    ///                   thread-function. This function has to expose the
-    ///                   minimal low level HPX-thread interface, i.e. it takes
-    ///                   one argument (a \a threads#thread_restart_state). The
-    ///                   thread will be terminated after the function returns.
-    ///
-    /// \note All other arguments are equivalent to those of the function
-    ///       \a threads#register_thread_plain
-    ///
     namespace detail {
 
         template <typename F>

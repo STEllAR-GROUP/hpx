@@ -6,16 +6,16 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/errors/try_catch_exception_ptr.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/tuple.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
+#include <hpx/tuple.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -183,7 +183,7 @@ struct external_future_additional_argument_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<external_future_executor> : std::true_type
     {
@@ -194,7 +194,7 @@ namespace hpx { namespace parallel { namespace execution {
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 int hpx_main()
 {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 
 #include <cstddef>
@@ -64,15 +63,15 @@ namespace hpx::local::detail {
         }
     }
 
-    bool handle_full_help(util::runtime_configuration& ini,
+    bool handle_full_help(util::runtime_configuration const& ini,
         hpx::program_options::options_description const& options)
     {
-        std::string fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
-        if (!fullhelp.empty())
+        if (std::string const fullhelp(ini.get_entry("hpx.cmd_line_help", ""));
+            !fullhelp.empty())
         {
-            std::string help_option(
-                ini.get_entry("hpx.cmd_line_help_option", ""));
-            if (0 == std::string("full").find(help_option))
+            if (std::string const help_option(
+                    ini.get_entry("hpx.cmd_line_help_option", ""));
+                0 == std::string("full").find(help_option))
             {
                 std::cout << decode_string(fullhelp);
                 std::cout << options << std::endl;
@@ -87,7 +86,7 @@ namespace hpx::local::detail {
         return false;
     }
 
-    std::string get_full_commandline(util::runtime_configuration& ini)
+    std::string get_full_commandline(util::runtime_configuration const& ini)
     {
         return ini.get_entry("hpx.commandline.command", "") + " " +
             ini.get_entry("hpx.commandline.prepend_options", "") +
@@ -95,13 +94,13 @@ namespace hpx::local::detail {
             ini.get_entry("hpx.commandline.config_options", "");
     }
 
-    bool handle_late_options(util::runtime_configuration& ini,
-        hpx::program_options::variables_map& vm,
+    bool handle_late_options(util::runtime_configuration const& ini,
+        hpx::program_options::variables_map const& vm,
         void (*handle_print_bind)(std::size_t))
     {
         if (handle_print_bind != nullptr && vm.count("hpx:print-bind"))
         {
-            std::size_t num_threads = hpx::util::from_string<std::size_t>(
+            std::size_t const num_threads = hpx::util::from_string<std::size_t>(
                 ini.get_entry("hpx.os_threads", 1));
             handle_print_bind(num_threads);
         }
@@ -121,16 +120,18 @@ namespace hpx::local::detail {
         // do secondary command line processing, check validity of options only
         try
         {
-            std::string unknown_cmd_line(
-                ini.get_entry("hpx.unknown_cmd_line", ""));
-            if (!unknown_cmd_line.empty())
+            if (std::string const unknown_cmd_line(
+                    ini.get_entry("hpx.unknown_cmd_line", ""));
+                !unknown_cmd_line.empty())
             {
                 util::commandline_error_mode mode =
                     util::commandline_error_mode::rethrow_on_error;
-                std::string allow_unknown(
-                    ini.get_entry("hpx.commandline.allow_unknown", "0"));
-                if (allow_unknown != "0")
+                if (std::string const allow_unknown(
+                        ini.get_entry("hpx.commandline.allow_unknown", "0"));
+                    allow_unknown != "0")
+                {
                     mode |= util::commandline_error_mode::allow_unregistered;
+                }
 
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
@@ -148,8 +149,8 @@ namespace hpx::local::detail {
 
             // secondary command line handling, looking for --exit and other
             // options
-            std::string cmd_line(get_full_commandline(ini));
-            if (!cmd_line.empty())
+            if (std::string const cmd_line(get_full_commandline(ini));
+                !cmd_line.empty())
             {
                 hpx::program_options::variables_map vm;
 

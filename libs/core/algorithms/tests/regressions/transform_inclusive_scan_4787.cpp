@@ -7,9 +7,10 @@
 // see #4787: `transform_inclusive_scan` gives incorrect results for
 //            non-commutative operator
 
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
+#include <hpx/numeric.hpp>
 
 #include <vector>
 

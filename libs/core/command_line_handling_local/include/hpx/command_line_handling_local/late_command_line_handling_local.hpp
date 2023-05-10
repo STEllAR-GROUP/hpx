@@ -25,12 +25,14 @@ namespace hpx::local::detail {
         util::runtime_configuration& ini,
         std::vector<std::string> const& still_unregistered_options);
 
-    HPX_CORE_EXPORT bool handle_full_help(util::runtime_configuration& ini,
+    HPX_CORE_EXPORT bool handle_full_help(
+        util::runtime_configuration const& ini,
         hpx::program_options::options_description const& options);
-    HPX_CORE_EXPORT bool handle_late_options(util::runtime_configuration& ini,
-        hpx::program_options::variables_map& vm,
+    HPX_CORE_EXPORT bool handle_late_options(
+        util::runtime_configuration const& ini,
+        hpx::program_options::variables_map const& vm,
         void (*handle_print_bind)(std::size_t) = nullptr);
 
     HPX_CORE_EXPORT std::string get_full_commandline(
-        util::runtime_configuration& ini);
+        util::runtime_configuration const& ini);
 }    // namespace hpx::local::detail

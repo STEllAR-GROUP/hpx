@@ -49,7 +49,8 @@ namespace hpx::util {
             std::vector<std::string>& ini_config, std::size_t& node,
             bool initial = false);
 
-        void enable_logging_settings(hpx::program_options::variables_map& vm,
+        static void enable_logging_settings(
+            hpx::program_options::variables_map& vm,
             std::vector<std::string>& ini_config);
     };
 }    // namespace hpx::util

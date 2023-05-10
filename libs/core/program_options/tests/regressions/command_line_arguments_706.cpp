@@ -7,7 +7,7 @@
 // verify #706 is fixed (`hpx::init` removes portions of non-option command
 // line arguments before last `=` sign)
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 char const* argv[] = {"command_line_argument_test",

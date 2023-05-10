@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 
 #include <climits>
 #include <cstddef>
@@ -40,10 +41,25 @@ namespace hpx::serialization {
         std::uint64_t rkey_;    // optional RDMA remote key for parcelport
                                 // operations
         chunk_type type_;       // chunk_type
+
+        [[nodiscard]] constexpr void const* data() const noexcept
+        {
+            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
+            return data_.cpos_;
+        }
+        [[nodiscard]] constexpr void* data() noexcept
+        {
+            HPX_ASSERT(type_ == chunk_type::chunk_type_pointer);
+            return data_.pos_;
+        }
+        [[nodiscard]] constexpr std::size_t size() const noexcept
+        {
+            return size_;
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////
-    inline serialization_chunk create_index_chunk(
+    [[nodiscard]] constexpr serialization_chunk create_index_chunk(
         std::size_t index, std::size_t size) noexcept
     {
         serialization_chunk retval = {
@@ -52,7 +68,7 @@ namespace hpx::serialization {
         return retval;
     }
 
-    inline serialization_chunk create_pointer_chunk(
+    [[nodiscard]] constexpr serialization_chunk create_pointer_chunk(
         void const* pos, std::size_t size, std::uint64_t rkey = 0) noexcept
     {
         serialization_chunk retval = {

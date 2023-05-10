@@ -1,9 +1,9 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
-    Copyright (c) 2001-2022 Hartmut Kaiser
+    Copyright (c) 2001-2023 Hartmut Kaiser
     Copyright (c)      2010 Bryce Lelbach
 
-//  SPDX-License-Identifier: BSL-1.0
+    SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
@@ -17,13 +17,12 @@
 #include <boost/spirit/home/x3/support/traits/move_to.hpp>
 #include <boost/spirit/home/x3/support/unused.hpp>
 
-#include <string>
 #include <type_traits>
 
 namespace hpx::threads::detail {
 
     template <typename Char, typename Iterator>
-    inline bool partial_string_parse(
+    constexpr bool partial_string_parse(
         Char const* str, Iterator& first, Iterator const& last) noexcept
     {
         Iterator i = first;
@@ -45,14 +44,13 @@ namespace hpx::threads::detail {
     }
 
     template <typename String, typename Iterator>
-    inline bool partial_string_parse(
+    constexpr bool partial_string_parse(
         String const& str, Iterator& first, Iterator const& last) noexcept
     {
         Iterator i = first;
-        typename String::const_iterator stri = str.begin();
-        typename String::const_iterator str_last = str.end();
+        auto const str_last = str.end();
 
-        for (; stri != str_last; ++stri, ++i)
+        for (auto stri = str.begin(); stri != str_last; ++stri, ++i)
         {
             if (i == last || (*stri != *i))
             {
@@ -67,7 +65,7 @@ namespace hpx::threads::detail {
     }
 
     template <typename Char, typename Iterator>
-    inline bool partial_string_parse(Char const* uc_i, Char const* lc_i,
+    constexpr bool partial_string_parse(Char const* uc_i, Char const* lc_i,
         Iterator& first, Iterator const& last) noexcept
     {
         Iterator i = first;
@@ -87,15 +85,13 @@ namespace hpx::threads::detail {
     }
 
     template <typename String, typename Iterator>
-    inline bool partial_string_parse(String const& ucstr, String const& lcstr,
-        Iterator& first, Iterator const& last) noexcept
+    constexpr bool partial_string_parse(String const& ucstr,
+        String const& lcstr, Iterator& first, Iterator const& last) noexcept
     {
-        typename String::const_iterator uc_i = ucstr.begin();
-        typename String::const_iterator uc_last = ucstr.end();
-        typename String::const_iterator lc_i = lcstr.begin();
         Iterator i = first;
-
-        for (; uc_i != uc_last; ++uc_i, ++lc_i, ++i)
+        auto const uc_last = ucstr.end();
+        auto lc_i = lcstr.begin();
+        for (auto uc_i = ucstr.begin(); uc_i != uc_last; ++uc_i, ++lc_i, ++i)
         {
             if (i == last || ((*uc_i != *i) && (*lc_i != *i)))
             {
@@ -115,7 +111,7 @@ namespace hpx::threads::detail {
     {
         using attribute_type = Attribute;
 
-        static constexpr bool const has_attribute =
+        static constexpr bool has_attribute =
             !std::is_same_v<boost::spirit::x3::unused_type, attribute_type>;
 
         constexpr partlit_parser(String const& str, Attribute const& value)

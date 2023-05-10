@@ -37,12 +37,11 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     /// This class implements an LRU cache to hold connections. It includes
     /// entries checked out from the cache in its cache size.
-    // TODO: investigate usage of boost.cache.
     template <typename Connection, typename Key>
     class connection_cache
     {
@@ -640,6 +639,6 @@ namespace hpx { namespace util {
         std::int64_t misses_;
         std::int64_t reclaims_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

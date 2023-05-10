@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/logging/config/defines.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling/command_line_handling.hpp>
 #include <hpx/command_line_handling/parse_command_line.hpp>
@@ -700,9 +702,9 @@ namespace hpx::util {
         num_threads_ = detail::handle_num_threads(cfgmap, rtcfg_, vm, env,
             using_nodelist, initial, use_process_mask_);
 
-        num_cores_ =
-            hpx::local::detail::handle_num_cores(cfgmap, vm, num_threads_,
-                detail::get_number_of_default_cores(env, use_process_mask_));
+        num_cores_ = hpx::local::detail::handle_num_cores_default(cfgmap, vm,
+            num_threads_,
+            detail::get_number_of_default_cores(env, use_process_mask_));
 
         // Set number of cores and OS threads in configuration.
         ini_config.emplace_back(
@@ -866,7 +868,7 @@ namespace hpx::util {
     {
         base_type::enable_logging_settings(vm, ini_config);
 
-#if defined(HPX_HAVE_LOGGING)
+#if defined(HPX_HAVE_LOGGING) && defined(HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS)
         if (vm.count("hpx:debug-agas-log"))
         {
             ini_config.emplace_back("hpx.logging.console.agas.destination=" +
@@ -893,12 +895,11 @@ namespace hpx::util {
 #else
         if (vm.count("hpx:debug-agas-log") || vm.count("hpx:debug-parcel-log"))
         {
-            // clang-format off
             throw hpx::detail::command_line_error(
-                "Command line option error: can't enable logging while it "
-                "was disabled at configuration time. Please re-configure "
-                "HPX using the option -DHPX_WITH_LOGGING=On.");
-            // clang-format on
+                "Command line option error: can't enable logging while it was "
+                "disabled at configuration time. Please re-configure HPX using "
+                "the options -DHPX_WITH_LOGGING=On and "
+                "-DHPX_LOGGING_WITH_SEPARATE_DESTINATIONS=On.");
         }
 #endif
     }

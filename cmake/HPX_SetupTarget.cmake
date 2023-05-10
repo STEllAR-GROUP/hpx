@@ -1,5 +1,5 @@
 # Copyright (c) 2014      Thomas Heller
-# Copyright (c) 2007-2018 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2011      Bryce Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0

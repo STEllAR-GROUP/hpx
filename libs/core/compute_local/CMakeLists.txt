@@ -28,10 +28,10 @@ set(compute_local_headers
 
 # cmake-format: off
 set(compute_local_compat_headers
-    hpx/compute/vector.hpp => hpx/modules/compute_local.hpp
-    hpx/compute/traits/allocator_traits.hpp => hpx/modules/compute_local.hpp
-    hpx/compute/host/numa_allocator.hpp => hpx/local/compute.hpp
-    hpx/compute/host/numa_binding_allocator.hpp => hpx/local/compute.hpp
+    hpx/compute/vector.hpp => hpx/compute.hpp
+    hpx/compute/traits/allocator_traits.hpp => hpx/compute.hpp
+    hpx/compute/host/numa_allocator.hpp => hpx/compute.hpp
+    hpx/compute/host/numa_binding_allocator.hpp => hpx/compute.hpp
 )
 # cmake-format: on
 

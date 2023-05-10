@@ -1,10 +1,10 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once    // prevent multiple inclusions of this header file.
+#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
@@ -310,24 +310,30 @@ namespace hpx::util::external_timer {
 
     inline std::shared_ptr<task_wrapper> new_task(
         threads::thread_description const&, std::uint32_t,
-        threads::thread_id_type)
+        threads::thread_id_type) noexcept
     {
         return {};
     }
 
     inline std::shared_ptr<task_wrapper> update_task(
-        std::shared_ptr<task_wrapper>, threads::thread_description const&)
+        std::shared_ptr<task_wrapper>,
+        threads::thread_description const&) noexcept
     {
         return {};
     }
 
     struct scoped_timer
     {
-        explicit scoped_timer(std::shared_ptr<task_wrapper>) noexcept {}
+        // clang-format off
+        explicit scoped_timer(std::shared_ptr<task_wrapper>) noexcept
+        {
+        }
+        // clang-format on
+
         ~scoped_timer() = default;
 
-        constexpr void stop(void) noexcept {}
-        constexpr void yield(void) noexcept {}
+        static constexpr void stop() noexcept {}
+        static constexpr void yield() noexcept {}
     };
 }    // namespace hpx::util::external_timer
 

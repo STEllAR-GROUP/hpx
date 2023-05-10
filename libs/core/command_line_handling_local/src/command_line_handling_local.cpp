@@ -1,10 +1,12 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/logging/config/defines.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/command_line_handling_local/command_line_handling_local.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
@@ -17,19 +19,17 @@
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/preprocessor/stringize.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
+#include <hpx/preprocessor/stringize.hpp>
+#endif
 
 #include <algorithm>
 #include <cstddef>
-#include <cstdint>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
 #include <iterator>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -110,8 +110,9 @@ namespace hpx::local::detail {
         return "file(" + dest + ")";
     }
 
-    std::string handle_queuing(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::string const& default_)
+    std::string handle_queuing(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm,
+        std::string const& default_)
     {
         // command line options is used preferred
         if (vm.count("hpx:queuing"))
@@ -121,8 +122,9 @@ namespace hpx::local::detail {
         return cfgmap.get_value<std::string>("hpx.scheduler", default_);
     }
 
-    std::string handle_affinity(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::string const& default_)
+    std::string handle_affinity(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm,
+        std::string const& default_)
     {
         // command line options is used preferred
         if (vm.count("hpx:affinity"))
@@ -132,15 +134,16 @@ namespace hpx::local::detail {
         return cfgmap.get_value<std::string>("hpx.affinity", default_);
     }
 
-    std::string handle_affinity_bind(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::string const& default_)
+    std::string handle_affinity_bind(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm,
+        std::string const& default_)
     {
         // command line options is used preferred
         if (vm.count("hpx:bind"))
         {
             std::string affinity_desc;
 
-            std::vector<std::string> bind_affinity =
+            std::vector<std::string> const bind_affinity =
                 vm["hpx:bind"].as<std::vector<std::string>>();
             for (std::string const& s : bind_affinity)
             {
@@ -156,8 +159,8 @@ namespace hpx::local::detail {
         return cfgmap.get_value<std::string>("hpx.bind", default_);
     }
 
-    std::size_t handle_pu_step(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t default_)
+    std::size_t handle_pu_step(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm, std::size_t default_)
     {
         // command line options is used preferred
         if (vm.count("hpx:pu-step"))
@@ -167,8 +170,8 @@ namespace hpx::local::detail {
         return cfgmap.get_value<std::size_t>("hpx.pu_step", default_);
     }
 
-    std::size_t handle_pu_offset(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t default_)
+    std::size_t handle_pu_offset(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm, std::size_t default_)
     {
         // command line options is used preferred
         if (vm.count("hpx:pu-offset"))
@@ -178,12 +181,12 @@ namespace hpx::local::detail {
         return cfgmap.get_value<std::size_t>("hpx.pu_offset", default_);
     }
 
-    std::size_t handle_numa_sensitive(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t default_)
+    std::size_t handle_numa_sensitive(util::manage_config const& cfgmap,
+        hpx::program_options::variables_map const& vm, std::size_t default_)
     {
         if (vm.count("hpx:numa-sensitive") != 0)
         {
-            std::size_t numa_sensitive =
+            std::size_t const numa_sensitive =
                 vm["hpx:numa-sensitive"].as<std::size_t>();
             if (numa_sensitive > 2)
             {
@@ -203,7 +206,7 @@ namespace hpx::local::detail {
     {
         if (use_process_mask)
         {
-            threads::topology& top = threads::create_topology();
+            threads::topology const& top = threads::create_topology();
             return threads::count(top.get_cpubind_mask());
         }
         return static_cast<std::size_t>(threads::hardware_concurrency());
@@ -211,13 +214,12 @@ namespace hpx::local::detail {
 
     std::size_t get_number_of_default_cores(bool use_process_mask)
     {
-        threads::topology& top = threads::create_topology();
-
-        std::size_t num_cores = top.get_number_of_cores();
+        threads::topology const& top = threads::create_topology();
+        std::size_t const num_cores = top.get_number_of_cores();
 
         if (use_process_mask)
         {
-            threads::mask_type proc_mask = top.get_cpubind_mask();
+            threads::mask_type const proc_mask = top.get_cpubind_mask();
             std::size_t num_cores_proc_mask = 0;
 
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
@@ -237,9 +239,9 @@ namespace hpx::local::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    std::size_t handle_num_threads(util::manage_config& cfgmap,
+    std::size_t handle_num_threads(util::manage_config const& cfgmap,
         hpx::util::runtime_configuration const& rtcfg,
-        hpx::program_options::variables_map& vm, bool use_process_mask)
+        hpx::program_options::variables_map const& vm, bool use_process_mask)
     {
         // If using the process mask we override "cores" and "all" options but
         // keep explicit numeric values.
@@ -248,11 +250,10 @@ namespace hpx::local::detail {
         std::size_t const init_cores =
             get_number_of_default_cores(use_process_mask);
 
-        std::string threads_str = cfgmap.get_value<std::string>(
-            "hpx.os_threads",
+        auto threads_str = cfgmap.get_value<std::string>("hpx.os_threads",
             rtcfg.get_entry("hpx.os_threads", std::to_string(init_threads)));
 
-        std::size_t threads = 0;
+        std::size_t threads;
         if ("cores" == threads_str)
         {
             threads = init_cores;
@@ -303,7 +304,7 @@ namespace hpx::local::detail {
         }
 
         // make sure minimal requested number of threads is observed
-        std::size_t min_os_threads =
+        auto min_os_threads =
             cfgmap.get_value<std::size_t>("hpx.force_min_os_threads", threads);
 
         if (min_os_threads == 0)
@@ -328,17 +329,17 @@ namespace hpx::local::detail {
         return threads;
     }
 
-    std::size_t handle_num_cores(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t num_threads,
+    std::size_t handle_num_cores_default(util::manage_config& cfgmap,
+        hpx::program_options::variables_map const& vm, std::size_t num_threads,
         std::size_t num_default_cores)
     {
-        std::string cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
+        auto cores_str = cfgmap.get_value<std::string>("hpx.cores", "");
         if ("all" == cores_str)
         {
             cfgmap.config_["hpx.cores"] = std::to_string(num_default_cores);
         }
 
-        std::size_t num_cores =
+        auto num_cores =
             cfgmap.get_value<std::size_t>("hpx.cores", num_threads);
         if (vm.count("hpx:cores"))
         {
@@ -357,10 +358,10 @@ namespace hpx::local::detail {
     }
 
     std::size_t handle_num_cores(util::manage_config& cfgmap,
-        hpx::program_options::variables_map& vm, std::size_t num_threads,
+        hpx::program_options::variables_map const& vm, std::size_t num_threads,
         bool use_process_mask)
     {
-        return handle_num_cores(cfgmap, vm, num_threads,
+        return handle_num_cores_default(cfgmap, vm, num_threads,
             get_number_of_default_cores(use_process_mask));
     }
 
@@ -386,7 +387,7 @@ namespace hpx::local::detail {
       , num_threads_(1)
       , num_cores_(1)
       , pu_step_(1)
-      , pu_offset_(std::size_t(-1))
+      , pu_offset_(static_cast<std::size_t>(-1))
       , numa_sensitive_(0)
       , use_process_mask_(false)
       , cmd_line_parsed_(false)
@@ -418,7 +419,8 @@ namespace hpx::local::detail {
             return;
         }
 
-        if (!(pu_offset_ == std::size_t(-1) || pu_offset_ == std::size_t(0)) ||
+        if (!(pu_offset_ == static_cast<std::size_t>(-1) ||
+                pu_offset_ == static_cast<std::size_t>(0)) ||
             pu_step_ != 1 || affinity_domain_ != "pu")
         {
             throw hpx::detail::command_line_error(
@@ -429,7 +431,7 @@ namespace hpx::local::detail {
 
     void command_line_handling::check_pu_offset() const
     {
-        if (pu_offset_ != std::size_t(-1) &&
+        if (pu_offset_ != static_cast<std::size_t>(-1) &&
             pu_offset_ >=
                 static_cast<std::size_t>(hpx::threads::hardware_concurrency()))
         {
@@ -454,14 +456,14 @@ namespace hpx::local::detail {
     }
 
     void command_line_handling::handle_high_priority_threads(
-        hpx::program_options::variables_map& vm,
-        std::vector<std::string>& ini_config)
+        hpx::program_options::variables_map const& vm,
+        std::vector<std::string>& ini_config) const
     {
         if (vm_.count("hpx:high-priority-threads"))
         {
-            std::size_t num_high_priority_queues =
+            std::size_t const num_high_priority_queues =
                 vm["hpx:high-priority-threads"].as<std::size_t>();
-            if (num_high_priority_queues != std::size_t(-1) &&
+            if (num_high_priority_queues != static_cast<std::size_t>(-1) &&
                 num_high_priority_queues > num_threads_)
             {
                 throw hpx::detail::command_line_error(
@@ -488,7 +490,7 @@ namespace hpx::local::detail {
         hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config)
     {
-        bool debug_clp = vm.count("hpx:debug-clp");
+        bool const debug_clp = vm.count("hpx:debug-clp");
 
         if (vm.count("hpx:ini"))
         {
@@ -554,10 +556,10 @@ namespace hpx::local::detail {
 
         check_pu_step();
 
-        pu_offset_ = detail::handle_pu_offset(cfgmap, vm, std::size_t(-1));
+        pu_offset_ =
+            detail::handle_pu_offset(cfgmap, vm, static_cast<std::size_t>(-1));
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
-        if (pu_offset_ != std::size_t(-1))
+        if (pu_offset_ != static_cast<std::size_t>(-1))
         {
 #if defined(__APPLE__)
             std::cerr << "Warning: PU offset set to \"" << pu_offset_
@@ -585,7 +587,7 @@ namespace hpx::local::detail {
 
         // default affinity mode is now 'balanced' (only if no pu-step or
         // pu-offset is given)
-        if (pu_step_ == 1 && pu_offset_ == std::size_t(-1) &&
+        if (pu_step_ == 1 && pu_offset_ == static_cast<std::size_t>(-1) &&
             affinity_bind_.empty())
         {
 #if defined(__APPLE__)
@@ -640,6 +642,7 @@ namespace hpx::local::detail {
             ini_config.emplace_back("hpx.logging.level=5");
         }
 
+#if defined(HPX_LOGGING_HAVE_SEPARATE_DESTINATIONS)
         if (vm.count("hpx:debug-timing-log"))
         {
             ini_config.emplace_back("hpx.logging.console.timing.destination=" +
@@ -651,7 +654,15 @@ namespace hpx::local::detail {
             ini_config.emplace_back("hpx.logging.console.timing.level=1");
             ini_config.emplace_back("hpx.logging.timing.level=1");
         }
-
+#else
+        if (vm.count("hpx:debug-timing-log"))
+        {
+            throw hpx::detail::command_line_error(
+                "Command line option error: can't enable logging while it was "
+                "disabled at configuration time. Please re-configure HPX using "
+                "the option -DHPX_LOGGING_WITH_SEPARATE_DESTINATIONS=On.");
+        }
+#endif
         if (vm.count("hpx:debug-app-log"))
         {
             ini_config.emplace_back(
@@ -721,13 +732,12 @@ namespace hpx::local::detail {
 
         if (!unregistered_options.empty())
         {
-            typedef std::vector<std::string>::const_iterator iterator_type;
-
-            iterator_type end = unregistered_options.end();
-            for (iterator_type it = unregistered_options.begin(); it != end;
-                 ++it)
+            auto const end = unregistered_options.end();
+            for (auto it = unregistered_options.begin(); it != end; ++it)
+            {
                 unregistered_options_cmd_line +=
                     " " + detail::encode_and_enquote(*it);
+            }
 
             ini_config_.emplace_back("hpx.unknown_cmd_line!=" +
                 detail::encode_and_enquote(cmd_name) +
@@ -746,7 +756,7 @@ namespace hpx::local::detail {
     {
         if (vm_.count("hpx:help"))
         {
-            std::string help_option(vm_["hpx:help"].as<std::string>());
+            std::string const help_option(vm_["hpx:help"].as<std::string>());
             if (0 == std::string("minimal").find(help_option))
             {
                 // print static help only
@@ -780,7 +790,8 @@ namespace hpx::local::detail {
 #if defined(_POSIX_VERSION) || defined(HPX_WINDOWS)
         if (vm_.count("hpx:attach-debugger"))
         {
-            std::string option = vm_["hpx:attach-debugger"].as<std::string>();
+            std::string const option =
+                vm_["hpx:attach-debugger"].as<std::string>();
             if (option != "off" && option != "startup" &&
                 option != "exception" && option != "test-failure")
             {
@@ -812,8 +823,9 @@ namespace hpx::local::detail {
 
         // extract all command line arguments from configuration settings and
         // remove them from this list
-        auto it = std::stable_partition(ini_config_.begin(), ini_config_.end(),
-            [](std::string const& e) { return e.find("--hpx:") != 0; });
+        auto const it =
+            std::stable_partition(ini_config_.begin(), ini_config_.end(),
+                [](std::string const& e) { return e.find("--hpx:") != 0; });
 
         std::move(it, ini_config_.end(), std::back_inserter(options));
         ini_config_.erase(it, ini_config_.end());
@@ -850,7 +862,7 @@ namespace hpx::local::detail {
         }
 
         hpx::string_util::escaped_list_separator sep('\\', ' ', '\"');
-        hpx::string_util::tokenizer tok(options, sep);
+        hpx::string_util::tokenizer const tok(options, sep);
 
         std::vector<std::string> result(tok.begin(), tok.end());
         std::move(args.begin(), args.end(), std::back_inserter(result));

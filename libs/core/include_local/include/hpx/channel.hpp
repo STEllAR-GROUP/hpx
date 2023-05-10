@@ -6,4 +6,4 @@
 
 #pragma once
 
-#include <hpx/local/tuple.hpp>
+#include <hpx/lcos_local/channel.hpp>

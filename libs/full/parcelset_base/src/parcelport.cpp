@@ -33,14 +33,17 @@ namespace hpx::parcelset {
 
     ///////////////////////////////////////////////////////////////////////////
     parcelport::parcelport(util::runtime_configuration const& ini,
-        locality const& here, std::string const& type,
+        locality here, std::string const& type,
         std::size_t zero_copy_serialization_threshold)
       : num_parcel_destinations_(0)
-      , here_(here)
-      , max_inbound_message_size_(ini.get_max_inbound_message_size())
-      , max_outbound_message_size_(ini.get_max_outbound_message_size())
+      , here_(HPX_MOVE(here))
+      , max_inbound_message_size_(
+            static_cast<std::int64_t>(ini.get_max_inbound_message_size()))
+      , max_outbound_message_size_(
+            static_cast<std::int64_t>(ini.get_max_outbound_message_size()))
       , allow_array_optimizations_(true)
       , allow_zero_copy_optimizations_(true)
+      , allow_zero_copy_receive_optimizations_(true)
       , async_serialization_(false)
       , priority_(hpx::util::get_entry_as<int>(
             ini, "hpx.parcel." + type + ".priority", 0))
@@ -55,14 +58,18 @@ namespace hpx::parcelset {
         {
             allow_array_optimizations_ = false;
             allow_zero_copy_optimizations_ = false;
+            allow_zero_copy_receive_optimizations_ = false;
         }
-        else
+        else if (hpx::util::get_entry_as<int>(
+                     ini, key + ".zero_copy_optimization", 1) == 0)
         {
-            if (hpx::util::get_entry_as<int>(
-                    ini, key + ".zero_copy_optimization", 1) == 0)
-            {
-                allow_zero_copy_optimizations_ = false;
-            }
+            allow_zero_copy_optimizations_ = false;
+            allow_zero_copy_receive_optimizations_ = false;
+        }
+        else if (hpx::util::get_entry_as<int>(
+                     ini, key + ".zero_copy_receive_optimization", 1) == 0)
+        {
+            allow_zero_copy_receive_optimizations_ = false;
         }
 
         if (hpx::util::get_entry_as<int>(
@@ -339,7 +346,7 @@ namespace hpx::parcelset {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::int64_t get_max_inbound_size(parcelport& pp)
+    std::int64_t get_max_inbound_size(parcelport const& pp)
     {
         return pp.get_max_inbound_message_size();
     }
@@ -364,6 +371,11 @@ namespace hpx::parcelset {
         return allow_zero_copy_optimizations_;
     }
 
+    bool parcelport::allow_zero_copy_receive_optimizations() const noexcept
+    {
+        return allow_zero_copy_receive_optimizations_;
+    }
+
     bool parcelport::async_serialization() const noexcept
     {
         return async_serialization_;
@@ -372,12 +384,12 @@ namespace hpx::parcelset {
     ///////////////////////////////////////////////////////////////////////////
     // the code below is needed to bootstrap the parcel layer
     void parcelport::early_pending_parcel_handler(
-        std::error_code const& ec, parcel const& p)
+        std::error_code const& ec, parcel const& p) const
     {
         if (ec)
         {
             // all errors during early parcel handling are fatal
-            std::exception_ptr exception =
+            std::exception_ptr const exception =
                 HPX_GET_EXCEPTION(ec, "early_pending_parcel_handler",
                     "error while handling early parcel: " + ec.message() + "(" +
                         std::to_string(ec.value()) + ")" +

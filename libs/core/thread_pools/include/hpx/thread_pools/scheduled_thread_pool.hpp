@@ -88,7 +88,7 @@ namespace hpx::threads::detail {
             thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) override;
 
-        void report_error(
+        bool report_error(
             std::size_t num, std::exception_ptr const& e) override;
 
         void abort_all_suspended_threads() override

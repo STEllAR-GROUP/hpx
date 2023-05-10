@@ -11,10 +11,10 @@
 // Forwarding of hpx_main, if necessary. This has to be in a separate
 // translation unit to ensure the linker can pick or ignore this function,
 // depending on whether the main executable defines this symbol or not.
-int hpx_main(int argc, char** argv)
+int hpx_main(int argc, char* argv[])
 {
     // Invoke hpx_startup::user_main
-    int result = hpx_startup::user_main(argc, argv);
+    int const result = hpx_startup::user_main(argc, argv);
     hpx::finalize();
     return result;
 }

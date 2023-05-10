@@ -37,7 +37,7 @@ namespace hpx::serialization {
         template <typename Container>
         explicit input_archive(Container& buffer,
             std::size_t inbound_data_size = 0,
-            std::vector<serialization_chunk> const* chunks = nullptr)
+            std::vector<serialization_chunk>* chunks = nullptr)
           : base_type(0U)
           , buffer_(new input_container<Container>(
                 buffer, chunks, inbound_data_size))
@@ -256,7 +256,7 @@ namespace hpx::serialization {
     public:
         void load_binary(void* address, std::size_t count)
         {
-            if (0 == count)
+            if (HPX_UNLIKELY(0 == count))
                 return;
 
             buffer_->load_binary(address, count);
@@ -264,15 +264,22 @@ namespace hpx::serialization {
             size_ += count;
         }
 
-        void load_binary_chunk(void* address, std::size_t count)
+        void load_binary_chunk(
+            void* address, std::size_t count, bool allow_zero_copy_receive)
         {
-            if (0 == count)
+            if (HPX_UNLIKELY(0 == count))
                 return;
 
-            if (disable_data_chunking())
+            if (HPX_UNLIKELY(disable_data_chunking()))
+            {
                 buffer_->load_binary(address, count);
+            }
             else
-                buffer_->load_binary_chunk(address, count);
+            {
+                buffer_->load_binary_chunk(address, count,
+                    allow_zero_copy_receive &&
+                        !disable_receive_data_chunking());
+            }
 
             size_ += count;
         }

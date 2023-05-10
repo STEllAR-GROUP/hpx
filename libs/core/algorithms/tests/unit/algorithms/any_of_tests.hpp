@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/all_any_none.hpp>
-#include <hpx/parallel/container_algorithms/all_any_none.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <cstddef>

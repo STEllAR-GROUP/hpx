@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2018 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
@@ -11,11 +11,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/register_thread.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -24,9 +22,6 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <functional>
-#include <type_traits>
-#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads {
@@ -41,7 +36,9 @@ namespace hpx::threads {
     ///                   referenced by the \a id parameter.
     /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
-    /// \param priority
+    /// \param priority   [in]
+    /// \param retry_on_active [in]
+    ///
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -87,7 +84,8 @@ namespace hpx::threads {
     ///                   referenced by the \a id parameter.
     /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
-    /// \param priority
+    /// \param priority        [in]
+    /// \param retry_on_active [in]
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -134,7 +132,8 @@ namespace hpx::threads {
     ///                   referenced by the \a id parameter.
     /// \param stateex    [in] The new extended state to be set for the
     ///                   thread referenced by the \a id parameter.
-    /// \param priority
+    /// \param priority        [in]
+    /// \param retry_on_active [in]
     /// \param ec         [in,out] this represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws
     ///                   the function will throw on error instead.
@@ -458,7 +457,7 @@ namespace hpx::this_thread {
     ///         \a hpx#error#invalid_status.
     ///
     HPX_CORE_EXPORT threads::thread_restart_state suspend(
-        threads::thread_schedule_state state, threads::thread_id_type id,
+        threads::thread_schedule_state state, threads::thread_id_type nextid,
         threads::thread_description const& description =
             threads::thread_description("this_thread::suspend"),
         error_code& ec = throws);

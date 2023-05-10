@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,6 +29,8 @@ namespace hpx::components {
         ///                 with the ini-information (one line per vector
         ///                 element) for all components implemented in this
         ///                 module.
+        /// \param filepath  [in]
+        /// \param is_static [in]
         ///
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
@@ -36,17 +38,7 @@ namespace hpx::components {
         virtual bool get_component_info(std::vector<std::string>& fillini,
             std::string const& filepath, bool is_static = false) = 0;
 
-        /// \brief Return the unique identifier of the component type this
-        ///        factory is responsible for
-        ///
-        /// \param locality     [in] The id of the locality this factory
-        ///                     is responsible for.
-        /// \param agas_client  [in] The AGAS client to use for component id
-        ///                     registration (if needed).
-        ///
-        /// \return Returns the unique identifier of the component type this
-        ///         factory instance is responsible for. This function throws on
-        ///         any error.
+        /// \brief Register the component type represented by this component
         virtual void register_component_type() = 0;
     };
 }    // namespace hpx::components

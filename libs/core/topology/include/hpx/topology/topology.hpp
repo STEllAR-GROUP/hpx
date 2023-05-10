@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -14,7 +14,6 @@
 #include <hpx/concurrency/spinlock.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/topology/cpu_mask.hpp>
-#include <hpx/type_support/static.hpp>
 
 #include <cstddef>
 #include <iosfwd>
@@ -29,7 +28,7 @@
 #error On Intel Xeon/Phi coprocessors HPX cannot be use with a HWLOC version earlier than V1.6.
 #endif
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
 
     struct hpx_hwloc_bitmap_wrapper
     {
@@ -42,7 +41,7 @@ namespace hpx { namespace threads {
         }
 
         explicit hpx_hwloc_bitmap_wrapper(void* bmp) noexcept
-          : bmp_(reinterpret_cast<hwloc_bitmap_t>(bmp))
+          : bmp_(static_cast<hwloc_bitmap_t>(bmp))
         {
         }
 
@@ -69,7 +68,7 @@ namespace hpx { namespace threads {
             return bmp_;
         }
 
-        // stringify the bitmp using hwloc
+        // stringify the bitmap using hwloc
         friend HPX_CORE_EXPORT std::ostream& operator<<(
             std::ostream& os, hpx_hwloc_bitmap_wrapper const* bmp);
 
@@ -102,16 +101,23 @@ namespace hpx { namespace threads {
     struct HPX_CORE_EXPORT topology
     {
         topology();
+
+        topology(topology const&) = delete;
+        topology(topology&&) = delete;
+        topology& operator=(topology const&) = delete;
+        topology& operator=(topology&&) = delete;
+
         ~topology();
 
         /// \brief Return the Socket number of the processing unit the
         ///        given thread is running on.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        std::size_t get_socket_number(
-            std::size_t num_thread, error_code& /*ec*/ = throws) const noexcept
+        std::size_t get_socket_number(std::size_t num_thread,
+            [[maybe_unused]] error_code& ec = throws) const noexcept
         {
             return socket_numbers_[num_thread % num_of_pus_];
         }
@@ -119,11 +125,12 @@ namespace hpx { namespace threads {
         /// \brief Return the NUMA node number of the processing unit the
         ///        given thread is running on.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
-        std::size_t get_numa_node_number(
-            std::size_t num_thread, error_code& /*ec*/ = throws) const noexcept
+        std::size_t get_numa_node_number(std::size_t num_thread,
+            [[maybe_unused]] error_code& ec = throws) const noexcept
         {
             return numa_node_numbers_[num_thread % num_of_pus_];
         }
@@ -154,6 +161,7 @@ namespace hpx { namespace threads {
         ///        processing unit available to the given thread inside
         ///        the socket it is running on.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -164,6 +172,7 @@ namespace hpx { namespace threads {
         ///        processing unit available to the given thread inside
         ///        the NUMA domain it is running on.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -171,18 +180,10 @@ namespace hpx { namespace threads {
             std::size_t num_thread, error_code& ec = throws) const;
 
         /// \brief Return a bit mask where each set bit corresponds to a
-        ///        processing unit associated with the given NUMA node.
-        ///
-        /// \param ec         [in,out] this represents the error status on exit,
-        ///                   if this is pre-initialized to \a hpx#throws
-        ///                   the function will throw on error instead.
-        mask_type get_numa_node_affinity_mask_from_numa_node(
-            std::size_t num_node) const;
-
-        /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread inside
         ///        the core it is running on.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -192,6 +193,7 @@ namespace hpx { namespace threads {
         /// \brief Return a bit mask where each set bit corresponds to a
         ///        processing unit available to the given thread.
         ///
+        /// \param num_thread [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -202,6 +204,7 @@ namespace hpx { namespace threads {
         ///        thread. Each set bit corresponds to a processing unit the
         ///        thread will be allowed to run on.
         ///
+        /// \param mask       [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -215,13 +218,14 @@ namespace hpx { namespace threads {
         ///        processing unit co-located with the memory the given
         ///        address is currently allocated on.
         ///
+        /// \param lva        [in]
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
         mask_type get_thread_affinity_mask_from_lva(
             void const* lva, error_code& ec = throws) const;
 
-        /// \brief Prints the \param m to os in a human readable form
+        /// \brief Prints the given mask \a m to os in a human readable form
         void print_affinity_mask(std::ostream& os, std::size_t num_thread,
             mask_cref_type m, std::string const& pool_name) const;
 
@@ -269,14 +273,14 @@ namespace hpx { namespace threads {
             error_code& ec = throws) const;
 
         /// Return the size of the cache associated with the given mask.
-        std::size_t get_cache_size(mask_type mask, int level) const;
+        std::size_t get_cache_size(mask_cref_type mask, int level) const;
 
         mask_type get_cpubind_mask(error_code& ec = throws) const;
         mask_type get_cpubind_mask(
             std::thread& handle, error_code& ec = throws) const;
 
         /// convert a cpu mask into a numa node mask in hwloc bitmap form
-        hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type cpuset) const;
+        hwloc_bitmap_ptr cpuset_to_nodeset(mask_cref_type mask) const;
 
         void write_to_log() const;
 
@@ -286,7 +290,7 @@ namespace hpx { namespace threads {
 
         /// allocate memory with binding to a numa node set as
         /// specified by the policy and flags (see hwloc docs)
-        void* allocate_membind(std::size_t len, hwloc_bitmap_ptr bitmap,
+        void* allocate_membind(std::size_t len, const hwloc_bitmap_ptr& bitmap,
             hpx_hwloc_membind_policy policy, int flags) const;
 
         threads::mask_type get_area_membind_nodeset(
@@ -300,10 +304,10 @@ namespace hpx { namespace threads {
         /// Free memory that was previously allocated by allocate
         void deallocate(void* addr, std::size_t len) const noexcept;
 
-        void print_vector(
-            std::ostream& os, std::vector<std::size_t> const& v) const;
-        void print_mask_vector(
-            std::ostream& os, std::vector<mask_type> const& v) const;
+        static void print_vector(
+            std::ostream& os, std::vector<std::size_t> const& v);
+        static void print_mask_vector(
+            std::ostream& os, std::vector<mask_type> const& v);
         void print_hwloc(std::ostream&) const;
 
         mask_type init_socket_affinity_mask_from_socket(
@@ -327,16 +331,16 @@ namespace hpx { namespace threads {
         friend std::size_t get_memory_page_size();
 
         std::size_t init_node_number(
-            std::size_t num_thread, hwloc_obj_type_t type);
+            std::size_t num_thread, hwloc_obj_type_t type) const;
 
-        std::size_t init_socket_number(std::size_t num_thread)
+        std::size_t init_socket_number(std::size_t num_thread) const
         {
             return init_node_number(num_thread, HWLOC_OBJ_SOCKET);
         }
 
-        std::size_t init_numa_node_number(std::size_t num_thread);
+        std::size_t init_numa_node_number(std::size_t num_thread) const;
 
-        std::size_t init_core_number(std::size_t num_thread)
+        std::size_t init_core_number(std::size_t num_thread) const
         {
             return init_node_number(
                 num_thread, use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE);
@@ -366,16 +370,17 @@ namespace hpx { namespace threads {
 
         mask_type init_core_affinity_mask(std::size_t num_thread) const
         {
-            mask_type default_mask = numa_node_affinity_masks_[num_thread];
+            mask_type const default_mask =
+                numa_node_affinity_masks_[num_thread];
             return init_core_affinity_mask_from_core(
                 get_core_number(num_thread), default_mask);
         }
 
         void init_num_of_pus();
 
-        hwloc_obj_t get_pu_obj(std::size_t num_core) const;
+        hwloc_obj_t get_pu_obj(std::size_t num_pu) const;
 
-        hwloc_topology_t topo;
+        hwloc_topology_t topo = nullptr;
 
         // We need to define a constant pu offset.
         // This is mainly to skip the first Core on the Xeon Phi
@@ -388,8 +393,8 @@ namespace hpx { namespace threads {
         static constexpr std::size_t core_offset = 1;
 #endif
 
-        std::size_t num_of_pus_;
-        bool use_pus_as_cores_;
+        std::size_t num_of_pus_ = 0;
+        bool use_pus_as_cores_ = false;
 
         using mutex_type = hpx::util::spinlock;
         mutable mutex_type topo_mtx;
@@ -411,7 +416,7 @@ namespace hpx { namespace threads {
         // For example, core_affinity_masks[0] is a bitmask, where the
         // elements = 1 indicate the PUs that belong to the core on which
         // PU #0 (zero-based index) lies.
-        mask_type machine_affinity_mask_;
+        mask_type machine_affinity_mask_{};
         std::vector<mask_type> socket_affinity_masks_;
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
@@ -430,4 +435,4 @@ namespace hpx { namespace threads {
     {
         return hpx::threads::topology::memory_page_size_;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -6,9 +6,9 @@
 
 // Demonstrate the use of hpx::latch
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/latch.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/latch.hpp>
 
 #include <cstddef>
 #include <functional>

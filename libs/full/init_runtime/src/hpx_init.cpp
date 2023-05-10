@@ -18,6 +18,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/init_logging.hpp>
@@ -32,6 +33,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
@@ -76,12 +78,9 @@
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #endif
 
-#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
-#include <cstdlib>
-#endif
-
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <exception>
 #include <functional>
 #include <iostream>
@@ -101,13 +100,79 @@
 namespace hpx_startup {
     std::vector<std::string> (*user_main_config_function)(
         std::vector<std::string> const&) = nullptr;
-}
+}    // namespace hpx_startup
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::detail {
 
     // forward declarations only
     void console_print(std::string const&);
+
+    int init_impl(
+        hpx::function<int(hpx::program_options::variables_map&)> const& f,
+        int argc, char** argv, init_params const& params,
+        char const* hpx_prefix)
+    {
+        if (argc == 0 || argv == nullptr)
+        {
+            argc = hpx::local::detail::dummy_argc;
+            argv = hpx::local::detail::dummy_argv;
+        }
+
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+        // artificially force the apex shared library to be loaded by the
+        // application
+        apex::version();
+#endif
+#endif
+        util::set_hpx_prefix(hpx_prefix);
+#if defined(__FreeBSD__)
+        freebsd_environ = environ;
+#endif
+        // set a handler for std::abort, std::at_quick_exit, and std::atexit
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        [[maybe_unused]] int ret = std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret == 0);
+#endif
+        return detail::run_or_start(f, argc, argv, params, true);
+    }
+
+    bool start_impl(
+        hpx::function<int(hpx::program_options::variables_map&)> const& f,
+        int argc, char** argv, init_params const& params,
+        char const* hpx_prefix)
+    {
+        if (argc == 0 || argv == nullptr)
+        {
+            argc = local::detail::dummy_argc;
+            argv = local::detail::dummy_argv;
+        }
+
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+        // artificially force the apex shared library to be loaded by the
+        // application
+        apex::version();
+#endif
+#endif
+        util::set_hpx_prefix(hpx_prefix);
+#if defined(__FreeBSD__)
+        freebsd_environ = environ;
+#endif
+        // set a handler for std::abort, std::at_quick_exit, and std::atexit
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        [[maybe_unused]] int ret = std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret == 0);
+#endif
+        return 0 == detail::run_or_start(f, argc, argv, params, false);
+    }
 }    // namespace hpx::detail
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)

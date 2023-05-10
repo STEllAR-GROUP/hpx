@@ -4,13 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <cmath>
 #include <cstddef>
@@ -71,7 +71,7 @@ std::string a_function(hpx::future<double>&& df)
     return "The number 2";
 }
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     struct guided_test_tag
     {
@@ -118,7 +118,7 @@ namespace hpx { namespace parallel { namespace execution {
             return 56;
         }
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 using namespace hpx::parallel::execution;
 

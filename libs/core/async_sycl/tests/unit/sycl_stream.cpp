@@ -1,10 +1,18 @@
-//  Copyright (c) 2022 Gregor Dai√ü
+//  Copyright (c) 2022 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 // hpxinspect:noascii
+
+#include <hpx/config.hpp>
+#include <hpx/future.hpp>
+#include <hpx/hpx_init.hpp>
+
+#if defined(HPX_HAVE_SYCL)
+#include <hpx/async_sycl/sycl_executor.hpp>
+#include <hpx/async_sycl/sycl_future.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -13,13 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <hpx/futures/future.hpp>
-#include <hpx/hpx_init.hpp>
-#include <hpx/local/future.hpp>
-#if defined(HPX_HAVE_SYCL)
-#include <hpx/async_sycl/sycl_executor.hpp>
-#include <hpx/async_sycl/sycl_future.hpp>
-
 #include "common/sycl_vector_add_test_utils.hpp"
 
 #include <CL/sycl.hpp>
@@ -27,7 +28,7 @@
 constexpr size_t vectorsize = 200000000;
 constexpr size_t num_bytes = vectorsize * sizeof(float);
 
-int hpx_main(int, char**)
+int hpx_main(int, char*[])
 {
     // Enable polling for the future
     hpx::sycl::experimental::detail::register_polling(
@@ -144,6 +145,8 @@ int main(int argc, char* argv[])
     return hpx::init(argc, argv);
 }
 #else
+#include <iostream>
+
 // Handle none-sycl builds
 int main()
 {

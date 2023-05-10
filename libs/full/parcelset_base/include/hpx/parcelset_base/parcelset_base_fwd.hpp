@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,4 +40,7 @@ namespace hpx::parcelset {
         /// perform all operations
         parcelport_background_mode_all = 0x07
     };
+
+    HPX_EXPORT char const* get_parcelport_background_mode_name(
+        parcelport_background_mode mode);
 }    // namespace hpx::parcelset

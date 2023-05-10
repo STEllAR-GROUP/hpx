@@ -130,7 +130,8 @@ namespace hpx::parallel::util::detail {
         HPX_HOST_DEVICE chunk_size_iterator(IterOrR it, std::size_t chunk_size,
             std::size_t count = 0, std::size_t current = 0) noexcept
           : data_(it, 0)
-          , chunk_size_((hpx::detail::min)(chunk_size, count))
+          , chunk_size_(
+                (std::max)((std::min)(chunk_size, count), std::size_t(1)))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))
@@ -352,7 +353,8 @@ namespace hpx::parallel::util::detail {
             std::size_t chunk_size, std::size_t count = 0,
             std::size_t current = 0, std::size_t base_idx = 0)
           : data_(it, 0, base_idx)
-          , chunk_size_((hpx::detail::min)(chunk_size, count))
+          , chunk_size_(
+                (std::max)((std::min)(chunk_size, count), std::size_t(1)))
           , last_chunk_size_(get_last_chunk_size(count, chunk_size))
           , count_(count)
           , current_(get_current(current, chunk_size))

@@ -55,7 +55,7 @@ void qt_main(int argc, char** argv)
     app.exec();
 }
 
-int hpx_main(int argc, char** argv)
+int hpx_main(int argc, char* argv[])
 {
     {
         // Get a reference to one of the main thread
