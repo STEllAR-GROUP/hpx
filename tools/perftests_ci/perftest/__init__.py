@@ -36,8 +36,16 @@ def _now():
     return datetime.now(timezone.utc).astimezone().isoformat()
 
 
-def run(local, targets_and_opts):
+def run(local, targets_and_opts, n_executions):
     from pyutils import buildinfo
+
+    def join_results(result_list):
+        # This should work, as long as the format of the result files stays consistent
+        joined_results = result_list[0]
+        for result in result_list[1:]:
+              for i in range(len(joined_results["outputs"])):
+                joined_results["outputs"][i]["series"].extend(result["outputs"][i]["series"])
+        return joined_results
 
     binary_dir = buildinfo.binary_dir
     command = []
@@ -45,12 +53,18 @@ def run(local, targets_and_opts):
         run_command = os.path.join(binary_dir, targets_and_opts)
         command += run_command.split()
 
-    if local:
-        output = runtools.run(command)
-    else:
-        output = runtools.srun(command)
 
-    data = json.loads(output)
+    result_list = []
+
+    for _ in range(n_executions):
+        if local:
+            output = runtools.run(command)
+        else:
+            output = runtools.srun(command)
+            
+        result_list.append(json.loads(output))
+  
+    data = join_results(result_list)
 
     data[var._project_name] = {
         'commit': _git_commit(), 'datetime': _git_datetime()}
