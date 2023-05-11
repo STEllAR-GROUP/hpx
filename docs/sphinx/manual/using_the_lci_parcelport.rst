@@ -7,9 +7,9 @@
 
 .. _using_the_lci_parcelport:
 
-==============
+========================
 Using the LCI parcelport
-==============
+========================
 
 .. _info_lci:
 
@@ -43,7 +43,7 @@ than the MPI parcelport.
 .. _build_lci_pp:
 
 Build |hpx| with the LCI parcelport
-==============================
+===================================
 
 While building |hpx|, you can specify a set of |cmake| variables to enable
 and configure the LCI parcelport. Below, there is a set of the most important
@@ -86,7 +86,7 @@ and frequently used CMake variables.
 .. _run_lci_pp:
 
 Run |hpx| with the LCI parcelport
-===============================
+=================================
 
 We use the same mechanisms as MPI to launch LCI, so you can use the same way you run MPI parcelport to run LCI
 parcelport. Typically, it would be ``hpxrun``, ``mpirun``, or ``srun``.
