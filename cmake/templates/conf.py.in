@@ -345,12 +345,18 @@ rst_prolog += '''
 .. |boost_wave| replace:: Boost Wave
 .. _boost_wave: https://www.boost.org/doc/libs/release/libs/wave/doc/wave_driver.html
 
-.. |boost_program_options| replace:: Boost.Program Options
+.. |boost_program_options| replace:: Boost.Program_options
 .. _boost_program_options: https://www.boost.org/doc/html/program_options.html
 .. |boost_atomic| replace:: Boost.Atomic
 .. _boost_atomic: https://www.boost.org/doc/libs/release/doc/html/atomic.html
 .. |boost_serialization| replace:: Boost.Serialization
 .. _boost_serialization: https://www.boost.org/doc/libs/release/libs/serialization/doc/index.html
+.. |boost_asio| replace:: Boost.Asio
+.. _boost_asio: https://www.boost.org/doc/libs/release/doc/html/boost_asio.html
+.. |boost_smartptr| replace:: Boost.SmartPtr
+.. _boost_smartptr: https://www.boost.org/doc/libs/release/libs/smart_ptr/doc/html/smart_ptr.html
+.. |boost_string_algo| replace:: Boost String Algorithms Library
+.. _boost_string_algo: https://www.boost.org/doc/libs/1_62_0/doc/html/string_algo.html
 
 .. |hwloc_downloads| replace:: Hwloc Downloads
 .. _hwloc_downloads: https://www.open-mpi.org/software/hwloc/v1.11
@@ -473,6 +479,8 @@ rst_prolog += '''
 .. _conan: https://www.conan.io/
 .. |vc| replace:: Vc Library
 .. _vc: https://github.com/VcDevel/Vc
+.. |sycl| replace:: SYCL
+.. _sycl: https://en.wikipedia.org/wiki/SYCL
 
 .. |cpp11| replace:: C++11 Standard
 .. _cpp11: http://www.open-std.org/jtc1/sc22/wg21
@@ -557,7 +565,6 @@ rst_prolog += '''
 .. _fortress: https://labs.oracle.com/projects/plrg/Publications/index.html
 .. |oneTBB| replace:: oneAPI Threading Building Blocks (oneTBB)
 .. _oneTBB: https://spec.oneapi.io/versions/1.0-rev-3/elements/oneTBB/source/task_scheduler/task_group/task_group_cls.html
-
 
 .. |email_hkaiser| image:: /_static/images/emails/hkaiser.png
 .. |email_theller| image:: /_static/images/emails/theller.png

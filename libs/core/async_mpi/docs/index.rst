@@ -11,9 +11,9 @@
 async_mpi
 =========
 
-The MPI library is intended to simplify the process of integrating MPI based
+The MPI library is intended to simplify the process of integrating |mpi|_ based
 codes with the |hpx| runtime. Any MPI function that is asynchronous and uses an
-MPI_Request may be converted into an hpx::future.
+``MPI_Request`` may be converted into an ``hpx::future``.
 The syntax is designed to allow a simple replacement of the MPI call with a futurized
 async version that accepts an executor instead of a communicator,
 and returns a future instead of assigning a request.
@@ -30,7 +30,7 @@ becomes
     hpx::future<int> f = hpx::async(executor, MPI_Isend, buf, count, datatype, rank, tag);
 
 When the MPI operation is complete, the future will become ready.
-This allows communication to integrated cleanly with the rest of HPX, in particular
+This allows communication to integrated cleanly with the rest of |hpx|, in particular
 the continuation style of programming may be used to build up more
 complex code. Consider the following example, that chains user processing,
 sends and receives using continuations...
@@ -100,10 +100,10 @@ though not all have been tested at the time of writing
     int MPI_Ineighbor_alltoallw(...);
 
 Note that the |hpx| mpi futurization wrapper should work with *any* asynchronous
-`MPI` call, as long as the function signature has the last two arguments
-`MPI_xxx(..., MPI_Comm comm, MPI_Request *request)`
+``MPI`` call, as long as the function signature has the last two arguments
+``MPI_xxx(..., MPI_Comm comm, MPI_Request *request)``
 - internally these two parameters will be substituted by the executor and future data
-parameters that are supplied by template instantiations inside the `hpx::mpi` code.
+parameters that are supplied by template instantiations inside the ``hpx::mpi`` code.
 
 See the :ref:`API reference <modules_mpi_api>` of this module for more
 details.

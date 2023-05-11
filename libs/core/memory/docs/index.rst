@@ -11,7 +11,7 @@
 memory
 ======
 
-Part of this module is a forked version of boost::intrusive_ptr from
-Boost.SmartPtr.
+Part of this module is a forked version of ``boost::intrusive_ptr`` from
+|boost_smartptr|_.
 
 See the :ref:`API reference <modules_memory_api>` of the module for more details.

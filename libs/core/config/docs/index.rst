@@ -13,6 +13,7 @@ config
 
 The config module contains various configuration options, typically hidden
 behind macros that choose the correct implementation based on the compiler and
-other available options.
+other available options. It also contains platform independent macros to control
+inlinining, export sets and more.
 
 See the :ref:`API reference <modules_config_api>` of the module for more details.

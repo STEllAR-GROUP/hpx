@@ -13,7 +13,8 @@ futures
 
 This module defines the :cpp:class:`hpx::future` and
 :cpp:class:`hpx::shared_future` classes corresponding to the C++ standard
-library classes ``std::future`` and ``std::shared_future``. Note that the
+library classes :cppreference-generic:`thread,future` and
+:cppreference-generic:`thread,shared_future`. Note that the
 specializations of :cpp:func:`hpx::future::then` for executors and
 execution policies are defined in the :ref:`modules_execution` module.
 
