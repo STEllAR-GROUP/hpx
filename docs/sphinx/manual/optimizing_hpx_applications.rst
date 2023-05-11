@@ -756,21 +756,13 @@ counters. These counters expose critical information about different modules of
 the runtime system. They can help determine system bottlenecks and fine-tune
 system and application performance.
 
-.. list-table:: :term:`AGAS` performance counters
+.. list-table:: :term:`AGAS` performance counter ``/agas/count/<agas_service>``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/agas/count/<agas_service>``
-   
-       .. _agas-count-agas-service: 
+     * ``/agas/count/<agas_service>``
 
-       :ref:`??<agas-count-agas-service>`
-
-       where:
-
-       ``<agas_service>`` is one of the following:
+       where ``<agas_service>`` is one of the following:
 
        *primary namespace services*: ``route``, ``bind_gid``, ``resolve_gid``,
        ``unbind_gid``, ``increment_credit``, ``decrement_credit``, ``allocate``,
@@ -786,11 +778,10 @@ system and application performance.
 
        *symbol namespace services*: ``bind``, ``resolve``, ``unbind``,
        ``iterate_names``, ``on_symbol_namespace_event``
+   * * Counter instance formatting
      * ``<agas_instance>/total``
 
-       where:
-
-       ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
+       where ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
        Currently, this value will be ``locality#0`` where ``0`` is the root
        :term:`locality` (the id of the locality hosting the :term:`AGAS`
        service).
@@ -801,25 +792,22 @@ system and application performance.
        ``resolve``, ``unbind``, and ``iterate_names`` (only the primary and
        symbol :term:`AGAS` service components live on all localities, whereas
        all other :term:`AGAS` services are available on ``locality#0`` only).
-     * None
+   * * Description
      * Returns the total number of invocations of the specified :term:`AGAS`
        service since its creation.
-   * * ``/agas/<agas_service_category>/count``
 
-       .. _agas-agas-service-category-count: 
+.. list-table:: :term:`AGAS` performance counter ``/agas/<agas_service_category>/count``
+   :widths: 20 80
 
-       :ref:`??<agas-agas-service-category-count>`
+   * * Counter type
+     * ``/agas/<agas_service_category>/count``
 
-       where:
-
-       ``<agas_service_category>`` is one of the following: ``primary``,
+       where ``<agas_service_category>`` is one of the following: ``primary``,
        ``locality``, ``component`` or ``symbol``
-
+   * * Counter instance formatting
      * ``<agas_instance>/total``
 
-       where:
-
-       ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
+       where ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
        Currently, this value will be ``locality#0`` where ``0`` is the root
        :term:`locality` (the id of the :term:`locality` hosting the :term:`AGAS`
        service). Except for ``<agas_service_category>``, ``primary`` or
@@ -827,20 +815,42 @@ system and application performance.
        (only the primary and symbol :term:`AGAS` service components live on all
        localities, whereas all other :term:`AGAS` services are available on
        ``locality#0`` only).
-     * None
+   * * Description
      * Returns the overall total number of invocations of all :term:`AGAS`
        services provided by the given :term:`AGAS` service category since its
        creation.
-   * * ``agas/time/<agas_service>``
 
-       .. _agas-time-agas-service: 
+.. list-table:: :term:`AGAS` performance counter ``/agas/<agas_service_category>/count``
+   :widths: 20 80
 
-       :ref:`??<agas-time-agas-service>`
+   * * Counter type
+     * ``/agas/<agas_service_category>/count``
 
-       where:
+       where ``<agas_service_category>`` is one of the following: ``primary``,
+       ``locality``, ``component`` or ``symbol``
+   * * Counter instance formatting
+     * ``<agas_instance>/total``
 
-       ``<agas_service>`` is one of the following:
+       where ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
+       Currently, this value will be ``locality#0`` where ``0`` is the root
+       :term:`locality` (the id of the :term:`locality` hosting the :term:`AGAS`
+       service). Except for ``<agas_service_category>``, ``primary`` or
+       ``symbol`` for which the value for ``*`` can be any :term:`locality` id
+       (only the primary and symbol :term:`AGAS` service components live on all
+       localities, whereas all other :term:`AGAS` services are available on
+       ``locality#0`` only).
+   * * Description
+     * Returns the overall total number of invocations of all :term:`AGAS`
+       services provided by the given :term:`AGAS` service category since its
+       creation.
 
+.. list-table:: :term:`AGAS` performance counter ``agas/time/<agas_service>``
+   :widths: 20 80
+
+   * * Counter type
+     * ``agas/time/<agas_service>``
+
+       where ``<agas_service>`` is one of the following:
 
        *primary namespace services*: ``route``, ``bind_gid``, ``resolve_gid``,
        ``unbind_gid``, ``increment_credit``, ``decrement_credit``, ``allocate``
@@ -856,12 +866,10 @@ system and application performance.
 
        *symbol namespace services*: ``bind``, ``resolve``, ``unbind``,
        ``iterate_names``, ``on_symbol_namespace_event``
-
+   * * Counter instance formatting
      * ``<agas_instance>/total``
 
-       where:
-
-       ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
+       where ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
        Currently, this value will be ``locality#0`` where ``0`` is the root
        :term:`locality` (the id of the :term:`locality` hosting the :term:`AGAS`
        service).
@@ -872,24 +880,22 @@ system and application performance.
        ``resolve``, ``unbind``, and ``iterate_names`` (only the primary and
        symbol :term:`AGAS` service components live on all localities, whereas
        all other :term:`AGAS` services are available on ``locality#0`` only).
-     * None
+   * * Description
      * Returns the overall execution time of the specified :term:`AGAS` service
        since its creation (in nanoseconds).
-   * * ``/agas/<agas_service_category>/time``
 
-       .. _agas-agas-service-category-time: 
+.. list-table:: :term:`AGAS` performance counter `/agas/<agas_service_category>/time``
+   :widths: 20 80
 
-       :ref:`??<agas-agas-service-category-time>`
+   * * Counter type
+     * ``/agas/<agas_service_category>/time``
 
-       where:
-
-       ``<agas_service_category>`` is one of the following: ``primary``,
+       where ``<agas_service_category>`` is one of the following: ``primary``,
        ``locality``, ``component`` or ``symbol``
+   * * Counter instance formatting
      * ``<agas_instance>/total``
 
-       where:
-
-       ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
+       where ``<agas_instance>`` is the name of the :term:`AGAS` service to query.
        Currently, this value will be ``locality#0`` where ``0`` is the root
        :term:`locality` (the id of the :term:`locality` hosting the :term:`AGAS`
        service). Except for ``<agas_service_category`` ``primary`` or ``symbol``
@@ -897,113 +903,100 @@ system and application performance.
        primary and symbol :term:`AGAS` service components live on all
        localities, whereas all other :term:`AGAS` services are available on
        ``locality#0`` only).
-     * None
+   * * Description
      * Returns the overall execution time of all :term:`AGAS` services provided
        by the given :term:`AGAS` service category since its creation (in
        nanoseconds).
-   * * ``/agas/count/entries``
-       
-       .. _agas-count-entries: 
 
-       :ref:`??<agas-count-entries>`
-     
+.. list-table:: :term:`AGAS` performance counter ``/agas/count/entries``
+   :widths: 20 80
+
+   * * Counter type
+     * ``/agas/count/entries``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
-       cache should be queried. The :term:`locality` id is a (zero based) number
-       identifying the :term:`locality`.
-     * None
+       where ``*`` is the :term:`locality` id of the :term:`locality` the
+       :term:`AGAS` cache should be queried. The :term:`locality` id is a (zero based)
+       number identifying the :term:`locality`.
+   * * Description
      * Returns the number of cache entries resident in the :term:`AGAS` cache of
        the specified :term:`locality` (see ``<cache_statistics>``).
-   * * ``/agas/count/<cache_statistics>``
 
-       .. _agas-count-cache-statistics: 
+.. list-table:: :term:`AGAS` performance counter ``/agas/count/<cache_statistics>``
+   :widths: 20 80
 
-       :ref:`??<agas-count-cache-statistics>`
+   * * Counter type
+     * ``/agas/count/<cache_statistics>``
 
-       where:
-
-       ``<cache_statistics>`` is one of the following: ``cache/evictions``,
-       ``cache/hits``, ``cache/insertions``, ``cache/misses``
+       where ``<cache_statistics>`` is one of the
+       following: ``cache/evictions``, ``cache/hits``, ``cache/insertions``, ``cache/misses``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
+       where ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
        cache should be queried. The :term:`locality` id is a (zero based) number
-       identifying the :term:`locality`.
-     * None
+       identifying the :term:`locality`
+   * * Description
      * Returns the number of cache events (evictions, hits, inserts, and misses)
        in the :term:`AGAS` cache of the specified :term:`locality` (see
        ``<cache_statistics>``).
-   * * ``/agas/count/<full_cache_statistics>``
 
-       .. _agas-count-full-cache-statistics: 
+.. list-table:: :term:`AGAS` performance counter ``/agas/count/<full_cache_statistics>``
+   :widths: 20 80
 
-       :ref:`??<agas-count-full-cache-statistics>`
+   * * Counter type
+     * ``/agas/count/<full_cache_statistics>``
 
-       where:
-
-       ``<full_cache_statistics>`` is one of the following: ``cache/get_entry``,
+       where ``<full_cache_statistics>`` is one of the following: ``cache/get_entry``,
        ``cache/insert_entry``, ``cache/update_entry``, ``cache/erase_entry``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
+       where ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
        cache should be queried. The :term:`locality` id is a (zero based) number
        identifying the :term:`locality`.
-     * None
+   * * Description
      * Returns the number of invocations of the specified cache API function of
        the :term:`AGAS` cache.
-   * * ``/agas/time/<full_cache_statistics>``
 
-       .. _agas-time-full-cache-statistics:
+.. list-table:: :term:`AGAS` performance counter ``/agas/time/<full_cache_statistics>``
+   :widths: 20 80
 
-       :ref:`??<agas-time-full-cache-statistics>`
+   * * Counter type
+     * ``/agas/time/<full_cache_statistics>``
 
-       where:
+       where ``<full_cache_statistics>`` is one of the following:
 
-       ``<full_cache_statistics>`` is one of the following:
        ``cache/get_entry``, ``cache/insert_entry``, ``cache/update_entry``,
        ``cache/erase_entry``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
+       where ``*`` is the :term:`locality` id of the :term:`locality` the :term:`AGAS`
        cache should be queried. The :term:`locality` id is a (zero based) number
        identifying the :term:`locality`.
-     * None
+   * * Description
      * Returns the overall time spent executing of the specified API function of
        the :term:`AGAS` cache.
 
-.. list-table:: :term:`Parcel` layer performance counters
+.. list-table:: :term:`Parcel` layer performance counter ``/data/count/<connection_type>/<operation>``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/data/count/<connection_type>/<operation>``
-
-       .. _data-count-connection-type-operation:
-
-       :ref:`??<data-count-connection-type-operation>`
+     * ``/data/count/<connection_type>/<operation>``
 
        where:
-
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of raw (uncompressed) bytes sent or received
        (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
@@ -1020,25 +1013,26 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/data/time/<connection_type>/<operation>``
 
-       .. _data-time-connection-type-operation:
 
-       :ref:`??<data-time-connection-type-operation>`
+.. list-table:: :term:`Parcel` layer performance counter ``/data/time/<connection_type>/<operation>``
+   :widths: 20 80
+
+   * * Counter type
+     * ``/data/time/<connection_type>/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the total
+       where ``*`` is the :term:`locality` id of the :term:`locality` the total
        transmission time should be queried for. The :term:`locality` id is a
        (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the total time (in nanoseconds) between the start of each
        asynchronous transmission operation and the end of the corresponding
        operation for the specified ``<connection_type>`` the given
@@ -1056,25 +1050,25 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/serialize/count/<connection_type>/<operation>``
 
-       .. _serialize-count-connection-type-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/serialize/count/<connection_type>/<operation>``
+   :widths: 20 80
 
-       :ref:`??<serialize-count-connection-type-operation>`
+   * * Counter type
+     * ``/serialize/count/<connection_type>/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of bytes transferred (see ``<operation>``,
        e.g. ``sent`` or ``received`` possibly compressed) for the specified
        ``<connection_type>`` by the given :term:`locality`.
@@ -1091,28 +1085,30 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
+   * * Description
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
        was specified, this counter allows one to specify an optional action name
        as its parameter. In this case the counter will report the number of
        bytes transmitted for the given action only.
-   * * ``/serialize/time/<connection_type>/<operation>``
 
-       .. _serialize-time-connection-type-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/serialize/time/<connection_type>/<operation>``
+   :widths: 20 80
 
-       :ref:`??<serialize-time-connection-type-operation>`
+   * * Counter type
+     * ``/serialize/time/<connection_type>/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the
+       where ``*`` is the :term:`locality` id of the :term:`locality` the
        serialization time should be queried for. The :term:`locality` id is a
        (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall time spent performing outgoing data serialization for
        the specified ``<connection_type>`` on the given :term:`locality` (see
        ``<operation>``, e.g. ``sent`` or ``received``).
@@ -1129,23 +1125,24 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
+   * * Parameters
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
        was specified, this counter allows one to specify an optional action name
        as its parameter. In this case the counter will report the serialization
        time for the given action only.
-   * * ``/parcels/count/routed``
 
-       .. _parcels-count-routed:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcels/count/routed``
+   :widths: 20 80
 
-       :ref:`??<parcels-count-routed>`
-
+   * * Counter type
+     * ``/parcels/count/routed``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the number of
+       where ``*`` is the :term:`locality` id of the :term:`locality` the number of
        routed parcels should be queried for. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of routed (outbound) parcels transferred by
        the given :term:`locality`.
 
@@ -1156,28 +1153,30 @@ system and application performance.
        (and is responsible for resolving the destination address). This
        :term:`AGAS` service component will deliver the parcel to its final
        target.
+   * * Parameters
      * If the configure-time option ``-DHPX_WITH_PARCELPORT_ACTION_COUNTERS=On``
        was specified, this counter allows one to specify an optional action name
        as its parameter. In this case the counter will report the number of
        parcels for the given action only.
-   * * ``/parcels/count/<connection_type>/<operation>``
 
-       .. _parcels-count-connection-type-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcels/count/<connection_type>/<operation>``
+   :widths: 20 80
 
-       :ref:`??<parcels-count-connection-type-operation>`
+   * * Counter type
+     * ``/parcels/count/<connection_type>/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the number of
+       where ``*`` is the :term:`locality` id of the :term:`locality` the number of
        parcels should be queried for. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of parcels transferred using the specified
        ``<connection_type>`` by the given :term:`locality` (see ``operation>``,
        e.g. ``sent`` or ``received``.
@@ -1194,25 +1193,24 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/messages/count/<connection_type>/<operation>``
 
-       .. _messages-count-connection-type-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/messages/count/<connection_type>/<operation>``
+   :widths: 20 80
 
-       :ref:`??<messages-count-connection-type-operation>`
-
+   * * Counter type
+     * ``/messages/count/<connection_type>/<operation>``
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the number of
+       where ``*`` is the :term:`locality` id of the :term:`locality` the number of
        messages should be queried for. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of messages [#]_ transferred using the
        specified ``<connection_type>`` by the given :term:`locality` (see
        ``<operation>``, e.g. ``sent`` or ``received``)
@@ -1229,25 +1227,25 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelport/count/<connection_type>/zero_copy_chunks/<operation>``
 
-       .. _parcelport-count-connection-type-zero_copy_chunks-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelport/count/<connection_type>/zero_copy_chunks/<operation>``
+   :widths: 20 80
 
-       :ref:`??<parcelport-count-connection-type-zero_copy_chunks-operation>`
+   * * Counter type
+     * ``/parcelport/count/<connection_type>/zero_copy_chunks/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of zero-copy chunks sent or received
        (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
@@ -1264,25 +1262,25 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelport/count-max/<connection_type>/zero_copy_chunks/<operation>``
 
-       .. _parcelport-count-max-connection-type-zero_copy_chunks-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelport/count-max/<connection_type>/zero_copy_chunks/<operation>``
+   :widths: 20 80
 
-       :ref:`??<parcelport-count-max-connection-type-zero_copy_chunks-operation>`
+   * * Counter type
+     * ``/parcelport/count-max/<connection_type>/zero_copy_chunks/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the maximum number of zero-copy chunks sent or received per message
        (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
@@ -1299,25 +1297,25 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelport/size/<connection_type>/zero_copy_chunks/<operation>``
 
-       .. _parcelport-size-connection-type-zero_copy_chunks-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelport/size/<connection_type>/zero_copy_chunks/<operation>``
+   :widths: 20 80
 
-       :ref:`??<parcelport-size-connection-type-zero_copy_chunks-operation>`
+   * * Counter type
+     * ``/parcelport/size/<connection_type>/zero_copy_chunks/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall size of zero-copy chunks sent or received
        (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
@@ -1334,25 +1332,25 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelport/size-max/<connection_type>/zero_copy_chunks/<operation>``
 
-       .. _parcelport-size-max-connection-type-zero_copy_chunks-operation:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelport/size-max/<connection_type>/zero_copy_chunks/<operation>``
+   :widths: 20 80
 
-       :ref:`??<parcelport-size-max-connection-type-zero_copy_chunks-operation>`
+   * * Counter type
+     * ``/parcelport/size-max/<connection_type>/zero_copy_chunks/<operation>``
 
        where:
 
        ``<operation>`` is one of the following: ``sent``, ``received``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the overall
+       where ``*`` is the :term:`locality` id of the :term:`locality` the overall
        number of transmitted bytes should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the maximum size of zero-copy chunks sent or received
        (see ``<operation>``, e.g. ``sent`` or ``received``) for the specified
        ``<connection_type>``.
@@ -1369,12 +1367,12 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelport/count/<connection_type>/<cache_statistics>``
 
-       .. _parcelport-count-connection-type-cache-statistics:
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelport/count/<connection_type>/<cache_statistics>``
+   :widths: 20 80
 
-       :ref:`??<parcelport-count-connection-type-cache-statistics>`
+   * * Counter type
+     * ``/parcelport/count/<connection_type>/<cache_statistics>``
 
        where:
 
@@ -1382,13 +1380,13 @@ system and application performance.
        ``cache/evictions``, ``cache/hits``, ``cache/misses``
 
        ``<connection_type>`` is one of the following: ``tcp``, ``mpi``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the number of
+       where ``*`` is the :term:`locality` id of the :term:`locality` the number of
        messages should be queried for. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number cache events (evictions, hits, inserts,
        misses, and reclaims) for the connection cache of the given connection
        type on the given :term:`locality` (see ``<cache_statistics``, e.g.
@@ -1402,39 +1400,30 @@ system and application performance.
        ``HPX_WITH_PARCELPORT_MPI``.
 
        Please see :ref:`cmake_variables` for more details.
-     * None
-   * * ``/parcelqueue/length/<operation>``
 
-       .. _parcelqueue-length-operation:
-
-       :ref:`??<parcelqueue-length-operation>`
-
-       where:
-
-       ``<operation>`` is one of the following: ``sent``, ``receive``
-     * ``locality#*/total``
-
-       where:
-
-       ``*`` is the :term:`locality` id of the :term:`locality` the :term:`parcel` queue
-       should be queried. The :term:`locality` id is a (zero based) number
-       identifying the :term:`locality`.
-     * Returns the current number of parcels stored in the :term:`parcel` queue (see
-       ``<operation>`` for which queue to query, e.g. ``sent`` or ``received``).
-     * None
-
-.. list-table:: Thread manager performance counters
+.. list-table:: :term:`Parcel` layer performance counter ``/parcelqueue/length/<operation>``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/threads/count/cumulative``
+     * ``/parcelqueue/length/<operation>``
 
-       .. _threads-count-cumulative:
+       where ``<operation>`` is one of the following: ``sent``, ``receive``
+   * * Counter instance formatting
+     * ``locality#*/total``
 
-       :ref:`??<threads-count-cumulative>`
+       where ``*`` is the :term:`locality` id of the :term:`locality` the :term:`parcel` queue
+       should be queried. The :term:`locality` id is a (zero based) number
+       identifying the :term:`locality`.
+   * * Description
+     * Returns the current number of parcels stored in the :term:`parcel` queue (see
+       ``<operation>`` for which queue to query, e.g. ``sent`` or ``received``).
 
+.. list-table:: Thread manager performance counter ``/threads/count/cumulative``
+   :widths: 20 80
+
+   * * Counter type
+     * ``/threads/count/cumulative``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1445,7 +1434,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the overall
        number of retired |hpx|-threads should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1453,11 +1442,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the overall
         number of retired |hpx|-threads should be queried for. The worker thread
-        number (given by the ``*`` is a (zero based) number identifying the
+        number (given by the ``*``) is a (zero based) number identifying the
         worker thread. The number of available worker threads is usually
         specified on the command line for the application using the option
         :option:`--hpx:threads`. If no pool-name is specified the counter refers
         to the 'default' pool.
+   * * Description
      * Returns the overall number of executed (retired) |hpx|-threads on the
        given :term:`locality` since application start. If the instance name is
        ``total`` the counter returns the accumulated number of retired
@@ -1467,13 +1457,13 @@ system and application performance.
        separately. This counter is available only if the configuration time
        constant ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` is set to ``ON`` (default:
        ``ON``).
-     * None
-   * * ``/threads/time/average``
 
-       .. _threads-time-average:
+.. list-table:: Thread manager performance counter ``/threads/time/average``
+   :widths: 20 80
 
-       :ref:`??<threads-time-average>`
-
+   * * Counter type
+     * ``/threads/time/average``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1483,10 +1473,9 @@ system and application performance.
 
        where:
 
-
        ``locality#*`` is defining the :term:`locality` for which the average
        time spent executing one |hpx|-thread should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1494,11 +1483,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the average
        time spent executing one |hpx|-thread should be queried for. The worker
-       thread number (given by the ``*`` is a (zero based) number identifying
+       thread number (given by the ``*``) is a (zero based) number identifying
        the worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the average time spent executing one |hpx|-thread on the given
        :term:`locality` since application start. If the instance name is ``total``
        the counter returns the average time spent executing one |hpx|-thread for
@@ -1509,13 +1499,13 @@ system and application performance.
        ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The unit
        of measure for this counter is nanosecond [ns].
-     * None
-   * * ``/threads/time/average-overhead``
-       
-       .. _threads-time-average-overhead:
 
-       :ref:`??<threads-time-average-overhead>`
+.. list-table:: Thread manager performance counter ``/threads/time/average-overhead``
+   :widths: 20 80
 
+   * * Counter type
+     * ``/threads/time/average-overhead``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1526,7 +1516,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        overhead spent executing one |hpx|-thread should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1534,11 +1524,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the average
        overhead spent executing one |hpx|-thread should be queried for. The
-       worker thread number (given by the ``*`` is a (zero based) number
+       worker thread number (given by the ``*``) is a (zero based) number
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the
        option :option:`--hpx:threads`. If no pool-name is specified the counter
        refers to the 'default' pool.
+   * * Description
      * Returns the average time spent on overhead while executing one
        |hpx|-thread on the given :term:`locality` since application start. If
        the instance name is ``total`` the counter returns the average time spent
@@ -1550,13 +1541,13 @@ system and application performance.
        ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
-     * None
-   * * ``/threads/count/cumulative-phases``
 
-       .. _threads-count-cumulative-phases:
+.. list-table:: Thread manager performance counter ``/threads/count/cumulative-phases``
+   :widths: 20 80
 
-       :ref:`??<threads-count-cumulative-phases>`
-
+   * * Counter type
+     * ``/threads/count/cumulative-phases``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1567,7 +1558,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the overall
        number of executed |hpx|-thread phases (invocations) should be queried
-       for. The :term:`locality` id (given by ``*`` is a (zero based) number
+       for. The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1575,11 +1566,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the overall
        number of executed |hpx|-thread phases (invocations) should be queried
-       for. The worker thread number (given by the ``*`` is a (zero based)
+       for. The worker thread number (given by the ``*``) is a (zero based)
        number identifying the worker thread. The number of available worker
        threads is usually specified on the command line for the application
        using the option :option:`--hpx:threads`. If no pool-name is specified
        the counter refers to the 'default' pool.
+   * * Description
      * Returns the overall number of executed |hpx|-thread phases (invocations)
        on the given :term:`locality` since application start. If the instance
        name is ``total`` the counter returns the accumulated number of executed
@@ -1590,13 +1582,13 @@ system and application performance.
        configuration time constant ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` is set
        to ``ON`` (default: ``ON``). The unit of measure for this counter is
        nanosecond [ns].
-     * None
-   * * ``/threads/time/average-phase``
 
-       .. _threads-time-average-phase:
+.. list-table:: Thread manager performance counter ``/threads/time/average-phase``
+   :widths: 20 80
 
-       :ref:`??<threads-time-average-phase>`
-
+   * * Counter type
+     * ``/threads/time/average-phase``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1607,7 +1599,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        time spent executing one |hpx|-thread phase (invocation) should be
-       queried for. The :term:`locality` id (given by ``*`` is a (zero based)
+       queried for. The :term:`locality` id (given by the ``*``) is a (zero based)
        number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1615,11 +1607,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the average
        time executing one |hpx|-thread phase (invocation) should be queried for.
-       The worker thread number (given by the ``*`` is a (zero based) number
+       The worker thread number (given by the ``*``) is a (zero based) number
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the
        option :option:`--hpx:threads`. If no pool-name is specified the counter
        refers to the 'default' pool.
+   * * Description
      * Returns the average time spent executing one |hpx|-thread phase
        (invocation) on the given :term:`locality` since application start. If
        the instance name is ``total`` the counter returns the average time spent
@@ -1631,13 +1624,13 @@ system and application performance.
        ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
-     * None
-   * * ``/threads/time/average-phase-overhead``
 
-       .. _threads-time-average-phase-overhead:
+.. list-table:: Thread manager performance counter ``/threads/time/average-phase-overhead``
+   :widths: 20 80
 
-       :ref:`??<threads-time-average-phase-overhead>`
-
+   * * Counter type
+     * ``/threads/time/average-phase-overhead``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1649,7 +1642,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        time overhead executing one |hpx|-thread phase (invocation) should be
-       queried for. The :term:`locality` id (given by ``*`` is a (zero based)
+       queried for. The :term:`locality` id (given by the ``*``) is a (zero based)
        number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1657,11 +1650,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the average
        overhead executing one |hpx|-thread phase (invocation) should be queried
-       for. The worker thread number (given by the ``*`` is a (zero based)
+       for. The worker thread number (given by the ``*``) is a (zero based)
        number identifying the worker thread. The number of available worker
        threads is usually specified on the command line for the application
        using the option :option:`--hpx:threads`. If no pool-name is specified
        the counter refers to the 'default' pool.
+   * * Description
      * Returns the average time spent on overhead executing one |hpx|-thread
        phase (invocation) on the given :term:`locality` since application start.
        If the instance name is ``total`` the counter returns the average time
@@ -1673,13 +1667,13 @@ system and application performance.
        constants ``HPX_WITH_THREAD_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
-     * None
-   * * ``/threads/time/overall``
 
-       .. _threads-time-overall:
+.. list-table:: Thread manager performance counter ``/threads/time/overall``
+   :widths: 20 80
 
-       :ref:`??<threads-time-overall>`
-
+   * * Counter type
+     * ``/threads/time/overall``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1690,7 +1684,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the overall
        time spent running the scheduler should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1698,11 +1692,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the overall
        time spent running the scheduler should be queried for. The worker thread
-       number (given by the ``*`` is a (zero based) number identifying the
+       number (given by the ``*``) is a (zero based) number identifying the
        worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the overall time spent running the scheduler on the given
        :term:`locality` since application start. If the instance name is ``total``
        the counter returns the overall time spent running the scheduler for all
@@ -1712,13 +1707,13 @@ system and application performance.
        only if the configuration time constant ``HPX_WITH_THREAD_IDLE_RATES`` is
        set to ``ON`` (default: ``OFF``). The unit of measure for this counter is
        nanosecond [ns].
-     * None
-   * * ``/threads/time/cumulative``
 
-       .. _threads-time-cumulative:
+.. list-table:: Thread manager performance counter ``/threads/time/cumulative``
+   :widths: 20 80
 
-       :ref:`??<threads-time-cumulative>`
-
+   * * Counter type
+     * ``/threads/time/cumulative``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1729,7 +1724,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the overall
        time spent executing all |hpx|-threads should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1737,11 +1732,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the overall
        time spent executing all |hpx|-threads should be queried for. The worker
-       thread number (given by the ``*`` is a (zero based) number identifying
+       thread number (given by the ``*``) is a (zero based) number identifying
        the worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the overall time spent executing all |hpx|-threads on the given
        :term:`locality` since application start. If the instance name is ``total``
        the counter returns the overall time spent executing all |hpx|-threads for
@@ -1751,13 +1747,13 @@ system and application performance.
        is available only if the configuration time constants
        ``HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_THREAD_MAINTAIN_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
-     * None
-   * * ``/threads/time/cumulative-overheads``
 
-       .. _threads-time-cumulative-overheads:
+.. list-table:: Thread manager performance counter ``/threads/time/cumulative-overheads``
+   :widths: 20 80
 
-       :ref:`??<threads-time-cumulative-overheads>`
-
+   * * Counter type
+     * ``/threads/time/cumulative-overheads``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1768,7 +1764,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the overall
        overhead time incurred by executing all |hpx|-threads should be queried
-       for. The :term:`locality` id (given by ``*`` is a (zero based) number
+       for. The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1776,11 +1772,12 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the the
        overall overhead time incurred by executing all |hpx|-threads should be
-       queried for. The worker thread number (given by the ``*`` is a (zero
+       queried for. The worker thread number (given by the ``*``) is a (zero
        based) number identifying the worker thread. The number of available
        worker threads is usually specified on the command line for the
        application using the option :option:`--hpx:threads`. If no pool-name is
        specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the overall overhead time incurred executing all |hpx|-threads on
        the given :term:`locality` since application start. If the instance name
        is ``total`` the counter returns the overall overhead time incurred
@@ -1792,17 +1789,18 @@ system and application performance.
        ``HPX_THREAD_MAINTAIN_CUMULATIVE_COUNTS`` (default: ``ON``) and
        ``HPX_THREAD_MAINTAIN_IDLE_RATES`` are set to ``ON`` (default: ``OFF``).
        The unit of measure for this counter is nanosecond [ns].
-     * None
-   * * ``threads/count/instantaneous/<thread-state>``
 
-       .. _threads-count-instantaneous-thread-state:
+.. list-table:: Thread manager performance counter ``threads/count/instantaneous/<thread-state>``
+   :widths: 20 80
 
-       :ref:`??<threads-count-instantaneous-thread-state>`
+   * * Counter type
+     * ``threads/count/instantaneous/<thread-state>``
 
        where:
 
        ``<thread-state>`` is one of the following: ``all``, ``active``,
        ``pending``, ``suspended``, ``terminated``, ``staged``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1813,7 +1811,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the current
        number of threads with the given state should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1821,7 +1819,7 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the current
        number of threads with the given state should be queried for. The worker
-       thread number (given by the ``*`` is a (zero based) number identifying
+       thread number (given by the ``*``) is a (zero based) number identifying
        the worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
@@ -1829,22 +1827,24 @@ system and application performance.
 
        The ``staged`` thread state refers to registered tasks before they are
        converted to thread objects.
+   * * Description
      * Returns the current number of |hpx|-threads having the given thread state
        on the given :term:`locality`. If the instance name is ``total`` the
        counter returns the current number of |hpx|-threads of the given state
        for all worker threads (cores) on that :term:`locality`. If the instance
        name is ``worker-thread#*`` the counter will return the current number of
        |hpx|-threads in the given state for all worker threads separately.
-     * None
-   * * ``threads/wait-time/<thread-state>``
 
-       .. _threads-wait-time-thread-state:
+.. list-table:: Thread manager performance counter ``threads/wait-time/<thread-state>``
+   :widths: 20 80
 
-       :ref:`??<threads-wait-time-thread-state>`
+   * * Counter type
+     * ``threads/wait-time/<thread-state>``
 
        where:
 
        ``<thread-state>`` is one of the following: ``pending`` ``staged``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1863,7 +1863,7 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the average
        wait time for the given state should be queried for. The worker thread
-       number (given by the ``*`` is a (zero based) number identifying the
+       number (given by the ``*``) is a (zero based) number identifying the
        worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
@@ -1873,6 +1873,7 @@ system and application performance.
        before they are converted into thread objects, while the ``pending``
        thread state refers to the wait time of threads in any of the scheduling
        queues.
+   * * Description
      * Returns the average wait time of |hpx|-threads (if the thread state is
        ``pending`` or of task descriptions (if the thread state is ``staged`` on
        the given :term:`locality` since application start. If the instance name
@@ -1886,13 +1887,13 @@ system and application performance.
        ``HPX_WITH_THREAD_QUEUE_WAITTIME`` was defined while compiling the |hpx|
        core library (default: ``OFF``). The unit of measure for this counter is
        nanosecond [ns].
-     * None
-   * * ``/threads/idle-rate``
 
-       .. _threads-idle-rate:
+.. list-table:: Thread manager performance counter ``/threads/idle-rate``
+   :widths: 20 80
 
-       :ref:`??<threads-idle-rate>`
-
+   * * Counter type
+     * ``/threads/idle-rate``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1903,7 +1904,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        idle rate of all (or one) worker threads should be queried for. The
-       :term:`locality` id (given by ``*`` is a (zero based) number identifying
+       :term:`locality` id (given by the ``*``) is a (zero based) number identifying
        the :term:`locality`
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1915,19 +1916,20 @@ system and application performance.
        of available worker threads is usually specified on the command line for
        the application using the option :option:`--hpx:threads`. If no pool-name
        is specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the average idle rate for the given worker thread(s) on the given
        :term:`locality`. The idle rate is defined as the ratio of the time spent
        on scheduling and management tasks and the overall time spent executing
        work since the application started. This counter is available only if the
        configuration time constant ``HPX_WITH_THREAD_IDLE_RATES`` is set to ``ON``
        (default: ``OFF``).
-     * None
-   * * ``/threads/creation-idle-rate``
 
-       .. _threads-creation-idle-rate:
+.. list-table:: Thread manager performance counter ``/threads/creation-idle-rate``
+   :widths: 20 80
 
-       :ref:`??<threads-creation-idle-rate>`
-
+   * * Counter type
+     * ``/threads/creation-idle-rate``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1938,7 +1940,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        creation idle rate of all (or one) worker threads should be queried for.
-       The :term:`locality` id (given by ``*`` is a (zero based) number
+       The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1950,6 +1952,7 @@ system and application performance.
        of available worker threads is usually specified on the command line for
        the application using the option :option:`--hpx:threads`. If no pool-name
        is specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the average idle rate for the given worker thread(s) on the given
        :term:`locality` which is caused by creating new threads. The creation idle
        rate is defined as the ratio of the time spent on creating new threads and
@@ -1957,13 +1960,13 @@ system and application performance.
        counter is available only if the configuration time constants
        ``HPX_WITH_THREAD_IDLE_RATES`` (default: ``OFF``) and
        ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to ``ON``.
-     * None
-   * * ``/threads/cleanup-idle-rate``
 
-       .. _threads-cleanup-idle-rate:
+.. list-table:: Thread manager performance counter ``/threads/cleanup-idle-rate``
+   :widths: 20 80
 
-       :ref:`??<threads-cleanup-idle-rate>`
-
+   * * Counter type
+     * ``/threads/cleanup-idle-rate``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -1975,7 +1978,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the average
        cleanup idle rate of all (or one) worker threads should be queried for.
-       The :term:`locality` id (given by ``*`` is a (zero based) number
+       The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -1983,10 +1986,11 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the averaged
        cleanup idle rate should be queried for. The worker thread number (given
-       by the ``*`` is a (zero based) number identifying the worker thread. The
+       by the ``*``) is a (zero based) number identifying the worker thread. The
        number of available worker threads is usually specified on the command
        line for the application using the option :option:`--hpx:threads`. If no
        pool-name is specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the average idle rate for the given worker thread(s) on the given
        :term:`locality` which is caused by cleaning up terminated threads. The
        cleanup idle rate is defined as the ratio of the time spent on cleaning up
@@ -1995,13 +1999,13 @@ system and application performance.
        configuration time constants ``HPX_WITH_THREAD_IDLE_RATES`` (default:
        ``OFF``) and ``HPX_WITH_THREAD_CREATION_AND_CLEANUP_RATES`` are set to
        ``ON``.
-     * None
-   * * ``/threadqueue/length``
 
-       .. _threadqueue-length:
+.. list-table:: Thread manager performance counter ``/threadqueue/length``
+   :widths: 20 80
 
-       :ref:`??<threadqueue-length>`
-
+   * * Counter type
+     * ``/threadqueue/length``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2012,7 +2016,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the current
        length of all thread queues in the scheduler for all (or one) worker
-       threads should be queried for. The :term:`locality` id (given by ``*`` is
+       threads should be queried for. The :term:`locality` id (given by the ``*``) is
        a (zero based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2020,20 +2024,21 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the current
        length of all thread queues in the scheduler should be queried for. The
-       worker thread number (given by the ``*`` is a (zero based) number
+       worker thread number (given by the ``*``) is a (zero based) number
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the
        option :option:`--hpx:threads`. If no pool-name is specified the counter
        refers to the 'default' pool.
+   * * Description
      * Returns the overall length of all queues for the given worker thread(s)
        on the given :term:`locality`.
-     * None
-   * * ``/threads/count/stack-unbinds``
 
-       .. _threads-count-stack-unbinds:
+.. list-table:: Thread manager performance counter ``/threads/count/stack-unbinds``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stack-unbinds>`
-
+   * * Counter type
+     * ``/threads/count/stack-unbinds``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2041,16 +2046,17 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the unbind
        (madvise) operations should be queried for. The :term:`locality` id is a
        (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the total number of |hpx|-thread unbind (madvise) operations
        performed for the referenced :term:`locality`. Note that this counter is
        not available on Windows based platforms.
-     * None
-   * * ``/threads/count/stack-recycles``
 
-       .. _threads-count-stack-recycles:
+.. list-table:: Thread manager performance counter ``/threads/count/stack-recycles``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stack-recycles>`
-
+   * * Counter type
+     * ``/threads/count/stack-recycles``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2058,33 +2064,35 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the recycling
        operations should be queried for. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the total number of |hpx|-thread recycling operations performed.
-     * None
-   * * ``/threads/count/stolen-from-pending``
 
-       .. _threads-count-stolen-from-pending:
+.. list-table:: Thread manager performance counter ``/threads/count/stolen-from-pending``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stolen-from-pending>`
-
+   * * Counter type
+     * ``/threads/count/stolen-from-pending``
+   * * Counter instance formatting
      * ``locality#*/total``
 
-          where:
+        where:
 
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        'stole' threads should be queried for. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the total number of |hpx|-threads 'stolen' from the pending
        thread queue by a neighboring thread worker thread (these threads are
        executed by a different worker thread than they were initially scheduled
        on). This counter is available only if the configuration time constant
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
-     * None
-   * * ``/threads/count/pending-misses``
 
-       .. _threads-count-pending-misses:
+.. list-table:: Thread manager performance counter ``/threads/count/pending-misses``
+   :widths: 20 80
 
-       :ref:`??<threads-count-pending-misses>`
-
+   * * Counter type
+     * ``/threads/count/pending-misses``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2095,7 +2103,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the number of
        pending queue misses of all (or one) worker threads should be queried
-       for. The :term:`locality` id (given by ``*`` is a (zero based) number
+       for. The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2103,23 +2111,24 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the number of
        pending queue misses should be queried for. The worker thread number
-       (given by the ``*`` is a (zero based) number identifying the worker
+       (given by the ``*``) is a (zero based) number identifying the worker
        thread. The number of available worker threads is usually specified on
        the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the total number of times that the referenced worker-thread on
        the referenced :term:`locality` failed to find pending |hpx|-threads in
        its associated queue. This counter is available only if the configuration
        time constant ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON``
        (default: ``ON``).
-     * None
-   * * ``/threads/count/pending-accesses``
- 
-       .. _threads-count-pending-accesses:
 
-       :ref:`??<threads-count-pending-accesses>`
+.. list-table:: Thread manager performance counter ``/threads/count/pending-accesses``
+   :widths: 20 80
 
+   * * Counter type
+     * ``/threads/count/pending-accesses``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2130,7 +2139,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the number of
        pending queue accesses of all (or one) worker threads should be queried
-       for. The :term:`locality` id (given by ``*`` is a (zero based) number
+       for. The :term:`locality` id (given by the ``*``) is a (zero based) number
        identifying the :term:`locality`
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2138,23 +2147,24 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the number of
        pending queue accesses should be queried for. The worker thread number
-       (given by the ``*`` is a (zero based) number identifying the worker
+       (given by the ``*``) is a (zero based) number identifying the worker
        thread. The number of available worker threads is usually specified on
        the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the total number of times that the referenced worker-thread on
        the referenced :term:`locality` looked for pending |hpx|-threads in its
        associated queue. This counter is available only if the configuration
        time constant ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON``
        (default: ``ON``).
-     * None
-   * * ``/threads/count/stolen-from-staged``
 
-       .. _threads-count-stolen-from-staged:
+.. list-table:: Thread manager performance counter ``/threads/count/stolen-from-staged``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stolen-from-staged>`
-
+   * * Counter type
+     * ``/threads/count/stolen-from-staged``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2165,7 +2175,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the number of
        |hpx|-threads stolen from the staged queue of all (or one) worker threads
-       should be queried for. The :term:`locality` id (given by ``*`` is a (zero
+       should be queried for. The :term:`locality` id (given by the ``*``) is a (zero
        based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2173,23 +2183,24 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the number of
        |hpx|-threads stolen from the staged queue should be queried for. The
-       worker thread number (given by the ``*`` is a (zero based) number
+       worker thread number (given by the ``*``) is a (zero based) number
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the
        option :option:`--hpx:threads`. If no pool-name is specified the counter
        refers to the 'default' pool.
+   * * Description
      * Returns the total number of |hpx|-threads 'stolen' from the staged thread
        queue by a neighboring worker thread (these threads are executed by a
        different worker thread than they were initially scheduled on). This
        counter is available only if the configuration time constant
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
-     * None
-   * * ``/threads/count/stolen-to-pending``
 
-       .. _threads-count-stolen-to-pending:
+.. list-table:: Thread manager performance counter ``/threads/count/stolen-to-pending``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stolen-to-pending>`
-
+   * * Counter type
+     * ``/threads/count/stolen-to-pending``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2200,7 +2211,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the number of
        |hpx|-threads stolen to the pending queue of all (or one) worker threads
-       should be queried for. The :term:`locality` id (given by ``*`` is a (zero
+       should be queried for. The :term:`locality` id (given by the ``*``) is a (zero
        based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2208,23 +2219,24 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the number of
        |hpx|-threads stolen to the pending queue should be queried for. The
-       worker thread number (given by the ``*`` is a (zero based) number
+       worker thread number (given by the ``*``) is a (zero based) number
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the
        option :option:`--hpx:threads`. If no pool-name is specified the counter
        refers to the 'default' pool.
+   * * Description
      * Returns the total number of |hpx|-threads 'stolen' to the pending thread
        queue of the worker thread (these threads are executed by a different
        worker thread than they were initially scheduled on). This counter is
        available only if the configuration time constant
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
-     * None
-   * * ``/threads/count/stolen-to-staged``
 
-       .. _threads-count-stolen-to-staged:
+.. list-table:: Thread manager performance counter ``/threads/count/stolen-to-staged``
+   :widths: 20 80
 
-       :ref:`??<threads-count-stolen-to-staged>`
-
+   * * Counter type
+     * ``/threads/count/stolen-to-staged``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*`` or
@@ -2235,7 +2247,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the number of
        |hpx|-threads stolen to the staged queue of all (or one) worker threads
-       should be queried for. The :term:`locality` id (given by ``*`` is a (zero
+       should be queried for. The :term:`locality` id (given by ``*``) is a (zero
        based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2243,24 +2255,25 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the number of
        |hpx|-threads stolen to the staged queue should be queried for. The
-       worker thread number (given by the ``*`` is a (zero based) worker thread
-       number (given by the ``*`` is a (zero based) number identifying the
+       worker thread number (given by the ``*``) is a (zero based) worker thread
+       number (given by the ``*``) is a (zero based) number identifying the
        worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`. If no pool-name is specified the counter refers
        to the 'default' pool.
+   * * Description
      * Returns the total number of |hpx|-threads 'stolen' to the staged thread
        queue of a neighboring worker thread (these threads are executed by a
        different worker thread than they were initially scheduled on). This
        counter is available only if the configuration time constant
        ``HPX_WITH_THREAD_STEALING_COUNTS`` is set to ``ON`` (default: ``ON``).
-     * None
-   * * ``/threads/count/objects``
 
-       .. _threads-count-objects:
+.. list-table:: Thread manager performance counter ``/threads/count/objects``
+   :widths: 20 80
 
-       :ref:`??<threads-count-objects>`
-
+   * * Counter type
+     * ``/threads/count/objects``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/allocator#*``
@@ -2269,42 +2282,46 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the current
        (cumulative) number of all created |hpx|-thread objects should be queried
-       for. The :term:`locality` id (given by ``*`` is a (zero based) number
+       for. The :term:`locality` id (given by ``*``) is a (zero based) number
        identifying the :term:`locality`.
 
        ``allocator#*`` is defining the number of the allocator instance using
        which the threads have been created. |hpx| uses a varying number of
        allocators to create (and recycle) |hpx|-thread objects, most likely
        these counters are of use for debugging purposes only. The allocator id
-       (given by ``*`` is a (zero based) number identifying the allocator to
+       (given by ``*``) is a (zero based) number identifying the allocator to
        query.
+   * * Description
      * Returns the total number of |hpx|-thread objects created. Note that
        thread objects are reused to improve system performance, thus this number
        does not reflect the number of actually executed (retired) |hpx|-threads.
-     * None
-   * * ``/scheduler/utilization/instantaneous``
 
-       .. _scheduler-utilization-instantaneous:
+.. list-table:: Thread manager performance counter ``/scheduler/utilization/instantaneous``
+   :widths: 20 80
 
-       :ref:`??<scheduler-utilization-instantaneous>`
-
+   * * Counter type
+     * ``/scheduler/utilization/instantaneous``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
 
        ``locality#*`` is defining the :term:`locality` for which the current
        (instantaneous) scheduler utilization queried for. The :term:`locality`
-       id (given by ``*`` is a (zero based) number identifying the
+       id (given by ``*``) is a (zero based) number identifying the
        :term:`locality`.
+   * * Description
      * Returns the total (instantaneous) scheduler utilization. This is the
         current percentage of scheduler threads executing |hpx| threads.
+   * * Parameters
      * Percent
-   * * ``/threads/idle-loop-count/instantaneous``
 
-       .. _threads-idle-loop-count-instantaneous:
+.. list-table:: Thread manager performance counter ``/threads/idle-loop-count/instantaneous``
+   :widths: 20 80
 
-       :ref:`??<threads-idle-loop-count-instantaneous>`
-       
+   * * Counter type
+     * ``/threads/idle-loop-count/instantaneous``
+   * * Counter instance formatting
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -2313,7 +2330,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the current
        current accumulated value of all idle-loop counters of all worker threads
-       should be queried. The :term:`locality` id (given by ``*`` is a (zero
+       should be queried. The :term:`locality` id (given by the ``*``) is a (zero
        based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2321,20 +2338,21 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the current
        value of the idle-loop counter should be queried for. The worker thread
-       number (given by the ``*`` is a (zero based) worker thread number (given
-       by the ``*`` is a (zero based) number identifying the worker thread. The
+       number (given by the ``*``) is a (zero based) worker thread number (given
+       by the ``*``) is a (zero based) number identifying the worker thread. The
        number of available worker threads is usually specified on the command
        line for the application using the option :option:`--hpx:threads`. If no
        pool-name is specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the current (instantaneous) idle-loop count for the given
        |hpx|- worker thread or the accumulated value for all worker threads.
-     * None
-   * * ``/threads/busy-loop-count/instantaneous``
 
-       .. _threads-busy-loop-count-instantaneous:
+.. list-table:: Thread manager performance counter ``/threads/busy-loop-count/instantaneous``
+   :widths: 20 80
 
-       :ref:`??<threads-busy-loop-count-instantaneous>`
-       
+   * * Counter type
+     * ``/threads/busy-loop-count/instantaneous``
+   * * Counter instance formatting
      * ``locality#*/worker-thread#*`` or
 
        ``locality#*/pool#*/worker-thread#*``
@@ -2343,7 +2361,7 @@ system and application performance.
 
        ``locality#*`` is defining the :term:`locality` for which the current
        current accumulated value of all busy-loop counters of all worker threads
-       should be queried. The :term:`locality` id (given by ``*`` is a (zero
+       should be queried. The :term:`locality` id (given by the ``*``) is a (zero
        based) number identifying the :term:`locality`.
 
        ``pool#*`` is defining the pool for which the current value of the
@@ -2351,20 +2369,23 @@ system and application performance.
 
        ``worker-thread#*`` is defining the worker thread for which the current
        value of the busy-loop counter should be queried for. The worker thread
-       number (given by the ``*`` is a (zero based) worker thread number (given
-       by the ``*`` is a (zero based) number identifying the worker thread. The
+       number (given by the ``*``) is a (zero based) worker thread number (given
+       by the ``*``) is a (zero based) number identifying the worker thread. The
        number of available worker threads is usually specified on the command
        line for the application using the option :option:`--hpx:threads`. If no
        pool-name is specified the counter refers to the 'default' pool.
+   * * Description
      * Returns the current (instantaneous) busy-loop count for the given |hpx|-
        worker thread or the accumulated value for all worker threads.
-     * None
-   * * ``/threads/time/background-work-duration``
 
-       .. _threads-time-background-work-duration:
+...................................................................................
 
-       :ref:`??<threads-time-background-work-duration>`
-       
+.. list-table:: Thread manager performance counter ``/threads/time/background-work-duration``
+   :widths: 20 80
+
+   * * Counter type
+     * ``/threads/time/background-work-duration``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2381,7 +2402,7 @@ system and application performance.
        the worker thread. The number of available worker threads is usually
        specified on the command line for the application using the option
        :option:`--hpx:threads`.
-
+   * * Description
      * Returns the overall time spent performing background work on the given
        locality since application start. If the instance name is ``total`` the
        counter returns the overall time spent performing background work for all
@@ -2393,13 +2414,13 @@ system and application performance.
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure for this counter is nanosecond [ns].
 
-     * None
-   * * ``/threads/background-overhead``
 
-       .. _threads-background-overhead:
+.. list-table:: Thread manager performance counter ``/threads/background-overhead``
+   :widths: 20 80
 
-       :ref:`??<threads-background-overhead>`
-
+   * * Counter type
+     * ``/threads/background-overhead``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2416,6 +2437,7 @@ system and application performance.
        thread. The number of available worker threads is usually specified on
        the command line for the application using the option
        :option:`--hpx:threads`.
+   * * Description
      * Returns the background overhead on the given locality since application
        start. If the instance name is ``total`` the counter returns the
        background overhead for all worker threads (cores) on that locality. If
@@ -2425,13 +2447,13 @@ system and application performance.
        ``HPX_WITH_BACKGROUND_THREAD_COUNTERS`` (default: ``OFF``) and
        ``HPX_WITH_THREAD_IDLE_RATES`` are set to ``ON`` (default: ``OFF``). The
        unit of measure displayed for this counter is 0.1%.
-     * None
-   * * ``/threads/time/background-send-duration``
 
-       .. _threads-time-background-send-duration:
+.. list-table:: Thread manager performance counter ``/threads/time/background-send-duration``
+   :widths: 20 80
 
-       :ref:`??<threads-time-background-send-duration>`
-
+   * * Counter type
+     * ``/threads/time/background-send-duration``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2449,7 +2471,7 @@ system and application performance.
        based) number identifying the worker thread. The number of available
        worker threads is usually specified on the command line for the
        application using the option :option:`--hpx:threads`.
-
+   * * Description
      * Returns the overall time spent performing background work related to
        sending parcels on the given locality since application start. If the
        instance name is ``total`` the counter returns the overall time spent
@@ -2464,13 +2486,13 @@ system and application performance.
        This counter will currently return meaningful values for the MPI
        parcelport only.
 
-     * None
-   * * ``/threads/background-send-overhead``
 
-       .. _threads-background-send-overhead:
+.. list-table:: Thread manager performance counter ``/threads/background-send-overhead``
+   :widths: 20 80
 
-       :ref:`??<threads-background-send-overhead>`
-
+   * * Counter type
+     * ``/threads/background-send-overhead``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2487,6 +2509,7 @@ system and application performance.
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the option
        :option:`--hpx:threads`.
+   * * Description
      * Returns the background overhead related to sending parcels on the given
        locality since application start. If the instance name is ``total`` the
        counter returns the background overhead for all worker threads (cores) on
@@ -2499,13 +2522,13 @@ system and application performance.
 
        This counter will currently return meaningful values for the MPI
        parcelport only.
-     * None
-   * * ``/threads/time/background-receive-duration``
 
-       .. _threads-time-background-receive-duration:
+.. list-table:: Thread manager performance counter ``/threads/time/background-receive-duration``
+   :widths: 20 80
 
-       :ref:`??<threads-time-background-receive-duration>`
-
+   * * Counter type
+     * ``/threads/time/background-receive-duration``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2524,6 +2547,7 @@ system and application performance.
        worker threads is usually specified on the command line for the
        application using the option :option:`--hpx:threads`.
 
+   * * Description
      * Returns the overall time spent performing background work related to
        receiving parcels on the given locality since application start. If the
        instance name is ``total`` the counter returns the overall time spent
@@ -2537,13 +2561,13 @@ system and application performance.
 
        This counter will currently return meaningful values for the MPI
        parcelport only.
-     * None
-   * * ``/threads/background-receive-overhead``
 
-       .. _threads-background-receive-overhead:
-       
-       :ref:`??<threads-background-receive-overhead>`
+.. list-table:: Thread manager performance counter ``/threads/background-receive-overhead``
+   :widths: 20 80
 
+   * * Counter type
+     * ``/threads/background-receive-overhead``
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2560,6 +2584,7 @@ system and application performance.
        identifying the worker thread. The number of available worker threads is
        usually specified on the command line for the application using the option
        :option:`--hpx:threads`.
+   * * Description
      * Returns the background overhead related to receiving parcels on the given
        locality since application start. If the instance name is ``total`` the
        counter returns the background overhead for all worker threads (cores) on
@@ -2572,20 +2597,14 @@ system and application performance.
 
        This counter will currently return meaningful values for the MPI
        parcelport only.
-     * None
 
-.. list-table:: General performance counters exposing characteristics of localities
+
+.. list-table::  General performance counter ``/runtime/count/component``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/runtime/count/component``
-
-       .. _runtime-count-component: 
-
-       :ref:`??<runtime-count-component>`
-
+     * ``/runtime/count/component``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2593,17 +2612,20 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        components should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall number of currently active components of the
        specified type on the given :term:`locality`.
+   * * Parameters
      * The type of the component. This is the string which has been used while
        registering the component with |hpx|, e.g. which has been passed as the
        second parameter to the macro :c:macro:`HPX_REGISTER_COMPONENT`.
-   * * ``/runtime/count/action-invocation``
 
-       .. _runtime-count-action-invocation: 
+.. list-table:: General performance counter ``/runtime/count/action-invocation``
+   :widths: 20 80
 
-       :ref:`??<runtime-count-action-invocation>`
-
+   * * Counter type
+     * ``/runtime/count/action-invocation``
+   * * Counter instance formatting
      * ``locality#*/total``
 
          where:
@@ -2611,18 +2633,21 @@ system and application performance.
        ``*`` is the :term:`locality` id of the locality the number of action
        invocations should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall (local) invocation count of the specified action type
        on the given :term:`locality`.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
-   * * ``/runtime/count/remote-action-invocation``
 
-       .. _runtime-count-remote-action-invocation:
+.. list-table:: General performance counter ``/runtime/count/remote-action-invocation``
+   :widths: 20 80
 
-       :ref:`??<runtime-count-remote-action-invocation>`
-
+   * * Counter type
+     * ``/runtime/count/remote-action-invocation``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2630,18 +2655,21 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        action invocations should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the overall (remote) invocation count of the specified action
        type on the given :term:`locality`.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
-   * * ``/runtime/uptime``
 
-       .. _runtime-uptime:
+.. list-table:: General performance counter ``/runtime/uptime``
+   :widths: 20 80
 
-       :ref:`??<runtime-uptime>`
-
+   * * Counter type
+     * ``/runtime/uptime``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2649,15 +2677,16 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the system
        uptime should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the overall time since application start on the given
        :term:`locality` in nanoseconds.
-     * None
-   * * ``/runtime/memory/virtual``
 
-       .. _runtime-memory-virtual:
+.. list-table:: General performance counter ``/runtime/memory/virtual``
+   :widths: 20 80
 
-       :ref:`??<runtime-memory-virtual>`
-
+   * * Counter type
+     * ``/runtime/memory/virtual``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2665,15 +2694,16 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the allocated
        virtual memory should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the amount of virtual memory currently allocated by the
        referenced :term:`locality` (in bytes).
-     * None
-   * * ``/runtime/memory/resident``
 
-       .. _runtime-memory-resident:
+.. list-table:: General performance counter ``/runtime/memory/resident``
+   :widths: 20 80
 
-       :ref:`??<runtime-memory-resident>`
-
+   * * Counter type
+     * ``/runtime/memory/resident``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2681,15 +2711,16 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the allocated
        resident memory should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the amount of resident memory currently allocated by the
        referenced :term:`locality` (in bytes).
-     * None
-   * * ``/runtime/memory/total``
 
-       .. _runtime-memory-total:
+.. list-table:: General performance counter ``/runtime/memory/total``
+   :widths: 20 80
 
-       :ref:`??<runtime-memory-total>`
-
+   * * Counter type
+     * ``/runtime/memory/total``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2698,16 +2729,17 @@ system and application performance.
        available memory should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`. Note: only supported in
        Linux.
+   * * Description
      * Returns the total available memory for use by the referenced
         :term:`locality` (in bytes). This counter is available on Linux and
         Windows systems only.
-     * None
-   * * ``/runtime/io/read_bytes_issued``
 
-       .. _runtime-io-read-bytes-issued:
+.. list-table:: General performance counter ``/runtime/io/read_bytes_issued``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-read-bytes-issued>`
-
+   * * Counter type
+     * ``/runtime/io/read_bytes_issued``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2715,17 +2747,18 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        bytes read should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the number of bytes read by the process (aggregate of count
        arguments passed to read() call or its analogues). This performance
        counter is available only on systems which expose the related data
        through the /proc file system.
-     * None
-   * * ``/runtime/io/write_bytes_issued``
 
-       .. _runtime-io-write-bytes-issued:
+.. list-table:: General performance counter ``/runtime/io/write_bytes_issued``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-write-bytes-issued>`
-
+   * * Counter type
+     * ``/runtime/io/write_bytes_issued``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2733,17 +2766,18 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        bytes written should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of bytes written by the process (aggregate of count
        arguments passed to write() call or its analogues). This performance
        counter is available only on systems which expose the related data
        through the /proc file system.
-     * None
-   * * ``/runtime/io/read_syscalls``
 
-       .. _runtime-io-read-syscalls:
+.. list-table:: General performance counter ``/runtime/io/read_syscalls``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-read-syscalls>`
-
+   * * Counter type
+     * ``/runtime/io/read_syscalls``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2751,16 +2785,17 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        system calls should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the number of system calls that perform I/O reads. This
        performance counter is available only on systems which expose the
        related data through the /proc file system.
-     * None
-   * * ``/runtime/io/write_syscalls``
 
-       .. _runtime-io-write-syscalls:
+.. list-table:: General performance counter ``/runtime/io/write_syscalls``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-write-syscalls>`
-
+   * * Counter type
+     * ``/runtime/io/write_syscalls``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2768,16 +2803,17 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        system calls should be queried. The :term:`locality` id is a (zero based)
        number identifying the :term:`locality`.
+   * * Description
      * Returns the number of system calls that perform I/O writes. This
        performance counter is available only on systems which expose the
        related data through the /proc file system.
-     * None
-   * * ``/runtime/io/read_bytes_transferred``
 
-       .. _runtime-io-read-bytes-transferred:
+.. list-table:: General performance counter ``/runtime/io/read_bytes_transferred``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-read-bytes-transferred>`
-
+   * * Counter type
+     * ``/runtime/io/read_bytes_transferred``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2785,16 +2821,17 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        bytes transferred should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of bytes retrieved from storage by I/O operations.
        This performance counter is available only on systems which expose the
        related data through the /proc file system.
-     * None
-   * * ``/runtime/io/write_bytes_transferred``
 
-       .. _runtime-io-write-bytes-transferred:
+.. list-table:: General performance counter ``/runtime/io/write_bytes_transferred``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-write-bytes-transferred>`
-
+   * * Counter type
+     * ``/runtime/io/write_bytes_transferred``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2802,16 +2839,17 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        bytes transferred should be queried. The :term:`locality` id is a (zero
        based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of bytes retrieved from storage by I/O operations.
        This performance counter is available only on systems which expose the
        related data through the /proc file system.
-     * None
-   * * ``/runtime/io/write_bytes_cancelled``
 
-       .. _runtime-io-write-bytes-cancelled:
+.. list-table:: General performance counter ``/runtime/io/write_bytes_cancelled``
+   :widths: 20 80
 
-       :ref:`??<runtime-io-write-bytes-cancelled>`
-
+   * * Counter type
+     * ``/runtime/io/write_bytes_cancelled``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -2819,23 +2857,18 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        bytes not being transferred should be queried. The :term:`locality` id is
        a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of bytes accounted by write_bytes_transferred that
        has not been ultimately stored due to truncation or deletion. This
        performance counter is available only on systems which expose the
        related data through the /proc file system.
-     * None
 
-.. list-table:: Performance counters exposing PAPI hardware counters
+
+.. list-table:: Performance counter ``/papi/<papi_event>``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/papi/<papi_event>``
-
-       .. _papi-papi-event:
-
-       :ref:`??<papi-papi-event>`
+     * ``/papi/<papi_event>``
 
        where:
 
@@ -2846,7 +2879,7 @@ system and application performance.
        For a full list of available PAPI events and their (short) description
        use the ``--hpx:list-counters`` and ``--hpx:papi-event-info=all`` command
        line options.
-
+   * * Counter instance formatting
      * ``locality#*/total`` or
 
        ``locality#*/worker-thread#*``
@@ -2864,29 +2897,24 @@ system and application performance.
        by the ``*``) is a (zero based) number identifying the worker thread. The
        number of available worker threads is usually specified on the command
        line for the application using the option :option:`--hpx:threads`.
-
-     * This counter returns the current count of occurrences of the specified
+   * * Description
+     * Returns the current count of occurrences of the specified
        PAPI event. This counter is available only if the configuration time
        constant ``HPX_WITH_PAPI`` is set to ``ON`` (default: ``OFF``).
-     * None
 
-.. list-table:: Performance counters for general statistics
+.. list-table:: Performance counter ``/statistics/average``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/statistics/average``
-
-       .. _statistics-average:
-
-       :ref:`??<statistics-average>`
-
+     * ``/statistics/average``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current average (mean) value calculated based on the values
        queried from the underlying counter (the one specified as the instance
        name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is
@@ -2895,17 +2923,19 @@ system and application performance.
        underlying counter should be reset during evaluation ``1`` or not ``0``.
        The default value is ``0``.
 
-   * * ``/statistics/rolling_average``
+.. list-table:: Performance counter ``/statistics/rolling_average``
+   :widths: 20 80
 
-       .. _statistics-rolling-average:
-
-       :ref:`??<statistics-rolling-average>`
-
+   * * Counter type
+     * ``/statistics/rolling_average``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current rolling average (mean) value calculated based on the
        values queried from the underlying counter (the one specified as the
        instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to three comma
        separated (integer) values, where the first is the time interval (in
        milliseconds) at which the underlying counter should be queried. If no
@@ -2916,17 +2946,19 @@ system and application performance.
        either ``0`` or ``1`` and specifies whether the underlying counter should
        be reset during evaluation ``1`` or not ``0``. The default value is ``0``.
 
-   * * ``/statistics/stddev``
+.. list-table:: Performance counter ``/statistics/stddev``
+   :widths: 20 80
 
-       .. _statistics-stddev:
-
-       :ref:`??<statistics-stddev>`
-
+   * * Counter type
+     * ``/statistics/stddev``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current standard deviation (stddev) value calculated based on
        the values queried from the underlying counter (the one specified as the
        instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is
@@ -2935,17 +2967,19 @@ system and application performance.
        underlying counter should be reset during evaluation ``1`` or not ``0``.
        The default value is ``0``.
 
-   * * ``/statistics/rolling_stddev``
+.. list-table:: Performance counter ``/statistics/rolling_stddev``
+   :widths: 20 80
 
-       .. _statistics-rolling-stddev:
-
-       :ref:`??<statistics-rolling-stddev>`
-
+   * * Counter type
+     * ``/statistics/rolling_stddev``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current rolling variance (stddev) value calculated based on
        the values queried from the underlying counter (the one specified as the
        instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to three comma
        separated (integer) values, where the first is the time interval (in
        milliseconds) at which the underlying counter should be queried. If no
@@ -2956,17 +2990,19 @@ system and application performance.
        or ``1`` and specifies whether the underlying counter should be reset
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
-   * * ``/statistics/median``
+.. list-table:: Performance counter ``/statistics/median``
+   :widths: 20 80
 
-       .. _statistics-median:
-
-       :ref:`??<statistics-median>`
-
+   * * Counter type
+     * ``/statistics/median``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current (statistically estimated) median value calculated
        based on the values queried from the underlying counter (the one
        specified as the instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is
@@ -2975,16 +3011,18 @@ system and application performance.
        underlying counter should be reset during evaluation ``1`` or not ``0``.
        The default value is ``0``.
 
-   * * ``/statistics/max``
+.. list-table:: Performance counter ``/statistics/max``
+   :widths: 20 80
 
-       .. _statistics-max:
-
-       :ref:`??<statistics-max>`
-
+   * * Counter type
+     * ``/statistics/max``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current maximum value calculated based on the values queried
        from the underlying counter (the one specified as the instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is
@@ -2993,17 +3031,19 @@ system and application performance.
        underlying counter should be reset during evaluation ``1`` or not ``0``.
        The default value is ``0``.
 
-   * * ``/statistics/rolling_max``
+.. list-table:: Performance counter ``/statistics/rolling_max``
+   :widths: 20 80
 
-       .. _statistics-rolling-max:
-
-       :ref:`??<statistics-rolling-max>`
-
+   * * Counter type
+     * ``/statistics/rolling_max``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current rolling maximum value calculated based on the values
        queried from the underlying counter (the one specified as the instance
        name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to three comma
        separated (integer) values, where the first is the time interval (in
        milliseconds) at which the underlying counter should be queried. If no
@@ -3014,16 +3054,18 @@ system and application performance.
        or ``1`` and specifies whether the underlying counter should be reset
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
-   * * ``/statistics/min``
+.. list-table:: Performance counter ``/statistics/min``
+   :widths: 20 80
 
-       .. _statistics-min:
-
-       :ref:`??<statistics-min>`
-
+   * * Counter type
+     * ``/statistics/min``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current minimum value calculated based on the values queried
        from the underlying counter (the one specified as the instance name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to two comma separated
        (integer) values, where the first is the time interval (in milliseconds)
        at which the underlying counter should be queried. If no value is
@@ -3032,17 +3074,19 @@ system and application performance.
        underlying counter should be reset during evaluation ``1`` or not ``0``.
        The default value is ``0``.
 
-   * * ``/statistics/rolling_min``
+.. list-table:: Performance counter ``/statistics/rolling_min``
+   :widths: 20 80
 
-       .. _statistics-rolling-min:
-
-       :ref:`??<statistics-rolling-min>`
-
+   * * Counter type
+     * ``/statistics/rolling_min``
+   * * Counter instance formatting
      * Any full performance counter name. The referenced performance counter is
        queried at fixed time intervals as specified by the first parameter.
+   * * Description
      * Returns the current rolling minimum value calculated based on the values
        queried from the underlying counter (the one specified as the instance
        name).
+   * * Parameters
      * Any parameter will be interpreted as a list of up to three comma
        separated (integer) values, where the first is the time interval (in
        milliseconds) at which the underlying counter should be queried. If no
@@ -3053,129 +3097,132 @@ system and application performance.
        or ``1`` and specifies whether the underlying counter should be reset
        during evaluation ``1`` or not ``0``. The default value is ``0``.
 
-.. list-table:: Performance counters for elementary arithmetic operations
+.. list-table:: Performance counter ``/arithmetics/add``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-   * * ``/arithmetics/add``
-
-       .. _arithmetics-add:
-
-       :ref:`??<arithmetics-add>`
-   
-     * None
+     * ``/arithmetics/add``
+   * * Description
      * Returns the sum calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/subtract``
 
-       .. _arithmetics-subtract:
+.. list-table:: Performance counter ``/arithmetics/subtract``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-subtract>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/subtract``
+   * * Description
      * Returns the difference calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/multiply``
 
-       .. _arithmetics-multiply:
+.. list-table:: Performance counter ``/arithmetics/multiply``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-multiply>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/multiply``
+   * * Description
      * Returns the product calculated based on the values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/divide``
 
-          .. _arithmetics-divide:
+.. list-table:: Performance counter ``/arithmetics/divide``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-divide>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/divide``
+   * * Description
      * Returns the result of division of the values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/mean``
 
-       .. _arithmetics-mean:
+.. list-table:: Performance counter ``/arithmetics/mean``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-mean>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/mean``
+   * * Description
      * Returns the average value of all values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/variance``
 
-       .. _arithmetics-variance:
+.. list-table:: Performance counter ``/arithmetics/variance``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-variance>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/variance``
+   * * Description
      * Returns the standard deviation of all values queried from the underlying
        counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/median``
 
-       .. _arithmetics-median:
+.. list-table:: Performance counter ``/arithmetics/median``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-median>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/median``
+   * * Description
      * Returns the median value of all values queried from the underlying
        counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/min``
 
-       .. _arithmetics-min:
+.. list-table:: Performance counter ``/arithmetics/min``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-min>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/min``
+   * * Description
      * Returns the minimum value of all values queried from the underlying
        counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/max``
 
-       .. _arithmetics-max:
+.. list-table:: Performance counter ``/arithmetics/max``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-max>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/max``
+   * * Description
      * Returns the maximum value of all values queried from the
        underlying counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
-   * * ``/arithmetics/count``
 
-       .. _arithmetics-count:
+.. list-table:: Performance counter ``/arithmetics/count``
+   :widths: 20 80
 
-       :ref:`??<arithmetics-count>`
-
-     * None
+   * * Counter type
+     * ``/arithmetics/count``
+   * * Description
      * Returns the count value of all values queried from the underlying
        counters (the ones specified as the parameters).
+   * * Parameters
      * The parameter will be interpreted as a comma separated list of full
        performance counter names which are queried whenever this counter is
        accessed. Any wildcards in the counter names will be expanded.
@@ -3208,19 +3255,12 @@ system and application performance.
               /threads{locality#0/worker-thread#0}/count/cumulative,\
               /threads{locality#0/worker-thread#1}/count/cumulative
 
-.. list-table:: Performance counters tracking :term:`parcel` coalescing
+.. list-table:: Performance counter ``/coalescing/count/parcels``
+   :widths: 20 80
 
    * * Counter type
-     * Counter instance formatting
-     * Description
-     * Parameters
-
-   * * ``/coalescing/count/parcels``
-
-       .. _coalescing-count-parcels:
-
-       :ref:`??<coalescing-count-parcels>`
-
+     * ``/coalescing/count/parcels``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -3228,19 +3268,21 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        parcels for the given action should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of parcels handled by the message handler
        associated with the action which is given by the counter parameter.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
-   * * ``/coalescing/count/messages``
+.. list-table:: Performance counter ``/coalescing/count/messages``
+   :widths: 20 80
 
-       .. _coalescing-count-messages:
-
-       :ref:`??<coalescing-count-messages>`
-
+   * * Counter type
+     * ``/coalescing/count/messages``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -3248,19 +3290,21 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        messages for the given action should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the number of messages generated by the message handler
        associated with the action which is given by the counter parameter.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`.
 
-   * * ``/coalescing/count/average-parcels-per-message``
+.. list-table:: Performance counter ``/coalescing/count/average-parcels-per-message``
+   :widths: 20 80
 
-       .. _coalescing-count-average-parcels-per-message:
-
-       :ref:`??<coalescing-count-average-parcels-per-message>`
-
+   * * Counter type
+     * ``/coalescing/count/average-parcels-per-message``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -3268,20 +3312,22 @@ system and application performance.
        ``*`` is the :term:`locality` id of the :term:`locality` the number of
        messages for the given action should be queried for. The :term:`locality`
        id is a (zero based) number identifying the :term:`locality`.
+   * * Description
      * Returns the average number of parcels sent in a message generated by the
        message handler associated with the action which is given by the counter
        parameter.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
-   * * ``/coalescing/time/average-parcel-arrival``
+.. list-table:: Performance counter ``/coalescing/time/average-parcel-arrival``
+   :widths: 20 80
 
-       .. _coalescing-time-average-parcel-arrival:
-
-       :ref:`??<coalescing-time-average-parcel-arrival>`
-
+   * * Counter type
+     * ``/coalescing/time/average-parcel-arrival``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -3290,19 +3336,21 @@ system and application performance.
        between parcels for the given action should be queried for. The
        :term:`locality` id is a (zero based) number identifying the
        :term:`locality`.
+   * * Description
      * Returns the average time between arriving parcels for the
        action which is given by the counter parameter.
+   * * Parameters
      * The action type. This is the string which has been used while registering
        the action with |hpx|, e.g. which has been passed as the second parameter
        to the macro :c:macro:`HPX_REGISTER_ACTION` or
        :c:macro:`HPX_REGISTER_ACTION_ID`
 
-   * * ``/coalescing/time/parcel-arrival-histogram``
+.. list-table:: Performance counter ``/coalescing/time/parcel-arrival-histogram``
+   :widths: 20 80
 
-       .. _coalescing-time-parcel-arrival-histogram:
-
-       :ref:`??<coalescing-time-parcel-arrival-histogram>`
-
+   * * Counter type
+     * ``/coalescing/time/parcel-arrival-histogram``
+   * * Counter instance formatting
      * ``locality#*/total``
 
        where:
@@ -3311,6 +3359,7 @@ system and application performance.
        between parcels for the given action should be queried for. The
        :term:`locality` id is a (zero based) number identifying the
        :term:`locality`.
+   * * Description
      * Returns a histogram representing the times between arriving parcels for
        the action which is given by the counter parameter.
 
@@ -3325,7 +3374,7 @@ system and application performance.
 
        For each bucket the counter shows a value between ``0`` and ``1000``
        which corresponds to a percentage value between ``0%`` and ``100%``.
-
+   * * Parameters
      * The action type and optional histogram parameters. The action type is
        the string which has been used while registering the action with |hpx|,
        e.g. which has been passed as the second parameter to the macro
