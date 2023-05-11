@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,15 +17,16 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
-    /// This hook can be inserted into the derivation chain of any component
-    /// allowing to automatically lock all action invocations for any instance
-    /// of the given component.
+    // This hook can be inserted into the derivation chain of any component
+    // allowing to automatically lock all action invocations for any instance
+    // of the given component.
     template <typename BaseComponent, typename Mutex = hpx::spinlock>
     struct locking_hook : BaseComponent
     {
@@ -35,45 +36,33 @@ namespace hpx { namespace components {
         using this_component_type = typename base_type::this_component_type;
 
     public:
-        locking_hook() = default;
+        locking_hook()
+          : mtx_(std::make_shared<mutex_type>())
+        {
+        }
 
         template <typename T, typename... Ts,
             typename Enable = std::enable_if_t<
                 !std::is_same_v<std::decay_t<T>, locking_hook>>>
         explicit locking_hook(T&& t, Ts&&... ts)
           : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
+          , mtx_(std::make_shared<mutex_type>())
         {
         }
 
-        locking_hook(locking_hook const& rhs)
-          : base_type(rhs)
-          , mtx_()
-        {
-        }
+        locking_hook(locking_hook const& rhs) = default;
+        locking_hook(locking_hook&& rhs) = default;
 
-        locking_hook(locking_hook&& rhs) noexcept
-          : base_type(HPX_MOVE(rhs))
-          , mtx_()
-        {
-        }
+        locking_hook& operator=(locking_hook const& rhs) = default;
+        locking_hook& operator=(locking_hook&& rhs) = default;
 
-        locking_hook& operator=(locking_hook const& rhs)
-        {
-            this->base_type::operator=(rhs);
-            return *this;
-        }
-
-        locking_hook& operator=(locking_hook&& rhs) noexcept
-        {
-            this->base_type::operator=(HPX_MOVE(rhs));
-            return *this;
-        }
+        ~locking_hook() = default;
 
         using decorates_action = void;
 
-        // This is the hook implementation for decorate_action which locks
-        // the component ensuring that only one action is executed at a time
-        // for this component instance.
+        // This is the hook implementation for decorate_action which locks the
+        // component ensuring that only one action is executed at a time for
+        // this component instance.
         template <typename F>
         static threads::thread_function_type decorate_action(
             naming::address_type lva, F&& f)
@@ -95,10 +84,15 @@ namespace hpx { namespace components {
                 typename Enable = std::enable_if_t<
                     !std::is_same_v<std::decay_t<F>, decorate_wrapper>>>
             // NOLINTNEXTLINE(bugprone-forwarding-reference-overload)
-            decorate_wrapper(F&& f)
+            explicit decorate_wrapper(F&& f)
             {
                 threads::get_self().decorate_yield(HPX_FORWARD(F, f));
             }
+
+            decorate_wrapper(decorate_wrapper const&) = delete;
+            decorate_wrapper(decorate_wrapper&&) = delete;
+            decorate_wrapper& operator=(decorate_wrapper const&) = delete;
+            decorate_wrapper& operator=(decorate_wrapper&&) = delete;
 
             ~decorate_wrapper()
             {
@@ -111,15 +105,14 @@ namespace hpx { namespace components {
         threads::thread_result_type thread_function(
             threads::thread_function_type f, threads::thread_arg_type state)
         {
-            threads::thread_result_type result(
-                threads::thread_schedule_state::unknown,
-                threads::invalid_thread_id);
+            threads::thread_result_type result;
 
             // now lock the mutex and execute the action
-            std::unique_lock l(mtx_);
+            std::shared_ptr<mutex_type> mtx(mtx_);    // keep alive
+            std::unique_lock l(*mtx);
 
-            // We can safely ignore this lock while checking as it is
-            // guaranteed to be unlocked before the thread is suspended.
+            // We can safely ignore this lock while checking as it is guaranteed
+            // to be unlocked before the thread is suspended.
             //
             // If this lock is not ignored it will cause false positives as the
             // check for held locks is performed before this lock is unlocked.
@@ -128,7 +121,7 @@ namespace hpx { namespace components {
 
             {
                 // register our yield decorator
-                decorate_wrapper yield_decorator(
+                decorate_wrapper const yield_decorator(
                     hpx::bind_front(&locking_hook::yield_function, this));
 
                 result = f(state);
@@ -146,6 +139,11 @@ namespace hpx { namespace components {
             {
             }
 
+            undecorate_wrapper(undecorate_wrapper const&) = delete;
+            undecorate_wrapper(undecorate_wrapper&&) = delete;
+            undecorate_wrapper& operator=(undecorate_wrapper const&) = delete;
+            undecorate_wrapper& operator=(undecorate_wrapper&&) = delete;
+
             ~undecorate_wrapper()
             {
                 threads::get_self().decorate_yield(HPX_MOVE(yield_decorator_));
@@ -161,24 +159,22 @@ namespace hpx { namespace components {
         {
             // We undecorate the yield function as the lock handling may
             // suspend, which causes an infinite recursion otherwise.
-            undecorate_wrapper yield_decorator;
-            threads::thread_arg_type result =
-                threads::thread_restart_state::unknown;
+            undecorate_wrapper const yield_decorator;
+            threads::thread_arg_type result;
 
             {
-                unlock_guard ul(mtx_);
+                unlock_guard ul(*mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 
-            // Re-enable ignoring the lock on the mutex above (this
-            // information is lost in the lock tracking tables once a mutex is
-            // unlocked).
-            util::ignore_lock(&mtx_);
+            // Re-enable ignoring the lock on the mutex above (this information
+            // is lost in the lock tracking tables once a mutex is unlocked).
+            util::ignore_lock(mtx_.get());
 
             return result;
         }
 
     private:
-        mutable mutex_type mtx_;
+        std::shared_ptr<mutex_type> mtx_;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

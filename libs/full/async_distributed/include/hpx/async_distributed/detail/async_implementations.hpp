@@ -111,12 +111,7 @@ namespace hpx { namespace detail {
             // as an unmanaged id
             if (target_is_managed_)
             {
-                typedef typename traits::detail::shared_state_ptr_for<
-                    future<Result>>::type shared_state_ptr;
-
-                shared_state_ptr const& state =
-                    traits::detail::get_shared_state(f_);
-                if (state)
+                if (auto const& state = traits::detail::get_shared_state(f_))
                 {
                     HPX_ASSERT(id_);
                     HPX_ASSERT(unmanaged_id_);
