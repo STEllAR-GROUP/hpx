@@ -18,9 +18,9 @@
 #include <hpx/modules/errors.hpp>
 #include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/io.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/phoenix/core.hpp>
+#include <boost/phoenix/object.hpp>
+#include <boost/phoenix/operator.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_uint.hpp>
 
@@ -35,7 +35,7 @@
 #endif
 
 // type to store parser output
-BOOST_FUSION_DEFINE_STRUCT((hpx)(performance_counters)(io), proc_io,
+BOOST_FUSION_DEFINE_STRUCT((hpx) (performance_counters) (io), proc_io,
     (std::uint64_t, riss)(std::uint64_t, wiss)(std::uint64_t, rsysc)(
         std::uint64_t, wsysc)(std::uint64_t, rstor)(std::uint64_t, wstor)(
         std::uint64_t, wcanc))
