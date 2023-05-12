@@ -12,17 +12,41 @@
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
 
 namespace hpx::components {
+
+    namespace detail {
+
+        template <typename Mutex>
+        struct refcounted_mutex
+        {
+            friend void intrusive_ptr_add_ref(refcounted_mutex* p) noexcept
+            {
+                ++p->reference_count;
+            }
+
+            friend void intrusive_ptr_release(refcounted_mutex* p) noexcept
+            {
+                if (--p->reference_count == 0)
+                {
+                    delete p;
+                }
+            }
+
+            hpx::util::atomic_count reference_count{1};
+            Mutex mtx_;
+        };
+    }    // namespace detail
 
     // This hook can be inserted into the derivation chain of any component
     // allowing to automatically lock all action invocations for any instance
@@ -31,13 +55,13 @@ namespace hpx::components {
     struct locking_hook : BaseComponent
     {
     private:
-        using mutex_type = Mutex;
+        using mutex_type = detail::refcounted_mutex<Mutex>;
         using base_type = BaseComponent;
         using this_component_type = typename base_type::this_component_type;
 
     public:
         locking_hook()
-          : mtx_(std::make_shared<mutex_type>())
+          : mtx_(new mutex_type(), false)
         {
         }
 
@@ -46,7 +70,7 @@ namespace hpx::components {
                 !std::is_same_v<std::decay_t<T>, locking_hook>>>
         explicit locking_hook(T&& t, Ts&&... ts)
           : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
-          , mtx_(std::make_shared<mutex_type>())
+          , mtx_(new mutex_type(), false)
         {
         }
 
@@ -108,8 +132,8 @@ namespace hpx::components {
             threads::thread_result_type result;
 
             // now lock the mutex and execute the action
-            std::shared_ptr<mutex_type> mtx(mtx_);    // keep alive
-            std::unique_lock l(*mtx);
+            auto mtx(mtx_);    // keep alive
+            std::unique_lock l(mtx->mtx_);
 
             // We can safely ignore this lock while checking as it is guaranteed
             // to be unlocked before the thread is suspended.
@@ -163,7 +187,7 @@ namespace hpx::components {
             threads::thread_arg_type result;
 
             {
-                unlock_guard ul(*mtx_);
+                unlock_guard ul(mtx_->mtx_);
                 result = threads::get_self().yield_impl(state);
             }
 
@@ -175,6 +199,6 @@ namespace hpx::components {
         }
 
     private:
-        std::shared_ptr<mutex_type> mtx_;
+        hpx::intrusive_ptr<mutex_type> mtx_;
     };
 }    // namespace hpx::components
