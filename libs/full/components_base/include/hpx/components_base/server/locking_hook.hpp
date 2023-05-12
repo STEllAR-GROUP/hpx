@@ -19,7 +19,6 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <memory>
 #include <mutex>
 #include <type_traits>
 #include <utility>
