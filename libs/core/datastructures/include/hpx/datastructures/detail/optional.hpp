@@ -18,6 +18,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx::optional_ns {
 
     struct nullopt_t
@@ -347,7 +349,7 @@ namespace hpx::optional_ns {
                 std::destroy_at(reinterpret_cast<T*>(&storage_));
                 empty_ = true;
             }
-            std::construct_at(reinterpret_cast<T*>(&storage_),
+            hpx::construct_at(reinterpret_cast<T*>(&storage_),
                 HPX_FORWARD(F, f)(HPX_FORWARD(Ts, ts)...));
             empty_ = false;
         }
@@ -779,15 +781,14 @@ namespace hpx::optional_ns {
 }    // namespace hpx::optional_ns
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace std {
-
-    template <typename T>
-    struct hash<::hpx::optional_ns::optional<T>>
+template <typename T>
+struct std::hash<::hpx::optional_ns::optional<T>>
+{
+    constexpr std::size_t operator()(
+        ::hpx::optional_ns::optional<T> const& arg) const
     {
-        constexpr std::size_t operator()(
-            ::hpx::optional_ns::optional<T> const& arg) const
-        {
-            return arg ? std::hash<T>{}(*arg) : std::size_t{};
-        }
-    };
-}    // namespace std
+        return arg ? std::hash<T>{}(*arg) : std::size_t{};
+    }
+};
+
+#include <hpx/config/warnings_suffix.hpp>
