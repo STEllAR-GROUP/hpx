@@ -16,13 +16,24 @@ hpx_targets=(
 hpx_test_options=(
     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
     --hpx:threads=4 --vector_size=104857 --work_delay=1 \
-    --chunk_size=0 --test_count=5000"
+    --chunk_size=0 --test_count=200"
     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
     --hpx:queuing=local-priority --hpx:threads=4 --test-all \
-    --repetitions=500 --futures=207270"
+    --repetitions=40 --futures=207270"
     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
-    --vector_size=518176 --hpx:threads=4 --iterations=5000 \
-    --warmup_iterations=500")
+    --vector_size=518176 --hpx:threads=4 --iterations=200 \
+    --warmup_iterations=20")
+
+
+    #     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
+    # --hpx:threads=4 --vector_size=10000 --work_delay=1 \
+    # --chunk_size=0 --test_count=5000"
+    # "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
+    # --hpx:queuing=local-priority --hpx:threads=4 --test-all \
+    # --repetitions=100 --futures=500000"
+    # "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
+    # --vector_size=1048576 --hpx:threads=4 --iterations=5000 \
+    # --warmup_iterations=500")
 
 # Build binaries for performance tests
 ${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
@@ -37,10 +48,13 @@ ${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
 index=0
 result_files=""
 
+n_executions=50
+
 # Run and compare for each targets specified
 for executable in "${hpx_targets[@]}"; do
     test_opts=${hpx_test_options[$index]}
     result=${build_dir}/reports/${executable}.json
+
     reference=${perftests_dir}/perftest/references/lsu_default/${executable}.json
     result_files+=(${result})
     references_files+=(${reference})
@@ -52,7 +66,7 @@ for executable in "${hpx_targets[@]}"; do
 
     # Run performance tests
     ${perftests_dir}/driver.py -v -l $logfile_tmp perftest run --local True \
-        --run_output $result --targets-and-opts "${run_command[@]}" ||
+        --run_output $result --targets-and-opts "${run_command[@]}" --n_executions $n_executions  ||
         {
             echo 'Running failed'
             test_errors=1
