@@ -19,6 +19,8 @@
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <array>
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <utility>
@@ -77,10 +79,10 @@ namespace hpx { namespace distributed {
     barrier::barrier(std::string const& base_name,
         std::vector<std::size_t> const& ranks, std::size_t rank)
     {
-        auto rank_it = std::find(ranks.begin(), ranks.end(), rank);
+        auto const rank_it = std::find(ranks.begin(), ranks.end(), rank);
         HPX_ASSERT(rank_it != ranks.end());
 
-        std::size_t barrier_rank = std::distance(ranks.begin(), rank_it);
+        std::size_t const barrier_rank = std::distance(ranks.begin(), rank_it);
         node_.reset(hpx::construct_at(
             static_cast<wrapping_type*>(
                 hpx::components::component_heap<wrapping_type>().alloc()),
@@ -116,12 +118,12 @@ namespace hpx { namespace distributed {
         release();
     }
 
-    void barrier::wait()
+    void barrier::wait() const
     {
         (*node_)->wait(false).get();
     }
 
-    hpx::future<void> barrier::wait(hpx::launch::async_policy)
+    hpx::future<void> barrier::wait(hpx::launch::async_policy) const
     {
         return (*node_)->wait(true);
     }
@@ -184,24 +186,29 @@ namespace hpx { namespace distributed {
         }
     }
 
-    barrier barrier::create_global_barrier()
+    std::array<barrier, 2> barrier::create_global_barrier()
     {
         runtime& rt = get_runtime();
         util::runtime_configuration const& cfg = rt.get_config();
-        return barrier("/0/hpx/global_barrier",
+        barrier b1("/0/hpx/global_barrier0",
             static_cast<std::size_t>(cfg.get_num_localities()));
+        barrier b2("/0/hpx/global_barrier1",
+            static_cast<std::size_t>(cfg.get_num_localities()));
+        return {{HPX_MOVE(b1), HPX_MOVE(b2)}};
     }
 
-    barrier& barrier::get_global_barrier()
+    std::array<barrier, 2>& barrier::get_global_barrier()
     {
-        static barrier b;
-        return b;
+        static std::array<barrier, 2> bs = {};
+        return bs;
     }
 
     void barrier::synchronize()
     {
-        static barrier& b = get_global_barrier();
-        HPX_ASSERT(b.node_);
-        b.wait();
+        static std::atomic<std::size_t> gen = 0;
+        static std::array<barrier, 2>& b = get_global_barrier();
+        HPX_ASSERT(b[0].node_ && b[1].node_);
+
+        b[++gen % 2].wait();
     }
 }}    // namespace hpx::distributed
