@@ -249,9 +249,12 @@ void print_counters(char const* name)
     hpx::error_code ec;
     for (performance_counter const& c : discover_counters(name, ec))
     {
-        counter_value value = c.get_counter_value(hpx::launch::sync);
-        std::cout << "counter: " << c.get_name(hpx::launch::sync)
-                  << ", value: " << value.get_value<double>() << std::endl;
+        counter_value value = c.get_counter_value(hpx::launch::sync, ec);
+        if (!ec)
+        {
+            std::cout << "counter: " << c.get_name(hpx::launch::sync)
+                      << ", value: " << value.get_value<double>() << std::endl;
+        }
     }
 }
 
