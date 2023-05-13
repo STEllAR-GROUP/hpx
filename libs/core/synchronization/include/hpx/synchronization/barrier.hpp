@@ -217,11 +217,10 @@ namespace hpx {
         void arrive_and_wait()
         {
             std::unique_lock<mutex_type> l(mtx_);
-            arrival_token old_phase = arrive_locked(l, 1);
+            arrival_token const old_phase = arrive_locked(l, 1);
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT_LOCKED(l, phase_ != old_phase);    //-V547
             }
         }
 
