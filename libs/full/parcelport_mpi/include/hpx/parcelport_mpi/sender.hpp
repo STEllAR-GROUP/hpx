@@ -24,6 +24,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 namespace hpx::parcelset::policies::mpi {
 
@@ -75,7 +76,9 @@ namespace hpx::parcelset::policies::mpi {
                     postprocess_handler;
                 std::swap(
                     postprocess_handler, connection->postprocess_handler_);
-                postprocess_handler(ec, connection->destination(), connection);
+                if (postprocess_handler)
+                    postprocess_handler(
+                        ec, connection->destination(), connection);
             }
             else
             {
@@ -104,6 +107,22 @@ namespace hpx::parcelset::policies::mpi {
             }
             next_free_tag();
             return has_work;
+        }
+
+        using buffer_type = std::vector<char>;
+        using chunk_type = serialization::serialization_chunk;
+        using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
+        using callback_fn_type =
+            hpx::move_only_function<void(error_code const&)>;
+        bool send_immediate(parcelset::parcelport* pp,
+            parcelset::locality const& dest, parcel_buffer_type buffer,
+            callback_fn_type&& callbackFn)
+        {
+            int dest_rank = dest.get<locality>().rank();
+            auto connection = create_connection(dest_rank, pp);
+            connection->buffer_ = HPX_MOVE(buffer);
+            connection->async_write(HPX_MOVE(callbackFn), nullptr);
+            return true;
         }
 
     private:

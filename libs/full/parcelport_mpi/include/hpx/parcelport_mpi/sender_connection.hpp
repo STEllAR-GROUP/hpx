@@ -86,12 +86,14 @@ namespace hpx::parcelset::policies::mpi {
         {
         }
 
-        template <typename Handler, typename ParcelPostprocess>
+        using handler_type = hpx::move_only_function<void(error_code const&)>;
+        using post_handler_type = hpx::move_only_function<void(
+            error_code const&, parcelset::locality const&,
+            std::shared_ptr<sender_connection>)>;
         void async_write(
-            Handler&& handler, ParcelPostprocess&& parcel_postprocess)
+            handler_type&& handler, post_handler_type&& parcel_postprocess)
         {
             HPX_ASSERT(!handler_);
-            HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -118,7 +120,8 @@ namespace hpx::parcelset::policies::mpi {
             {
                 HPX_ASSERT(!handler_);
                 error_code ec;
-                parcel_postprocess(ec, there_, shared_from_this());
+                if (parcel_postprocess)
+                    parcel_postprocess(ec, there_, shared_from_this());
             }
         }
 
@@ -307,12 +310,7 @@ namespace hpx::parcelset::policies::mpi {
         int tag_;
         int dst_;
 
-        using handler_type = hpx::move_only_function<void(error_code const&)>;
         handler_type handler_;
-
-        using post_handler_type = hpx::move_only_function<void(
-            error_code const&, parcelset::locality const&,
-            std::shared_ptr<sender_connection>)>;
         post_handler_type postprocess_handler_;
 
         header header_;

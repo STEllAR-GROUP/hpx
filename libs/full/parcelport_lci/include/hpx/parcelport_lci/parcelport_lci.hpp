@@ -231,6 +231,7 @@ namespace hpx::traits {
                 "${HPX_HAVE_PARCELPORT_LCI_MAX_CONNECTIONS:8192}\n"
                 "log_level = none\n"
                 "log_outfile = stderr\n"
+                "sendimm = 1\n"
                 "backlog_queue = 0\n"
                 "use_two_device = 0\n"
                 "prg_thread_core = -1\n"
