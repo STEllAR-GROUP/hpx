@@ -43,13 +43,15 @@ namespace hpx::execution::experimental {
             hpx::intrusive_ptr<Data> data;
 
         protected:
+            // Note: MSVC toolset v142 fails compiling 'data->' below, using
+            // '(*data).' instead
             template <typename U>
             void set_value(U&& u) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
-                    [&]() { data->set_value(HPX_FORWARD(U, u)); },
+                    [&]() { (*data).set_value(HPX_FORWARD(U, u)); },
                     [&](std::exception_ptr ep) {
-                        data->set_exception(HPX_MOVE(ep));
+                        (*data).set_exception(HPX_MOVE(ep));
                     });
                 data.reset();
             }

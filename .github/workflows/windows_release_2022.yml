@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Windows CI (Debug)
+name: Windows CI (Release, VS2022 toolset)
 
 on: [pull_request]
 
@@ -27,7 +27,7 @@ jobs:
       shell: bash
       run: |
           cmake . -Bbuild -G'Visual Studio 17 2022' \
-              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_TOOLCHAIN_FILE='C:/projects/vcpkg/scripts/buildsystems/vcpkg.cmake' \
               -DHPX_WITH_FETCH_ASIO=ON \
               -DHPX_WITH_EXAMPLES=ON \
@@ -35,26 +35,25 @@ jobs:
               -DHPX_WITH_TESTS_UNIT=ON \
               -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
-              -DHPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION=ON \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
-          cmake --build build --config Debug \
+          cmake --build build --config Release \
           --target ALL_BUILD \
           -- -maxcpucount:2 -verbosity:minimal -nologo
     - name: Install
       shell: bash
       run: |
-          cmake --install build --config Debug
+          cmake --install build --config Release
     - name: Test
       run: |
-          Set-Alias -Name grep -Value 'C:\Program Files\Git\usr\bin\grep.exe'
-          Set-Alias -Name sed -Value 'C:\Program Files\Git\usr\bin\sed.exe'
+          Set-Alias -Name grep -Value "C:\Program Files\Git\usr\bin\grep.exe"
+          Set-Alias -Name sed -Value "C:\Program Files\Git\usr\bin\sed.exe"
           cd build
           ctest `
           --output-on-failure `
-            --build-config Debug `
+            --build-config Release `
             --tests-regex tests.examples `
             --exclude-regex `
                  $(grep -v  -e ^# -e ^$ D:/a/hpx/hpx/.github/workflows/tests.examples.targets | sed ':b;N;$!bb;s/\n/|/g')
