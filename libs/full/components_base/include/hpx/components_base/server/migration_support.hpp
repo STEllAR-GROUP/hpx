@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
@@ -43,7 +43,7 @@ namespace hpx { namespace components {
         }
 
         template <typename T, typename... Ts,
-            typename Enable = std::enable_if_t<
+            typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<T>, migration_support>>>
         explicit migration_support(T&& t, Ts&&... ts)
           : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
@@ -218,9 +218,9 @@ namespace hpx { namespace components {
                 false);
         }
 
-        /// This hook is invoked on the newly created object after the migration
-        /// has been finished
-        constexpr void on_migrated() noexcept {}
+        // This hook is invoked on the newly created object after the migration
+        // has been finished
+        static constexpr void on_migrated() noexcept {}
 
         using decorates_action = void;
 
@@ -270,4 +270,4 @@ namespace hpx { namespace components {
         hpx::promise<void> trigger_migration_;
         bool was_marked_for_migration_;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

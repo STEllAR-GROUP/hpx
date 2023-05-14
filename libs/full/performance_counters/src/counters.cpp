@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,7 +22,6 @@
 #include <hpx/performance_counters/counter_interface.hpp>
 #include <hpx/performance_counters/counter_parser.hpp>
 #include <hpx/performance_counters/counters.hpp>
-#include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/registry.hpp>
 #include <hpx/runtime_local/get_num_all_localities.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
@@ -298,12 +297,12 @@ namespace hpx::performance_counters {
         return counter_status::valid_data;
     }
 
-    /// \brief Fill the given \a counter_path_elements instance from the given
-    ///        full name of a counter
-    ///
-    ///    /objectname{parentinstancename#parentindex
-    ///       /instancename#instanceindex}/countername
-    ///
+    // Fill the given \a counter_path_elements instance from the given full name
+    // of a counter
+    //
+    //    /objectname{parentinstancename#parentindex
+    //       /instancename#instanceindex}/countername
+    //
     counter_status get_counter_path_elements(
         std::string const& name, counter_path_elements& path, error_code& ec)
     {
@@ -355,14 +354,16 @@ namespace hpx::performance_counters {
 
                 if (path.instancename_ == "pool")
                 {
-                    path.instanceindex_ = hpx::resource::get_pool_index(
-                        elements.instance_.child_.index_);
+                    path.instanceindex_ =
+                        static_cast<std::int64_t>(hpx::resource::get_pool_index(
+                            elements.instance_.child_.index_));
                 }
                 else
                 {
                     path.instanceindex_ = hpx::util::from_string<std::int64_t>(
-                        elements.instance_.child_.index_, std::int64_t(-2));
-                    if (path.instanceindex_ == std::int64_t(-2))
+                        elements.instance_.child_.index_,
+                        static_cast<std::int64_t>(-2));
+                    if (path.instanceindex_ == static_cast<std::int64_t>(-2))
                     {
                         HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                             "get_counter_path_elements",
@@ -378,7 +379,7 @@ namespace hpx::performance_counters {
             }
             else if (!elements.instance_.subchild_.index_.empty())
             {
-                path.subinstanceindex_ = hpx::util::from_string<std::uint64_t>(
+                path.subinstanceindex_ = hpx::util::from_string<std::int64_t>(
                     elements.instance_.subchild_.index_);
             }
         }
@@ -389,12 +390,11 @@ namespace hpx::performance_counters {
         return counter_status::valid_data;
     }
 
-    /// \brief Fill the given \a counter_type_path_elements instance from the
-    ///        given full name of a counter
-    ///
-    ///    /objectname{...}/countername
-    ///    /objectname
-    ///
+    // Fill the given \a counter_type_path_elements instance from the given full
+    // name of a counter
+    //
+    //    /objectname{...}/countername /objectname
+    //
     counter_status get_counter_type_path_elements(std::string const& name,
         counter_type_path_elements& path, error_code& ec)
     {
@@ -425,7 +425,8 @@ namespace hpx::performance_counters {
     {
         counter_type_path_elements p;
 
-        counter_status status = get_counter_type_path_elements(name, p, ec);
+        counter_status const status =
+            get_counter_type_path_elements(name, p, ec);
         if (!status_is_valid(status))
             return status;
 
@@ -438,7 +439,7 @@ namespace hpx::performance_counters {
     {
         counter_path_elements p;
 
-        counter_status status = get_counter_path_elements(name, p, ec);
+        counter_status const status = get_counter_path_elements(name, p, ec);
         if (!status_is_valid(status))
             return status;
 
@@ -459,7 +460,7 @@ namespace hpx::performance_counters {
     {
         counter_path_elements p;
 
-        counter_status status =
+        counter_status const status =
             get_counter_path_elements(info.fullname_, p, ec);
         if (!status_is_valid(status))
             return status;
@@ -497,7 +498,8 @@ namespace hpx::performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Get the name for a given counter type
     namespace strings {
-        char const* const counter_type_names[] = {
+
+        constexpr char const* const counter_type_names[] = {
             "text",
             "raw",
             "monotonically_increasing",
@@ -779,7 +781,6 @@ namespace hpx::performance_counters {
                     "create_counter_local",
                     "no create function for performance counter found: {} ({})",
                     remove_counter_prefix(info.fullname_), ec.get_message());
-                return naming::invalid_gid;
             }
 
             counter_path_elements paths;
@@ -795,7 +796,6 @@ namespace hpx::performance_counters {
                     "create_counter_local",
                     "attempt to create counter on wrong locality ({})",
                     ec.get_message());
-                return hpx::naming::invalid_gid;
             }
 
             // attempt to create the new counter instance
@@ -806,7 +806,6 @@ namespace hpx::performance_counters {
                     "create_counter_local",
                     "couldn't create performance counter: {} ({})",
                     remove_counter_prefix(info.fullname_), ec.get_message());
-                return naming::invalid_gid;
             }
 
             return gid;
@@ -815,7 +814,7 @@ namespace hpx::performance_counters {
         ///////////////////////////////////////////////////////////////////////
         inline bool is_thread_kind(std::string const& pattern)
         {
-            std::string::size_type p = pattern.find("-thread#*");
+            std::string::size_type const p = pattern.find("-thread#*");
             return p != std::string::npos && p == pattern.size() - 9;
         }
 
@@ -828,7 +827,7 @@ namespace hpx::performance_counters {
         ///////////////////////////////////////////////////////////////////////
         inline bool is_pool_kind(std::string const& pattern)
         {
-            std::string::size_type p = pattern.find("pool#*");
+            std::string::size_type const p = pattern.find("pool#*");
             return p != std::string::npos;
         }
 
@@ -841,7 +840,7 @@ namespace hpx::performance_counters {
         ///////////////////////////////////////////////////////////////////////
         inline bool is_node_kind(std::string const& pattern)
         {
-            std::string::size_type p = pattern.find("-node#*");
+            std::string::size_type const p = pattern.find("-node#*");
             return p != std::string::npos && p == pattern.size() - 7;
         }
 
@@ -859,18 +858,24 @@ namespace hpx::performance_counters {
         {
             // discover all base names
             std::vector<counter_info> counter_infos;
-            counter_status status = discover_counter_type(p.parentinstancename_,
-                counter_infos, discover_counters_mode::full, ec);
-            if (!status_is_valid(status) || ec)
+            if (counter_status const status =
+                    discover_counter_type(p.parentinstancename_, counter_infos,
+                        discover_counters_mode::full, ec);
+                !status_is_valid(status) || ec)
+            {
                 return false;
+            }
 
             counter_info i = info;
-            for (counter_info& basei : counter_infos)
+            for (counter_info const& basei : counter_infos)
             {
                 p.parentinstancename_ = basei.fullname_;
-                counter_status status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
+                if (counter_status const s =
+                        get_counter_name(p, i.fullname_, ec);
+                    !status_is_valid(s) || !f(i, ec) || ec)
+                {
                     return false;
+                }
             }
             return true;
         }
@@ -881,31 +886,35 @@ namespace hpx::performance_counters {
             counter_path_elements& p, discover_counter_func const& f,
             error_code& ec)
         {
-            std::size_t num_pools = hpx::resource::get_num_thread_pools();
+            std::size_t const num_pools = hpx::resource::get_num_thread_pools();
             for (std::size_t l = 0; l != num_pools; ++l)
             {
                 p.instanceindex_ = static_cast<std::int64_t>(l);
 
                 if (expand_threads)
                 {
-                    std::size_t num_threads =
+                    std::size_t const num_threads =
                         hpx::resource::get_num_threads(p.instanceindex_);
                     for (std::size_t t = 0; t != num_threads; ++t)
                     {
                         p.subinstanceindex_ = static_cast<std::int64_t>(t);
 
-                        counter_status status =
-                            get_counter_name(p, i.fullname_, ec);
-                        if (!status_is_valid(status) || !f(i, ec) || ec)
+                        if (counter_status const status =
+                                get_counter_name(p, i.fullname_, ec);
+                            !status_is_valid(status) || !f(i, ec) || ec)
+                        {
                             return false;
+                        }
                     }
                 }
                 else
                 {
-                    counter_status status =
-                        get_counter_name(p, i.fullname_, ec);
-                    if (!status_is_valid(status) || !f(i, ec) || ec)
+                    if (counter_status const status =
+                            get_counter_name(p, i.fullname_, ec);
+                        !status_is_valid(status) || !f(i, ec) || ec)
+                    {
                         return false;
+                    }
                 }
             }
             return true;
@@ -915,15 +924,18 @@ namespace hpx::performance_counters {
             counter_path_elements& p, discover_counter_func const& f,
             error_code& ec)
         {
-            std::size_t num_threads =
+            std::size_t const num_threads =
                 hpx::resource::get_num_threads(p.instanceindex_);
             for (std::size_t t = 0; t != num_threads; ++t)
             {
                 p.subinstanceindex_ = static_cast<std::int64_t>(t);
 
-                counter_status status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
+                if (counter_status const status =
+                        get_counter_name(p, i.fullname_, ec);
+                    !status_is_valid(status) || !f(i, ec) || ec)
+                {
                     return false;
+                }
             }
             return true;
         }
@@ -932,13 +944,16 @@ namespace hpx::performance_counters {
             counter_path_elements& p, discover_counter_func const& f,
             error_code& ec)
         {
-            std::size_t num_threads = get_os_thread_count();
+            std::size_t const num_threads = get_os_thread_count();
             for (std::size_t l = 0; l != num_threads; ++l)
             {
                 p.instanceindex_ = static_cast<std::int64_t>(l);
-                counter_status status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
+                if (counter_status const status =
+                        get_counter_name(p, i.fullname_, ec);
+                    !status_is_valid(status) || !f(i, ec) || ec)
+                {
                     return false;
+                }
             }
             return true;
         }
@@ -947,14 +962,17 @@ namespace hpx::performance_counters {
             counter_path_elements& p, discover_counter_func const& f,
             error_code& ec)
         {
-            std::size_t num_nodes =
+            std::size_t const num_nodes =
                 hpx::threads::get_topology().get_number_of_numa_nodes();
             for (std::size_t l = 0; l != num_nodes; ++l)
             {
                 p.instanceindex_ = static_cast<std::int64_t>(l);
-                counter_status status = get_counter_name(p, i.fullname_, ec);
-                if (!status_is_valid(status) || !f(i, ec) || ec)
+                if (counter_status const status =
+                        get_counter_name(p, i.fullname_, ec);
+                    !status_is_valid(status) || !f(i, ec) || ec)
+                {
                     return false;
+                }
             }
             return true;
         }
@@ -990,7 +1008,8 @@ namespace hpx::performance_counters {
                 expand_nodes = true;
             }
 
-            std::uint32_t last_locality = get_num_localities(hpx::launch::sync);
+            std::uint32_t const last_locality =
+                get_num_localities(hpx::launch::sync);
             for (std::uint32_t l = 0; l != last_locality; ++l)
             {
                 p.parentinstanceindex_ = static_cast<std::int32_t>(l);
@@ -1014,10 +1033,12 @@ namespace hpx::performance_counters {
                 }
                 else
                 {
-                    counter_status status =
-                        get_counter_name(p, i.fullname_, ec);
-                    if (!status_is_valid(status) || !f(i, ec) || ec)
+                    if (counter_status const status =
+                            get_counter_name(p, i.fullname_, ec);
+                        !status_is_valid(status) || !f(i, ec) || ec)
+                    {
                         return false;
+                    }
                 }
             }
             return true;
@@ -1104,10 +1125,12 @@ namespace hpx::performance_counters {
         discover_counter_func const& f, error_code& ec)
     {
         counter_path_elements p;
-        counter_status status =
-            get_counter_path_elements(info.fullname_, p, ec);
-        if (!status_is_valid(status))
+        if (counter_status const status =
+                get_counter_path_elements(info.fullname_, p, ec);
+            !status_is_valid(status))
+        {
             return false;
+        }
 
         return detail::expand_counter_info(info, p, f, ec);
     }
@@ -1126,13 +1149,11 @@ namespace hpx::performance_counters {
     hpx::future<hpx::id_type> get_counter_async(
         counter_info const& info, error_code& ec)
     {
-        typedef hpx::future<hpx::id_type> result_type;
-
         // complement counter info data
         counter_info complemented_info = info;
         complement_counter_info(complemented_info, ec);
         if (ec)
-            return result_type();
+            return {};
 
         ensure_counter_prefix(complemented_info.fullname_);
         // pre-pend prefix, if necessary
@@ -1148,7 +1169,7 @@ namespace hpx::performance_counters {
                 counter_path_elements p;
                 get_counter_path_elements(complemented_info.fullname_, p, ec);
                 if (ec)
-                    return result_type();
+                    return {};
 
                 // Take target locality from base counter if if this is an
                 // aggregating counter (the instance name is a base counter).
@@ -1156,7 +1177,7 @@ namespace hpx::performance_counters {
                 {
                     get_counter_path_elements(p.parentinstancename_, p, ec);
                     if (ec)
-                        return result_type();
+                        return {};
                 }
 
                 if (p.parentinstancename_ == "locality" &&
@@ -1167,7 +1188,7 @@ namespace hpx::performance_counters {
                 {
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter, "get_counter",
                         "attempt to create counter on non-existing locality");
-                    return result_type();
+                    return {};
                 }
 
                 // use the runtime_support component of the target locality to
@@ -1201,11 +1222,11 @@ namespace hpx::performance_counters {
                 LPCS_(warning).format("failed to create counter {} ({})",
                     remove_counter_prefix(complemented_info.fullname_),
                     e.what());
-                return hpx::future<hpx::id_type>();
+                return {};
             }
         }
         if (ec)
-            return result_type();
+            return {};
 
         return hpx::make_ready_future(id);
     }
@@ -1215,13 +1236,13 @@ namespace hpx::performance_counters {
     {
         ensure_counter_prefix(name);    // prepend prefix, if necessary
 
-        counter_info info(name);    // set full counter name
+        counter_info const info(name);    // set full counter name
         return get_counter_async(info, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_value::serialize(
-        serialization::output_archive& ar, unsigned int const)
+        serialization::output_archive& ar, unsigned int const) const
     {
         // clang-format off
         ar & status_ & time_ & count_ & value_ & scaling_ & scale_inverse_;
@@ -1237,7 +1258,7 @@ namespace hpx::performance_counters {
     }
 
     void counter_values_array::serialize(
-        serialization::output_archive& ar, unsigned int const)
+        serialization::output_archive& ar, unsigned int const) const
     {
         // clang-format off
         ar & status_ & time_ & count_ & values_ & scaling_ & scale_inverse_;
@@ -1254,7 +1275,7 @@ namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_type_path_elements::serialize(
-        serialization::output_archive& ar, unsigned int const)
+        serialization::output_archive& ar, unsigned int const) const
     {
         // clang-format off
         ar & objectname_ & countername_ & parameters_;
@@ -1273,9 +1294,10 @@ namespace hpx::performance_counters {
     void counter_path_elements::serialize(
         serialization::output_archive& ar, unsigned int const)
     {
-        typedef counter_type_path_elements base_type;
-        hpx::serialization::base_object_type<counter_path_elements, base_type>
-            base = hpx::serialization::base_object<base_type>(*this);
+        using base_type = counter_type_path_elements;
+        hpx::serialization::base_object_type<counter_path_elements,
+            base_type> const base =
+            hpx::serialization::base_object<base_type>(*this);
 
         // clang-format off
         ar & base & parentinstancename_ & instancename_ & subinstancename_ &
@@ -1287,9 +1309,10 @@ namespace hpx::performance_counters {
     void counter_path_elements::serialize(
         serialization::input_archive& ar, unsigned int const)
     {
-        typedef counter_type_path_elements base_type;
-        hpx::serialization::base_object_type<counter_path_elements, base_type>
-            base = hpx::serialization::base_object<base_type>(*this);
+        using base_type = counter_type_path_elements;
+        hpx::serialization::base_object_type<counter_path_elements,
+            base_type> const base =
+            hpx::serialization::base_object<base_type>(*this);
 
         // clang-format off
         ar & base & parentinstancename_ & instancename_ & subinstancename_ &
@@ -1300,7 +1323,7 @@ namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     void counter_info::serialize(
-        serialization::output_archive& ar, unsigned int const)
+        serialization::output_archive& ar, unsigned int const) const
     {
         // clang-format off
         ar & type_ & version_ & status_ & fullname_ & helptext_ &

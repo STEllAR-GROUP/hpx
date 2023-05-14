@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,10 +8,8 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/async_distributed/post.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/performance_counter.hpp>
@@ -20,7 +18,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     performance_counter::performance_counter(std::string const& name)
@@ -57,13 +55,23 @@ namespace hpx { namespace performance_counters {
 #endif
     }
     counter_info performance_counter::get_info(
-        launch::sync_policy, error_code& ec) const
+        launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
-        return get_info().get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return counter_info{};
+        using action_type =
+            server::base_performance_counter::get_counter_info_action;
+        return hpx::async(action_type(), HPX_MOVE(id)).get(ec);
+#else
+        HPX_ASSERT(false);
+        return counter_info{};
+#endif
     }
 
     hpx::future<counter_value> performance_counter::get_counter_value(
-        bool reset)
+        [[maybe_unused]] bool reset) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -71,72 +79,77 @@ namespace hpx { namespace performance_counters {
         return hpx::async<action_type>(get_id(), reset);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(reset);
         return hpx::make_ready_future(counter_value{});
 #endif
     }
-    counter_value performance_counter::get_counter_value(
-        launch::sync_policy, bool reset, error_code& ec)
+    counter_value performance_counter::get_counter_value(launch::sync_policy,
+        [[maybe_unused]] bool reset, [[maybe_unused]] error_code& ec) const
     {
-        return get_counter_value(reset).get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return counter_value{};
+        using action_type =
+            server::base_performance_counter::get_counter_value_action;
+        return hpx::async(action_type(), HPX_MOVE(id), reset).get(ec);
+#else
+        HPX_ASSERT(false);
+        return counter_value{};
+#endif
     }
 
     hpx::future<counter_value> performance_counter::get_counter_value() const
     {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type =
-            server::base_performance_counter::get_counter_value_action;
-        return hpx::async<action_type>(get_id(), false);
-#else
-        HPX_ASSERT(false);
-        return hpx::make_ready_future(counter_value{});
-#endif
+        return get_counter_value(false);
     }
     counter_value performance_counter::get_counter_value(
-        launch::sync_policy, error_code& ec) const
+        launch::sync_policy l, error_code& ec) const
     {
-        return get_counter_value().get(ec);
+        return get_counter_value(l, false, ec);
     }
 
     hpx::future<counter_values_array>
-    performance_counter::get_counter_values_array(bool reset)
+    performance_counter::get_counter_values_array(
+        [[maybe_unused]] bool reset) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
             server::base_performance_counter::get_counter_values_array_action;
-        return hpx::async<action_type>(get_id(), reset);
+        return hpx::async(action_type(), get_id(), reset);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(reset);
         return hpx::make_ready_future(counter_values_array{});
 #endif
     }
     counter_values_array performance_counter::get_counter_values_array(
-        launch::sync_policy, bool reset, error_code& ec)
+        launch::sync_policy, bool reset, error_code& ec) const
     {
-        return get_counter_values_array(reset).get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return counter_values_array{};
+        using action_type =
+            server::base_performance_counter::get_counter_values_array_action;
+        return hpx::async(action_type(), HPX_MOVE(id), reset).get(ec);
+#else
+        HPX_ASSERT(false);
+        return counter_values_array{};
+#endif
     }
 
     hpx::future<counter_values_array>
     performance_counter::get_counter_values_array() const
     {
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type =
-            server::base_performance_counter::get_counter_values_array_action;
-        return hpx::async<action_type>(get_id(), false);
-#else
-        HPX_ASSERT(false);
-        return hpx::make_ready_future(counter_values_array{});
-#endif
+        return get_counter_values_array(false);
     }
     counter_values_array performance_counter::get_counter_values_array(
-        launch::sync_policy, error_code& ec) const
+        launch::sync_policy l, error_code& ec) const
     {
-        return get_counter_values_array().get(ec);
+        return get_counter_values_array(l, false, ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<bool> performance_counter::start()
+    hpx::future<bool> performance_counter::start() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::start_action;
@@ -146,12 +159,22 @@ namespace hpx { namespace performance_counters {
         return hpx::make_ready_future(true);
 #endif
     }
-    bool performance_counter::start(launch::sync_policy, error_code& ec)
+    bool performance_counter::start(
+        launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
-        return start().get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return false;
+        using action_type = server::base_performance_counter::start_action;
+        return hpx::async(action_type(), HPX_MOVE(id)).get(ec);
+#else
+        HPX_ASSERT(false);
+        return false;
+#endif
     }
 
-    hpx::future<bool> performance_counter::stop()
+    hpx::future<bool> performance_counter::stop() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::stop_action;
@@ -161,12 +184,22 @@ namespace hpx { namespace performance_counters {
         return hpx::make_ready_future(true);
 #endif
     }
-    bool performance_counter::stop(launch::sync_policy, error_code& ec)
+    bool performance_counter::stop(
+        launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
-        return stop().get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return false;
+        using action_type = server::base_performance_counter::stop_action;
+        return hpx::async(action_type(), HPX_MOVE(id)).get(ec);
+#else
+        HPX_ASSERT(false);
+        return false;
+#endif
     }
 
-    hpx::future<void> performance_counter::reset()
+    hpx::future<void> performance_counter::reset() const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type =
@@ -177,29 +210,47 @@ namespace hpx { namespace performance_counters {
         return hpx::make_ready_future();
 #endif
     }
-    void performance_counter::reset(launch::sync_policy, error_code& ec)
+    void performance_counter::reset(
+        launch::sync_policy, [[maybe_unused]] error_code& ec) const
     {
-        reset().get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return;
+        using action_type =
+            server::base_performance_counter::reset_counter_value_action;
+        hpx::async(action_type(), HPX_MOVE(id)).get(ec);
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
-    hpx::future<void> performance_counter::reinit(bool reset)
+    hpx::future<void> performance_counter::reinit(
+        [[maybe_unused]] bool reset) const
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         using action_type = server::base_performance_counter::reinit_action;
         return hpx::async<action_type>(get_id(), reset);
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(reset);
         return hpx::make_ready_future();
 #endif
     }
     void performance_counter::reinit(
-        launch::sync_policy, bool reset, error_code& ec)
+        launch::sync_policy, bool reset, error_code& ec) const
     {
-        reinit(reset).get(ec);
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::id_type id = get_id(ec);
+        if (ec)
+            return;
+        using action_type = server::base_performance_counter::reinit_action;
+        hpx::async(action_type(), HPX_MOVE(id), reset).get(ec);
+#else
+        HPX_ASSERT(false);
+#endif
     }
 
-    ///
+    ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::string> performance_counter::get_name() const
     {
         return hpx::make_future<std::string>(get_info(),
@@ -220,25 +271,25 @@ namespace hpx { namespace performance_counters {
         std::vector<performance_counter> counters;
 
         std::vector<counter_info> infos;
-        counter_status status = discover_counter_type(
+        counter_status const status = discover_counter_type(
             name, infos, discover_counters_mode::full, ec);
         if (!status_is_valid(status) || ec)
             return counters;
 
-        try
+        counters.reserve(infos.size());
+        for (counter_info const& info : infos)
         {
-            counters.reserve(infos.size());
-            for (counter_info const& info : infos)
+            try
             {
                 performance_counter counter(info.fullname_);
                 counters.push_back(counter);
             }
-        }
-        catch (hpx::exception const& e)
-        {
-            HPX_RETHROWS_IF(ec, e, "discover_counters");
+            catch (hpx::exception const& e)
+            {
+                HPX_RETHROWS_IF(ec, e, "discover_counters");
+            }
         }
 
         return counters;
     }
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

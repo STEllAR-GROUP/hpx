@@ -240,7 +240,9 @@ namespace hpx { namespace detail {
     void post_main()
     {
         // simply destroy global barrier
-        hpx::distributed::barrier::get_global_barrier().detach();
+        auto& b = hpx::distributed::barrier::get_global_barrier();
+        b[0].detach();
+        b[1].detach();
     }
 }}    // namespace hpx::detail
 

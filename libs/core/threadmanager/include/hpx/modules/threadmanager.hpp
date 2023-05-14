@@ -22,6 +22,7 @@
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
@@ -140,7 +141,9 @@ namespace hpx { namespace threads {
 
         bool is_busy();
         bool is_idle();
+
         void wait();
+        bool wait_for(hpx::chrono::steady_duration const& rel_time);
 
         // \brief Suspend all thread pools.
         void suspend();

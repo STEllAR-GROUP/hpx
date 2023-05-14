@@ -246,18 +246,22 @@ void print_counters(char const* name)
 {
     using namespace hpx::performance_counters;
 
-    for (performance_counter const& c : discover_counters(name))
+    hpx::error_code ec;
+    for (performance_counter const& c : discover_counters(name, ec))
     {
-        counter_value value = c.get_counter_value(hpx::launch::sync);
-        std::cout << "counter: " << c.get_name(hpx::launch::sync)
-                  << ", value: " << value.get_value<double>() << std::endl;
+        counter_value value = c.get_counter_value(hpx::launch::sync, ec);
+        if (!ec)
+        {
+            std::cout << "counter: " << c.get_name(hpx::launch::sync)
+                      << ", value: " << value.get_value<double>() << std::endl;
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
