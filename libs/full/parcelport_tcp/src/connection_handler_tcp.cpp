@@ -24,6 +24,9 @@
 #include <hpx/parcelport_tcp/sender.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 

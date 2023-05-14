@@ -31,7 +31,7 @@ extern char*** _NSGetEnviron(void);
 }
 #define environ (*_NSGetEnviron())
 #elif defined(HPX_WINDOWS)
-#include <winsock2.h>
+#include <stdlib.h>
 #define environ _environ
 #elif defined(__FreeBSD__)
 // On FreeBSD the environment is available for executables only, so needs to be

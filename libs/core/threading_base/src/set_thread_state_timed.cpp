@@ -5,7 +5,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/functional/bind.hpp>
@@ -16,6 +15,9 @@
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/basic_waitable_timer.hpp>
 
 #include <atomic>

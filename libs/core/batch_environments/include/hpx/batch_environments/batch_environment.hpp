@@ -7,8 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
-
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/ip/tcp.hpp>
 
 #include <cstddef>

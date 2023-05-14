@@ -17,7 +17,6 @@
 #include <cstdint>
 #include <string>
 
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/errors.hpp>
 

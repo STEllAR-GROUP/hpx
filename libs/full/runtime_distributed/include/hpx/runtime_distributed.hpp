@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/agas/addressing_service.hpp>
 #include <hpx/components_base/generate_unique_ids.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset_base/locality.hpp>

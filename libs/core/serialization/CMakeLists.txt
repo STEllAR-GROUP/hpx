@@ -125,6 +125,7 @@ set(serialization_headers
     hpx/serialization/list.hpp
     hpx/serialization/map.hpp
     hpx/serialization/set.hpp
+    hpx/serialization/serialize_buffer_fwd.hpp
     hpx/serialization/serialize_buffer.hpp
     hpx/serialization/string.hpp
     hpx/serialization/std_tuple.hpp

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,20 +8,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_configuration/runtime_mode.hpp>
 #include <hpx/runtime_local/os_thread_type.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
 #include <hpx/runtime_local/startup_function.hpp>
 #include <hpx/runtime_local/state.hpp>
-#include <hpx/runtime_local/thread_hooks.hpp>
 #include <hpx/runtime_local/thread_mapper.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 
@@ -31,7 +28,6 @@
 #include <cstdint>
 #include <exception>
 #include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -433,14 +429,14 @@ namespace hpx {
         std::exception_ptr exception_;
 
         notification_policy_type main_pool_notifier_;
-        util::io_service_pool main_pool_;
+        std::unique_ptr<util::io_service_pool> main_pool_;
 #ifdef HPX_HAVE_IO_POOL
         notification_policy_type io_pool_notifier_;
-        util::io_service_pool io_pool_;
+        std::unique_ptr<util::io_service_pool> io_pool_;
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         notification_policy_type timer_pool_notifier_;
-        util::io_service_pool timer_pool_;
+        std::unique_ptr<util::io_service_pool> timer_pool_;
 #endif
         notification_policy_type notifier_;
         std::unique_ptr<hpx::threads::threadmanager> thread_manager_;
