@@ -43,7 +43,7 @@ namespace hpx::threads {
 
     std::string execution_agent::description() const
     {
-        thread_id_type id = self_.get_thread_id();
+        thread_id_type const id = self_.get_thread_id();
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
@@ -109,9 +109,9 @@ namespace hpx::threads {
         // Just yield until time has passed by...
         auto now = std::chrono::steady_clock::now();
 
-        // Note: we yield at least once to allow for other threads to
-        // make progress in any case. We also use yield instead of yield_k
-        // for the same reason.
+        // Note: we yield at least once to allow for other threads to make
+        // progress in any case. We also use yield instead of yield_k for the
+        // same reason.
         std::size_t k = 0;
         do
         {
@@ -177,16 +177,15 @@ namespace hpx::threads {
         thrd_data->set_last_worker_thread_num(
             hpx::get_local_worker_thread_num());
 
-        threads::thread_restart_state statex =
-            threads::thread_restart_state::unknown;
+        threads::thread_restart_state statex;
 
         {
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
-            threads::detail::reset_lco_description desc(
+            [[maybe_unused]] threads::detail::reset_lco_description reset_desc(
                 id.noref(), threads::thread_description(desc));
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            threads::detail::reset_backtrace bt(id);
+            [[maybe_unused]] threads::detail::reset_backtrace reset_bt(id);
 #endif
             [[maybe_unused]] on_exit_reset_held_lock_data held_locks;
 
@@ -219,7 +218,7 @@ namespace hpx::threads {
     }
 
     void execution_agent::do_resume(
-        char const* /* desc */, hpx::threads::thread_restart_state statex)
+        char const* /* desc */, hpx::threads::thread_restart_state statex) const
     {
         threads::detail::set_thread_state(self_.get_thread_id(),
             thread_schedule_state::pending, statex, thread_priority::normal,

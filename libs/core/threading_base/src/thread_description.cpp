@@ -60,8 +60,7 @@ namespace hpx::threads {
             return;
         }
 
-        hpx::threads::thread_id_type const id = hpx::threads::get_self_id();
-        if (id)
+        if (hpx::threads::thread_id_type const id = hpx::threads::get_self_id())
         {
             // get the current task description
             thread_description const desc =

@@ -7,32 +7,16 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue_mc.hpp>
 #include <hpx/threading_base/print.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 //
-#include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/type_support/unused.hpp>
-//
 #include <hpx/schedulers/queue_holder_thread.hpp>
 //
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <list>
-#include <map>
-#include <unordered_set>
-#include <vector>
-
-#include <atomic>
 #include <exception>
-#include <functional>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <utility>
+#include <vector>
 
 #if !defined(QUEUE_HOLDER_NUMA_DEBUG)
 #if defined(HPX_DEBUG)
@@ -232,7 +216,7 @@ namespace hpx::threads::policies {
         }
 
         // ----------------------------------------------------------------
-        inline std::int64_t get_thread_count(
+        inline std::size_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_) const
         {
@@ -265,33 +249,33 @@ namespace hpx::threads::policies {
         std::vector<ThreadQueue*> queues_;
 
     public:
-        constexpr void increment_num_pending_misses(
+        static constexpr void increment_num_pending_misses(
             std::size_t /* num */ = 1) noexcept
         {
         }
-        constexpr void increment_num_pending_accesses(
+        static constexpr void increment_num_pending_accesses(
             std::size_t /* num */ = 1) noexcept
         {
         }
-        constexpr void increment_num_stolen_from_pending(
+        static constexpr void increment_num_stolen_from_pending(
             std::size_t /* num */ = 1) noexcept
         {
         }
-        constexpr void increment_num_stolen_from_staged(
+        static constexpr void increment_num_stolen_from_staged(
             std::size_t /* num */ = 1) noexcept
         {
         }
-        constexpr void increment_num_stolen_to_pending(
+        static constexpr void increment_num_stolen_to_pending(
             std::size_t /* num */ = 1) noexcept
         {
         }
-        constexpr void increment_num_stolen_to_staged(
+        static constexpr void increment_num_stolen_to_staged(
             std::size_t /* num */ = 1) noexcept
         {
         }
 
         // ------------------------------------------------------------
-        bool dump_suspended_threads(std::size_t /* num_thread */,
+        static bool dump_suspended_threads(std::size_t /* num_thread */,
             std::int64_t& /* idle_loop_count */, bool /* running */) noexcept
         {
             return false;
@@ -305,9 +289,15 @@ namespace hpx::threads::policies {
         }
 
         // ------------------------------------------------------------
-        constexpr void on_start_thread(std::size_t /* num_thread */) noexcept {}
-        constexpr void on_stop_thread(std::size_t /* num_thread */) noexcept {}
-        constexpr void on_error(std::size_t /* num_thread */,
+        static constexpr void on_start_thread(
+            std::size_t /* num_thread */) noexcept
+        {
+        }
+        static constexpr void on_stop_thread(
+            std::size_t /* num_thread */) noexcept
+        {
+        }
+        static constexpr void on_error(std::size_t /* num_thread */,
             std::exception_ptr const& /* e */) noexcept
         {
         }

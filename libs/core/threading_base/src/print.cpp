@@ -9,6 +9,7 @@
 #include <hpx/threading_base/thread_data.hpp>
 
 #include <cstdint>
+#include <iomanip>
 #include <thread>
 
 /// \cond NODETAIL
@@ -76,7 +77,7 @@ namespace hpx::debug {
             }
             else
             {
-                hpx::threads::thread_data* dummy =
+                hpx::threads::thread_data const* dummy =
                     hpx::threads::get_self_id_data();
                 os << dummy << " ";
             }

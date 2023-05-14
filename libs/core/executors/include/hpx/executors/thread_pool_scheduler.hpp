@@ -20,6 +20,7 @@
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/timing/steady_clock.hpp>
 

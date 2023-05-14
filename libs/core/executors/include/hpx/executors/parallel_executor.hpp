@@ -30,8 +30,8 @@
 #include <hpx/modules/topology.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>

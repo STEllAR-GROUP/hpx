@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/datastructures/tuple.hpp>
 #include <hpx/debugging/print.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/threading_base/print.hpp>
@@ -17,7 +16,6 @@
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -25,12 +23,11 @@
 #include <cstdint>
 #include <exception>
 #include <functional>
-#include <iomanip>
 #include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <tuple>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -356,14 +353,14 @@ namespace hpx::threads::policies {
                     tq_deb.debug(debug::str<>("cleanup"), "delete",
                         queue_data_print(this),
                         debug::threadinfo<thread_data*>(todelete));
-                    thread_id_type tid(todelete);
+                    thread_id_type const tid(todelete);
                     remove_from_thread_map(tid, true);
                 }
             }
             else
             {
                 // delete only this many threads
-                std::int64_t delete_count = static_cast<std::int64_t>(
+                auto delete_count = static_cast<std::int64_t>(
                     terminated_items_count_.data_.load(
                         std::memory_order_relaxed) /
                     2);
@@ -505,7 +502,7 @@ namespace hpx::threads::policies {
 #endif
             {
                 // Allocate a new thread object.
-                threads::thread_data* p = nullptr;
+                threads::thread_data* p;
                 if (stacksize == parameters_.nostack_stacksize_)
                 {
                     p = threads::thread_data_stackless::create(
@@ -528,7 +525,7 @@ namespace hpx::threads::policies {
         void recycle_thread(thread_id_type tid)
         {
 #if !defined(HPX_HAVE_ADDRESS_SANITIZER)
-            std::ptrdiff_t stacksize =
+            std::ptrdiff_t const stacksize =
                 get_thread_id_data(tid)->get_stack_size();
 
             if (stacksize == parameters_.small_stacksize_)
@@ -575,12 +572,12 @@ namespace hpx::threads::policies {
             scoped_lock lk(thread_map_mtx_.data_);
 
             // add a new entry in the map for this thread
-            std::pair<thread_map_type::iterator, bool> p =
+            std::pair<thread_map_type::iterator, bool> const p =
                 thread_map_.insert(tid);
 
             if (/*HPX_UNLIKELY*/ (!p.second))
             {
-                std::string map_size = std::to_string(thread_map_.size());
+                std::string const map_size = std::to_string(thread_map_.size());
 
                 tq_deb.error(debug::str<>("map add"),
                     "Couldn't add new thread to the thread map",
@@ -609,7 +606,7 @@ namespace hpx::threads::policies {
             HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
             HPX_ASSERT(thread_map_count_.data_ >= 0);
 
-            [[maybe_unused]] bool deleted = thread_map_.erase(tid) != 0;
+            [[maybe_unused]] bool const deleted = thread_map_.erase(tid) != 0;
             HPX_ASSERT(deleted);
 
             tq_deb.debug(debug::str<>("map remove"), queue_data_print(this),
@@ -680,8 +677,8 @@ namespace hpx::threads::policies {
         }
 
         // ----------------------------------------------------------------
-        std::size_t add_new_HP(
-            std::int64_t add_count, thread_holder_type* addfrom, bool stealing)
+        std::size_t add_new_HP(std::int64_t add_count,
+            thread_holder_type const* addfrom, bool stealing)
         {
             std::size_t added;
             if (owns_bp_queue() && !stealing)
@@ -794,7 +791,6 @@ namespace hpx::threads::policies {
                     "unknown thread priority value (thread_priority::unknown)");
             }
             }
-            return 0;
         }
 
         // ----------------------------------------------------------------
@@ -845,7 +841,6 @@ namespace hpx::threads::policies {
                     "unknown thread priority value (thread_priority::unknown)");
             }
             }
-            return 0;
         }
 
         // ----------------------------------------------------------------
@@ -873,9 +868,8 @@ namespace hpx::threads::policies {
             scoped_lock lk(thread_map_mtx_.data_);
 
             std::int64_t num_threads = 0;
-            thread_map_type::const_iterator end = thread_map_.end();
-            for (thread_map_type::const_iterator it = thread_map_.begin();
-                 it != end; ++it)
+            auto const end = thread_map_.end();
+            for (auto it = thread_map_.begin(); it != end; ++it)
             {
                 if (get_thread_id_data(*it)->get_state().state() == state)
                     ++num_threads;
@@ -896,8 +890,8 @@ namespace hpx::threads::policies {
                 "xthread", xthread, queue_data_print(this),
                 debug::threadinfo<threads::thread_data*>(thrd));
             terminated_items_.push(thrd);
-            std::int64_t count = ++terminated_items_count_.data_;
 
+            std::int64_t const count = ++terminated_items_count_.data_;
             if (!xthread && (count > parameters_.max_terminated_threads_))
             {
                 // clean up all terminated threads
@@ -909,16 +903,17 @@ namespace hpx::threads::policies {
         void abort_all_suspended_threads()
         {
             scoped_lock lk(thread_map_mtx_.data_);
-            thread_map_type::iterator end = thread_map_.end();
-            for (thread_map_type::iterator it = thread_map_.begin(); it != end;
-                 ++it)
+            auto const end = thread_map_.end();
+            for (auto it = thread_map_.begin(); it != end; ++it)
             {
                 if (get_thread_id_data(*it)->get_state().state() ==
                     thread_schedule_state::suspended)
                 {
-                    get_thread_id_data(*it)->set_state(
-                        thread_schedule_state::pending,
-                        thread_restart_state::abort);
+                    [[maybe_unused]] auto const s =
+                        get_thread_id_data(*it)->set_state(
+                            thread_schedule_state::pending,
+                            thread_restart_state::abort);
+
                     // np queue always exists so use that as priority doesn't matter
                     np_queue_->schedule_work(*it, true);
                 }
@@ -940,7 +935,6 @@ namespace hpx::threads::policies {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "queue_holder_thread::iterate_threads",
                     "can't iterate over thread ids of staged threads");
-                return false;
             }
 
             std::vector<thread_id_type> tids;
@@ -949,9 +943,8 @@ namespace hpx::threads::policies {
             if (state == thread_schedule_state::unknown)
             {
                 scoped_lock lk(thread_map_mtx_.data_);
-                thread_map_type::const_iterator end = thread_map_.end();
-                for (thread_map_type::const_iterator it = thread_map_.begin();
-                     it != end; ++it)
+                auto const end = thread_map_.end();
+                for (auto it = thread_map_.begin(); it != end; ++it)
                 {
                     tids.push_back(*it);
                 }
@@ -959,9 +952,8 @@ namespace hpx::threads::policies {
             else
             {
                 scoped_lock lk(thread_map_mtx_.data_);
-                thread_map_type::const_iterator end = thread_map_.end();
-                for (thread_map_type::const_iterator it = thread_map_.begin();
-                     it != end; ++it)
+                auto const end = thread_map_.end();
+                for (auto it = thread_map_.begin(); it != end; ++it)
                 {
                     if (get_thread_id_data(*it)->get_state().state() == state)
                         tids.push_back(*it);

@@ -18,7 +18,7 @@ namespace hpx::detail {
     char const* store_function_annotation(std::string name)
     {
         static thread_local std::unordered_set<std::string> names;
-        auto r = names.emplace(HPX_MOVE(name));
+        auto const r = names.emplace(HPX_MOVE(name));
         return (*std::get<0>(r)).c_str();
     }
 }    // namespace hpx::detail

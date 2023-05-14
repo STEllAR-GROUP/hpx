@@ -370,7 +370,7 @@ namespace hpx::debug {
         std::string buffered_msg;
 
         //
-        scoped_var(char const* p, Args const&... args)
+        explicit scoped_var(char const* p, Args const&... args)
           : prefix_(p)
           , message_(args...)
         {
@@ -395,7 +395,7 @@ namespace hpx::debug {
         double const delay_;
         std::tuple<Args...> const message_;
         //
-        timed_var(double delay, Args const&... args)
+        explicit timed_var(double delay, Args const&... args)
           : time_start_(std::chrono::steady_clock::now())
           , delay_(delay)
           , message_(args...)

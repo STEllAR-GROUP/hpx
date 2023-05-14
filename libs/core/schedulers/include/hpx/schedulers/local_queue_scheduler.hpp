@@ -34,8 +34,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-// TODO: add branch prediction and function heat
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
 
@@ -67,7 +65,7 @@ namespace hpx::threads::policies {
         {
             init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
-                thread_queue_init_parameters thread_queue_init =
+                thread_queue_init_parameters const& thread_queue_init =
                     thread_queue_init_parameters{},
                 char const* description = "local_queue_scheduler")
               : num_queues_(num_queues)
@@ -81,7 +79,6 @@ namespace hpx::threads::policies {
                 detail::affinity_data const& affinity_data,
                 char const* description)
               : num_queues_(num_queues)
-              , thread_queue_init_()
               , affinity_data_(affinity_data)
               , description_(description)
             {
@@ -101,11 +98,6 @@ namespace hpx::threads::policies {
           , queues_(init.num_queues_)
           , curr_queue_(0)
           , affinity_data_(init.affinity_data_)
-        // we know that the MIC has one NUMA domain only)
-#if !defined(HPX_NATIVE_MIC)
-          , steals_in_numa_domain_()
-          , steals_outside_numa_domain_()
-#endif
           , numa_domain_masks_(
                 init.num_queues_, create_topology().get_machine_affinity_mask())
           , outside_numa_domain_masks_(
@@ -125,7 +117,12 @@ namespace hpx::threads::policies {
             }
         }
 
-        ~local_queue_scheduler()
+        local_queue_scheduler(local_queue_scheduler const&) = delete;
+        local_queue_scheduler(local_queue_scheduler&&) = delete;
+        local_queue_scheduler& operator=(local_queue_scheduler const&) = delete;
+        local_queue_scheduler& operator=(local_queue_scheduler&&) = delete;
+
+        ~local_queue_scheduler() override
         {
             for (std::size_t i = 0; i != queues_.size(); ++i)
                 delete queues_[i];
@@ -296,11 +293,11 @@ namespace hpx::threads::policies {
             std::size_t num_thread =
                 data.schedulehint.mode == thread_schedule_hint_mode::thread ?
                 data.schedulehint.hint :
-                std::size_t(-1);
+                static_cast<std::size_t>(-1);
 
-            std::size_t queue_size = queues_.size();
+            std::size_t const queue_size = queues_.size();
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % queue_size;
             }
@@ -330,25 +327,24 @@ namespace hpx::threads::policies {
         bool get_next_thread(std::size_t num_thread, bool running,
             threads::thread_id_ref_type& thrd, bool /*enable_stealing*/)
         {
-            std::size_t queues_size = queues_.size();
+            std::size_t const queues_size = queues_.size();
 
             {
                 HPX_ASSERT(num_thread < queues_size);
 
                 thread_queue_type* q = queues_[num_thread];
-                bool result = q->get_next_thread(thrd);
+                bool const result = q->get_next_thread(thrd);
 
                 q->increment_num_pending_accesses();
                 if (result)
                     return true;
                 q->increment_num_pending_misses();
 
-                bool have_staged =
-                    q->get_staged_queue_length(std::memory_order_relaxed) != 0;
-
                 // Give up, we should have work to convert.
-                if (have_staged)
+                if (q->get_staged_queue_length(std::memory_order_relaxed) != 0)
+                {
                     return false;
+                }
             }
 
             if (!running)
@@ -356,13 +352,14 @@ namespace hpx::threads::policies {
                 return false;
             }
 
-            bool numa_stealing = has_scheduler_mode(
+            bool const numa_stealing = has_scheduler_mode(
                 policies::scheduler_mode::enable_stealing_numa);
             if (!numa_stealing)
             {
                 // steal work items: first try to steal from other cores in
                 // the same NUMA node
-                std::size_t pu_number = affinity_data_.get_pu_num(num_thread);
+                std::size_t const pu_number =
+                    affinity_data_.get_pu_num(num_thread);
 
                 // we know that the MIC has one NUMA domain only
 #if !defined(HPX_NATIVE_MIC)
@@ -380,10 +377,13 @@ namespace hpx::threads::policies {
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = affinity_data_.get_pu_num(idx);
-                        if (!test(this_numa_domain,
+                        if (std::size_t const pu_num =
+                                affinity_data_.get_pu_num(idx);
+                            !test(this_numa_domain,
                                 pu_num))    //-V560 //-V600 //-V111
+                        {
                             continue;
+                        }
 
                         thread_queue_type* q = queues_[idx];
                         if (q->get_next_thread(thrd, running))
@@ -413,7 +413,8 @@ namespace hpx::threads::policies {
 
                         HPX_ASSERT(idx != num_thread);
 
-                        std::size_t pu_num = affinity_data_.get_pu_num(idx);
+                        std::size_t const pu_num =
+                            affinity_data_.get_pu_num(idx);
                         if (!test(numa_domain,
                                 pu_num))    //-V560 //-V600 //-V111
                             continue;
@@ -459,7 +460,7 @@ namespace hpx::threads::policies {
             thread_priority /* priority */ = thread_priority::default_) override
         {
             // NOTE: This scheduler ignores NUMA hints.
-            std::size_t num_thread = std::size_t(-1);
+            auto num_thread = static_cast<std::size_t>(-1);
             if (schedulehint.mode ==
                 thread_schedule_hint_mode::thread)    //-V1051
             {
@@ -470,9 +471,9 @@ namespace hpx::threads::policies {
                 allow_fallback = false;
             }
 
-            std::size_t queue_size = queues_.size();
+            std::size_t const queue_size = queues_.size();
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % queue_size;
             }
@@ -502,7 +503,7 @@ namespace hpx::threads::policies {
             thread_priority /* priority */ = thread_priority::default_) override
         {
             // NOTE: This scheduler ignores NUMA hints.
-            std::size_t num_thread = std::size_t(-1);
+            auto num_thread = static_cast<std::size_t>(-1);
             if (schedulehint.mode ==
                 thread_schedule_hint_mode::thread)    //-V1051
             {
@@ -513,9 +514,9 @@ namespace hpx::threads::policies {
                 allow_fallback = false;
             }
 
-            std::size_t queue_size = queues_.size();
+            std::size_t const queue_size = queues_.size();
 
-            if (std::size_t(-1) == num_thread)
+            if (static_cast<std::size_t>(-1) == num_thread)
             {
                 num_thread = curr_queue_++ % queue_size;
             }
@@ -541,12 +542,11 @@ namespace hpx::threads::policies {
 
         ///////////////////////////////////////////////////////////////////////
         // This returns the current length of the queues (work items and new items)
-        std::int64_t get_queue_length(
-            std::size_t num_thread = std::size_t(-1)) const override
+        std::int64_t get_queue_length(std::size_t num_thread) const override
         {
             // Return queue length of one specific queue.
             std::int64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            if (static_cast<std::size_t>(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < queues_.size());
 
@@ -564,12 +564,12 @@ namespace hpx::threads::policies {
         std::int64_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
-            std::size_t num_thread = std::size_t(-1),
+            std::size_t num_thread = static_cast<std::size_t>(-1),
             bool /* reset */ = false) const override
         {
             // Return thread count of one specific queue.
             std::int64_t count = 0;
-            if (std::size_t(-1) != num_thread)
+            if (static_cast<std::size_t>(-1) != num_thread)
             {
                 HPX_ASSERT(num_thread < queues_.size());
 
@@ -593,10 +593,8 @@ namespace hpx::threads::policies {
                         "local_queue_scheduler::get_thread_count",
                         "unknown thread priority value "
                         "(thread_priority::unknown)");
-                    return 0;
                 }
                 }
-                return 0;
             }
 
             // Return the cumulative count for all queues.
@@ -624,7 +622,6 @@ namespace hpx::threads::policies {
                     "local_queue_scheduler::get_thread_count",
                     "unknown thread priority value "
                     "(thread_priority::unknown)");
-                return 0;
             }
             }
             return count;
@@ -711,7 +708,7 @@ namespace hpx::threads::policies {
             std::int64_t& idle_loop_count, bool /* enable_stealing */,
             std::size_t& added, thread_id_ref_type* = nullptr)
         {
-            std::size_t queues_size = queues_.size();
+            std::size_t const queues_size = queues_.size();
             HPX_ASSERT(num_thread < queues_.size());
 
             added = 0;
@@ -729,14 +726,14 @@ namespace hpx::threads::policies {
                 return true;
             }
 
-            bool numa_stealing_ = has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa);
             // limited or no stealing across domains
-            if (!numa_stealing_)
+            if (!has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa))
             {
                 // steal work items: first try to steal from other cores in the
                 // same NUMA node
-                std::size_t pu_number = affinity_data_.get_pu_num(num_thread);
+                std::size_t const pu_number =
+                    affinity_data_.get_pu_num(num_thread);
 
                 // we know that the MIC has one NUMA domain only
 #if !defined(HPX_NATIVE_MIC)
@@ -875,7 +872,7 @@ namespace hpx::threads::policies {
             auto const& topo = create_topology();
 
             // pre-calculate certain constants for the given thread number
-            std::size_t num_pu = affinity_data_.get_pu_num(num_thread);
+            std::size_t const num_pu = affinity_data_.get_pu_num(num_thread);
             mask_cref_type machine_mask = topo.get_machine_affinity_mask();
             mask_cref_type core_mask = topo.get_thread_affinity_mask(num_pu);
             mask_cref_type node_mask = topo.get_numa_node_affinity_mask(num_pu);
@@ -892,15 +889,15 @@ namespace hpx::threads::policies {
             mask_type first_mask = mask_type();
             resize(first_mask, mask_size(core_mask));
 
-            std::size_t first = find_first(node_mask);
-            if (first != std::size_t(-1))
+            std::size_t const first = find_first(node_mask);
+            if (first != static_cast<std::size_t>(-1))
                 set(first_mask, first);
             else
                 first_mask = core_mask;
 
-            bool numa_stealing = has_scheduler_mode(
-                policies::scheduler_mode::enable_stealing_numa);
-            if (numa_stealing && any(first_mask & core_mask))
+            if (has_scheduler_mode(
+                    policies::scheduler_mode::enable_stealing_numa) &&
+                any(first_mask & core_mask))
             {
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
                 set(steals_outside_numa_domain_, num_pu);

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 #include <hpx/modules/command_line_handling_local.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/util/from_string.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -43,7 +42,7 @@ namespace hpx::util {
                 hpx::program_options::variables_map vm;
                 std::vector<std::string> still_unregistered_options;
                 util::parse_commandline(ini, options, unknown_cmd_line, vm,
-                    std::size_t(-1), mode,
+                    static_cast<std::size_t>(-1), mode,
                     get_runtime_mode_from_name(runtime_mode), nullptr,
                     &still_unregistered_options);
 
@@ -65,7 +64,7 @@ namespace hpx::util {
                 hpx::program_options::variables_map vm;
 
                 util::parse_commandline(ini, options, cmd_line, vm,
-                    std::size_t(-1),
+                    static_cast<std::size_t>(-1),
                     util::commandline_error_mode::allow_unregistered |
                         util::commandline_error_mode::
                             report_missing_config_file,

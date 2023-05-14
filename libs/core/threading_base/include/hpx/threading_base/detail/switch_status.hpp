@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,8 +10,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
-
-#include <atomic>
 
 namespace hpx::threads::detail {
 
@@ -29,6 +27,11 @@ namespace hpx::threads::detail {
                 thread_schedule_state::active, prev_state_, orig_state_))
         {
         }
+
+        switch_status(switch_status const&) = delete;
+        switch_status(switch_status&&) = delete;
+        switch_status& operator=(switch_status const&) = delete;
+        switch_status& operator=(switch_status&&) = delete;
 
         ~switch_status()
         {
