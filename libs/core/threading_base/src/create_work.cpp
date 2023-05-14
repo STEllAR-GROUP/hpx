@@ -61,7 +61,7 @@ namespace hpx::threads::detail {
 #endif
             ;
 
-        thread_self* self = get_self_ptr();
+        thread_self const* self = get_self_ptr();
 
 #ifdef HPX_HAVE_THREAD_PARENT_REFERENCE
         if (nullptr == data.parent_id)

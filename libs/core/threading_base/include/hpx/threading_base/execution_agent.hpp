@@ -64,7 +64,7 @@ namespace hpx::threads {
             char const* desc, threads::thread_schedule_state state);
 
         void do_resume(
-            char const* desc, hpx::threads::thread_restart_state statex);
+            char const* desc, hpx::threads::thread_restart_state statex) const;
 
         execution_context context_;
     };

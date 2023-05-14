@@ -8,21 +8,15 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
-#include <hpx/modules/logging.hpp>
-#include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
 #include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <mutex>
 #include <string_view>
-#include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -67,8 +61,10 @@ namespace hpx::threads::policies {
         {
             // this scheduler does not support stealing or numa stealing, but
             // needs to enable background work
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            mode = static_cast<scheduler_mode>(
+                mode & ~scheduler_mode::enable_stealing);
+            mode = static_cast<scheduler_mode>(
+                mode & ~scheduler_mode::enable_stealing_numa);
             mode = mode | ~scheduler_mode::do_background_work;
             mode = mode | ~scheduler_mode::do_background_work_only;
             scheduler_base::set_scheduler_mode(mode);
@@ -76,7 +72,7 @@ namespace hpx::threads::policies {
 
         // Return the next thread to be executed, return false if none is
         // available
-        constexpr bool get_next_thread(
+        static constexpr bool get_next_thread(
             std::size_t, bool, threads::thread_id_ref_type&, bool) noexcept
         {
             // this scheduler does not maintain any thread queues
@@ -87,8 +83,9 @@ namespace hpx::threads::policies {
         // manager to allow for maintenance tasks to be executed in the
         // scheduler. Returns true if the OS thread calling this function has to
         // be terminated (i.e. no more work has to be done).
-        constexpr bool wait_or_add_new(std::size_t, bool running, std::int64_t&,
-            bool, std::size_t&, thread_id_ref_type* = nullptr)
+        static constexpr bool wait_or_add_new(std::size_t, bool running,
+            std::int64_t&, bool, std::size_t&,
+            thread_id_ref_type* = nullptr) noexcept
         {
             return !running;
         }

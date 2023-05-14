@@ -37,8 +37,6 @@ namespace hpx::util {
       , pool_name_(pool_name)
       , pool_name_postfix_(name_postfix)
       , waiting_(false)
-      , wait_barrier_()
-      , continue_barrier_()
     {
         LPROGRESS_ << pool_name;
         init(pool_size);
@@ -52,7 +50,6 @@ namespace hpx::util {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "io_service_pool::io_service_pool",
                 "io_service_pool size is 0");
-            return;
         }
 
         wait_barrier_.reset(new barrier(pool_size + 1));
@@ -93,7 +90,8 @@ namespace hpx::util {
         clear_locked();
     }
 
-    void io_service_pool::thread_run(std::size_t index, util::barrier* startup)
+    void io_service_pool::thread_run(
+        std::size_t index, util::barrier* startup) const
     {
         // wait for all threads to start up before before starting HPX work
         if (startup != nullptr)

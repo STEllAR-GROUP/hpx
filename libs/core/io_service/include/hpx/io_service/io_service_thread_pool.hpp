@@ -8,8 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/io_service/io_service_pool_fwd.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 

@@ -13,16 +13,12 @@
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/schedulers/thread_queue.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <mutex>
 #include <string_view>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -66,8 +62,10 @@ namespace hpx::threads::policies {
         void set_scheduler_mode(scheduler_mode mode) noexcept override
         {
             // this scheduler does not support stealing or numa stealing
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing);
-            mode = scheduler_mode(mode & ~scheduler_mode::enable_stealing_numa);
+            mode = static_cast<scheduler_mode>(
+                mode & ~scheduler_mode::enable_stealing);
+            mode = static_cast<scheduler_mode>(
+                mode & ~scheduler_mode::enable_stealing_numa);
             scheduler_base::set_scheduler_mode(mode);
         }
 

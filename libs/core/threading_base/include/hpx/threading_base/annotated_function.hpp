@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,6 @@
 #endif
 
 #include <cstddef>
-#include <cstdint>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -77,7 +76,6 @@ namespace hpx {
             /// \brief Returns the function address
             ///
             /// This function returns the passed function address.
-            /// \param none
             constexpr std::size_t get_function_address() const noexcept
             {
                 return traits::get_function_address<fun_type>::call(f_);
@@ -89,8 +87,6 @@ namespace hpx {
             /// This function returns the function annotation, if it has a name
             /// name is returned, name is returned; if name is empty the typeid
             /// is returned
-            ///
-            /// \param none
             constexpr char const* get_function_annotation() const noexcept
             {
                 return name_ ? name_ : typeid(f_).name();
@@ -150,31 +146,28 @@ namespace hpx {
 #endif
 }    // namespace hpx
 
-namespace hpx::traits {
-
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename F>
-    struct get_function_address<hpx::detail::annotated_function<F>>
+///////////////////////////////////////////////////////////////////////////
+template <typename F>
+struct hpx::traits::get_function_address<hpx::detail::annotated_function<F>>
+{
+    static constexpr std::size_t call(
+        hpx::detail::annotated_function<F> const& f) noexcept
     {
-        static constexpr std::size_t call(
-            hpx::detail::annotated_function<F> const& f) noexcept
-        {
-            return f.get_function_address();
-        }
-    };
+        return f.get_function_address();
+    }
+};
 
-    template <typename F>
-    struct get_function_annotation<hpx::detail::annotated_function<F>>
+template <typename F>
+struct hpx::traits::get_function_annotation<hpx::detail::annotated_function<F>>
+{
+    static constexpr char const* call(
+        hpx::detail::annotated_function<F> const& f) noexcept
     {
-        static constexpr char const* call(
-            hpx::detail::annotated_function<F> const& f) noexcept
-        {
-            return f.get_function_annotation();
-        }
-    };
+        return f.get_function_annotation();
+    }
+};
 #endif
-}    // namespace hpx::traits
 
 namespace hpx::util {
 

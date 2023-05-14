@@ -13,10 +13,10 @@
 #include <hpx/execution/detail/sync_launch_policy_dispatch.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstdint>
 #include <type_traits>

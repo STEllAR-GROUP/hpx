@@ -10,8 +10,6 @@
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/io_service/io_service_thread_pool.hpp>
-#include <hpx/threading_base/callback_notifier.hpp>
-#include <hpx/threading_base/scheduler_mode.hpp>
 
 #include <cstddef>
 #include <exception>

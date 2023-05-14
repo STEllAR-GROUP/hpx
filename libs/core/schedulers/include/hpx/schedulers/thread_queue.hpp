@@ -342,7 +342,7 @@ namespace hpx::threads::policies {
             return addednew != 0;
         }
 
-        void recycle_thread(thread_id_type thrd)
+        void recycle_thread(thread_id_type const& thrd)
         {
             std::ptrdiff_t const stacksize =
                 get_thread_id_data(thrd)->get_stack_size();
@@ -961,8 +961,9 @@ namespace hpx::threads::policies {
                 if (thrd->get_state().state() ==
                     thread_schedule_state::suspended)
                 {
-                    thrd->set_state(thread_schedule_state::pending,
-                        thread_restart_state::abort);
+                    [[maybe_unused]] auto const s =
+                        thrd->set_state(thread_schedule_state::pending,
+                            thread_restart_state::abort);
 
                     // thread holds self-reference
                     HPX_ASSERT(thrd->count_ > 1);

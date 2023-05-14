@@ -17,10 +17,10 @@
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
-#include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <exception>
 #include <type_traits>

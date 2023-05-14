@@ -100,7 +100,7 @@ namespace hpx::util {
         }
 
         /// \brief Activate the thread \a index for this thread pool
-        void thread_run(std::size_t index, barrier* startup = nullptr);
+        void thread_run(std::size_t index, barrier* startup = nullptr) const;
 
         /// \brief Return name of this pool
         constexpr char const* get_name() const noexcept
@@ -122,7 +122,8 @@ namespace hpx::util {
         using io_service_ptr = std::unique_ptr<asio::io_context>;
         using work_type = std::unique_ptr<asio::io_context::work>;
 
-        HPX_FORCEINLINE work_type initialize_work(asio::io_context& io_service)
+        HPX_FORCEINLINE work_type initialize_work(
+            asio::io_context& io_service) const
         {
             return work_type(
                 std::make_unique<asio::io_context::work>(io_service));

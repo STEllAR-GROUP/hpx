@@ -73,6 +73,7 @@ set(threading_base_sources
     get_default_pool.cpp
     get_default_timer_service.cpp
     print.cpp
+    register_thread.cpp
     scheduler_base.cpp
     set_thread_state.cpp
     set_thread_state_timed.cpp

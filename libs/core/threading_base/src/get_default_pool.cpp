@@ -22,7 +22,7 @@ namespace hpx_start {
     // Redefining weak variables defined in hpx_main.hpp to facilitate error
     // checking and make sure correct errors are thrown. It is added again to
     // make sure that these variables are defined correctly in cases where
-    // hpx_main functionalities are not used.
+    // hpx_main functionality is not used.
     HPX_SYMBOL_EXPORT bool is_linked __attribute__((weak)) = false;
     HPX_SYMBOL_EXPORT bool include_libhpx_wrap __attribute__((weak)) = false;
 }    // namespace hpx_start
@@ -41,8 +41,7 @@ namespace hpx::threads::detail {
     thread_pool_base* get_self_or_default_pool()
     {
         thread_pool_base* pool = nullptr;
-        auto thrd_data = get_self_id_data();
-        if (thrd_data)
+        if (auto const* thrd_data = get_self_id_data())
         {
             pool = thrd_data->get_scheduler_base()->get_parent_pool();
         }

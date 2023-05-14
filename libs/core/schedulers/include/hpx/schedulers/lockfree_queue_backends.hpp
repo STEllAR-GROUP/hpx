@@ -51,8 +51,8 @@ namespace hpx::threads::policies {
         using size_type = std::uint64_t;
 
         explicit lockfree_fifo_backend(size_type initial_size = 0,
-            size_type /* num_thread */ = size_type(-1))
-          : queue_(std::size_t(initial_size))
+            size_type /* num_thread */ = static_cast<size_type>(-1))
+          : queue_(static_cast<std::size_t>(initial_size))
         {
         }
 
@@ -115,8 +115,8 @@ namespace hpx::threads::policies {
         using size_type = std::uint64_t;
 
         explicit moodycamel_fifo_backend(size_type initial_size = 0,
-            size_type /* num_thread */ = size_type(-1))
-          : queue_(std::size_t(initial_size))
+            size_type /* num_thread */ = static_cast<size_type>(-1))
+          : queue_(static_cast<std::size_t>(initial_size))
         {
         }
 
@@ -171,8 +171,8 @@ namespace hpx::threads::policies {
         using size_type = std::uint64_t;
 
         explicit lockfree_lifo_backend(size_type initial_size = 0,
-            size_type /* num_thread */ = size_type(-1))
-          : queue_(std::size_t(initial_size))
+            size_type /* num_thread */ = static_cast<size_type>(-1))
+          : queue_(static_cast<std::size_t>(initial_size))
         {
         }
 
@@ -231,8 +231,8 @@ namespace hpx::threads::policies {
         using size_type = std::uint64_t;
 
         explicit lockfree_abp_fifo_backend(size_type initial_size = 0,
-            size_type /* num_thread */ = size_type(-1))
-          : queue_(std::size_t(initial_size))
+            size_type /* num_thread */ = static_cast<size_type>(-1))
+          : queue_(static_cast<std::size_t>(initial_size))
         {
         }
 
@@ -288,8 +288,8 @@ namespace hpx::threads::policies {
         using size_type = std::uint64_t;
 
         explicit lockfree_abp_lifo_backend(size_type initial_size = 0,
-            size_type /* num_thread */ = size_type(-1))
-          : queue_(std::size_t(initial_size))
+            size_type /* num_thread */ = static_cast<size_type>(-1))
+          : queue_(static_cast<std::size_t>(initial_size))
         {
         }
 
