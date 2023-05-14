@@ -14,14 +14,10 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/threading_base/thread_data.hpp>
-#include <hpx/threading_base/thread_queue_init_parameters.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
-#include <iomanip>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::threads::policies {
@@ -56,9 +52,9 @@ namespace hpx::threads::policies {
             for (typename Map::const_iterator it = tm.begin(); it != end; ++it)
             {
                 threads::thread_data const* thrd = get_thread_id_data(*it);
-                threads::thread_schedule_state state =
+                threads::thread_schedule_state const state =
                     thrd->get_state().state();
-                threads::thread_schedule_state marked_state =
+                threads::thread_schedule_state const marked_state =
                     thrd->get_marked_state();
 
                 if (state != marked_state)

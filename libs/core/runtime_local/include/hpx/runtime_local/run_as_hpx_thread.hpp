@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2018 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <chrono>
 #include <condition_variable>

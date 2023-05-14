@@ -16,7 +16,6 @@
 #include <cstddef>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>

@@ -57,10 +57,11 @@ namespace hpx::threads::policies {
     /// scheduler policies
     struct scheduler_base
     {
-    public:
-        HPX_NON_COPYABLE(scheduler_base);
+        scheduler_base(scheduler_base const&) = delete;
+        scheduler_base(scheduler_base&&) = delete;
+        scheduler_base& operator=(scheduler_base const&) = delete;
+        scheduler_base& operator=(scheduler_base&&) = delete;
 
-    public:
         using pu_mutex_type = std::mutex;
 
         explicit scheduler_base(std::size_t num_threads,
