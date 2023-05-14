@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,8 +24,7 @@
 namespace hpx { namespace performance_counters {
     ///////////////////////////////////////////////////////////////////////////
     constexpr char const counter_prefix[] = "/counters";
-    constexpr std::size_t counter_prefix_len =
-        (sizeof(counter_prefix) / sizeof(counter_prefix[0])) - 1;
+    constexpr std::size_t counter_prefix_len = std::size(counter_prefix) - 1;
 
     ///////////////////////////////////////////////////////////////////////////
     inline std::string& ensure_counter_prefix(std::string& name)
@@ -232,9 +231,9 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int);
+            serialization::output_archive& ar, unsigned int) const;
         HPX_EXPORT void serialize(
-            serialization::input_archive& ar, const unsigned int);
+            serialization::input_archive& ar, unsigned int);
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -308,22 +307,22 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int);
+            serialization::output_archive& ar, unsigned int);
         HPX_EXPORT void serialize(
-            serialization::input_archive& ar, const unsigned int);
+            serialization::input_archive& ar, unsigned int);
     };
 
     ///////////////////////////////////////////////////////////////////////////
     struct counter_info
     {
-        counter_info(counter_type type = counter_type::raw)
+        explicit counter_info(counter_type type = counter_type::raw)
           : type_(type)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
           , status_(counter_status::invalid_data)
         {
         }
 
-        counter_info(std::string const& name)
+        explicit counter_info(std::string const& name)
           : type_(counter_type::raw)
           , version_(HPX_PERFORMANCE_COUNTER_V1)
           , status_(counter_status::invalid_data)
@@ -359,9 +358,9 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int);
+            serialization::output_archive& ar, unsigned int) const;
         HPX_EXPORT void serialize(
-            serialization::input_archive& ar, const unsigned int);
+            serialization::input_archive& ar, unsigned int);
     };
 
     ///////////////////////////////////////////////////////////////////////////
