@@ -11,6 +11,7 @@
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
+
 #include <windows.h>
 
 #include <hpx/thread_support/set_thread_name.hpp>
