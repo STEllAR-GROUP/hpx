@@ -302,9 +302,3 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
-#else
-int main(int, char*[])
-{
-    return 0;
-}
-#endif
