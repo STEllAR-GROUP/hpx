@@ -6,6 +6,9 @@
 
 #include <hpx/config.hpp>
 
+// NVCC fails unceremoniously with this test at least until V11.5
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1105)
+
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
@@ -299,3 +302,9 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+#else
+int main(int, char*[])
+{
+    return 0;
+}
+#endif
