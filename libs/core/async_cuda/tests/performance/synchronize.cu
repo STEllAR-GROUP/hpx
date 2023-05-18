@@ -269,3 +269,9 @@ int main(int argc, char* argv[])
 
     return hpx::local::init(hpx_main, argc, argv, init_args);
 }
+#else
+int main(int, char*[])
+{
+    return 0;
+}
+#endif
