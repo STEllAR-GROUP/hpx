@@ -13,49 +13,19 @@
 #include <hpx/assert.hpp>
 
 #include <hpx/modules/lci_base.hpp>
-#include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
-#include <hpx/parcelport_lci/receiver.hpp>
-#include <hpx/parcelport_lci/sender.hpp>
-#include <hpx/parcelport_lci/sender_connection.hpp>
+#include <hpx/parcelport_lci/receiver_base.hpp>
+#include "hpx/parcelport_lci/putva/sender_connection_putva.hpp"
 
 #include <memory>
 #include <utility>
 #include <vector>
 
 namespace hpx::parcelset::policies::lci {
-    void sender_connection::async_write(
-        sender_connection::handler_type&& handler,
-        sender_connection::postprocess_handler_type&& parcel_postprocess)
-    {
-        load(HPX_FORWARD(handler_type, handler),
-            HPX_FORWARD(postprocess_handler_type, parcel_postprocess));
-        if (!util::lci_environment::enable_lci_backlog_queue ||
-            HPX_UNLIKELY(parcelport::is_sending_early_parcel))
-        {
-            while (!send())
-                continue;
-            return;
-        }
-        else
-        {
-            if (!backlog_queue::empty(dst_rank))
-            {
-                backlog_queue::push(shared_from_this());
-                return;
-            }
-            bool isSent = send();
-            if (!isSent)
-            {
-                backlog_queue::push(shared_from_this());
-                return;
-            }
-        }
-    }
 
-    bool sender_connection::can_be_eager_message(size_t eager_threshold)
+    bool sender_connection_putva::can_be_eager_message(size_t eager_threshold)
     {
         int num_zero_copy_chunks = static_cast<int>(buffer_.num_chunks_.first);
         if (num_zero_copy_chunks > 0)
@@ -71,8 +41,9 @@ namespace hpx::parcelset::policies::lci {
             return false;
     }
 
-    void sender_connection::load(sender_connection::handler_type&& handler,
-        sender_connection::postprocess_handler_type&& parcel_postprocess)
+    void sender_connection_putva::load(
+        sender_connection_putva::handler_type&& handler,
+        sender_connection_putva::postprocess_handler_type&& parcel_postprocess)
     {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         data_point_ = buffer_.data_point_;
@@ -92,14 +63,12 @@ namespace hpx::parcelset::policies::lci {
         int num_zero_copy_chunks = static_cast<int>(buffer_.num_chunks_.first);
         if (is_eager)
         {
-            while (LCI_mbuffer_alloc(util::lci_environment::get_device_eager(),
-                       &mbuffer) != LCI_OK)
+            while (LCI_mbuffer_alloc(pp_->device_eager, &mbuffer) != LCI_OK)
                 continue;
             HPX_ASSERT(mbuffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(buffer_, (char*) mbuffer.address, mbuffer.length);
             mbuffer.length = header_.size();
-            if (util::lci_environment::enable_send_immediate)
-                done();
+            cleanup();
         }
         else
         {
@@ -164,77 +133,118 @@ namespace hpx::parcelset::policies::lci {
                 }
             }
             HPX_ASSERT(long_msg_num == i);
-            sharedPtr_p =
-                new std::shared_ptr<sender_connection>(shared_from_this());
+            sharedPtr_p = new std::shared_ptr<sender_connection_putva>(
+                std::dynamic_pointer_cast<sender_connection_putva>(
+                    shared_from_this()));
         }
+        profile_start_hook(header_);
+        state.store(connection_state::initialized, std::memory_order_release);
     }
 
-    bool sender_connection::isEager()
+    bool sender_connection_putva::isEager()
     {
         return is_eager;
     }
 
-    bool sender_connection::send()
+    sender_connection_putva::return_t sender_connection_putva::send_nb()
     {
+        switch (state.load(std::memory_order_acquire))
+        {
+        case connection_state::initialized:
+            return send_msg();
+
+        case connection_state::sent:
+            return {return_status_t::done, nullptr};
+
+        case connection_state::locked:
+            return {return_status_t::retry, nullptr};
+
+        default:
+            throw std::runtime_error("Unexpected send state!");
+        }
+    }
+
+    sender_connection_putva::return_t sender_connection_putva::send_msg()
+    {
+        const auto current_state = connection_state::initialized;
+        const auto next_state = connection_state::sent;
+        HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
+
         int ret;
         if (is_eager)
         {
-            ret = LCI_putmna(util::lci_environment::get_endpoint_eager(),
-                mbuffer, dst_rank, 0, LCI_DEFAULT_COMP_REMOTE);
+            ret = LCI_putmna(pp_->endpoint_new_eager, mbuffer, dst_rank, 0,
+                LCI_DEFAULT_COMP_REMOTE);
             if (ret == LCI_OK)
             {
-#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-                data_point_.time_ = hpx::chrono::high_resolution_clock::now() -
-                    data_point_.time_;
-                pp_->add_sent_data(data_point_);
-#endif
-                if (!util::lci_environment::enable_send_immediate)
-                    done();
+                state.store(next_state, std::memory_order_release);
+                return {return_status_t::done, nullptr};
             }
         }
         else
         {
             void* buffer_to_free = iovec.piggy_back.address;
+            LCI_comp_t completion =
+                pp_->send_completion_manager->alloc_completion();
             // In order to keep the send_connection object from being
             // deallocated. We have to allocate a shared_ptr in the heap
             // and pass a pointer to shared_ptr to LCI.
             // We will get this pointer back via the send completion queue
             // after this send completes.
-            ret = LCI_putva(util::lci_environment::get_endpoint_iovec(), iovec,
-                util::lci_environment::get_scq(), dst_rank, 0,
-                LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
+            state.store(connection_state::locked, std::memory_order_relaxed);
+            ret = LCI_putva(pp_->endpoint_new_iovec, iovec, completion,
+                dst_rank, 0, LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
             // After this point, if ret == OK, this object can be shared by
             // two threads (the sending thread and the thread polling the
             // completion queue). Care must be taken to avoid data race.
             if (ret == LCI_OK)
             {
                 free(buffer_to_free);
+                state.store(next_state, std::memory_order_release);
+                return {return_status_t::wait, completion};
+            }
+            else
+            {
+                state.store(current_state, std::memory_order_release);
             }
         }
-        return ret == LCI_OK;
+        return {return_status_t::retry, nullptr};
     }
 
-    void sender_connection::done()
+    void sender_connection_putva::cleanup()
     {
         if (!is_eager)
         {
             HPX_ASSERT(iovec.count > 0);
             free(iovec.lbuffers);
-#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-            data_point_.time_ =
-                hpx::chrono::high_resolution_clock::now() - data_point_.time_;
-            pp_->add_sent_data(data_point_);
-#endif
         }
         error_code ec;
         handler_(ec);
         handler_.reset();
         buffer_.clear();
+    }
 
+    void sender_connection_putva::done()
+    {
+        profile_end_hook();
+        if (!is_eager)
+        {
+            cleanup();
+        }
+#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
+        data_point_.time_ =
+            hpx::chrono::high_resolution_clock::now() - data_point_.time_;
+        pp_->add_sent_data(data_point_);
+#endif
         if (postprocess_handler_)
         {
+            // Return this connection to the connection cache.
+            // After postprocess_handler is invoked, this connection can be
+            // obtained by another thread.
+            // so make sure to call this at the very end.
             hpx::move_only_function<void(error_code const&,
-                parcelset::locality const&, std::shared_ptr<sender_connection>)>
+                parcelset::locality const&,
+                std::shared_ptr<sender_connection_base>)>
                 postprocess_handler;
             std::swap(postprocess_handler, postprocess_handler_);
             error_code ec2;
@@ -242,9 +252,12 @@ namespace hpx::parcelset::policies::lci {
         }
     }
 
-    bool sender_connection::tryMerge(
-        const std::shared_ptr<sender_connection>& other)
+    bool sender_connection_putva::tryMerge(
+        const std::shared_ptr<sender_connection_base>& other_base)
     {
+        std::shared_ptr<sender_connection_putva> other =
+            std::dynamic_pointer_cast<sender_connection_putva>(other_base);
+        HPX_ASSERT(other);
         if (!isEager() || !other->isEager())
         {
             // we can only merge eager messages
