@@ -16,6 +16,9 @@
     !defined(HPX_MINGW)
 #include <windows.h>
 
+#include <cstddef>
+#include <string>
+
 namespace hpx::util {
 
     constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
