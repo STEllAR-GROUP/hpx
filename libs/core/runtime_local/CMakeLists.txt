@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -37,6 +37,10 @@ set(runtime_local_headers
     hpx/runtime_local/thread_pool_helpers.hpp
     hpx/runtime_local/thread_stacktrace.hpp
 )
+
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(runtime_local_headers ${runtime_local_headers} hpx/init.hpp)
+endif()
 
 # cmake-format: off
 set(runtime_local_compat_headers

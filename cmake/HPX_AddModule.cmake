@@ -428,7 +428,7 @@ function(add_hpx_module libname modulename)
 
   # Link modules to their higher-level libraries
   if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
-    if(UNIX)
+    if(UNIX OR MINGW)
       if(APPLE)
         set(_module_target "-Wl,-all_load" "hpx_${modulename}")
       else()
