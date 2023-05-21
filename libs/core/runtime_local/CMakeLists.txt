@@ -38,10 +38,6 @@ set(runtime_local_headers
     hpx/runtime_local/thread_stacktrace.hpp
 )
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(runtime_local_headers ${runtime_local_headers} hpx/init.hpp)
-endif()
-
 # cmake-format: off
 set(runtime_local_compat_headers
     hpx/custom_exception_info.hpp => hpx/modules/runtime_local.hpp
