@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/parallel/algorithm.hpp>
-#include <hpx/parallel/container_algorithms.hpp>
-#include <hpx/parallel/unseq.hpp>
-#if defined(HPX_HAVE_DATAPAR)
-#include <hpx/parallel/datapar.hpp>
-#endif
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/execution_base.hpp>
+#include <hpx/modules/executors.hpp>
+#include <hpx/modules/timed_execution.hpp>

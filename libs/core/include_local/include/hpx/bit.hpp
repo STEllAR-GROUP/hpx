@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,5 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/compute_local/host.hpp>
-#include <hpx/compute_local/serialization/vector.hpp>
-#include <hpx/compute_local/vector.hpp>
+#include <hpx/config.hpp>    // for endian support
+#include <hpx/type_support/bit_cast.hpp>

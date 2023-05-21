@@ -6,9 +6,4 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-#include <hpx/lcos_local/channel.hpp>
-
-namespace hpx {
-    using hpx::lcos::local::channel;
-}
+#include <hpx/modules/timing.hpp>

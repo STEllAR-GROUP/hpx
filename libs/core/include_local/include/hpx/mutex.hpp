@@ -6,8 +6,5 @@
 
 #pragma once
 
-#include <hpx/synchronization/mutex.hpp>
-#include <hpx/synchronization/no_mutex.hpp>
-#include <hpx/synchronization/once.hpp>
-#include <hpx/synchronization/recursive_mutex.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>

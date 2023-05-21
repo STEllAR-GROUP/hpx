@@ -5,12 +5,12 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/functional/bind.hpp>
-#include <hpx/functional/protect.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/futures.hpp>
 
 #include <cstddef>
 #include <iostream>
