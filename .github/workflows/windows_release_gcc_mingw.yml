@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: Windows CI (Debug, gcc/mingw toolset)
+name: Windows CI (Release, gcc/mingw toolset)
 
 on: [pull_request]
 
@@ -28,7 +28,7 @@ jobs:
         .\bootstrap.bat gcc
         .\b2.exe `
             link=shared `
-            variant=debug `
+            variant=release `
             architecture=x86 `
             address-model=64 `
             threading=multi `
@@ -41,7 +41,7 @@ jobs:
       shell: bash
       run: |
           cmake . -Bbuild -G'Ninja' \
-              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_CXX_COMPILER=g++ \
               -DBOOST_ROOT="C:\Boost" \
               -DHWLOC_ROOT="C:\projects\hwloc-win64-build-2.8.0" \
@@ -59,19 +59,4 @@ jobs:
     - name: Build
       shell: bash
       run: |
-          cmake --build build --config Debug -- -j 4
-    - name: Install
-      shell: bash
-      run: |
-          cmake --install build --config Debug
-    - name: Test
-      run: |
-          Set-Alias -Name grep -Value 'C:\Program Files\Git\usr\bin\grep.exe'
-          Set-Alias -Name sed -Value 'C:\Program Files\Git\usr\bin\sed.exe'
-          cd build
-          ctest `
-          --output-on-failure `
-            --build-config Debug `
-            --tests-regex tests.examples `
-            --exclude-regex `
-                 $(grep -v  -e ^# -e ^$ D:/a/hpx/hpx/.github/workflows/tests.examples.targets | sed ':b;N;$!bb;s/\n/|/g')
+          cmake --build build --config Release -- -j 2

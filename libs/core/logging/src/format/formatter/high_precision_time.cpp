@@ -17,6 +17,7 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <chrono>
