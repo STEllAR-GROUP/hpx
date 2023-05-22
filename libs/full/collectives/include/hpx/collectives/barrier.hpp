@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,12 +11,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/collectives/detail/barrier_node.hpp>
-#include <hpx/components_base/server/managed_component_base.hpp>
+#include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/create_communicator.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/modules/memory.hpp>
 
-#include <array>
+#include <atomic>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -24,13 +24,6 @@
 
 namespace hpx::distributed {
 
-    /// \cond NOINTERNAL
-    namespace detail {
-
-        struct barrier_node;
-    }
-    /// \endcond
-
     /// The barrier is an implementation performing a barrier over a number of
     /// participating threads. The different threads don't have to be on the
     /// same locality. This barrier can be invoked in a distributed application.
@@ -38,99 +31,161 @@ namespace hpx::distributed {
     /// For a local only barrier \see hpx::barrier.
     class HPX_EXPORT barrier
     {
-        /// \cond NOINTERNAL
-        typedef detail::barrier_node wrapped_type;
-        typedef components::managed_component<wrapped_type> wrapping_type;
-        /// \endcond
-
     public:
         /// Creates a barrier, rank is locality id, size is number of localities
         ///
         /// \param base_name The name of the barrier
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the created communicator
+        /// \param root_site The root locality that controls the barrier (default
+        ///                  is locality 0)
         ///
         /// A barrier \a base_name is created. It expects that
         /// hpx::get_num_localities() participate and the local rank is
         /// hpx::get_locality_id().
-        explicit barrier(std::string const& base_name);
+
+        explicit barrier(std::string const& base_name,
+            hpx::collectives::generation_arg generation =
+                hpx::collectives::generation_arg{},
+            hpx::collectives::root_site_arg root_site =
+                hpx::collectives::root_site_arg(0));
 
         /// Creates a barrier with a given size, rank is locality id
         ///
         /// \param base_name The name of the barrier
         /// \param num The number of participating threads
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the created communicator
+        /// \param root_site The root locality that controls the barrier (default
+        ///                  is locality 0)
         ///
-        /// A barrier \a base_name is created. It expects that
-        /// \a num participate and the local rank is hpx::get_locality_id().
-        barrier(std::string const& base_name, std::size_t num);
+        /// A barrier \a base_name is created. It expects that \a num
+        /// participate and the local rank is hpx::get_locality_id().
+        ///
+        barrier(std::string const& base_name,
+            hpx::collectives::num_sites_arg num,
+            hpx::collectives::generation_arg generation =
+                hpx::collectives::generation_arg{},
+            hpx::collectives::root_site_arg root_site =
+                hpx::collectives::root_site_arg(0));
+
+        HPX_DEPRECATED_V(1, 9,
+            "this barrier::barrier constructor is deprecated, use the "
+            "constructor taking a num_sites_arg instead")
+        barrier(std::string const& base_name, std::size_t num)
+          : barrier(base_name, hpx::collectives::num_sites_arg(num))
+        {
+        }
 
         /// Creates a barrier with a given size and rank
         ///
         /// \param base_name The name of the barrier
         /// \param num The number of participating threads
         /// \param rank The rank of the calling site for this invocation
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the created communicator
+        /// \param root_site The root locality that controls the barrier (default
+        ///                  is locality 0)
         ///
         /// A barrier \a base_name is created. It expects that
         /// \a num participate and the local rank is \a rank.
-        barrier(
-            std::string const& base_name, std::size_t num, std::size_t rank);
+        ///
+        barrier(std::string const& base_name,
+            hpx::collectives::num_sites_arg num,
+            hpx::collectives::this_site_arg rank,
+            hpx::collectives::generation_arg generation =
+                hpx::collectives::generation_arg{},
+            hpx::collectives::root_site_arg root_site =
+                hpx::collectives::root_site_arg(0));
+
+        barrier(barrier const&);
+        barrier(barrier&&) noexcept;
+
+        barrier& operator=(barrier const&);
+        barrier& operator=(barrier&&) noexcept;
+
+        ~barrier();
+
+        HPX_DEPRECATED_V(1, 9,
+            "this barrier::barrier constructor is deprecated, use the "
+            "constructor taking a num_sites_arg and a this_site_arg instead")
+        barrier(std::string const& base_name, std::size_t num, std::size_t rank)
+          : barrier(base_name, hpx::collectives::num_sites_arg(num),
+                hpx::collectives::this_site_arg(rank))
+        {
+        }
 
         /// Creates a barrier with a vector of ranks
         ///
         /// \param base_name The name of the barrier
-        /// \param ranks Gives a list of participating ranks (this could be derived
-        ///              from a list of locality ids
+        ///
+        /// \param ranks Gives a list of participating ranks (this could be
+        ///              derived from a list of locality ids
         /// \param rank The rank of the calling site for this invocation
         ///
-        /// A barrier \a base_name is created. It expects that ranks.size()
-        /// and the local rank is \a rank (must be contained in \a ranks).
+        /// A barrier \a base_name is created. It expects that ranks.size() and
+        /// the local rank is \a rank (must be contained in \a ranks).
+        ///
+        /// \note This constructor is deprecated and will be removed in the
+        ///       future.
+        ///
+        HPX_DEPRECATED_V(
+            1, 9, "this barrier::barrier constructor is deprecated")
         barrier(std::string const& base_name,
             std::vector<std::size_t> const& ranks, std::size_t rank);
 
-        /// \cond NOINTERNAL
-        barrier(barrier&& other) noexcept;
-        barrier& operator=(barrier&& other) noexcept;
-
-        /// \cond NOINTERNAL
-        ~barrier();
-        /// \endcond
+        /// Wait until each participant entered the barrier. Must be called by
+        /// all participants
+        ///
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the barrier operation.
+        void wait(hpx::collectives::generation_arg generation =
+                      hpx::collectives::generation_arg{});
 
         /// Wait until each participant entered the barrier. Must be called by
         /// all participants
         ///
-        /// \returns This function returns once all participants have entered
-        /// the barrier (have called \a wait).
-        void wait() const;
-
-        /// Wait until each participant entered the barrier. Must be called by
-        /// all participants
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the barrier operation.
         ///
-        /// \returns a future that becomes ready once all participants have
-        /// entered the barrier (have called \a wait).
-        hpx::future<void> wait(hpx::launch::async_policy) const;
+        /// \returns A future that becomes ready once all participants have
+        ///          entered the barrier (have called \a wait).
+        ///
+        hpx::future<void> wait(hpx::launch::async_policy,
+            hpx::collectives::generation_arg generation =
+                hpx::collectives::generation_arg{});
 
         /// \cond NOINTERNAL
-        // Resets this barrier instance.
-        void release();
-
-        void detach();
-
         // Get the instance of the global barrier
-        static std::array<barrier, 2>& get_global_barrier();
-        static std::array<barrier, 2> create_global_barrier();
+        static barrier& get_global_barrier();
+        static void create_global_barrier();
+
+        // detach the communicator
+        void detach();
         /// \endcond
 
+    public:
         /// Perform a global synchronization using the default global barrier
         /// The barrier is created once at startup and can be reused throughout
         /// the lifetime of an HPX application.
         ///
+        /// \param generation An optional generational sequence number used to
+        ///                   distinguish the barrier operation.
+        ///
         /// \note This function currently does not support dynamic connection
-        /// and disconnection of localities.
-        static void synchronize();
+        ///       and disconnection of localities.
+        ///
+        static void synchronize(hpx::collectives::generation_arg generation =
+                                    hpx::collectives::generation_arg{});
 
     private:
         /// \cond NOINTERNAL
         barrier();
 
-        hpx::intrusive_ptr<wrapping_type> node_;
+        std::atomic<std::size_t> generation_ = 0;
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        hpx::collectives::communicator comm_;
+#endif
         /// \endcond
     };
 }    // namespace hpx::distributed

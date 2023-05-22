@@ -1,214 +1,278 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/async_combinators/when_all.hpp>
-#include <hpx/collectives/barrier.hpp>
-#include <hpx/components/basename_registration.hpp>
-#include <hpx/components_base/server/component_heap.hpp>
-#include <hpx/modules/execution.hpp>
-#include <hpx/modules/memory.hpp>
-#include <hpx/runtime_configuration/runtime_configuration.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
-#include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/runtime_local/state.hpp>
-#include <hpx/type_support/construct_at.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/logging.hpp>
+#include <hpx/modules/type_support.hpp>
 
-#include <array>
-#include <atomic>
+#include <hpx/async_distributed/async.hpp>
+#include <hpx/collectives/argument_types.hpp>
+#include <hpx/collectives/barrier.hpp>
+#include <hpx/collectives/create_communicator.hpp>
+#include <hpx/collectives/detail/communicator.hpp>
+#include <hpx/components_base/agas_interface.hpp>
+#include <hpx/runtime_configuration/runtime_configuration.hpp>
+
+#include <algorithm>
 #include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
 
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace distributed {
+namespace hpx::traits {
 
-    barrier::barrier(std::string const& base_name)
-      : node_(hpx::construct_at(
-            static_cast<wrapping_type*>(
-                hpx::components::component_heap<wrapping_type>().alloc()),
-            new wrapped_type(base_name,
-                static_cast<std::size_t>(
-                    hpx::get_num_localities(hpx::launch::sync)),
-                static_cast<std::size_t>(hpx::get_locality_id()))))
+    ///////////////////////////////////////////////////////////////////////////
+    // support for barrier
+    namespace communication {
+        struct barrier_tag;
+    }    // namespace communication
+
+    template <typename Communicator>
+    struct communication_operation<Communicator, communication::barrier_tag>
     {
-        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
+        template <typename Result>
+        static Result get(Communicator& communicator, std::size_t which,
+            std::size_t generation)
         {
-            register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
-                .get();
+            return communicator.template handle_data<void>(which, generation);
         }
+    };
+}    // namespace hpx::traits
+
+#endif
+
+namespace hpx::distributed {
+
+    barrier::barrier([[maybe_unused]] std::string const& basename,
+        [[maybe_unused]] hpx::collectives::generation_arg generation,
+        [[maybe_unused]] hpx::collectives::root_site_arg root_site)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+      : comm_(hpx::collectives::create_communicator(basename.c_str(),
+            hpx::collectives::num_sites_arg{},
+            hpx::collectives::this_site_arg{}, generation, root_site))
+#endif
+    {
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        auto state = hpx::traits::detail::get_shared_state(comm_);
+        auto f = [state]() mutable {
+            using hpx::collectives::detail::communicator_data;
+            state->get_extra_data<communicator_data>() =
+                communicator_data{agas::get_num_localities(hpx::launch::sync),
+                    agas::get_locality_id()};
+        };
+        state->set_on_completed(HPX_MOVE(f));
+#endif
     }
 
-    barrier::barrier(std::string const& base_name, std::size_t num)
-      : node_(hpx::construct_at(
-            static_cast<wrapping_type*>(
-                hpx::components::component_heap<wrapping_type>().alloc()),
-            new wrapped_type(base_name, num,
-                static_cast<std::size_t>(hpx::get_locality_id()))))
+    barrier::barrier([[maybe_unused]] std::string const& basename,
+        [[maybe_unused]] hpx::collectives::num_sites_arg num,
+        [[maybe_unused]] hpx::collectives::generation_arg generation,
+        [[maybe_unused]] hpx::collectives::root_site_arg root_site)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+      : comm_(hpx::collectives::create_communicator(basename.c_str(), num,
+            hpx::collectives::this_site_arg{}, generation, root_site))
+#endif
     {
-        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-        {
-            register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
-                .get();
-        }
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        auto state = hpx::traits::detail::get_shared_state(comm_);
+        auto f = [num, state]() mutable {
+            using hpx::collectives::detail::communicator_data;
+            state->get_extra_data<communicator_data>() =
+                communicator_data{num, agas::get_locality_id()};
+        };
+        state->set_on_completed(HPX_MOVE(f));
+#endif
     }
 
-    barrier::barrier(
-        std::string const& base_name, std::size_t num, std::size_t rank)
-      : node_(hpx::construct_at(
-            static_cast<wrapping_type*>(
-                hpx::components::component_heap<wrapping_type>().alloc()),
-            new wrapped_type(base_name, num, rank)))
+    barrier::barrier([[maybe_unused]] std::string const& basename,
+        [[maybe_unused]] hpx::collectives::num_sites_arg num,
+        [[maybe_unused]] hpx::collectives::this_site_arg rank,
+        [[maybe_unused]] hpx::collectives::generation_arg generation,
+        [[maybe_unused]] hpx::collectives::root_site_arg root_site)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+      : comm_(hpx::collectives::create_communicator(
+            basename.c_str(), num, rank, generation, root_site))
+#endif
     {
-        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-        {
-            register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
-                .get();
-        }
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        auto state = hpx::traits::detail::get_shared_state(comm_);
+        auto f = [num, rank, state]() mutable {
+            using hpx::collectives::detail::communicator_data;
+            state->get_extra_data<communicator_data>() =
+                communicator_data{num, rank};
+        };
+        state->set_on_completed(HPX_MOVE(f));
+#endif
     }
+
+    barrier::barrier(barrier const& rhs)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+      : comm_(rhs.comm_)
+#endif
+    {
+    }
+    barrier::barrier(barrier&& rhs) noexcept
+      : generation_(rhs.generation_.load())
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+      , comm_(HPX_MOVE(rhs.comm_))
+#endif
+    {
+    }
+
+    barrier& barrier::operator=(barrier const& rhs)
+    {
+        generation_ = 0;
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        comm_ = rhs.comm_;
+#endif
+        return *this;
+    }
+    barrier& barrier::operator=(barrier&& rhs) noexcept
+    {
+        generation_.store(rhs.generation_.load());
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        comm_ = HPX_MOVE(rhs.comm_);
+#endif
+        return *this;
+    }
+
+    barrier::~barrier() = default;
+
+    namespace {
+
+        std::size_t find_rank(
+            std::vector<std::size_t> const& ranks, std::size_t rank)
+        {
+            auto const rank_it = std::find(ranks.begin(), ranks.end(), rank);
+            HPX_ASSERT(rank_it != ranks.end());
+
+            return static_cast<std::size_t>(
+                std::distance(ranks.begin(), rank_it));
+        }
+    }    // namespace
 
     barrier::barrier(std::string const& base_name,
         std::vector<std::size_t> const& ranks, std::size_t rank)
+      : barrier(base_name, hpx::collectives::num_sites_arg(ranks.size()),
+            hpx::collectives::this_site_arg(find_rank(ranks, rank)))
     {
-        auto const rank_it = std::find(ranks.begin(), ranks.end(), rank);
-        HPX_ASSERT(rank_it != ranks.end());
-
-        std::size_t const barrier_rank = std::distance(ranks.begin(), rank_it);
-        node_.reset(hpx::construct_at(
-            static_cast<wrapping_type*>(
-                hpx::components::component_heap<wrapping_type>().alloc()),
-            new wrapped_type(base_name, ranks.size(), barrier_rank)));
-
-        if ((*node_)->num_ >= (*node_)->cut_off_ || (*node_)->rank_ == 0)
-        {
-            register_with_basename(
-                base_name, node_->get_unmanaged_id(), (*node_)->rank_)
-                .get();
-        }
     }
 
     barrier::barrier() = default;
 
-    barrier::barrier(barrier&& other) noexcept
-      : node_(HPX_MOVE(other.node_))
-    {
-        other.node_.reset();
-    }
-
-    barrier& barrier::operator=(barrier&& other) noexcept
-    {
-        release();
-        node_ = HPX_MOVE(other.node_);
-        other.node_.reset();
-
-        return *this;
-    }
-
-    barrier::~barrier()
-    {
-        release();
-    }
-
-    void barrier::wait() const
-    {
-        (*node_)->wait(false).get();
-    }
-
-    hpx::future<void> barrier::wait(hpx::launch::async_policy) const
-    {
-        return (*node_)->wait(true);
-    }
-
-    void barrier::release()
-    {
-        if (node_)
-        {
-            if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(hpx::state::running) &&
-                !hpx::is_stopped_or_shutting_down())
-            {
-                // make sure this runs as an HPX thread
-                if (hpx::threads::get_self_ptr() == nullptr)
-                {
-                    hpx::threads::run_as_hpx_thread(&barrier::release, this);
-                }
-
-                hpx::future<void> f;
-                if ((*node_)->num_ >= (*node_)->cut_off_ ||
-                    (*node_)->rank_ == 0)
-                {
-                    f = hpx::unregister_with_basename(
-                        (*node_)->base_name_, (*node_)->rank_);
-                }
-
-                // we need to wait on everyone to have its name unregistered,
-                // and hold on to our node long enough...
-                hpx::intrusive_ptr<wrapping_type> node = node_;
-                hpx::when_all(f, wait(hpx::launch::async))
-                    .then(hpx::launch::sync,
-                        [node = HPX_MOVE(node)](hpx::future<void> f) {
-                            HPX_UNUSED(node);
-                            f.get();
-                        })
-                    .get();
-            }
-            intrusive_ptr_release(node_->get());
-            node_.reset();
-        }
-    }
-
     void barrier::detach()
     {
-        if (node_)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        comm_.free();
+#endif
+        generation_ = 0;
+    }
+
+    void barrier::wait(hpx::collectives::generation_arg generation)
+    {
+        std::size_t this_site = 0;
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        this_site = comm_.get_info().second;
+#endif
+        LRT_(info).format(
+            "hpx::distributed::barrier::wait: rank({}), generation({}): "
+            "entering barrier",
+            this_site, generation);
+
+        wait(hpx::launch::async, generation).get();
+
+        LRT_(info).format(
+            "hpx::distributed::barrier::wait: rank({}), generation({}): "
+            "exiting barrier",
+            this_site, generation);
+    }
+
+    hpx::future<void> barrier::wait(
+        hpx::launch::async_policy, hpx::collectives::generation_arg generation)
+    {
+        if (generation == 0)
         {
-            if (hpx::get_runtime_ptr() != nullptr &&
-                hpx::threads::threadmanager_is(hpx::state::running) &&
-                !hpx::is_stopped_or_shutting_down())
-            {
-                if ((*node_)->num_ >= (*node_)->cut_off_ ||
-                    (*node_)->rank_ == 0)
-                {
-                    hpx::unregister_with_basename(
-                        (*node_)->base_name_, (*node_)->rank_);
-                }
-            }
-            intrusive_ptr_release(node_->get());
-            node_.reset();
+            return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                hpx::error::bad_parameter, "hpx::distributed::barrier",
+                "the generation number shouldn't be zero"));
         }
+
+        if (generation != static_cast<std::size_t>(-1))
+        {
+            std::size_t const prev_generation =
+                generation_.exchange(generation);
+            if (prev_generation >= generation)
+            {
+                return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
+                    hpx::error::bad_parameter, "hpx::distributed::barrier",
+                    "the generation number must be continuously increasing"));
+            }
+        }
+        else
+        {
+            // use the next available generation number, if none is given
+            generation = ++generation_;
+        }
+
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+        auto barrier_data = [this, generation](auto&&) -> hpx::future<void> {
+            using action_type = hpx::collectives::detail::communicator_server::
+                communication_get_action<traits::communication::barrier_tag,
+                    hpx::future<void>>;
+
+            // make sure id is kept alive as long as the returned future,
+            // explicitly unwrap returned future
+            auto const this_site = comm_.get_info().second;
+            hpx::future<void> result =
+                hpx::async(action_type(), comm_, this_site, generation);
+
+            if (!result.is_ready())
+            {
+                traits::detail::get_shared_state(result)->set_on_completed(
+                    [comm = comm_] { HPX_UNUSED(comm); });
+            }
+
+            return result;
+        };
+
+        if (comm_.is_ready())
+        {
+            return barrier_data(comm_);
+        }
+        return comm_.then(hpx::launch::sync, HPX_MOVE(barrier_data));
+#else
+        return hpx::make_ready_future<void>();
+#endif
     }
 
-    std::array<barrier, 2> barrier::create_global_barrier()
+    void barrier::create_global_barrier()
     {
-        runtime& rt = get_runtime();
-        util::runtime_configuration const& cfg = rt.get_config();
-        barrier b1("/0/hpx/global_barrier0",
-            static_cast<std::size_t>(cfg.get_num_localities()));
-        barrier b2("/0/hpx/global_barrier1",
-            static_cast<std::size_t>(cfg.get_num_localities()));
-        return {{HPX_MOVE(b1), HPX_MOVE(b2)}};
+        util::runtime_configuration const& cfg = get_runtime().get_config();
+        get_global_barrier() = barrier("/0/hpx/global_barrier",
+            hpx::collectives::num_sites_arg(cfg.get_num_localities()),
+            hpx::collectives::this_site_arg(cfg.get_locality()));
     }
 
-    std::array<barrier, 2>& barrier::get_global_barrier()
+    barrier& barrier::get_global_barrier()
     {
-        static std::array<barrier, 2> bs = {};
-        return bs;
+        static barrier b;
+        return b;
     }
 
-    void barrier::synchronize()
+    void barrier::synchronize(hpx::collectives::generation_arg generation)
     {
-        static std::atomic<std::size_t> gen = 0;
-        static std::array<barrier, 2>& b = get_global_barrier();
-        HPX_ASSERT(b[0].node_ && b[1].node_);
-
-        b[++gen % 2].wait();
+        get_global_barrier().wait(generation);
     }
-}}    // namespace hpx::distributed
+}    // namespace hpx::distributed

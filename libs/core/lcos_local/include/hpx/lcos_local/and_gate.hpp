@@ -52,6 +52,7 @@ namespace hpx::lcos::local {
         {
         }
 
+        base_and_gate(base_and_gate const& rhs) = delete;
         base_and_gate(base_and_gate&& rhs) noexcept
           : mtx_()
           , received_segments_(HPX_MOVE(rhs.received_segments_))
@@ -59,9 +60,10 @@ namespace hpx::lcos::local {
           , generation_(rhs.generation_)
           , conditions_(HPX_MOVE(rhs.conditions_))
         {
-            rhs.generation_ = std::size_t(-1);
+            rhs.generation_ = static_cast<std::size_t>(-1);
         }
 
+        base_and_gate& operator=(base_and_gate const& rhs) = delete;
         base_and_gate& operator=(base_and_gate&& rhs) noexcept
         {
             if (this != &rhs)
@@ -71,11 +73,13 @@ namespace hpx::lcos::local {
                 received_segments_ = HPX_MOVE(rhs.received_segments_);
                 promise_ = HPX_MOVE(rhs.promise_);
                 generation_ = rhs.generation_;
-                rhs.generation_ = std::size_t(-1);
+                rhs.generation_ = static_cast<std::size_t>(-1);
                 conditions_ = HPX_MOVE(rhs.conditions_);
             }
             return *this;
         }
+
+        ~base_and_gate() = default;
 
     protected:
         bool trigger_conditions(error_code& ec = throws)
@@ -84,7 +88,7 @@ namespace hpx::lcos::local {
             if (!conditions_.empty())
             {
                 error_code rc(throwmode::lightweight);
-                condition_list_entry* next = nullptr;
+                condition_list_entry* next;
                 for (auto* c = conditions_.front(); c != nullptr; c = next)
                 {
                     // item me be deleted during processing
@@ -105,11 +109,10 @@ namespace hpx::lcos::local {
             return triggered;
         }
 
-    protected:
         /// Get a future allowing to wait for the gate to fire
         template <typename OuterLock>
         hpx::future<void> get_future(OuterLock& outer_lock,
-            std::size_t count = std::size_t(-1),
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -117,7 +120,7 @@ namespace hpx::lcos::local {
 
             // by default we use as many segments as specified during
             // construction
-            if (count == std::size_t(-1))
+            if (count == static_cast<std::size_t>(-1))
             {
                 count = received_segments_.size();
             }
@@ -126,7 +129,7 @@ namespace hpx::lcos::local {
             init_locked(outer_lock, l, count, ec);
             if (!ec)
             {
-                HPX_ASSERT(generation_ != std::size_t(-1));
+                HPX_ASSERT(generation_ != static_cast<std::size_t>(-1));
                 ++generation_;
 
                 // re-check/trigger condition, if needed
@@ -142,7 +145,8 @@ namespace hpx::lcos::local {
         }
 
     public:
-        hpx::future<void> get_future(std::size_t count = std::size_t(-1),
+        hpx::future<void> get_future(
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -155,7 +159,7 @@ namespace hpx::lcos::local {
         /// Get a shared future allowing to wait for the gate to fire
         template <typename OuterLock>
         hpx::shared_future<void> get_shared_future(OuterLock& outer_lock,
-            std::size_t count = std::size_t(-1),
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -163,12 +167,12 @@ namespace hpx::lcos::local {
 
             // by default we use as many segments as specified during
             // construction
-            if (count == std::size_t(-1))
+            if (count == static_cast<std::size_t>(-1))
             {
                 count = received_segments_.size();
             }
             HPX_ASSERT(count != 0);
-            HPX_ASSERT(generation_ != std::size_t(-1));
+            HPX_ASSERT(generation_ != static_cast<std::size_t>(-1));
 
             if (generation_ == 0)
             {
@@ -194,7 +198,7 @@ namespace hpx::lcos::local {
 
     public:
         hpx::shared_future<void> get_shared_future(
-            std::size_t count = std::size_t(-1),
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -268,9 +272,9 @@ namespace hpx::lcos::local {
         }
 
     protected:
-        bool test_condition(std::size_t generation_value) noexcept
+        bool test_condition(std::size_t generation_value) const noexcept
         {
-            return !(generation_value > generation_);
+            return generation_value <= generation_;
         }
 
         struct manage_condition
@@ -282,6 +286,11 @@ namespace hpx::lcos::local {
             {
                 this_.conditions_.push_back(cond);
             }
+
+            manage_condition(manage_condition const&) = delete;
+            manage_condition(manage_condition&&) = delete;
+            manage_condition& operator=(manage_condition const&) = delete;
+            manage_condition& operator=(manage_condition&&) = delete;
 
             ~manage_condition()
             {
@@ -350,9 +359,9 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
-            HPX_ASSERT(generation_ != std::size_t(-1));
+            HPX_ASSERT(generation_ != static_cast<std::size_t>(-1));
 
-            if (new_generation != std::size_t(-1))
+            if (new_generation != static_cast<std::size_t>(-1))
             {
                 if (new_generation < generation_)
                 {
@@ -361,12 +370,11 @@ namespace hpx::lcos::local {
                         "and_gate::next_generation",
                         "sequencing error, new generational counter value too "
                         "small");
-                    return std::size_t(-1);
                 }
                 generation_ = new_generation;
             }
 
-            std::size_t retval = ++generation_;
+            std::size_t const retval = ++generation_;
 
             trigger_conditions();    // re-check/trigger condition, if needed
 
@@ -374,7 +382,7 @@ namespace hpx::lcos::local {
         }
 
         std::size_t next_generation(
-            std::size_t new_generation = std::size_t(-1))
+            std::size_t new_generation = static_cast<std::size_t>(-1))
         {
             std::unique_lock<mutex_type> l(mtx_);
             return next_generation(l, new_generation);
@@ -413,6 +421,7 @@ namespace hpx::lcos::local {
             {
                 received_segments_.resize(count);    // resize the bitmap
             }
+
             received_segments_.reset();    // reset all existing bits
 
             if (&ec != &throws)
@@ -431,7 +440,7 @@ namespace hpx::lcos::local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct and_gate : public base_and_gate<hpx::no_mutex>
+    struct and_gate : base_and_gate<hpx::no_mutex>
     {
     private:
         using base_type = base_and_gate<hpx::no_mutex>;
@@ -442,11 +451,13 @@ namespace hpx::lcos::local {
         {
         }
 
+        and_gate(and_gate const&) = delete;
         and_gate(and_gate&& rhs) noexcept
           : base_type(HPX_MOVE(static_cast<base_type&>(rhs)))
         {
         }
 
+        and_gate& operator=(and_gate const& rhs) = delete;
         and_gate& operator=(and_gate&& rhs) noexcept
         {
             if (this != &rhs)
@@ -454,9 +465,11 @@ namespace hpx::lcos::local {
             return *this;
         }
 
+        ~and_gate() = default;
+
         template <typename Lock>
         hpx::future<void> get_future(Lock& l,
-            std::size_t count = std::size_t(-1),
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {
@@ -465,7 +478,7 @@ namespace hpx::lcos::local {
 
         template <typename Lock>
         hpx::shared_future<void> get_shared_future(Lock& l,
-            std::size_t count = std::size_t(-1),
+            std::size_t count = static_cast<std::size_t>(-1),
             std::size_t* generation_value = nullptr,
             error_code& ec = hpx::throws)
         {

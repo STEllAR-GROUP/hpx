@@ -65,38 +65,25 @@ namespace hpx::traits {
         ///////////////////////////////////////////////////////////////////////
         template <typename Future, typename Enable = void>
         struct shared_state_ptr_for
-          : shared_state_ptr<
-                traits::future_traits_t<std::remove_const_t<Future>>>
+          : shared_state_ptr<traits::future_traits_t<Future>>
         {
         };
 
         template <typename Future>
-        struct shared_state_ptr_for<Future&> : shared_state_ptr_for<Future>
-        {
-        };
-
-        template <typename Future>
-        struct shared_state_ptr_for<Future&&> : shared_state_ptr_for<Future>
-        {
-        };
+        using shared_state_ptr_for_t =
+            typename shared_state_ptr_for<std::decay_t<Future>>::type;
 
         template <typename Future>
         struct shared_state_ptr_for<std::vector<Future>>
         {
-            using type =
-                std::vector<typename shared_state_ptr_for<Future>::type>;
+            using type = std::vector<shared_state_ptr_for_t<Future>>;
         };
 
         template <typename Future, std::size_t N>
         struct shared_state_ptr_for<std::array<Future, N>>
         {
-            using type =
-                std::array<typename shared_state_ptr_for<Future>::type, N>;
+            using type = std::array<shared_state_ptr_for_t<Future>, N>;
         };
-
-        template <typename Future>
-        using shared_state_ptr_for_t =
-            typename shared_state_ptr_for<Future>::type;
 
         ///////////////////////////////////////////////////////////////////////
         template <typename SharedState, typename Allocator>

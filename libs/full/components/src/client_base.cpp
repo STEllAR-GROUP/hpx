@@ -66,6 +66,18 @@ namespace hpx::lcos::detail {
         return empty_string;
     }
 
+    std::string future_data<hpx::id_type>::move_registered_name()
+        const&& noexcept
+    {
+        if (auto* registered_name =
+                try_get_extra_data<registered_name_tracker>())
+        {
+            return HPX_MOVE(*registered_name);
+        }
+
+        return {};
+    }
+
     void future_data<hpx::id_type>::set_registered_name(std::string name)
     {
         auto& registered_name = get_extra_data<registered_name_tracker>();

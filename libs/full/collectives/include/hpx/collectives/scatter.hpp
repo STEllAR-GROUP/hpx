@@ -306,6 +306,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return scatter_from_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(scatter_from_data));
     }
 
@@ -368,6 +372,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return scatter_to_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(scatter_to_data));
     }
 

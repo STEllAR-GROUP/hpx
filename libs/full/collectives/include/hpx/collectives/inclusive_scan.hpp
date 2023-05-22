@@ -221,6 +221,10 @@ namespace hpx::collectives {
             return result;
         };
 
+        if (fid.is_ready())
+        {
+            return inclusive_scan_data(HPX_MOVE(fid));
+        }
         return fid.then(hpx::launch::sync, HPX_MOVE(inclusive_scan_data));
     }
 

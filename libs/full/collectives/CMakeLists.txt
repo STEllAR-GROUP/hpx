@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2022 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -34,7 +34,6 @@ set(collectives_headers
     hpx/collectives/reduce_direct.hpp
     hpx/collectives/scatter.hpp
     hpx/collectives/spmd_block.hpp
-    hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/latch.hpp
 )
 
@@ -59,7 +58,6 @@ set(collectives_sources
     channel_communicator.cpp
     create_communicator.cpp
     latch.cpp
-    detail/barrier_node.cpp
     detail/channel_communicator_server.cpp
     detail/communication_set_node.cpp
 )

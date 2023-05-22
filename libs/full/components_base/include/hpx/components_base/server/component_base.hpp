@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,20 +13,14 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <mutex>
-#include <sstream>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     namespace detail {
 
@@ -141,4 +135,4 @@ namespace hpx { namespace components {
                 static_cast<Component const&>(*this).get_current_address());
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

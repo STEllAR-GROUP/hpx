@@ -40,34 +40,30 @@ namespace hpx::execution {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    struct task_policy_tag final : hpx::execution::experimental::to_task_t
-    {
-    private:
-        // we don't want to allow using 'task' as a CPO from user code
-        using hpx::execution::experimental::to_task_t::operator();
-
-        template <template <class, class> typename Derived, typename Executor,
-            typename Parameters, typename Category>
-        friend struct detail::execution_policy;
-    };
-
-    inline constexpr task_policy_tag task{};
-
-    struct non_task_policy_tag final
-      : hpx::execution::experimental::to_non_task_t
-    {
-    private:
-        // we don't want to allow using 'non_task' as a CPO from user code
-        using hpx::execution::experimental::to_non_task_t::operator();
-
-        template <template <class, class> typename Derived, typename Executor,
-            typename Parameters, typename Category>
-        friend struct detail::execution_policy;
-    };
-
-    inline constexpr non_task_policy_tag non_task{};
-
     namespace experimental {
+
+        struct task_policy_tag final : hpx::execution::experimental::to_task_t
+        {
+        private:
+            // we don't want to allow using 'task' as a CPO from user code
+            using hpx::execution::experimental::to_task_t::operator();
+
+            template <template <class, class> typename Derived,
+                typename Executor, typename Parameters, typename Category>
+            friend struct hpx::execution::detail::execution_policy;
+        };
+
+        struct non_task_policy_tag final
+          : hpx::execution::experimental::to_non_task_t
+        {
+        private:
+            // we don't want to allow using 'non_task' as a CPO from user code
+            using hpx::execution::experimental::to_non_task_t::operator();
+
+            template <template <class, class> typename Derived,
+                typename Executor, typename Parameters, typename Category>
+            friend struct hpx::execution::detail::execution_policy;
+        };
 
         template <>
         struct is_execution_policy_mapping<task_policy_tag> : std::true_type
@@ -79,6 +75,20 @@ namespace hpx::execution {
         {
         };
     }    // namespace experimental
+
+    inline constexpr hpx::execution::experimental::to_task_t task{};
+
+    inline constexpr hpx::execution::experimental::to_non_task_t non_task{};
+
+    using task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_task_t instead") =
+        hpx::execution::experimental::to_task_t;
+
+    using non_task_policy_tag HPX_DEPRECATED_V(1, 9,
+        "hpx::execution::non_task_policy_tag is deprecated, use "
+        "hpx::execution::experimental::to_non_task_t instead") =
+        hpx::execution::experimental::to_non_task_t;
 
     namespace detail {
 

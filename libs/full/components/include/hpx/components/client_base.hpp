@@ -19,7 +19,6 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/future_traits.hpp>
 #include <hpx/futures/traits/is_future.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -64,6 +63,37 @@ namespace hpx::traits {
         struct future_access_customization_point<Derived,
             std::enable_if_t<is_client_v<Derived>>>
         {
+            template <typename SourceState, typename DestState>
+            static void transfer_data(SourceState const* src, DestState* dest)
+            {
+                if (src == dest)
+                    return;
+
+                using extra_client_data = typename Derived::extra_data_type;
+                using shared_state_type = typename Derived::shared_state_type;
+
+                HPX_ASSERT(dynamic_cast<shared_state_type const*>(src));
+                auto const* src_ptr =
+                    static_cast<shared_state_type const*>(src);
+
+                if constexpr (!std::is_void_v<extra_client_data>)
+                {
+                    extra_client_data* data =
+                        src_ptr
+                            ->template try_get_extra_data<extra_client_data>();
+
+                    if (data != nullptr)
+                    {
+                        dest->template get_extra_data<extra_client_data>() =
+                            HPX_MOVE(*data);
+                        *data = extra_client_data();
+                    }
+                }
+
+                dest->set_registered_name(
+                    HPX_MOVE(*src_ptr).move_registered_name());
+            }
+
             template <typename SharedState>
             HPX_FORCEINLINE static Derived create(
                 hpx::intrusive_ptr<SharedState> const& shared_state)
@@ -75,7 +105,7 @@ namespace hpx::traits {
             HPX_FORCEINLINE static Derived create(
                 hpx::intrusive_ptr<SharedState>&& shared_state)
             {
-                return Derived(hpx::future<id_type>(HPX_MOVE(shared_state)));
+                return Derived(hpx::future<id_type>(shared_state));
             }
 
             template <typename SharedState>
@@ -86,16 +116,23 @@ namespace hpx::traits {
                     hpx::intrusive_ptr<SharedState>(shared_state, addref)));
             }
 
-            HPX_FORCEINLINE static shared_state_ptr_t<id_type> const&
-            get_shared_state(Derived const& client)
+            HPX_FORCEINLINE static auto get_shared_state(Derived const& client)
             {
-                return client.shared_state_;
+                using shared_state_type = typename Derived::shared_state_type;
+                HPX_ASSERT(dynamic_cast<shared_state_type*>(
+                    client.shared_state_.get()));
+                return static_pointer_cast<shared_state_type>(
+                    client.shared_state_);
             }
 
-            HPX_FORCEINLINE static shared_state_ptr_t<id_type>::element_type*
-            detach_shared_state(Derived const& f)
+            HPX_FORCEINLINE static auto* detach_shared_state(
+                Derived const& client)
             {
-                return f.shared_state_.get();
+                using shared_state_type = typename Derived::shared_state_type;
+                HPX_ASSERT(dynamic_cast<shared_state_type*>(
+                    client.shared_state_.get()));
+                return static_cast<shared_state_type*>(
+                    client.shared_state_.get());
             }
 
             template <typename Destination>
@@ -103,31 +140,7 @@ namespace hpx::traits {
                 Derived&& src, Destination& dest)
             {
                 dest.set_value(src.get());
-
-                using extra_client_data = typename Derived::extra_data_type;
-                using shared_state_type = typename Derived::shared_state_type;
-
-                HPX_ASSERT(
-                    dynamic_cast<shared_state_type*>(src.shared_state_.get()));
-                auto* src_ptr =
-                    static_cast<shared_state_type*>(src.shared_state_.get());
-
-                if constexpr (!std::is_void_v<extra_client_data>)
-                {
-                    extra_client_data* data =
-                        src_ptr
-                            ->template try_get_extra_data<extra_client_data>();
-
-                    if (data != nullptr)
-                    {
-                        dest.template get_extra_data<extra_client_data>() =
-                            HPX_MOVE(*data);
-                        *data = extra_client_data();
-                    }
-                }
-
-                dest.set_registered_name(src_ptr->get_registered_name());
-                src_ptr->set_registered_name(std::string());
+                transfer_data(src.shared_state_.get(), &dest);
             }
         };
 
@@ -149,8 +162,9 @@ namespace hpx::traits {
         template <typename Derived>
         struct shared_state_ptr_for<Derived,
             std::enable_if_t<is_client_v<Derived>>>
-          : shared_state_ptr<traits::future_traits_t<Derived>>
         {
+            using type =
+                hpx::intrusive_ptr<lcos::detail::future_data<hpx::id_type>>;
         };
     }    // namespace detail
 }    // namespace hpx::traits
@@ -161,7 +175,7 @@ namespace hpx::lcos::detail {
     struct future_unwrap_result<Derived,
         std::enable_if_t<traits::is_client_v<Derived>>>
     {
-        using type = id_type;
+        using type = hpx::id_type;
         using wrapped_type = Derived;
     };
 
@@ -169,12 +183,72 @@ namespace hpx::lcos::detail {
     struct future_unwrap_result<hpx::future<Derived>,
         std::enable_if_t<traits::is_client_v<Derived>>>
     {
-        using type = id_type;
+        using type = hpx::id_type;
         using wrapped_type = Derived;
     };
 
     // default extra data stored in the shared state for a client
     using registered_name_tracker = std::string;
+
+    // Specialization for shared state of id_type, additionally (optionally) holds a
+    // registered name for the object it refers to.
+    template <>
+    struct HPX_EXPORT future_data<hpx::id_type> : future_data_base<hpx::id_type>
+    {
+        future_data(future_data const&) = delete;
+        future_data(future_data&&) = delete;
+        future_data& operator=(future_data const&) = delete;
+        future_data& operator=(future_data&&) = delete;
+
+        using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
+
+        future_data() = default;
+
+        explicit future_data(init_no_addref no_addref)
+          : future_data_base(no_addref)
+        {
+        }
+
+        template <typename... T>
+        future_data(
+            init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
+          : future_data_base(no_addref, in_place, HPX_FORWARD(T, ts)...)
+        {
+        }
+
+        future_data(init_no_addref no_addref, std::exception_ptr const& e)
+          : future_data_base(no_addref, e)
+        {
+        }
+        future_data(init_no_addref no_addref, std::exception_ptr&& e)
+          : future_data_base(no_addref, HPX_MOVE(e))
+        {
+        }
+
+        ~future_data() noexcept override;
+
+        std::string const& get_registered_name() const noexcept;
+        std::string move_registered_name() const&& noexcept;
+
+        void set_registered_name(std::string name);
+        bool register_as(std::string name, bool manage_lifetime);
+
+        // access extra data stored
+        template <typename T>
+        T& get_extra_data()
+        {
+            return extra_data_.get<T>();
+        }
+
+        // try accessing extra data stored, might return nullptr
+        template <typename T>
+        [[nodiscard]] T* try_get_extra_data() const noexcept
+        {
+            return extra_data_.try_get<T>();
+        }
+
+        util::extra_data extra_data_;
+    };
 }    // namespace hpx::lcos::detail
 
 // This is explicitly instantiated to ensure that the id is stable across shared
@@ -184,66 +258,10 @@ struct hpx::util::extra_data_helper<hpx::lcos::detail::registered_name_tracker>
 {
     HPX_EXPORT static extra_data_id_type id() noexcept;
     HPX_EXPORT static void reset(lcos::detail::registered_name_tracker*);
-};    // namespace hpx::util
-
-// Specialization for shared state of id_type, additionally (optionally) holds a
-// registered name for the object it refers to.
-template <>
-struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
-  : future_data_base<id_type>
-{
-    HPX_NON_COPYABLE(future_data);
-
-    using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
-
-    future_data() = default;
-
-    explicit future_data(init_no_addref no_addref)
-      : future_data_base(no_addref)
-    {
-    }
-
-    template <typename... T>
-    future_data(init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
-      : future_data_base(no_addref, in_place, HPX_FORWARD(T, ts)...)
-    {
-    }
-
-    future_data(init_no_addref no_addref, std::exception_ptr const& e)
-      : future_data_base(no_addref, e)
-    {
-    }
-    future_data(init_no_addref no_addref, std::exception_ptr&& e)
-      : future_data_base(no_addref, HPX_MOVE(e))
-    {
-    }
-
-    ~future_data() noexcept override;
-
-    [[nodiscard]] std::string const& get_registered_name() const noexcept;
-    void set_registered_name(std::string name);
-    bool register_as(std::string name, bool manage_lifetime);
-
-    // access extra data stored
-    template <typename T>
-    T& get_extra_data()
-    {
-        return extra_data_.get<T>();
-    }
-
-    // try accessing extra data stored, might return nullptr
-    template <typename T>
-    [[nodiscard]] T* try_get_extra_data() const noexcept
-    {
-        return extra_data_.try_get<T>();
-    }
-
-    util::extra_data extra_data_;
-};    // namespace hpx::lcos::detail
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components {
-
     namespace detail {
 
         // Wrap a given type such that it is usable as a stub_base.
@@ -284,12 +302,13 @@ namespace hpx::components {
         using future_type = shared_future<hpx::id_type>;
         using extra_data_type = Data;
 
-        client_base(hpx::intrusive_ptr<base_shared_state_type> const& state)
+        explicit client_base(
+            hpx::intrusive_ptr<base_shared_state_type> const& state)
           : shared_state_(state)
         {
         }
 
-        client_base(hpx::intrusive_ptr<base_shared_state_type>&& state)
+        explicit client_base(hpx::intrusive_ptr<base_shared_state_type>&& state)
           : shared_state_(HPX_MOVE(state))
         {
         }
