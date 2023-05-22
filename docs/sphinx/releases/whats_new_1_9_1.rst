@@ -34,7 +34,6 @@ here was on completing the API documentation of the most important API functions
 We have started adding migration guides for people interested in moving their
 codes away from other, commonplace parallelization frameworks like OpenMP.
 
-
 Breaking changes
 ================
 
@@ -53,7 +52,6 @@ Closed issues
 * :hpx-issue:`6246` - HPX fails to compile under cxx 20 (fresh system)
 * :hpx-issue:`6247` - HPX 1.9.0 does not compile with GCC on Windows
 * :hpx-issue:`6282` - The "attach-debugger" option is broken on the current master branch.
-
 
 Closed pull requests
 ====================
