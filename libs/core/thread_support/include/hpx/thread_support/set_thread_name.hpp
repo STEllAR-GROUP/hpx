@@ -12,15 +12,14 @@
 
 namespace hpx::util {
 
-    HPX_CORE_EXPORT void set_thread_name(
-        char const*, unsigned long = static_cast<unsigned long>(-1));
+    HPX_CORE_EXPORT void set_thread_name(char const* thread_name) noexcept;
 }    // namespace hpx::util
 
 #else
 
 namespace hpx::util {
 
-    constexpr void set_thread_name(char const* /*thread_name*/) noexcept {}
+    constexpr void set_thread_name(char const*) noexcept {}
 }    // namespace hpx::util
 
 #endif
