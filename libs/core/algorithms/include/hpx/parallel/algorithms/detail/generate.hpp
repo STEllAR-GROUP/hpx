@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/parallel/unseq/loop.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <algorithm>
@@ -54,20 +53,7 @@ namespace hpx::parallel::detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iter, typename F>
     constexpr Iter sequential_generate_n_helper(
-        Iter first, std::size_t count, F&& f, /*is unsequenced*/ std::true_type)
-    {
-#ifdef HPX_WITH_CXX20_STD_EXECUTION_POLICES    // unseq execution was added in CXX20
-        return std::generate_n(std::execution::unseq, first, count, f);
-#else
-        auto f2 = [&](Iter it) { *it = f(); };
-        return ::hpx::parallel::util::detail::unseq_loop_n::call(
-            first, count, f2);
-#endif
-    }
-
-    template <typename Iter, typename F>
-    constexpr Iter sequential_generate_n_helper(Iter first, std::size_t count,
-        F&& f, /*is unsequenced*/ std::false_type)
+        Iter first, std::size_t count, F&& f)
     {
         return std::generate_n(first, count, f);
     }
@@ -80,9 +66,8 @@ namespace hpx::parallel::detail {
         friend constexpr Iter tag_fallback_invoke(sequential_generate_n_t,
             ExPolicy&&, Iter first, std::size_t count, F&& f)
         {
-            using is_unseq = hpx::is_unsequenced_execution_policy<ExPolicy>;
             return sequential_generate_n_helper(
-                first, count, HPX_FORWARD(F, f), is_unseq());
+                first, count, HPX_FORWARD(F, f));
         }
     };
 
