@@ -24,9 +24,9 @@ namespace hpx::parallel { namespace detail {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T>
         static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-            ExPolicy&& policy, FwdIter first, Sent last, T const& val)
+            ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
-            hpx::reduce(HPX_FORWARD(policy), first, last, HPX_FORWARD(T, init),
+            hpx::reduce(HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
                 HPX_FORWARD(F, f));
         }
     };
