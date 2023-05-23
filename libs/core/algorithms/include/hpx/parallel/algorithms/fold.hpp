@@ -22,7 +22,7 @@ namespace hpx::parallel { namespace detail {
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T>
+            typename T, typename F>
         static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
