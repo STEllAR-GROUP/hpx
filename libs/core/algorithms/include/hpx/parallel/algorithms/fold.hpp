@@ -16,14 +16,9 @@ namespace hpx::parallel { namespace detail {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T, typename F>
         HPX_HOST_DEVICE static constexpr T sequential(
-            ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
+            ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
-            if (first == last)
-                return HPX_MOVE(init);
-            T acc = HPX_MOVE(init);
-            while (first != last)
-                acc = HPX_MOVE(f(HPX_MOVE(acc), *first++));
-            return HPX_MOVE(acc);
+            hpx::reduce(first, last, HPX_FORWARD(T, init), HPX_FORWARD(F, f));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -31,7 +26,8 @@ namespace hpx::parallel { namespace detail {
         static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T const& val)
         {
-            return first;
+            hpx::reduce(HPX_FORWARD(policy), first, last, HPX_FORWARD(T, init),
+                HPX_FORWARD(F, f));
         }
     };
 
