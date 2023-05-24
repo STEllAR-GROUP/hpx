@@ -5,11 +5,11 @@
 
 namespace hpx::parallel { namespace detail {
 
-    template <typename _T>
-    struct fold_left : public algorithm<fold_left<_T>, _T>
+    template <typename T_>
+    struct fold_left : public algorithm<fold_left<T_>, T_>
     {
         constexpr fold_left() noexcept
-          : algorithm<fold_left, _T>("fold_left")
+          : algorithm<fold_left, T_>("fold_left")
         {
         }
 
@@ -26,8 +26,8 @@ namespace hpx::parallel { namespace detail {
         static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
-            hpx::reduce(HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(F, f));
+            hpx::reduce(HPX_FORWARD(ExPolicy, policy), first, last,
+                HPX_FORWARD(T, init), HPX_FORWARD(F, f));
         }
     };
 
@@ -43,7 +43,7 @@ private:
     friend
         typename hpx::parallel::util::detail::algorithm_result<ExPolicy>::type
         tag_fallback_invoke(fold_left_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T&& init, F&& f)
+            FwdIter last, T init, F f)
     {
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
@@ -62,7 +62,7 @@ private:
         typename F>    // TODO : add concept
     // clang-format on
     friend T tag_fallback_invoke(
-        fold_left_t, FwdIter first, FwdIter last, T&& init, F&& f)
+        fold_left_t, FwdIter first, FwdIter last, T init, F f)
     {
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
