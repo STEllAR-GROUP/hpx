@@ -64,8 +64,8 @@ namespace hpx {
             Allocator>::template rebind_alloc<aligned_block>;
 
         template <typename Allocator>
-        concept has_real_pointers = std::is_void_v<Allocator> ||
-            std::is_pointer_v<
+        concept has_real_pointers =
+            std::is_void_v<Allocator> || std::is_pointer_v<
                 typename std::allocator_traits<Allocator>::pointer>;
 
         // clang-format off
@@ -324,8 +324,13 @@ namespace hpx {
 
                 dealloc_fn const dealloc = [](void* const p,
                                                std::size_t const s) {
+#if defined(HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE)
                     ::operator delete[](
                         p, s + sizeof(std::size_t) + sizeof(dealloc_fn));
+#else
+                    ::operator delete[](p);
+                    (void) s;
+#endif
                 };
 
                 char* address = static_cast<char*>(ptr);
