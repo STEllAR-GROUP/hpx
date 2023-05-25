@@ -64,8 +64,8 @@ namespace hpx {
             Allocator>::template rebind_alloc<aligned_block>;
 
         template <typename Allocator>
-        concept has_real_pointers = std::is_void_v<Allocator> ||
-            std::is_pointer_v<
+        concept has_real_pointers =
+            std::is_void_v<Allocator> || std::is_pointer_v<
                 typename std::allocator_traits<Allocator>::pointer>;
 
         // clang-format off
