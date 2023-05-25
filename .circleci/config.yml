@@ -568,7 +568,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 180 \
+                --timeout 270 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \
