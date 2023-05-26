@@ -322,11 +322,15 @@ namespace hpx {
                 void* const ptr = ::operator new[](
                     size + sizeof(std::size_t) + sizeof(dealloc_fn));
 
-                dealloc_fn const dealloc = [](void* const p,
-                                               std::size_t const s) {
-                    ::operator delete[](
-                        p, s + sizeof(std::size_t) + sizeof(dealloc_fn));
-                };
+                dealloc_fn const dealloc =
+                    [](void* const p, [[maybe_unused]] std::size_t const s) {
+#if defined(HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE)
+                        ::operator delete[](
+                            p, s + sizeof(std::size_t) + sizeof(dealloc_fn));
+#else
+                        ::operator delete[](p);
+#endif
+                    };
 
                 char* address = static_cast<char*>(ptr);
                 *reinterpret_cast<std::size_t*>(address) = size;
