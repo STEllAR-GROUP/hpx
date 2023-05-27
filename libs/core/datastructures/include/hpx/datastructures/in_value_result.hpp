@@ -1,3 +1,5 @@
+#pragma once
+
 namespace hpx::experimental { namespace ranges {
     template <typename Iter, typename T>
     struct in_value_result
