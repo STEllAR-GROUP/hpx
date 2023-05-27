@@ -778,6 +778,7 @@ namespace hpx { namespace components { namespace server {
 
         // collect additional command-line options
         hpx::program_options::options_description options;
+        options.add(get_runtime().get_app_options());
 
         // then dynamic ones
         naming::resolver_client& client = naming::get_agas_client();
