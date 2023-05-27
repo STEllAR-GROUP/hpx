@@ -26,6 +26,7 @@
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace hpx::parcelset {
     namespace policies::lci {
@@ -123,16 +124,13 @@ namespace hpx::parcelset {
             std::atomic<bool> is_sending_early_parcel = false;
 
             // LCI objects
-            LCI_device_t device_eager;
-            LCI_device_t device_iovec;
-            LCI_endpoint_t endpoint_new_eager;
+            LCI_device_t device;
+            LCI_endpoint_t endpoint_new;
             LCI_endpoint_t endpoint_followup;
-            LCI_endpoint_t endpoint_new_iovec;
 
             // Parcelport objects
             static std::atomic<bool> prg_thread_flag;
-            std::unique_ptr<std::thread> prg_thread_eager_p;
-            std::unique_ptr<std::thread> prg_thread_iovec_p;
+            std::unique_ptr<std::thread> prg_thread_p;
             std::shared_ptr<completion_manager_base> send_completion_manager;
             std::shared_ptr<completion_manager_base>
                 recv_new_completion_manager;
@@ -195,20 +193,35 @@ namespace hpx::traits {
                         "wrong!\n");
                     exit(1);
                 }
-                rp.create_thread_pool("lci-progress-pool-eager",
+                rp.create_thread_pool("lci-progress-pool",
                     hpx::resource::scheduling_policy::static_,
                     hpx::threads::policies::scheduler_mode::
                         do_background_work_only);
-                if (parcelset::policies::lci::config_t::use_two_device)
-                    rp.create_thread_pool("lci-progress-pool-iovec",
-                        hpx::resource::scheduling_policy::static_,
-                        hpx::threads::policies::scheduler_mode::
-                            do_background_work_only);
-                rp.add_resource(rp.numa_domains()[0].cores()[0].pus()[0],
-                    "lci-progress-pool-eager");
-                if (parcelset::policies::lci::config_t::use_two_device)
-                    rp.add_resource(rp.numa_domains()[0].cores()[1].pus()[0],
-                        "lci-progress-pool-iovec");
+
+                size_t ncores_to_add =
+                    parcelset::policies::lci::config_t::progress_thread_num;
+                std::vector<const hpx::resource::core*> cores;
+                for (auto& numa_domain : rp.numa_domains())
+                {
+                    for (auto& core : numa_domain.cores())
+                    {
+                        cores.push_back(&core);
+                    }
+                }
+                if (cores.size() <= 1)
+                {
+                    fprintf(stderr, "We don't have enough cores!\n");
+                    exit(1);
+                }
+                if ((size_t) ncores_to_add > cores.size() / 2)
+                {
+                    ncores_to_add = cores.size() / 2;
+                }
+                for (size_t i = 0; i < ncores_to_add; ++i)
+                {
+                    size_t next_core = i * cores.size() / ncores_to_add;
+                    rp.add_resource(*cores[next_core], "lci-progress-pool");
+                }
             }
         }
 
@@ -233,9 +246,8 @@ namespace hpx::traits {
                 "log_outfile = stderr\n"
                 "sendimm = 1\n"
                 "backlog_queue = 0\n"
-                "use_two_device = 0\n"
-                "prg_thread_core = -1\n"
-                "protocol = putva\n"
+                "prg_thread_num = 1\n"
+                "protocol = putsendrecv\n"
                 "comp_type = queue\n"
                 "progress_type = rp\n"
                 "prepost_recv_num = 1\n";

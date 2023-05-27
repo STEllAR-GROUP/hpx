@@ -17,8 +17,6 @@ namespace hpx::parcelset::policies::lci {
     {
         // whether init_config has been called
         static bool is_initialized;
-        // whether to use separate devices/progress threads for eager and iovec messages.
-        static bool use_two_device;
         // whether to bypass the parcel queue and connection cache.
         static bool enable_send_immediate;
         // whether to enable the backlog queue and eager message aggregation
@@ -36,13 +34,14 @@ namespace hpx::parcelset::policies::lci {
         // how to run LCI_progress
         enum class progress_type_t
         {
-            rp,         // HPX resource partitioner
-            pthread,    // Normal pthread
-            worker,     // HPX worker thread
+            rp,                // HPX resource partitioner
+            pthread,           // Normal progress pthread
+            worker,            // HPX worker thread
+            pthread_worker,    // Normal progress pthread + worker thread
         };
         static progress_type_t progress_type;
-        // Which core to pin the progress threads
-        static int progress_thread_core;
+        // How many progress threads to create
+        static int progress_thread_num;
         // How many pre-posted receives for new messages
         // (can only be applied to `sendrecv` protocol).
         static int prepost_recv_num;
