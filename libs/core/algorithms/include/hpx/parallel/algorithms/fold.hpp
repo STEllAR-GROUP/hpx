@@ -96,7 +96,7 @@ namespace hpx::parallel { namespace detail {
         {
             using T = ::hpx::traits::iter_value_t<FwdIter>;
             using U =
-                decltype(hpx::fold_left(std::move(first), last, T(*first), f));
+                decltype(hpx::fold_left(HPX_MOVE(first), last, T(*first), f));
 
             if (first == last)
                 return hpx::optional<U>();
@@ -117,7 +117,7 @@ namespace hpx::parallel { namespace detail {
         {
             using T = ::hpx::traits::iter_value_t<FwdIter>;
             using U =
-                decltype(hpx::fold_left(std::move(first), last, T(*first), f));
+                decltype(hpx::fold_left(HPX_MOVE(first), last, T(*first), f));
 
             if (first == last)
                 return hpx::optional<U>();
@@ -151,7 +151,7 @@ private:
             typename hpx::parallel::util::detail::algorithm_result<
                 ExPolicy>::type;
 
-        using U = decltype(hpx::fold_left(std::move(first), last,
+        using U = decltype(hpx::fold_left(HPX_MOVE(first), last,
             ::hpx::traits::iter_value_t<FwdIter>(*first), f));
 
         return hpx::parallel::detail::fold_left_first<hpx::optional<U>>().call(
@@ -165,7 +165,7 @@ private:
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
 
-        using U = decltype(hpx::fold_left(std::move(first), last,
+        using U = decltype(hpx::fold_left(HPX_MOVE(first), last,
             ::hpx::traits::iter_value_t<FwdIter>(*first), f));
 
         return hpx::parallel::detail::fold_left_first<hpx::optional<U>>().call(
@@ -192,11 +192,11 @@ namespace hpx::parallel { namespace detail {
             using U = std::decay_t<
                 std::invoke_result_t<F&, hpx::traits::iter_reference_t<FwdIter>, T>>;
             if (first == last)
-                return U(std::move(init));
+                return U(HPX_MOVE(init));
      
-            U accum = f(*--last, std::move(init));
+            U accum = f(*--last, HPX_MOVE(init));
             while (first != last)
-                accum = f(*--last, std::move(accum));
+                accum = f(*--last, HPX_MOVE(accum));
             return accum;
         }
 
