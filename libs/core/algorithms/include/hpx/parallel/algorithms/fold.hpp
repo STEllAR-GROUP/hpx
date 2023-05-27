@@ -189,11 +189,11 @@ namespace hpx::parallel { namespace detail {
         HPX_HOST_DEVICE static constexpr auto sequential(
             ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
-            using U = std::decay_t<
-                std::invoke_result_t<F&, hpx::traits::iter_reference_t<FwdIter>, T>>;
+            using U = std::decay_t<std::invoke_result_t<F&,
+                hpx::traits::iter_reference_t<FwdIter>, T>>;
             if (first == last)
                 return U(HPX_MOVE(init));
-     
+
             U accum = f(*--last, HPX_MOVE(init));
             while (first != last)
                 accum = f(*--last, HPX_MOVE(accum));
