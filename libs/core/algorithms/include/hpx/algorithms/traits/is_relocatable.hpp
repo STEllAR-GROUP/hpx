@@ -14,7 +14,7 @@ namespace hpx {
     struct is_relocatable
     {
         static constexpr bool value =
-            std::is_move_constructible_v<T> && std::is_destructible_v<T>;
+            std::is_move_constructible_v<T>;
     };
 
     template <typename T>
