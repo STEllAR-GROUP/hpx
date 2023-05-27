@@ -8,7 +8,7 @@
 # This is a dummy file to trigger the upload of the perftests reports
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
-set(CTEST_TEST_TIMEOUT 900)
+set(CTEST_TEST_TIMEOUT 300)
 set(CTEST_BUILD_PARALLELISM 20)
 set(CTEST_TEST_PARALLELISM 4)
 set(CTEST_CMAKE_GENERATOR Ninja)
