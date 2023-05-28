@@ -39,6 +39,7 @@ namespace hpx::parallel { namespace detail {
             return std::reduce(HPX_FORWARD(ExPolicy, policy), first, last,
                 HPX_FORWARD(T, init), HPX_FORWARD(F, f));
 #else
+            HPX_UNUSED(policy);    // TODO : par support
             return std::reduce(
                 first, last, HPX_FORWARD(T, init), HPX_FORWARD(F, f));
 #endif
@@ -205,6 +206,12 @@ namespace hpx::parallel { namespace detail {
         static constexpr auto parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
+            HPX_UNUSED(policy);
+            HPX_UNUSED(first);
+            HPX_UNUSED(last);
+            HPX_UNUSED(init);
+            HPX_UNUSED(f);
+
             exit(
                 1);    // parallel version of fold_right has not been implemented
             return f(first, init);
