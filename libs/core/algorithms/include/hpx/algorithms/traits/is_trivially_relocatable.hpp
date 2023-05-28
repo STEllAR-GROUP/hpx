@@ -46,7 +46,7 @@ namespace hpx {
       : std::true_type
     {
     };
-    
+
     template <typename T>
     inline constexpr bool is_trivially_relocatable_v =
         is_trivially_relocatable<T>::value;

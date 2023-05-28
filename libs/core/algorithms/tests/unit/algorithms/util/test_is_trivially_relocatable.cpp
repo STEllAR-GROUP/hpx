@@ -9,12 +9,14 @@
 #include <cassert>
 
 struct TriviallyRelocatable
-{};
+{
+};
 
 HPX_DECLARE_TRIVIALLY_RELOCATABLE(TriviallyRelocatable);
 
 struct NotTriviallyRelocatable
-{};
+{
+};
 
 static_assert(hpx::is_trivially_relocatable_v<TriviallyRelocatable>);
 static_assert(!hpx::is_trivially_relocatable_v<NotTriviallyRelocatable>);
@@ -25,7 +27,7 @@ static_assert(hpx::is_trivially_relocatable_v<double>);
 static_assert(hpx::is_trivially_relocatable_v<char>);
 static_assert(hpx::is_trivially_relocatable_v<bool>);
 
-// pointers 
+// pointers
 
 static_assert(hpx::is_trivially_relocatable_v<void*>);
 static_assert(hpx::is_trivially_relocatable_v<int*>);
@@ -33,4 +35,3 @@ static_assert(hpx::is_trivially_relocatable_v<double*>);
 static_assert(hpx::is_trivially_relocatable_v<NotTriviallyRelocatable*>);
 
 int main(int, char*[]) {}
-
