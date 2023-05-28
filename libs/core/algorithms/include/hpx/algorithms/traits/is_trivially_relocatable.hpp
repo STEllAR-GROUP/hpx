@@ -34,7 +34,7 @@ namespace hpx {
     // All iterator types are trivially relocatable
     template <typename T>
     struct is_trivially_relocatable<T,
-        typename std::enable_if<traits::is_iterator<T>::value>::type>
+        std::enable_if_t<traits::is_iterator_v<T>>>
       : std::true_type
     {
     };
