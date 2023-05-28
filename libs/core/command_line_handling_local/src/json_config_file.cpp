@@ -13,8 +13,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <strstream>
 #include <vector>
 
 #include <nlohmann/json.hpp>
@@ -34,33 +34,43 @@ namespace hpx::local::detail {
             return;
         }
 
+        if (value.is_object())
+        {
+            std::string const basekey(key + ":");
+            for (auto it = value.begin(); it != value.end(); ++it)
+            {
+                generate_option(options, basekey + it.key(), it.value());
+            }
+            return;
+        }
+
         std::stringstream str;
         if (value.is_boolean())
         {
             if (value.template get<bool>())
             {
                 str << "--" << key;
+                options.push_back(str.str());
             }
+            return;
         }
-        else
+
+        str << "--" << key << "=";
+        if (value.is_string())
         {
-            str << "--" << key << "=";
-            if (value.is_string())
-            {
-                str << value.template get<std::string>();
-            }
-            else if (value.is_number_integer())
-            {
-                str << value.template get<int>();
-            }
-            else if (value.is_number_unsigned())
-            {
-                str << value.template get<unsigned int>();
-            }
-            else if (value.is_number_float())
-            {
-                str << value.template get<double>();
-            }
+            str << value.template get<std::string>();
+        }
+        else if (value.is_number_integer())
+        {
+            str << value.template get<int>();
+        }
+        else if (value.is_number_unsigned())
+        {
+            str << value.template get<unsigned int>();
+        }
+        else if (value.is_number_float())
+        {
+            str << value.template get<double>();
         }
         options.push_back(str.str());
     }

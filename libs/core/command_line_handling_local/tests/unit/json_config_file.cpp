@@ -8,7 +8,9 @@
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include <cstddef>
 #include <string>
+#include <vector>
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -27,6 +29,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
     HPX_TEST((vm["array_option"].as<std::vector<int>>() ==
         std::vector<int>{1, 2, 3, 4, 5}));
 
+    HPX_TEST_EQ(vm.count("base:option"), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(vm["base:option"].as<int>(), 42);
+
     return hpx::local::finalize();
 }
 
@@ -44,6 +49,7 @@ int main(int argc, char* argv[])
         ("bool_option", "test bool_option")
         ("array_option", value<std::vector<int>>()->composing(),
             "test array_option")
+        ("base:option", value<int>(), "test base:option")
     ;
     // clang-format on
 

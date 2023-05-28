@@ -9,5 +9,8 @@
     "string_option": "42",
     "float_option": 42.0,
     "bool_option": true,
-    "array_option": [ 1, 2, 3, 4, 5 ]
+    "array_option": [ 1, 2, 3, 4, 5 ],
+    "base": {
+        "option": 42
+    }
 }

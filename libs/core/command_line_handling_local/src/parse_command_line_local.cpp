@@ -617,9 +617,8 @@ namespace hpx::local::detail {
 
             handle_generic_config_options(arg0, vm,
                 all_options[options_type::desc_cfgfile], rtcfg, error_mode);
-            handle_config_options(vm,
-                all_options[options_type::desc_cfgfile], rtcfg,
-                error_mode);
+            handle_config_options(
+                vm, all_options[options_type::desc_cfgfile], rtcfg, error_mode);
 
             return result;
         }
