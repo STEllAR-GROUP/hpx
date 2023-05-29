@@ -7,7 +7,6 @@
 set(include_local_headers
     hpx/any.hpp
     hpx/bit.hpp
-    hpx/channel.hpp
     hpx/chrono.hpp
     hpx/condition_variable.hpp
     hpx/datapar.hpp
@@ -33,18 +32,15 @@ set(include_local_headers
     hpx/experimental/task_group.hpp
 )
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(include_local_headers
-      ${include_local_headers}
-      hpx/algorithm.hpp
-      hpx/barrier.hpp
-      hpx/channel.hpp
-      hpx/compute.hpp
-      hpx/future.hpp
-      hpx/latch.hpp
-      hpx/runtime.hpp
-  )
-endif()
+set(generated_include_local_headers
+    hpx/algorithm.hpp
+    hpx/barrier.hpp
+    hpx/channel.hpp
+    hpx/compute.hpp
+    hpx/future.hpp
+    hpx/latch.hpp
+    hpx/runtime.hpp
+)
 
 # The headers in hpx/local/ were deprecated in HPX V1.10.0
 # cmake-format: off
@@ -87,6 +83,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN OFF
   HEADERS ${include_local_headers}
   COMPAT_HEADERS ${include_local_compat_headers}
+  GENERATED_HEADERS ${generated_include_local_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
     hpx_async_base

@@ -70,7 +70,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
   else()
     target_link_libraries(APEX::apex INTERFACE apex)
   endif()
-  if(UNIX AND NOT APPLE)
+  if((UNIX AND NOT APPLE) OR MINGW)
     target_link_options(APEX::apex INTERFACE "-Wl,-no-as-needed")
   endif()
 

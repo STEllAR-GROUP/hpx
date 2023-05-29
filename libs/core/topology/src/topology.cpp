@@ -130,12 +130,12 @@ namespace hpx::threads::detail {
     // abstract away memory page size
     std::size_t get_memory_page_size_impl()
     {
-#if defined(HPX_HAVE_UNISTD_H)
-        return sysconf(_SC_PAGE_SIZE);
-#elif defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS)
         SYSTEM_INFO systemInfo;
         GetSystemInfo(&systemInfo);
         return static_cast<std::size_t>(systemInfo.dwPageSize);
+#elif defined(HPX_HAVE_UNISTD_H)
+        return sysconf(_SC_PAGE_SIZE);
 #else
         return 4096;
 #endif

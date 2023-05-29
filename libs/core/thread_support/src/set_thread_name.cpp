@@ -9,7 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
+    !defined(HPX_MINGW)
 #include <windows.h>
 
 #include <hpx/thread_support/set_thread_name.hpp>
