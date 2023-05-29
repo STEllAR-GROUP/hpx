@@ -388,6 +388,16 @@ namespace hpx {
             return std::uint32_t(-1);
         }
 
+        hpx::program_options::options_description const& get_app_options() const
+        {
+            return app_options_;
+        }
+        void set_app_options(
+            hpx::program_options::options_description const& app_options)
+        {
+            app_options_.add(app_options);
+        }
+
     protected:
         void init_global_data();
         void deinit_global_data();
@@ -479,6 +489,8 @@ namespace hpx {
         bool stop_called_;
         bool stop_done_;
         std::condition_variable wait_condition_;
+
+        hpx::program_options::options_description app_options_;
     };
 
     HPX_CORE_EXPORT void set_error_handlers();

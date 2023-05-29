@@ -1335,9 +1335,8 @@ namespace hpx {
             // the distributed runtime
             if (handle_print_bind != nullptr)
             {
-                hpx::program_options::options_description options;
                 result = hpx::local::detail::handle_late_commandline_options(
-                    get_config(), options, handle_print_bind);
+                    get_config(), get_app_options(), handle_print_bind);
                 if (result)
                 {
                     lbt_ << "runtime_local::run_helper: bootstrap "

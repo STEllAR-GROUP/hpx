@@ -426,6 +426,14 @@ function(add_hpx_module libname modulename)
     endforeach()
   endif()
 
+  # install cmake files specific to this module
+  install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+    COMPONENT ${modulename}
+    OPTIONAL
+  )
+
   # Link modules to their higher-level libraries
   if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
     if(UNIX)
