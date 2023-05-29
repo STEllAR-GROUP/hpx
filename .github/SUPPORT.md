@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2017 Hartmut Kaiser                                            -->
+<!-- Copyright (c) 2017-2023 Hartmut Kaiser                                       -->
 <!--                                                                              -->
 <!-- SPDX-License-Identifier: BSL-1.0                                             -->
 <!-- Distributed under the Boost Software License, Version 1.0. (See accompanying -->
@@ -14,6 +14,12 @@ get support for using HPX.
 
 * [User Documentation](https://hpx-docs.stellar-group.org/latest/html/index.html)
 
+
+### Reporting security issues and vulnerabilities
+
+  Please send us an [email](info@stellar-group.org) describing the issue. See our
+  [security policy](https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SECURITY.md)
+  for details.
 
 ### Real-time Chat
 
