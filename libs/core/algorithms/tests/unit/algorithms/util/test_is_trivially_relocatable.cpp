@@ -8,30 +8,48 @@
 
 #include <cassert>
 
-struct TriviallyRelocatable
+// Trivially Copyable types are trivially relocatable
+struct TriviallyCopyable
 {
+    TriviallyCopyable(TriviallyCopyable const&) = default;
 };
+static_assert(hpx::is_trivially_relocatable_v<TriviallyCopyable>,
+    "Trivially Copyable type should be Trivially Relocatable");
 
-HPX_DECLARE_TRIVIALLY_RELOCATABLE(TriviallyRelocatable);
-
-struct NotTriviallyRelocatable
+// Non trivially copyable types are not trivially relocatable
+// Unless they are explicitly declared as such
+struct NotTriviallyCopyable_1
 {
+    NotTriviallyCopyable_1(NotTriviallyCopyable_1 const&){};
 };
+static_assert(!hpx::is_trivially_relocatable_v<NotTriviallyCopyable_1>,
+    "Not Trivially Copyable and Not declared Trivially Relocatable type should "
+    "not be Trivially Relocatable");
 
-static_assert(hpx::is_trivially_relocatable_v<TriviallyRelocatable>);
-static_assert(!hpx::is_trivially_relocatable_v<NotTriviallyRelocatable>);
+struct NotTriviallyCopyable_2
+{
+    NotTriviallyCopyable_2(NotTriviallyCopyable_2 const&){};
+};
+HPX_DECLARE_TRIVIALLY_RELOCATABLE(NotTriviallyCopyable_2)
 
-// C++ standard library types
-static_assert(hpx::is_trivially_relocatable_v<int>);
-static_assert(hpx::is_trivially_relocatable_v<double>);
-static_assert(hpx::is_trivially_relocatable_v<char>);
-static_assert(hpx::is_trivially_relocatable_v<bool>);
+static_assert(hpx::is_trivially_relocatable_v<NotTriviallyCopyable_2>,
+    "Not Trivially Copyable but declared Trivially Relocatable type should "
+    "be Trivially Relocatable");
 
-// pointers
-
-static_assert(hpx::is_trivially_relocatable_v<void*>);
-static_assert(hpx::is_trivially_relocatable_v<int*>);
-static_assert(hpx::is_trivially_relocatable_v<double*>);
-static_assert(hpx::is_trivially_relocatable_v<NotTriviallyRelocatable*>);
+// Standard library types are trivially relocatable
+static_assert(hpx::is_trivially_relocatable_v<int>,
+    "int should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<double>,
+    "double should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<char>,
+    "char should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<void*>,
+    "void* should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<int*>,
+    "int* should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<double*>,
+    "double* should be Trivially Relocatable");
+static_assert(hpx::is_trivially_relocatable_v<char*>,
+    "char* should be Trivially Relocatable");
 
 int main(int, char*[]) {}
