@@ -25,24 +25,10 @@ namespace hpx {
     {
     };
 
-    // All pointer types are trivially relocatable
-    template <typename T>
-    struct is_trivially_relocatable<T*> : std::true_type
-    {
-    };
-
-    // All iterator types are trivially relocatable
-    template <typename T>
-    struct is_trivially_relocatable<T,
-        std::enable_if_t<traits::is_iterator_v<T>>>
-      : std::true_type
-    {
-    };
-
     // All trivially copyable types are trivially relocatable
     template <typename T>
     struct is_trivially_relocatable<T,
-        typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
+        typename std::enable_if_t<std::is_trivially_copyable_v<T>>>
       : std::true_type
     {
     };
