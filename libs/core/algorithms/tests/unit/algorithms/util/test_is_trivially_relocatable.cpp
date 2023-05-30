@@ -131,11 +131,11 @@ static_assert(!hpx::is_trivially_relocatable_v<
               derived_from_explicitly_trivially_relocatable>);
 
 // Polymorphic types are not trivially relocatable
-struct polymorphic {
+struct polymorphic
+{
     virtual int f();
 };
 static_assert(!hpx::is_trivially_relocatable_v<polymorphic>);
-
 
 // Primive data types are trivially relocatable
 static_assert(hpx::is_trivially_relocatable_v<int>,
