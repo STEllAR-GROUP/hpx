@@ -22,7 +22,7 @@ struct not_trivially_copyable_1
 {
     not_trivially_copyable_1(not_trivially_copyable_1 const&){};
 };
-static_assert(!hpx::is_trivially_relocatable_v<NotTriviallyCopyable_1>,
+static_assert(!hpx::is_trivially_relocatable_v<not_trivially_copyable_1>,
     "Not Trivially Copyable and Not declared Trivially Relocatable type should "
     "not be Trivially Relocatable");
 
