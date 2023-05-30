@@ -28,8 +28,7 @@ namespace hpx {
     // All trivially copyable types are trivially relocatable
     template <typename T>
     struct is_trivially_relocatable<T,
-        typename std::enable_if_t<std::is_trivially_copyable_v<T>>>
-      : std::true_type
+        std::enable_if_t<std::is_trivially_copyable_v<T>>> : std::true_type
     {
     };
 
