@@ -12,7 +12,6 @@
 #include <hpx/async_colocated/post_colocated.hpp>
 #include <hpx/async_distributed/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
-#include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/naming_base/id_type.hpp>

@@ -24,14 +24,14 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     template <typename Result, typename RemoteResult>
     class promise_lco;
-}}}    // namespace hpx::lcos::detail
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Result, typename RemoteResult>
     struct managed_component_dtor_policy<
@@ -39,10 +39,10 @@ namespace hpx { namespace traits {
     {
         typedef managed_object_is_lifetime_controlled type;
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos { namespace detail {
+namespace hpx::lcos::detail {
 
     template <typename Result, typename RemoteResult>
     class promise_lco_base
@@ -170,7 +170,7 @@ namespace hpx { namespace lcos { namespace detail {
             HPX_UNUSED(bp);
         }
     };
-}}}    // namespace hpx::lcos::detail
+}    // namespace hpx::lcos::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
@@ -210,7 +210,7 @@ namespace hpx {
             components::component_invalid;
     }    // namespace traits
 
-    namespace components { namespace detail {
+    namespace components::detail {
 
         // Forward declare promise_lco<void> to avoid duplicate instantiations
         template <>
@@ -237,5 +237,6 @@ namespace hpx {
                 return heap.get();
             }
         };
-    }}    // namespace components::detail
+    }    // namespace components::detail
+    // namespace components::detail
 }    // namespace hpx

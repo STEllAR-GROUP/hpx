@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,14 +15,12 @@
 #include <hpx/async_distributed/detail/sync_implementations_fwd.hpp>
 #include <hpx/async_local/sync_fwd.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/futures/traits/is_future.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
-#include <cstddef>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
@@ -56,51 +54,71 @@ namespace hpx { namespace detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Launch, typename... Ts>
-    typename hpx::traits::extract_action<Action>::type::local_result_type
-    sync_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
+    typename hpx::traits::extract_action_t<Action>::local_result_type sync_impl(
+        Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
-        using action_type = typename hpx::traits::extract_action<Action>::type;
+        using action_type = hpx::traits::extract_action_t<Action>;
         using result_type = typename action_type::local_result_type;
         using component_type = typename action_type::component_type;
 
-        std::pair<bool, components::pinned_ptr> r;
-
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr) &&
-            can_invoke_locally<action_type>())
-        {
-            // route launch policy through component
-            launch adapted_policy =
-                traits::action_select_direct_execution<Action>::call(
-                    policy, addr.address_);
 
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
+        {
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<Action>::call(
                     id, addr.address_);
-                if (!r.first)
-                {
-                    if (adapted_policy == launch::sync ||
-                        action_type::direct_execution::value)
-                    {
-                        return hpx::detail::sync_local_invoke_direct<
-                            action_type, result_type>::call(id, HPX_MOVE(addr),
-                            HPX_FORWARD(Ts, vs)...);
-                    }
-                }
-            }
-            else if (adapted_policy == launch::sync ||
-                action_type::direct_execution::value)
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                can_invoke_locally<action_type>())
             {
-                return hpx::detail::sync_local_invoke_direct<action_type,
-                    result_type>::call(id, HPX_MOVE(addr),
-                    HPX_FORWARD(Ts, vs)...);
+                // route launch policy through component
+                launch const adapted_policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        policy, addr.address_);
+
+                if (!r.first &&
+                    (adapted_policy == launch::sync ||
+                        action_type::direct_execution::value))
+                {
+                    return hpx::detail::sync_local_invoke_direct<action_type,
+                        result_type>::call(id, HPX_MOVE(addr),
+                        HPX_FORWARD(Ts, vs)...);
+                }
+
+                // fall through
+            }
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr) &&
+                can_invoke_locally<action_type>())
+            {
+                // route launch policy through component
+                launch const adapted_policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        policy, addr.address_);
+
+                if (adapted_policy == launch::sync ||
+                    action_type::direct_execution::value)
+                {
+                    return hpx::detail::sync_local_invoke_direct<action_type,
+                        result_type>::call(id, HPX_MOVE(addr),
+                        HPX_FORWARD(Ts, vs)...);
+                }
+
+                // fall through
             }
         }
 
+        // Note: the pinned_ptr is still being held, if necessary
         return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
             HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...)
             .get();
     }
     /// \endcond
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

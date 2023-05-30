@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,62 +10,75 @@
 #include <hpx/actions_base/traits/action_is_target_valid.hpp>
 #include <hpx/actions_base/traits/action_was_object_migrated.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/components_base/agas_interface.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/parcelset/parcel.hpp>
 
-#include <system_error>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     template <typename Action, typename Continuation, typename... Ts>
-    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post_impl(Continuation&& c, hpx::id_type const& id,
+    std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
+        Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id))
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        if (!traits::action_is_target_valid<action_type>::call(id))
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "hpx::detail::post_impl",
                 "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<Action>());
-            return false;
+                hpx::actions::detail::get_action_name<action_type>());
         }
 
-        std::pair<bool, components::pinned_ptr> r;
-
-        // Determine whether the id is local or remote
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
         {
-            using component_type = typename Action::component_type;
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
                     id, addr.address_);
-                if (!r.first)
-                {
-                    return hpx::detail::post_l_p<Action>(
-                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
-                        priority, HPX_FORWARD(Ts, vs)...);
-                }
-            }
-            else
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                !r.first)
             {
-                return hpx::detail::post_l_p<Action>(
+                return hpx::detail::post_l_p<action_type>(
                     HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
                     HPX_FORWARD(Ts, vs)...);
             }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr))
+            {
+                return hpx::detail::post_l_p<action_type>(
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Ts, vs)...);
+            }
+
+            // fall through
         }
 
 #if defined(HPX_HAVE_NETWORKING)
+        // Note: the pinned_ptr is still being held, if necessary
+
         // apply remotely
-        return hpx::detail::post_r_p<Action>(HPX_MOVE(addr),
+        return hpx::detail::post_r_p<action_type>(HPX_MOVE(addr),
             HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_impl",
@@ -74,107 +87,108 @@ namespace hpx { namespace detail {
     }
 
     template <typename Action, typename Continuation, typename... Ts>
-    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
-    post_impl(Continuation&& c, hpx::id_type const& id, naming::address&& addr,
+    std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
+        Continuation&& c, hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs)
     {
-        // Determine whether the id is local or remote
-        if (addr)
+        if (!addr)
         {
-            if (!traits::action_is_target_valid<Action>::call(id))
-            {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "hpx::detail::post_impl",
-                    "the target (destination) does not match the action type "
-                    "({})",
-                    hpx::actions::detail::get_action_name<Action>());
-                return false;
-            }
-
-            std::pair<bool, components::pinned_ptr> r;
-            if (naming::get_locality_id_from_gid(addr.locality_) ==
-                agas::get_locality_id())
-            {
-                using component_type = typename Action::component_type;
-                if (traits::component_supports_migration<
-                        component_type>::call())
-                {
-                    r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
-                    if (!r.first)
-                    {
-                        return hpx::detail::post_l_p<Action>(
-                            HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
-                            priority, HPX_FORWARD(Ts, vs)...);
-                    }
-                }
-                else
-                {
-                    return hpx::detail::post_l_p<Action>(
-                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
-                        priority, HPX_FORWARD(Ts, vs)...);
-                }
-            }
-            // object was migrated or is not local
-            else
-            {
-                // apply remotely
-#if defined(HPX_HAVE_NETWORKING)
-                return hpx::detail::post_r_p<Action>(HPX_MOVE(addr),
-                    HPX_FORWARD(Continuation, c), id, priority,
-                    HPX_FORWARD(Ts, vs)...);
-#else
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::detail::post_impl",
-                    "unexpected attempt to send a parcel with networking "
-                    "disabled");
-#endif
-            }
+            return post_impl<Action>(HPX_FORWARD(Continuation, c), id, priority,
+                HPX_FORWARD(Ts, vs)...);
         }
 
-        return post_impl<Action>(
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        // Determine whether the id is local or remote
+        if (!traits::action_is_target_valid<action_type>::call(id))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_impl",
+                "the target (destination) does not match the action type ({})",
+                hpx::actions::detail::get_action_name<action_type>());
+        }
+
+        if (naming::get_locality_id_from_gid(addr.locality_) ==
+            agas::get_locality_id())
+        {
+            if constexpr (traits::component_supports_migration<
+                              component_type>::call())
+            {
+                HPX_ASSERT(
+                    !traits::action_was_object_migrated<action_type>::call(
+                        id, addr.address_)
+                         .first);
+                HPX_ASSERT(pin_count_is_valid<component_type>(addr.address_));
+            }
+
+            return hpx::detail::post_l_p<action_type>(
+                HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                HPX_FORWARD(Ts, vs)...);
+        }
+
+#if defined(HPX_HAVE_NETWORKING)
+        // object was migrated or is not local, apply remotely
+        return hpx::detail::post_r_p<action_type>(HPX_MOVE(addr),
             HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
+#else
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::detail::post_impl",
+            "unexpected attempt to send a parcel with networking disabled");
+#endif
     }
 
     template <typename Action, typename... Ts>
     bool post_impl(
         hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id))
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        if (!traits::action_is_target_valid<action_type>::call(id))
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "hpx::detail::post_impl",
                 "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<Action>());
-            return false;
+                hpx::actions::detail::get_action_name<action_type>());
         }
 
-        std::pair<bool, components::pinned_ptr> r;
-
-        // Determine whether the id is local or remote
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
         {
-            using component_type = typename Action::component_type;
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
                     id, addr.address_);
-                if (!r.first)
-                {
-                    return hpx::detail::post_l_p<Action>(
-                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
-                }
-            }
-            else
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                !r.first)
             {
-                return hpx::detail::post_l_p<Action>(
+                return hpx::detail::post_l_p<action_type>(
                     id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
             }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr))
+            {
+                return hpx::detail::post_l_p<action_type>(
+                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+            }
+
+            // fall through
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        // apply remotely
+        // Note: the pinned_ptr is still being held, if necessary
+
+        // object was migrated or is not local, apply remotely
         return hpx::detail::post_r_p<Action>(
             HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
 #else
@@ -187,119 +201,113 @@ namespace hpx { namespace detail {
     bool post_impl(hpx::id_type const& id, naming::address&& addr,
         threads::thread_priority priority, Ts&&... vs)
     {
-        // Determine whether the id is local or remote
-        if (addr)
+        if (!addr)
         {
-            if (!traits::action_is_target_valid<Action>::call(id))
+            return post_impl<Action>(id, priority, HPX_FORWARD(Ts, vs)...);
+        }
+
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        // Determine whether the id is local or remote
+        if (!traits::action_is_target_valid<action_type>::call(id))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_impl",
+                "the target (destination) does not match the action type ({})",
+                hpx::actions::detail::get_action_name<action_type>());
+        }
+
+        if (naming::get_locality_id_from_gid(addr.locality_) ==
+            agas::get_locality_id())
+        {
+            if constexpr (traits::component_supports_migration<
+                              component_type>::call())
             {
-                HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                    "hpx::detail::post_impl",
-                    "the target (destination) does not match the action type "
-                    "({})",
-                    hpx::actions::detail::get_action_name<Action>());
-                return false;
+                HPX_ASSERT(
+                    !traits::action_was_object_migrated<action_type>::call(
+                        id, addr.address_)
+                         .first);
+                HPX_ASSERT(pin_count_is_valid<component_type>(addr.address_));
             }
 
-            std::pair<bool, components::pinned_ptr> r;
-            if (naming::get_locality_id_from_gid(addr.locality_) ==
-                agas::get_locality_id())
-            {
-                using component_type = typename Action::component_type;
-                if (traits::component_supports_migration<
-                        component_type>::call())
-                {
-                    r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
-                    if (!r.first)
-                    {
-                        return hpx::detail::post_l_p<Action>(id, HPX_MOVE(addr),
-                            priority, HPX_FORWARD(Ts, vs)...);
-                    }
-                }
-                else
-                {
-                    return hpx::detail::post_l_p<Action>(
-                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
-                }
-            }
-            // object was migrated or is not local
-            else
-            {
-                // apply remotely
-#if defined(HPX_HAVE_NETWORKING)
-                return hpx::detail::post_r_p<Action>(
-                    HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
-#else
-                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                    "hpx::detail::post_impl",
-                    "unexpected attempt to send a parcel with networking "
-                    "disabled");
-#endif
-            }
+            return hpx::detail::post_l_p<action_type>(
+                id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
         }
-        return post_impl<Action>(id, priority, HPX_FORWARD(Ts, vs)...);
+
+#if defined(HPX_HAVE_NETWORKING)
+        // object was migrated or is not local, apply remotely
+        return hpx::detail::post_r_p<action_type>(
+            HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
+#else
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::detail::post_impl",
+            "unexpected attempt to send a parcel with networking disabled");
+#endif
     }
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
-    std::enable_if_t<traits::is_continuation<Continuation>::value, bool>
+    std::enable_if_t<traits::is_continuation_v<Continuation>, bool>
     post_cb_impl(Continuation&& c, hpx::id_type const& id,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id))
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        if (!traits::action_is_target_valid<action_type>::call(id))
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "hpx::detail::post_cb_impl",
                 "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<Action>());
-            return false;
+                hpx::actions::detail::get_action_name<action_type>());
         }
 
-        std::pair<bool, components::pinned_ptr> r;
-
-        // Determine whether the id is local or remote
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
         {
-            using component_type = typename Action::component_type;
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
                     id, addr.address_);
-                if (!r.first)
-                {
-                    bool result = hpx::detail::post_l_p<Action>(
-                        HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr),
-                        priority, HPX_FORWARD(Ts, vs)...);
+            };
 
-                    // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                    cb(std::error_code(), parcelset::parcel());
-#else
-                    cb();
-#endif
-                    return result;
-                }
-            }
-            else
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                !r.first)
             {
-                bool result =
-                    hpx::detail::post_l_p<Action>(HPX_FORWARD(Continuation, c),
-                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                bool const result = hpx::detail::post_l_p<action_type>(
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Ts, vs)...);
 
-                // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                cb(std::error_code(), parcelset::parcel());
-#else
-                cb();
-#endif
+                invoke_callback(HPX_FORWARD(Callback, cb));
                 return result;
             }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr))
+            {
+                bool const result = hpx::detail::post_l_p<action_type>(
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Ts, vs)...);
+
+                invoke_callback(HPX_FORWARD(Callback, cb));
+                return result;
+            }
+
+            // fall through
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        // apply remotely
-        return hpx::detail::post_r_p_cb<Action>(HPX_MOVE(addr),
+        // Note: the pinned_ptr is still being held, if necessary
+
+        // object was migrated or is not local, apply remotely
+        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr),
             HPX_FORWARD(Continuation, c), id, priority,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
@@ -313,63 +321,65 @@ namespace hpx { namespace detail {
     bool post_cb_impl(hpx::id_type const& id, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs)
     {
-        if (!traits::action_is_target_valid<Action>::call(id))
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        if (!traits::action_is_target_valid<action_type>::call(id))
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "hpx::detail::post_cb_impl",
                 "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<Action>());
-            return false;
+                hpx::actions::detail::get_action_name<action_type>());
         }
 
-        std::pair<bool, components::pinned_ptr> r;
-
-        // Determine whether the id is local or remote
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
-        {
-            using component_type = typename Action::component_type;
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
-                    id, addr.address_);
-                if (!r.first)
-                {
-                    bool result = hpx::detail::post_l_p<Action>(
-                        id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
 
-                    // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                    cb(std::error_code(), parcelset::parcel());
-#else
-                    cb();
-#endif
-                    return result;
-                }
-            }
-            else
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
+        {
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
+                    id, addr.address_);
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                !r.first)
             {
-                bool result = hpx::detail::post_l_p<Action>(
+                bool const result = hpx::detail::post_l_p<action_type>(
                     id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
 
-                // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                cb(std::error_code(), parcelset::parcel());
-#else
-                cb();
-#endif
+                invoke_callback(HPX_FORWARD(Callback, cb));
                 return result;
             }
+
+            // fall through
+        }
+        else
+        {
+            // Determine whether the id is local or remote
+            if (agas::is_local_address_cached(id, addr))
+            {
+                bool const result = hpx::detail::post_l_p<action_type>(
+                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+
+                invoke_callback(HPX_FORWARD(Callback, cb));
+                return result;
+            }
+
+            // fall through
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        // apply remotely
-        return hpx::detail::post_r_p_cb<Action>(HPX_MOVE(addr), id, priority,
-            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+        // Note: the pinned_ptr is still being held, if necessary
+
+        // object was migrated or is not local, apply remotely
+        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr), id,
+            priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "hpx::detail::post_cb_impl",
             "unexpected attempt to send a parcel with networking disabled");
 #endif
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

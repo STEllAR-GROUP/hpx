@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     ///////////////////////////////////////////////////////////////////////////
     bool is_console()
@@ -125,6 +125,16 @@ namespace hpx { namespace agas {
         naming::gid_type const& gid, naming::address& addr, error_code& ec)
     {
         return detail::is_local_address_cached_addr(gid, addr, ec);
+    }
+
+    bool is_local_address_cached(naming::gid_type const& gid,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec)
+    {
+        return detail::is_local_address_cached_addr_pinned_ptr(
+            gid, addr, r, HPX_MOVE(f), ec);
     }
 
     void update_cache_entry(naming::gid_type const& gid,
@@ -357,9 +367,10 @@ namespace hpx { namespace agas {
         return detail::was_object_migrated(gid, HPX_MOVE(f));
     }
 
-    void unmark_as_migrated(naming::gid_type const& gid)
+    void unmark_as_migrated(
+        naming::gid_type const& gid, hpx::move_only_function<void()>&& f)
     {
-        return detail::unmark_as_migrated(gid);
+        return detail::unmark_as_migrated(gid, HPX_MOVE(f));
     }
 
     hpx::future<std::map<std::string, hpx::id_type>> find_symbols(
@@ -420,4 +431,4 @@ namespace hpx { namespace agas {
     {
         return detail::get_runtime_support_lva();
     }
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
