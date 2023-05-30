@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2021 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     /// This hook has to be inserted into the derivation chain of any
@@ -32,21 +32,45 @@ namespace hpx { namespace components {
         using this_component_type = typename base_type::this_component_type;
 
     public:
+        abstract_base_migration_support() = default;
+
+        abstract_base_migration_support(
+            abstract_base_migration_support const&) = delete;
+        abstract_base_migration_support(
+            abstract_base_migration_support&&) = delete;
+        abstract_base_migration_support& operator=(
+            abstract_base_migration_support const&) = delete;
+        abstract_base_migration_support& operator=(
+            abstract_base_migration_support&&) = delete;
+
         virtual ~abstract_base_migration_support() = default;
 
         // This component type supports migration.
-        // static constexpr bool supports_migration() { return true; }
+        [[nodiscard]] static constexpr bool supports_migration() noexcept
+        {
+            return true;
+        }
 
         // Pinning functionality
         virtual void pin() = 0;
         virtual bool unpin() = 0;
-        virtual std::uint32_t pin_count() const = 0;
+        [[nodiscard]] virtual std::uint32_t pin_count() const = 0;
         virtual void mark_as_migrated() = 0;
 
         // migration support
         virtual hpx::future<void> mark_as_migrated(
             hpx::id_type const& to_migrate) = 0;
+        virtual void unmark_as_migrated(hpx::id_type const& to_migrate) = 0;
         virtual void on_migrated() = 0;
+        virtual std::pair<bool, components::pinned_ptr> was_object_migrated_v(
+            hpx::naming::gid_type const& id, naming::address_type lva) = 0;
+
+        static std::pair<bool, components::pinned_ptr> was_object_migrated(
+            hpx::naming::gid_type const& id, naming::address_type lva)
+        {
+            return get_lva<abstract_base_migration_support>::call(lva)
+                ->was_object_migrated_v(id, lva);
+        }
 
         using decorates_action = void;
 
@@ -103,19 +127,38 @@ namespace hpx { namespace components {
         template <typename T, typename... Ts,
             typename Enable = std::enable_if_t<
                 !std::is_same_v<std::decay_t<T>, abstract_migration_support>>>
-        abstract_migration_support(T&& t, Ts&&... ts)
+        explicit abstract_migration_support(T&& t, Ts&&... ts)
           : abstract_base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
         {
         }
 
+        abstract_migration_support(abstract_migration_support const&) = delete;
+        abstract_migration_support(abstract_migration_support&&) = delete;
+        abstract_migration_support& operator=(
+            abstract_migration_support const&) = delete;
+        abstract_migration_support& operator=(
+            abstract_migration_support&&) = delete;
+
         ~abstract_migration_support() = default;
 
-        constexpr void finalize() noexcept {}
+        // Disambiguate supports_migration() function.
+        [[nodiscard]] static constexpr bool supports_migration() noexcept
+        {
+            return true;
+        }
+
+        using decorates_action = void;
+
+        static constexpr void finalize() noexcept {}
 
         hpx::future<void> mark_as_migrated(
             hpx::id_type const& to_migrate) override
         {
             return this->base_type::mark_as_migrated(to_migrate);
+        }
+        void unmark_as_migrated(hpx::id_type const& to_migrate) override
+        {
+            return this->base_type::unmark_as_migrated(to_migrate);
         }
 
         void mark_as_migrated() override
@@ -123,7 +166,7 @@ namespace hpx { namespace components {
             this->base_type::mark_as_migrated();
         }
 
-        std::uint32_t pin_count() const override
+        [[nodiscard]] std::uint32_t pin_count() const override
         {
             return this->base_type::pin_count();
         }
@@ -141,5 +184,11 @@ namespace hpx { namespace components {
         {
             return this->base_type::on_migrated();
         }
+
+        std::pair<bool, components::pinned_ptr> was_object_migrated_v(
+            hpx::naming::gid_type const& id, naming::address_type lva) override
+        {
+            return this->base_type::was_object_migrated(id, lva);
+        }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

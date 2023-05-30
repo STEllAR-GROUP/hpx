@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/async_distributed/detail/post_callback.hpp>
+#include <hpx/async_distributed/detail/post_implementations_fwd.hpp>
 #include <hpx/async_distributed/promise.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
@@ -34,7 +35,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
 #if defined(HPX_HAVE_NETWORKING)
     namespace detail {
@@ -156,21 +157,11 @@ namespace hpx { namespace lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
-            if (addr)
-            {
-                hpx::post_p_cb<action_type>(
-                    actions::typed_continuation<Result, remote_result_type>(
-                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                    HPX_MOVE(addr), id, priority, HPX_MOVE(f),
-                    HPX_FORWARD(Ts, vs)...);
-            }
-            else
-            {
-                hpx::post_p_cb<action_type>(
-                    actions::typed_continuation<Result, remote_result_type>(
-                        HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                    id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
-            }
+            hpx::post_p_cb<action_type>(
+                actions::typed_continuation<Result, remote_result_type>(
+                    HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
+                HPX_MOVE(addr), id, priority, HPX_MOVE(f),
+                HPX_FORWARD(Ts, vs)...);
 
             this->shared_state_->mark_as_started();
         }
@@ -212,7 +203,7 @@ namespace hpx { namespace lcos {
                 sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
-            using callback_type = typename std::decay<Callback>::type;
+            using callback_type = std::decay_t<Callback>;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
@@ -253,7 +244,7 @@ namespace hpx { namespace lcos {
                 sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
-            using callback_type = typename std::decay<Callback>::type;
+            using callback_type = std::decay_t<Callback>;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
@@ -387,7 +378,7 @@ namespace hpx { namespace lcos {
                 sizeof...(Ts));
 
 #if defined(HPX_HAVE_NETWORKING)
-            using callback_type = typename std::decay<Callback>::type;
+            using callback_type = std::decay_t<Callback>;
             auto&& f = detail::parcel_write_handler_cb<Result, callback_type>{
                 this->shared_state_, HPX_FORWARD(Callback, cb)};
 #else
@@ -435,33 +426,26 @@ namespace hpx { namespace lcos {
         template <typename... Ts>
         void post(hpx::id_type const& id, Ts&&... vs)
         {
-            std::pair<bool, components::pinned_ptr> r;
+            using action_type = hpx::traits::extract_action_t<Action>;
+            using component_type = typename action_type::component_type;
 
+            [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
             naming::address addr;
-            if (agas::is_local_address_cached(id, addr))
-            {
-                using component_type = typename Action::component_type;
-                HPX_ASSERT(
-                    traits::component_type_is_compatible<component_type>::call(
-                        addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
-                {
-                    r = traits::action_was_object_migrated<Action>::call(
+            if constexpr (traits::component_supports_migration<
+                              component_type>::call())
+            {
+                auto f = [id](naming::address const& addr) {
+                    return traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
-                    if (!r.first)
-                    {
-                        // local, direct execution
-                        auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                        this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(HPX_MOVE(result));
-                        return;
-                    }
-                }
-                else
+                };
+
+                if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                    !r.first)
                 {
+                    HPX_ASSERT(traits::component_type_is_compatible<
+                        component_type>::call(addr));
+
                     // local, direct execution
                     auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
@@ -469,6 +453,26 @@ namespace hpx { namespace lcos {
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
                     return;
                 }
+
+                // fall through
+            }
+            else
+            {
+                // non-migratable objects
+                if (agas::is_local_address_cached(id, addr))
+                {
+                    HPX_ASSERT(traits::component_type_is_compatible<
+                        component_type>::call(addr));
+
+                    // local, direct execution
+                    auto&& result = action_type::execute_function(
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
+                    return;
+                }
+
+                // fall through
             }
 
             // remote execution
@@ -479,40 +483,34 @@ namespace hpx { namespace lcos {
         template <typename... Ts>
         void post(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
-            std::pair<bool, components::pinned_ptr> r;
+            using action_type = hpx::traits::extract_action_t<Action>;
+            using component_type = typename action_type::component_type;
 
-            if (naming::get_locality_id_from_gid(addr.locality_) ==
-                agas::get_locality_id())
+            if (addr &&
+                naming::get_locality_id_from_gid(addr.locality_) ==
+                    agas::get_locality_id())
             {
-                using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if constexpr (traits::component_supports_migration<
+                                  component_type>::call())
                 {
-                    r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
-                    if (!r.first)
-                    {
-                        // local, direct execution
-                        auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                        this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(HPX_MOVE(result));
-                        return;
-                    }
+                    HPX_ASSERT(
+                        !traits::action_was_object_migrated<action_type>::call(
+                            id, addr.address_)
+                             .first);
+                    HPX_ASSERT(hpx::detail::pin_count_is_valid<component_type>(
+                        addr.address_));
                 }
-                else
-                {
-                    // local, direct execution
-                    auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(HPX_MOVE(result));
-                    return;
-                }
+
+                // local, direct execution
+                auto&& result = action_type::execute_function(
+                    addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
+                this->shared_state_->mark_as_started();
+                this->shared_state_->set_remote_data(HPX_MOVE(result));
+                return;
             }
 
             // remote execution
@@ -524,40 +522,22 @@ namespace hpx { namespace lcos {
         template <typename Callback, typename... Ts>
         void post_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
-            std::pair<bool, components::pinned_ptr> r;
+            using action_type = hpx::traits::extract_action_t<Action>;
+            using component_type = typename action_type::component_type;
 
+            [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
             naming::address addr;
-            if (agas::is_local_address_cached(id, addr))
+
+            if constexpr (traits::component_supports_migration<
+                              component_type>::call())
             {
-                using component_type = typename Action::component_type;
-                HPX_ASSERT(
-                    traits::component_type_is_compatible<component_type>::call(
-                        addr));
-
-                if (traits::component_supports_migration<
-                        component_type>::call())
-                {
-                    r = traits::action_was_object_migrated<Action>::call(
+                auto f = [id](naming::address const& addr) {
+                    return traits::action_was_object_migrated<Action>::call(
                         id, addr.address_);
-                    if (!r.first)
-                    {
-                        // local, direct execution
-                        auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                        this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(HPX_MOVE(result));
+                };
 
-                        // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                        cb(std::error_code(), parcelset::parcel());
-#else
-                        cb();
-#endif
-
-                        return;
-                    }
-                }
-                else
+                if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                    !r.first)
                 {
                     // local, direct execution
                     auto&& result = action_type::execute_function(
@@ -565,14 +545,31 @@ namespace hpx { namespace lcos {
                     this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
 
-                    // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                    cb(std::error_code(), parcelset::parcel());
-#else
-                    cb();
-#endif
+                    hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
                     return;
                 }
+
+                // fall through
+            }
+            else
+            {
+                // non-migratable objects
+                if (agas::is_local_address_cached(id, addr))
+                {
+                    HPX_ASSERT(traits::component_type_is_compatible<
+                        component_type>::call(addr));
+
+                    // local, direct execution
+                    auto&& result = action_type::execute_function(
+                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
+                    this->shared_state_->mark_as_started();
+                    this->shared_state_->set_remote_data(HPX_MOVE(result));
+
+                    hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
+                    return;
+                }
+
+                // fall through
             }
 
             // remote execution
@@ -584,54 +581,34 @@ namespace hpx { namespace lcos {
         void post_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
-            std::pair<bool, components::pinned_ptr> r;
-
-            if (naming::get_locality_id_from_gid(addr.locality_) ==
-                agas::get_locality_id())
+            if (addr &&
+                naming::get_locality_id_from_gid(addr.locality_) ==
+                    agas::get_locality_id())
             {
                 using component_type = typename Action::component_type;
                 HPX_ASSERT(
                     traits::component_type_is_compatible<component_type>::call(
                         addr));
 
-                if (traits::component_supports_migration<
-                        component_type>::call())
+                if constexpr (traits::component_supports_migration<
+                                  component_type>::call())
                 {
-                    r = traits::action_was_object_migrated<Action>::call(
-                        id, addr.address_);
-                    if (!r.first)
-                    {
-                        // local, direct execution
-                        auto&& result = action_type::execute_function(
-                            addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                        this->shared_state_->mark_as_started();
-                        this->shared_state_->set_remote_data(HPX_MOVE(result));
-
-                        // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                        cb(std::error_code(), parcelset::parcel());
-#else
-                        cb();
-#endif
-                        return;
-                    }
+                    HPX_ASSERT(
+                        !traits::action_was_object_migrated<action_type>::call(
+                            id, addr.address_)
+                             .first);
+                    HPX_ASSERT(hpx::detail::pin_count_is_valid<component_type>(
+                        addr.address_));
                 }
-                else
-                {
-                    // local, direct execution
-                    auto&& result = action_type::execute_function(
-                        addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
-                    this->shared_state_->set_remote_data(HPX_MOVE(result));
 
-                    // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-                    cb(std::error_code(), parcelset::parcel());
-#else
-                    cb();
-#endif
-                    return;
-                }
+                // local, direct execution
+                auto&& result = action_type::execute_function(
+                    addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
+                this->shared_state_->mark_as_started();
+                this->shared_state_->set_remote_data(HPX_MOVE(result));
+
+                hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
+                return;
             }
 
             // remote execution
@@ -640,4 +617,4 @@ namespace hpx { namespace lcos {
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos

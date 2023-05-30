@@ -12,7 +12,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
@@ -22,7 +21,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
+
     ///////////////////////////////////////////////////////////////////////////
     // Migrate given component to the component storage
     //
@@ -57,6 +57,7 @@ namespace hpx { namespace components { namespace server {
     //       scope.
     //
     namespace detail {
+
         // clean up (source) memory of migrated object
         template <typename Component>
         hpx::id_type migrate_to_storage_here_cleanup(future<hpx::id_type> f,
@@ -70,35 +71,33 @@ namespace hpx { namespace components { namespace server {
         // trigger the actual migration to storage
         template <typename Component>
         future<hpx::id_type> migrate_to_storage_here_postproc(
-            std::shared_ptr<Component> const& ptr,
-            hpx::id_type const& to_migrate, hpx::id_type const& target_storage)
+            [[maybe_unused]] std::shared_ptr<Component> const& ptr,
+            [[maybe_unused]] hpx::id_type const& to_migrate,
+            [[maybe_unused]] hpx::id_type const& target_storage)
         {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
             using components::stubs::runtime_support;
 
-            std::uint32_t pin_count = ptr->pin_count();
+            std::uint32_t const pin_count = ptr->pin_count();
 
             if (pin_count == ~0x0u)
             {
-                agas::unmark_as_migrated(to_migrate.get_gid());
+                ptr->unmark_as_migrated(to_migrate);
 
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which "
-                    "was "
-                    "already migrated");
-                return make_ready_future(hpx::invalid_id);
+                    "was already migrated");
             }
 
             if (pin_count > 1)
             {
-                agas::unmark_as_migrated(to_migrate.get_gid());
+                ptr->unmark_as_migrated(to_migrate);
 
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::migrate_to_storage_here",
                     "attempting to migrate an instance of a component which is "
                     "currently pinned");
-                return make_ready_future(hpx::invalid_id);
             }
 
             // serialize the given component
@@ -111,8 +110,8 @@ namespace hpx { namespace components { namespace server {
 
             naming::address addr(ptr->get_current_address());
 
-            typedef typename server::component_storage::migrate_to_here_action
-                action_type;
+            using action_type =
+                typename server::component_storage::migrate_to_here_action;
 
             return hpx::async<action_type>(
                 target_storage, HPX_MOVE(data), to_migrate, addr)
@@ -121,9 +120,6 @@ namespace hpx { namespace components { namespace server {
                         ptr, to_migrate));
 #else
             HPX_ASSERT(false);
-            HPX_UNUSED(ptr);
-            HPX_UNUSED(to_migrate);
-            HPX_UNUSED(target_storage);
             return hpx::make_ready_future(hpx::id_type{});
 #endif
         }
@@ -136,13 +132,12 @@ namespace hpx { namespace components { namespace server {
     future<hpx::id_type> migrate_to_storage_here(hpx::id_type const& to_migrate,
         naming::address const& addr, hpx::id_type const& target_storage)
     {
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
-            return make_ready_future(hpx::invalid_id);
         }
 
         // retrieve pointer to object (must be local)
@@ -168,16 +163,16 @@ namespace hpx { namespace components { namespace server {
     // resolution for the given object.
     template <typename Component>
     future<hpx::id_type> trigger_migrate_to_storage_here(
-        hpx::id_type const& to_migrate, hpx::id_type const& target_storage)
+        [[maybe_unused]] hpx::id_type const& to_migrate,
+        [[maybe_unused]] hpx::id_type const& target_storage)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
-            return make_ready_future(hpx::invalid_id);
         }
 
         if (naming::get_locality_id_from_id(to_migrate) != get_locality_id())
@@ -186,13 +181,12 @@ namespace hpx { namespace components { namespace server {
                 "hpx::components::server::trigger_migrate_to_storage_here",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");
-            return make_ready_future(hpx::invalid_id);
         }
 
-        auto r = agas::begin_migration(to_migrate).get();
+        auto const r = agas::begin_migration(to_migrate).get();
 
         // perform actual object migration
-        typedef server::migrate_to_storage_here_action<Component> action_type;
+        using action_type = server::migrate_to_storage_here_action<Component>;
 
         future<id_type> f =
             async<action_type>(r.first, to_migrate, r.second, target_storage);
@@ -203,8 +197,6 @@ namespace hpx { namespace components { namespace server {
         });
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(to_migrate);
-        HPX_UNUSED(target_storage);
         return hpx::make_ready_future(hpx::id_type{});
 #endif
     }
@@ -217,4 +209,4 @@ namespace hpx { namespace components { namespace server {
             trigger_migrate_to_storage_here_action<Component>>
     {
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

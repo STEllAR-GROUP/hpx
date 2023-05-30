@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,13 +15,13 @@ namespace hpx {
     /// \namespace components
     namespace components {
 
-        /// \ cond NODETAIL
+        /// \cond NODETAIL
         namespace detail {
             struct this_type
             {
             };
         }    // namespace detail
-        /// \ endcond
+        /// \endcond
 
         ///////////////////////////////////////////////////////////////////////
         class pinned_ptr;

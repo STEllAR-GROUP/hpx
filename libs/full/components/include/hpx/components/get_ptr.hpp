@@ -33,8 +33,8 @@ namespace hpx {
         ///////////////////////////////////////////////////////////////////////
         struct get_ptr_deleter
         {
-            explicit get_ptr_deleter(hpx::id_type const& id) noexcept
-              : id_(id)
+            explicit get_ptr_deleter(hpx::id_type id) noexcept
+              : id_(HPX_MOVE(id))
             {
             }
 
@@ -50,8 +50,8 @@ namespace hpx {
 
         struct get_ptr_no_unpin_deleter
         {
-            explicit get_ptr_no_unpin_deleter(hpx::id_type const& id) noexcept
-              : id_(id)
+            explicit get_ptr_no_unpin_deleter(hpx::id_type id) noexcept
+              : id_(HPX_MOVE(id))
             {
             }
 
@@ -66,21 +66,20 @@ namespace hpx {
 
         struct get_ptr_for_migration_deleter
         {
-            explicit get_ptr_for_migration_deleter(
-                hpx::id_type const& id) noexcept
-              : id_(id)
+            explicit get_ptr_for_migration_deleter(hpx::id_type id) noexcept
+              : id_(HPX_MOVE(id))
             {
             }
 
             template <typename Component>
             void operator()(Component* p)
             {
-                bool was_migrated =
-                    traits::component_pin_support<Component>::unpin(p);
-
-                if (was_migrated)
+                // delete the object once the shared_ptr goes out of scope
+                auto const pin_count =
+                    traits::component_pin_support<Component>::pin_count(p);
+                if (pin_count == ~0x0u)
                 {
-                    components::component_type type =
+                    components::component_type const type =
                         components::get_component_type<Component>();
                     components::deleter(type)(id_.get_gid(),
                         naming::address(naming::get_gid_from_locality_id(
@@ -94,8 +93,8 @@ namespace hpx {
         };
 
         template <typename Component, typename Deleter>
-        std::shared_ptr<Component> get_ptr_postproc(
-            naming::address const& addr, hpx::id_type const& id)
+        std::shared_ptr<Component> get_ptr_postproc(naming::address const& addr,
+            hpx::id_type const& id, bool pin_object = true)
         {
             if (agas::get_locality_id() !=
                 naming::get_locality_id_from_gid(addr.locality_))
@@ -103,7 +102,6 @@ namespace hpx {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "hpx::get_ptr_postproc<Component, Deleter>",
                     "the given component id does not belong to a local object");
-                return std::shared_ptr<Component>();
             }
 
             if (!traits::component_type_is_compatible<Component>::call(addr))
@@ -112,14 +110,16 @@ namespace hpx {
                     "hpx::get_ptr_postproc<Component, Deleter>",
                     "requested component type does not match the given "
                     "component id");
-                return std::shared_ptr<Component>();
             }
 
             Component* p = get_lva<Component>::call(addr.address_);
             std::shared_ptr<Component> ptr(p, Deleter(id));
 
-            // the shared_ptr pins the component
-            traits::component_pin_support<Component>::pin(ptr.get());
+            // the shared_ptr pins the component, if requested
+            if (pin_object)
+            {
+                traits::component_pin_support<Component>::pin(ptr.get());
+            }
             return ptr;
         }
 
@@ -130,8 +130,9 @@ namespace hpx {
         std::shared_ptr<Component> get_ptr_for_migration(
             naming::address const& addr, hpx::id_type const& id)
         {
+            // do not pin/unpin the object
             return get_ptr_postproc<Component, get_ptr_for_migration_deleter>(
-                addr, id);
+                addr, id, false);
         }
     }    // namespace detail
     /// \endcond
@@ -145,8 +146,7 @@ namespace hpx {
     /// \param id  [in] The global id of the component for which the pointer
     ///            to the underlying memory should be retrieved.
     ///
-    /// \tparam    The only template parameter has to be the type of the
-    ///            server side component.
+    /// \tparam    Component The type of the server side component.
     ///
     /// \returns   This function returns a future representing the pointer to
     ///            the underlying memory for the component instance with the

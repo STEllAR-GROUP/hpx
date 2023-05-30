@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2021 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,6 +29,10 @@ set(async_headers
     hpx/async_distributed/continuation2_impl.hpp
     hpx/async_distributed/make_continuation.hpp
     hpx/async_distributed/dataflow.hpp
+    hpx/async_distributed/detail/async_implementations_fwd.hpp
+    hpx/async_distributed/detail/async_implementations.hpp
+    hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp
+    hpx/async_distributed/detail/async_unwrap_result_implementations.hpp
     hpx/async_distributed/detail/post_callback.hpp
     hpx/async_distributed/detail/post_continue_callback.hpp
     hpx/async_distributed/detail/post_continue_fwd.hpp
@@ -36,10 +40,6 @@ set(async_headers
     hpx/async_distributed/detail/post_implementations_fwd.hpp
     hpx/async_distributed/detail/post_implementations.hpp
     hpx/async_distributed/detail/post.hpp
-    hpx/async_distributed/detail/async_implementations_fwd.hpp
-    hpx/async_distributed/detail/async_implementations.hpp
-    hpx/async_distributed/detail/async_unwrap_result_implementations_fwd.hpp
-    hpx/async_distributed/detail/async_unwrap_result_implementations.hpp
     hpx/async_distributed/detail/sync_implementations_fwd.hpp
     hpx/async_distributed/detail/sync_implementations.hpp
     hpx/async_distributed/detail/trigger.hpp

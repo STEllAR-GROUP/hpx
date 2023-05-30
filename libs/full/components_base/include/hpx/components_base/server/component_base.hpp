@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,20 +13,14 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/components_base_fwd.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <mutex>
-#include <sstream>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     namespace detail {
 
@@ -42,12 +36,13 @@ namespace hpx { namespace components {
             base_component(base_component&& rhs) noexcept = default;
             base_component& operator=(base_component&& rhs) noexcept = default;
 
-            // finalize() will be called just before the instance gets destructed
+            // finalize() will be called just before the instance gets
+            // destructed
             static constexpr void finalize() noexcept {}
 
-            HPX_EXPORT hpx::id_type get_id(naming::gid_type gid) const;
-            HPX_EXPORT hpx::id_type get_unmanaged_id(
-                naming::gid_type const& gid) const;
+            HPX_EXPORT static hpx::id_type get_id(naming::gid_type gid);
+            HPX_EXPORT static hpx::id_type get_unmanaged_id(
+                naming::gid_type const& gid);
 
             static void mark_as_migrated() noexcept
             {
@@ -66,11 +61,12 @@ namespace hpx { namespace components {
             }
 
         protected:
-            // Create a new GID (if called for the first time), assign this
-            // GID to this instance of a component and register this gid
-            // with the AGAS service
+            // Create a new GID (if called for the first time), assign this GID
+            // to this instance of a component and register this gid with the
+            // AGAS service
             //
-            // Returns he global id (GID) assigned to this instance of a component
+            // Returns the global id (GID) assigned to this instance of a
+            // component
             HPX_EXPORT naming::gid_type get_base_gid_dynamic(
                 naming::gid_type const& assign_gid, naming::address const& addr,
                 naming::gid_type (*f)(naming::gid_type) = nullptr) const;
@@ -79,7 +75,6 @@ namespace hpx { namespace components {
                 naming::address const& addr,
                 naming::gid_type (*f)(naming::gid_type) = nullptr) const;
 
-        protected:
             mutable naming::gid_type gid_;
         };
     }    // namespace detail
@@ -110,7 +105,6 @@ namespace hpx { namespace components {
         component_base& operator=(component_base const&) = default;
         component_base& operator=(component_base&& rhs) noexcept = default;
 
-    public:
         naming::address get_current_address() const
         {
             return naming::address(
@@ -141,4 +135,4 @@ namespace hpx { namespace components {
                 static_cast<Component const&>(*this).get_current_address());
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components
