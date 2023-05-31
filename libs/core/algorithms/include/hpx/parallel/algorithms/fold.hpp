@@ -26,7 +26,7 @@ namespace hpx::parallel { namespace detail {
                 return HPX_MOVE(init);
             T acc = HPX_MOVE(init);
             while (first != last)
-                acc = HPX_MOVE(f(HPX_MOVE(acc), *first++));
+                acc = f(HPX_MOVE(acc), *first++);
             return HPX_MOVE(acc);
         }
 
@@ -148,10 +148,6 @@ private:
         static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
             "Requires at least forward iterator.");
 
-        using result_type =
-            typename hpx::parallel::util::detail::algorithm_result<
-                ExPolicy>::type;
-
         using U = decltype(hpx::fold_left(HPX_MOVE(first), last,
             ::hpx::traits::iter_value_t<FwdIter>(*first), f));
 
@@ -212,8 +208,8 @@ namespace hpx::parallel { namespace detail {
             HPX_UNUSED(init);
             HPX_UNUSED(f);
 
-            exit(
-                1);    // parallel version of fold_right has not been implemented
+            // parallel version of fold_right has not been implemented
+            exit(1);
             return f(first, init);
         }
     };
