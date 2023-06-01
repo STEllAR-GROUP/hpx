@@ -505,7 +505,7 @@ namespace hpx {
     ///
     /// \brief The \a condition_variable_any class is a generalization of
     /// \a hpx::condition_variable. Whereas \a hpx::condition_variable works
-    /// only on \a std::unique_lock<std::mutex>, \a acondition_variable_any can
+    /// only on \a std::unique_lock<std::mutex>, \a a condition_variable_any can
     /// operate on any lock that meets the \namedrequirement{BasicLockable}
     /// requirements.
     ///

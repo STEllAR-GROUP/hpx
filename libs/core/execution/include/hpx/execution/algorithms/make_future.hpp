@@ -37,6 +37,10 @@ namespace hpx::execution::experimental {
     // enforce proper formatting
     namespace detail {
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         template <typename Data>
         struct future_receiver_base
         {
@@ -70,6 +74,9 @@ namespace hpx::execution::experimental {
                 std::terminate();
             }
         };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         template <typename T>
         struct future_receiver

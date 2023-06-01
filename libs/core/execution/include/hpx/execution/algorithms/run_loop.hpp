@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,16 +15,51 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/get_env.hpp>
-#include <hpx/modules/lock_registration.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
+#include <hpx/modules/memory.hpp>
+#include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <exception>
 #include <mutex>
 
 namespace hpx::execution::experimental {
+
+    namespace detail {
+
+        struct run_loop_data;
+
+        HPX_CORE_EXPORT void intrusive_ptr_add_ref(run_loop_data* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_release(run_loop_data* p) noexcept;
+
+        struct run_loop_data
+        {
+            using mutex_type = hpx::spinlock;
+
+            run_loop_data() noexcept
+              : count_(1)
+            {
+            }
+
+            run_loop_data(run_loop_data const&) = delete;
+            run_loop_data(run_loop_data&&) = delete;
+            run_loop_data& operator=(run_loop_data const&) = delete;
+            run_loop_data& operator=(run_loop_data&&) = delete;
+
+            ~run_loop_data() = default;
+
+            mutable mutex_type mtx_;
+
+        private:
+            friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+                run_loop_data*) noexcept;
+            friend HPX_CORE_EXPORT void intrusive_ptr_release(
+                run_loop_data*) noexcept;
+
+            hpx::util::atomic_count count_;
+        };
+    }    // namespace detail
 
     // A run_loop is an execution context on which work can be scheduled. It
     // maintains a simple, thread-safe first-in-first-out queue of work. Its
@@ -60,8 +95,13 @@ namespace hpx::execution::experimental {
             {
             }
 
+            run_loop_opstate_base(run_loop_opstate_base const&) = delete;
             run_loop_opstate_base(run_loop_opstate_base&&) = delete;
+            run_loop_opstate_base& operator=(
+                run_loop_opstate_base const&) = delete;
             run_loop_opstate_base& operator=(run_loop_opstate_base&&) = delete;
+
+            ~run_loop_opstate_base() = default;
 
             run_loop_opstate_base* next;
             union
@@ -120,11 +160,6 @@ namespace hpx::execution::experimental {
                             hpx::execution::experimental::set_error(
                                 HPX_MOVE(receiver), HPX_MOVE(ep));
                         });
-                }
-
-                explicit type(run_loop_opstate_base* tail) noexcept
-                  : run_loop_opstate_base(tail)
-                {
                 }
 
                 type(run_loop_opstate_base* next, run_loop& loop, Receiver r)
@@ -261,8 +296,8 @@ namespace hpx::execution::experimental {
     private:
         friend struct run_loop_scheduler::run_loop_sender;
 
-        hpx::spinlock mtx;
-        hpx::condition_variable cond_var;
+        hpx::intrusive_ptr<detail::run_loop_data> mtx;
+        hpx::lcos::local::detail::condition_variable cond_var;
 
         // MSVC and gcc don't properly handle the friend declaration above
 #if defined(HPX_MSVC) || defined(HPX_GCC_VERSION)
@@ -275,24 +310,32 @@ namespace hpx::execution::experimental {
 
         void push_back(run_loop_opstate_base* t)
         {
-            std::unique_lock l(mtx);
+            auto const local_mtx = mtx;    // keep alive
+            std::unique_lock l(local_mtx->mtx_);
+
             stop = false;
             t->next = &head;
             head.tail = head.tail->next = t;
-            cond_var.notify_one();
+            cond_var.notify_one(HPX_MOVE(l));
         }
 
         run_loop_opstate_base* pop_front()
         {
-            std::unique_lock l(mtx);
-            cond_var.wait(l, [this] { return head.next != &head || stop; });
+            auto const local_mtx = mtx;    // keep alive
+            std::unique_lock l(local_mtx->mtx_);
+
+            while (head.next == &head && !stop)
+            {
+                cond_var.wait(l);
+            }
+
             if (head.tail == head.next)
             {
                 head.tail = &head;
             }
 
             // std::exchange(head.next, head.next->next);
-            auto old_val = HPX_MOVE(head.next);
+            auto const old_val = HPX_MOVE(head.next);
             head.next = HPX_MOVE(head.next->next);
             return old_val;
         }
@@ -300,11 +343,14 @@ namespace hpx::execution::experimental {
     public:
         // [exec.run_loop.ctor] construct/copy/destroy
         run_loop() noexcept
-          : head(&head)    //-V546
+          : mtx(new detail::run_loop_data(), false)
+          , head(&head)    //-V546
         {
         }
 
+        run_loop(run_loop const&) = delete;
         run_loop(run_loop&&) = delete;
+        run_loop& operator=(run_loop const&) = delete;
         run_loop& operator=(run_loop&&) = delete;
 
         // If count is not 0 or if state is running, invokes terminate().
@@ -336,11 +382,11 @@ namespace hpx::execution::experimental {
 
         void finish()
         {
-            std::unique_lock l(mtx);
-            hpx::util::ignore_while_checking<decltype(l)> il(&l);
-            HPX_UNUSED(il);
+            auto const local_mtx = mtx;    // keep alive
+            std::unique_lock l(local_mtx->mtx_);
+
             stop = true;
-            cond_var.notify_all();
+            cond_var.notify_all(HPX_MOVE(l));
         }
     };
 
