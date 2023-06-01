@@ -20,8 +20,7 @@ struct non_empty_but_trivial
 
 struct non_trivial_but_trivially_copyable
 {
-    explicit non_trivial_but_trivially_copyable(
-        non_trivial_but_trivially_copyable const&);
+    explicit non_trivial_but_trivially_copyable(int);
     int i;
 };
 
