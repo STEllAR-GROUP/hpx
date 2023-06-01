@@ -21,7 +21,7 @@ ulimit -l unlimited
 
 set +e
 ctest \
-    --verbose \
+    ${ctest_extra_args} \
     -S ${src_dir}/.jenkins/lsu/ctest.cmake \
     -DCTEST_CONFIGURE_EXTRA_OPTIONS="${configure_extra_options}" \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name_with_build_type}" \
