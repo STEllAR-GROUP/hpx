@@ -536,7 +536,6 @@ care of synchronization:
 
     future_outer.get();    // Wait for the outer task to complete
 
-
 Task yield
 ^^^^^^^^^^
 
