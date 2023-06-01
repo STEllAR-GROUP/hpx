@@ -11,8 +11,13 @@
 Quick start
 ===========
 
-The following steps will help you get started with |hpx|. 
+The following steps will help you get started with |hpx|. After :ref:`installing_hpx`, you
+can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
+explains how you can get started with |hpx|. You can refer to our :ref:`migration_guide` if you use
+other APIs for parallelism (like |openmp|, |mpi| or |tbb|) and you would like to convert your code to
+|hpx| code.
 
+.. _installing_hpx:
 
 Installing |hpx|
 ================
@@ -57,6 +62,8 @@ More information or alternatives regarding the installation can be found in the
 :ref:`building_hpx`, a detailed guide with thorough explanation of ways to build
 and use |hpx|.
 
+.. _hello_world:
+
 Hello, World!
 =============
 
@@ -94,15 +101,15 @@ Then, in your project directory run the following:
     Hello World!
 
 The program looks almost like a regular C++ hello world with the exception of
-the two includes and ``hpx::cout``. 
+the two includes and ``hpx::cout``.
 
 * When you include ``hpx_main.hpp`` |hpx| makes sure that ``main`` actually gets
   launched on the |hpx| runtime. So while it looks almost the same you can now use
   futures, ``async``, parallel algorithms and more which make use of the |hpx|
-  runtime with lightweight threads. 
+  runtime with lightweight threads.
 
-* ``hpx::cout`` is a replacement for ``std::cout`` to make sure printing never blocks 
-  a lightweight thread. You can read more about ``hpx::cout`` in :ref:`iostreams`. 
+* ``hpx::cout`` is a replacement for ``std::cout`` to make sure printing never blocks
+  a lightweight thread. You can read more about ``hpx::cout`` in :ref:`iostreams`.
 
 .. note::
 
@@ -118,7 +125,7 @@ the two includes and ``hpx::cout``.
      functionality in our application.
 
    * You do not have to let |hpx| take over your main function like in the
-     example. See :ref:`starting_hpx` for more details on how to initialize and run 
+     example. See :ref:`starting_hpx` for more details on how to initialize and run
      the |hpx| runtime.
 
 .. caution::
@@ -129,6 +136,8 @@ the two includes and ``hpx::cout``.
    ``main``. If you do not include the return statement, you may end up with
    confusing compile time errors mentioning ``user_main`` or even runtime
    errors.
+
+.. _writing_task_based_applications:
 
 Writing task-based applications
 ===============================
