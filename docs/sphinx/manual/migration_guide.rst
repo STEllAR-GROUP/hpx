@@ -191,7 +191,7 @@ Reduction
 
     int s = 0;
 
-    hpx::experimental::for_loop(hpx::execution::par, 0, n, reduction(s, 0, plus<>()), [&](int i, int accum) {
+    hpx::experimental::for_loop(hpx::execution::par, 0, n, reduction(s, 0, plus<>()), [&](int i, int& accum) {
         accum += i;
         // loop body
     });
@@ -253,4 +253,402 @@ Accordingly, other types of scheduling are available and can be used in a simila
     hpx::execution::experimental::auto_chunk_size cs(1000);
 
 
+|openmp| single thread
+----------------------
 
+|openmp| code:
+
+.. code-block:: c++
+
+    {   // parallel code
+        #pragma omp single
+        {
+            // single-threaded code
+        }
+        // more parallel code
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    hpx::mutex mtx;
+
+    {   // parallel code
+        {   // single-threaded code
+            std::scoped_lock l(mtx);
+        }
+        // more parallel code
+    }
+
+To make sure that only one thread accesses a specific code within a parallel section
+you can use `hpx::mutex` and `std::scoped_lock` to take ownership of the given mutex `mtx`.
+For more information about mutexes please refer to :ref:`mutex`.
+
+|openmp| tasks
+--------------
+
+Simple tasks
+^^^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    // executed asynchronously by any available thread
+    #pragma omp task
+    {
+        // task code
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    auto future = hpx::async([](){
+        // task code
+    });
+
+or
+
+.. code-block:: c++
+
+    #include <hpx/async_base/post.hpp>
+
+    hpx::post([](){
+        // task code
+    }); // fire and forget
+
+The tasks in |hpx| can be defined simply by using the `async` function and passing as argument
+the code you wish to run asynchronously. Another alternative is to use `post` which is a
+fire-and-forget method.
+
+.. note::
+
+    If you think you will like to synchronize your tasks later on, we suggest you use
+    `hpx::async` which provides synchronization options, while `hpx::post` explicitly states
+    that there is no return value or way to synchronize with the function execution.
+    Synchronization options are listed below.
+
+Task wait
+^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp task
+    {
+        // task code
+    }
+
+    #pragma omp taskwait
+    // code after completion of task
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    hpx::async([](){
+        // task code
+    }).get(); // wait for the task to complete
+
+    // code after completion of task
+
+The `get()` function can be used to ensure that the task created with `hpx::async`
+is completed before the code continues executing beyond that point.
+
+Multiple tasks synchronization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp task
+    {
+        // task 1 code
+    }
+
+    #pragma omp task
+    {
+        // task 2 code
+    }
+
+    #pragma omp taskwait
+    // code after completion of both tasks 1 and 2
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    auto future1 = hpx::async([](){
+        // task 1 code
+    });
+
+    auto future2 = hpx::async([](){
+        // task 2 code
+    });
+
+    auto future = hpx::when_all(future1, future2).then([](auto&&){
+        // code after completion of both tasks 1 and 2
+    });
+
+
+If you would like to synchronize multiple tasks, you can use the `hpx::when_all` function
+to define which futures have to be ready and the `then()` function to declare what should
+be executed once these futures are ready.
+
+
+Dependencies
+^^^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    int a = 10;
+    int b = 20;
+    int c = 0;
+
+    #pragma omp task depend(in: a, b) depend(out: c)
+    {
+        // task code
+        c = 100;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+    #include <hpx/async_base/dataflow.hpp>
+
+    int a = 10;
+    int b = 20;
+    int c = 0;
+
+    // Create a future representing 'a'
+    auto future_a = hpx::make_ready_future(a);
+
+    // Create a future representing 'b'
+    auto future_b = hpx::make_ready_future(b);
+
+    // Create a task that depends on 'a' and 'b' and executes 'task_code'
+    auto future_c = hpx::dataflow([](){
+                                        // task code
+                                        return 100;
+                                      },
+                                      future_a,
+                                      future_b);
+
+    c = future_c.get();
+
+If one of the arguments of `hpx::dataflow` is a future, then it will wait for the
+future to be ready to launch the thread. Hence, to define the dependencies of tasks
+you have to create futures representing the variables that create dependencies and pass
+them as arguments to `hpx::dataflow`. `get()` is used to save the result of the future
+to the desired variable.
+
+
+Nested tasks
+^^^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp task
+    {
+        // Outer task code
+        #pragma omp task
+        {
+            // Inner task code
+        }
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    auto future_outer = hpx::async([](){
+        // Outer task code
+
+        hpx::async([](){
+            // Inner task code
+        });
+    });
+
+or
+
+.. code-block:: c++
+
+    #include <hpx/async_base/post.hpp>
+
+    auto future_outer = hpx::post([](){ // fire and forget
+        // Outer task code
+
+        hpx::post([](){ // fire and forget
+            // Inner task code
+        });
+    });
+
+If you have nested tasks, you can simply use nested `hpx::async` or `hpx::post` calls.
+The implementation is similar if you want to take care of synchronization:
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp taskwait
+    {
+        // Outer task code
+        #pragma omp taskwait
+        {
+            // Inner task code
+        }
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    auto future_outer = hpx::async([](){
+        // Outer task code
+
+        hpx::async([](){
+            // Inner task code
+        }).get(); // Wait for the inner task to complete
+    });
+
+    future_outer.get(); // Wait for the outer task to complete
+
+
+Task yield
+^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp task
+    {
+        // code before yielding
+        #pragma omp taskyield
+        // code after yielding
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+    #include <hpx/threading/thread.hpp>
+
+    auto future = hpx::async([](){
+        // code before yielding
+    });
+
+    // yield execution to potentially allow other tasks to run
+    hpx::this_thread::yield();
+
+    // code after yielding
+
+After creating a task using `hpx::async`, `hpx::this_thread::yield()` can be used to
+reschedule the execution of threads, allowing other threads to run.
+
+Task group
+^^^^^^^^^^
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp taskgroup
+    {
+        #pragma omp task
+        {
+            // task 1 code
+        }
+
+        #pragma omp task
+        {
+            // task 2 code
+        }
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/experimental/task_group.hpp>
+
+    // Declare a task group
+    hpx::experimental::task_group tg;
+
+    // Run the tasks
+    tg.run([](){
+        // task 1 code
+    });
+    tg.run(
+        // task 2 code
+    });
+
+    // Wait for the task group
+    tg.wait();
+
+To create task groups, you can use `hpx::experimental::task_group`. The function
+`run()` can be used to run each task within the task group, while `wait()` can be used to
+achieve synchronization. If you do not care about waiting for the task group to complete
+its execution, you can simply remove the `wait()` function.
+
+|openmp| sections
+-----------------
+
+|openmp| code:
+
+.. code-block:: c++
+
+    #pragma omp sections
+    {
+        #pragma omp section
+        // section 1 code
+        #pragma omp section
+        // section 2 code
+    } // implicit synchronization
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    auto future_section1 = hpx::async([](){
+        // section 1 code
+    });
+    auto future_section2 = hpx::async([](){
+        // section 2 code
+    );
+
+    // synchronization: wait for both sections to complete
+    hpx::wait_all(future_section1, future_section2);
+
+Unlike tasks, there is an implicit synchronization barrier at the end of each `sections``
+directive in |openmp|. This synchronization is achieved using `hpx::wait_all` function.
+
+.. note::
+
+    If the `nowait` clause is used in the `sections` directive, then you can just remove
+    the `hpx::wait_all` function while keeping the rest of the code as it is.
