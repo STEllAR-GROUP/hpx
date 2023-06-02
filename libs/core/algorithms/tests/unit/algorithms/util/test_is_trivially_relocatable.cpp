@@ -136,7 +136,7 @@ struct polymorphic
 };
 static_assert(!hpx::is_trivially_relocatable_v<polymorphic>);
 
-// Primive data types are trivially relocatable
+// Primitive data types are trivially relocatable
 static_assert(hpx::is_trivially_relocatable_v<int>,
     "int should be Trivially Relocatable");
 static_assert(hpx::is_trivially_relocatable_v<double>,
