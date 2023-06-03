@@ -7,6 +7,7 @@
 /// \file parallel/algorithms/uninitialized_copy.hpp
 
 #pragma once
+#include <stdio.h>
 
 #if defined(DOXYGEN)
 namespace hpx {
@@ -252,15 +253,23 @@ namespace hpx::parallel {
             InIter1 first, std::size_t count, InIter2 dest,
             util::cancellation_token<util::detail::no_data>& tok)
         {
-            return {std::next(first, count),
-                util::loop_with_cleanup_n_with_token(
-                    first, count, dest, tok,
-                    [](InIter1 it, InIter2 dest) -> void {
-                        hpx::construct_at(std::addressof(*dest), *it);
-                    },
-                    [](InIter2 dest) -> void {
-                        std::destroy_at(std::addressof(*dest));
-                    })};
+            using T = ::hpx::traits::iter_value_t<InIter1>;
+            if constexpr (std::is_trivially_copyable_v<T>)
+            {
+                InIter1 dest = std::advance(first, count);
+                std::memcpy(std::addressof(*first), std::addressof(*dest),
+                    count * sizeof(T));
+            }
+            else
+                return {std::next(first, count),
+                    util::loop_with_cleanup_n_with_token(
+                        first, count, dest, tok,
+                        [](InIter1 it, InIter2 dest) -> void {
+                            hpx::construct_at(std::addressof(*dest), *it);
+                        },
+                        [](InIter2 dest) -> void {
+                            std::destroy_at(std::addressof(*dest));
+                        })};
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -334,10 +343,8 @@ namespace hpx::parallel {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return sequential_uninitialized_copy(
-                    first, dest, [last](InIter1 first, FwdIter2) -> bool {
-                        return first != last;
-                    });
+                return sequential_uninitialized_copy_n(
+                    first, std::distance(first, last), dest);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -420,6 +427,12 @@ namespace hpx::parallel {
                 FwdIter2 current = dest;
                 try
                 {
+                    using T = ::hpx::traits::iter_value_t<InIter>;
+                    if constexpr (std::is_trivially_copyable_v<T>)
+                    {
+                        std::memcpy(std::addressof(*first),
+                            std::addressof(*dest), count * sizeof(T));
+                    }
                     for (/* */; count > 0; ++first, (void) ++current, --count)
                     {
                         hpx::construct_at(std::addressof(*current), *first);
