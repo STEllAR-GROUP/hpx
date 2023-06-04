@@ -403,7 +403,7 @@ namespace hpx::parallel {
                 ExPolicy policy, InIter1 first, Sent last, FwdIter2 dest)
             {
                 return sequential_uninitialized_copy_n(
-                    ExPolicy, first, dest, std::distance(first, last));
+                    ExPolicy policy, first, dest, std::distance(first, last));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -528,9 +528,7 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
-            template <typename ExPolicy, typename InIter, typename FwdIter2,
-                typename = std::enable_if_t<
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
+            template <typename ExPolicy, typename InIter, typename FwdIter2>
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
