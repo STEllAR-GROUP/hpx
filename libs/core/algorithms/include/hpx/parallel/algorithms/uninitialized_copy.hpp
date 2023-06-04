@@ -380,6 +380,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter, typename FwdIter2,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_sequenced_execution_policy_v<ExPolicy>)>
+
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy&& policy, InIter first, std::size_t count,
                 FwdIter2 dest)
