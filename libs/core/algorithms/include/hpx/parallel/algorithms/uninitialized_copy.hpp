@@ -235,7 +235,7 @@ namespace hpx::parallel {
                 {
                     hpx::construct_at(std::addressof(*current), *first);
                 }
-                return util::in_out_result<InIter1, FwdIter2>{first, current};
+                return {first, current};
             }
             catch (...)
             {
@@ -256,11 +256,15 @@ namespace hpx::parallel {
             using T = ::hpx::traits::iter_value_t<InIter1>;
             if constexpr (std::is_trivially_copyable_v<T>)
             {
-                InIter1 dest = std::advance(first, count);
-                std::memcpy(std::addressof(*first), std::addressof(*dest),
+                std::memcpy(std::addressof(*dest), std::addressof(*first),
                     count * sizeof(T));
+                std::advance(first, count);
+                std::advance(dest, count);
+
+                return util::in_out_result<InIter1, InIter2>{first, dest};
             }
             else
+            {
                 return {std::next(first, count),
                     util::loop_with_cleanup_n_with_token(
                         first, count, dest, tok,
@@ -270,6 +274,7 @@ namespace hpx::parallel {
                         [](InIter2 dest) -> void {
                             std::destroy_at(std::addressof(*dest));
                         })};
+            }
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -424,29 +429,39 @@ namespace hpx::parallel {
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
-                FwdIter2 current = dest;
-                try
+                using T = ::hpx::traits::iter_value_t<InIter>;
+
+                if constexpr (std::is_trivially_copyable_v<T>)
                 {
-                    using T = ::hpx::traits::iter_value_t<InIter>;
-                    if constexpr (std::is_trivially_copyable_v<T>)
-                    {
-                        std::memcpy(std::addressof(*first),
-                            std::addressof(*dest), count * sizeof(T));
-                    }
-                    for (/* */; count > 0; ++first, (void) ++current, --count)
-                    {
-                        hpx::construct_at(std::addressof(*current), *first);
-                    }
-                    return util::in_out_result<InIter, FwdIter2>{
-                        first, current};
+                    std::memcpy(std::addressof(*dest), std::addressof(*first),
+                        count * sizeof(T));
+                    std::advance(first, count);
+                    std::advance(dest, count);
+
+                    return util::in_out_result<InIter, FwdIter2>{first, dest};
                 }
-                catch (...)
+                else
                 {
-                    for (/* */; dest != current; ++dest)
+                    FwdIter2 current = dest;
+
+                    try
                     {
-                        std::destroy_at(std::addressof(*dest));
+                        for (/* */; count > 0;
+                             ++first, (void) ++current, --count)
+                        {
+                            hpx::construct_at(std::addressof(*current), *first);
+                        }
+                        return util::in_out_result<InIter, FwdIter2>{
+                            first, current};
                     }
-                    throw;
+                    catch (...)
+                    {
+                        for (/* */; dest != current; ++dest)
+                        {
+                            std::destroy_at(std::addressof(*dest));
+                        }
+                        throw;
+                    }
                 }
             }
 
