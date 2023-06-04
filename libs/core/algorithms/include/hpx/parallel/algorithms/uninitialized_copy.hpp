@@ -7,7 +7,6 @@
 /// \file parallel/algorithms/uninitialized_copy.hpp
 
 #pragma once
-#include <stdio.h>
 
 #if defined(DOXYGEN)
 namespace hpx {
