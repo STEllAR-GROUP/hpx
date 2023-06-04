@@ -7,7 +7,6 @@
 /// \file parallel/algorithms/uninitialized_copy.hpp
 
 #pragma once
-#include <stdio.h>
 
 #if defined(DOXYGEN)
 namespace hpx {
@@ -348,8 +347,10 @@ namespace hpx::parallel {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
+                util::cancellation_token<util::detail::no_data> tok;
+
                 return sequential_uninitialized_copy_n(
-                    first, std::distance(first, last), dest);
+                    first, std::distance(first, last), dest, tok);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
