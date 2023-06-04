@@ -403,7 +403,7 @@ namespace hpx::parallel {
                 ExPolicy policy, InIter1 first, Sent last, FwdIter2 dest)
             {
                 return sequential_uninitialized_copy_n(
-                    ExPolicy policy, first, dest, std::distance(first, last));
+                    policy, first, dest, std::distance(first, last));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
