@@ -200,6 +200,119 @@ namespace hpx::parallel::util {
                 return call(base_idx, it, count, HPX_FORWARD(F, f));
             }
         };
+
+        template <typename IterCat>
+        struct unseq_loop_with_cleanup_n
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename FwdIter, typename F, typename Cleanup>
+            static FwdIter call(
+                FwdIter it, std::size_t num, F&& f, Cleanup&& cleanup)
+            {
+                FwdIter base = it;
+                try
+                {
+                    std::size_t count(num & std::size_t(-4));    // -V112
+
+                    // clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (std::size_t i = 0; i < count;
+                         (void) ++it, i += 4)    // -V112
+                    {
+                        HPX_INVOKE(f, it);
+                        HPX_INVOKE(f, ++it);
+                        HPX_INVOKE(f, ++it);
+                        HPX_INVOKE(f, ++it);
+                    }
+
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (/**/; count < num; (void) ++count, ++it)
+                    {
+                        HPX_INVOKE(f, it);
+                    }
+                    // clang-format on
+
+                    return it;
+                }
+                catch (...)
+                {
+                    for (/**/; base != it; ++base)
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
+                    throw;
+                }
+            }
+
+            template <typename Iter, typename FwdIter, typename F,
+                typename Cleanup>
+            static FwdIter call(Iter it, std::size_t num, FwdIter dest, F&& f,
+                Cleanup&& cleanup)
+            {
+                FwdIter base = dest;
+                try
+                {
+                    std::size_t count(num & std::size_t(-4));    // -V112
+
+                    //clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (std::size_t i = 0;
+                                                            i < count;
+                                                            (void) ++it, ++dest,
+                                                            i += 4)    // -V112
+                    {
+                        HPX_INVOKE(f, it, dest);
+                        HPX_INVOKE(f, ++it, ++dest);
+                        HPX_INVOKE(f, ++it, ++dest);
+                        HPX_INVOKE(f, ++it, ++dest);
+                    }
+
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (/**/; count < num;
+                                                            (void) ++count,
+                                                            ++it, ++dest)
+                    {
+                        HPX_INVOKE(f, it, dest);
+                    }
+                    //clang-format on
+
+                    return dest;
+                }
+                catch (...)
+                {
+                    for (/**/; base != dest; ++base)
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
+                    throw;
+                }
+            }
+
+            template <typename FwdIter, typename CancelToken, typename F,
+                typename Cleanup>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static FwdIter call_with_token(
+                FwdIter it, std::size_t num, CancelToken& tok, F&& f,
+                Cleanup&& cleanup)
+            {
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return it;
+
+                return call(
+                    it, num, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+            }
+
+            template <typename Iter, typename FwdIter, typename CancelToken,
+                typename F, typename Cleanup>
+            static FwdIter call_with_token(Iter it, std::size_t num,
+                FwdIter dest, CancelToken& tok, F&& f, Cleanup&& cleanup)
+            {
+                // check at the start of a partition only
+                if (tok.was_cancelled())
+                    return dest;
+
+                return call(it, num, dest, HPX_FORWARD(F, f),
+                    HPX_FORWARD(Cleanup, cleanup));
+            }
+        };
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
