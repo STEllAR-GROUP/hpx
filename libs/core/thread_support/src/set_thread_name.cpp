@@ -78,11 +78,6 @@ namespace hpx::util {
             __except (EXCEPTION_EXECUTE_HANDLER)
             {
             }
-
-            // also set it the 'new' way in case the application is not running in
-            // the debugger at this time
-            SetThreadDescription(GetCurrentThread(),
-                detail::to_wide_string(thread_name).c_str());
         }
     }    // namespace detail
 
@@ -114,4 +109,13 @@ namespace hpx::util {
     {
         detail::set_thread_name(thread_name);
     }
+
+
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
+    !defined(HPX_MINGW)
+    // also set it the 'new' way in case the application is not running in
+    // the debugger at this time
+    SetThreadDescription(
+        GetCurrentThread(), detail::to_wide_string(thread_name).c_str());
+#endif
 }    // namespace hpx::util
