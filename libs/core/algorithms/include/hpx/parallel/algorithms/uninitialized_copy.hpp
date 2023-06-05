@@ -480,7 +480,6 @@ namespace hpx::parallel {
             {
             }
 
-
             // vectorized overload
             template <typename ExPolicy, typename InIter, typename FwdIter2,
                 typename = std::enable_if_t<
