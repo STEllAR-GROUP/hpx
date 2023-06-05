@@ -8,15 +8,13 @@
 //      http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 
 #include <hpx/config.hpp>
+#include <hpx/thread_support/set_thread_name.hpp>
+#include <cstddef>
+#include <string>
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
     !defined(HPX_MINGW)
 #include <windows.h>
-
-#include <hpx/thread_support/set_thread_name.hpp>
-
-#include <cstddef>
-#include <string>
 
 namespace hpx::util {
 
@@ -80,19 +78,40 @@ namespace hpx::util {
             __except (EXCEPTION_EXECUTE_HANDLER)
             {
             }
+
+            // also set it the 'new' way in case the application is not running in
+            // the debugger at this time
+            SetThreadDescription(GetCurrentThread(),
+                detail::to_wide_string(thread_name).c_str());
         }
     }    // namespace detail
+
+}    // namespace hpx::util
+
+#elif (defined(__linux__))
+
+#include <pthread.h>
+namespace hpx::util { namespace detail {
+    void set_thread_name(char const* thread_name)
+    {
+        pthread_setname_np(pthread_self(), thread_name);
+    }
+}}    // namespace hpx::util::detail
+
+#else
+namespace hpx::util { namespace detail {
+    void set_thread_name(char const* thread_name)
+    {
+        return;
+    }
+}}    // namespace hpx::util::detail
+#endif
+
+namespace hpx::util {
 
     // Set the name of the thread shown in the Visual Studio debugger
     void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
-
-        // also set it the 'new' way in case the application is not running in
-        // the debugger at this time
-        SetThreadDescription(
-            GetCurrentThread(), detail::to_wide_string(thread_name).c_str());
     }
 }    // namespace hpx::util
-
-#endif
