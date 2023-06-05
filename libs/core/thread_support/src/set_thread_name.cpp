@@ -108,14 +108,13 @@ namespace hpx::util {
     void set_thread_name(char const* thread_name) noexcept
     {
         detail::set_thread_name(thread_name);
-    }
-
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
     !defined(HPX_MINGW)
-    // also set it the 'new' way in case the application is not running in
-    // the debugger at this time
-    SetThreadDescription(
-        GetCurrentThread(), detail::to_wide_string(thread_name).c_str());
+        // also set it the 'new' way in case the application is not running in
+        // the debugger at this time
+        SetThreadDescription(
+            GetCurrentThread(), detail::to_wide_string(thread_name).c_str());
 #endif
+    }
 }    // namespace hpx::util
