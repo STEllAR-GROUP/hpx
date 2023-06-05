@@ -655,8 +655,8 @@ endif()
 hpx_option(
   HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD
   STRING
-  "The threshold in bytes to when perform zero copy optimizations (default: 128)"
-  "128"
+  "The threshold in bytes to when perform zero copy optimizations (default: 8192)"
+  "8192"
   ADVANCED
 )
 hpx_add_config_define(
