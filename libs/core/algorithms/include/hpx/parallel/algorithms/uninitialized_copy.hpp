@@ -400,7 +400,7 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter1, typename Sent,
                 typename FwdIter2>
             static util::in_out_result<InIter1, FwdIter2> sequential(
-                ExPolicy policy, InIter1 first, Sent last, FwdIter2 dest)
+                ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
             {
                 return sequential_uninitialized_copy_n(first, dest,
                     std::distance(first, last),
