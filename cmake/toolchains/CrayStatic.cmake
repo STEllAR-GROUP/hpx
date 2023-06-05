@@ -83,9 +83,3 @@ set(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
     OFF
     CACHE BOOL "Libfabric parcelport logging on/off flag"
 )
-set(HPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD
-    "4096"
-    CACHE
-      STRING
-      "The threshold in bytes to when perform zero copy optimizations (default: 128)"
-)

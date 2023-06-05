@@ -23,6 +23,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
+    int mpi_environment::MPI_MAX_TAG = 32767;
+
     namespace detail {
 
         bool detect_mpi_environment(
@@ -267,6 +269,11 @@ namespace hpx::util {
 
         rtcfg.add_entry("hpx.parcel.mpi.rank", std::to_string(this_rank));
         rtcfg.add_entry("hpx.parcel.mpi.processorname", get_processor_name());
+        void* max_tag_p;
+        int flag;
+        MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &max_tag_p, &flag);
+        if (flag)
+            MPI_MAX_TAG = *(int*) max_tag_p;
     }
 
     std::string mpi_environment::get_processor_name()
