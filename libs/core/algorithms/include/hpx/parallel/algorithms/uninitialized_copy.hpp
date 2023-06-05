@@ -256,14 +256,14 @@ namespace hpx::parallel {
             FwdIter2 current = dest;
             try
             {
-                // clang-format on
+                // clang-format off
                 HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (/* */; count != 0;
                                                         (void) ++first,
                                                         ++current, count--)
                 {
                     hpx::construct_at(std::addressof(*current), *first);
                 }
-                // clang-format off
+                // clang-format on
 
                 return {first, current};
             }
@@ -402,8 +402,9 @@ namespace hpx::parallel {
             static util::in_out_result<InIter1, FwdIter2> sequential(
                 ExPolicy policy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return sequential_uninitialized_copy_n(
-                    policy, first, dest, std::distance(first, last));
+                return sequential_uninitialized_copy_n(first, dest,
+                    std::distance(first, last),
+                    hpx::is_unsequenced_execution_policy_v<ExPolicy>());
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
