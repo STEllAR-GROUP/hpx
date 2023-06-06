@@ -55,7 +55,6 @@ set(datastructures_headers
     hpx/datastructures/member_pack.hpp
     hpx/datastructures/optional.hpp
     hpx/datastructures/tuple.hpp
-    hpx/datastructures/in_value_result.hpp
     hpx/datastructures/traits/supports_streaming_with_any.hpp
     hpx/datastructures/traits/is_tuple_like.hpp
     hpx/datastructures/variant.hpp
