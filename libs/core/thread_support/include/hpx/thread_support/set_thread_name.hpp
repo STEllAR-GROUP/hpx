@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/type_support/unused.hpp>
 
 namespace hpx::util {
 
