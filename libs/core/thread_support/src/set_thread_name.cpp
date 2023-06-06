@@ -103,6 +103,7 @@ namespace hpx::util { namespace detail {
 namespace hpx::util { namespace detail {
     void set_thread_name(char const* thread_name)
     {
+        HPX_UNUSED(thread_name);
         return;
     }
 }}    // namespace hpx::util::detail
