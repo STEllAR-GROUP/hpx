@@ -86,7 +86,8 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename CancelToken, typename F>
+                typename CancelToken, typename F,
+                HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
             {
