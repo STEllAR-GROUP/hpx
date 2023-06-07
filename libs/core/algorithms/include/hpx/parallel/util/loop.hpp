@@ -42,7 +42,9 @@ namespace hpx::parallel::util {
             }
 
             template <typename Begin, typename End, typename CancelToken,
-                typename F>
+                typename F,
+                HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<End>&&
+                        hpx::traits::is_forward_iterator_v<Begin>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 Begin it, End end, CancelToken& tok, F&& f)
             {
@@ -72,8 +74,7 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename Begin, typename End,
                 typename F,
                 HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
-                    !hpx::is_parallel_execution_policy_v<ExPolicy>)>
+                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 ExPolicy&&, Begin it, End end, F&& f)
             {
