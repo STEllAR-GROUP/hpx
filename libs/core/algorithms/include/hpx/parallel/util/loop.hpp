@@ -56,7 +56,7 @@ namespace hpx::parallel::util {
                     hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy, Begin it, End end, F&& f)
+                ExPolicy&&, Begin it, End end, F&& f)
             {
                 // clang-format off
                 HPX_IVDEP HPX_UNROLL HPX_VECTORIZE 
@@ -70,12 +70,12 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename F, ,
+                typename F,
                 HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
                     !hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy, Begin it, End end, F&& f)
+                ExPolicy&&, Begin it, End end, F&& f)
             {
                 for (/**/; it != end; ++it)
                 {
@@ -88,8 +88,7 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename Begin, typename End,
                 typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
-                typename ExPolicy policy, Begin it, End end, CancelToken& tok,
-                F&& f)
+                ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
             {
                 // check at the start of a partition only
                 if (tok.was_cancelled())
@@ -116,7 +115,7 @@ namespace hpx::parallel::util {
         template <typename ExPolicy, typename Begin, typename End,
             typename CancelToken, typename F>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(hpx::parallel::util::loop_t, ExPolicy&&,
+        tag_fallback_invoke(hpx::parallel::util::loop_t, ExPolicy&& policy,
             Begin begin, End end, CancelToken& tok, F&& f)
         {
             return detail::loop<Begin>::call(HPX_FORWARD(ExPolicy, policy),
@@ -632,8 +631,8 @@ namespace hpx::parallel::util {
                 HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::unseq
                     hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
-            static FwdIter call(ExPolicy&& policy, Iter it, Iter last,
-                FwdIter dest, F&& f, Cleanup&& cleanup)
+            static FwdIter call(ExPolicy&&, Iter it, Iter last, FwdIter dest,
+                F&& f, Cleanup&& cleanup)
             {
                 FwdIter base = dest;
                 try
@@ -686,23 +685,22 @@ namespace hpx::parallel::util {
       : hpx::functional::detail::tag_fallback<loop_with_cleanup_t>
     {
     private:
-        template <typename ExPolicy, typename Begin, typename End, typename F>
+        template <typename ExPolicy, typename Begin, typename End, typename F,
+            typename Cleanup>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(hpx::parallel::util::loop_with_cleanup,
-            ExPolicy&& policy, Iter it, Iter last, FwdIter dest, F&& f,
-            Cleanup&& cleanup)
+        tag_fallback_invoke(detail::loop_with_cleanup, ExPolicy&& policy,
+            Begin it, End last, FwdIter dest, F&& f, Cleanup&& cleanup)
         {
             return detail::loop_with_cleanup<Begin>::call(
                 HPX_FORWARD(ExPolicy, policy), it, last, dest,
                 HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
         }
 
-        template <typename ExPolicy, typename Begin, typename End,
-            typename CancelToken, typename F>
+        template <typename ExPolicy, typename Begin, typename End, typename F,
+            typename Cleanup>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(hpx::parallel::util::loop_with_cleanup, ExPolicy&&,
-            ExPolicy&& policy, FwdIter first, FwdIter last, F&& f,
-            Cleanup&& cleanup)
+        tag_fallback_invoke(detail::loop_with_cleanup, ExPolicy&& policy,
+            Begin first, End last, F&& f, Cleanup&& cleanup)
         {
             return detail::loop_with_cleanup<Begin>::call(
                 HPX_FORWARD(ExPolicy, policy), it, last, HPX_FORWARD(F, f),
