@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -61,7 +62,7 @@ namespace hpx::parallel::util {
                 ExPolicy&&, Begin it, End end, F&& f)
             {
                 // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE 
+                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                 for (/**/; it != end; ++it)
                 {
                     HPX_INVOKE(f, it);

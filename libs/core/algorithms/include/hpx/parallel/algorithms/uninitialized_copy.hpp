@@ -403,7 +403,7 @@ namespace hpx::parallel {
             {
                 return sequential_uninitialized_copy_n(first, dest,
                     std::distance(first, last),
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>());
+                    hpx::is_unsequenced_execution_policy_v<ExPolicy>);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
