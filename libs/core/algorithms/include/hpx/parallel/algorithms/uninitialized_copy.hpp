@@ -481,8 +481,9 @@ namespace hpx::parallel {
 
             // vectorized overload
             template <typename ExPolicy, typename InIter, typename FwdIter2,
-                typename = std::enable_if_t<
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>>>
+                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::unseq
+                    hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
+                    !hpx::is_parallel_execution_policy_v<ExPolicy>)>
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
@@ -527,7 +528,9 @@ namespace hpx::parallel {
             }
 
             // non vectorized overload
-            template <typename ExPolicy, typename InIter, typename FwdIter2>
+            template <typename ExPolicy, typename InIter, typename FwdIter2,
+                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
+                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
             {
