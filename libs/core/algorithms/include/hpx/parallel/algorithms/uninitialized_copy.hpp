@@ -257,9 +257,8 @@ namespace hpx::parallel {
             try
             {
                 // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (/* */; count != 0;
-                                                        (void) ++first,
-                                                        ++current, count--)
+                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                for (/* */; count != 0; (void) ++first, ++current, count--)
                 {
                     hpx::construct_at(std::addressof(*current), *first);
                 }
