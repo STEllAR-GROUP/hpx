@@ -117,12 +117,12 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename Begin, typename End,
-                typename F, ,
+                typename F,
                 HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
                     !hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
                     !hpx::is_parallel_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy, Begin it, End end, F&& f)
+                ExPolicy&&, Begin it, End end, F&& f)
             {
                 for (/**/; it != end; ++it)
                 {
@@ -135,8 +135,7 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename Begin, typename End,
                 typename CancelToken, typename F>
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
-                typename ExPolicy policy, Begin it, End end, CancelToken& tok,
-                F&& f)
+                ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
             {
                 // check at the start of a partition only
                 if (tok.was_cancelled())
