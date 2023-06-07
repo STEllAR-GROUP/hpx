@@ -688,22 +688,22 @@ namespace hpx::parallel::util {
         template <typename ExPolicy, typename Begin, typename End, typename F,
             typename Cleanup>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(detail::loop_with_cleanup, ExPolicy&& policy,
-            Begin it, End last, FwdIter dest, F&& f, Cleanup&& cleanup)
+        tag_fallback_invoke(detail::loop_with_cleanup<Begin>, ExPolicy&& policy,
+            Begin first, End last, Begin dest, F&& f, Cleanup&& cleanup)
         {
             return detail::loop_with_cleanup<Begin>::call(
-                HPX_FORWARD(ExPolicy, policy), it, last, dest,
+                HPX_FORWARD(ExPolicy, policy), first, last, dest,
                 HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
         }
 
         template <typename ExPolicy, typename Begin, typename End, typename F,
             typename Cleanup>
         friend HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin
-        tag_fallback_invoke(detail::loop_with_cleanup, ExPolicy&& policy,
+        tag_fallback_invoke(detail::loop_with_cleanup<Begin>, ExPolicy&& policy,
             Begin first, End last, F&& f, Cleanup&& cleanup)
         {
             return detail::loop_with_cleanup<Begin>::call(
-                HPX_FORWARD(ExPolicy, policy), it, last, HPX_FORWARD(F, f),
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_FORWARD(F, f),
                 HPX_FORWARD(Cleanup, cleanup));
         }
     } loop_with_cleanup{};
