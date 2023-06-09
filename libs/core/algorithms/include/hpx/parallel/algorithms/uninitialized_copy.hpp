@@ -248,7 +248,7 @@ namespace hpx::parallel {
                 call(
                     HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
                     count,
-                    [tok, policy](zip_iterator t, std::size_t part_size) mutable
+                    [policy](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
