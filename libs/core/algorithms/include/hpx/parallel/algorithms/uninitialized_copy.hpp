@@ -243,8 +243,6 @@ namespace hpx::parallel {
             using zip_iterator = hpx::util::zip_iterator<Iter, FwdIter2>;
             using partition_result_type = std::pair<FwdIter2, FwdIter2>;
 
-            util::cancellation_token<util::detail::no_data> tok;
-
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
@@ -259,7 +257,7 @@ namespace hpx::parallel {
                             util::get_second_element(
                                 hpx::parallel::util::uninit_copy_n(
                                     HPX_FORWARD(ExPolicy, policy),
-                                    get<0>(iters), dest, part_size, tok)));
+                                    get<0>(iters), part_size, dest)));
                     },
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
@@ -381,7 +379,7 @@ namespace hpx::parallel {
 
             // non vectorized overload
             template <typename ExPolicy, typename InIter, typename FwdIter2,
-                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
+                HPX_CONCEPT_REQUIRES_(
                     hpx::is_sequenced_execution_policy_v<ExPolicy>)>
             static util::in_out_result<InIter, FwdIter2> sequential(
                 ExPolicy&& policy, InIter first, std::size_t count,
