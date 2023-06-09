@@ -1694,8 +1694,8 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     bool runtime_support::load_plugins(util::section& ini,
-        hpx::program_options::options_description& options,
-        std::set<std::string>& startup_handled)
+        [[maybe_unused]] hpx::program_options::options_description& options,
+        [[maybe_unused]] std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.plugins"))

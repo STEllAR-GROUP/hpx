@@ -101,7 +101,7 @@ set(execution_headers
 )
 
 set(execution_sources execution_parameter_callbacks.cpp
-                      polymorphic_executor.cpp
+                      polymorphic_executor.cpp run_loop.cpp
 )
 
 # cmake-format: off

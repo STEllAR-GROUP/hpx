@@ -108,12 +108,11 @@ namespace hpx::parcelset::policies::mpi {
 
             state_ = initialized;
 
-            handler_ = HPX_FORWARD(Handler, handler);
+            handler_ = HPX_MOVE(handler);
 
             if (!send())
             {
-                postprocess_handler_ =
-                    HPX_FORWARD(ParcelPostprocess, parcel_postprocess);
+                postprocess_handler_ = HPX_MOVE(parcel_postprocess);
                 add_connection(sender_, shared_from_this());
             }
             else

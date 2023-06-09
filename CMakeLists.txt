@@ -110,7 +110,7 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 # print initial diagnostics
-hpx_info("CMake version: ${CMAKE_VERSION}")
+hpx_info("CMake version: ${CMAKE_VERSION}, generator: ${CMAKE_GENERATOR}")
 hpx_info("HPX version: ${HPX_VERSION}")
 
 # ##############################################################################
@@ -373,9 +373,9 @@ endif()
 # The cmake Ninja generator runs out of memory if the modules are being built as
 # OBJECT libraries. In this case the fallback is to build whole-archive STATIC
 # libraries.
-set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
-if("${CMAKE_MAKE_PROGRAM}" STREQUAL "ninja")
-  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
+  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
 endif()
 
 hpx_option(
@@ -1754,6 +1754,12 @@ if(WIN32)
     hpx_add_target_compile_option(-MP PUBLIC)
     # Increase the maximum size of object file sections
     hpx_add_target_compile_option(-bigobj PUBLIC)
+  elseif(MINGW)
+    if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
+      target_link_libraries(
+        hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+      )
+    endif()
   endif()
 
   target_link_libraries(hpx_base_libraries INTERFACE psapi shlwapi)

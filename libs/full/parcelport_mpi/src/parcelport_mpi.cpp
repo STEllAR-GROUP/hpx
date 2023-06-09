@@ -255,9 +255,8 @@ namespace hpx::parcelset {
                 sender::parcel_buffer_type buffer,
                 sender::callback_fn_type&& callbackFn)
             {
-                return sender_.send_immediate(pp, dest,
-                    HPX_FORWARD(sender_base::parcel_buffer_type, buffer),
-                    HPX_FORWARD(sender_base::callback_fn_type, callbackFn));
+                return sender_.send_immediate(
+                    pp, dest, HPX_MOVE(buffer), HPX_MOVE(callbackFn));
             }
 
             template <typename F>
