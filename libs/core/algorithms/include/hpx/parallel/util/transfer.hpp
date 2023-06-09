@@ -8,6 +8,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
+#include <hpx/concepts/concepts.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
@@ -362,8 +364,8 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename InIter, typename OutIter,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_sequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter>
-            call(ExPolicy, InIter first, std::size_t num, OutIter dest)
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
 
@@ -401,8 +403,8 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename InIter, typename OutIter,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter>
-            call(ExPolicy, InIter first, std::size_t num, OutIter dest)
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
                 try
