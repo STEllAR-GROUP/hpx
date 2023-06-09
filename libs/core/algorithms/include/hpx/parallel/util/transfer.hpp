@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <cstring>    // for std::memmove
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -361,7 +362,7 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename InIter, typename OutIter,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_sequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter>
             call(ExPolicy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
@@ -400,7 +401,7 @@ namespace hpx::parallel::util {
             template <typename ExPolicy, typename InIter, typename OutIter,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static constexpr in_out_result<InIter, OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter>
             call(ExPolicy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
