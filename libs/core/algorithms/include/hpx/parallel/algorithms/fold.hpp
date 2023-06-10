@@ -8,7 +8,7 @@
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
-#include <hpx/parallel/algorithms/reduce.hpp>
+#include <hpx/parallel/util/loop.hpp>
 
 #include <iterator>
 #include <numeric>
@@ -28,12 +28,10 @@ namespace hpx::parallel { namespace detail {
         HPX_HOST_DEVICE static constexpr T sequential(
             ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
-            if (first == last)
-                return HPX_MOVE(init);
-            T acc = HPX_MOVE(init);
-            while (first != last)
-                acc = f(HPX_MOVE(acc), *first++);
-            return HPX_MOVE(acc);
+            util::loop_ind<ExPolicy>(
+                first, last, [&init, &f](auto const& it) mutable {
+                    init = HPX_INVOKE(f, HPX_MOVE(init), it);
+                });
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -41,14 +39,10 @@ namespace hpx::parallel { namespace detail {
         static constexpr auto parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
-#ifdef HPX_WITH_CXX17_STD_EXECUTION_POLICES
-            return std::reduce(HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(F, f));
-#else
-            HPX_UNUSED(policy);    // TODO : par support
-            return std::reduce(
-                first, last, HPX_FORWARD(T, init), HPX_FORWARD(F, f));
-#endif
+            util::loop_ind<ExPolicy>(
+                first, last, [&init, &f](auto const& it) mutable {
+                    init = HPX_INVOKE(f, HPX_MOVE(init), it);
+                });
         }
     };
 
