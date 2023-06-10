@@ -372,20 +372,21 @@ namespace hpx::parallel::util {
                 try
                 {
                     std::size_t count(
-                        num & static_cast<std::size_t>(-4));      // -V112
-                    for (std::size_t i = 0; i < count; i += 4)    //-V112
+                        num & static_cast<std::size_t>(-4));    // -V112
+                    for (std::size_t i = 0; i < count;
+                         i += 4, ++current, ++first)    //-V112
                     {
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*current), *first);
                         // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*++current), *++first);
                         // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*++current), *++first);
                         // NOLINTNEXTLINE(bugprone-macro-repeated-side-effects)
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*++current), *++first);
                     }
                     for (/**/; count < num; count++)
                     {
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*++current), *++first);
                     }
                     return in_out_result<InIter, OutIter>{
                         HPX_MOVE(first), HPX_MOVE(current)};
@@ -413,7 +414,7 @@ namespace hpx::parallel::util {
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                     for (std::size_t i = 0; i < num; i++)    //-V112
                     {
-                        hpx::construct_at(std::addressof(*current++), *first++);
+                        hpx::construct_at(std::addressof(*++current), *++first);
                     }
                     // clang-format on
 
