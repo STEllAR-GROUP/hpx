@@ -37,7 +37,7 @@ namespace hpx::parallel { namespace detail {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T, typename F>
         static constexpr auto parallel(
-            ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
+            ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
             util::loop_ind<ExPolicy>(
                 first, last, [&init, &f](auto const& it) mutable {
