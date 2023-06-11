@@ -789,7 +789,7 @@ namespace hpx::parallel::util {
                     // clang-format off
                     HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                     for (std::size_t i = 0; i < count;
-                         (void) ++it, ++dest, i += 4)    // -V112
+                         (void) ++it, ++dest, ++i)    // -V112
                     {
                         HPX_INVOKE(f, it, dest);
                     }
@@ -813,6 +813,79 @@ namespace hpx::parallel::util {
                 }
             }
 
+            template <typename ExPolicy, typename Iter, typename FwdIter,
+                typename F, typename Cleanup,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
+            static FwdIter call(
+                ExPolicy, Iter it, std::size_t num, F&& f, Cleanup&& cleanup)
+            {
+                FwdIter base = it;
+                try
+                {
+                    std::size_t count(num & std::size_t(-4));    // -V112
+                    for (std::size_t i = 0; i < count;
+                         (void) ++it, i += 4)    // -V112
+                    {
+                        HPX_INVOKE(f, it);
+                        HPX_INVOKE(f, ++it);
+                        HPX_INVOKE(f, ++it);
+                        HPX_INVOKE(f, ++it);
+                    }
+                    for (/**/; count < num; (void) ++count, ++it)
+                    {
+                        HPX_INVOKE(f, it);
+                    }
+                    return it;
+                }
+                catch (...)
+                {
+                    for (/**/; base != it; ++base)
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
+                    throw;
+                }
+            }
+            template <typename ExPolicy, typename Iter, typename FwdIter,
+                typename F, typename Cleanup,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+            static FwdIter call(
+                ExPolicy, Iter it, std::size_t num, F&& f, Cleanup&& cleanup)
+            {
+                FwdIter base = it;
+                try
+                {
+                    std::size_t count(num & std::size_t(-4));    // -V112
+
+                    // clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (std::size_t i = 0; i < count;
+                         (void) ++it, ++i)    // -V112
+                    {
+                        HPX_INVOKE(f, it);
+                    }
+
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (/**/; count < num; (void) ++count, ++it)
+                    {
+                        HPX_INVOKE(f, it);
+                    }
+                    // clang-format on
+                    
+                    return it;
+                }
+                catch (...)
+                {
+                    for (/**/; base != it; ++base)
+                    {
+                        HPX_INVOKE(cleanup, base);
+                    }
+                    throw;
+                }
+            }
+
             template <typename ExPolicy, typename FwdIter, typename CancelToken,
                 typename F, typename Cleanup>
             HPX_HOST_DEVICE HPX_FORCEINLINE static FwdIter call_with_token(
@@ -823,7 +896,7 @@ namespace hpx::parallel::util {
                 if (tok.was_cancelled())
                     return it;
 
-                return call(HPX_FORWARD(ExPolicy, policy), it, num, it,
+                return call(HPX_FORWARD(ExPolicy, policy), it, num,
                     HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
             }
 
