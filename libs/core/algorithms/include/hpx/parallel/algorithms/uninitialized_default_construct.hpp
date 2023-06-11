@@ -269,9 +269,10 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Sent>
-            static FwdIter sequential(ExPolicy policy, FwdIter first, Sent last)
+            static FwdIter sequential(
+                ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return sequential_uninitialized_default_construct_n(
+                sequential_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     std::distance(first, last));
             }
@@ -280,7 +281,7 @@ namespace hpx::parallel {
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return parallel_uninitialized_default_construct_n(
+                parallel_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
@@ -306,9 +307,10 @@ namespace hpx::parallel {
 
             template <typename ExPolicy>
             static FwdIter sequential(
-                ExPolicy, FwdIter first, std::size_t count)
+                ExPolicy&& policy, FwdIter first, std::size_t count)
             {
-                return std_uninitialized_default_construct_n(first, count);
+                return sequential_uninitialized_default_construct_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count);
             }
 
             template <typename ExPolicy>
@@ -331,13 +333,14 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
         // clang-format off
-        template <typename FwdIter,
+        template <typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<Sent>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
-            hpx::uninitialized_default_construct_t, FwdIter first, FwdIter last)
+            hpx::uninitialized_default_construct_t, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -347,15 +350,16 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
+        template <typename ExPolicy, typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<Sent>
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::uninitialized_default_construct_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last)
+            ExPolicy&& policy, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
