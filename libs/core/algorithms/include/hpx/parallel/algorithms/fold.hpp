@@ -8,6 +8,8 @@
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <iterator>
@@ -75,7 +77,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fold_left<T>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
                 HPX_FORWARD(F, f));
         }
     } fold_left{};
@@ -107,9 +109,9 @@ namespace hpx::parallel::detail {
 
             std::advance(first, 1);
 
-            return hpx::optional<U>(
-                hpx::parallel::detail::fold_left<T>().call(hpx::execution::seq,
-                    first, last, HPX_FORWARD(T, init), HPX_FORWARD(F, f)));
+            return hpx::optional<U>(hpx::parallel::detail::fold_left<T>().call(
+                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+                HPX_FORWARD(F, f)));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -168,7 +170,7 @@ namespace hpx {
                 ::hpx::traits::iter_value_t<FwdIter>(*first), f));
 
             return hpx::parallel::detail::fold_left_first<hpx::optional<U>>()
-                .call(hpx::execution::seq, first, last, HPX_FORWARD(F, f));
+                .call(::hpx::execution::seq, first, last, HPX_FORWARD(F, f));
         }
     } fold_left_first{};
 }    // namespace hpx
@@ -245,7 +247,7 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fold_right<T>().call(
-                hpx::execution::seq, first, last, HPX_FORWARD(T, init),
+                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
                 HPX_FORWARD(F, f));
         }
     } fold_right{};
