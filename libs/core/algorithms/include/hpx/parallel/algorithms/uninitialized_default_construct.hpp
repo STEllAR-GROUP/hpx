@@ -289,7 +289,7 @@ namespace hpx::parallel {
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return parallel_uninitialized_default_construct_n(
+                parallel_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
