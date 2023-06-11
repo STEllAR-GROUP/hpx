@@ -272,7 +272,8 @@ namespace hpx::parallel {
             static FwdIter sequential(ExPolicy policy, FwdIter first, Sent last)
             {
                 return sequential_uninitialized_default_construct_n(
-                    HPX_FORWARD(ExPolicy, policy), first, std::distance(first, last));
+                    HPX_FORWARD(ExPolicy, policy), first,
+                    std::distance(first, last));
             }
 
             template <typename ExPolicy, typename Sent>

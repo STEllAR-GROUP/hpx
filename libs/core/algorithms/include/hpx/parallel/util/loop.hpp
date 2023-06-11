@@ -813,12 +813,12 @@ namespace hpx::parallel::util {
                 }
             }
 
-            template <typename ExPolicy, typename Iter, typename FwdIter,
-                typename F, typename Cleanup,
+            template <typename ExPolicy, typename FwdIter, typename F,
+                typename Cleanup,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_sequenced_execution_policy_v<ExPolicy>)>
             static FwdIter call(
-                ExPolicy, Iter it, std::size_t num, F&& f, Cleanup&& cleanup)
+                ExPolicy, FwdIter it, std::size_t num, F&& f, Cleanup&& cleanup)
             {
                 FwdIter base = it;
                 try
@@ -847,12 +847,12 @@ namespace hpx::parallel::util {
                     throw;
                 }
             }
-            template <typename ExPolicy, typename Iter, typename FwdIter,
-                typename F, typename Cleanup,
+            template <typename ExPolicy, typename FwdIter, typename F,
+                typename Cleanup,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
             static FwdIter call(
-                ExPolicy, Iter it, std::size_t num, F&& f, Cleanup&& cleanup)
+                ExPolicy, FwdIter it, std::size_t num, F&& f, Cleanup&& cleanup)
             {
                 FwdIter base = it;
                 try
@@ -873,7 +873,7 @@ namespace hpx::parallel::util {
                         HPX_INVOKE(f, it);
                     }
                     // clang-format on
-                    
+
                     return it;
                 }
                 catch (...)
