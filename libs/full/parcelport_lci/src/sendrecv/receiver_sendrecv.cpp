@@ -17,6 +17,7 @@
 #include <hpx/parcelport_lci/sendrecv/receiver_sendrecv.hpp>
 
 #include <hpx/assert.hpp>
+#include <cstddef>
 #include <memory>
 
 namespace hpx::parcelset::policies::lci {
@@ -38,22 +39,31 @@ namespace hpx::parcelset::policies::lci {
 
     bool receiver_sendrecv::accept_new() noexcept
     {
+        bool did_some_work = false;
+
+        auto poll_comp_start = util::lci_environment::pcounter_now();
+        auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
         request_wrapper_t request;
-        request.request = pp_->recv_new_completion_manager->poll();
+        request.request = completion_manager_p->recv_new->poll();
+        util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
+            util::lci_environment::pcounter_since(poll_comp_start));
 
         if (request.request.flag == LCI_OK)
         {
+            auto useful_bg_start = util::lci_environment::pcounter_now();
             if (config_t::protocol == config_t::protocol_t::sendrecv)
             {
+                std::size_t device_idx =
+                    (std::size_t) request.request.user_context;
+                auto& device = pp_->devices[device_idx];
                 LCI_comp_t completion =
-                    pp_->recv_new_completion_manager->alloc_completion();
-                LCI_recvmn(
-                    pp_->endpoint_new, LCI_RANK_ANY, 0, completion, nullptr);
-                pp_->recv_new_completion_manager->enqueue_completion(
-                    completion);
+                    completion_manager_p->recv_new->alloc_completion();
+                LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0, completion,
+                    reinterpret_cast<void*>(device_idx));
+                completion_manager_p->recv_new->enqueue_completion(completion);
             }
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "accept_new (%d, %d, %d) length %lu\n", request.request.rank,
                 LCI_RANK, request.request.tag,
                 request.request.data.mbuffer.length);
@@ -67,22 +77,31 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                pp_->recv_followup_completion_manager->enqueue_completion(
+                completion_manager_p->recv_followup->enqueue_completion(
                     ret.completion);
             }
-            return true;
+            util::lci_environment::pcounter_add(
+                util::lci_environment::useful_bg_work,
+                util::lci_environment::pcounter_since(useful_bg_start));
+            did_some_work = true;
         }
-        return false;
+        return did_some_work;
     }
 
     bool receiver_sendrecv::followup() noexcept
     {
+        bool did_some_work = false;
         // We don't use a request_wrapper here because all the receive buffers
         // should be managed by the connections
-        LCI_request_t request = pp_->recv_followup_completion_manager->poll();
+        auto poll_comp_start = util::lci_environment::pcounter_now();
+        auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
+        LCI_request_t request = completion_manager_p->recv_followup->poll();
+        util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
+            util::lci_environment::pcounter_since(poll_comp_start));
 
         if (request.flag == LCI_OK)
         {
+            auto useful_bg_start = util::lci_environment::pcounter_now();
             HPX_ASSERT(request.user_context);
             auto* sharedPtr_p = (connection_ptr*) request.user_context;
             size_t length;
@@ -91,7 +110,7 @@ namespace hpx::parcelset::policies::lci {
             else
                 length = request.data.lbuffer.length;
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "followup (%d, %d, %d) length %lu\n", request.rank, LCI_RANK,
                 request.tag, length);
             receiver_connection_sendrecv::return_t ret =
@@ -103,12 +122,15 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                pp_->recv_followup_completion_manager->enqueue_completion(
+                completion_manager_p->recv_followup->enqueue_completion(
                     ret.completion);
             }
-            return true;
+            util::lci_environment::pcounter_add(
+                util::lci_environment::useful_bg_work,
+                util::lci_environment::pcounter_since(useful_bg_start));
+            did_some_work = true;
         }
-        return false;
+        return did_some_work;
     }
 }    // namespace hpx::parcelset::policies::lci
 

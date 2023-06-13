@@ -49,7 +49,7 @@ namespace hpx::parcelset::policies::lci {
         data_point_ = buffer_.data_point_;
         data_point_.time_ = hpx::chrono::high_resolution_clock::now();
 #endif
-
+        conn_start_time = util::lci_environment::pcounter_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -62,7 +62,7 @@ namespace hpx::parcelset::policies::lci {
         int num_zero_copy_chunks = static_cast<int>(buffer_.num_chunks_.first);
         if (is_eager)
         {
-            while (LCI_mbuffer_alloc(pp_->device, &mbuffer) != LCI_OK)
+            while (LCI_mbuffer_alloc(device_p->device, &mbuffer) != LCI_OK)
                 continue;
             HPX_ASSERT(mbuffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(buffer_, (char*) mbuffer.address, mbuffer.length);
@@ -97,7 +97,16 @@ namespace hpx::parcelset::policies::lci {
                 // data (non-zero-copy chunks)
                 iovec.lbuffers[i].address = buffer_.data_.data();
                 iovec.lbuffers[i].length = buffer_.data_.size();
-                iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                if (config_t::reg_mem)
+                {
+                    LCI_memory_register(device_p->device,
+                        iovec.lbuffers[i].address, iovec.lbuffers[i].length,
+                        &iovec.lbuffers[i].segment);
+                }
+                else
+                {
+                    iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                }
                 ++i;
             }
             if (num_zero_copy_chunks != 0)
@@ -112,7 +121,16 @@ namespace hpx::parcelset::policies::lci {
                         sizeof(parcel_buffer_type::transmission_chunk_type));
                     iovec.lbuffers[i].address = tchunks.data();
                     iovec.lbuffers[i].length = tchunks_length;
-                    iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                    if (config_t::reg_mem)
+                    {
+                        LCI_memory_register(device_p->device,
+                            iovec.lbuffers[i].address, iovec.lbuffers[i].length,
+                            &iovec.lbuffers[i].segment);
+                    }
+                    else
+                    {
+                        iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                    }
                     ++i;
                 }
                 // zero-copy chunks
@@ -126,7 +144,17 @@ namespace hpx::parcelset::policies::lci {
                         iovec.lbuffers[i].address =
                             const_cast<void*>(c.data_.cpos_);
                         iovec.lbuffers[i].length = c.size_;
-                        iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                        if (config_t::reg_mem)
+                        {
+                            LCI_memory_register(device_p->device,
+                                iovec.lbuffers[i].address,
+                                iovec.lbuffers[i].length,
+                                &iovec.lbuffers[i].segment);
+                        }
+                        else
+                        {
+                            iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                        }
                         ++i;
                     }
                 }
@@ -172,7 +200,7 @@ namespace hpx::parcelset::policies::lci {
         int ret;
         if (is_eager)
         {
-            ret = LCI_putmna(pp_->endpoint_new, mbuffer, dst_rank, 0,
+            ret = LCI_putmna(device_p->endpoint_new, mbuffer, dst_rank, 0,
                 LCI_DEFAULT_COMP_REMOTE);
             if (ret == LCI_OK)
             {
@@ -184,15 +212,15 @@ namespace hpx::parcelset::policies::lci {
         {
             void* buffer_to_free = iovec.piggy_back.address;
             LCI_comp_t completion =
-                pp_->send_completion_manager->alloc_completion();
+                device_p->completion_manager_p->send->alloc_completion();
             // In order to keep the send_connection object from being
             // deallocated. We have to allocate a shared_ptr in the heap
             // and pass a pointer to shared_ptr to LCI.
             // We will get this pointer back via the send completion queue
             // after this send completes.
             state.store(connection_state::locked, std::memory_order_relaxed);
-            ret = LCI_putva(pp_->endpoint_new, iovec, completion, dst_rank, 0,
-                LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
+            ret = LCI_putva(device_p->endpoint_new, iovec, completion, dst_rank,
+                0, LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
             // After this point, if ret == OK, this object can be shared by
             // two threads (the sending thread and the thread polling the
             // completion queue). Care must be taken to avoid data race.
@@ -215,6 +243,13 @@ namespace hpx::parcelset::policies::lci {
         if (!is_eager)
         {
             HPX_ASSERT(iovec.count > 0);
+            for (int i = 0; i < iovec.count; ++i)
+            {
+                if (iovec.lbuffers[i].segment != LCI_SEGMENT_ALL)
+                {
+                    LCI_memory_deregister(&iovec.lbuffers[i].segment);
+                }
+            }
             free(iovec.lbuffers);
         }
         error_code ec;
@@ -235,6 +270,10 @@ namespace hpx::parcelset::policies::lci {
             hpx::chrono::high_resolution_clock::now() - data_point_.time_;
         pp_->add_sent_data(data_point_);
 #endif
+        util::lci_environment::pcounter_add(
+            util::lci_environment::send_conn_timer,
+            util::lci_environment::pcounter_since(conn_start_time));
+
         if (postprocess_handler_)
         {
             // Return this connection to the connection cache.

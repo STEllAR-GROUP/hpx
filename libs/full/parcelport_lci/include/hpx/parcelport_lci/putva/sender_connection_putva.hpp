@@ -54,6 +54,8 @@ namespace hpx::parcelset::policies::lci {
         LCI_iovec_t iovec;
         std::shared_ptr<sender_connection_putva>*
             sharedPtr_p;    // for LCI_putva
+        // for profiling
+        LCT_time_t conn_start_time;
     };
 }    // namespace hpx::parcelset::policies::lci
 

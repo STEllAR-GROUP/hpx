@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::lci {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         timer_.restart();
 #endif
-
+        conn_start_time = util::lci_environment::pcounter_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -44,7 +44,7 @@ namespace hpx::parcelset::policies::lci {
         postprocess_handler_ = HPX_MOVE(parcel_postprocess);
 
         // build header
-        while (LCI_mbuffer_alloc(pp_->device, &header_buffer) != LCI_OK)
+        while (LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
             continue;
         HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
         header_ = header(
@@ -81,15 +81,20 @@ namespace hpx::parcelset::policies::lci {
         }
         if ((int) tag <= LCI_MAX_TAG && (int) tag + num_send > LCI_MAX_TAG)
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "tag",
                 "Rank %d Wrap around!\n", LCI_RANK);
+        header_.set_device_idx(device_p->idx);
         header_.set_tag(tag);
         send_chunks_idx = 0;
+        completion = nullptr;
+        segment_to_use = LCI_SEGMENT_ALL;
+        segment_used = LCI_SEGMENT_ALL;
         // set state
         profile_start_hook(header_);
         state.store(connection_state::initialized, std::memory_order_release);
         original_tag = tag;
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
+            "send",
             "send connection (%d, %d, %d, %d) tchunks "
             "%d data %d chunks %d start!\n",
             LCI_RANK, dst_rank, original_tag, num_send,
@@ -138,18 +143,19 @@ namespace hpx::parcelset::policies::lci {
         LCI_error_t ret;
         if (config_t::protocol == config_t::protocol_t::putsendrecv)
         {
-            ret = LCI_putmna(pp_->endpoint_new, header_buffer, dst_rank, 0,
+            ret = LCI_putmna(device_p->endpoint_new, header_buffer, dst_rank, 0,
                 LCI_DEFAULT_COMP_REMOTE);
         }
         else
         {
             HPX_ASSERT(config_t::protocol == config_t::protocol_t::sendrecv);
-            ret = LCI_sendmn(pp_->endpoint_new, header_buffer, dst_rank, 0);
+            ret =
+                LCI_sendmn(device_p->endpoint_new, header_buffer, dst_rank, 0);
         }
         if (ret == LCI_OK)
         {
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "send",
                 "%s (%d, %d, %d) length %lu\n",
                 config_t::protocol == config_t::protocol_t::putsendrecv ?
                     "LCI_putmna" :
@@ -174,13 +180,13 @@ namespace hpx::parcelset::policies::lci {
             buffer.address = address;
             buffer.length = length;
             LCI_error_t ret =
-                LCI_sendm(pp_->endpoint_followup, buffer, dst_rank, tag);
+                LCI_sendm(device_p->endpoint_followup, buffer, dst_rank, tag);
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug,
-                    "sendm (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
-                    original_tag, tag, length);
+                    util::lci_environment::log_level_t::debug, "send",
+                    "sendm (%d, %d, %d) device %d tag %d size %d\n", LCI_RANK,
+                    dst_rank, original_tag, device_p->idx, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
                 return {return_status_t::done, nullptr};
             }
@@ -192,22 +198,39 @@ namespace hpx::parcelset::policies::lci {
         }
         else
         {
+            if (config_t::reg_mem && segment_to_use == LCI_SEGMENT_ALL)
+            {
+                LCI_memory_register(
+                    device_p->device, address, length, &segment_to_use);
+            }
+            if (completion == nullptr)
+            {
+                completion =
+                    device_p->completion_manager_p->send->alloc_completion();
+            }
             LCI_lbuffer_t buffer;
-            buffer.segment = LCI_SEGMENT_ALL;
+            buffer.segment = segment_to_use;
             buffer.address = address;
             buffer.length = length;
-            LCI_comp_t completion =
-                pp_->send_completion_manager->alloc_completion();
-            LCI_error_t ret = LCI_sendl(pp_->endpoint_followup, buffer,
+            LCI_error_t ret = LCI_sendl(device_p->endpoint_followup, buffer,
                 dst_rank, tag, completion, sharedPtr_p);
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug,
-                    "sendl (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
-                    original_tag, tag, length);
+                    util::lci_environment::log_level_t::debug, "send",
+                    "sendl (%d, %d, %d) device %d, tag %d size %d\n", LCI_RANK,
+                    dst_rank, original_tag, device_p->idx, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
-                return {return_status_t::wait, completion};
+                if (segment_used != LCI_SEGMENT_ALL)
+                {
+                    LCI_memory_deregister(&segment_used);
+                    segment_used = LCI_SEGMENT_ALL;
+                }
+                segment_used = segment_to_use;
+                segment_to_use = LCI_SEGMENT_ALL;
+                auto ret_comp = completion;
+                completion = nullptr;
+                return {return_status_t::wait, ret_comp};
             }
             else
             {
@@ -331,8 +354,8 @@ namespace hpx::parcelset::policies::lci {
     void sender_connection_sendrecv::done()
     {
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "send connection (%d, %d, %d, %d) done!\n", LCI_RANK, dst_rank,
-            original_tag, tag - original_tag + 1);
+            "send", "send connection (%d, %d, %d, %d) done!\n", LCI_RANK,
+            dst_rank, original_tag, tag - original_tag + 1);
         profile_end_hook();
         error_code ec;
         handler_(ec);
@@ -341,7 +364,17 @@ namespace hpx::parcelset::policies::lci {
         data_point_.time_ = timer_.elapsed_nanoseconds();
         pp_->add_sent_data(data_point_);
 #endif
+        if (segment_used != LCI_SEGMENT_ALL)
+        {
+            LCI_memory_deregister(&segment_used);
+            segment_used = LCI_SEGMENT_ALL;
+        }
+        HPX_ASSERT(completion == nullptr);
+        HPX_ASSERT(segment_to_use == LCI_SEGMENT_ALL);
         buffer_.clear();
+        util::lci_environment::pcounter_add(
+            util::lci_environment::send_conn_timer,
+            util::lci_environment::pcounter_since(conn_start_time));
 
         if (postprocess_handler_)
         {
