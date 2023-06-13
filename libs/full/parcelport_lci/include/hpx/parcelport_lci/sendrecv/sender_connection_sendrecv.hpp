@@ -63,6 +63,11 @@ namespace hpx::parcelset::policies::lci {
         LCI_tag_t tag;
         LCI_tag_t original_tag;
         std::shared_ptr<sender_connection_sendrecv>* sharedPtr_p;
+        // temporary data
+        LCI_comp_t completion;
+        LCI_segment_t segment_to_use, segment_used;
+        // for profiling
+        LCT_time_t conn_start_time;
 
         static std::atomic<int> next_tag;
     };

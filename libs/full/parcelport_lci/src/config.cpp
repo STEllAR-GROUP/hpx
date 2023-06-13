@@ -25,6 +25,9 @@ namespace hpx::parcelset::policies::lci {
     config_t::progress_type_t config_t::progress_type;
     int config_t::progress_thread_num;
     int config_t::prepost_recv_num;
+    bool config_t::reg_mem;
+    int config_t::ndevices;
+    int config_t::ncomps;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
     {
@@ -99,6 +102,9 @@ namespace hpx::parcelset::policies::lci {
             util::get_entry_as(rtcfg, "hpx.parcel.lci.prg_thread_num", -1);
         prepost_recv_num =
             util::get_entry_as(rtcfg, "hpx.parcel.lci.prepost_recv_num", 1);
+        reg_mem = util::get_entry_as(rtcfg, "hpx.parcel.lci.reg_mem", 1);
+        ndevices = util::get_entry_as(rtcfg, "hpx.parcel.lci.ndevices", 1);
+        ncomps = util::get_entry_as(rtcfg, "hpx.parcel.lci.ncomps", 1);
 
         if (!enable_send_immediate && enable_lci_backlog_queue)
         {
@@ -112,6 +118,25 @@ namespace hpx::parcelset::policies::lci {
         {
             progress_type = progress_type_t::pthread;
             fprintf(stderr, "WARNING: set progress_type to pthread!\n");
+        }
+#ifndef LCI_ENABLE_MULTITHREAD_PROGRESS
+        if (progress_type == progress_type_t::worker ||
+            progress_thread_num > ndevices)
+        {
+            fprintf(stderr,
+                "WARNING: Thread-safe LCI_progress is needed "
+                "but not enabled during compilation!\n");
+        }
+#endif
+        if (ncomps > ndevices)
+        {
+            int old_ncomps = ncomps;
+            ncomps = ndevices;
+            fprintf(stderr,
+                "WARNING: the number of completion managers (%d) "
+                "cannot exceed the number of devices (%d). "
+                "ncomps is adjusted accordingly (%d).",
+                old_ncomps, ndevices, ncomps);
         }
     }
 }    // namespace hpx::parcelset::policies::lci

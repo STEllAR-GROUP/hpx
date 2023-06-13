@@ -37,17 +37,28 @@ namespace hpx::parcelset::policies::lci {
 
         bool background_work() noexcept
         {
-            // We first try to accept a new connection
+            bool did_some_work = false;
+
+            auto poll_comp_start = util::lci_environment::pcounter_now();
+            auto completion_manager_p =
+                pp_->get_tls_device().completion_manager_p;
             request_wrapper_t request;
-            request.request = pp_->recv_new_completion_manager->poll();
+            request.request = completion_manager_p->recv_new->poll();
+            util::lci_environment::pcounter_add(
+                util::lci_environment::poll_comp,
+                util::lci_environment::pcounter_since(poll_comp_start));
 
             if (request.request.flag == LCI_OK)
             {
+                auto useful_bg_start = util::lci_environment::pcounter_now();
                 HPX_ASSERT(request.request.flag == LCI_OK);
                 process_request(request.request);
-                return true;
+                util::lci_environment::pcounter_add(
+                    util::lci_environment::useful_bg_work,
+                    util::lci_environment::pcounter_since(useful_bg_start));
+                did_some_work = true;
             }
-            return false;
+            return did_some_work;
         }
 
     private:
@@ -83,6 +94,8 @@ namespace hpx::parcelset::policies::lci {
             hpx::chrono::high_resolution_timer timer_;
             parcelset::data_point& data = buffer.data_point_;
 #endif
+            util::lci_environment::pcounter_add(
+                util::lci_environment::recv_conn_start, 1);
             // decode header
             header header_ = header((char*) address);
             header_.assert_valid();
@@ -97,6 +110,8 @@ namespace hpx::parcelset::policies::lci {
             int num_non_zero_copy_chunks = header_.num_non_zero_copy_chunks();
             buffer.num_chunks_.first = num_zero_copy_chunks;
             buffer.num_chunks_.second = num_non_zero_copy_chunks;
+            util::lci_environment::pcounter_add(
+                util::lci_environment::recv_conn_end, 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
@@ -111,6 +126,8 @@ namespace hpx::parcelset::policies::lci {
             parcelset::data_point& data = buffer.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
 #endif
+            util::lci_environment::pcounter_add(
+                util::lci_environment::recv_conn_start, 1);
             // decode header
             header header_ = header((char*) iovec.piggy_back.address);
             header_.assert_valid();
@@ -169,6 +186,8 @@ namespace hpx::parcelset::policies::lci {
                 }
             }
             HPX_ASSERT(i == iovec.count);
+            util::lci_environment::pcounter_add(
+                util::lci_environment::recv_conn_end, 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
             data.time_ = timer_.elapsed_nanoseconds();

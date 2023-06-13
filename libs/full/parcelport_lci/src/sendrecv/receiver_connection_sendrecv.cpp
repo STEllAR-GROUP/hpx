@@ -32,6 +32,9 @@ namespace hpx::parcelset::policies::lci {
 
     void receiver_connection_sendrecv::load(char* header_buffer)
     {
+        conn_start_time = util::lci_environment::pcounter_now();
+        util::lci_environment::pcounter_add(
+            util::lci_environment::recv_conn_start, 1);
         header header_ = header(header_buffer);
         header_.assert_valid();
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -39,6 +42,7 @@ namespace hpx::parcelset::policies::lci {
             static_cast<std::size_t>(header_.numbytes());
         timer_.restart();
 #endif
+        device_p = &pp_->devices[header_.get_device_idx()];
         tag = header_.get_tag();
         // decode data
         buffer.data_.allocate(header_.numbytes_nonzero_copy());
@@ -91,12 +95,14 @@ namespace hpx::parcelset::policies::lci {
                 shared_from_this());
         }
         // set state
-        state.store(connection_state::initialized, std::memory_order_release);
         recv_chunks_idx = 0;
         recv_zero_copy_chunks_idx = 0;
         original_tag = tag;
+        segment_used = LCI_SEGMENT_ALL;
+        state.store(connection_state::initialized, std::memory_order_release);
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "recv connection (%d, %d, %d) start!\n", dst_rank, LCI_RANK, tag);
+            "recv", "recv connection (%d, %d, %d) start!\n", dst_rank, LCI_RANK,
+            tag);
     }
 
     receiver_connection_sendrecv::return_t
@@ -131,37 +137,51 @@ namespace hpx::parcelset::policies::lci {
         void* address, int length)
     {
         LCI_comp_t completion =
-            pp_->recv_followup_completion_manager->alloc_completion();
+            device_p->completion_manager_p->recv_followup->alloc_completion();
         if (length <= LCI_MEDIUM_SIZE)
         {
             LCI_mbuffer_t mbuffer;
             mbuffer.address = address;
             mbuffer.length = length;
-            LCI_error_t ret = LCI_recvm(pp_->endpoint_followup, mbuffer,
+            LCI_error_t ret = LCI_recvm(device_p->endpoint_followup, mbuffer,
                 dst_rank, tag, completion, sharedPtr_p);
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
-                "recvm (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
-                original_tag, tag, length);
+                util::lci_environment::log_level_t::debug, "recv",
+                "recvm (%d, %d, %d) device %d tag %d size %d\n", dst_rank,
+                LCI_RANK, original_tag, device_p->idx, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
         }
         else
         {
             LCI_lbuffer_t lbuffer;
-            lbuffer.segment = LCI_SEGMENT_ALL;
             lbuffer.address = address;
             lbuffer.length = length;
-            LCI_error_t ret = LCI_recvl(pp_->endpoint_followup, lbuffer,
+            if (config_t::reg_mem)
+            {
+                LCI_memory_register(device_p->device, lbuffer.address,
+                    lbuffer.length, &lbuffer.segment);
+            }
+            else
+            {
+                lbuffer.segment = LCI_SEGMENT_ALL;
+            }
+            LCI_error_t ret = LCI_recvl(device_p->endpoint_followup, lbuffer,
                 dst_rank, tag, completion, sharedPtr_p);
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
-                "recvl (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
-                original_tag, tag, length);
+                util::lci_environment::log_level_t::debug, "recv",
+                "recvl (%d, %d, %d) device %d tag %d size %d\n", dst_rank,
+                LCI_RANK, original_tag, device_p->idx, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
+            if (segment_used != LCI_SEGMENT_ALL)
+            {
+                LCI_memory_deregister(&segment_used);
+                segment_used = LCI_SEGMENT_ALL;
+            }
+            segment_used = lbuffer.segment;
         }
         return completion;
     }
@@ -334,13 +354,23 @@ namespace hpx::parcelset::policies::lci {
 
     void receiver_connection_sendrecv::done()
     {
+        util::lci_environment::pcounter_add(
+            util::lci_environment::recv_conn_end, 1);
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "recv connection (%d, %d, %d, %d) done!\n", dst_rank, LCI_RANK,
-            original_tag, tag - original_tag + 1);
+            "recv", "recv connection (%d, %d, %d, %d) done!\n", dst_rank,
+            LCI_RANK, original_tag, tag - original_tag + 1);
+        if (segment_used != LCI_SEGMENT_ALL)
+        {
+            LCI_memory_deregister(&segment_used);
+            segment_used = LCI_SEGMENT_ALL;
+        }
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer.data_point_.time_ = timer_.elapsed_nanoseconds();
 #endif
-
+        util::lci_environment::pcounter_add(
+            util::lci_environment::recv_conn_timer,
+            util::lci_environment::pcounter_since(conn_start_time));
+        auto handle_parcels_start_time = util::lci_environment::pcounter_now();
         if (parcels_.empty())
         {
             // decode and handle received data
@@ -356,6 +386,9 @@ namespace hpx::parcelset::policies::lci {
                 pp_->allow_zero_copy_receive_optimizations());
             handle_received_parcels(HPX_MOVE(parcels_));
         }
+        util::lci_environment::pcounter_add(
+            util::lci_environment::handle_parcels,
+            util::lci_environment::pcounter_since(handle_parcels_start_time));
         buffer.data_.free();
         parcels_.clear();
     }

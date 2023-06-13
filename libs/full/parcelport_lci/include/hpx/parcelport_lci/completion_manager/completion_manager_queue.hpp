@@ -17,7 +17,10 @@ namespace hpx::parcelset::policies::lci {
     {
         completion_manager_queue()
         {
-            LCI_queue_create(LCI_UR_DEVICE, &queue);
+            // LCI_queue_create(LCI_UR_DEVICE, &queue);
+            // Hack for now
+            LCI_queue_createx(LCI_UR_DEVICE,
+                LCI_SERVER_NUM_PKTS * (size_t) config_t::ndevices, &queue);
         }
 
         ~completion_manager_queue()

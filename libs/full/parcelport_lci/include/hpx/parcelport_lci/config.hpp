@@ -45,6 +45,12 @@ namespace hpx::parcelset::policies::lci {
         // How many pre-posted receives for new messages
         // (can only be applied to `sendrecv` protocol).
         static int prepost_recv_num;
+        // Whether to register the buffer in HPX (or rely on LCI to register it)
+        static bool reg_mem;
+        // How many devices to use
+        static int ndevices;
+        // How many completion managers to use
+        static int ncomps;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };

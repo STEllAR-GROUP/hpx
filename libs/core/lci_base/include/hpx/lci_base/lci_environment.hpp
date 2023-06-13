@@ -42,22 +42,55 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
-        // Configurations:
-        // Log level
+        // log
         enum class log_level_t
         {
             none,
             profile,
-            debug
+            debug,
         };
         static log_level_t log_level;
-        // Output filename of log
-        static FILE* log_outfile;
-        static void log(log_level_t level, const char* format, ...);
+#ifdef HPX_HAVE_PARCELPORT_LCI_LOG
+        static LCT_log_ctx_t log_ctx;
+#endif
+        static void log(
+            log_level_t level, const char* tag, const char* format, ...);
+        // performance counter
+// clang-format off
+#define HPX_LCI_PCOUNTER_NONE_FOR_EACH(_macro)
 
-    private:
-        static bool enabled_;
-    };
+#define HPX_LCI_PCOUNTER_TREND_FOR_EACH(_macro) \
+    _macro(send_conn_start)                  \
+    _macro(send_conn_end)                    \
+    _macro(recv_conn_start)                  \
+    _macro(recv_conn_end)
+
+#define HPX_LCI_PCOUNTER_TIMER_FOR_EACH(_macro) \
+    _macro(send_conn_timer)                       \
+    _macro(recv_conn_timer)                       \
+    _macro(async_write_timer)                       \
+    _macro(send_timer)                       \
+    _macro(handle_parcels)                    \
+    _macro(poll_comp)                        \
+    _macro(useful_bg_work)
+            // clang-format on
+
+#define HPX_LCI_PCOUNTER_HANDLE_DECL(name) static LCT_pcounter_handle_t name;
+
+            HPX_LCI_PCOUNTER_NONE_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DECL)
+            HPX_LCI_PCOUNTER_TREND_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DECL)
+            HPX_LCI_PCOUNTER_TIMER_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DECL)
+
+            static LCT_pcounter_ctx_t pcounter_ctx;
+            static int64_t pcounter_now();
+            static int64_t pcounter_since(int64_t then);
+            static void pcounter_add(LCT_pcounter_handle_t handle, int64_t val);
+            static void pcounter_start(LCT_pcounter_handle_t handle);
+            static void pcounter_end(LCT_pcounter_handle_t handle);
+
+        private:
+            static bool enabled_;
+        };
 }}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>
