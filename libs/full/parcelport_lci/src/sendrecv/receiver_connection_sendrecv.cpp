@@ -32,6 +32,7 @@ namespace hpx::parcelset::policies::lci {
 
     void receiver_connection_sendrecv::load(char* header_buffer)
     {
+        util::lci_environment::pcounter_add(util::lci_environment::recv_conn_start, 1);
         header header_ = header(header_buffer);
         header_.assert_valid();
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -96,7 +97,8 @@ namespace hpx::parcelset::policies::lci {
         recv_zero_copy_chunks_idx = 0;
         original_tag = tag;
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "recv connection (%d, %d, %d) start!\n", dst_rank, LCI_RANK, tag);
+            "recv", "recv connection (%d, %d, %d) start!\n", dst_rank, LCI_RANK,
+            tag);
     }
 
     receiver_connection_sendrecv::return_t
@@ -142,7 +144,7 @@ namespace hpx::parcelset::policies::lci {
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "recvm (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
                 original_tag, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
@@ -158,7 +160,7 @@ namespace hpx::parcelset::policies::lci {
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "recvl (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
                 original_tag, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
@@ -334,13 +336,15 @@ namespace hpx::parcelset::policies::lci {
 
     void receiver_connection_sendrecv::done()
     {
+        util::lci_environment::pcounter_add(util::lci_environment::recv_conn_end, 1);
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "recv connection (%d, %d, %d, %d) done!\n", dst_rank, LCI_RANK,
-            original_tag, tag - original_tag + 1);
+            "recv", "recv connection (%d, %d, %d, %d) done!\n", dst_rank,
+            LCI_RANK, original_tag, tag - original_tag + 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         buffer.data_point_.time_ = timer_.elapsed_nanoseconds();
 #endif
 
+        util::lci_environment::pcounter_start(util::lci_environment::handle_packet);
         if (parcels_.empty())
         {
             // decode and handle received data
@@ -356,6 +360,7 @@ namespace hpx::parcelset::policies::lci {
                 pp_->allow_zero_copy_receive_optimizations());
             handle_received_parcels(HPX_MOVE(parcels_));
         }
+        util::lci_environment::pcounter_end(util::lci_environment::handle_packet);
         buffer.data_.free();
         parcels_.clear();
     }

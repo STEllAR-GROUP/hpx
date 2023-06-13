@@ -91,60 +91,18 @@ namespace hpx { namespace util {
     defined(HPX_HAVE_MODULE_LCI_BASE)
 
 namespace hpx { namespace util {
-
     bool lci_environment::enabled_ = false;
-    lci_environment::log_level_t lci_environment::log_level = log_level_t::none;
-    FILE* lci_environment::log_outfile = nullptr;
-
-    ///////////////////////////////////////////////////////////////////////////
-    void lci_environment::init_config(util::runtime_configuration& rtcfg)
-    {
-        // The default value here does not matter here
-        std::string log_level_str = get_entry_as<std::string>(
-            rtcfg, "hpx.parcel.lci.log_level", "" /* Does not matter*/);
-        if (log_level_str == "none")
-            log_level = log_level_t::none;
-        else if (log_level_str == "profile")
-            log_level = log_level_t::profile;
-        else if (log_level_str == "debug")
-            log_level = log_level_t::debug;
-        else
-            throw std::runtime_error("Unknown log level " + log_level_str);
-        std::string log_filename = get_entry_as<std::string>(
-            rtcfg, "hpx.parcel.lci.log_outfile", "" /* Does not matter*/);
-        if (log_filename == "stderr")
-            log_outfile = stderr;
-        else if (log_filename == "stdout")
-            log_outfile = stdout;
-        else
-        {
-            const int filename_max = 256;
-            char filename[filename_max];
-            char* p0_old = log_filename.data();
-            char* p0_new = strchr(log_filename.data(), '%');
-            char* p1 = filename;
-            while (p0_new)
-            {
-                long nbytes = p0_new - p0_old;
-                HPX_ASSERT(p1 + nbytes < filename + filename_max);
-                memcpy(p1, p0_old, nbytes);
-                p1 += nbytes;
-                nbytes =
-                    snprintf(p1, filename + filename_max - p1, "%d", LCI_RANK);
-                p1 += nbytes;
-                p0_old = p0_new + 1;
-                p0_new = strchr(p0_old, '%');
-            }
-            strncat(p1, p0_old, filename + filename_max - p1 - 1);
-            log_outfile = fopen(filename, "w+");
-            if (log_outfile == nullptr)
-            {
-                throw std::runtime_error(
-                    "Cannot open the logfile " + std::string(filename));
-            }
-        }
-    }
-
+    lci_environment::log_level_t lci_environment::log_level;
+#ifdef HPX_HAVE_PARCELPORT_LCI_LOG
+    LCT_log_ctx_t lci_environment::log_ctx;
+#endif
+    LCT_pcounter_ctx_t lci_environment::pcounter_ctx;
+    LCT_pcounter_handle_t lci_environment::send_conn_start;
+    LCT_pcounter_handle_t lci_environment::send_conn_end;
+    LCT_pcounter_handle_t lci_environment::recv_conn_start;
+    LCT_pcounter_handle_t lci_environment::recv_conn_end;
+    LCT_pcounter_handle_t lci_environment::send_timer;
+    LCT_pcounter_handle_t lci_environment::handle_packet;
     ///////////////////////////////////////////////////////////////////////////
     void lci_environment::init(
         int*, char***, util::runtime_configuration& rtcfg)
@@ -186,7 +144,28 @@ namespace hpx { namespace util {
 
         rtcfg.add_entry("hpx.parcel.bootstrap", "lci");
         rtcfg.add_entry("hpx.parcel.lci.rank", std::to_string(this_rank));
-        init_config(rtcfg);
+        LCT_init();
+        // initialize the log context
+#ifdef HPX_HAVE_PARCELPORT_LCI_LOG
+        const char* const log_levels[] = {"none", "profile", "debug"};
+        log_ctx = LCT_log_ctx_alloc(log_levels,
+            sizeof(log_levels) / sizeof(log_levels[0]), "hpx_lci",
+            getenv("HPX_LCI_LOG_OUTFILE"), getenv("HPX_LCI_LOG_LEVEL"),
+            getenv("HPX_LCI_LOG_WHITELIST"), getenv("HPX_LCI_LOG_BLACKLIST"));
+        log_level = static_cast<log_level_t>(LCT_log_get_level(log_ctx));
+#else
+        log_level = log_level_t::none;
+#endif
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        // initialize the performance counters
+        pcounter_ctx = LCT_pcounter_ctx_alloc("hpx-lci");
+        send_conn_start = LCT_pcounter_register(pcounter_ctx, "send_conn_start", LCT_PCOUNTER_TREND);
+        send_conn_end = LCT_pcounter_register(pcounter_ctx, "send_conn_end", LCT_PCOUNTER_TREND);
+        recv_conn_start = LCT_pcounter_register(pcounter_ctx, "recv_conn_start", LCT_PCOUNTER_TREND);
+        recv_conn_end = LCT_pcounter_register(pcounter_ctx, "recv_conn_end", LCT_PCOUNTER_TREND);
+        send_timer = LCT_pcounter_register(pcounter_ctx, "send_timer", LCT_PCOUNTER_TIMER);
+        handle_packet = LCT_pcounter_register(pcounter_ctx, "handle_packet", LCT_PCOUNTER_TIMER);
+#endif
         enabled_ = true;
     }
 
@@ -200,7 +179,13 @@ namespace hpx { namespace util {
         if (enabled())
         {
             enabled_ = false;
-            // for some reasons, this code block can be entered twice when HPX exits
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+            LCT_pcounter_ctx_free(&pcounter_ctx);
+#endif
+#ifdef HPX_HAVE_PARCELPORT_LCI_LOG
+            LCT_log_ctx_free(&log_ctx);
+#endif
+            LCT_fina();
             int lci_init = 0;
             LCI_initialized(&lci_init);
             if (lci_init)
@@ -240,17 +225,40 @@ namespace hpx { namespace util {
         return res;
     }
 
-    void lci_environment::log(
-        lci_environment::log_level_t level, const char* format, ...)
+    void lci_environment::log([[maybe_unused]] log_level_t level,
+        [[maybe_unused]] const char* tag, [[maybe_unused]] const char* format, ...)
     {
+#ifdef HPX_HAVE_PARCELPORT_LCI_LOG
+        if (level > log_level)
+            return;
         va_list args;
         va_start(args, format);
 
-        if (level <= log_level)
-            vfprintf(log_outfile, format, args);
+        LCT_Logv(log_ctx, static_cast<int>(level), tag, format, args);
 
         va_end(args);
+#endif
     }
+
+    void lci_environment::pcounter_add([[maybe_unused]] LCT_pcounter_handle_t handle, [[maybe_unused]] int64_t val)
+    {
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        LCT_pcounter_add(pcounter_ctx, handle, val);
+#endif
+    }
+
+    void lci_environment::pcounter_start([[maybe_unused]] LCT_pcounter_handle_t handle) {
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        LCT_pcounter_start(pcounter_ctx, handle);
+#endif
+    }
+
+    void lci_environment::pcounter_end([[maybe_unused]] LCT_pcounter_handle_t handle) {
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        LCT_pcounter_end(pcounter_ctx, handle);
+#endif
+    }
+
 }}    // namespace hpx::util
 
 #endif

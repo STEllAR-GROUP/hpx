@@ -53,7 +53,7 @@ namespace hpx::parcelset::policies::lci {
                     completion);
             }
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "accept_new (%d, %d, %d) length %lu\n", request.request.rank,
                 LCI_RANK, request.request.tag,
                 request.request.data.mbuffer.length);
@@ -91,7 +91,7 @@ namespace hpx::parcelset::policies::lci {
             else
                 length = request.data.lbuffer.length;
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "recv",
                 "followup (%d, %d, %d) length %lu\n", request.rank, LCI_RANK,
                 request.tag, length);
             receiver_connection_sendrecv::return_t ret =

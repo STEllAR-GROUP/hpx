@@ -45,47 +45,61 @@ namespace hpx::parcelset::policies::lci {
 
     sender_connection_base::return_t sender_connection_base::send()
     {
+        util::lci_environment::pcounter_start(util::lci_environment::send_timer);
+        return_t ret;
+        const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
             HPX_UNLIKELY(pp_->is_sending_early_parcel))
         {
             // If we are sending early parcels, we should not expect the
             // thread make progress on the backlog queue
-            return_t ret;
+            int retry_count = 0;
             do
             {
                 ret = send_nb();
-                if (ret.status == return_status_t::retry &&
-                    (config_t::progress_type ==
+                if (ret.status == return_status_t::retry)
+                {
+                    ++retry_count;
+                    if (retry_count > retry_max_spin)
+                    {
+                        retry_count = 0;
+                        while (pp_->background_work(
+                            -1, parcelport_background_mode_all))
+                            continue;
+                        sched_yield();
+                    }
+                    if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
                         config_t::progress_type ==
-                            config_t::progress_type_t::pthread_worker))
-                    while (pp_->do_progress())
-                        continue;
+                            config_t::progress_type_t::pthread_worker)
+                        while (pp_->do_progress())
+                            continue;
+                }
             } while (ret.status == return_status_t::retry);
-            return ret;
         }
         else
         {
             if (!backlog_queue::empty(dst_rank))
             {
                 backlog_queue::push(shared_from_this());
-                return {return_status_t::retry, nullptr};
-            }
-            return_t ret = send_nb();
-            if (ret.status == return_status_t::retry)
-            {
-                backlog_queue::push(shared_from_this());
-                return ret;
+                ret = {return_status_t::retry, nullptr};
             }
             else
             {
-                return ret;
+                ret = send_nb();
+                if (ret.status == return_status_t::retry)
+                {
+                    backlog_queue::push(shared_from_this());
+                }
             }
         }
+        util::lci_environment::pcounter_end(util::lci_environment::send_timer);
+        return ret;
     }
 
     void sender_connection_base::profile_start_hook(const header& header_)
     {
+        util::lci_environment::pcounter_add(util::lci_environment::send_conn_start, 1);
         if (util::lci_environment::log_level <
             util::lci_environment::log_level_t::profile)
             return;
@@ -109,14 +123,15 @@ namespace hpx::parcelset::policies::lci {
         consumed += snprintf(buf + consumed, sizeof(buf) - consumed, "]\n");
         HPX_ASSERT(sizeof(buf) > consumed);
         util::lci_environment::log(
-            util::lci_environment::log_level_t::profile, "%s", buf);
+            util::lci_environment::log_level_t::profile, "send", "%s", buf);
     }
 
     void sender_connection_base::profile_end_hook()
     {
         util::lci_environment::log(util::lci_environment::log_level_t::profile,
-            "%d:%lf:send_connection(%p) end\n", LCI_RANK,
+            "send", "%d:%lf:send_connection(%p) end\n", LCI_RANK,
             hpx::chrono::high_resolution_clock::now() / 1e9, (void*) this);
+        util::lci_environment::pcounter_add(util::lci_environment::send_conn_end, 1);
     }
 }    // namespace hpx::parcelset::policies::lci
 

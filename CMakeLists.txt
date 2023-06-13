@@ -1142,6 +1142,22 @@ if(HPX_WITH_NETWORKING)
     CATEGORY "Build Targets"
     ADVANCED
   )
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCI_LOG STRING "Enable the LCI-parcelport-specific logger" OFF
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+  if(HPX_WITH_PARCELPORT_LCI_LOG)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCI_LOG)
+  endif()
+  hpx_option(
+    HPX_WITH_PARCELPORT_LCI_PCOUNTER STRING "Enable the LCI-parcelport-specific performance counter" OFF
+    CATEGORY "Parcelport"
+    ADVANCED
+  )
+  if(HPX_WITH_PARCELPORT_LCI_PCOUNTER)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_LCI_PCOUNTER)
+  endif()
 
   hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON

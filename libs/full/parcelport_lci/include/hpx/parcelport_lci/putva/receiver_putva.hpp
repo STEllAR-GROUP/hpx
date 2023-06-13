@@ -83,6 +83,7 @@ namespace hpx::parcelset::policies::lci {
             hpx::chrono::high_resolution_timer timer_;
             parcelset::data_point& data = buffer.data_point_;
 #endif
+            util::lci_environment::pcounter_add(util::lci_environment::recv_conn_start, 1);
             // decode header
             header header_ = header((char*) address);
             header_.assert_valid();
@@ -97,6 +98,7 @@ namespace hpx::parcelset::policies::lci {
             int num_non_zero_copy_chunks = header_.num_non_zero_copy_chunks();
             buffer.num_chunks_.first = num_zero_copy_chunks;
             buffer.num_chunks_.second = num_non_zero_copy_chunks;
+            util::lci_environment::pcounter_add(util::lci_environment::recv_conn_end, 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
@@ -111,6 +113,7 @@ namespace hpx::parcelset::policies::lci {
             parcelset::data_point& data = buffer.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
 #endif
+            util::lci_environment::pcounter_add(util::lci_environment::recv_conn_start, 1);
             // decode header
             header header_ = header((char*) iovec.piggy_back.address);
             header_.assert_valid();
@@ -169,6 +172,7 @@ namespace hpx::parcelset::policies::lci {
                 }
             }
             HPX_ASSERT(i == iovec.count);
+            util::lci_environment::pcounter_add(util::lci_environment::recv_conn_end, 1);
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
             data.time_ = timer_.elapsed_nanoseconds();

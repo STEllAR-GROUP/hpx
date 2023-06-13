@@ -81,7 +81,7 @@ namespace hpx::parcelset::policies::lci {
         }
         if ((int) tag <= LCI_MAX_TAG && (int) tag + num_send > LCI_MAX_TAG)
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "tag",
                 "Rank %d Wrap around!\n", LCI_RANK);
         header_.set_tag(tag);
         send_chunks_idx = 0;
@@ -90,6 +90,7 @@ namespace hpx::parcelset::policies::lci {
         state.store(connection_state::initialized, std::memory_order_release);
         original_tag = tag;
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
+            "send",
             "send connection (%d, %d, %d, %d) tchunks "
             "%d data %d chunks %d start!\n",
             LCI_RANK, dst_rank, original_tag, num_send,
@@ -149,7 +150,7 @@ namespace hpx::parcelset::policies::lci {
         if (ret == LCI_OK)
         {
             util::lci_environment::log(
-                util::lci_environment::log_level_t::debug,
+                util::lci_environment::log_level_t::debug, "send",
                 "%s (%d, %d, %d) length %lu\n",
                 config_t::protocol == config_t::protocol_t::putsendrecv ?
                     "LCI_putmna" :
@@ -178,7 +179,7 @@ namespace hpx::parcelset::policies::lci {
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug,
+                    util::lci_environment::log_level_t::debug, "send",
                     "sendm (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
                     original_tag, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
@@ -203,7 +204,7 @@ namespace hpx::parcelset::policies::lci {
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
-                    util::lci_environment::log_level_t::debug,
+                    util::lci_environment::log_level_t::debug, "send",
                     "sendl (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
                     original_tag, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
@@ -331,8 +332,8 @@ namespace hpx::parcelset::policies::lci {
     void sender_connection_sendrecv::done()
     {
         util::lci_environment::log(util::lci_environment::log_level_t::debug,
-            "send connection (%d, %d, %d, %d) done!\n", LCI_RANK, dst_rank,
-            original_tag, tag - original_tag + 1);
+            "send", "send connection (%d, %d, %d, %d) done!\n", LCI_RANK,
+            dst_rank, original_tag, tag - original_tag + 1);
         profile_end_hook();
         error_code ec;
         handler_(ec);
