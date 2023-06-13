@@ -74,7 +74,7 @@ namespace hpx::parallel::util {
 
             template <typename ExPolicy, typename Begin, typename End,
                 typename F,
-                HPX_CONCEPT_REQUIRES_(    
+                HPX_CONCEPT_REQUIRES_(
                     !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 ExPolicy&&, Begin it, End end, F&& f)
@@ -660,7 +660,7 @@ namespace hpx::parallel::util {
 
             template <typename ExPolicy, typename Iter, typename FwdIter,
                 typename F, typename Cleanup,
-                HPX_CONCEPT_REQUIRES_(    
+                HPX_CONCEPT_REQUIRES_(
                     !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
             static FwdIter call(ExPolicy&&, Iter it, Iter last, FwdIter dest,
                 F&& f, Cleanup&& cleanup)

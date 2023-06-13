@@ -166,6 +166,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -194,6 +195,64 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy, typename InIter, typename Sent,
+            HPX_CONCEPT_REQUIRES_(
+                !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+        InIter sequential_uninitialized_default_construct(
+            ExPolicy&& policy, InIter first, Sent last)
+        {
+            using value_type = typename std::iterator_traits<Iter>::value_type;
+
+            Iter s_first = first;
+            try
+            {
+                for (/* */; first != last; ++first)
+                {
+                    ::new (std::addressof(*first)) value_type;
+                }
+                return first;
+            }
+            catch (...)
+            {
+                for (/* */; s_first != first; ++s_first)
+                {
+                    std::destroy_at(std::addressof(*s_first));
+                }
+                throw;
+            }
+        }
+
+        template <typename ExPolicy, typename InIter, typename Sent,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+        InIter sequential_uninitialized_default_construct(
+            ExPolicy&& policy, InIter first, Sent last)
+        {
+            using value_type = typename std::iterator_traits<Iter>::value_type;
+
+            Iter s_first = first;
+            try
+            {
+                // clang-format off
+                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                for (/* */; first != last; ++first)
+                {
+                    ::new (std::addressof(*first)) value_type;
+                }
+                // clang-format on
+
+                return first;
+            }
+            catch (...)
+            {
+                for (/* */; s_first != first; ++s_first)
+                {
+                    std::destroy_at(std::addressof(*s_first));
+                }
+                throw;
+            }
+        }
+
         template <typename ExPolicy, typename InIter>
         InIter sequential_uninitialized_default_construct_n(
             ExPolicy&& policy, InIter first, std::size_t count)
@@ -272,16 +331,15 @@ namespace hpx::parallel {
             static FwdIter sequential(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                sequential_uninitialized_default_construct_n(
-                    HPX_FORWARD(ExPolicy, policy), first,
-                    std::distance(first, last));
+                return sequential_uninitialized_default_construct(
+                    HPX_FORWARD(ExPolicy, policy), first, last);
             }
 
             template <typename ExPolicy, typename Sent>
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                parallel_uninitialized_default_construct_n(
+                return parallel_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
