@@ -195,11 +195,11 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename InIter, typename Sent,
+        template <typename ExPolicy, typename Iter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
                 !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-        InIter sequential_uninitialized_default_construct(
-            ExPolicy&& policy, InIter first, Sent last)
+        Iter sequential_uninitialized_default_construct(
+            ExPolicy&&, Iter first, Sent last)
         {
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
@@ -222,11 +222,11 @@ namespace hpx::parallel {
             }
         }
 
-        template <typename ExPolicy, typename InIter, typename Sent,
+        template <typename ExPolicy, typename Iter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-        InIter sequential_uninitialized_default_construct(
-            ExPolicy&& policy, InIter first, Sent last)
+        Iter sequential_uninitialized_default_construct(
+            ExPolicy&&, Iter first, Sent last)
         {
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
