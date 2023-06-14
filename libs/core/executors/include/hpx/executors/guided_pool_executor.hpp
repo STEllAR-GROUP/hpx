@@ -196,6 +196,10 @@ namespace hpx::parallel::execution {
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
                 int domain = -1;
 #else
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Werror=dangling-reference"
+#endif
                 // get the argument for the numa hint function from the predecessor future
                 int domain =
                     numa_function_(detail::future_extract_value()(

@@ -320,6 +320,10 @@ struct bitset_test
         b = std::move(b);    // self assignment check
 #endif
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic pop
+#endif
+
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(b == rhs);
     }
