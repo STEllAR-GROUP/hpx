@@ -15,7 +15,7 @@
 #pragma warning(disable : 4786)    // identifier truncated in debug info
 #pragma warning(disable : 4710)    // function not inlined
 #pragma warning(                                                               \
-    disable : 4711)    // function selected for automatic inline expansion
+        disable : 4711)    // function selected for automatic inline expansion
 #pragma warning(disable : 4514)    // unreferenced inline removed
 #endif
 
@@ -34,7 +34,16 @@ int main()
 
     pair_type pair(10, 20);
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Werror=dangling-reference"
+#endif
+
     int const& x = hpx::bind(&pair_type::first, placeholders::_1)(pair);
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic pop
+#endif
 
     HPX_TEST_EQ(&pair.first, &x);
 

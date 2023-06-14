@@ -39,8 +39,6 @@ namespace hpx { namespace lcos {
 
     base_lco::~base_lco() = default;
 
-    void base_lco::finalize() {}
-
     void base_lco::set_event_nonvirt()
     {
         set_event();
