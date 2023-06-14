@@ -40,7 +40,9 @@ namespace tests {
     {
         while (i != j)
         {
-            co_yield i++;
+            // gcc reports -Werrer,-Wunsequenced without retval
+            int retval = i++;
+            co_yield retval;
         }
     }
 
@@ -114,7 +116,7 @@ namespace tests {
 
     hpx::generator<X const&> const_lvalue_example()
     {
-        co_yield X{1};    // OK
+        co_yield X{1};            // OK
         X const x{2};
         co_yield x;               // OK
         co_yield std::move(x);    // OK: same as above

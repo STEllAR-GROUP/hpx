@@ -53,9 +53,8 @@ namespace hpx::parcelset::policies::lci {
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
-        handler_ = HPX_FORWARD(Handler, handler);
-        postprocess_handler_ =
-            HPX_FORWARD(ParcelPostprocess, parcel_postprocess);
+        handler_ = HPX_MOVE(handler);
+        postprocess_handler_ = HPX_MOVE(parcel_postprocess);
 
         // build header
         header header_;

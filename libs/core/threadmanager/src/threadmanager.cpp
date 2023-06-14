@@ -232,9 +232,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_local_priority_lifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
@@ -373,9 +374,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_abp_priority_fifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
@@ -421,9 +423,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_abp_priority_lifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
