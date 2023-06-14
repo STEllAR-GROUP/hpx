@@ -44,6 +44,9 @@ namespace hpx::parallel::util {
         template <typename Category, typename Enable = void>
         struct uninit_copy_n_helper;
 
+        template <typename Category, typename Enable = void>
+        struct uninit_move_n_helper;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char*> to_ptr(
@@ -452,6 +455,109 @@ namespace hpx::parallel::util {
             hpx::traits::pointer_copy_category_t<std::decay_t<InIter>,
                 std::decay_t<OutIter>>;
         return detail::uninit_copy_n_helper<category>::call(
+            HPX_FORWARD(ExPolicy, policy), first, count, dest);
+    }
+
+    // helpers for uninit_move_n
+    namespace detail {
+        // Customization point for optimizing move_n operations
+        template <typename Category, typename Enable>
+        struct uninit_move_n_helper
+        {
+            template <typename ExPolicy, typename InIter, typename OutIter,
+                HPX_CONCEPT_REQUIRES_(
+                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy, InIter first, std::size_t num, OutIter dest)
+            {
+                OutIter current = dest;
+
+                try
+                {
+                    for (std::size_t i = 0; i < num;
+                         ++i, ++current, ++first)    //-V112
+                    {
+                        hpx::construct_at(
+                            std::addressof(*current), HPX_MOVE(*first));
+                    }
+                    return in_out_result<InIter, OutIter>{
+                        HPX_MOVE(first), HPX_MOVE(current)};
+                }
+                catch (...)
+                {
+                    for (/* */; dest != current; ++dest)
+                    {
+                        std::destroy_at(std::addressof(*dest));
+                    }
+                    throw;
+                }
+            }
+
+            template <typename ExPolicy, typename InIter, typename OutIter,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy, InIter first, std::size_t num, OutIter dest)
+            {
+                OutIter current = dest;
+                try
+                {
+                    // clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (std::size_t i = 0; i < num;
+                         ++i, ++current, ++first)    //-V112
+                    {
+                        hpx::construct_at(
+                            std::addressof(*current), HPX_MOVE(*first));
+                    }
+                    // clang-format on
+
+                    return in_out_result<InIter, OutIter>{
+                        HPX_MOVE(first), HPX_MOVE(current)};
+                }
+                catch (...)
+                {
+                    for (/* */; dest != current; ++dest)
+                    {
+                        std::destroy_at(std::addressof(*dest));
+                    }
+                    throw;
+                }
+            }
+        };
+
+        template <typename Dummy>
+        struct uninit_move_n_helper<hpx::traits::trivially_copyable_pointer_tag,
+            Dummy>
+        {
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(ExPolicy,
+                InIter first, std::size_t count, OutIter dest) noexcept
+            {
+                return copy_memmove(first, count, dest);
+            }
+        };
+    }    // namespace detail
+
+    template <typename InIter, typename OutIter>
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_move_n(
+        InIter first, std::size_t count, OutIter dest)
+    {
+        using category =
+            hpx::traits::pointer_copy_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
+        return detail::uninit_move_n_helper<category>::call(
+            hpx::execution::seq, first, count, dest);
+    }
+
+    template <typename ExPolicy, typename InIter, typename OutIter>
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_move_n(
+        ExPolicy&& policy, InIter first, std::size_t count, OutIter dest)
+    {
+        using category =
+            hpx::traits::pointer_copy_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
+        return detail::uninit_move_n_helper<category>::call(
             HPX_FORWARD(ExPolicy, policy), first, count, dest);
     }
 }    // namespace hpx::parallel::util
