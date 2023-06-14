@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Maximilian Bremer
-//  Copyright (c) 2019 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,8 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+constexpr std::size_t N = 50;
 
 ///////////////////////////////////////////////////////////////////////////////
 struct test_server_base
@@ -211,13 +213,13 @@ struct test_server
     // be Serializable and CopyConstructable. Components can be
     // MoveConstructable in which case the serialized data is moved into the
     // component's constructor.
-    test_server(test_server&& rhs)
+    test_server(test_server&& rhs) noexcept
       : base_type(std::move(rhs))
       , data_(rhs.data_)
     {
     }
 
-    test_server& operator=(test_server&& rhs)
+    test_server& operator=(test_server&& rhs) noexcept
     {
         this->test_server_base::operator=(
             std::move(static_cast<test_server_base&>(rhs)));
@@ -488,8 +490,6 @@ bool test_migrate_polymorphic_component2(
     HPX_TEST_EQ(t1.get_data(), 42);
     HPX_TEST_EQ(t1.get_base_data(), 7);
 
-    std::size_t N = 100;
-
     try
     {
         // migrate an object back and forth between 2 localities a couple of
@@ -539,8 +539,6 @@ bool test_migrate_lazy_polymorphic_component2(
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.lazy_get_data(), 42);
     HPX_TEST_EQ(t1.lazy_get_base_data(), 7);
-
-    std::size_t N = 100;
 
     try
     {
@@ -593,12 +591,10 @@ bool test_migrate_busy_polymorphic_component2(
     HPX_TEST_EQ(t1.get_data(), 42);
     HPX_TEST_EQ(t1.get_base_data(), 7);
 
-    std::size_t N = 100;
-
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times
-    hpx::future<void> migrate_future = hpx::async([source, target, t1,
-                                                      N]() mutable {
+    hpx::future<void> migrate_future = hpx::async([source, target,
+                                                      t1]() mutable {
         for (std::size_t i = 0; i < N; ++i)
         {
             // migrate t1 to the target (loc2)
@@ -628,7 +624,7 @@ bool test_migrate_busy_polymorphic_component2(
 
     // Second, we generate tons of work which should automatically follow
     // the migration.
-    hpx::future<void> create_work = hpx::async([t1, N]() {
+    hpx::future<void> create_work = hpx::async([t1]() {
         for (std::size_t i = 0; i < 2 * N; ++i)
         {
             hpx::cout << hpx::naming::get_locality_id_from_id(t1.call())
@@ -666,12 +662,10 @@ bool test_migrate_lazy_busy_polymorphic_component2(
     HPX_TEST_EQ(t1.get_data(), 42);
     HPX_TEST_EQ(t1.get_base_data(), 7);
 
-    std::size_t N = 100;
-
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times
-    hpx::future<void> migrate_future = hpx::async([source, target, t1,
-                                                      N]() mutable {
+    hpx::future<void> migrate_future = hpx::async([source, target,
+                                                      t1]() mutable {
         for (std::size_t i = 0; i < N; ++i)
         {
             // migrate t1 to the target (loc2)
@@ -701,7 +695,7 @@ bool test_migrate_lazy_busy_polymorphic_component2(
 
     // Second, we generate tons of work which should automatically follow
     // the migration.
-    hpx::future<void> create_work = hpx::async([t1, N]() {
+    hpx::future<void> create_work = hpx::async([t1]() {
         for (std::size_t i = 0; i < 2 * N; ++i)
         {
             hpx::cout << hpx::naming::get_locality_id_from_id(t1.call())
@@ -731,7 +725,7 @@ bool test_migrate_lazy_busy_polymorphic_component2(
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+    std::vector<hpx::id_type> const localities = hpx::find_remote_localities();
 
     for (hpx::id_type const& id : localities)
     {

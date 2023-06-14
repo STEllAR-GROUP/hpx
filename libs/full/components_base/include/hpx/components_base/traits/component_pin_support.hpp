@@ -11,7 +11,7 @@
 
 #include <cstdint>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component pinning
@@ -28,7 +28,7 @@ namespace hpx { namespace traits {
             static constexpr auto call(int, Component* p) noexcept
                 -> decltype(p->pin())
             {
-                p->pin();
+                return p->pin();
             }
         };
 
@@ -85,4 +85,4 @@ namespace hpx { namespace traits {
             return detail::pin_count_helper::call(0, p);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

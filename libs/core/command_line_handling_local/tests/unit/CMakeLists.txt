@@ -23,8 +23,6 @@ foreach(test ${tests})
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources}
-    NOLIBS
-    DEPENDENCIES hpx_core
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Unit/Modules/Core/CommandLineHandlingLocal/"
   )

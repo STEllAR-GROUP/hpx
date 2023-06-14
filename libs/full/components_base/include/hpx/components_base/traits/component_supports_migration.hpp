@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,17 +6,14 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
-#include <type_traits>
-#include <utility>
-
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component capabilities
     namespace detail {
+
         struct supports_migration_helper
         {
             // by default we return 'false' (component does not support
@@ -29,7 +26,7 @@ namespace hpx { namespace traits {
 
             // forward the call if the component implements the function
             template <typename Component>
-            static constexpr auto call(int)
+            static constexpr auto call(int) noexcept
                 -> decltype(Component::supports_migration())
             {
                 return Component::supports_migration();
@@ -37,7 +34,7 @@ namespace hpx { namespace traits {
         };
 
         template <typename Component>
-        constexpr bool call_supports_migration()
+        constexpr bool call_supports_migration() noexcept
         {
             return supports_migration_helper::template call<Component>(0);
         }
@@ -47,9 +44,9 @@ namespace hpx { namespace traits {
     struct component_supports_migration
     {
         // returns whether target supports migration
-        static constexpr bool call()
+        static constexpr bool call() noexcept
         {
             return detail::call_supports_migration<Component>();
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

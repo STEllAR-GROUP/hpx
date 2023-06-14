@@ -32,7 +32,7 @@ namespace hpx::parcelset {
 
     namespace detail {
         struct create_parcel;
-    }
+    }    // namespace detail
 
     ////////////////////////////////////////////////////////////////////////
     /// \brief Return boolean value when thread processing is completed.

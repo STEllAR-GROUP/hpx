@@ -33,7 +33,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
     namespace detail {
@@ -113,9 +113,9 @@ namespace hpx { namespace actions {
     };
 
     /// \endcond
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     /// \cond NOINTERNAL
     template <>
@@ -125,6 +125,7 @@ namespace hpx { namespace traits {
         return hpx::components::component_plain_function;
     }
 
+    // clang-format off
     template <>
     HPX_ALWAYS_EXPORT inline void
         component_type_database<hpx::actions::detail::plain_function>::set(
@@ -132,8 +133,9 @@ namespace hpx { namespace traits {
     {
         HPX_ASSERT(false);    // shouldn't be ever called
     }
+    // clang-format on
     /// \endcond
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
 /// \def HPX_DEFINE_PLAIN_ACTION(func, name)
 /// \brief Defines a plain action type
@@ -223,7 +225,7 @@ namespace hpx { namespace traits {
 ///
 #define HPX_DECLARE_PLAIN_ACTION(...)                                          \
     HPX_DECLARE_ACTION(__VA_ARGS__)                                            \
-    /**/
+/**/
 
 /// \def HPX_PLAIN_ACTION(func, name)
 ///

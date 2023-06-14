@@ -17,6 +17,8 @@ namespace hpx::parcelset {
     class HPX_EXPORT locality;
     class HPX_EXPORT parcel;
 
+    extern HPX_EXPORT parcel empty_parcel;
+
     /// The type of a function that can be registered as a parcel write handler
     /// using the function \a hpx::set_parcel_write_handler.
     ///

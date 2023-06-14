@@ -125,6 +125,12 @@ namespace hpx::agas {
     HPX_EXPORT bool is_local_address_cached(naming::gid_type const& gid,
         naming::address& addr, error_code& ec = throws);
 
+    HPX_EXPORT bool is_local_address_cached(naming::gid_type const& gid,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec = throws);
+
     inline bool is_local_address_cached(
         hpx::id_type const& id, error_code& ec = throws)
     {
@@ -135,6 +141,15 @@ namespace hpx::agas {
         hpx::id_type const& id, naming::address& addr, error_code& ec = throws)
     {
         return is_local_address_cached(id.get_gid(), addr, ec);
+    }
+
+    inline bool is_local_address_cached(hpx::id_type const& id,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec = throws)
+    {
+        return is_local_address_cached(id.get_gid(), addr, r, HPX_MOVE(f), ec);
     }
 
     HPX_EXPORT void update_cache_entry(naming::gid_type const& gid,
@@ -261,7 +276,8 @@ namespace hpx::agas {
         naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f);
 
-    HPX_EXPORT void unmark_as_migrated(naming::gid_type const& gid);
+    HPX_EXPORT void unmark_as_migrated(
+        naming::gid_type const& gid, hpx::move_only_function<void()>&& f);
 
     HPX_EXPORT hpx::future<std::map<std::string, hpx::id_type>> find_symbols(
         std::string const& pattern = "*");

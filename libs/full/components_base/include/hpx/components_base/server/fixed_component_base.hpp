@@ -67,6 +67,7 @@ namespace hpx::components {
             {
                 error_code ec(throwmode::lightweight);    // ignore errors
                 agas::unbind_gid_local(gid_, ec);
+
                 gid_ = naming::gid_type();    // invalidate GID
             }
         }

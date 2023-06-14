@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 
-#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <mutex>
@@ -22,7 +21,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     namespace detail {
 
@@ -155,7 +154,7 @@ namespace hpx { namespace components {
     }    // namespace detail
 
     // Return the string representation for a given component type id
-    std::string const get_component_type_name(std::int32_t type)
+    std::string get_component_type_name(std::int32_t type)
     {
         std::string result;
 
@@ -199,8 +198,8 @@ namespace hpx { namespace components {
 
     namespace detail {
 
-        component_type get_agas_component_type(const char* name,
-            const char* base_name, component_type base_type, bool enabled)
+        component_type get_agas_component_type(char const* name,
+            char const* base_name, component_type base_type, bool enabled)
         {
             component_type type = component_invalid;
             if (enabled)
@@ -231,4 +230,4 @@ namespace hpx { namespace components {
             return type;
         }
     }    // namespace detail
-}}       // namespace hpx::components
+}    // namespace hpx::components
