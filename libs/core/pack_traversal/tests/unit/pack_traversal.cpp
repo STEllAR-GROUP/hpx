@@ -483,12 +483,20 @@ static void test_strategic_traverse()
     {
         std::unique_ptr<int> ptr(new int(7));
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Werror=dangling-reference"
+#endif
         std::unique_ptr<int> const& ref = map_pack(
             [](std::unique_ptr<int> const& ref) -> std::unique_ptr<int> const& {
                 // ...
                 return ref;
             },
             ptr);
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic pop
+#endif
 
         HPX_TEST_EQ(*ref, 7);
         *ptr = 0;
@@ -804,8 +812,8 @@ static void test_spread_tuple_like_traverse()
 
     // 1:0 mappings
     {
-        using Result = decltype(
-            map_pack(zero_mapper{}, make_tuple(make_tuple(1, 2), 1), 1));
+        using Result = decltype(map_pack(
+            zero_mapper{}, make_tuple(make_tuple(1, 2), 1), 1));
         static_assert(std::is_void<Result>::value, "Failed...");
     }
 

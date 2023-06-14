@@ -202,7 +202,7 @@ namespace tests {
     };
 
     // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
     hpx::generator<int, void, std::allocator<std::byte>> stateless_example()
     {
         co_yield 42;
@@ -313,7 +313,7 @@ int main()
     }
 
     // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
     {
         std::vector const expected = {42};
         std::size_t i = 0;
