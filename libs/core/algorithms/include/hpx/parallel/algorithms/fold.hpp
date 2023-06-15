@@ -31,7 +31,7 @@ namespace hpx::parallel::detail {
         HPX_HOST_DEVICE static constexpr T sequential(
             ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
-            util::loop_ind<ExPolicy>(
+            return util::loop_ind<ExPolicy>(
                 first, last, [&init, &f](auto const& it) mutable {
                     init = HPX_INVOKE(f, HPX_MOVE(init), it);
                 });
@@ -42,7 +42,7 @@ namespace hpx::parallel::detail {
         static constexpr auto parallel(
             ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
         {
-            util::loop_ind<ExPolicy>(
+            return util::loop_ind<ExPolicy>(
                 first, last, [&init, &f](auto const& it) mutable {
                     init = HPX_INVOKE(f, HPX_MOVE(init), it);
                 });
