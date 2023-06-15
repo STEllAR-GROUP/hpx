@@ -14,7 +14,7 @@
 
 void detail_set_thread_name(const char*)
 {
-    // set_thread_name is guarenteed to exist on windows
+    // set_thread_name is guaranteed to exist on windows
     return;
 }
 #elif (defined(__linux__))
@@ -32,7 +32,7 @@ void detail_set_thread_name(const char* thread_name)
 
 void detail_set_thread_name(const char* thread_name)
 {
-    pthread_setname_np(pthread_self(), thread_name, NULL);
+    pthread_setname_np(pthread_self(), thread_name);
     return;
 }
 
