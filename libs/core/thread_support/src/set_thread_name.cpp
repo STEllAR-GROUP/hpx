@@ -99,6 +99,29 @@ namespace hpx::util { namespace detail {
     }
 }}    // namespace hpx::util::detail
 
+#elif defined(__NetBSD__) && defined(HPX_HAVE_NAMEABLE_THREADS)
+
+#include <pthread.h>
+namespace hpx::util { namespace detail {
+
+    void set_thread_name(char const* thread_name)
+    {
+        pthread_set_name_np(pthread_self(), thread_name);
+    }
+
+}}    // namespace hpx::util::detail
+
+#elif (defined(__FreeBSD__) || defined(__OpenBSD__))
+#include <pthread.h>
+namespace hpx::util { namespace detail {
+
+    void set_thread_name(char const* thread_name)
+    {
+        pthread_set_name_np(pthread_self(), thread_name);
+    }
+
+}}    // namespace hpx::util::detail
+
 #else
 namespace hpx::util { namespace detail {
     void set_thread_name([[maybe_unused]] char const* thread_name)
