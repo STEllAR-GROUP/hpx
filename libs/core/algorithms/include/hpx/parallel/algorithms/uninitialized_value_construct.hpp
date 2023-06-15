@@ -193,36 +193,29 @@ namespace hpx::parallel {
         // provide our own implementation of std::uninitialized_value_construct
         // as some versions of MSVC horribly fail at compiling it for some types
         // T
-        template <typename InIter, typename Sent>
-        InIter std_uninitialized_value_construct(InIter first, Sent last)
+        template <typename ExPolicy, typename InIter, typename Sent>
+        InIter sequential_uninitialized_value_construct(
+            ExPolicy&& policy, InIter first, Sent last)
         {
-            InIter s_first = first;
-            try
-            {
-                for (/* */; first != last; ++first)
-                {
-                    hpx::construct_at(std::addressof(*first));
-                }
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
+            return util::loop_with_cleanup(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                [](InIter it) -> void {
+                    hpx::construct_at(std::addressof(*it));
+                },
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename InIter>
-        InIter sequential_uninitialized_value_construct_n(InIter first,
-            std::size_t count,
-            util::cancellation_token<util::detail::no_data>& tok)
+        template <typename ExPolicy, typename InIter>
+        InIter sequential_uninitialized_value_construct_n(
+            ExPolicy&& policy, InIter first, std::size_t count)
         {
+            util::cancellation_token<util::detail::no_data> tok;
+
             return util::loop_with_cleanup_n_with_token(
-                first, count, tok,
+                HPX_FORWARD(ExPolicy, policy), first, count, tok,
                 [](InIter it) -> void {
                     hpx::construct_at(std::addressof(*it));
                 },
@@ -234,7 +227,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename FwdIter>
         util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        parallel_sequential_uninitialized_value_construct_n(
+        parallel_uninitialized_value_construct_n(
             ExPolicy&& policy, FwdIter first, std::size_t count)
         {
             if (count == 0)
@@ -245,16 +238,15 @@ namespace hpx::parallel {
 
             using partition_result_type = std::pair<FwdIter, FwdIter>;
 
-            util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<ExPolicy, FwdIter,
                 partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [tok](FwdIter it, std::size_t part_size) mutable
+                    [policy](FwdIter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_value_construct_n(
-                                it, part_size, tok));
+                                HPX_FORWARD(ExPolicy, policy), it, part_size));
                     },
                     // finalize, called once if no error occurred
                     [first, count](auto&& data) mutable -> FwdIter {
@@ -288,16 +280,18 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Sent>
-            static FwdIter sequential(ExPolicy, FwdIter first, Sent last)
+            static FwdIter sequential(
+                ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return std_uninitialized_value_construct(first, last);
+                return sequential_uninitialized_value_construct(
+                    HPX_FORWARD(ExPolicy, policy), first, last);
             }
 
             template <typename ExPolicy, typename Sent>
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return parallel_sequential_uninitialized_value_construct_n(
+                return parallel_uninitialized_value_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
@@ -308,33 +302,6 @@ namespace hpx::parallel {
     // uninitialized_value_construct_n
     namespace detail {
         /// \cond NOINTERNAL
-
-        // provide our own implementation of std::uninitialized_value_construct
-        // as some versions of MSVC horribly fail at compiling it for some types
-        // T
-        template <typename InIter>
-        InIter std_uninitialized_value_construct_n(
-            InIter first, std::size_t count)
-        {
-            InIter s_first = first;
-            try
-            {
-                for (/* */; count != 0; (void) ++first, --count)
-                {
-                    hpx::construct_at(std::addressof(*first));
-                }
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
-        }
-
         template <typename FwdIter>
         struct uninitialized_value_construct_n
           : public algorithm<uninitialized_value_construct_n<FwdIter>, FwdIter>
@@ -347,16 +314,17 @@ namespace hpx::parallel {
 
             template <typename ExPolicy>
             static FwdIter sequential(
-                ExPolicy, FwdIter first, std::size_t count)
+                ExPolicy&& policy, FwdIter first, std::size_t count)
             {
-                return std_uninitialized_value_construct_n(first, count);
+                return sequential_uninitialized_value_construct_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count);
             }
 
             template <typename ExPolicy>
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, std::size_t count)
             {
-                return parallel_sequential_uninitialized_value_construct_n(
+                return parallel_uninitialized_value_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first, count);
             }
         };
