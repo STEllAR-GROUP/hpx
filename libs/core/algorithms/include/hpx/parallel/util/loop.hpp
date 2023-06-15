@@ -746,26 +746,6 @@ namespace hpx::parallel::util {
             first, last, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
     }
 
-    // ///////////////////////////////////////////////////////////////////////////
-    // template <typename Iter, typename F, typename Cleanup>
-    // HPX_FORCEINLINE constexpr Iter loop_with_cleanup(
-    //     Iter it, Iter last, F&& f, Cleanup&& cleanup)
-    // {
-    //     using cat = typename std::iterator_traits<Iter>::iterator_category;
-    //     return detail::loop_with_cleanup<cat>::call(
-    //         it, last, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
-    // }
-
-    // template <typename Iter, typename FwdIter, typename F, typename Cleanup>
-    // HPX_FORCEINLINE constexpr FwdIter loop_with_cleanup(
-    //     Iter it, Iter last, FwdIter dest, F&& f, Cleanup&& cleanup)
-    // {
-    //     using cat = typename std::iterator_traits<Iter>::iterator_category;
-    //     return detail::loop_with_cleanup<cat>::call(
-    //         it, last, dest, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
-    // }
-
-    ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
         // Helper class to repeatedly call a function a given number of times
