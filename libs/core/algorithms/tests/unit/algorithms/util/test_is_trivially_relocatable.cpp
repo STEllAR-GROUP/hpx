@@ -59,9 +59,9 @@ static_assert(
 struct not_trivially_copyable_1
 {
     not_trivially_copyable_1();
-    not_trivially_copyable_1(const not_trivially_copyable_1&);
+    not_trivially_copyable_1(not_trivially_copyable_1 const&);
     not_trivially_copyable_1& operator=(
-        const not_trivially_copyable_1&) = default;
+        not_trivially_copyable_1 const&) = default;
     ~not_trivially_copyable_1() = default;
 };
 
@@ -69,8 +69,8 @@ struct not_trivially_copyable_1
 struct not_trivially_copyable_2
 {
     not_trivially_copyable_2();
-    not_trivially_copyable_2(const not_trivially_copyable_2&) = default;
-    not_trivially_copyable_2& operator=(const not_trivially_copyable_2&);
+    not_trivially_copyable_2(not_trivially_copyable_2 const&) = default;
+    not_trivially_copyable_2& operator=(not_trivially_copyable_2 const&);
     ~not_trivially_copyable_2() = default;
 };
 
@@ -78,9 +78,9 @@ struct not_trivially_copyable_2
 struct not_trivially_copyable_3
 {
     not_trivially_copyable_3();
-    not_trivially_copyable_3(const not_trivially_copyable_3&) = default;
+    not_trivially_copyable_3(not_trivially_copyable_3 const&) = default;
     not_trivially_copyable_3& operator=(
-        const not_trivially_copyable_3&) = default;
+        not_trivially_copyable_3 const&) = default;
     ~not_trivially_copyable_3();
 };
 
@@ -95,9 +95,9 @@ struct explicitly_trivially_relocatable_1
 {
     explicitly_trivially_relocatable_1() = default;
     explicitly_trivially_relocatable_1(
-        const explicitly_trivially_relocatable_1&);
+        explicitly_trivially_relocatable_1 const&);
     explicitly_trivially_relocatable_1& operator=(
-        const explicitly_trivially_relocatable_1&);
+        explicitly_trivially_relocatable_1 const&);
     ~explicitly_trivially_relocatable_1() = default;
 };
 
