@@ -15,8 +15,6 @@ foreach(test ${function_tests})
   add_hpx_executable(
     ${test}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${test}_FLAGS}
-    NOLIBS
-    DEPENDENCIES hpx_core
     EXCLUDE_FROM_ALL
     FOLDER "Tests/Regressions/Modules/Core/Functional"
   )
