@@ -13,7 +13,7 @@
 #include <string>
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
-    !defined(HPX_MINGW) && defined(HPX_HAVE_NAMEABLE_THREADS)
+    !defined(HPX_MINGW)
 #include <windows.h>
 
 namespace hpx::util {
@@ -83,7 +83,7 @@ namespace hpx::util {
 
 }    // namespace hpx::util
 
-#elif defined(__linux__) && defined(HPX_HAVE_NAMEABLE_THREADS)
+#elif defined(__linux__) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
 
 #include <pthread.h>
 namespace hpx::util { namespace detail {
@@ -99,7 +99,7 @@ namespace hpx::util { namespace detail {
     }
 }}    // namespace hpx::util::detail
 
-#elif defined(__NetBSD__) && defined(HPX_HAVE_NAMEABLE_THREADS)
+#elif defined(__NetBSD__) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
 
 #include <pthread.h>
 namespace hpx::util { namespace detail {
@@ -139,7 +139,7 @@ namespace hpx::util {
         detail::set_thread_name(thread_name);
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
-    !defined(HPX_MINGW) && defined(HPX_HAVE_NAMEABLE_THREADS)
+    !defined(HPX_MINGW) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
         // also set it the 'new' way in case the application is not running in
         // the debugger at this time
         SetThreadDescription(

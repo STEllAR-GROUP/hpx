@@ -507,9 +507,9 @@ function(hpx_check_for_cxx20_perfect_pack_capture)
 endfunction()
 
 # ##############################################################################
-function(hpx_check_for_nameable_threads)
+function(hpx_check_for_pthread_setname_np)
   add_hpx_config_test(
-    HPX_HAVE_NAMEABLE_THREADS
+    HPX_HAVE_PTHREAD_SETNAME_NP
     SOURCE cmake/tests/set_thread_name.cpp
     FILE ${ARGN}
   )
