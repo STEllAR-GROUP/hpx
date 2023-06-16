@@ -179,6 +179,7 @@ Functions
    :cpp:func:`hpx::ranges::stable_sort`                     :cppreference-generic:`algorithm/ranges,stable_sort`
    :cpp:func:`hpx::ranges::starts_with`                     :cppreference-generic:`algorithm/ranges,starts_with`
    :cpp:func:`hpx::ranges::swap_ranges`                     :cppreference-generic:`algorithm/ranges,swap_ranges`
+   :cpp:func:`hpx::ranges::transform`                       :cppreference-generic:`algorithm/ranges,transform`
    :cpp:func:`hpx::ranges::unique`                          :cppreference-generic:`algorithm/ranges,unique`
    :cpp:func:`hpx::ranges::unique_copy`                     :cppreference-generic:`algorithm/ranges,unique_copy`
    :cpp:func:`hpx::ranges::experimental::for_loop`          |cpp19_n4808|_
