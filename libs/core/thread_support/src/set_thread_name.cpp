@@ -81,28 +81,33 @@ namespace hpx::util {
         }
     }    // namespace detail
 
+    void set_thread_name(const char* thread_name) noexcept
+    {
+        detail::set_thread_name(thread_name);
+    }
 }    // namespace hpx::util
 
 #elif defined(HPX_HAVE_PTHREAD_SETNAME_NP)
 
 #include <pthread.h>
-namespace hpx::util { namespace detail {
+namespace hpx::util {
 
     void set_thread_name(char const* thread_name)
     {
         pthread_set_name_np(pthread_self(), thread_name);
     }
 
-}}    // namespace hpx::util::detail
+}    // namespace hpx::util
 
 #else
 
-namespace hpx::util { namespace detail {
+namespace hpx::util {
 
     void set_thread_name(char const*)
     {
         return;
     }
-}}    // namespace hpx::util::detail
+
+}    // namespace hpx::util
 
 #endif
