@@ -35,6 +35,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 namespace hpx::local::detail {
 
     std::string runtime_configuration_string(command_line_handling const& cfg)

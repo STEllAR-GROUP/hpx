@@ -35,6 +35,10 @@
 
 #include <cstddef>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 /*
    ContextImpl concept documentation.
    A ContextImpl holds a context plus its stack.

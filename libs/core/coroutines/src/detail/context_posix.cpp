@@ -7,6 +7,10 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/detail/context_impl.hpp>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 // The preprocessor conditions below are kept in sync with those used in
 // context_impl.hpp
 
