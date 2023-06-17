@@ -83,23 +83,7 @@ namespace hpx::util {
 
 }    // namespace hpx::util
 
-#elif defined(__linux__) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
-
-#include <pthread.h>
-namespace hpx::util { namespace detail {
-
-    void set_thread_name(char const* thread_name)
-    {
-        pthread_setname_np(pthread_self(), thread_name);
-    }
-
-    int get_thread_name(char* buf, size_t len)
-    {
-        return pthread_getname_np(pthread_self(), buf, len);
-    }
-}}    // namespace hpx::util::detail
-
-#elif defined(__NetBSD__) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
+#elif defined(HPX_HAVE_PTHREAD_SETNAME_NP)
 
 #include <pthread.h>
 namespace hpx::util { namespace detail {
@@ -111,39 +95,4 @@ namespace hpx::util { namespace detail {
 
 }}    // namespace hpx::util::detail
 
-#elif (defined(__FreeBSD__) || defined(__OpenBSD__))
-#include <pthread.h>
-namespace hpx::util { namespace detail {
-
-    void set_thread_name(char const* thread_name)
-    {
-        pthread_set_name_np(pthread_self(), thread_name);
-    }
-
-}}    // namespace hpx::util::detail
-
-#else
-namespace hpx::util { namespace detail {
-    void set_thread_name([[maybe_unused]] char const* thread_name)
-    {
-        return;
-    }
-}}    // namespace hpx::util::detail
 #endif
-
-namespace hpx::util {
-
-    // Set the name of the thread shown in the Visual Studio debugger
-    void set_thread_name(char const* thread_name) noexcept
-    {
-        detail::set_thread_name(thread_name);
-
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
-    !defined(HPX_MINGW) && defined(HPX_HAVE_PTHREAD_SETNAME_NP)
-        // also set it the 'new' way in case the application is not running in
-        // the debugger at this time
-        SetThreadDescription(
-            GetCurrentThread(), detail::to_wide_string(thread_name).c_str());
-#endif
-    }
-}    // namespace hpx::util
