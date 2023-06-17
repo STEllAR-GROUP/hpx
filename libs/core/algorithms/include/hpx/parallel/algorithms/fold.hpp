@@ -10,133 +10,60 @@
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
+#include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
 #include <iterator>
 #include <numeric>
 
-namespace hpx::parallel::detail {
-
-    template <typename T_>
-    struct fold_left : public algorithm<fold_left<T_>, T_>
-    {
-        constexpr fold_left() noexcept
-          : algorithm<fold_left, T_>("fold_left")
-        {
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T, typename F>
-        HPX_HOST_DEVICE static constexpr T sequential(
-            ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
-        {
-            return util::loop_ind<ExPolicy>(
-                first, last, [&init, &f](auto const& it) mutable {
-                    init = HPX_INVOKE(f, HPX_MOVE(init), it);
-                });
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename T, typename F>
-        static constexpr auto parallel(
-            ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
-        {
-            return util::loop_ind<ExPolicy>(
-                first, last, [&init, &f](auto const& it) mutable {
-                    init = HPX_INVOKE(f, HPX_MOVE(init), it);
-                });
-        }
-    };
-
-}    // namespace hpx::parallel::detail
-
 namespace hpx {
     inline constexpr struct fold_left_t final
       : hpx::detail::tag_parallel_algorithm<fold_left_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename F>    // TODO : add concept
+        template <typename ExPolicy, typename FwdIter, typename T, typename F>
         friend T tag_fallback_invoke(fold_left_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::detail::fold_left<T>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(F, f));
+            return hpx::reduce(HPX_FORWARD(ExPolicy, policy), first, last, init,
+                HPX_FORWARD(F, f));
         }
 
-        template <typename FwdIter, typename T,
-            typename F>    // TODO : add concept
+        template <typename FwdIter, typename T, typename F>
         friend T tag_fallback_invoke(
             fold_left_t, FwdIter first, FwdIter last, T init, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            return hpx::parallel::detail::fold_left<T>().call(
-                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(F, f));
+            return hpx::reduce(
+                hpx::execution::seq, first, last, init, HPX_FORWARD(F, f));
         }
     } fold_left{};
 }    // namespace hpx
 
 namespace hpx::parallel::detail {
-
-    template <typename T_>
-    struct fold_left_first : public algorithm<fold_left_first<T_>, T_>
+    template <typename ExPolicy, typename FwdIter, typename F>
+    auto fold_left_first_helper(
+        ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
     {
-        constexpr fold_left_first() noexcept
-          : algorithm<fold_left_first, T_>("fold_left_first")
-        {
-        }
+        using T = ::hpx::traits::iter_value_t<FwdIter>;
+        using U = decltype(hpx::fold_left(HPX_MOVE(first), last, T(*first), f));
 
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename F>
-        HPX_HOST_DEVICE static constexpr auto sequential(
-            ExPolicy&&, FwdIter first, Sent last, F&& f)
-        {
-            using T = ::hpx::traits::iter_value_t<FwdIter>;
-            using U =
-                decltype(hpx::fold_left(HPX_MOVE(first), last, T(*first), f));
+        if (first == last)
+            return hpx::optional<U>();
 
-            if (first == last)
-                return hpx::optional<U>();
+        T init = *first;
 
-            T init = *first;
+        std::advance(first, 1);
 
-            std::advance(first, 1);
-
-            return hpx::optional<U>(hpx::parallel::detail::fold_left<T>().call(
-                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(F, f)));
-        }
-
-        template <typename ExPolicy, typename FwdIter, typename Sent,
-            typename F>
-        static constexpr auto parallel(
-            ExPolicy&& policy, FwdIter first, Sent last, F&& f)
-        {
-            using T = ::hpx::traits::iter_value_t<FwdIter>;
-            using U =
-                decltype(hpx::fold_left(HPX_MOVE(first), last, T(*first), f));
-
-            if (first == last)
-                return hpx::optional<U>();
-
-            T init = *first;
-
-            std::advance(first, 1);
-
-            return hpx::optional<U>(hpx::parallel::detail::fold_left<T>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(F, f)));
-        }
-    };
-
+        return hpx::optional<U>(hpx::fold_left(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_MOVE(init), HPX_MOVE(f)));
+    }
 }    // namespace hpx::parallel::detail
 
 namespace hpx {
@@ -144,34 +71,26 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<fold_left_first_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter,
-            typename F>    // TODO : add concept
+        template <typename ExPolicy, typename FwdIter, typename F>
         friend auto tag_fallback_invoke(fold_left_first_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            using U = decltype(hpx::fold_left(HPX_MOVE(first), last,
-                ::hpx::traits::iter_value_t<FwdIter>(*first), f));
-
-            return hpx::parallel::detail::fold_left_first<hpx::optional<U>>()
-                .call(HPX_FORWARD(ExPolicy, policy), first, last,
-                    HPX_FORWARD(F, f));
+            return hpx::parallel::detail::fold_left_first_helper(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f));
         }
 
-        template <typename FwdIter, typename F>    // TODO : add concept
+        template <typename FwdIter, typename F>
         friend auto tag_fallback_invoke(
             fold_left_first_t, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
-            using U = decltype(hpx::fold_left(HPX_MOVE(first), last,
-                ::hpx::traits::iter_value_t<FwdIter>(*first), f));
-
-            return hpx::parallel::detail::fold_left_first<hpx::optional<U>>()
-                .call(::hpx::execution::seq, first, last, HPX_FORWARD(F, f));
+            return hpx::parallel::detail::fold_left_first_helper(
+                hpx::execution::seq, first, last, HPX_MOVE(f));
         }
     } fold_left_first{};
 }    // namespace hpx
@@ -189,17 +108,13 @@ namespace hpx::parallel::detail {
         template <typename ExPolicy, typename FwdIter, typename Sent,
             typename T, typename F>
         HPX_HOST_DEVICE static constexpr auto sequential(
-            ExPolicy&&, FwdIter first, Sent last, T&& init, F&& f)
+            ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
-            using U = std::decay_t<std::invoke_result_t<F&,
-                hpx::traits::iter_reference_t<FwdIter>, T>>;
-            if (first == last)
-                return U(HPX_MOVE(init));
-
-            U accum = f(*--last, HPX_MOVE(init));
-            while (first != last)
-                accum = f(*--last, HPX_MOVE(accum));
-            return accum;
+            // last++ moves backward when its reverse iterator
+            return hpx::fold_left(HPX_FORWARD(ExPolicy, policy),
+                std::make_reverse_iterator(last),
+                std::make_reverse_iterator(first), HPX_FORWARD(T, init),
+                HPX_FORWARD(F, f));
         }
 
         template <typename ExPolicy, typename FwdIter, typename Sent,
@@ -207,27 +122,42 @@ namespace hpx::parallel::detail {
         static constexpr auto parallel(
             ExPolicy&& policy, FwdIter first, Sent last, T&& init, F&& f)
         {
-            HPX_UNUSED(policy);
-            HPX_UNUSED(first);
-            HPX_UNUSED(last);
-            HPX_UNUSED(init);
-            HPX_UNUSED(f);
+            if (first == last)
+            {
+                return init;
+            }
 
-            // parallel version of fold_right has not been implemented
-            exit(1);
-            return f(first, init);
+            auto ChunkReduce = [f, policy](FwdIter it, std::size_t chunkSize) {
+                FwdIter endIter = it;
+                std::advance(endIter, --chunkSize);
+
+                T init = *endIter;
+
+                return sequential(
+                    HPX_FORWARD(ExPolicy, policy), it, endIter, init, f);
+            };
+
+            auto RecursiveReduce = [f, policy, init](auto&& results) {
+                auto begin = hpx::util::begin(results);
+                auto end = hpx::util::end(results);
+                return sequential(
+                    HPX_FORWARD(ExPolicy, policy), begin, end, init, f);
+            };
+
+            return util::partitioner<ExPolicy, T>::call(
+                HPX_FORWARD(ExPolicy, policy), first,
+                std::distance(first, last), HPX_MOVE(ChunkReduce),
+                hpx::unwrapping(HPX_MOVE(RecursiveReduce)));
         }
     };
-
-}    // namespace hpx::parallel::detail
+};    // namespace hpx::parallel::detail
 
 namespace hpx {
     inline constexpr struct fold_right_t final
       : hpx::detail::tag_parallel_algorithm<fold_right_t>
     {
     private:
-        template <typename ExPolicy, typename FwdIter, typename T,
-            typename F>    // TODO : add concept
+        template <typename ExPolicy, typename FwdIter, typename T, typename F>
         friend T tag_fallback_invoke(fold_right_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, F f)
         {
@@ -235,12 +165,11 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fold_right<T>().call(
-                HPX_FORWARD(ExPolicy, policy), first, last,
-                HPX_FORWARD(T, init), HPX_FORWARD(F, f));
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(init),
+                HPX_MOVE(f));
         }
 
-        template <typename FwdIter, typename T,
-            typename F>    // TODO : add concept
+        template <typename FwdIter, typename T, typename F>
         friend T tag_fallback_invoke(
             fold_right_t, FwdIter first, FwdIter last, T init, F f)
         {
@@ -248,8 +177,8 @@ namespace hpx {
                 "Requires at least forward iterator.");
 
             return hpx::parallel::detail::fold_right<T>().call(
-                ::hpx::execution::seq, first, last, HPX_FORWARD(T, init),
-                HPX_FORWARD(F, f));
+                ::hpx::execution::seq, first, last, HPX_MOVE(init),
+                HPX_MOVE(f));
         }
     } fold_right{};
 }    // namespace hpx
