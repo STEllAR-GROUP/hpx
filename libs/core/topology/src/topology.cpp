@@ -43,13 +43,13 @@
 #include <hwi/include/bqc/A2_inlines.h>
 #endif
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 #if defined(_POSIX_VERSION)
 #include <sys/resource.h>
 #include <sys/syscall.h>
-#endif
-
-#if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
 #endif
 
 namespace hpx::threads::detail {
