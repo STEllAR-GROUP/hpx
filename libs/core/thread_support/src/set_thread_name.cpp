@@ -95,4 +95,14 @@ namespace hpx::util { namespace detail {
 
 }}    // namespace hpx::util::detail
 
+#else
+
+namespace hpx::util { namespace detail {
+
+    void set_thread_name(char const*)
+    {
+        return;
+    }
+}}    // namespace hpx::util::detail
+
 #endif
