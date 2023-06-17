@@ -127,21 +127,23 @@ namespace hpx::parallel::detail {
                 return init;
             }
 
-            auto ChunkReduce = [f, policy](FwdIter it, std::size_t chunkSize) {
+            auto ChunkReduce = [f = HPX_FORWARD(F, f),
+                                   policy = HPX_FORWARD(ExPolicy, policy)](
+                                   FwdIter it, std::size_t chunkSize) {
                 FwdIter endIter = it;
                 std::advance(endIter, --chunkSize);
 
                 T init = *endIter;
 
-                return sequential(
-                    HPX_FORWARD(ExPolicy, policy), it, endIter, init, f);
+                return sequential(HPX_FORWARD(ExPolicy, policy), it, endIter,
+                    init, HPX_FORWARD(F, f));
             };
 
-            auto RecursiveReduce = [f, policy, init](auto&& results) {
+            auto RecursiveReduce = [f, policy, init](auto&& results) mutable {
                 auto begin = hpx::util::begin(results);
                 auto end = hpx::util::end(results);
-                return sequential(
-                    HPX_FORWARD(ExPolicy, policy), begin, end, init, f);
+                return sequential(HPX_FORWARD(ExPolicy, policy), begin, end,
+                    init, HPX_FORWARD(F, f));
             };
 
             return util::partitioner<ExPolicy, T>::call(
