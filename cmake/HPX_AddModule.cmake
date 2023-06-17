@@ -166,8 +166,9 @@ function(add_hpx_module libname modulename)
     set(generated_file_base "${CMAKE_CURRENT_BINARY_DIR}/include")
     if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
       foreach(file_to_generate ${${modulename}_GENERATED_HEADERS})
-        file(COPY_FILE include/${file_to_generate}.in
-             ${generated_file_base}/${file_to_generate} ONLY_IF_DIFFERENT
+        configure_file(
+          ${HEADER_ROOT}/${file_to_generate}.in
+          ${generated_file_base}/${file_to_generate} COPYONLY
         )
         set(generated_headers ${generated_headers}
                               ${generated_file_base}/${file_to_generate}
