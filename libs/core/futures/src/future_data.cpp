@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -44,6 +43,16 @@ namespace hpx::lcos::detail {
         {
             ++count_;
         }
+
+        handle_continuation_recursion_count(
+            handle_continuation_recursion_count const&) = delete;
+        handle_continuation_recursion_count(
+            handle_continuation_recursion_count&&) = delete;
+        handle_continuation_recursion_count& operator=(
+            handle_continuation_recursion_count const&) = delete;
+        handle_continuation_recursion_count& operator=(
+            handle_continuation_recursion_count&&) = delete;
+
         ~handle_continuation_recursion_count()
         {
             --count_;
@@ -58,7 +67,7 @@ namespace hpx::lcos::detail {
     {
         lcos::local::futures_factory<void()> p(HPX_FORWARD(Callback, f));
 
-        bool is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
+        bool const is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
         hpx::launch policy = launch::fork;
         if (!is_hpx_thread)
         {
@@ -69,7 +78,7 @@ namespace hpx::lcos::detail {
         policy.set_stacksize(threads::thread_stacksize::current);
 
         // launch a new thread executing the given function
-        threads::thread_id_ref_type tid =    //-V821
+        threads::thread_id_ref_type const tid =    //-V821
             p.post("run_on_completed_on_new_thread", policy);
 
         // wait for the task to run
@@ -135,7 +144,7 @@ namespace hpx::lcos::detail {
         // and promise::set_exception).
         if (s == exception)
         {
-            std::exception_ptr const* exception_ptr =
+            auto const* exception_ptr =
                 static_cast<std::exception_ptr const*>(storage);
 
             // an error has been reported in the meantime, throw or set
@@ -145,10 +154,8 @@ namespace hpx::lcos::detail {
                 std::rethrow_exception(*exception_ptr);
                 // never reached
             }
-            else
-            {
-                ec = make_error_code(*exception_ptr);
-            }
+
+            ec = make_error_code(*exception_ptr);
         }
 
         return nullptr;
@@ -199,7 +206,7 @@ namespace hpx::lcos::detail {
         bool recurse_asynchronously =
             !this_thread::has_sufficient_stack_space();
 #else
-        handle_continuation_recursion_count cnt;
+        handle_continuation_recursion_count const cnt;
         bool recurse_asynchronously =
             cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
             (hpx::threads::get_self_ptr() == nullptr);
@@ -215,8 +222,10 @@ namespace hpx::lcos::detail {
 
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
-                    constexpr void (*p)(Callback &&) noexcept =
+                    // clang-format off
+                    constexpr void (*p)(Callback&&) noexcept =
                         &future_data_base::run_on_completed;
+                    // clang-format on
                     run_on_completed_on_new_thread(util::deferred_call(
                         p, HPX_FORWARD(Callback, on_completed)));
                 },
@@ -260,6 +269,8 @@ namespace hpx::lcos::detail {
         }
         else
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             std::unique_lock l(mtx_);
             if (is_ready())
             {
@@ -282,6 +293,8 @@ namespace hpx::lcos::detail {
         state s = state_.load(std::memory_order_acquire);
         if (s == empty)
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             std::unique_lock l(mtx_);
             s = state_.load(std::memory_order_relaxed);
             if (s == empty)
@@ -311,6 +324,8 @@ namespace hpx::lcos::detail {
         // block if this entry is empty
         if (state_.load(std::memory_order_acquire) == empty)
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             std::unique_lock l(mtx_);
             if (state_.load(std::memory_order_relaxed) == empty)
             {
