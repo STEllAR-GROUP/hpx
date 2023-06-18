@@ -92,7 +92,7 @@ namespace hpx::util {
 #include <pthread.h>
 namespace hpx::util {
 
-    void set_thread_name(char const* thread_name)
+    void set_thread_name(char const* thread_name) noexcept
     {
         pthread_set_name_np(pthread_self(), thread_name);
     }
@@ -103,7 +103,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    void set_thread_name(char const*)
+    void set_thread_name(char const*) noexcept
     {
         return;
     }
