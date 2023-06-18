@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 
 int main()
 {
-    char* s = aligned_alloc(1024, 1024 * sizeof(char));
+    char* s = static_cast<char*>(aligned_alloc(1024, 1024 * sizeof(char)));
 
     free(s);
     return 0;

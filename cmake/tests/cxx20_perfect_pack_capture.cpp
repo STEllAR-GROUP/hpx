@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,7 @@
 #include <utility>
 
 template <typename... Ts>
-void foo(Ts&&... ts)
+auto foo(Ts&&... ts)
 {
     return [... ts = std::forward<Ts>(ts)]() {};
 }

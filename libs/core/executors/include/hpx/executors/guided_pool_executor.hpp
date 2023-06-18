@@ -196,18 +196,11 @@ namespace hpx::parallel::execution {
 #ifdef GUIDED_POOL_EXECUTOR_FAKE_NOOP
                 int domain = -1;
 #else
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=dangling-reference"
-#endif
                 // get the argument for the numa hint function from the predecessor future
-                auto const& predecessor_value = detail::future_extract_value()(
-                    HPX_FORWARD(Future, predecessor));
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic pop
-#endif
-                int domain = numa_function_(predecessor_value, ts...);
+                int domain =
+                    numa_function_(detail::future_extract_value()(
+                                       HPX_FORWARD(Future, predecessor)),
+                        ts...);
 #endif
 
                 gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
@@ -415,21 +408,10 @@ namespace hpx::parallel::execution {
             OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=dangling-reference"
-#endif
-            // get the tuple of futures from the predecessor future <tuple of futures>
-            auto const& predecessor_value =
-                detail::future_extract_value()(predecessor);
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic pop
-#endif
-
             // create a tuple of the unwrapped future values
-            auto unwrapped_futures_tuple = hpx::util::map_pack(
-                detail::future_extract_value{}, predecessor_value);
+            auto unwrapped_futures_tuple =
+                hpx::util::map_pack(detail::future_extract_value{},
+                    detail::future_extract_value()(predecessor));
 
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
