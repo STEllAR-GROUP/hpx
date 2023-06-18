@@ -141,7 +141,7 @@ namespace hpx::parallel::detail {
             auto RecursiveReduce = [f, policy, init](auto&& results) mutable {
                 auto begin = hpx::util::begin(results);
                 auto end = hpx::util::end(results);
-                return sequential(HPX_FORWARD(ExPolicy, policy), begin, end,
+                return sequential(policy, begin, end,
                     init, f);
             };
 
