@@ -87,14 +87,14 @@ namespace hpx::util {
     }
 }    // namespace hpx::util
 
-#elif defined(HPX_HAVE_PTHREAD_SETNAME_NP)
+#elif defined(HPX_WITH_PTHREAD_SETNAME_NP)
 
 #include <pthread.h>
 namespace hpx::util {
 
     void set_thread_name(char const* thread_name) noexcept
     {
-        pthread_set_name_np(pthread_self(), thread_name);
+        pthread_setname_np(pthread_self(), thread_name);
     }
 
 }    // namespace hpx::util
@@ -109,5 +109,4 @@ namespace hpx::util {
     }
 
 }    // namespace hpx::util
-
 #endif

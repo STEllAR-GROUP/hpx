@@ -509,7 +509,7 @@ endfunction()
 # ##############################################################################
 function(hpx_check_for_pthread_setname_np)
   add_hpx_config_test(
-    HPX_HAVE_PTHREAD_SETNAME_NP
+    HPX_WITH_PTHREAD_SETNAME_NP
     SOURCE cmake/tests/set_thread_name.cpp
     FILE ${ARGN}
   )
