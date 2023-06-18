@@ -150,7 +150,7 @@ namespace hpx::parallel::detail {
                 hpx::unwrapping(HPX_MOVE(RecursiveReduce)));
         }
     };
-};    // namespace hpx::parallel::detail
+}    // namespace hpx::parallel::detail
 
 namespace hpx {
     inline constexpr struct fold_right_t final
