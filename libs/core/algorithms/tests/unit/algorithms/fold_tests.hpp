@@ -74,8 +74,8 @@ void fold_right_test1(IteratorTag)
     int val(1);
     auto op = [](auto v1, auto v2) { return v1 * v2; };
 
-    int r1 =
-        hpx::fold_right(iterator(std::begin(c)), iterator(std::end(c)), val, op);
+    int r1 = hpx::fold_right(
+        iterator(std::begin(c)), iterator(std::end(c)), val, op);
 
     // verify values
     int r2 = 120;

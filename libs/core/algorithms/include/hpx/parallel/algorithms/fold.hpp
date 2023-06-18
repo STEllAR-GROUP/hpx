@@ -14,6 +14,7 @@
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 
@@ -133,15 +134,15 @@ namespace hpx::parallel::detail {
 
                 T init = *endIter;
 
-                return sequential(HPX_FORWARD(ExPolicy, policy), it, endIter,
-                    init, HPX_FORWARD(F, f));
+                return sequential(policy, it, endIter,
+                    init, f);
             };
 
             auto RecursiveReduce = [f, policy, init](auto&& results) mutable {
                 auto begin = hpx::util::begin(results);
                 auto end = hpx::util::end(results);
                 return sequential(HPX_FORWARD(ExPolicy, policy), begin, end,
-                    init, HPX_FORWARD(F, f));
+                    init, f);
             };
 
             return util::partitioner<ExPolicy, T>::call(
