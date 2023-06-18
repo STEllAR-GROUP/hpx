@@ -315,16 +315,9 @@ struct bitset_test
         Bitset c(rhs);
         b = std::move(c);
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=self-move"
-#endif
-
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
         // NOLINTNEXTLINE(clang-diagnostic-self-assign-overloaded)
         b = std::move(b);    // self assignment check
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic pop
 #endif
 
         // NOLINTNEXTLINE(bugprone-use-after-move)

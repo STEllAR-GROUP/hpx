@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@ int main()
 {
     unsigned char buffer[sizeof(A)];
 
-    A* ptr = hpx::construct_at(reinterpret_cast<A*>(buffer), 42);
+    A* ptr = std::construct_at(reinterpret_cast<A*>(buffer), 42);
     std::destroy_at(ptr);
 
     return 0;

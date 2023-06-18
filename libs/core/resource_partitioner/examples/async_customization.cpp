@@ -152,21 +152,9 @@ private:
         using result_type = util::detail::invoke_deferred_result_t<F,
             OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Werror=dangling-reference"
-#endif
-        // get the tuple of futures from the predecessor future <tuple of futures>
-        const auto& predecessor_value =
-            future_extract_value().operator()(predecessor);
-
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
-#pragma GCC diagnostic pop
-#endif
-
         // create a tuple of the unwrapped future values
-        auto unwrapped_futures_tuple =
-            util::map_pack(future_extract_value{}, predecessor_value);
+        auto unwrapped_futures_tuple = util::map_pack(future_extract_value{},
+            future_extract_value().operator()(predecessor));
 
         using namespace hpx::util::debug;
         std::cout << "when_all(fut) : Predecessor : "
