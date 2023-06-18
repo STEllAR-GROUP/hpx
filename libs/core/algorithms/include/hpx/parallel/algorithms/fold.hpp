@@ -57,9 +57,7 @@ namespace hpx::parallel::detail {
         if (first == last)
             return hpx::optional<U>();
 
-        T init = *first;
-
-        std::advance(first, 1);
+        T init = *first++;
 
         return hpx::optional<U>(hpx::fold_left(HPX_FORWARD(ExPolicy, policy),
             first, last, HPX_MOVE(init), HPX_MOVE(f)));
@@ -183,4 +181,52 @@ namespace hpx {
                 HPX_MOVE(f));
         }
     } fold_right{};
+}    // namespace hpx
+
+namespace hpx::parallel::detail {
+    template <typename ExPolicy, typename FwdIter, typename F>
+    auto fold_right_first_helper(
+        ExPolicy&& policy, FwdIter first, FwdIter last, F&& f)
+    {
+        using T = ::hpx::traits::iter_value_t<FwdIter>;
+        using U =
+            decltype(hpx::fold_right(HPX_MOVE(first), last, T(*first), f));
+
+        if (first == last)
+            return hpx::optional<U>();
+
+        T init = *--last;
+
+        return hpx::optional<U>(hpx::fold_right(HPX_FORWARD(ExPolicy, policy),
+            first, last, HPX_MOVE(init), HPX_MOVE(f)));
+    }
+}    // namespace hpx::parallel::detail
+
+namespace hpx {
+    inline constexpr struct fold_right_first_t final
+      : hpx::detail::tag_parallel_algorithm<fold_right_first_t>
+    {
+    private:
+        template <typename ExPolicy, typename FwdIter, typename F>
+        friend auto tag_fallback_invoke(fold_right_first_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::detail::fold_right_first_helper(
+                HPX_FORWARD(ExPolicy, policy), first, last, HPX_MOVE(f));
+        }
+
+        template <typename FwdIter, typename F>
+        friend auto tag_fallback_invoke(
+            fold_right_first_t, FwdIter first, FwdIter last, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return hpx::parallel::detail::fold_right_first_helper(
+                hpx::execution::seq, first, last, HPX_MOVE(f));
+        }
+    } fold_right_first{};
 }    // namespace hpx
