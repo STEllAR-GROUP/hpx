@@ -13,6 +13,7 @@
 #include <hpx/parallel/algorithms/reduce.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
+#include <hpx/parallel/util/result_types.hpp>
 
 #include <cstddef>
 #include <iterator>
@@ -134,15 +135,13 @@ namespace hpx::parallel::detail {
 
                 T init = *endIter;
 
-                return sequential(policy, it, endIter,
-                    init, f);
+                return sequential(policy, it, endIter, init, f);
             };
 
             auto RecursiveReduce = [f, policy, init](auto&& results) mutable {
                 auto begin = hpx::util::begin(results);
                 auto end = hpx::util::end(results);
-                return sequential(policy, begin, end,
-                    init, f);
+                return sequential(policy, begin, end, init, f);
             };
 
             return util::partitioner<ExPolicy, T>::call(
@@ -230,4 +229,92 @@ namespace hpx {
                 hpx::execution::seq, first, last, HPX_MOVE(f));
         }
     } fold_right_first{};
+}    // namespace hpx
+
+namespace hpx {
+    inline constexpr struct fold_left_with_iter_t final
+      : hpx::detail::tag_parallel_algorithm<fold_left_with_iter_t>
+    {
+    private:
+        template <typename Iter, typename T>
+        using fold_left_with_iter_ty = hpx::ranges::in_value_result<Iter, T>;
+
+        template <typename ExPolicy, typename FwdIter, typename T, typename F>
+        friend T tag_fallback_invoke(fold_left_with_iter_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, T init, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return fold_left_with_iter_ty<FwdIter, T>{
+                hpx::reduce(HPX_FORWARD(ExPolicy, policy), first, last, init,
+                    HPX_FORWARD(F, f)),
+                last};
+        }
+
+        template <typename FwdIter, typename T, typename F>
+        friend T tag_fallback_invoke(
+            fold_left_with_iter_t, FwdIter first, FwdIter last, T init, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return fold_left_with_iter_ty<FwdIter, T>{
+                hpx::reduce(
+                    hpx::execution::seq, first, last, init, HPX_FORWARD(F, f)),
+                last};
+        }
+    } fold_left_with_iter{};
+}    // namespace hpx
+
+namespace hpx::parallel::detail {
+
+    template <typename ExPolicy, typename FwdIter, typename Sent, typename F>
+    auto fold_left_first_with_iter_helper(
+        ExPolicy&& policy, FwdIter first, Sent last, F&& f)
+    {
+        using T = ::hpx::traits::iter_value_t<FwdIter>;
+        using fold_left_first_with_iter_ty =
+            hpx::optional<hpx::ranges::in_value_result<FwdIter, T>>;
+
+        if (first == last)
+            return fold_left_first_with_iter_ty();
+
+        T init = *first++;
+
+        return fold_left_first_with_iter_ty(
+            {hpx::fold_left_with_iter(HPX_FORWARD(ExPolicy, policy), first,
+                 last, HPX_MOVE(init), HPX_MOVE(f)),
+                last});
+    }
+}    // namespace hpx::parallel::detail
+
+namespace hpx {
+    inline constexpr struct fold_left_first_with_iter_t final
+      : hpx::detail::tag_parallel_algorithm<fold_left_first_with_iter_t>
+    {
+    private:
+        template <typename ExPolicy, typename FwdIter, typename Sent,
+            typename F>
+        friend auto tag_fallback_invoke(fold_left_first_with_iter_t,
+            ExPolicy&& policy, FwdIter first, Sent last, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return fold_left_first_with_iter_helper(
+                HPX_FORWARD(ExPolicy, policy), first, last, f);
+        }
+
+        template <typename FwdIter, typename F, typename Sent>
+        friend auto tag_fallback_invoke(
+            fold_left_first_with_iter_t, FwdIter first, Sent last, F f)
+        {
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "Requires at least forward iterator.");
+
+            return fold_left_first_with_iter_helper(
+                hpx::execution::seq, first, last, f);
+        }
+    } fold_left_first_with_iter{};
 }    // namespace hpx
