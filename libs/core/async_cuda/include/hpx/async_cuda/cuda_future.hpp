@@ -219,7 +219,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // main API call to get a future from a stream using allocator
         template <typename Allocator>
         hpx::future<void> get_future_with_event(
-            Allocator const& a, cudaStream_t stream, int device)
+            Allocator const& a, cudaStream_t stream, int device = 0)
         {
             return get_future<Allocator, event_mode>(a, stream, device);
         }
@@ -231,7 +231,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t, int);
+        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
+            cudaStream_t stream, int device = 0);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental
 
