@@ -81,7 +81,7 @@ namespace hpx { namespace cuda { namespace experimental {
             future_data() {}
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream)
+                cudaStream_t stream, int device)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
             {
@@ -104,7 +104,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                     status)));
                         }
                     },
-                    stream);
+                    stream, device);
             }
         };
 
@@ -128,7 +128,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream)
+                cudaStream_t stream, int device)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
@@ -183,7 +183,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // main API call to get a future from a stream using allocator, and the
         // specified mode
         template <typename Allocator, typename Mode>
-        hpx::future<void> get_future(Allocator const& a, cudaStream_t stream)
+        hpx::future<void> get_future(Allocator const& a, cudaStream_t stream, int device = 0)
         {
             using shared_state = future_data<Allocator, Mode>;
 
@@ -200,7 +200,7 @@ namespace hpx { namespace cuda { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream);
+            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream, device);
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
@@ -212,16 +212,16 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> get_future_with_callback(
             Allocator const& a, cudaStream_t stream)
         {
-            return get_future<Allocator, callback_mode>(a, stream);
+            return get_future<Allocator, callback_mode>(a, stream, 0);
         }
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
         template <typename Allocator>
         hpx::future<void> get_future_with_event(
-            Allocator const& a, cudaStream_t stream)
+            Allocator const& a, cudaStream_t stream, int device)
         {
-            return get_future<Allocator, event_mode>(a, stream);
+            return get_future<Allocator, event_mode>(a, stream, device);
         }
 
         // -------------------------------------------------------------
@@ -231,7 +231,7 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
+        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t, int);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental
 
