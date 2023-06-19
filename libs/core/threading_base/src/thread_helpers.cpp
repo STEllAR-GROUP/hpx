@@ -441,7 +441,7 @@ namespace hpx::this_thread {
         threads::thread_self& self = threads::get_self();
 
         // keep alive
-        threads::thread_id_ref_type id = self.get_outer_thread_id();
+        threads::thread_id_ref_type const id = self.get_outer_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id.noref(), ec);
@@ -451,8 +451,8 @@ namespace hpx::this_thread {
         threads::thread_restart_state statex;
 
         {
-            // verify that there are no more registered locks for this OS-thread
 #ifdef HPX_HAVE_VERIFY_LOCKS
+            // verify that there are no more registered locks for this OS-thread
             util::verify_no_locks();
 #endif
 #ifdef HPX_HAVE_THREAD_DESCRIPTION
@@ -460,7 +460,7 @@ namespace hpx::this_thread {
                 id.noref(), description, ec);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            threads::detail::reset_backtrace bt(id, ec);
+            threads::detail::reset_backtrace bt(id.noref(), ec);
 #endif
             // We might need to dispatch 'nextid' to it's correct scheduler only
             // if our current scheduler is the same, we should yield to the id
@@ -512,7 +512,7 @@ namespace hpx::this_thread {
         threads::thread_self& self = threads::get_self();
 
         // keep alive
-        threads::thread_id_ref_type id = self.get_outer_thread_id();
+        threads::thread_id_ref_type const id = self.get_outer_thread_id();
 
         // handle interruption, if needed
         threads::interruption_point(id.noref(), ec);
@@ -532,7 +532,7 @@ namespace hpx::this_thread {
                 id.noref(), description, ec);
 #endif
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
-            threads::detail::reset_backtrace bt(id, ec);
+            threads::detail::reset_backtrace bt(id.noref(), ec);
 #endif
             std::atomic<bool> timer_started(false);
             threads::thread_id_ref_type const timer_id =
