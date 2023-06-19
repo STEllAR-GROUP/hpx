@@ -5,8 +5,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(tests
-    test_is_relocatable
-    test_is_trivially_relocatable
+    is_relocatable
+    is_trivially_relocatable
 )
 
 if(HPX_WITH_CXX20_COROUTINES)
