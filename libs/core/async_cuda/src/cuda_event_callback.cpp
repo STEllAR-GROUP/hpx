@@ -108,7 +108,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         event_callback_function_type&& f, cudaStream_t stream, int device)
     {
         cudaEvent_t event;
-        if (!cuda_event_pool::get_event_pool(device).pop(event))
+        if (!cuda_event_pool::get_event_pool().pop(event, device))
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "add_event_callback", "could not get an event");
@@ -178,8 +178,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     continuation.f(status);
                     // Grab the handle to the event pool so we can return completed events
                     cuda_event_pool& pool = hpx::cuda::experimental::
-                        cuda_event_pool::get_event_pool(continuation.device);
-                    pool.push(HPX_MOVE(continuation.event));
+                        cuda_event_pool::get_event_pool();
+                    pool.push(HPX_MOVE(continuation.event), continuation.device);
                     return true;
                 }),
             event_callback_vector.end());
@@ -203,8 +203,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                 continuation.f(status);
                 // Grab the handle to the event pool so we can return completed events
                 cuda_event_pool& pool =
-                    hpx::cuda::experimental::cuda_event_pool::get_event_pool(continuation.device);
-                pool.push(HPX_MOVE(continuation.event));
+                    hpx::cuda::experimental::cuda_event_pool::get_event_pool();
+                pool.push(HPX_MOVE(continuation.event), continuation.device);
             }
         }
 

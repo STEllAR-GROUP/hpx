@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <deque>
+
 #include <hpx/async_cuda/cuda_exception.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/concurrency/stack.hpp>
@@ -21,59 +23,71 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         static constexpr int initial_events_in_pool = 128;
 
-        const int device_id;
-
-        static cuda_event_pool& get_event_pool(size_t device_id)
+        static cuda_event_pool& get_event_pool()
         {
-            static std::array<cuda_event_pool, 4> event_pool_{0, 1, 2, 3};
-            return event_pool_[device_id];
+            static cuda_event_pool event_pool_;
+            return event_pool_;
         }
 
         // create a bunch of events on initialization
-        cuda_event_pool(int device_id)
-          : device_id(device_id), free_list_(initial_events_in_pool)
+        cuda_event_pool()
+          : max_number_devices_(0)
         {
-            check_cuda_error(cudaSetDevice(device_id));
-            for (int i = 0; i < initial_events_in_pool; ++i)
-            {
-                add_event_to_pool();
+            check_cuda_error(cudaGetDeviceCount(&max_number_devices_));
+            HPX_ASSERT_MSG(max_number_devices_ > 0,
+                "CUDA polling enabled and called, yet no CUDA device found!");
+            for (int device = 0; device < max_number_devices_; device++) {
+              check_cuda_error(cudaSetDevice(device));
+              free_lists_.emplace_back(initial_events_in_pool);
+              for (int i = 0; i < initial_events_in_pool; ++i)
+              {
+                  add_event_to_pool(device);
+              }
+              std::cerr << "Created " << device << std::endl;
             }
-            std::cerr << "Created " << device_id << std::endl;
         }
 
         // on destruction, all objects in stack will be freed
         ~cuda_event_pool()
         {
-            check_cuda_error(cudaSetDevice(device_id));
-            cudaEvent_t event;
-            bool ok = true;
-            while (ok)
-            {
-                ok = free_list_.pop(event);
-                if (ok)
-                    check_cuda_error(cudaEventDestroy(event));
+            HPX_ASSERT_MSG(free_lists_.size != max_number_devices_,
+                "Number of CUDA event pools does not match the number of devices!");
+            for (int device = 0; device < max_number_devices_; device++) {
+              check_cuda_error(cudaSetDevice(device));
+              cudaEvent_t event;
+              bool ok = true;
+              while (ok)
+              {
+                  ok = free_lists_[device].pop(event);
+                  if (ok)
+                      check_cuda_error(cudaEventDestroy(event));
+              }
             }
         }
 
-        inline bool pop(cudaEvent_t& event)
+        inline bool pop(cudaEvent_t& event, int device)
         {
+            HPX_ASSERT_MSG(device > 0 && device < max_number_devices_,
+                "Accessing CUDA event pool with invalid device ID!");
             // pop an event off the pool, if that fails, create a new one
-            while (!free_list_.pop(event))
+            while (!free_lists_[device].pop(event))
             {
-                add_event_to_pool();
+                add_event_to_pool(device);
             }
             return true;
         }
 
-        inline bool push(cudaEvent_t event)
+        inline bool push(cudaEvent_t event, int device)
         {
-            return free_list_.push(event);
+            HPX_ASSERT_MSG(device > 0 && device < max_number_devices_,
+                "Accessing CUDA event pool with invalid device ID!");
+            return free_lists_[device].push(event);
         }
 
     private:
-        void add_event_to_pool()
+        void add_event_to_pool(int device)
         {
-            check_cuda_error(cudaSetDevice(device_id));
+            check_cuda_error(cudaSetDevice(device));
             cudaEvent_t event;
             // Create an cuda_event to query a CUDA/CUBLAS kernel for completion.
             // Timing is disabled for performance. [1]
@@ -81,10 +95,11 @@ namespace hpx { namespace cuda { namespace experimental {
             // [1]: CUDA Runtime API, section 5.5 cuda_event Management
             check_cuda_error(
                 cudaEventCreateWithFlags(&event, cudaEventDisableTiming));
-            free_list_.push(event);
+            free_lists_[device].push(event);
         }
+        int max_number_devices_;
 
-        // pool is dynamically sized and can grow if needed
-        hpx::lockfree::stack<cudaEvent_t> free_list_;
+        // One pool per GPU - each pool is dynamically sized and can grow if needed
+        std::deque<hpx::lockfree::stack<cudaEvent_t>> free_lists_;
     };
 }}}    // namespace hpx::cuda::experimental
