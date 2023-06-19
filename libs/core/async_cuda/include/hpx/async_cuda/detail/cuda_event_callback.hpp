@@ -26,7 +26,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         hpx::move_only_function<void(cudaError_t)>;
 
     HPX_CORE_EXPORT void add_event_callback(
-        event_callback_function_type&& f, cudaStream_t stream);
+        event_callback_function_type&& f, cudaStream_t stream, int device);
 
     HPX_CORE_EXPORT void register_polling(hpx::threads::thread_pool_base& pool);
     HPX_CORE_EXPORT void unregister_polling(

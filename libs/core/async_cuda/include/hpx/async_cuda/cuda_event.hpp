@@ -21,25 +21,30 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         static constexpr int initial_events_in_pool = 128;
 
-        static cuda_event_pool& get_event_pool()
+        const int device_id;
+
+        static cuda_event_pool& get_event_pool(size_t device_id)
         {
-            static cuda_event_pool event_pool_;
-            return event_pool_;
+            static std::array<cuda_event_pool, 4> event_pool_{0, 1, 2, 3};
+            return event_pool_[device_id];
         }
 
         // create a bunch of events on initialization
-        cuda_event_pool()
-          : free_list_(initial_events_in_pool)
+        cuda_event_pool(int device_id)
+          : device_id(device_id), free_list_(initial_events_in_pool)
         {
+            check_cuda_error(cudaSetDevice(device_id));
             for (int i = 0; i < initial_events_in_pool; ++i)
             {
                 add_event_to_pool();
             }
+            std::cerr << "Created " << device_id << std::endl;
         }
 
         // on destruction, all objects in stack will be freed
         ~cuda_event_pool()
         {
+            check_cuda_error(cudaSetDevice(device_id));
             cudaEvent_t event;
             bool ok = true;
             while (ok)
@@ -68,6 +73,7 @@ namespace hpx { namespace cuda { namespace experimental {
     private:
         void add_event_to_pool()
         {
+            check_cuda_error(cudaSetDevice(device_id));
             cudaEvent_t event;
             // Create an cuda_event to query a CUDA/CUBLAS kernel for completion.
             // Timing is disabled for performance. [1]

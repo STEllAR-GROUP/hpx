@@ -18,8 +18,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             hpx::util::internal_allocator<>{}, stream);
     }
 
-    hpx::future<void> get_future_with_event(cudaStream_t stream)
+    hpx::future<void> get_future_with_event(cudaStream_t stream, int device)
     {
-        return get_future_with_event(hpx::util::internal_allocator<>{}, stream);
+        return get_future_with_event(hpx::util::internal_allocator<>{}, stream, device);
     }
 }}}}    // namespace hpx::cuda::experimental::detail
