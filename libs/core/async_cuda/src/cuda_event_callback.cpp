@@ -116,7 +116,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
         check_cuda_error(cudaSetDevice(device));
         check_cuda_error(cudaEventRecord(event, stream));
 
-        detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f), device});
+        detail::add_to_event_callback_queue(
+            event_callback{event, HPX_MOVE(f), device});
     }
 
     // Background progress function for async CUDA operations. Checks for completed
@@ -179,7 +180,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                         "active events",
                         debug::dec<3>(get_number_of_active_events()));
                     continuation.f(status);
-                    pool.push(HPX_MOVE(continuation.event), continuation.device);
+                    pool.push(
+                        HPX_MOVE(continuation.event), continuation.device);
                     return true;
                 }),
             event_callback_vector.end());

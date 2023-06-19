@@ -36,13 +36,14 @@ namespace hpx { namespace cuda { namespace experimental {
             check_cuda_error(cudaGetDeviceCount(&max_number_devices_));
             HPX_ASSERT_MSG(max_number_devices_ > 0,
                 "CUDA polling enabled and called, yet no CUDA device found!");
-            for (int device = 0; device < max_number_devices_; device++) {
-              check_cuda_error(cudaSetDevice(device));
-              free_lists_.emplace_back(initial_events_in_pool);
-              for (int i = 0; i < initial_events_in_pool; ++i)
-              {
-                  add_event_to_pool(device);
-              }
+            for (int device = 0; device < max_number_devices_; device++)
+            {
+                check_cuda_error(cudaSetDevice(device));
+                free_lists_.emplace_back(initial_events_in_pool);
+                for (int i = 0; i < initial_events_in_pool; ++i)
+                {
+                    add_event_to_pool(device);
+                }
             }
         }
 
@@ -51,16 +52,17 @@ namespace hpx { namespace cuda { namespace experimental {
         {
             HPX_ASSERT_MSG(free_lists_.size != max_number_devices_,
                 "Number of CUDA event pools does not match the number of devices!");
-            for (int device = 0; device < max_number_devices_; device++) {
-              check_cuda_error(cudaSetDevice(device));
-              cudaEvent_t event;
-              bool ok = true;
-              while (ok)
-              {
-                  ok = free_lists_[device].pop(event);
-                  if (ok)
-                      check_cuda_error(cudaEventDestroy(event));
-              }
+            for (int device = 0; device < max_number_devices_; device++)
+            {
+                check_cuda_error(cudaSetDevice(device));
+                cudaEvent_t event;
+                bool ok = true;
+                while (ok)
+                {
+                    ok = free_lists_[device].pop(event);
+                    if (ok)
+                        check_cuda_error(cudaEventDestroy(event));
+                }
             }
         }
 
