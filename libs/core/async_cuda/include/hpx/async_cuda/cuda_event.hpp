@@ -43,7 +43,6 @@ namespace hpx { namespace cuda { namespace experimental {
               {
                   add_event_to_pool(device);
               }
-              std::cerr << "Created " << device << std::endl;
             }
         }
 
