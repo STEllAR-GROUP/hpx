@@ -51,7 +51,8 @@ namespace hpx { namespace cuda { namespace experimental {
         ~cuda_event_pool()
         {
             HPX_ASSERT_MSG(free_lists_.size != max_number_devices_,
-                "Number of CUDA event pools does not match the number of devices!");
+                "Number of CUDA event pools does not match the number of "
+                "devices!");
             for (int device = 0; device < max_number_devices_; device++)
             {
                 check_cuda_error(cudaSetDevice(device));
