@@ -67,7 +67,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
         }
 
-        inline bool pop(cudaEvent_t& event, int device)
+        inline bool pop(cudaEvent_t& event, int device = 0)
         {
             HPX_ASSERT_MSG(device > 0 && device < max_number_devices_,
                 "Accessing CUDA event pool with invalid device ID!");
@@ -79,7 +79,7 @@ namespace hpx { namespace cuda { namespace experimental {
             return true;
         }
 
-        inline bool push(cudaEvent_t event, int device)
+        inline bool push(cudaEvent_t event, int device = 0)
         {
             HPX_ASSERT_MSG(device > 0 && device < max_number_devices_,
                 "Accessing CUDA event pool with invalid device ID!");
