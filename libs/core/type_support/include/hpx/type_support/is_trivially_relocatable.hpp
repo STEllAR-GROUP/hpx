@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <type_traits>
 
 // Macro to specialize template for given type
