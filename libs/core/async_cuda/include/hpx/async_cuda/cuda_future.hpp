@@ -183,7 +183,8 @@ namespace hpx { namespace cuda { namespace experimental {
         // main API call to get a future from a stream using allocator, and the
         // specified mode
         template <typename Allocator, typename Mode>
-        hpx::future<void> get_future(Allocator const& a, cudaStream_t stream, int device = 0)
+        hpx::future<void> get_future(
+            Allocator const& a, cudaStream_t stream, int device = 0)
         {
             using shared_state = future_data<Allocator, Mode>;
 
@@ -200,7 +201,8 @@ namespace hpx { namespace cuda { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream, device);
+            traits::construct(
+                alloc, p.get(), init_no_addref{}, alloc, stream, device);
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);

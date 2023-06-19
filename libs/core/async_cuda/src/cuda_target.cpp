@@ -187,7 +187,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
     hpx::future<void> target::get_future_with_event() const
     {
-        return detail::get_future_with_event(handle_.get_stream(), handle_.get_device());
+        return detail::get_future_with_event(
+            handle_.get_stream(), handle_.get_device());
     }
 
     hpx::future<void> target::get_future_with_callback() const
