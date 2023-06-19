@@ -131,7 +131,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream)
+                cudaStream_t stream, int device)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
