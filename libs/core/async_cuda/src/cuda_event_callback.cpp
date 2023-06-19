@@ -161,6 +161,9 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                 debug::dec<3>(get_number_of_active_events()));
         }
 
+        // Grab the handle to the event pool so we can return completed events
+        cuda_event_pool& pool =
+            hpx::cuda::experimental::cuda_event_pool::get_event_pool();
 
         // Iterate over our list of events and see if any have completed
         event_callback_vector.erase(
