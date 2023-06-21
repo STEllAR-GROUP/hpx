@@ -128,7 +128,7 @@ namespace hpx { namespace cuda { namespace experimental {
             }
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream, int device)
+                cudaStream_t stream)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
               , rt_(hpx::get_runtime_ptr())
@@ -201,8 +201,19 @@ namespace hpx { namespace cuda { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(
-                alloc, p.get(), init_no_addref{}, alloc, stream, device);
+            static_assert(std::is_same_v<Mode, event_mode> ||
+                    std::is_same_v<Mode, callback_mode>,
+                "get_future mode not supported!");
+            if constexpr (std::is_same_v<Mode, event_mode>)
+            {
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, stream, device);
+            }
+            else if constexpr (std::is_same_v<Mode, callback_mode>)
+            {
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, stream);
+            }
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
@@ -214,7 +225,7 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> get_future_with_callback(
             Allocator const& a, cudaStream_t stream)
         {
-            return get_future<Allocator, callback_mode>(a, stream, 0);
+            return get_future<Allocator, callback_mode>(a, stream);
         }
 
         // -------------------------------------------------------------
