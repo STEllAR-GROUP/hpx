@@ -21,30 +21,12 @@ namespace hpx { namespace cuda { namespace experimental {
     // of them at startup.
     struct cuda_event_pool
     {
-        static constexpr int initial_events_in_pool = 128;
+        static constexpr std::size_t initial_events_in_pool = 128;
 
         static cuda_event_pool& get_event_pool()
         {
             static cuda_event_pool event_pool_;
             return event_pool_;
-        }
-
-        // create a bunch of events on initialization
-        cuda_event_pool()
-          : max_number_devices_(0)
-        {
-            check_cuda_error(cudaGetDeviceCount(&max_number_devices_));
-            HPX_ASSERT_MSG(max_number_devices_ > 0,
-                "CUDA polling enabled and called, yet no CUDA device found!");
-            for (int device = 0; device < max_number_devices_; device++)
-            {
-                check_cuda_error(cudaSetDevice(device));
-                free_lists_.emplace_back(initial_events_in_pool);
-                for (int i = 0; i < initial_events_in_pool; ++i)
-                {
-                    add_event_to_pool(device);
-                }
-            }
         }
 
         // on destruction, all objects in stack will be freed
@@ -86,7 +68,33 @@ namespace hpx { namespace cuda { namespace experimental {
             return free_lists_[device].push(event);
         }
 
+        // delete copy / move constructors
+        cuda_event_pool(cuda_event_pool&&) = delete;
+        cuda_event_pool& operator=(cuda_event_pool&&) = delete;
+        cuda_event_pool(const cuda_event_pool&) = delete;
+        cuda_event_pool& operator=(const cuda_event_pool&) = delete;
+
     private:
+        // Private singleton constructor 
+        // Creates a bunch of events on initialization
+        cuda_event_pool()
+          : max_number_devices_(0)
+        {
+            check_cuda_error(cudaGetDeviceCount(&max_number_devices_));
+            HPX_ASSERT_MSG(max_number_devices_ > 0,
+                "CUDA polling enabled and called, yet no CUDA device found!");
+            /* free_lists_.reserve(max_number_devices_); */
+            for (int device = 0; device < max_number_devices_; device++)
+            {
+                check_cuda_error(cudaSetDevice(device));
+                free_lists_.emplace_back(initial_events_in_pool);
+                for (std::size_t i = 0; i < initial_events_in_pool; ++i)
+                {
+                    add_event_to_pool(device);
+                }
+            }
+        }
+
         void add_event_to_pool(int device)
         {
             check_cuda_error(cudaSetDevice(device));
