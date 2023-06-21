@@ -184,6 +184,7 @@ set(algorithms_headers
     hpx/parallel/unseq/loop.hpp
     hpx/parallel/unseq/reduce.hpp
     hpx/parallel/unseq/reduce_helpers.hpp
+    hpx/parallel/unseq/simd_helpers.hpp
     hpx/parallel/unseq/transform_loop.hpp
     hpx/parallel/util/adapt_placement_mode.hpp
     hpx/parallel/util/adapt_sharing_mode.hpp
