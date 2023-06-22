@@ -507,6 +507,15 @@ function(hpx_check_for_cxx20_perfect_pack_capture)
 endfunction()
 
 # ##############################################################################
+function(hpx_check_for_pthread_setname_np)
+  add_hpx_config_test(
+    HPX_WITH_PTHREAD_SETNAME_NP
+    SOURCE cmake/tests/set_thread_name.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
 function(hpx_check_for_cxx20_experimental_simd)
   add_hpx_config_test(
     HPX_WITH_CXX20_EXPERIMENTAL_SIMD
