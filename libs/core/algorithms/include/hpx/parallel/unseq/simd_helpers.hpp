@@ -25,8 +25,8 @@ namespace hpx::parallel::util {
         Compiler and Hardware should also support vector operations for IterDiff,
         else we see slower performance when compared to sequential version
     */
-    template <class Iter, class IterDiff, class F>
-    Iter unseq_first_n(Iter const first, IterDiff const n, F&& f_) noexcept
+    template <typename Iter, typename IterDiff, typename F>
+    Iter unseq_first_n(Iter const first, IterDiff const n, F&& f) noexcept
     {
         /*
             OMP loops can not have ++Iter, only integral types are allowed
@@ -41,7 +41,7 @@ namespace hpx::parallel::util {
         HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
         for (; i < n; ++i)
         {
-            if (f(first, i))
+            if (f(*(first + i)))
             {
                 break;
             }
@@ -50,8 +50,6 @@ namespace hpx::parallel::util {
 
         return first + i;
 #else
-        auto f = [f_ = HPX_FORWARD(F, f_)](
-                     auto it, int ind) { return f_(*(ind + it)); };
         // std::int32_t has best support for vectorization from compilers and hardware
         IterDiff i = 0;
         static constexpr std::int32_t num_blocks =
@@ -65,7 +63,7 @@ namespace hpx::parallel::util {
             HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : found_flag)
             for (IterDiff j = i; j < i + num_blocks; ++j)
             {
-                std::int32_t const t = f(first, j);
+                std::int32_t const t = f(*(first + j));
                 simd_lane[j - i] = t;
                 found_flag |= t;
             }
@@ -89,7 +87,7 @@ namespace hpx::parallel::util {
         //Keep remainder scalar
         while (i != n)
         {
-            if (f(first, i))
+            if (f(*(first + i)))
             {
                 return first + i;
             }
@@ -99,7 +97,7 @@ namespace hpx::parallel::util {
 #endif    //HPX_EARLYEXIT_PRESENT
     }
 
-    template <class Iter1, class Iter2, class IterDiff, class F>
+    template <typename Iter1, typename Iter2, typename IterDiff, typename F>
     std::pair<Iter1, Iter2> unseq2_first_n(Iter1 const first1,
         Iter2 const first2, IterDiff const n, F&& f) noexcept
     {
