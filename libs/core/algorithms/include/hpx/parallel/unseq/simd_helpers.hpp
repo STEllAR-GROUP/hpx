@@ -26,7 +26,7 @@ namespace hpx::parallel::util {
         else we see slower performance when compared to sequential version
     */
     template <class Iter, class IterDiff, class F>
-    Iter unseq_first_n(const Iter first, const IterDiff n, F&& f_) noexcept
+    Iter unseq_first_n(Iter const first, IterDiff const n, F&& f_) noexcept
     {
         /*
             OMP loops can not have ++Iter, only integral types are allowed
@@ -41,7 +41,7 @@ namespace hpx::parallel::util {
         HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
         for (; i < n; ++i)
         {
-            if (HPX_INVOKE(f, first, i))
+            if (f(first, i))
             {
                 break;
             }
@@ -50,44 +50,46 @@ namespace hpx::parallel::util {
 
         return first + i;
 #else
-        auto f = [](auto it, int ind) { return HPX_INVOKE(f_, *(ind + it)) };
-        // int32_t has best support for vectorization from compilers and hardware
+        auto f = [f_ = HPX_FORWARD(F, f_)](
+                     auto it, int ind) { return f_(*(ind + it)); };
+        // std::int32_t has best support for vectorization from compilers and hardware
         IterDiff i = 0;
-        static constexpr int32_t numBlocks = HPX_LANE_SIZE / sizeof(int32_t);
-        alignas(HPX_LANE_SIZE) int32_t simdLane[numBlocks] = {0};
-        while (i <= n - numBlocks)
+        static constexpr std::int32_t num_blocks =
+            HPX_LANE_SIZE / sizeof(std::int32_t);
+        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
+        while (i <= n - num_blocks)
         {
-            int32_t foundFlag = 0;
+            std::int32_t found_flag = 0;
 
             // clang-format off
-            HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : foundFlag)
-            for (IterDiff j = i; j < i + numBlocks; ++j)
+            HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : found_flag)
+            for (IterDiff j = i; j < i + num_blocks; ++j)
             {
-                const int32_t t = HPX_INVOKE(f,first, j);
-                simdLane[j - i] = t;
-                foundFlag |= t;
+                std::int32_t const t = f(first, j);
+                simd_lane[j - i] = t;
+                found_flag |= t;
             }
             // clang-format on
 
-            if (foundFlag)
+            if (found_flag)
             {
                 IterDiff j;
-                for (j = 0; j < numBlocks; ++j)
+                for (j = 0; j < num_blocks; ++j)
                 {
-                    if (simdLane[j])
+                    if (simd_lane[j])
                     {
                         break;
                     }
                 }
                 return first + i + j;
             }
-            i += numBlocks;
+            i += num_blocks;
         }
 
         //Keep remainder scalar
         while (i != n)
         {
-            if (HPX_INVOKE(f, first, i))
+            if (f(first, i))
             {
                 return first + i;
             }
@@ -98,8 +100,8 @@ namespace hpx::parallel::util {
     }
 
     template <class Iter1, class Iter2, class IterDiff, class F>
-    std::pair<Iter1, Iter2> unseq2_first_n(const Iter1 first1,
-        const Iter2 first2, const IterDiff n, F&& f) noexcept
+    std::pair<Iter1, Iter2> unseq2_first_n(Iter1 const first1,
+        Iter2 const first2, IterDiff const n, F&& f) noexcept
     {
 #if HPX_EARLYEXIT_PRESENT
         IterDiff i = 0;
@@ -107,53 +109,55 @@ namespace hpx::parallel::util {
         // clang-format off
         HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA_SIMD_EARLYEXIT
         for (; i < n; ++i)
-            if (HPX_INVOKE(f, *(first1 + i), *(first2 + i)))
+            if (f(*(first1 + i), *(first2 + i)))
                 break;
         // clang-format on
 
         return std::make_pair(first1 + i, first2 + i);
 #else
-        const Iter1 last1 = first1 + n;
-        const Iter2 last2 = first2 + n;
+        Iter1 const last1 = first1 + n;
+        Iter2 const last2 = first2 + n;
 
-        static constexpr int32_t numBlocks = HPX_LANE_SIZE / sizeof(int32_t);
-        alignas(HPX_LANE_SIZE) int32_t simdLane[numBlocks] = {0};
+        static constexpr std::int32_t num_blocks =
+            HPX_LANE_SIZE / sizeof(std::int32_t);
+        alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
 
-        std::size_t outLoopInd = 0;
-        while (outLoopInd <= n - numBlocks)
+        std::size_t outer_loop_ind = 0;
+        while (outer_loop_ind <= n - num_blocks)
         {
-            int32_t foundFlag = 0;
+            std::int32_t found_flag = 0;
             IterDiff i;
 
             // clang-format off
-            HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : foundFlag)
-            for (i = 0; i < numBlocks; ++i)
+            HPX_PRAGMA_VECTOR_UNALIGNED HPX_VECTOR_REDUCTION(| : found_flag)
+            for (i = 0; i < num_blocks; ++i)
             {
-                const IterDiff t = HPX_INVOKE(
-                    f, *(first1 + outLoopInd + i), *(first2 + outLoopInd + i));
-                simdLane[i] = t;
-                foundFlag |= t;
+                IterDiff const t = f(*(first1 + outer_loop_ind + i),
+                    *(first2 + outer_loop_ind + i));
+                simd_lane[i] = t;
+                found_flag |= t;
             }
             // clang-format on
 
-            if (foundFlag)
+            if (found_flag)
             {
                 IterDiff i2;
-                for (i2 = 0; i2 < numBlocks; ++i2)
+                for (i2 = 0; i2 < num_blocks; ++i2)
                 {
-                    if (simdLane[i2])
+                    if (simd_lane[i2])
                         break;
                 }
                 return std::make_pair(
-                    first1 + outLoopInd + i2, first2 + outLoopInd + i2);
+                    first1 + outer_loop_ind + i2, first2 + outer_loop_ind + i2);
             }
-            outLoopInd += numBlocks;
+            outer_loop_ind += num_blocks;
         }
 
         //Keep remainder scalar
-        for (; outLoopInd != n; ++outLoopInd)
-            if (HPX_INVOKE(f, *(first1 + outLoopInd), *(first2 + outLoopInd)))
-                return std::make_pair(first1 + outLoopInd, first2 + outLoopInd);
+        for (; outer_loop_ind != n; ++outer_loop_ind)
+            if ((f, *(first1 + outer_loop_ind), *(first2 + outer_loop_ind)))
+                return std::make_pair(
+                    first1 + outer_loop_ind, first2 + outer_loop_ind);
 
         return std::make_pair(last1, last2);
 #endif    //HPX_EARLYEXIT_PRESENT
