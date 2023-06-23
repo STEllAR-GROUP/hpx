@@ -184,7 +184,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // specified mode
         template <typename Allocator, typename Mode>
         hpx::future<void> get_future(
-            Allocator const& a, cudaStream_t stream, int device = 0)
+            Allocator const& a, cudaStream_t stream, int device)
         {
             using shared_state = future_data<Allocator, Mode>;
 
@@ -225,15 +225,19 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> get_future_with_callback(
             Allocator const& a, cudaStream_t stream)
         {
-            return get_future<Allocator, callback_mode>(a, stream);
+            // device id 0 will be dropped in callback mode - can be
+            // an arbitrary number here
+            return get_future<Allocator, callback_mode>(a, stream, 0);
         }
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
         template <typename Allocator>
         hpx::future<void> get_future_with_event(
-            Allocator const& a, cudaStream_t stream, int device = 0)
+            Allocator const& a, cudaStream_t stream, int device = -1)
         {
+            if (device == -1) 
+              check_cuda_error(cudaGetDevice(&device));
             return get_future<Allocator, event_mode>(a, stream, device);
         }
 
@@ -245,7 +249,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
         HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
-            cudaStream_t stream, int device = 0);
+            cudaStream_t stream, int device = -1);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental
 
