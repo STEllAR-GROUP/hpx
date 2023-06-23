@@ -1842,8 +1842,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
-    hpx_add_compile_flag_if_available(-Wextra)
-    hpx_add_compile_flag_if_available(-Wpedantic)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
     hpx_add_compile_flag_if_available(-Wno-sign-promo)
     hpx_add_compile_flag_if_available(-Wno-attributes)
@@ -1856,6 +1854,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
         # caused by the use of std::destructive_interference_size
         hpx_add_compile_flag_if_available(-Wno-interference-size)
       endif()
+      if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "13.0")
+        # gcc V13.x is overeager to report dangling references where there are
+        # none
+        hpx_add_compile_flag_if_available(-Wextra)
+        hpx_add_compile_flag_if_available(-Wpedantic)
+        hpx_add_compile_flag_if_available(-Wno-self-move)
+      endif()
+    else()
+      hpx_add_compile_flag_if_available(-Wextra)
+      hpx_add_compile_flag_if_available(-Wpedantic)
     endif()
 
     # We do not in general guarantee ABI compatibility between C++ standards, so

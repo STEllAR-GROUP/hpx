@@ -152,13 +152,9 @@ private:
         using result_type = util::detail::invoke_deferred_result_t<F,
             OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
 
-        // get the tuple of futures from the predecessor future <tuple of futures>
-        const auto& predecessor_value =
-            future_extract_value().operator()(predecessor);
-
         // create a tuple of the unwrapped future values
-        auto unwrapped_futures_tuple =
-            util::map_pack(future_extract_value{}, predecessor_value);
+        auto unwrapped_futures_tuple = util::map_pack(future_extract_value{},
+            future_extract_value().operator()(predecessor));
 
         using namespace hpx::util::debug;
         std::cout << "when_all(fut) : Predecessor : "

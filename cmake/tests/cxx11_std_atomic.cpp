@@ -18,6 +18,12 @@ void test_atomic()
     (void) i;
 }
 
+struct index_data
+{
+    std::uint16_t first;
+    std::uint16_t second;
+};
+
 int main()
 {
 // ATOMIC_FLAG_INIT is deprecated starting C++20
@@ -34,6 +40,7 @@ int main()
     test_atomic<std::uint16_t>();
     test_atomic<std::uint32_t>();
     test_atomic<std::uint64_t>();
+    test_atomic<index_data>();
 
     std::memory_order mo;
     mo = std::memory_order_relaxed;

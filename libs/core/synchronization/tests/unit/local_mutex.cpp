@@ -124,7 +124,8 @@ struct test_lock_times_out_if_other_thread_has_lock
     void locking_thread()
     {
         Lock lock(m, std::defer_lock);
-        lock.try_lock_for(std::chrono::milliseconds(50));
+        [[maybe_unused]] bool retval =
+            lock.try_lock_for(std::chrono::milliseconds(50));
 
         std::lock_guard<hpx::mutex> lk(done_mutex);
         locked = lock.owns_lock();

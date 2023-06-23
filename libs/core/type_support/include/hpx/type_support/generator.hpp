@@ -636,16 +636,26 @@ namespace hpx {
                 ++*this;
             }
 
-            [[nodiscard]] bool operator==(
-                hpx::default_sentinel_t) const noexcept
+            [[nodiscard]] friend bool operator==(
+                gen_iter lhs, hpx::default_sentinel_t) noexcept
             {
-                return coro.done();
+                return lhs.coro.done();
+            }
+            [[nodiscard]] friend bool operator!=(
+                gen_iter lhs, hpx::default_sentinel_t rhs) noexcept
+            {
+                return !(lhs == rhs);
             }
 
-            [[nodiscard]] bool operator!=(
-                hpx::default_sentinel_t) const noexcept
+            [[nodiscard]] friend bool operator==(
+                hpx::default_sentinel_t, gen_iter rhs) noexcept
             {
-                return !coro.done();
+                return rhs.coro.done();
+            }
+            [[nodiscard]] friend bool operator!=(
+                hpx::default_sentinel_t lhs, gen_iter rhs) noexcept
+            {
+                return !(lhs == rhs);
             }
 
         private:
