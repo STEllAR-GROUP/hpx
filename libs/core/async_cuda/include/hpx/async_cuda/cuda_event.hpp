@@ -71,8 +71,8 @@ namespace hpx { namespace cuda { namespace experimental {
         // delete copy / move constructors
         cuda_event_pool(cuda_event_pool&&) = delete;
         cuda_event_pool& operator=(cuda_event_pool&&) = delete;
-        cuda_event_pool(const cuda_event_pool&) = delete;
-        cuda_event_pool& operator=(const cuda_event_pool&) = delete;
+        cuda_event_pool(cuda_event_pool const&) = delete;
+        cuda_event_pool& operator=(cuda_event_pool const&) = delete;
 
     private:
         // Private singleton constructor 
