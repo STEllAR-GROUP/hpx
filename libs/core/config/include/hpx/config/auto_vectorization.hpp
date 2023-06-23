@@ -38,7 +38,7 @@
 #endif
 
 #if (__INTEL_COMPILER >= 1800)
-#define HPX_EARLYEXIT_PRESENT 
+#define HPX_EARLYEXIT_PRESENT
 #define HPX_PRAGMA_SIMD_EARLYEXIT HPX_PRAGMA(omp simd early_exit)
 #else
 #define HPX_PRAGMA_SIMD_EARLYEXIT
