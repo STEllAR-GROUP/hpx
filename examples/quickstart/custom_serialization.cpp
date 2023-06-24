@@ -203,8 +203,16 @@ int main()
 
     send_gravity_action gravityAction;
     auto gravity = planet_weight_calculator(9.81);
-    hpx::async(gravityAction, hpx::find_remote_localities()[0], gravity).get();
 
+    auto remote_localities = hpx::find_remote_localities();
+    if (!remote_localities.empty())
+    {
+        hpx::async(gravityAction, remote_localities[0], gravity).get();
+    }
+    else
+    {
+        hpx::async(gravityAction, hpx::find_here(), gravity).get();
+    }
     return 0;
 }
 //]
