@@ -185,8 +185,6 @@ namespace hpx::parcelset::policies::gasnet {
                 return false;
             }
 
-            HPX_ASSERT(request_ptr_ == nullptr);
-
             std::vector<typename parcel_buffer_type::transmission_chunk_type>&
                 chunks = buffer_.transmission_chunks_;
             if (!chunks.empty())

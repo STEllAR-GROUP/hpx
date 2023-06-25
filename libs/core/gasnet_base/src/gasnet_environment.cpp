@@ -524,7 +524,7 @@ namespace hpx { namespace util {
                     }
 
                     local_buf = calloc(1, buf_sz);
-                    assert(gettable(chpl_nodeID, local_buf, buf_sz));
+                    assert(gettable(node, local_buf, buf_sz));
                 }
 
                 // do a PUT on the remote locale back to here.
