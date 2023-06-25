@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/gasnet_base.hpp>
@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::gasnet {
         // different versions of clang-format disagree
         // clang-format off
         sender() noexcept
-          : next_free_tag_request_((MPI_Request) (-1))
+          : next_free_tag_request_(-1)
           , next_free_tag_(-1)
         {
         }
@@ -44,6 +44,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         void run() noexcept
         {
+            hpx::util::gasnet_environment::scoped_lock l;
             get_next_free_tag();
         }
 
@@ -128,7 +129,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         int next_free_tag_locked() noexcept
         {
-            util::gasnet_environment::scoped_try_lock l;
+            hpx::util::gasnet_environment::scoped_try_lock l;
             if (l.locked)
             {
                 return get_next_free_tag();
@@ -140,9 +141,9 @@ namespace hpx::parcelset::policies::gasnet {
         {
             int next_free = next_free_tag_;
   
-            util::gasnet_environment::scoped_lock l;
+            hpx::util::gasnet_environment::scoped_lock l;
             std::memcpy(&next_free,
-                util::gasnet_environment::gasnet_buffer[self_],
+                hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
                 sizeof(int));
 
             return next_free;
@@ -152,7 +153,7 @@ namespace hpx::parcelset::policies::gasnet {
         connection_list connections_;
 
         hpx::spinlock next_free_tag_mtx_;
-        MPI_Request next_free_tag_request_;
+        int next_free_tag_request_;
         int next_free_tag_;
     };
 }    // namespace hpx::parcelset::policies::gasnet

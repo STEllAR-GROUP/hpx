@@ -28,21 +28,6 @@
 
 namespace hpx::parcelset::policies::gasnet {
 
-    struct exp_backoff {
-        int numTries;
-        const static int maxRetries = 10;
-
-        void operator()() {
-           if(numTries <= maxRetries) {
-              gasnet_AMPoll();
-              hpx::this_thread::suspend(std::chrono::microseconds(1 << numTries));
-           }
-           else {
-              numTries = 0;
-           }
-        }
-    };
-
     template <typename Parcelport>
     struct receiver
     {
@@ -52,9 +37,23 @@ namespace hpx::parcelset::policies::gasnet {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
+        struct exp_backoff {
+            int numTries;
+            const static int maxRetries = 10;
+
+            void operator()() {
+                if(numTries <= maxRetries) {
+                    gasnet_AMPoll();
+                    hpx::this_thread::suspend(std::chrono::microseconds(1 << numTries));
+                }
+                else {
+                    numTries = 0;
+                }
+            }
+        };
+
         explicit constexpr receiver(Parcelport& pp) noexcept
-          : pp_(pp)
-          , hdr_request_(0)
+          : pp_(pp), bo()
         {
         }
 
@@ -134,10 +133,7 @@ namespace hpx::parcelset::policies::gasnet {
             header h = rcv_header_;
             rcv_header_.reset();
 
-            exp_backoff bo{0};
-
             while(rcv_header_.data() == 0) {
-               gasnet_AMPoll();
                bo();
             }
 
@@ -154,6 +150,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         hpx::spinlock connections_mtx_;
         connection_list connections_;
+        exp_backoff bo;
     };
 }    // namespace hpx::parcelset::policies::gasnet
 

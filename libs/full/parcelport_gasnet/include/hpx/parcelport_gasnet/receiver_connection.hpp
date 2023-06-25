@@ -10,7 +10,7 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/assert.hpp>
 #include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/timing.hpp>
@@ -51,7 +51,6 @@ namespace hpx::parcelset::policies::gasnet {
           , src_(src)
           , tag_(h.tag())
           , header_(h)
-          , request_(MPI_REQUEST_NULL)
           , request_ptr_(false)
           , chunks_idx_(0)
           , pp_(pp)
@@ -93,7 +92,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         bool receive_transmission_chunks(std::size_t num_thread = -1)
         {
-            auto self_ = util::gasnet_environment::rank();
+            auto self_ = hpx::util::gasnet_environment::rank();
 
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
@@ -106,9 +105,9 @@ namespace hpx::parcelset::policies::gasnet {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    util::gasnet_environment::scoped_lock l;
+                    hpx::util::gasnet_environment::scoped_lock l;
                     std::memcpy(buffer_.transmission_chunks_.data(),
-                        util::gasnet_environment::gasnet_buffer[self_],
+                        hpx::util::gasnet_environment::segments[self_].addr,
                         static_cast<int>(buffer_.transmission_chunks_.size() *
                             sizeof(buffer_type::transmission_chunk_type)));
 
@@ -136,9 +135,11 @@ namespace hpx::parcelset::policies::gasnet {
             }
             else
             {
-                auto self_ = util::gasnet_environment::rank();
-                util::gasnet_environment::scoped_lock l;
-                std::memcopy(buffer_.data_.data(), util::gasnet_environment::gasnet_buffer[self_], buffer_.data_.size());
+                auto self_ = hpx::util::gasnet_environment::rank();
+                hpx::util::gasnet_environment::scoped_lock l;
+                std::memcpy(buffer_.data_.data(),
+                   hpx::util::gasnet_environment::segments[self_].addr,
+                   buffer_.data_.size());
                 request_ptr_ = true;
             }
 
@@ -164,9 +165,11 @@ namespace hpx::parcelset::policies::gasnet {
                 data_type& c = buffer_.chunks_[idx];
                 c.resize(chunk_size);
                 {
-                    auto self_ = util::gasnet_environment::rank();
-                    util::gasnet_environment::scoped_lock l;
-                    std::memcopy(c.data(), data.util::gasnet_environment::gasnet_buffer[self_], c.size());
+                    auto self_ = hpx::util::gasnet_environment::rank();
+                    hpx::util::gasnet_environment::scoped_lock l;
+                    std::memcpy(c.data(),
+                       hpx::util::gasnet_environment::segments[self_].addr,
+                       c.size());
                     request_ptr_ = true;
                 }
             }
@@ -187,9 +190,11 @@ namespace hpx::parcelset::policies::gasnet {
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
             {
-                auto self_ = util::gasnet_environment::rank();
-                util::gasnet_environment::scoped_lock l;
-                std::memcopy(&tag_[src_], data.util::gasnet_environment::gasnet_buffer[self_], sizeof(int));
+                auto self_ = hpx::util::gasnet_environment::rank();
+                hpx::util::gasnet_environment::scoped_lock l;
+                std::memcpy(&tag_,
+                   hpx::util::gasnet_environment::segments[self_].addr,
+                   sizeof(int));
                 request_ptr_ = true;
             }
 
@@ -207,7 +212,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         bool request_done() noexcept
         {
-            util::gasnet_environment::scoped_try_lock l;
+            hpx::util::gasnet_environment::scoped_try_lock l;
             if (!l.locked)
             {
                 return false;
