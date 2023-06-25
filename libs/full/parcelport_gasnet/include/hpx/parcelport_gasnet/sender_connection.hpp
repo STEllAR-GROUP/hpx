@@ -161,7 +161,7 @@ namespace hpx::parcelset::policies::gasnet {
                 // put from this localities gasnet shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
-                hpx::util::gasnet_environment::put<std::uint8_t>(
+                hpx::util::gasnet_environment::put(
                     static_cast<std::uint8_t*>(
                        hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
                     ),
@@ -229,7 +229,7 @@ namespace hpx::parcelset::policies::gasnet {
                     hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
                     buffer_.data_.data(), buffer_.data_.size());
 
-                hpx::util::gasnet_environment::put<std::uint8_t>(
+                hpx::util::gasnet_environment::put(
                     static_cast<std::uint8_t*>(
                        hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
                     ),
@@ -268,7 +268,7 @@ namespace hpx::parcelset::policies::gasnet {
                        static_cast<int>(c.size_)
                     );
 
-                    hpx::util::gasnet_environment::put<std::uint8_t>(
+                    hpx::util::gasnet_environment::put(
                         static_cast<std::uint8_t*>(
                             hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
                         ),
