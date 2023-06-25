@@ -56,7 +56,6 @@ set(_hpx_core_modules
     logging
     memory
     mpi_base
-    gasnet_base
     pack_traversal
     plugin
     prefix
