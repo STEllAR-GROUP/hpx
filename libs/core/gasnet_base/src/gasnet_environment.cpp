@@ -418,7 +418,7 @@ namespace hpx { namespace util {
         return name;
     }
 
-    bool gettable(const int node, void* start, const size_t len)
+    bool gasnet_environment::gettable(const int node, void* start, const size_t len)
     {
         const uintptr_t segstart = (uintptr_t) gasnet_environment::segments[node].addr;
         const uintptr_t segend = segstart + gasnet_environment::segments[node].size;
@@ -431,10 +431,7 @@ namespace hpx { namespace util {
             reqend <= segend);
     }
 
-    template<typename T>
-    void gasnet_environment::put(T * addr, const int node, T * raddr, const std::size_t size) {
-        static_assert(std::is_integral<T>::value, "Error! ***gasnet_environment::put***\tIntegral required.");
-    
+    void gasnet_environment::put(std::uint8_t * addr, const int node, std::uint8_t * raddr, const std::size_t size) {
         const bool in_remote_seg = gettable(node, raddr, size);
         if(in_remote_seg) {
             const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
@@ -479,10 +476,7 @@ namespace hpx { namespace util {
         }
     }
 
-    template<typename T>
-    void gasnet_environment::get(T * addr, const int node, T * raddr, const std::size_t size) {
-        static_assert(std::is_integral<T>::value, "Error! ***gasnet_environment::get***\tIntegral required.");
-
+    void gasnet_environment::get(std::uint8_t * addr, const int node, std::uint8_t * raddr, const std::size_t size) {
         bool remote_in_segment = false;
 
         if (rank() == node) {

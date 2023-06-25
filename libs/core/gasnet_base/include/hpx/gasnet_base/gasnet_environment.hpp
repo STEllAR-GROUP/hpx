@@ -44,11 +44,9 @@ namespace hpx { namespace util {
 
         static bool gettable(const int node, void* start, const size_t len);
 
-        template<typename T>
-        static void put(T * addr, const int rank, T * raddr, const std::size_t size);
+        static void put(std::uint8_t * addr, const int rank, std::uint8_t * raddr, const std::size_t size);
 
-        template<typename T>
-        static void get(T * addr, const int rank, T * raddr, const std::size_t size);
+        static void get(std::uint8_t * addr, const int rank, std::uint8_t * raddr, const std::size_t size);
 
         struct HPX_CORE_EXPORT scoped_lock
         {
