@@ -9,10 +9,11 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/functional.hpp>
+#include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -21,12 +22,9 @@
 #include <hpx/plugin/traits/plugin_config_data.hpp>
 
 #include <hpx/command_line_handling/command_line_handling.hpp>
-#include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelport_gasnet/receiver.hpp>
 #include <hpx/parcelport_gasnet/sender.hpp>
-#include <hpx/gasnet_base/gasnet.hpp>
-#include <hpx/gasnet_base/gasnet_environment.hpp>
 #include <hpx/parcelset/parcelport_impl.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/plugin_factories/parcelport_factory.hpp>
@@ -54,6 +52,7 @@ namespace hpx::parcelset {
         using send_early_parcel = std::true_type;
         using do_background_work = std::true_type;
         using send_immediate_parcels = std::false_type;
+        using is_connectionless = std::false_type;
 
         static constexpr const char* type() noexcept
         {
@@ -104,14 +103,31 @@ namespace hpx::parcelset {
                     HPX_PARCEL_MAX_CONNECTIONS);
             }
 
+            static std::size_t background_threads(
+                util::runtime_configuration const& ini)
+            {
+/*
+                return hpx::util::get_entry_as<std::size_t>(ini,
+                    "hpx.parcel.gasnet.background_threads",
+                    HPX_HAVE_PARCELPORT_GASNET_BACKGROUND_THREADS);
+*/
+                return 1UL;
+            }
+
         public:
             parcelport(util::runtime_configuration const& ini,
                 threads::policies::callback_notifier const& notifier)
               : base_type(ini, here(), notifier)
               , stopped_(false)
               , receiver_(*this)
+              , background_threads_(background_threads(ini))
             {
             }
+
+            parcelport(parcelport const&) = delete;
+            parcelport(parcelport&&) = delete;
+            parcelport& operator=(parcelport const&) = delete;
+            parcelport& operator=(parcelport&&) = delete;
 
             ~parcelport()
             {
@@ -144,15 +160,20 @@ namespace hpx::parcelset {
                             "gasnet::parcelport::do_stop");
                 }
 
-                stopped_ = true;
-                gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
-                if((retval = gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK) {
-                    // throw exception
-                    HPX_THROW_EXCEPTION(invalid_status,
-                       "hpx::util::gasnet_environment::init",
-                       "GASNET failed ", std::to_string(gasnetErrorName(retval)), " ",
-                       std::to_string(gasnetErrorDesc(retval)));
-                    gasnet_exit(retval);
+
+                bool expected = false;
+                if (stopped_.compare_exchange_strong(expected, true))
+                {
+                    stopped_ = true;
+                    gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
+                    if((retval = gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK) {
+                        // throw exception
+                        HPX_THROW_EXCEPTION(invalid_status,
+                           "hpx::util::gasnet_environment::init",
+                           "GASNET failed ", std::string{gasnet_ErrorName(retval)}, " ",
+                           std::string{gasnet_ErrorDesc(retval)});
+                        gasnet_exit(retval);
+                    }
                 }
             }
 
@@ -182,9 +203,10 @@ namespace hpx::parcelset {
             }
 
             bool background_work(
-                std::size_t /* num_thread */, parcelport_background_mode mode)
+                std::size_t num_thread, parcelport_background_mode mode)
             {
-                if (stopped_)
+                if (stopped_.load(std::memory_order_acquire) ||
+                    num_thread >= background_threads_)
                 {
                     return false;
                 }
@@ -229,6 +251,8 @@ namespace hpx::parcelset {
                     }
                 }
             }
+
+            std::size_t background_threads_;
 
             void early_write_handler(std::error_code const& ec, parcel const& p)
             {
@@ -291,6 +315,6 @@ namespace hpx::traits {
     };
 }    // namespace hpx::traits
 
-HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::gasnet::connection_handler, gasnet)
+HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::gasnet::parcelport, gasnet)
 
 #endif

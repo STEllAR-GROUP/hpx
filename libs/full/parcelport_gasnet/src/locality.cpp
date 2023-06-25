@@ -8,10 +8,9 @@
 
 #include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_PARCELPORT_GASNET)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/util.hpp>
-
 #include <hpx/parcelport_gasnet/locality.hpp>
 
 namespace hpx::parcelset::policies::gasnet {
