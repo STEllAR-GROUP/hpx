@@ -54,8 +54,6 @@ endif()
 
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
   set(GASNET_ROOT "@GASNET_ROOT@")
-  include(HPX_SetupGASNET)
-  hpx_setup_gasnet()
 endif()
 
 # Eve can be installed by HPX or externally installed. In the first case we use
