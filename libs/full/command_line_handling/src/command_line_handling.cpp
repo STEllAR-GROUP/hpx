@@ -990,6 +990,18 @@ namespace hpx::util {
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
         }
 #endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+        // better to put GASNET init after MPI init, since GASNET will also
+        // initialize MPI if MPI is not already initialized.
+        if (util::gasnet_environment::check_gasnet_environment(rtcfg_))
+        {
+            util::gasnet_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::gasnet_environment::size());
+            node_ = static_cast<std::size_t>(util::gasnet_environment::rank());
+        }
+#endif
 
         // load plugin modules (after first pass of command line handling, so
         // that settings given on command line could propagate to modules)
