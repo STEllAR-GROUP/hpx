@@ -10,10 +10,10 @@
 #error "This test requires compiler support for C++20 coroutines"
 #endif
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <string>

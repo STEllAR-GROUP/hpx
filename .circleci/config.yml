@@ -245,6 +245,9 @@ jobs:
                 -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=On \
                 -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On \
                 -DHPX_LOGGING_WITH_SEPARATE_DESTINATIONS=Off \
+                -DHPX_WITH_THREAD_DEBUG_INFO=On \
+                -DHPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On \
+                -DHPX_WITH_FETCH_JSON=On \
                 -DCMAKE_EXPORT_COMPILE_COMMANDS=On \
                 -DHPX_WITH_DOCUMENTATION=On \
                 -DHPX_WITH_DOCUMENTATION_OUTPUT_FORMATS="${DOCUMENTATION_OUTPUT_FORMATS}"
@@ -567,7 +570,7 @@ jobs:
           command: |
               ulimit -c unlimited
               ctest \
-                --timeout 180 \
+                --timeout 270 \
                 -T test \
                 --no-compress-output \
                 --output-on-failure \

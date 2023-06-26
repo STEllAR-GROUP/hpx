@@ -7,12 +7,12 @@
 // This example benchmarks the time it takes to start and stop the HPX runtime.
 // This is meant to be compared to resume_suspend and openmp_parallel_region.
 
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>

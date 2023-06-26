@@ -37,19 +37,25 @@ namespace hpx::execution::experimental {
     // enforce proper formatting
     namespace detail {
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
         template <typename Data>
         struct future_receiver_base
         {
             hpx::intrusive_ptr<Data> data;
 
         protected:
+            // Note: MSVC toolset v142 fails compiling 'data->' below, using
+            // '(*data).' instead
             template <typename U>
             void set_value(U&& u) && noexcept
             {
                 hpx::detail::try_catch_exception_ptr(
-                    [&]() { data->set_value(HPX_FORWARD(U, u)); },
+                    [&]() { (*data).set_value(HPX_FORWARD(U, u)); },
                     [&](std::exception_ptr ep) {
-                        data->set_exception(HPX_MOVE(ep));
+                        (*data).set_exception(HPX_MOVE(ep));
                     });
                 data.reset();
             }
@@ -68,6 +74,9 @@ namespace hpx::execution::experimental {
                 std::terminate();
             }
         };
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         template <typename T>
         struct future_receiver

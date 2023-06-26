@@ -6,9 +6,10 @@
 
 #pragma once
 
-#include <hpx/local/execution.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/memory.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/container_algorithms/destroy.hpp>
 
 #include <atomic>
 #include <cstddef>

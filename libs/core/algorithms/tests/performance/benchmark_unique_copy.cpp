@@ -6,13 +6,12 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <hpx/local/init.hpp>
-#include <hpx/modules/format.hpp>
-#include <hpx/modules/program_options.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/format.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/timing.hpp>
-#include <hpx/parallel/algorithms/generate.hpp>
-#include <hpx/parallel/algorithms/unique.hpp>
+#include <hpx/program_options.hpp>
 
 #include <algorithm>
 #include <cstddef>

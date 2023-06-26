@@ -27,6 +27,8 @@ namespace hpx {
 
 #include <hpx/datastructures/detail/optional.hpp>
 
+#include <hpx/config/warnings_prefix.hpp>
+
 namespace hpx {
 
     using hpx::optional_ns::bad_optional_access;
@@ -35,6 +37,8 @@ namespace hpx {
     using hpx::optional_ns::nullopt_t;
     using hpx::optional_ns::optional;
 }    // namespace hpx
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif
 

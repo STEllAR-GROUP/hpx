@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #1751:
 // hpx::future::wait_for fails a simple test
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>

@@ -24,6 +24,9 @@
 #include <hpx/parcelport_tcp/sender.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 
@@ -90,7 +93,7 @@ namespace hpx::parcelset::policies::tcp {
         // initialize network
         std::size_t tried = 0;
         exception_list errors;
-        util::endpoint_iterator_type end = util::accept_end();
+        util::endpoint_iterator_type const end = util::accept_end();
         for (util::endpoint_iterator_type it =
                  util::accept_begin(here_.get<locality>(), io_service);
              it != end; ++it, ++tried)
@@ -121,7 +124,6 @@ namespace hpx::parcelset::policies::tcp {
             // all attempts failed
             HPX_THROW_EXCEPTION(hpx::error::network_error,
                 "tcp::parcelport::run", errors.get_message());
-            return false;
         }
         return true;
     }
@@ -238,8 +240,9 @@ namespace hpx::parcelset::policies::tcp {
 #if defined(HPX_DEBUG)
         HPX_ASSERT(l == sender_connection->destination());
 
-        std::string connection_addr = s.remote_endpoint().address().to_string();
-        std::uint16_t connection_port = s.remote_endpoint().port();
+        std::string const connection_addr =
+            s.remote_endpoint().address().to_string();
+        std::uint16_t const connection_port = s.remote_endpoint().port();
         HPX_ASSERT(hpx::util::cleanup_ip_address(l.get<locality>().address()) ==
             hpx::util::cleanup_ip_address(connection_addr));
         HPX_ASSERT(l.get<locality>().port() == connection_port);
@@ -317,8 +320,8 @@ namespace hpx::parcelset::policies::tcp {
     }
 
     // Handle completion of a read operation.
-    void connection_handler::handle_read_completion(
-        std::error_code const& e, std::shared_ptr<receiver> receiver_conn)
+    void connection_handler::handle_read_completion(std::error_code const& e,
+        std::shared_ptr<receiver> const& receiver_conn)
     {
         if (!e)
         {

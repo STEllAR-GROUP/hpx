@@ -7,10 +7,10 @@
 // This example is meant for inclusion in the documentation.
 
 //[condition_variable_docs
-#include <hpx/local/condition_variable.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/mutex.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/condition_variable.hpp>
+#include <hpx/init.hpp>
+#include <hpx/mutex.hpp>
+#include <hpx/thread.hpp>
 
 #include <iostream>
 #include <string>

@@ -99,6 +99,13 @@ namespace hpx::agas::detail {
     extern HPX_EXPORT bool (*is_local_address_cached_addr)(
         naming::gid_type const& gid, naming::address& addr, error_code& ec);
 
+    extern HPX_EXPORT bool (*is_local_address_cached_addr_pinned_ptr)(
+        naming::gid_type const& gid, naming::address& addr,
+        std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec);
+
     extern HPX_EXPORT void (*update_cache_entry)(naming::gid_type const& gid,
         naming::address const& addr, std::uint64_t count, std::uint64_t offset,
         error_code& ec);
@@ -213,7 +220,8 @@ namespace hpx::agas::detail {
         *was_object_migrated)(naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f);
 
-    extern HPX_EXPORT void (*unmark_as_migrated)(naming::gid_type const& gid);
+    extern HPX_EXPORT void (*unmark_as_migrated)(
+        naming::gid_type const& gid, hpx::move_only_function<void()>&& f);
 
     ///////////////////////////////////////////////////////////////////////////
     extern HPX_EXPORT hpx::future<std::map<std::string, hpx::id_type>> (

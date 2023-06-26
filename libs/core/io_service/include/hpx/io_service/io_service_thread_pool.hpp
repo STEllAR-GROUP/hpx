@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,18 +7,17 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
 #include <cstddef>
-#include <cstdint>
 #include <exception>
 #include <iosfwd>
+#include <memory>
 #include <mutex>
-#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -34,9 +33,10 @@ namespace hpx::threads::detail {
         void print_pool(std::ostream&) const override {}
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::state get_state() const override;
-        hpx::state get_state(std::size_t num_thread) const override;
-        bool has_reached_state(hpx::state s) const override;
+        [[nodiscard]] hpx::state get_state() const override;
+        [[nodiscard]] hpx::state get_state(
+            std::size_t num_thread) const override;
+        [[nodiscard]] bool has_reached_state(hpx::state s) const override;
 
         ///////////////////////////////////////////////////////////////////////
         void create_thread(thread_init_data& data, thread_id_ref_type& id,
@@ -55,12 +55,12 @@ namespace hpx::threads::detail {
             thread_restart_state newstate_ex, thread_priority priority,
             error_code& ec) override;
 
-        void report_error(
+        bool report_error(
             std::size_t num, std::exception_ptr const& e) override;
 
         ///////////////////////////////////////////////////////////////////////
         bool run(
-            std::unique_lock<std::mutex>& l, std::size_t pool_threads) override;
+            std::unique_lock<std::mutex>& l, std::size_t num_threads) override;
 
         ///////////////////////////////////////////////////////////////////////
         void stop(
@@ -82,10 +82,10 @@ namespace hpx::threads::detail {
         std::thread& get_os_thread_handle(
             std::size_t global_thread_num) override;
 
-        std::size_t get_os_thread_count() const override;
+        [[nodiscard]] std::size_t get_os_thread_count() const override;
 
     private:
-        util::io_service_pool threads_;
+        std::unique_ptr<util::io_service_pool> threads_;
     };
 }    // namespace hpx::threads::detail
 

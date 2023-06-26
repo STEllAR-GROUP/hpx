@@ -1,4 +1,4 @@
-//  Copyright (c) 2013-2014 Hartmut Kaiser
+//  Copyright (c) 2013-2023 Hartmut Kaiser
 //  Copyright (c) 2015 Andreas Schaefer
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,6 +14,7 @@
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
+#include <hpx/serialization/serialize_buffer_fwd.hpp>
 
 #if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
 #include <boost/shared_array.hpp>
@@ -26,7 +27,7 @@
 namespace hpx::serialization {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T, typename Allocator = std::allocator<T>>
+    template <typename T, typename Allocator>
     class serialize_buffer
     {
     private:

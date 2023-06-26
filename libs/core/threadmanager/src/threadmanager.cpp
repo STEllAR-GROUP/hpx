@@ -14,6 +14,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/hardware/timestamp.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/schedulers.hpp>
@@ -27,6 +28,7 @@
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -231,9 +233,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_local_priority_lifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
@@ -372,9 +375,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_abp_priority_fifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
@@ -420,9 +424,10 @@ namespace hpx { namespace threads {
     }
 
     void threadmanager::create_scheduler_abp_priority_lifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and perform
@@ -1236,10 +1241,18 @@ namespace hpx { namespace threads {
 
     void threadmanager::wait()
     {
-        std::size_t shutdown_check_count = util::get_entry_as<std::size_t>(
+        auto const shutdown_check_count = util::get_entry_as<std::size_t>(
             rtcfg_, "hpx.shutdown_check_count", 10);
         hpx::util::detail::yield_while_count(
             [this]() { return is_busy(); }, shutdown_check_count);
+    }
+
+    bool threadmanager::wait_for(hpx::chrono::steady_duration const& rel_time)
+    {
+        auto const shutdown_check_count = util::get_entry_as<std::size_t>(
+            rtcfg_, "hpx.shutdown_check_count", 10);
+        return hpx::util::detail::yield_while_count_timeout(
+            [this]() { return is_busy(); }, shutdown_check_count, rel_time);
     }
 
     void threadmanager::suspend()

@@ -34,7 +34,6 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
-#include <string>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,7 +78,7 @@ namespace hpx::threads {
         thread_id_type const& id, error_code& /* ec */) noexcept
     {
         return id ? get_thread_id_data(id)->get_thread_phase() :
-                    std::size_t(~0);
+                    static_cast<std::size_t>(~0);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -142,7 +141,6 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
                 "null thread id encountered");
-            return false;
         }
 
         if (&ec != &throws)
@@ -159,7 +157,6 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "hpx::threads::get_thread_interruption_enabled",
                 "null thread id encountered");
-            return false;
         }
 
         if (&ec != &throws)
@@ -301,8 +298,7 @@ namespace hpx::threads {
 
     std::size_t& get_continuation_recursion_count() noexcept
     {
-        thread_self* self_ptr = get_self_ptr();
-        if (self_ptr)
+        if (thread_self* self_ptr = get_self_ptr())
         {
             return self_ptr->get_continuation_recursion_count();
         }
@@ -449,8 +445,7 @@ namespace hpx::this_thread {
         if (ec)
             return threads::thread_restart_state::unknown;
 
-        threads::thread_restart_state statex =
-            threads::thread_restart_state::unknown;
+        threads::thread_restart_state statex;
 
         {
             // verify that there are no more registered locks for this OS-thread
@@ -464,8 +459,8 @@ namespace hpx::this_thread {
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
             threads::detail::reset_backtrace bt(id, ec);
 #endif
-            // We might need to dispatch 'nextid' to it's correct scheduler
-            // only if our current scheduler is the same, we should yield the id
+            // We might need to dispatch 'nextid' to it's correct scheduler only
+            // if our current scheduler is the same, we should yield to the id
             if (nextid &&
                 get_thread_id_data(nextid)->get_scheduler_base() !=
                     get_thread_id_data(id)->get_scheduler_base())
@@ -522,8 +517,7 @@ namespace hpx::this_thread {
             return threads::thread_restart_state::unknown;
 
         // let the thread manager do other things while waiting
-        threads::thread_restart_state statex =
-            threads::thread_restart_state::unknown;
+        threads::thread_restart_state statex;
 
         {
 #ifdef HPX_HAVE_VERIFY_LOCKS
@@ -538,7 +532,7 @@ namespace hpx::this_thread {
             threads::detail::reset_backtrace bt(id, ec);
 #endif
             std::atomic<bool> timer_started(false);
-            threads::thread_id_ref_type timer_id =
+            threads::thread_id_ref_type const timer_id =
                 threads::set_thread_state(id.noref(), abs_time, &timer_started,
                     threads::thread_schedule_state::pending,
                     threads::thread_restart_state::timeout,
@@ -546,8 +540,8 @@ namespace hpx::this_thread {
             if (ec)
                 return threads::thread_restart_state::unknown;
 
-            // We might need to dispatch 'nextid' to it's correct scheduler
-            // only if our current scheduler is the same, we should yield the id
+            // We might need to dispatch 'nextid' to it's correct scheduler only
+            // if our current scheduler is the same, we should yield to the id
             if (nextid &&
                 get_thread_id_data(nextid)->get_scheduler_base() !=
                     get_thread_id_data(id)->get_scheduler_base())
@@ -611,16 +605,15 @@ namespace hpx::this_thread {
 
     std::ptrdiff_t get_available_stack_space() noexcept
     {
-        threads::thread_self* self = threads::get_self_ptr();
-        if (self)
+        if (threads::thread_self const* self = threads::get_self_ptr())
         {
             return self->get_available_stack_space();
         }
-
         return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
 
-    bool has_sufficient_stack_space(std::size_t space_needed) noexcept
+    bool has_sufficient_stack_space(
+        [[maybe_unused]] std::size_t space_needed) noexcept
     {
         if (nullptr == hpx::threads::get_self_ptr())
             return false;

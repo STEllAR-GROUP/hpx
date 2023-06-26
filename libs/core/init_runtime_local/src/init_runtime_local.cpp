@@ -517,6 +517,9 @@ namespace hpx {
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
 
+                    // Store application defined command line options
+                    rt->set_app_options(params.desc_cmdline);
+
                     result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
                         HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));
                 }

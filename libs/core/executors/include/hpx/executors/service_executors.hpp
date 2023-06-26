@@ -19,13 +19,13 @@
 #include <hpx/executors/current_executor.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/functional/function.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/pack_traversal/unwrap.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
 #include <algorithm>
-#include <cstddef>
 #include <exception>
 #include <memory>
 #include <type_traits>
@@ -55,6 +55,9 @@ namespace hpx::parallel::execution::detail {
             HPX_ASSERT(pool);
         }
 
+        HPX_CORE_EXPORT static void post(
+            hpx::util::io_service_pool* pool, hpx::function<void()>&&);
+
         template <typename F, typename... Ts>
         friend decltype(auto) tag_invoke(hpx::parallel::execution::post_t,
             [[maybe_unused]] service_executor const& exec, F&& f, Ts&&... ts)
@@ -69,9 +72,10 @@ namespace hpx::parallel::execution::detail {
                 HPX_MOVE(f_wrapper));
 
 #if defined(HPX_COMPUTE_HOST_CODE)
-            exec.pool_->get_io_service().post(hpx::bind_front(
-                &post_wrapper_helper<decltype(f_wrapper)>::invoke,
-                HPX_MOVE(t)));
+            post(exec.pool_,
+                hpx::bind_front(
+                    &post_wrapper_helper<decltype(f_wrapper)>::invoke,
+                    HPX_MOVE(t)));
 #else
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");
@@ -94,10 +98,11 @@ namespace hpx::parallel::execution::detail {
                 HPX_MOVE(f_wrapper));
 
 #if defined(HPX_COMPUTE_HOST_CODE)
-            exec.pool_->get_io_service().post(hpx::bind_front(
-                &async_execute_wrapper_helper<decltype(f_wrapper),
-                    result_type>::invoke,
-                t));
+            post(exec.pool_,
+                hpx::bind_front(
+                    &async_execute_wrapper_helper<decltype(f_wrapper),
+                        result_type>::invoke,
+                    t));
 #else
             HPX_ASSERT_MSG(
                 false, "Attempting to use io_service_pool in device code");

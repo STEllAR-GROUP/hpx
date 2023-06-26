@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <hpx/async_colocated/async_colocated.hpp>
-#include <hpx/async_colocated/async_colocated_callback.hpp>
-#include <hpx/async_distributed/async.hpp>
-#include <hpx/async_distributed/async_callback.hpp>
-#include <hpx/async_distributed/async_continue_callback.hpp>
-#include <hpx/async_distributed/promise.hpp>
-#include <hpx/local/future.hpp>
+#include <hpx/modules/async_base.hpp>
+#include <hpx/modules/async_colocated.hpp>
+#include <hpx/modules/async_combinators.hpp>
+#include <hpx/modules/async_distributed.hpp>
+#include <hpx/modules/async_local.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/futures.hpp>
+#include <hpx/modules/lcos_local.hpp>

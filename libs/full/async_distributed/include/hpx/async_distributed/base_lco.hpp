@@ -22,7 +22,7 @@
 #include <exception>
 #include <type_traits>
 
-namespace hpx { namespace lcos {
+namespace hpx::lcos {
 
     /// The \a base_lco class is the common base class for all LCO's
     /// implementing a simple set_event action
@@ -51,10 +51,6 @@ namespace hpx { namespace lcos {
         /// Destructor, needs to be virtual to allow for clean destruction of
         /// derived objects
         virtual ~base_lco();
-
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
-        virtual void finalize();
 
         /// The \a function set_event_nonvirt is called whenever a
         /// \a set_event_action is applied on a instance of a LCO. This function
@@ -115,33 +111,31 @@ namespace hpx { namespace lcos {
         HPX_DEFINE_COMPONENT_DIRECT_ACTION(
             base_lco, disconnect_nonvirt, disconnect_action)
     };
-}}    // namespace hpx::lcos
+}    // namespace hpx::lcos
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx {
-
-    template <>
-    struct get_lva<lcos::base_lco>
+template <>
+struct hpx::get_lva<hpx::lcos::base_lco>
+{
+    constexpr static hpx::lcos::base_lco* call(
+        hpx::naming::address_type lva) noexcept
     {
-        constexpr static lcos::base_lco* call(naming::address_type lva) noexcept
-        {
-            using wrapping_type = typename lcos::base_lco::wrapping_type;
-            return static_cast<wrapping_type*>(lva)->get();
-        }
-    };
+        using wrapping_type = hpx::lcos::base_lco::wrapping_type;
+        return static_cast<wrapping_type*>(lva)->get();
+    }
+};
 
-    template <>
-    struct get_lva<lcos::base_lco const>
+template <>
+struct hpx::get_lva<hpx::lcos::base_lco const>
+{
+    constexpr static hpx::lcos::base_lco const* call(
+        hpx::naming::address_type lva) noexcept
     {
-        constexpr static lcos::base_lco const* call(
-            naming::address_type lva) noexcept
-        {
-            using wrapping_type =
-                std::add_const_t<typename lcos::base_lco::wrapping_type>;
-            return static_cast<wrapping_type*>(lva)->get();
-        }
-    };
-}    // namespace hpx
+        using wrapping_type =
+            std::add_const_t<hpx::lcos::base_lco::wrapping_type>;
+        return static_cast<wrapping_type*>(lva)->get();
+    }
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declaration of serialization support for the base LCO actions
@@ -157,7 +151,7 @@ HPX_REGISTER_ACTION_DECLARATION(
 ///////////////////////////////////////////////////////////////////////////////
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_event_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
+    static_cast<std::size_t>(-1), static_cast<std::size_t>(-1))
 HPX_ACTION_USES_MESSAGE_COALESCING_NOTHROW_DECLARATION(
     hpx::lcos::base_lco::set_exception_action, "lco_set_value_action",
-    std::size_t(-1), std::size_t(-1))
+    static_cast<std::size_t>(-1), static_cast<std::size_t>(-1))

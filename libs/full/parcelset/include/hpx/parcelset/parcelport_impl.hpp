@@ -151,13 +151,12 @@ namespace hpx::parcelset {
             if (endian_out == "little")
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::endian_little);
+                    serialization::archive_flags::endian_little;
             }
             else if (endian_out == "big")
             {
-                archive_flags_ = archive_flags_ |
-                    static_cast<int>(serialization::archive_flags::endian_big);
+                archive_flags_ =
+                    archive_flags_ | serialization::archive_flags::endian_big;
             }
             else
             {
@@ -167,17 +166,23 @@ namespace hpx::parcelset {
             if (!this->allow_array_optimizations())
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(serialization::archive_flags::
-                            disable_array_optimization);
+                    serialization::archive_flags::disable_array_optimization;
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::disable_data_chunking);
+                    serialization::archive_flags::disable_data_chunking;
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
             }
             else if (!this->allow_zero_copy_optimizations())
             {
                 archive_flags_ = archive_flags_ |
-                    static_cast<int>(
-                        serialization::archive_flags::disable_data_chunking);
+                    serialization::archive_flags::disable_data_chunking;
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
+            }
+            else if (!this->allow_zero_copy_receive_optimizations())
+            {
+                archive_flags_ = archive_flags_ |
+                    serialization::archive_flags::disable_receive_data_chunking;
             }
         }
 
@@ -343,26 +348,50 @@ namespace hpx::parcelset {
                 parcelset::parcelport::shared_from_this());
         }
 
-        /// Cache specific functionality
+    protected:
+        template <typename F>
+        bool reschedule_on_thread(
+            F&& f, threads::thread_schedule_state state, char const* funcname)
+        {
+            error_code ec(throwmode::lightweight);
+            hpx::threads::thread_init_data data(
+                hpx::threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
+                funcname, threads::thread_priority::normal,
+                threads::thread_schedule_hint(
+                    static_cast<std::int16_t>(get_next_num_thread())),
+                threads::thread_stacksize::default_, state, true);
+
+            auto id = hpx::threads::register_thread(data, ec);
+            if (!ec)
+                return false;
+
+            if (state == threads::thread_schedule_state::suspended)
+            {
+                threads::set_thread_state(id.noref(),
+                    std::chrono::milliseconds(100),
+                    threads::thread_schedule_state::pending,
+                    threads::thread_restart_state::signaled,
+                    threads::thread_priority::boost, true, ec);
+            }
+
+            return true;
+        }
+
+    public:
+        // Cache specific functionality
         void remove_from_connection_cache_delayed(locality const& loc)
         {
             if (operations_in_flight_ != 0)
             {
-                error_code ec(throwmode::lightweight);
-                hpx::threads::thread_init_data data(
-                    hpx::threads::make_thread_function_nullary(
+                if (!connection_handler().reschedule_on_thread(
                         util::deferred_call(
                             &parcelport_impl::remove_from_connection_cache,
-                            this, loc)),
-                    "remove_from_connection_cache_delayed",
-                    threads::thread_priority::normal,
-                    threads::thread_schedule_hint(
-                        static_cast<std::int16_t>(get_next_num_thread())),
-                    threads::thread_stacksize::default_,
-                    threads::thread_schedule_state::pending, true);
-                hpx::threads::register_thread(data, ec);
-                if (!ec)
+                            this, loc),
+                        threads::thread_schedule_state::pending,
+                        "remove_from_connection_cache_delayed"))
+                {
                     return;
+                }
             }
 
             connection_cache_.clear(loc);
@@ -370,27 +399,12 @@ namespace hpx::parcelset {
 
         void remove_from_connection_cache(locality const& loc) override
         {
-            error_code ec(throwmode::lightweight);
-            hpx::threads::thread_init_data data(
-                hpx::threads::make_thread_function_nullary(util::deferred_call(
+            connection_handler().reschedule_on_thread(
+                util::deferred_call(
                     &parcelport_impl::remove_from_connection_cache_delayed,
-                    this, loc)),
-                "remove_from_connection_cache",
-                threads::thread_priority::normal,
-                threads::thread_schedule_hint(
-                    static_cast<std::int16_t>(get_next_num_thread())),
-                threads::thread_stacksize::default_,
-                threads::thread_schedule_state::suspended, true);
-            threads::thread_id_ref_type const id =
-                hpx::threads::register_thread(data, ec);
-            if (ec)
-                return;
-
-            threads::set_thread_state(id.noref(),
-                std::chrono::milliseconds(100),
+                    this, loc),
                 threads::thread_schedule_state::pending,
-                threads::thread_restart_state::signaled,
-                threads::thread_priority::boost, true, ec);
+                "remove_from_connection_cache_delayed");
         }
 
         /// Return the name of this locality
@@ -532,7 +546,7 @@ namespace hpx::parcelset {
                         std::make_move_iterator(ps),
                         std::make_move_iterator(ps + encoded_parcels)));
 
-            if (ConnectionHandler::sender_type::send(
+            if (connection_handler().send_immediate(
                     this, dest_, HPX_MOVE(buffer), HPX_MOVE(callback_fn)))
             {
                 // we don't propagate errors for now

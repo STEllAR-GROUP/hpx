@@ -23,7 +23,8 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
+
     ///////////////////////////////////////////////////////////////////////////
     // Migrate given component from the specified storage component
     //
@@ -58,6 +59,7 @@ namespace hpx { namespace components { namespace server {
     //       scope.
     //
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         template <typename Component>
         future<hpx::id_type> migrate_from_storage_here_id(
@@ -101,9 +103,6 @@ namespace hpx { namespace components { namespace server {
                 archive >> ptr;
             }
 
-            // make sure the migration code works properly
-            traits::component_pin_support<Component>::pin(ptr.get());
-
             // if target locality is not specified, use the address of the last
             // locality where the object was living before
             if (target_locality == hpx::invalid_id)
@@ -126,13 +125,12 @@ namespace hpx { namespace components { namespace server {
     future<hpx::id_type> trigger_migrate_from_storage_here(
         hpx::id_type const& to_resurrect, hpx::id_type const& target_locality)
     {
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::components::server::trigger_migrate_from_storage_here",
                 "attempting to migrate an instance of a component which "
                 "does not support migration");
-            return make_ready_future(hpx::invalid_id);
         }
 
         if (naming::get_locality_id_from_id(to_resurrect) != get_locality_id())
@@ -141,22 +139,21 @@ namespace hpx { namespace components { namespace server {
                 "hpx::components::server::trigger_migrate_from_storage_here",
                 "this function has to be executed on the locality responsible "
                 "for managing the address of the given object");
-            return make_ready_future(hpx::invalid_id);
         }
 
-        auto r = agas::begin_migration(to_resurrect).get();
+        auto const r = agas::begin_migration(to_resurrect).get();
 
         // retrieve the data from the given storage
-        typedef typename server::component_storage::migrate_from_here_action
-            action_type;
+        using action_type =
+            typename server::component_storage::migrate_from_here_action;
+
         return async<action_type>(r.first, to_resurrect.get_gid())
             .then(hpx::bind_back(&detail::migrate_from_storage_here<Component>,
                 to_resurrect, r.second, target_locality))
-            .then(
-                [to_resurrect](future<hpx::id_type>&& f) -> hpx::id_type {
-                    agas::end_migration(to_resurrect);
-                    return f.get();
-                });
+            .then([to_resurrect](future<hpx::id_type>&& f) -> hpx::id_type {
+                agas::end_migration(to_resurrect);
+                return f.get();
+            });
     }
 
     template <typename Component>
@@ -167,4 +164,4 @@ namespace hpx { namespace components { namespace server {
             trigger_migrate_from_storage_here_action<Component>>
     {
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

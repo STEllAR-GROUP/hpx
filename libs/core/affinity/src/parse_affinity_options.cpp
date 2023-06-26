@@ -4,13 +4,12 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/affinity/detail/partlit.hpp>
 #include <hpx/affinity/parse_affinity_options.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/topology/topology.hpp>
-
-#include <hpx/affinity/detail/partlit.hpp>
 
 #include <hwloc.h>
 
@@ -169,8 +168,8 @@ namespace hpx::threads::detail {
     void parse_mappings(
         std::string const& spec, mappings_type& mappings, error_code& ec)
     {
-        std::string::const_iterator begin = spec.begin();
-        if (!detail::parse(begin, spec.end(), mappings) || begin != spec.end())
+        if (auto begin = spec.begin();
+            !detail::parse(begin, spec.end(), mappings) || begin != spec.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "parse_affinity_options",
@@ -191,8 +190,8 @@ namespace hpx::threads::detail {
         if (m.index_bounds_.empty())
             return result;
 
-        bounds_type::const_iterator first = m.index_bounds_.begin();
-        bounds_type::const_iterator last = m.index_bounds_.end();
+        auto first = m.index_bounds_.begin();
+        auto const last = m.index_bounds_.end();
 
         while (first != last)
         {
@@ -201,17 +200,18 @@ namespace hpx::threads::detail {
                 // bind all entities
                 result.clear();
                 for (std::size_t i = 0; i != default_last; ++i)
-                    result.push_back(i);
+                {
+                    result.push_back(static_cast<std::int64_t>(i));
+                }
                 break;    // we will not get more than 'all'
             }
 
-            bounds_type::const_iterator second = first;
-            if (++second != last)
+            if (auto second = first; ++second != last)
             {
                 if (*second == 0 || *second == spec_type::all_entities())
                 {
                     // one element only
-                    if (default_last <= std::size_t(*first))
+                    if (default_last <= static_cast<std::size_t>(*first))
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -225,7 +225,7 @@ namespace hpx::threads::detail {
                 else if (*second < 0)
                 {
                     // all elements between min and -max
-                    if (default_last <= std::size_t(-*second))
+                    if (default_last <= static_cast<std::size_t>(-*second))
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -234,13 +234,16 @@ namespace hpx::threads::detail {
                             "number of existing resources");
                         return result;
                     }
+
                     for (std::int64_t i = *first; i <= -*second; ++i)
+                    {
                         result.push_back(i);
+                    }
                 }
                 else
                 {
                     // just min and max
-                    if (default_last <= std::size_t(*second))
+                    if (default_last <= static_cast<std::size_t>(*second))
                     {
                         result.clear();
                         HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -257,7 +260,7 @@ namespace hpx::threads::detail {
             else
             {
                 // one element only
-                if (default_last <= std::size_t(*first))
+                if (default_last <= static_cast<std::size_t>(*first))
                 {
                     result.clear();
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -278,14 +281,14 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    //                  index,       mask
-    typedef hpx::tuple<std::size_t, mask_type> mask_info;
+    //                                 index,      mask
+    using mask_info = hpx::tuple<std::size_t, mask_type>;
 
-    inline std::size_t get_index(mask_info const& smi)
+    constexpr std::size_t get_index(mask_info const& smi) noexcept
     {
         return hpx::get<0>(smi);
     }
-    inline mask_cref_type get_mask(mask_info const& smi)
+    constexpr mask_cref_type get_mask(mask_info const& smi) noexcept
     {
         return hpx::get<1>(smi);
     }
@@ -295,7 +298,7 @@ namespace hpx::threads::detail {
         topology const& t, bounds_type const& b)
     {
         std::vector<mask_info> masks;
-        for (std::int64_t index : b)
+        for (std::int64_t const index : b)
         {
             masks.emplace_back(static_cast<std::size_t>(index),
                 t.init_socket_affinity_mask_from_socket(
@@ -308,7 +311,7 @@ namespace hpx::threads::detail {
         topology const& t, bounds_type const& b)
     {
         std::vector<mask_info> masks;
-        for (std::int64_t index : b)
+        for (std::int64_t const index : b)
         {
             masks.emplace_back(static_cast<std::size_t>(index),
                 t.init_numa_node_affinity_mask_from_numa_node(
@@ -327,26 +330,26 @@ namespace hpx::threads::detail {
     {
         switch (s.type_)
         {
+        // requested top level is a socket
         case spec_type::type::socket:
-            // requested top level is a socket
-            {
-                std::size_t num_sockets = t.get_number_of_sockets();
-                return extract_socket_masks(
-                    t, extract_bounds(s, num_sockets, ec));
-            }
+        {
+            std::size_t const num_sockets = t.get_number_of_sockets();
+            return extract_socket_masks(t, extract_bounds(s, num_sockets, ec));
+        }
 
+        // requested top level is a NUMA node
         case spec_type::type::numanode:
-            // requested top level is a NUMA node
-            {
-                std::size_t num_numanodes = t.get_number_of_numa_nodes();
-                return extract_numanode_masks(
-                    t, extract_bounds(s, num_numanodes, ec));
-            }
+        {
+            std::size_t const num_numanodes = t.get_number_of_numa_nodes();
+            return extract_numanode_masks(
+                t, extract_bounds(s, num_numanodes, ec));
+        }
 
         case spec_type::type::unknown:
         {
             std::vector<mask_info> masks;
-            masks.emplace_back(std::size_t(-1), extract_machine_mask(t, ec));
+            masks.emplace_back(
+                static_cast<std::size_t>(-1), extract_machine_mask(t, ec));
             return masks;
         }
 
@@ -358,7 +361,7 @@ namespace hpx::threads::detail {
             break;
         }
 
-        return std::vector<mask_info>();
+        return {};
     }
 
     std::vector<mask_info> extract_core_masks(topology const& t,
@@ -372,9 +375,9 @@ namespace hpx::threads::detail {
         case spec_type::type::core:
         {
             std::size_t base = 0;
-            std::size_t num_cores = 0;
+            std::size_t num_cores;
 
-            if (socket != std::size_t(-1))
+            if (socket != static_cast<std::size_t>(-1))
             {
                 for (std::size_t i = 0; i != socket; ++i)
                 {
@@ -384,25 +387,34 @@ namespace hpx::threads::detail {
                     // just sockets, but no direct numa domains. The bind
                     // description might relate to sockets, not NUMA domains.
                     if (t.get_number_of_numa_nodes() == 0)
+                    {
                         base += t.get_number_of_socket_cores(i);
+                    }
                     else
+                    {
                         base += t.get_number_of_numa_node_cores(i);
+                    }
                 }
+
                 if (t.get_number_of_numa_nodes() == 0)
+                {
                     num_cores = t.get_number_of_socket_cores(socket);
+                }
                 else
+                {
                     num_cores = t.get_number_of_numa_node_cores(socket);
+                }
             }
             else
             {
                 num_cores = t.get_number_of_cores();
             }
 
-            bounds_type bounds = extract_bounds(s, num_cores, ec);
+            bounds_type const bounds = extract_bounds(s, num_cores, ec);
             if (ec)
                 break;
 
-            for (std::int64_t index : bounds)
+            for (std::int64_t const index : bounds)
             {
                 mask_type mask = t.init_core_affinity_mask_from_core(
                     static_cast<std::size_t>(index + base));
@@ -414,8 +426,9 @@ namespace hpx::threads::detail {
 
         case spec_type::type::unknown:
         {
-            mask_type mask = extract_machine_mask(t, ec);
-            masks.emplace_back(std::size_t(-1), mask & socket_mask);
+            mask_type const mask = extract_machine_mask(t, ec);
+            masks.emplace_back(
+                static_cast<std::size_t>(-1), mask & socket_mask);
         }
         break;
 
@@ -439,21 +452,25 @@ namespace hpx::threads::detail {
         {
         case spec_type::type::pu:
         {
-            std::size_t num_pus = 0;
             std::size_t socket_base = 0;
-            if (std::size_t(-1) != socket)
+            if (static_cast<std::size_t>(-1) != socket)
             {
                 // core number is relative to socket
                 for (std::size_t i = 0; i != socket; ++i)
                 {
                     if (t.get_number_of_numa_nodes() == 0)
+                    {
                         socket_base += t.get_number_of_socket_cores(i);
+                    }
                     else
+                    {
                         socket_base += t.get_number_of_numa_node_cores(i);
+                    }
                 }
             }
 
-            if (std::size_t(-1) != core)
+            std::size_t num_pus;
+            if (static_cast<std::size_t>(-1) != core)
             {
                 num_pus = t.get_number_of_core_pus(core);
             }
@@ -461,15 +478,16 @@ namespace hpx::threads::detail {
             {
                 num_pus = t.get_number_of_pus();
             }
-            bounds_type bounds = extract_bounds(s, num_pus, ec);
+
+            bounds_type const bounds = extract_bounds(s, num_pus, ec);
             if (ec)
                 break;
 
-            std::size_t num_cores = t.get_number_of_cores();
-            for (std::int64_t index : bounds)
+            std::size_t const num_cores = t.get_number_of_cores();
+            for (std::int64_t const index : bounds)
             {
                 std::size_t base_core = socket_base;
-                if (std::size_t(-1) != core)    //-V1051
+                if (static_cast<std::size_t>(-1) != core)    //-V1051
                 {
                     base_core += core;
                 }
@@ -479,10 +497,13 @@ namespace hpx::threads::detail {
                     std::size_t base = 0;
                     for (/**/; base_core < num_cores; ++base_core)
                     {
-                        std::size_t num_core_pus =
+                        std::size_t const num_core_pus =
                             t.get_number_of_core_pus(base_core);
-                        if (base + num_core_pus > std::size_t(index))
+                        if (base + num_core_pus >
+                            static_cast<std::size_t>(index))
+                        {
                             break;
+                        }
                         base += num_core_pus;
                     }
                 }
@@ -497,8 +518,8 @@ namespace hpx::threads::detail {
 
         case spec_type::type::unknown:
         {
-            mask_type mask = extract_machine_mask(t, ec);
-            masks.emplace_back(std::size_t(-1), mask & core_mask);
+            mask_type const mask = extract_machine_mask(t, ec);
+            masks.emplace_back(static_cast<std::size_t>(-1), mask & core_mask);
         }
         break;
 
@@ -514,10 +535,10 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     // sanity checks
-    void mappings_sanity_checks(full_mapping_type& fmt, std::size_t /* size */,
-        bounds_type const& b, error_code& ec)
+    void mappings_sanity_checks(full_mapping_type const& fmt,
+        std::size_t /* size */, bounds_type const& b, error_code& ec)
     {
-        mapping_type& m = fmt.second;
+        mapping_type const& m = fmt.second;
         if (m.size() != 3)
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter, "decode_mapping",
@@ -546,7 +567,7 @@ namespace hpx::threads::detail {
         // get the core masks for each of the sockets
         for (mask_info const& cmi : core_masks)
         {
-            if (get_index(cmi) == std::size_t(-1))
+            if (get_index(cmi) == static_cast<std::size_t>(-1))
             {
                 // all cores
                 if (specs[2].type_ == spec_type::type::unknown)
@@ -557,8 +578,9 @@ namespace hpx::threads::detail {
                 else
                 {
                     // handle pu information in the absence of core information
-                    std::vector<mask_info> pu_masks = extract_pu_masks(t,
-                        specs[2], socket, std::size_t(-1), get_mask(cmi), ec);
+                    std::vector<mask_info> const pu_masks =
+                        extract_pu_masks(t, specs[2], socket,
+                            static_cast<std::size_t>(-1), get_mask(cmi), ec);
                     if (ec)
                         break;
 
@@ -594,7 +616,7 @@ namespace hpx::threads::detail {
         // get the core masks for each of the sockets
         for (mask_info const& smi : socket_masks)
         {
-            if (get_index(smi) == std::size_t(-1))
+            if (get_index(smi) == static_cast<std::size_t>(-1))
             {
                 // all NUMA domains
                 if (specs[1].type_ == spec_type::type::unknown)
@@ -608,9 +630,11 @@ namespace hpx::threads::detail {
                     else
                     {
                         // handle pu information in the absence of core/socket
-                        std::vector<mask_info> pu_masks =
-                            extract_pu_masks(t, specs[2], std::size_t(-1),
-                                std::size_t(-1), get_mask(smi), ec);
+                        std::vector<mask_info> const pu_masks =
+                            extract_pu_masks(t, specs[2],
+                                static_cast<std::size_t>(-1),
+                                static_cast<std::size_t>(-1), get_mask(smi),
+                                ec);
                         if (ec)
                             break;
 
@@ -627,8 +651,10 @@ namespace hpx::threads::detail {
                     if (specs[2].type_ == spec_type::type::unknown)
                     {
                         // no pu information
-                        std::vector<mask_info> core_masks = extract_core_masks(
-                            t, specs[1], std::size_t(-1), get_mask(smi), ec);
+                        std::vector<mask_info> const core_masks =
+                            extract_core_masks(t, specs[1],
+                                static_cast<std::size_t>(-1), get_mask(smi),
+                                ec);
                         if (ec)
                             break;
 
@@ -639,15 +665,18 @@ namespace hpx::threads::detail {
                     }
                     else
                     {
-                        std::vector<mask_info> core_masks = extract_core_masks(
-                            t, specs[1], std::size_t(-1), get_mask(smi), ec);
+                        std::vector<mask_info> const core_masks =
+                            extract_core_masks(t, specs[1],
+                                static_cast<std::size_t>(-1), get_mask(smi),
+                                ec);
                         if (ec)
                             break;
 
                         // get the pu masks (i.e. overall affinity masks) for
                         // all of the core masks
-                        extract_pu_affinities(t, specs, std::size_t(-1),
-                            core_masks, affinities, ec);
+                        extract_pu_affinities(t, specs,
+                            static_cast<std::size_t>(-1), core_masks,
+                            affinities, ec);
                         if (ec)
                             break;
                     }
@@ -671,7 +700,7 @@ namespace hpx::threads::detail {
         }
     }
 
-    void decode_mappings(topology const& t, full_mapping_type& m,
+    void decode_mappings(topology const& t, full_mapping_type const& m,
         std::vector<mask_type>& affinities, std::size_t num_threads,
         error_code& ec)
     {
@@ -681,7 +710,7 @@ namespace hpx::threads::detail {
         // numbering is relative to the given socket.
 
         // generate overall masks for each of the given sockets
-        std::vector<mask_info> socket_masks =
+        std::vector<mask_info> const socket_masks =
             extract_socket_or_numanode_masks(t, m.second[0], ec);
 
         HPX_ASSERT(!socket_masks.empty());
@@ -696,7 +725,7 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    bool pu_in_process_mask(bool use_process_mask, topology& t,
+    bool pu_in_process_mask(bool use_process_mask, topology const& t,
         std::size_t num_core, std::size_t num_pu)
     {
         if (!use_process_mask)
@@ -704,20 +733,20 @@ namespace hpx::threads::detail {
             return true;
         }
 
-        threads::mask_type proc_mask = t.get_cpubind_mask();
-        threads::mask_type pu_mask =
+        threads::mask_type const proc_mask = t.get_cpubind_mask();
+        threads::mask_type const pu_mask =
             t.init_thread_affinity_mask(num_core, num_pu);
 
         return threads::bit_and(proc_mask, pu_mask);
     }
 
-    void check_num_threads(bool use_process_mask, topology& t,
+    void check_num_threads(bool use_process_mask, topology const& t,
         std::size_t num_threads, error_code& ec)
     {
         if (use_process_mask)
         {
-            threads::mask_type proc_mask = t.get_cpubind_mask();
-            std::size_t num_pus_proc_mask = threads::count(proc_mask);
+            threads::mask_type const proc_mask = t.get_cpubind_mask();
+            std::size_t const num_pus_proc_mask = threads::count(proc_mask);
 
             if (num_threads > num_pus_proc_mask)
             {
@@ -730,7 +759,7 @@ namespace hpx::threads::detail {
         }
         else
         {
-            std::size_t num_threads_available =
+            auto const num_threads_available =
                 static_cast<std::size_t>(threads::hardware_concurrency());
 
             if (num_threads > num_threads_available)
@@ -745,12 +774,12 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_compact_distribution(topology& t,
+    void decode_compact_distribution(topology const& t,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::vector<std::size_t>& num_pus,
         bool use_process_mask, error_code& ec)
     {
-        std::size_t num_threads = affinities.size();
+        std::size_t const num_threads = affinities.size();
 
         check_num_threads(use_process_mask, t, num_threads, ec);
 
@@ -760,14 +789,15 @@ namespace hpx::threads::detail {
             max_cores = t.get_number_of_cores();
         }
 
-        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
+        std::size_t const num_cores =
+            (std::min)(max_cores, t.get_number_of_cores());
         num_pus.resize(num_threads);
 
         for (std::size_t num_thread = 0; num_thread < num_threads; /**/)
         {
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
             {
-                std::size_t num_core_pus =
+                std::size_t const num_core_pus =
                     t.get_number_of_core_pus(num_core + used_cores);
                 for (std::size_t num_pu = 0; num_pu < num_core_pus; ++num_pu)
                 {
@@ -798,12 +828,12 @@ namespace hpx::threads::detail {
         }
     }
 
-    void decode_scatter_distribution(topology& t,
+    void decode_scatter_distribution(topology const& t,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::vector<std::size_t>& num_pus,
         bool use_process_mask, error_code& ec)
     {
-        std::size_t num_threads = affinities.size();
+        std::size_t const num_threads = affinities.size();
 
         check_num_threads(use_process_mask, t, num_threads, ec);
 
@@ -813,7 +843,8 @@ namespace hpx::threads::detail {
             max_cores = t.get_number_of_cores();
         }
 
-        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
+        std::size_t const num_cores =
+            (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> next_pu_index(num_cores, 0);
         num_pus.resize(num_threads);
@@ -831,7 +862,8 @@ namespace hpx::threads::detail {
                     return;
                 }
 
-                std::size_t num_core_pus = t.get_number_of_core_pus(num_core);
+                std::size_t const num_core_pus =
+                    t.get_number_of_core_pus(num_core);
                 std::size_t pu_index = next_pu_index[num_core];
                 bool use_pu = false;
 
@@ -867,12 +899,12 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_balanced_distribution(topology& t,
+    void decode_balanced_distribution(topology const& t,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::vector<std::size_t>& num_pus,
         bool use_process_mask, error_code& ec)
     {
-        std::size_t num_threads = affinities.size();
+        std::size_t const num_threads = affinities.size();
 
         check_num_threads(use_process_mask, t, num_threads, ec);
 
@@ -882,7 +914,8 @@ namespace hpx::threads::detail {
             max_cores = t.get_number_of_cores();
         }
 
-        std::size_t num_cores = (std::min)(max_cores, t.get_number_of_cores());
+        std::size_t const num_cores =
+            (std::min)(max_cores, t.get_number_of_cores());
 
         std::vector<std::size_t> num_pus_cores(num_cores, 0);
         std::vector<std::size_t> next_pu_index(num_cores, 0);
@@ -895,7 +928,8 @@ namespace hpx::threads::detail {
         {
             for (std::size_t num_core = 0; num_core < num_cores; ++num_core)
             {
-                std::size_t num_core_pus = t.get_number_of_core_pus(num_core);
+                std::size_t const num_core_pus =
+                    t.get_number_of_core_pus(num_core);
                 std::size_t pu_index = next_pu_index[num_core];
                 bool use_pu = false;
 
@@ -954,13 +988,13 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_numabalanced_distribution(topology& t,
+    void decode_numabalanced_distribution(topology const& t,
         std::vector<mask_type>& affinities, std::size_t used_cores,
-        std::size_t max_cores, std::vector<std::size_t>& num_pus,
-        bool use_process_mask, error_code& ec)
+        [[maybe_unused]] std::size_t max_cores,
+        std::vector<std::size_t>& num_pus, bool use_process_mask,
+        error_code& ec)
     {
-        HPX_UNUSED(max_cores);
-        std::size_t num_threads = affinities.size();
+        std::size_t const num_threads = affinities.size();
 
         check_num_threads(use_process_mask, t, num_threads, ec);
 
@@ -972,8 +1006,8 @@ namespace hpx::threads::detail {
         num_pus.resize(num_threads);
 
         // numa nodes
-        std::size_t num_numas =
-            (std::max)(std::size_t(1), t.get_number_of_numa_nodes());
+        std::size_t const num_numas = (std::max)(
+            static_cast<std::size_t>(1), t.get_number_of_numa_nodes());
         std::vector<std::size_t> num_cores_numa(num_numas, 0);
         std::vector<std::size_t> num_pus_numa(num_numas, 0);
         std::vector<std::size_t> num_threads_numa(num_numas, 0);
@@ -989,9 +1023,9 @@ namespace hpx::threads::detail {
             for (std::size_t num_core = 0; num_core < num_cores_numa[n];
                  ++num_core)
             {
-                std::size_t num_pus =
+                std::size_t const pus =
                     t.get_number_of_core_pus(num_core + core_offset);
-                for (std::size_t num_pu = 0; num_pu < num_pus; ++num_pu)
+                for (std::size_t num_pu = 0; num_pu < pus; ++num_pu)
                 {
                     if (pu_in_process_mask(use_process_mask, t,
                             num_core + core_offset, num_pu))
@@ -1009,7 +1043,7 @@ namespace hpx::threads::detail {
         std::size_t pus_t2 = 0;
         for (std::size_t n = 0; n < num_numas; ++n)
         {
-            std::size_t temp = static_cast<std::size_t>(
+            auto temp = static_cast<std::size_t>(
                 std::round(static_cast<double>(num_threads * num_pus_numa[n]) /
                     static_cast<double>(pus_t)));
 
@@ -1041,7 +1075,7 @@ namespace hpx::threads::detail {
                 for (std::size_t num_core = 0; num_core < num_cores_numa[n];
                      ++num_core)
                 {
-                    std::size_t num_core_pus =
+                    std::size_t const num_core_pus =
                         t.get_number_of_core_pus(num_core);
                     std::size_t pu_index = next_pu_index[num_core];
                     bool use_pu = false;
@@ -1103,7 +1137,7 @@ namespace hpx::threads::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void decode_distribution(distribution_type d, topology& t,
+    void decode_distribution(distribution_type d, topology const& t,
         std::vector<mask_type>& affinities, std::size_t used_cores,
         std::size_t max_cores, std::size_t num_threads,
         std::vector<std::size_t>& num_pus, bool use_process_mask,
@@ -1154,7 +1188,7 @@ namespace hpx::threads {
 
         // We need to instantiate a new topology object as the runtime has not
         // been initialized yet
-        threads::topology& t = threads::create_topology();
+        threads::topology const& t = threads::create_topology();
 
         switch (mappings.which())
         {
@@ -1236,6 +1270,9 @@ namespace hpx::threads {
             }
         }
         break;
+
+        default:
+            HPX_ASSERT(false);
         }
     }
 }    // namespace hpx::threads

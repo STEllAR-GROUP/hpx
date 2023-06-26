@@ -214,7 +214,7 @@ namespace hpx::parallel::util {
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
-    inline constexpr loop_ind_t loop_ind = loop_ind_t<ExPolicy>{};
+    inline constexpr loop_ind_t<ExPolicy> loop_ind = loop_ind_t<ExPolicy>{};
 #else
     template <typename ExPolicy, typename Begin, typename End, typename F>
     HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_ind(

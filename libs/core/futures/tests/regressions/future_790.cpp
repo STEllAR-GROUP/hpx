@@ -7,8 +7,8 @@
 // This test case demonstrates the issue described in #790: wait_for() doesn't
 // compile
 
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <chrono>

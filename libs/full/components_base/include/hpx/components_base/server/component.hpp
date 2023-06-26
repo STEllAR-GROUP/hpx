@@ -16,11 +16,10 @@
 #include <hpx/components_base/traits/component_heap_type.hpp>
 
 #include <cstddef>
-#include <new>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////
     template <typename Component>
@@ -42,9 +41,9 @@ namespace hpx { namespace components { namespace detail {
 
     template <typename Component>
     util::internal_allocator<Component> simple_heap<Component>::alloc_;
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable>
@@ -52,9 +51,9 @@ namespace hpx { namespace traits {
     {
         using type = hpx::components::detail::simple_heap<Component>;
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
@@ -77,4 +76,4 @@ namespace hpx { namespace components {
         {
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

@@ -11,7 +11,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/static_reinit/static_reinit.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>    // for placement new

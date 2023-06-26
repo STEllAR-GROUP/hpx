@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2011 Katelyn Kufahl
@@ -26,10 +26,12 @@
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/buffer.hpp>
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
-#include <asio/placeholders.hpp>
 #include <asio/read.hpp>
 #include <asio/write.hpp>
 
@@ -57,17 +59,15 @@ namespace hpx::parcelset::policies::tcp {
     public:
         // Construct a sending parcelport_connection with the given io_context.
         sender(asio::io_context& io_service,
-            parcelset::locality const& locality_id, parcelset::parcelport* pp)
+            parcelset::locality const& locality_id,
+            [[maybe_unused]] parcelset::parcelport* pp)
           : socket_(io_service)
-          , ack_(0)
+          , ack_(false)
           , there_(locality_id)
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
           , pp_(pp)
 #endif
         {
-#if !defined(HPX_HAVE_PARCELPORT_COUNTERS)
-            HPX_UNUSED(pp);
-#endif
         }
 
         ~sender()
@@ -98,7 +98,7 @@ namespace hpx::parcelset::policies::tcp {
         {
 #if defined(HPX_DEBUG)
             std::error_code ec;
-            asio::ip::tcp::socket::endpoint_type endpoint =
+            asio::ip::tcp::socket::endpoint_type const endpoint =
                 socket_.remote_endpoint(ec);
 
             locality const& impl = parcel_locality_id.get<locality>();
@@ -185,8 +185,8 @@ namespace hpx::parcelset::policies::tcp {
                 &sender::handle_write;
 
             asio::async_write(socket_, buffers,
-                hpx::bind(
-                    f, shared_from_this(), placeholders::_1, placeholders::_2));
+                hpx::bind(f, shared_from_this(), hpx::placeholders::_1,
+                    hpx::placeholders::_2));
         }
 
     private:

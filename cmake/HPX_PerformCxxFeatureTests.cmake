@@ -32,8 +32,7 @@ function(hpx_perform_cxx_feature_tests)
   endif()
 
   hpx_check_for_cxx11_std_atomic(
-    REQUIRED "HPX needs support for C++11 std::atomic"
-    ${atomics_additional_flags}
+    DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC ${atomics_additional_flags}
   )
 
   # Separately check for 128 bit atomics
@@ -48,6 +47,10 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   hpx_check_for_c11_aligned_alloc(DEFINITIONS HPX_HAVE_C11_ALIGNED_ALLOC)
+
+  hpx_check_for_cxx14_delete_operator_with_size(
+    DEFINITIONS HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE
+  )
 
   hpx_check_for_cxx17_std_aligned_alloc(
     DEFINITIONS HPX_HAVE_CXX17_STD_ALIGNED_ALLOC

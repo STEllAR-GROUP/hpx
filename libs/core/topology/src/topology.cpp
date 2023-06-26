@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -15,7 +15,6 @@
 #include <hpx/modules/logging.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 #include <hpx/topology/topology.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/ios_flags_saver.hpp>
 
 #include <cstddef>
@@ -44,13 +43,13 @@
 #include <hwi/include/bqc/A2_inlines.h>
 #endif
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 #if defined(_POSIX_VERSION)
 #include <sys/resource.h>
 #include <sys/syscall.h>
-#endif
-
-#if defined(HPX_HAVE_UNISTD_H)
-#include <unistd.h>
 #endif
 
 namespace hpx::threads::detail {
@@ -59,7 +58,7 @@ namespace hpx::threads::detail {
     {
         try
         {
-            threads::topology& top = threads::create_topology();
+            threads::topology const& top = threads::create_topology();
             return top.get_number_of_pus();
         }
         catch (...)
@@ -131,12 +130,12 @@ namespace hpx::threads::detail {
     // abstract away memory page size
     std::size_t get_memory_page_size_impl()
     {
-#if defined(HPX_HAVE_UNISTD_H)
-        return sysconf(_SC_PAGE_SIZE);
-#elif defined(HPX_WINDOWS)
+#if defined(HPX_WINDOWS)
         SYSTEM_INFO systemInfo;
         GetSystemInfo(&systemInfo);
         return static_cast<std::size_t>(systemInfo.dwPageSize);
+#elif defined(HPX_HAVE_UNISTD_H)
+        return sysconf(_SC_PAGE_SIZE);
 #else
         return 4096;
 #endif
@@ -166,7 +165,7 @@ namespace hpx::threads {
         // as the first NUMA domain is likely to have the PCI controllers etc.
         mask_cref_type machine_mask = this->get_numa_node_affinity_mask(0, ec);
         if (ec || !any(machine_mask))
-            return mask_type();
+            return {};
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -176,9 +175,8 @@ namespace hpx::threads {
         return (!any(res)) ? machine_mask : res;
     }
 
-    bool topology::reduce_thread_priority(error_code& ec) const
+    bool topology::reduce_thread_priority([[maybe_unused]] error_code& ec) const
     {
-        HPX_UNUSED(ec);
 #ifdef HPX_HAVE_NICE_THREADLEVEL
 #if defined(__linux__) && !defined(__ANDROID__) && !defined(__bgq__)
         pid_t tid;
@@ -215,9 +213,6 @@ namespace hpx::threads {
 #endif
 
     topology::topology()
-      : topo(nullptr)
-      , use_pus_as_cores_(false)
-      , machine_affinity_mask_(0)
     {
         int err = hwloc_topology_init(&topo);
         if (err != 0)
@@ -381,7 +376,7 @@ namespace hpx::threads {
                 HPX_THROWS_IF(ec, hpx::error::no_success,
                     "topology::hwloc_get_nobjs_by_type",
                     "Failed to get number of cores");
-                return std::size_t(-1);
+                return static_cast<std::size_t>(-1);
             }
             use_pus = true;
         }
@@ -394,13 +389,14 @@ namespace hpx::threads {
                 topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_core));
 
             num_pu %= core_obj->arity;    //-V101 //-V104
-            return std::size_t(core_obj->children[num_pu]->logical_index);
+            return static_cast<std::size_t>(
+                core_obj->children[num_pu]->logical_index);
         }
 
         core_obj = hwloc_get_obj_by_type(
             topo, HWLOC_OBJ_PU, static_cast<unsigned>(num_core));
 
-        return std::size_t(core_obj->logical_index);
+        return static_cast<std::size_t>(core_obj->logical_index);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -416,9 +412,8 @@ namespace hpx::threads {
     mask_cref_type topology::get_socket_affinity_mask(
         std::size_t num_thread, error_code& ec) const
     {
-        std::size_t num_pu = num_thread % num_of_pus_;
-
-        if (num_pu < socket_affinity_masks_.size())
+        if (std::size_t const num_pu = num_thread % num_of_pus_;
+            num_pu < socket_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -435,9 +430,8 @@ namespace hpx::threads {
     mask_cref_type topology::get_numa_node_affinity_mask(
         std::size_t num_thread, error_code& ec) const
     {
-        std::size_t num_pu = num_thread % num_of_pus_;
-
-        if (num_pu < numa_node_affinity_masks_.size())
+        if (std::size_t const num_pu = num_thread % num_of_pus_;
+            num_pu < numa_node_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -454,9 +448,8 @@ namespace hpx::threads {
     mask_cref_type topology::get_core_affinity_mask(
         std::size_t num_thread, error_code& ec) const
     {
-        std::size_t num_pu = num_thread % num_of_pus_;
-
-        if (num_pu < core_affinity_masks_.size())
+        if (std::size_t const num_pu = num_thread % num_of_pus_;
+            num_pu < core_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -473,9 +466,8 @@ namespace hpx::threads {
     mask_cref_type topology::get_thread_affinity_mask(
         std::size_t num_thread, error_code& ec) const
     {
-        std::size_t num_pu = num_thread % num_of_pus_;
-
-        if (num_pu < thread_affinity_masks_.size())
+        if (std::size_t const num_pu = num_thread % num_of_pus_;
+            num_pu < thread_affinity_masks_.size())
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -495,7 +487,7 @@ namespace hpx::threads {
     {
 #if !defined(__APPLE__)
         // setting thread affinities is not supported by OSX
-        hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+        hwloc_cpuset_t const cpuset = hwloc_bitmap_alloc();
 
         int const pu_depth = hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
 
@@ -503,8 +495,8 @@ namespace hpx::threads {
         {
             if (test(mask, i))
             {
-                hwloc_obj_t const pu_obj =
-                    hwloc_get_obj_by_depth(topo, pu_depth, unsigned(i));
+                hwloc_obj_t const pu_obj = hwloc_get_obj_by_depth(
+                    topo, pu_depth, static_cast<unsigned>(i));
                 HPX_ASSERT(i == detail::get_index(pu_obj));
                 hwloc_bitmap_set(
                     cpuset, static_cast<unsigned int>(pu_obj->os_index));
@@ -519,8 +511,7 @@ namespace hpx::threads {
                 // Strict binding not supported or failed, try weak binding.
                 if (hwloc_set_cpubind(topo, cpuset, HWLOC_CPUBIND_THREAD))
                 {
-                    std::unique_ptr<char[]> buffer =
-                        std::make_unique<char[]>(1024);
+                    auto const buffer = std::make_unique<char[]>(1024);
 
                     hwloc_bitmap_snprintf(buffer.get(), 1024, cpuset);
                     hwloc_bitmap_free(cpuset);
@@ -554,65 +545,67 @@ namespace hpx::threads {
             ec = make_success_code();
 
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_DEFAULT;
-        hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
 
         {
+            hwloc_nodeset_t nodeset = hwloc_bitmap_alloc();
             std::unique_lock<mutex_type> lk(topo_mtx);
-            int ret =
 #if HWLOC_API_VERSION >= 0x00010b06
-                hwloc_get_area_membind(
-                    topo, lva, 1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
+            int const ret = hwloc_get_area_membind(
+                topo, lva, 1, nodeset, &policy, HWLOC_MEMBIND_BYNODESET);
 #else
-                hwloc_get_area_membind_nodeset(
-                    topo, lva, 1, nodeset, &policy, 0);
+            int const ret = hwloc_get_area_membind_nodeset(
+                topo, lva, 1, nodeset, &policy, 0);
 #endif
 
             if (-1 != ret)
             {
-                hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+                hwloc_cpuset_t const cpuset = hwloc_bitmap_alloc();
                 hwloc_cpuset_from_nodeset(topo, cpuset, nodeset);
                 lk.unlock();
 
                 hwloc_bitmap_free(nodeset);
 
-                mask_type mask = mask_type();
+                auto mask = mask_type();
                 resize(mask, get_number_of_pus());
 
                 int const pu_depth =
                     hwloc_get_type_or_below_depth(topo, HWLOC_OBJ_PU);
-                for (unsigned int i = 0; std::size_t(i) != num_of_pus_; ++i)
+                for (unsigned int i = 0;
+                     static_cast<std::size_t>(i) != num_of_pus_; ++i)
                 {
                     hwloc_obj_t const pu_obj =
                         hwloc_get_obj_by_depth(topo, pu_depth, i);
-                    unsigned idx = static_cast<unsigned>(pu_obj->os_index);
-                    if (hwloc_bitmap_isset(cpuset, idx) != 0)
+
+                    if (auto const idx =
+                            static_cast<unsigned>(pu_obj->os_index);
+                        hwloc_bitmap_isset(cpuset, idx) != 0)
+                    {
                         set(mask, detail::get_index(pu_obj));
+                    }
                 }
 
                 hwloc_bitmap_free(cpuset);
                 return mask;
             }
-            else
-            {
-                std::string errstr = std::strerror(errno);
 
-                lk.unlock();
-                HPX_THROW_EXCEPTION(hpx::error::no_success,
-                    "topology::get_thread_affinity_mask_from_lva",
-                    "failed calling 'hwloc_get_area_membind_nodeset', "
-                    "reported error: {}",
-                    errstr);
-            }
+            std::string const errstr = std::strerror(errno);
+
+            lk.unlock();
+            HPX_THROW_EXCEPTION(hpx::error::no_success,
+                "topology::get_thread_affinity_mask_from_lva",
+                "failed calling 'hwloc_get_area_membind_nodeset', "
+                "reported error: {}",
+                errstr);
         }
     }
 
-    std::size_t topology::init_numa_node_number(std::size_t num_thread)
+    std::size_t topology::init_numa_node_number(std::size_t num_thread) const
     {
 #if HWLOC_API_VERSION >= 0x00020000
-        if (std::size_t(-1) == num_thread)
-            return std::size_t(-1);
+        if (static_cast<std::size_t>(-1) == num_thread)
+            return static_cast<std::size_t>(-1);
 
-        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
+        std::size_t const num_pu = (num_thread + pu_offset) % num_of_pus_;
 
         hwloc_obj_t obj;
         {
@@ -628,7 +621,7 @@ namespace hpx::threads {
         {
             if (hwloc_bitmap_intersects(tmp->cpuset, obj->cpuset))
             {
-                /* tmp matches, use it */
+                // tmp matches, use it
                 return static_cast<std::size_t>(tmp->logical_index);
             }
         }
@@ -639,12 +632,12 @@ namespace hpx::threads {
     }
 
     std::size_t topology::init_node_number(
-        std::size_t num_thread, hwloc_obj_type_t type)
+        std::size_t num_thread, hwloc_obj_type_t type) const
     {
-        if (std::size_t(-1) == num_thread)
-            return std::size_t(-1);
+        if (static_cast<std::size_t>(-1) == num_thread)
+            return static_cast<std::size_t>(-1);
 
-        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
+        std::size_t const num_pu = (num_thread + pu_offset) % num_of_pus_;
 
         {
             hwloc_obj_t obj;
@@ -739,28 +732,26 @@ namespace hpx::threads {
 
     std::size_t topology::get_number_of_sockets() const
     {
-        int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
+        int const nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_SOCKET);
         if (0 > nobjs)
         {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_sockets",
                 "hwloc_get_nbobjs_by_type failed");
-            return std::size_t(nobjs);
         }
-        return std::size_t(nobjs);
+        return static_cast<std::size_t>(nobjs);
     }
 
     std::size_t topology::get_number_of_numa_nodes() const
     {
-        int nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NUMANODE);
+        int const nobjs = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_NUMANODE);
         if (0 > nobjs)
         {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_numa_nodes",
                 "hwloc_get_nbobjs_by_type failed");
-            return std::size_t(nobjs);
         }
-        return std::size_t(nobjs);
+        return static_cast<std::size_t>(nobjs);
     }
 
     std::size_t topology::get_number_of_cores() const
@@ -773,7 +764,6 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_cores",
                 "hwloc_get_nbobjs_by_type(HWLOC_OBJ_CORE) failed");
-            return std::size_t(nobjs);
         }
         else if (0 == nobjs)
         {
@@ -785,7 +775,6 @@ namespace hpx::threads {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::get_number_of_cores",
                     "hwloc_get_nbobjs_by_type(HWLOC_OBJ_PU) failed");
-                return std::size_t(nobjs);
             }
         }
 
@@ -796,15 +785,14 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_number_of_cores",
                 "hwloc_get_nbobjs_by_type reports zero cores/pus");
-            return std::size_t(nobjs);
         }
 
-        return std::size_t(nobjs);
+        return static_cast<std::size_t>(nobjs);
     }
 
     std::size_t topology::get_number_of_socket_pus(std::size_t num_socket) const
     {
-        hwloc_obj_t socket_obj = nullptr;
+        hwloc_obj_t socket_obj;
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -815,7 +803,7 @@ namespace hpx::threads {
         if (socket_obj)
         {
             HPX_ASSERT(num_socket == detail::get_index(socket_obj));
-            std::size_t pu_count = 0;
+            constexpr std::size_t pu_count = 0;
             return extract_node_count(socket_obj, HWLOC_OBJ_PU, pu_count);
         }
 
@@ -825,7 +813,7 @@ namespace hpx::threads {
     std::size_t topology::get_number_of_numa_node_pus(
         std::size_t numa_node) const
     {
-        hwloc_obj_t node_obj = nullptr;
+        hwloc_obj_t node_obj;
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -836,8 +824,9 @@ namespace hpx::threads {
         if (node_obj)
         {
             HPX_ASSERT(numa_node == detail::get_index(node_obj));
-            std::size_t pu_count = 0;
             node_obj = detail::adjust_node_obj(node_obj);
+
+            constexpr std::size_t pu_count = 0;
             return extract_node_count(node_obj, HWLOC_OBJ_PU, pu_count);
         }
 
@@ -846,17 +835,17 @@ namespace hpx::threads {
 
     std::size_t topology::get_number_of_core_pus_locked(std::size_t core) const
     {
-        hwloc_obj_t core_obj = hwloc_get_obj_by_type(
+        hwloc_obj_t const core_obj = hwloc_get_obj_by_type(
             topo, HWLOC_OBJ_CORE, static_cast<unsigned>(core));
 
         if (!use_pus_as_cores_ && core_obj)
         {
             HPX_ASSERT(core == detail::get_index(core_obj));
-            std::size_t pu_count = 0;
+            constexpr std::size_t pu_count = 0;
             return extract_node_count_locked(core_obj, HWLOC_OBJ_PU, pu_count);
         }
 
-        return std::size_t(1);
+        return static_cast<std::size_t>(1);
     }
 
     std::size_t topology::get_number_of_core_pus(std::size_t core) const
@@ -868,7 +857,7 @@ namespace hpx::threads {
     std::size_t topology::get_number_of_socket_cores(
         std::size_t num_socket) const
     {
-        hwloc_obj_t socket_obj = nullptr;
+        hwloc_obj_t socket_obj;
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -879,7 +868,7 @@ namespace hpx::threads {
         if (socket_obj)
         {
             HPX_ASSERT(num_socket == detail::get_index(socket_obj));
-            std::size_t pu_count = 0;
+            constexpr std::size_t pu_count = 0;
             return extract_node_count(socket_obj,
                 use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE, pu_count);
         }
@@ -890,7 +879,7 @@ namespace hpx::threads {
     std::size_t topology::get_number_of_numa_node_cores(
         std::size_t numa_node) const
     {
-        hwloc_obj_t node_obj = nullptr;
+        hwloc_obj_t node_obj;
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
             node_obj = hwloc_get_obj_by_type(
@@ -900,8 +889,9 @@ namespace hpx::threads {
         if (node_obj)
         {
             HPX_ASSERT(numa_node == detail::get_index(node_obj));
-            std::size_t pu_count = 0;
             node_obj = detail::adjust_node_obj(node_obj);
+
+            constexpr std::size_t pu_count = 0;
             return extract_node_count(node_obj,
                 use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE, pu_count);
         }
@@ -972,14 +962,13 @@ namespace hpx::threads {
 
         for (std::size_t i = 0; i != num_of_pus_; ++i)
         {
-            hwloc_obj_t obj =
-                hwloc_get_obj_by_type(topo, HWLOC_OBJ_PU, unsigned(i));
+            hwloc_obj_t obj = hwloc_get_obj_by_type(
+                topo, HWLOC_OBJ_PU, static_cast<unsigned>(i));
             if (!obj)
             {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::print_affinity_mask",
                     "object not found");
-                return;
             }
 
             if (!test(m, detail::get_index(obj)))    //-V106
@@ -1011,7 +1000,7 @@ namespace hpx::threads {
 
     mask_type topology::init_machine_affinity_mask() const
     {
-        mask_type machine_affinity_mask = mask_type();
+        auto machine_affinity_mask = mask_type();
         resize(machine_affinity_mask, get_number_of_pus());
 
         hwloc_obj_t machine_obj;
@@ -1019,6 +1008,7 @@ namespace hpx::threads {
             std::unique_lock<mutex_type> lk(topo_mtx);
             machine_obj = hwloc_get_obj_by_type(topo, HWLOC_OBJ_MACHINE, 0);
         }
+
         if (machine_obj)
         {
             extract_node_mask(machine_obj, machine_affinity_mask);
@@ -1028,7 +1018,6 @@ namespace hpx::threads {
         HPX_THROW_EXCEPTION(hpx::error::kernel_error,
             "hpx::threads::topology::init_machine_affinity_mask",
             "failed to initialize machine affinity mask");
-        return empty_mask;
     }
 
     mask_type topology::init_socket_affinity_mask_from_socket(
@@ -1036,10 +1025,11 @@ namespace hpx::threads {
     {
         // If we have only one or no socket, the socket affinity mask
         // spans all processors
-        if (std::size_t(-1) == num_socket)
+        if (static_cast<std::size_t>(-1) == num_socket)
             return machine_affinity_mask_;
 
-        hwloc_obj_t socket_obj = nullptr;
+        hwloc_obj_t socket_obj;
+
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
             socket_obj = hwloc_get_obj_by_type(
@@ -1050,7 +1040,7 @@ namespace hpx::threads {
         {
             HPX_ASSERT(num_socket == detail::get_index(socket_obj));
 
-            mask_type socket_affinity_mask = mask_type();
+            auto socket_affinity_mask = mask_type();
             resize(socket_affinity_mask, get_number_of_pus());
 
             extract_node_mask(socket_obj, socket_affinity_mask);
@@ -1065,12 +1055,13 @@ namespace hpx::threads {
     {
         // If we have only one or no NUMA domain, the NUMA affinity mask
         // spans all processors
-        if (std::size_t(-1) == numa_node)
+        if (static_cast<std::size_t>(-1) == numa_node)
         {
             return machine_affinity_mask_;
         }
 
-        hwloc_obj_t numa_node_obj = nullptr;
+        hwloc_obj_t numa_node_obj;
+
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
             numa_node_obj = hwloc_get_obj_by_type(
@@ -1080,7 +1071,7 @@ namespace hpx::threads {
         if (numa_node_obj)
         {
             HPX_ASSERT(numa_node == detail::get_index(numa_node_obj));
-            mask_type node_affinity_mask = mask_type();
+            auto node_affinity_mask = mask_type();
             resize(node_affinity_mask, get_number_of_pus());
 
             numa_node_obj = detail::adjust_node_obj(numa_node_obj);
@@ -1094,14 +1085,14 @@ namespace hpx::threads {
     mask_type topology::init_core_affinity_mask_from_core(
         std::size_t core, mask_cref_type default_mask) const
     {
-        if (std::size_t(-1) == core)
+        if (static_cast<std::size_t>(-1) == core)
         {
             return default_mask;
         }
 
-        hwloc_obj_t core_obj = nullptr;
-
-        std::size_t num_core = (core + core_offset) % get_number_of_cores();
+        hwloc_obj_t core_obj;
+        std::size_t const num_core =
+            (core + core_offset) % get_number_of_cores();
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -1125,14 +1116,13 @@ namespace hpx::threads {
 
     mask_type topology::init_thread_affinity_mask(std::size_t num_thread) const
     {
-        if (std::size_t(-1) == num_thread)
+        if (static_cast<std::size_t>(-1) == num_thread)
         {
             return get_core_affinity_mask(num_thread);
         }
 
-        std::size_t num_pu = (num_thread + pu_offset) % num_of_pus_;
-
-        hwloc_obj_t obj = nullptr;
+        std::size_t const num_pu = (num_thread + pu_offset) % num_of_pus_;
+        hwloc_obj_t obj;
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
@@ -1146,7 +1136,7 @@ namespace hpx::threads {
         }
 
         HPX_ASSERT(num_pu == detail::get_index(obj));
-        mask_type mask = mask_type();
+        auto mask = mask_type();
         resize(mask, get_number_of_pus());
 
         set(mask, detail::get_index(obj));    //-V106
@@ -1157,11 +1147,11 @@ namespace hpx::threads {
     mask_type topology::init_thread_affinity_mask(
         std::size_t num_core, std::size_t num_pu) const
     {
-        hwloc_obj_t obj = nullptr;
+        hwloc_obj_t obj;
 
         {
             std::unique_lock<mutex_type> lk(topo_mtx);
-            int num_cores = hwloc_get_nbobjs_by_type(
+            int const num_cores = hwloc_get_nbobjs_by_type(
                 topo, use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE);
 
             // If num_cores is smaller 0, we have an error, it should never be
@@ -1172,10 +1162,10 @@ namespace hpx::threads {
                 HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                     "hpx::threads::topology::init_thread_affinity_mask",
                     "hwloc_get_nbobjs_by_type failed");
-                return empty_mask;
             }
 
-            num_core = (num_core + core_offset) % std::size_t(num_cores);
+            num_core =
+                (num_core + core_offset) % static_cast<std::size_t>(num_cores);
             obj = hwloc_get_obj_by_type(topo,
                 use_pus_as_cores_ ? HWLOC_OBJ_PU : HWLOC_OBJ_CORE,
                 static_cast<unsigned>(num_core));
@@ -1186,7 +1176,7 @@ namespace hpx::threads {
 
         HPX_ASSERT(num_core == detail::get_index(obj));
 
-        mask_type mask = mask_type();
+        auto mask = mask_type();
         resize(mask, get_number_of_pus());
 
         if (use_pus_as_cores_)
@@ -1218,8 +1208,9 @@ namespace hpx::threads {
                 use_pus_as_cores_ = true;
             }
 
-            int num_of_pus = hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
-            if (num_of_pus > 0)
+            if (int const num_of_pus =
+                    hwloc_get_nbobjs_by_type(topo, HWLOC_OBJ_PU);
+                num_of_pus > 0)
             {
                 num_of_pus_ = static_cast<std::size_t>(num_of_pus);
             }
@@ -1234,9 +1225,9 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     mask_type topology::get_cpubind_mask(error_code& ec) const
     {
-        hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
+        hwloc_cpuset_t const cpuset = hwloc_bitmap_alloc();
 
-        mask_type mask = mask_type();
+        auto mask = mask_type();
         resize(mask, get_number_of_pus());
 
 #if !defined(__APPLE__)
@@ -1257,7 +1248,7 @@ namespace hpx::threads {
             {
                 hwloc_obj_t const pu_obj =
                     hwloc_get_obj_by_depth(topo, pu_depth, i);
-                unsigned idx = static_cast<unsigned>(pu_obj->os_index);
+                auto const idx = static_cast<unsigned>(pu_obj->os_index);
                 if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
@@ -1277,7 +1268,7 @@ namespace hpx::threads {
     {
         hwloc_cpuset_t cpuset = hwloc_bitmap_alloc();
 
-        mask_type mask = mask_type();
+        auto mask = mask_type();
         resize(mask, get_number_of_pus());
 
         {
@@ -1304,7 +1295,7 @@ namespace hpx::threads {
             {
                 hwloc_obj_t const pu_obj =
                     hwloc_get_obj_by_depth(topo, pu_depth, i);
-                unsigned idx = static_cast<unsigned>(pu_obj->os_index);
+                auto const idx = static_cast<unsigned>(pu_obj->os_index);
                 if (hwloc_bitmap_isset(cpuset, idx) != 0)
                     set(mask, detail::get_index(pu_obj));
             }
@@ -1329,13 +1320,14 @@ namespace hpx::threads {
     ///////////////////////////////////////////////////////////////////////////
     /// Allocate some memory on NUMA memory nodes specified by nodeset
     /// as specified by the hwloc hwloc_alloc_membind_nodeset call
-    void* topology::allocate_membind(std::size_t len, hwloc_bitmap_ptr bitmap,
-        hpx_hwloc_membind_policy policy, int flags) const
+    void* topology::allocate_membind(std::size_t len,
+        hwloc_bitmap_ptr const& bitmap, hpx_hwloc_membind_policy policy,
+        int flags) const
     {
         return
 #if HWLOC_API_VERSION >= 0x00010b06
             hwloc_alloc_membind(topo, len, bitmap->get_bmp(),
-                hwloc_membind_policy_t(policy),
+                static_cast<hwloc_membind_policy_t>(policy),
                 flags | HWLOC_MEMBIND_BYNODESET);
 #else
             hwloc_alloc_membind_nodeset(topo, len, bitmap->get_bmp(),
@@ -1348,13 +1340,13 @@ namespace hpx::threads {
     {
 #if !defined(__APPLE__)
         hwloc_membind_policy_t policy = ::HWLOC_MEMBIND_BIND;
-        hwloc_nodeset_t ns = reinterpret_cast<hwloc_nodeset_t>(nodeset);
+        auto ns = static_cast<hwloc_nodeset_t>(nodeset);
 
-        int ret =
 #if HWLOC_API_VERSION >= 0x00010b06
-            hwloc_set_area_membind(
-                topo, addr, len, ns, policy, HWLOC_MEMBIND_BYNODESET);
+        int ret = hwloc_set_area_membind(
+            topo, addr, len, ns, policy, HWLOC_MEMBIND_BYNODESET);
 #else
+        int ret =
             hwloc_set_area_membind_nodeset(topo, addr, len, ns, policy, 0);
 #endif
 
@@ -1363,12 +1355,12 @@ namespace hpx::threads {
             std::string msg = std::strerror(errno);
             if (errno == ENOSYS)
                 msg = "the action is not supported";
-            if (errno == EXDEV)
+            else if (errno == EXDEV)
                 msg = "the binding cannot be enforced";
+
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::set_area_membind_nodeset",
                 "hwloc_set_area_membind_nodeset failed : {}", msg);
-            return false;
         }
 #endif
         return true;
@@ -1391,8 +1383,7 @@ namespace hpx::threads {
         }
 
         hwloc_membind_policy_t policy;
-        hwloc_nodeset_t ns =
-            reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
+        auto ns = reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
 
 #if HWLOC_API_VERSION >= 0x00010b06
         if (hwloc_get_area_membind(
@@ -1405,7 +1396,6 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_area_membind_nodeset",
                 "hwloc_get_area_membind_nodeset failed");
-            return bitmap_to_mask(ns, HWLOC_OBJ_MACHINE);
         }
 
         return bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
@@ -1421,10 +1411,9 @@ namespace hpx::threads {
         }
 
         //
-        hwloc_nodeset_t ns =
-            reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
+        auto const ns = reinterpret_cast<hwloc_nodeset_t>(nodeset.get_bmp());
 
-        int ret = hwloc_get_area_memlocation(
+        int const ret = hwloc_get_area_memlocation(
             topo, addr, 1, ns, HWLOC_MEMBIND_BYNODESET);
         if (ret < 0)
         {
@@ -1436,11 +1425,10 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::kernel_error,
                 "hpx::threads::topology::get_numa_domain",
                 "hwloc_get_area_memlocation failed {}", msg);
-            return -1;
 #endif
         }
 
-        threads::mask_type mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
+        threads::mask_type const mask = bitmap_to_mask(ns, HWLOC_OBJ_NUMANODE);
         return static_cast<int>(threads::find_first(mask));
 #else
         return 0;
@@ -1456,7 +1444,7 @@ namespace hpx::threads {
     ////////////////////////////////////////////////////////////////////////////
     hwloc_obj_t topology::get_pu_obj(std::size_t num_pu) const
     {
-        hwloc_obj_t pu_obj = hwloc_get_obj_by_type(
+        hwloc_obj_t const pu_obj = hwloc_get_obj_by_type(
             topo, HWLOC_OBJ_CORE, static_cast<unsigned>(num_pu));
 
         if (pu_obj == nullptr)
@@ -1474,7 +1462,8 @@ namespace hpx::threads {
     static void iterate(hwloc_bitmap_t cpuset, F&& f)
     {
         for (auto id = hwloc_bitmap_first(cpuset);
-             (unsigned) id != (unsigned) -1; id = hwloc_bitmap_next(cpuset, id))
+             static_cast<unsigned>(id) != static_cast<unsigned>(-1);
+             id = hwloc_bitmap_next(cpuset, id))
         {
             if (hwloc_bitmap_isset(cpuset, id))
             {
@@ -1491,7 +1480,7 @@ namespace hpx::threads {
     }
 
     // Return the size of the cache associated with the given cpuset.
-    std::size_t topology::get_cache_size(mask_type mask, int level) const
+    std::size_t topology::get_cache_size(mask_cref_type mask, int level) const
     {
         if (level < 1 || level > 5)
         {
@@ -1536,12 +1525,13 @@ namespace hpx::threads {
             if (pu_obj == nullptr)
                 return;
 
-            hwloc_obj_t cache_obj =
+            hwloc_obj_t const cache_obj =
                 hwloc_get_ancestor_obj_by_type(topo, type, pu_obj);
             if (cache_obj == nullptr)
                 return;
 
-            cache_size += std::size_t(cache_obj->attr->cache.size) /
+            cache_size +=
+                static_cast<std::size_t>(cache_obj->attr->cache.size) /
                 num_set_bits(cache_obj->cpuset);
 #else
             // traverse up until found the requested cache level
@@ -1566,7 +1556,7 @@ namespace hpx::threads {
     hwloc_bitmap_t topology::mask_to_bitmap(
         mask_cref_type mask, hwloc_obj_type_t htype) const
     {
-        hwloc_bitmap_t bitmap = hwloc_bitmap_alloc();
+        hwloc_bitmap_t const bitmap = hwloc_bitmap_alloc();
         hwloc_bitmap_zero(bitmap);
         //
         int const depth = hwloc_get_type_or_below_depth(topo, htype);
@@ -1575,8 +1565,8 @@ namespace hpx::threads {
         {
             if (test(mask, i))
             {
-                hwloc_obj_t const hw_obj =
-                    hwloc_get_obj_by_depth(topo, depth, unsigned(i));
+                hwloc_obj_t const hw_obj = hwloc_get_obj_by_depth(
+                    topo, depth, static_cast<unsigned>(i));
                 HPX_ASSERT(i == detail::get_index(hw_obj));
                 hwloc_bitmap_set(
                     bitmap, static_cast<unsigned int>(hw_obj->os_index));
@@ -1589,16 +1579,17 @@ namespace hpx::threads {
     mask_type topology::bitmap_to_mask(
         hwloc_bitmap_t bitmap, hwloc_obj_type_t htype) const
     {
-        mask_type mask = mask_type();
+        auto mask = mask_type();
         resize(mask, get_number_of_pus());
-        std::size_t num = hwloc_get_nbobjs_by_type(topo, htype);
-        //
+        std::size_t const num = hwloc_get_nbobjs_by_type(topo, htype);
+
         int const pu_depth = hwloc_get_type_or_below_depth(topo, htype);
-        for (unsigned int i = 0; std::size_t(i) != num; ++i)    //-V104
+        for (unsigned int i = 0; static_cast<std::size_t>(i) != num;
+             ++i)    //-V104
         {
             hwloc_obj_t const pu_obj =
                 hwloc_get_obj_by_depth(topo, pu_depth, i);
-            unsigned idx = static_cast<unsigned>(pu_obj->os_index);
+            auto const idx = static_cast<unsigned>(pu_obj->os_index);
             if (hwloc_bitmap_isset(bitmap, idx) != 0)
                 set(mask, detail::get_index(pu_obj));
         }
@@ -1607,9 +1598,9 @@ namespace hpx::threads {
 
     ///////////////////////////////////////////////////////////////////////////
     void topology::print_mask_vector(
-        std::ostream& os, std::vector<mask_type> const& v) const
+        std::ostream& os, std::vector<mask_type> const& v)
     {
-        std::size_t s = v.size();
+        std::size_t const s = v.size();
         if (s == 0)
         {
             os << "(empty)\n";
@@ -1624,9 +1615,9 @@ namespace hpx::threads {
     }
 
     void topology::print_vector(
-        std::ostream& os, std::vector<std::size_t> const& v) const
+        std::ostream& os, std::vector<std::size_t> const& v)
     {
-        std::size_t s = v.size();
+        std::size_t const s = v.size();
         if (s == 0)
         {
             os << "(empty)\n";
@@ -1655,6 +1646,7 @@ namespace hpx::threads {
            << "hardware concurrency  : " << hpx::threads::hardware_concurrency()
            << "\n"
            << std::endl;
+
         //! -------------------------------------- topology (affinity masks)
         os << "[HWLOC topology info] affinity masks :\n"
            << "machine               : \n"
@@ -1696,7 +1688,7 @@ namespace hpx::threads {
     struct hw_concurrency
     {
         hw_concurrency()
-#if defined(__ANDROID__) && defined(ANDROID)
+#if defined(__ANDROID__) || defined(ANDROID)
           : num_of_cores_(::android_getCpuCount())
 #else
           : num_of_cores_(detail::hwloc_hardware_concurrency())

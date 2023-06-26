@@ -7,9 +7,9 @@
 // This example is meant for inclusion in the documentation.
 
 //[for_each_docs
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include <iostream>
 #include <vector>

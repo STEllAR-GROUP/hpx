@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,17 +13,65 @@
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/futures.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <cstdint>
 #include <mutex>
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
+
+    namespace detail {
+
+        template <typename Mutex>
+        struct migration_support_data
+        {
+            migration_support_data() noexcept
+              : count_(1)
+            {
+            }
+
+            migration_support_data(migration_support_data const&) = delete;
+            migration_support_data(migration_support_data&&) = delete;
+            migration_support_data& operator=(
+                migration_support_data const&) = delete;
+            migration_support_data& operator=(
+                migration_support_data&&) = delete;
+
+            ~migration_support_data()
+            {
+                // make sure object is deleted only after all pin-counts have
+                // been given back
+                HPX_ASSERT(pin_count_ == ~0x0u || pin_count_ == 0);
+            }
+
+            mutable Mutex mtx_;
+            std::uint32_t pin_count_ = 0;
+
+        private:
+            friend void intrusive_ptr_add_ref(
+                migration_support_data* p) noexcept
+            {
+                ++p->count_;
+            }
+            friend void intrusive_ptr_release(
+                migration_support_data* p) noexcept
+            {
+                if (0 == --p->count_)
+                {
+                    delete p;
+                }
+            }
+
+            hpx::util::atomic_count count_;
+        };
+    }    // namespace detail
+    /// \endcond
 
     /// This hook has to be inserted into the derivation chain of any component
     /// for it to support migration.
@@ -31,36 +79,30 @@ namespace hpx { namespace components {
     struct migration_support : BaseComponent
     {
     private:
-        using mutex_type = Mutex;
         using base_type = BaseComponent;
         using this_component_type = typename base_type::this_component_type;
 
     public:
         migration_support() noexcept
-          : pin_count_(0)
-          , was_marked_for_migration_(false)
+          : data_(new detail::migration_support_data<Mutex>(), false)
         {
         }
 
         template <typename T, typename... Ts,
-            typename Enable = std::enable_if_t<
+            typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<T>, migration_support>>>
         explicit migration_support(T&& t, Ts&&... ts)
           : base_type(HPX_FORWARD(T, t), HPX_FORWARD(Ts, ts)...)
-          , pin_count_(0)
-          , was_marked_for_migration_(false)
+          , data_(new detail::migration_support_data<Mutex>(), false)
         {
         }
 
-        ~migration_support()
-        {
-            // prevent base destructor from unregistering the gid if this
-            // instance has been migrated
-            if (pin_count_ == ~0x0u)
-            {
-                this->gid_ = naming::invalid_gid;
-            }
-        }
+        migration_support(migration_support const&) = default;
+        migration_support(migration_support&&) = default;
+        migration_support& operator=(migration_support const&) = default;
+        migration_support& operator=(migration_support&&) = default;
+
+        ~migration_support() = default;
 
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
@@ -78,7 +120,7 @@ namespace hpx { namespace components {
         }
 
         // This component type supports migration.
-        static constexpr bool supports_migration() noexcept
+        [[nodiscard]] static constexpr bool supports_migration() noexcept
         {
             return true;
         }
@@ -86,34 +128,70 @@ namespace hpx { namespace components {
         // Pinning functionality
         void pin() noexcept
         {
-            std::lock_guard l(mtx_);
-            HPX_ASSERT(pin_count_ != ~0x0u);
-            if (pin_count_ != ~0x0u)
+            intrusive_ptr_add_ref(data_.get());    // keep alive
+
+            std::unique_lock l(data_->mtx_);
+
+            HPX_ASSERT_LOCKED(l, data_->pin_count_ != ~0x0u);
+            if (data_->pin_count_ != ~0x0u)
             {
-                ++pin_count_;
+                // there shouldn't be any pinning happening once the pin-count
+                // has gone to zero and has triggered a migration
+                HPX_ASSERT_LOCKED(l,
+                    data_->pin_count_ != 0 ||
+                        (!started_migration_ && !was_marked_for_migration_));
+                ++data_->pin_count_;
             }
         }
+
+    private:
+        struct release_on_exit
+        {
+            explicit release_on_exit(
+                detail::migration_support_data<Mutex>* data) noexcept
+              : data_(data)
+            {
+            }
+
+            release_on_exit(release_on_exit const&) = delete;
+            release_on_exit(release_on_exit&&) = delete;
+            release_on_exit& operator=(release_on_exit const&) = delete;
+            release_on_exit& operator=(release_on_exit&&) = delete;
+
+            ~release_on_exit()
+            {
+                intrusive_ptr_release(data_);
+            }
+
+            detail::migration_support_data<Mutex>* data_;
+        };
+
+    public:
         bool unpin()
         {
+            // pin() acquired an additional reference count that needs to be
+            // released after unpinning.
+            release_on_exit _(data_.get());
+
             {
                 // no need to go through AGAS if the object is currently pinned
                 // more than once
-                std::unique_lock l(this->mtx_);
+                std::unique_lock l(data_->mtx_);
 
-                if (pin_count_ != ~0x0u && pin_count_ > 1)
+                if (data_->pin_count_ != ~0x0u && data_->pin_count_ > 1)
                 {
-                    --pin_count_;
+                    --data_->pin_count_;
                     return false;
                 }
 
                 // no need to go through AGAS either if this object is not
                 // currently being migrated (unpin will be called for each
-                // action run on this object)
+                // action that runs on this object)
                 if (!was_marked_for_migration_)
                 {
-                    if (pin_count_ != ~0x0u)
+                    if (data_->pin_count_ != ~0x0u)
                     {
-                        --pin_count_;
+                        --data_->pin_count_;
                     }
                     return false;
                 }
@@ -123,27 +201,21 @@ namespace hpx { namespace components {
             bool was_migrated = false;
             agas::mark_as_migrated(
                 this->gid_,
-                [this, &was_migrated]() mutable
-                -> std::pair<bool, hpx::future<void>> {
-                    std::unique_lock l(this->mtx_);
+                [this, &was_migrated]() -> std::pair<bool, hpx::future<void>> {
+                    std::unique_lock l(data_->mtx_);
 
-                    // avoid locking errors while handling asserts below
-                    util::ignore_while_checking il(&l);
-                    HPX_UNUSED(il);
+                    was_migrated = data_->pin_count_ == ~0x0u;
 
-                    was_migrated = this->pin_count_ == ~0x0u;
-                    HPX_ASSERT(this->pin_count_ != 0);
-                    if (this->pin_count_ != ~0x0u)
+                    HPX_ASSERT_LOCKED(l, data_->pin_count_ != 0);
+                    if (data_->pin_count_ != ~0x0u)
                     {
-                        if (--this->pin_count_ == 0)
+                        if (--data_->pin_count_ == 0)
                         {
                             // trigger pending migration if this was the last
                             // unpin and a migration operation is pending
-                            HPX_ASSERT(trigger_migration_.valid());
+                            HPX_ASSERT_LOCKED(l, trigger_migration_.valid());
                             if (was_marked_for_migration_)
                             {
-                                was_marked_for_migration_ = false;
-
                                 hpx::promise<void> p;
                                 std::swap(p, trigger_migration_);
 
@@ -163,22 +235,24 @@ namespace hpx { namespace components {
             return was_migrated;
         }
 
-        std::uint32_t pin_count() const noexcept
+        [[nodiscard]] std::uint32_t pin_count() const noexcept
         {
-            std::lock_guard l(mtx_);
-            return pin_count_;
+            auto const data = data_;    // keep alive
+            std::unique_lock l(data->mtx_);
+
+            return data->pin_count_;
         }
         void mark_as_migrated()
         {
-            std::unique_lock l(mtx_);
+            auto const data = data_;    // keep alive
+            std::unique_lock l(data->mtx_);
 
-            // avoid locking errors while handling asserts below
-            util::ignore_while_checking il(&l);
-            HPX_UNUSED(il);
+            HPX_ASSERT_LOCKED(l, 0 == data->pin_count_);
+            data->pin_count_ = ~0x0u;
 
-            HPX_ASSERT(1 == pin_count_);
-
-            pin_count_ = ~0x0u;
+            // prevent base destructor from unregistering the gid if this
+            // instance was migrated
+            this->gid_ = naming::invalid_gid;
         }
 
         hpx::future<void> mark_as_migrated(hpx::id_type const& to_migrate)
@@ -188,7 +262,8 @@ namespace hpx { namespace components {
             return agas::mark_as_migrated(
                 to_migrate.get_gid(),
                 [this]() mutable -> std::pair<bool, hpx::future<void>> {
-                    std::unique_lock l(mtx_);
+                    auto const data = data_;    // keep alive
+                    std::unique_lock l(data->mtx_);
 
                     // make sure that no migration is currently in flight
                     if (was_marked_for_migration_)
@@ -202,9 +277,10 @@ namespace hpx { namespace components {
                                 "migration operation is already in flight")));
                     }
 
-                    if (1 == pin_count_)
+                    if (1 == data->pin_count_)
                     {
                         // all is well, migration can be triggered now
+                        started_migration_ = true;
                         return std::make_pair(true, make_ready_future());
                     }
 
@@ -218,9 +294,25 @@ namespace hpx { namespace components {
                 false);
         }
 
-        /// This hook is invoked on the newly created object after the migration
-        /// has been finished
-        constexpr void on_migrated() noexcept {}
+        // This hook is invoked if a migration step is being cancelled
+        void unmark_as_migrated(hpx::id_type const& to_migrate)
+        {
+            // we need to first lock the AGAS migrated objects table, only then
+            // access (lock) the object
+            agas::unmark_as_migrated(to_migrate.get_gid(), [this] {
+                auto const data = data_;    // keep alive
+                std::unique_lock l(data->mtx_);
+
+                HPX_ASSERT_LOCKED(l, 0 == data->pin_count_);
+
+                started_migration_ = false;
+                was_marked_for_migration_ = false;
+            });
+        }
+
+        // This hook is invoked on the newly created object after the migration
+        // has been finished
+        static constexpr void on_migrated() noexcept {}
 
         using decorates_action = void;
 
@@ -265,9 +357,9 @@ namespace hpx { namespace components {
         }
 
     private:
-        mutable mutex_type mtx_;
-        std::uint32_t pin_count_;
+        hpx::intrusive_ptr<detail::migration_support_data<Mutex>> data_;
         hpx::promise<void> trigger_migration_;
-        bool was_marked_for_migration_;
+        bool started_migration_ = false;
+        bool was_marked_for_migration_ = false;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

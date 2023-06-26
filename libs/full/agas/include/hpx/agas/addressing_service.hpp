@@ -176,7 +176,7 @@ namespace hpx { namespace agas {
         // FIXME: document (add comments)
         void garbage_collect(error_code& ec = throws);
 
-        std::int64_t synchronize_with_async_incref(
+        static std::int64_t synchronize_with_async_incref(
             hpx::future<std::int64_t> fut, hpx::id_type const& id,
             std::int64_t compensated_credit);
 
@@ -196,16 +196,17 @@ namespace hpx { namespace agas {
         }
 
         server::component_namespace* get_local_component_namespace_service()
+            const
         {
             return component_ns_->get_service();
         }
 
-        server::locality_namespace* get_local_locality_namespace_service()
+        server::locality_namespace* get_local_locality_namespace_service() const
         {
             return locality_ns_->get_service();
         }
 
-        server::symbol_namespace& get_local_symbol_namespace_service()
+        server::symbol_namespace& get_local_symbol_namespace_service() const
         {
             return symbol_ns_.get_service();
         }
@@ -285,7 +286,7 @@ namespace hpx { namespace agas {
 
         /// \brief Get locality locality_id of the console locality.
         ///
-        /// \param locality_id     [out] The locality_id value uniquely identifying the
+        /// \param locality   [out] The locality_id value uniquely identifying the
         ///                   console locality. This is valid only, if the
         ///                   return value of this function is true.
         /// \param try_cache  [in] If this is set to true the console is first
@@ -336,7 +337,7 @@ namespace hpx { namespace agas {
             components::component_type type, error_code& ec = throws) const;
 
         bool get_localities(std::vector<naming::gid_type>& locality_ids,
-            error_code& ec = throws)
+            error_code& ec = throws) const
         {
             return get_localities(
                 locality_ids, components::component_invalid, ec);
@@ -441,7 +442,7 @@ namespace hpx { namespace agas {
         ///                   of hpx#exception.
         components::component_type register_factory(
             naming::gid_type const& locality_id, std::string const& name,
-            error_code& ec = throws)
+            error_code& ec = throws) const
         {
             return register_factory(
                 naming::get_locality_id_from_gid(locality_id), name, ec);
@@ -621,7 +622,6 @@ namespace hpx { namespace agas {
         ///
         /// \note             This function will raise an error if the global
         ///                   reference count of the given gid is not zero!
-        ///                   TODO: confirm that this happens.
         bool unbind_local(naming::gid_type const& id, error_code& ec = throws)
         {
             return unbind_range_local(id, 1, ec);
@@ -661,7 +661,6 @@ namespace hpx { namespace agas {
         ///
         /// \note             This function will raise an error if the global
         ///                   reference count of the given gid is not zero!
-        ///                   TODO: confirm that this happens.
         bool unbind_local(naming::gid_type const& id, naming::address& addr,
             error_code& ec = throws)
         {
@@ -702,7 +701,6 @@ namespace hpx { namespace agas {
         ///
         /// \note             This function will raise an error if the global
         ///                   reference count of the given gid is not zero!
-        ///                   TODO: confirm that this happens.
         bool unbind_range_local(naming::gid_type const& lower_id,
             std::uint64_t count, error_code& ec = throws)
         {
@@ -759,7 +757,7 @@ namespace hpx { namespace agas {
         /// This function will test whether the given address refers to an object
         /// living on the locality of the caller.
         ///
-        /// \param addr       [in] The address to test.
+        /// \param id         [in] The address to test.
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -781,6 +779,12 @@ namespace hpx { namespace agas {
 
         bool is_local_address_cached(naming::gid_type const& id,
             naming::address& addr, error_code& ec = throws);
+
+        bool is_local_address_cached(naming::gid_type const& id,
+            naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+            hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+                naming::address const&)>&& f,
+            error_code& ec = throws);
 
         bool is_local_lva_encoded_address(std::uint64_t msb) const;
 
@@ -908,7 +912,6 @@ namespace hpx { namespace agas {
 
         ///////////////////////////////////////////////////////////////////////////
         // Bulk version.
-        // TODO: Add versions that take std::vector<id_type> for convenience.
         bool resolve_local(naming::gid_type const* gids, naming::address* addrs,
             std::size_t size, hpx::detail::dynamic_bitset<>& locals,
             error_code& ec = throws)
@@ -916,7 +919,7 @@ namespace hpx { namespace agas {
             // Try the cache.
             if (caching_)
             {
-                bool all_resolved =
+                bool const all_resolved =
                     resolve_cached(gids, addrs, size, locals, ec);
                 if (ec)
                     return false;
@@ -945,6 +948,7 @@ namespace hpx { namespace agas {
         ///
         /// \param p          [in] this is the parcel which has to be routed to the
         ///                   AGAS service instance managing the destination GID.
+        /// \param local_priority [in]
         ///
         /// \note             The route operation is asynchronous, thus it returns
         ///                   before the parcel has been delivered to its
@@ -958,10 +962,11 @@ namespace hpx { namespace agas {
 
         /// \brief Increment the global reference count for the given id
         ///
-        /// \param id         [in] The global address (id) for which the
+        /// \param gid        [in] The global address (id) for which the
         ///                   global reference count has to be incremented.
         /// \param credits    [in] The number of reference counts to add for
         ///                   the given id.
+        /// \param keep_alive [in] Id to keep alive (if valid)
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
         ///                   the function will throw on error instead.
@@ -1016,7 +1021,7 @@ namespace hpx { namespace agas {
         /// Any error results in an exception thrown (or reported) from this
         /// function.
         ///
-        /// \param pattern    [in] pattern (poosibly using wildcards) to match
+        /// \param pattern    [in] pattern (possibly using wildcards) to match
         ///                   all existing entries against
         ///
         hpx::future<iterate_names_return_type> iterate_ids(
@@ -1189,7 +1194,8 @@ namespace hpx { namespace agas {
             bool expect_to_be_marked_as_migrating);
 
         /// Remove the given object from the table of migrated objects
-        void unmark_as_migrated(naming::gid_type const& gid);
+        void unmark_as_migrated(
+            naming::gid_type const& gid_, hpx::move_only_function<void()>&& f);
 
         // Pre-cache locality endpoints in hosted locality namespace
         void pre_cache_endpoints(std::vector<parcelset::endpoints_type> const&);

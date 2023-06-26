@@ -4,15 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/init.hpp>
-#include <hpx/modules/program_options.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/copy.hpp>
-#include <hpx/parallel/algorithms/exclusive_scan.hpp>
-#include <hpx/parallel/algorithms/inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/transform_exclusive_scan.hpp>
-#include <hpx/parallel/algorithms/transform_inclusive_scan.hpp>
-#include <hpx/parallel/algorithms/unique.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/program_options.hpp>
 
 #include <array>
 #include <cstddef>

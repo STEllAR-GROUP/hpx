@@ -15,7 +15,7 @@ This module provides function wrappers and helpers for managing functions and
 their arguments.
 
 * :cpp:class:`hpx::function`
-* :cpp:class:`hpx::function_ref_`
+* :cpp:class:`hpx::function_ref`
 * :cpp:class:`hpx::move_only_function`
 * :cpp:func:`hpx::bind`
 * :cpp:func:`hpx::bind_back`

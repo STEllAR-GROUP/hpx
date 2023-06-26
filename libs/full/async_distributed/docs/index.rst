@@ -5,11 +5,11 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-.. _modules_async:
+.. _modules_async_distributed:
 
-=====
-async
-=====
+=================
+async_distributed
+=================
 
 This module contains functionality for asynchronously launching work on remote
 localities: :cpp:func:`hpx::async`, :cpp:func:`hpx::post`. This module extends

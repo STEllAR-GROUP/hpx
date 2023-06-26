@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,11 +49,11 @@ namespace hpx::threads::policies {
         /// enable/disable it
         enable_stealing = 0x0020,
 
-        /// This option allows schedulersthat support it to disallow stealing
+        /// This option allows schedulers that support it to disallow stealing
         /// between numa domains
         enable_stealing_numa = 0x0040,
 
-        /// This option tells schedulersthat support it to add tasks round robin
+        /// This option tells schedulers that support it to add tasks round robin
         /// to queues on each core
         assign_work_round_robin = 0x0080,
 
@@ -110,47 +110,47 @@ namespace hpx::threads::policies {
         // clang-format on
     };
 
-    inline constexpr scheduler_mode operator|(
+    constexpr scheduler_mode operator|(
         scheduler_mode lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             static_cast<std::uint32_t>(lhs) | static_cast<std::uint32_t>(rhs));
     }
 
-    inline constexpr scheduler_mode operator|(
+    constexpr scheduler_mode operator|(
         std::uint32_t lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             lhs | static_cast<std::uint32_t>(rhs));
     }
 
-    inline constexpr scheduler_mode operator|(
+    constexpr scheduler_mode operator|(
         scheduler_mode lhs, std::uint32_t rhs) noexcept
     {
         return static_cast<scheduler_mode>(
             static_cast<std::uint32_t>(lhs) | rhs);
     }
 
-    inline constexpr std::uint32_t operator&(
+    constexpr std::uint32_t operator&(
         scheduler_mode lhs, scheduler_mode rhs) noexcept
     {
         return static_cast<std::uint32_t>(lhs) &
             static_cast<std::uint32_t>(rhs);
     }
 
-    inline constexpr std::uint32_t operator&(
+    constexpr std::uint32_t operator&(
         std::uint32_t lhs, scheduler_mode rhs) noexcept
     {
         return lhs & static_cast<std::uint32_t>(rhs);
     }
 
-    inline constexpr std::uint32_t operator&(
+    constexpr std::uint32_t operator&(
         scheduler_mode lhs, std::uint32_t rhs) noexcept
     {
         return static_cast<std::uint32_t>(lhs) & rhs;
     }
 
-    inline constexpr std::uint32_t operator~(scheduler_mode mode) noexcept
+    constexpr std::uint32_t operator~(scheduler_mode mode) noexcept
     {
         return ~static_cast<std::uint32_t>(mode);
     }

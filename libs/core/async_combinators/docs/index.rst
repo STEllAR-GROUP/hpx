@@ -24,8 +24,8 @@ exception that they do not throw if one of the futures has become exceptional.
 The ``split_future`` combinator takes a single future of a container (e.g.
 ``tuple``) and turns it into a container of futures.
 
-See :ref:`modules_lcos_local`, :ref:`modules_synchronization`, and :ref:`modules_async`
-for other synchronization facilities.
+See :ref:`modules_lcos_local`, :ref:`modules_synchronization`, and
+:ref:`modules_async_distributed` for other synchronization facilities.
 
 See the :ref:`API reference <modules_async_combinators_api>` of this module for more
 details.

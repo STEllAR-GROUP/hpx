@@ -6,12 +6,12 @@
 
 #include <hpx/config.hpp>
 
-// NVCC fails unceremoniously with this test at least until V11.5
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1105)
+// NVCC fails unceremoniously with this test at least until V12.1
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1201)
 
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/async_cuda.hpp>
 
 #include <cstddef>

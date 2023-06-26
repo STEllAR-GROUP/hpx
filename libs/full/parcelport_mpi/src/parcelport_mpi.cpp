@@ -30,6 +30,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -48,8 +49,8 @@ namespace hpx::parcelset {
         using connection_type = policies::mpi::sender_connection;
         using send_early_parcel = std::true_type;
         using do_background_work = std::true_type;
-        using send_immediate_parcels = std::false_type;
-        using is_connectionless = std::false_type;
+        using send_immediate_parcels = std::true_type;
+        using is_connectionless = std::true_type;
 
         static constexpr const char* type() noexcept
         {
@@ -103,18 +104,50 @@ namespace hpx::parcelset {
             static std::size_t background_threads(
                 util::runtime_configuration const& ini)
             {
+                // limit the number of cores accessing MPI to one if
+                // multi-threading in MPI is disabled
+                if (!multi_threaded_mpi(ini))
+                {
+                    return 1;
+                }
+
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.mpi.background_threads",
                     HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS);
             }
 
+            static bool multi_threaded_mpi(
+                util::runtime_configuration const& ini)
+            {
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.mpi.multithreaded", 1) != 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            static bool enable_send_immediate(
+                util::runtime_configuration const& ini)
+            {
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.mpi.sendimm", 0) != 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+
         public:
+            using sender_type = sender;
             parcelport(util::runtime_configuration const& ini,
                 threads::policies::callback_notifier const& notifier)
               : base_type(ini, here(), notifier)
               , stopped_(false)
               , receiver_(*this)
               , background_threads_(background_threads(ini))
+              , multi_threaded_mpi_(multi_threaded_mpi(ini))
+              , enable_send_immediate_(enable_send_immediate(ini))
             {
             }
 
@@ -212,6 +245,55 @@ namespace hpx::parcelset {
                 return has_work;
             }
 
+            bool can_send_immediate()
+            {
+                return enable_send_immediate_;
+            }
+
+            bool send_immediate(parcelset::parcelport* pp,
+                parcelset::locality const& dest,
+                sender::parcel_buffer_type buffer,
+                sender::callback_fn_type&& callbackFn)
+            {
+                return sender_.send_immediate(
+                    pp, dest, HPX_MOVE(buffer), HPX_MOVE(callbackFn));
+            }
+
+            template <typename F>
+            bool reschedule_on_thread(F&& f,
+                threads::thread_schedule_state state, char const* funcname)
+            {
+                // if MPI was initialized in serialized mode the new thread
+                // needs to be pinned to thread 0
+                if (multi_threaded_mpi_)
+                {
+                    return this->base_type::reschedule_on_thread(
+                        HPX_FORWARD(F, f), state, funcname);
+                }
+
+                error_code ec(throwmode::lightweight);
+                hpx::threads::thread_init_data data(
+                    hpx::threads::make_thread_function_nullary(
+                        HPX_FORWARD(F, f)),
+                    funcname, threads::thread_priority::bound,
+                    threads::thread_schedule_hint(static_cast<std::int16_t>(0)),
+                    threads::thread_stacksize::default_, state, true);
+
+                auto const id = hpx::threads::register_thread(data, ec);
+                if (!ec)
+                    return false;
+
+                if (state == threads::thread_schedule_state::suspended)
+                {
+                    threads::set_thread_state(id.noref(),
+                        std::chrono::milliseconds(100),
+                        threads::thread_schedule_state::pending,
+                        threads::thread_restart_state::signaled,
+                        threads::thread_priority::bound, true, ec);
+                }
+                return true;
+            }
+
         private:
             std::atomic<bool> stopped_;
 
@@ -242,6 +324,8 @@ namespace hpx::parcelset {
             }
 
             std::size_t background_threads_;
+            bool multi_threaded_mpi_;
+            bool enable_send_immediate_;
         };
     }    // namespace policies::mpi
 }    // namespace hpx::parcelset
@@ -303,7 +387,8 @@ struct hpx::traits::plugin_config_data<
 
             // number of cores that do background work, default: all
             "background_threads = "
-            "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n";
+            "${HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS:-1}\n"
+            "sendimm = 0\n";
     }
 };    // namespace hpx::traits
 

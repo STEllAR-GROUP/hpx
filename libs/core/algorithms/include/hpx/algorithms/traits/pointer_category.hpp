@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/algorithms/traits/is_relocatable.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 
 #include <type_traits>
@@ -21,6 +22,10 @@ namespace hpx::traits {
     };
 
     struct trivially_copyable_pointer_tag : general_pointer_tag
+    {
+    };
+
+    struct relocatable_pointer_tag : general_pointer_tag
     {
     };
 
@@ -99,14 +104,8 @@ namespace hpx::traits {
         // clang-format on
 
         template <typename Source, typename Dest,
-            bool NonContiguous = !iterators_are_contiguous_v<Source, Dest>>
+            bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
         struct pointer_move_category
-        {
-            using type = general_pointer_tag;
-        };
-
-        template <typename Source, typename Dest>
-        struct pointer_move_category<Source, Dest, false>
         {
             using type = std::conditional_t<
                 std::is_trivially_assignable_v<iter_reference_t<Dest>,
@@ -116,15 +115,15 @@ namespace hpx::traits {
                 general_pointer_tag>;
         };
 
-        template <typename Source, typename Dest,
-            bool NonContiguous = !iterators_are_contiguous_v<Source, Dest>>
-        struct pointer_copy_category
+        template <typename Source, typename Dest>
+        struct pointer_move_category<Source, Dest, false>
         {
             using type = general_pointer_tag;
         };
 
-        template <typename Source, typename Dest>
-        struct pointer_copy_category<Source, Dest, false>
+        template <typename Source, typename Dest,
+            bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
+        struct pointer_copy_category
         {
             using type = std::conditional_t<
                 std::is_trivially_assignable_v<iter_reference_t<Dest>,
@@ -133,14 +132,35 @@ namespace hpx::traits {
                     iter_value_t<Dest>>,
                 general_pointer_tag>;
         };
+
+        template <typename Source, typename Dest>
+        struct pointer_copy_category<Source, Dest, false>
+        {
+            using type = general_pointer_tag;
+        };
+
+        template <typename Source, typename Dest,
+            bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
+        struct pointer_relocate_category
+        {
+            using type = std::conditional_t<
+                std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
+                    is_relocatable_v<iter_value_t<Source>>,
+                relocatable_pointer_tag, general_pointer_tag>;
+        };
+
+        template <typename Source, typename Dest>
+        struct pointer_relocate_category<Source, Dest, false>
+        {
+            using type = general_pointer_tag;
+        };
     }    // namespace detail
 
     // isolate iterators that refer to contiguous trivially copyable sequences or
     // which are pointers and their value_types are assignable
     template <typename Source, typename Dest, typename Enable = void>
-    struct pointer_copy_category
+    struct pointer_copy_category : detail::pointer_copy_category<Source, Dest>
     {
-        using type = typename detail::pointer_copy_category<Source, Dest>::type;
     };
 
     template <typename Source, typename Dest>
@@ -148,14 +168,23 @@ namespace hpx::traits {
         typename pointer_copy_category<Source, Dest>::type;
 
     template <typename Source, typename Dest, typename Enable = void>
-    struct pointer_move_category
+    struct pointer_move_category : detail::pointer_move_category<Source, Dest>
     {
-        using type = typename detail::pointer_move_category<Source, Dest>::type;
     };
 
     template <typename Source, typename Dest>
     using pointer_move_category_t =
         typename pointer_move_category<Source, Dest>::type;
+
+    template <typename Source, typename Dest, typename Enable = void>
+    struct pointer_relocate_category
+      : detail::pointer_relocate_category<Source, Dest>
+    {
+    };
+
+    template <typename Source, typename Dest>
+    using pointer_relocate_category_t =
+        typename pointer_relocate_category<Source, Dest>::type;
 
     // Allow for matching of iterator<T const> to iterator<T> while calculating
     // pointer category.

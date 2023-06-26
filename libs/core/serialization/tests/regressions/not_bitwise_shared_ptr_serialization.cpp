@@ -11,7 +11,7 @@
 #define HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION
 
 #include <hpx/config.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/testing.hpp>
 

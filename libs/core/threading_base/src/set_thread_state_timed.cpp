@@ -1,11 +1,10 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#include <hpx/config/asio.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/functional/bind.hpp>
@@ -16,12 +15,13 @@
 #include <hpx/threading_base/set_thread_state_timed.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/basic_waitable_timer.hpp>
-#include <asio/io_context.hpp>
 
 #include <atomic>
 #include <chrono>
-#include <functional>
 #include <memory>
 #include <system_error>
 #include <utility>
@@ -43,8 +43,6 @@ namespace hpx::threads::detail {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::wake_timer_thread",
                 "null thread id encountered (id)");
-            return thread_result_type(
-                thread_schedule_state::terminated, invalid_thread_id);
         }
 
         if (HPX_UNLIKELY(!timer_id))
@@ -52,8 +50,6 @@ namespace hpx::threads::detail {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::wake_timer_thread",
                 "null thread id encountered (timer_id)");
-            return thread_result_type(
-                thread_schedule_state::terminated, invalid_thread_id);
         }
 
         HPX_ASSERT(my_statex == thread_restart_state::abort ||
@@ -67,14 +63,13 @@ namespace hpx::threads::detail {
                 retry_on_active, ec);
         }
 
-        return thread_result_type(
-            thread_schedule_state::terminated, invalid_thread_id);
+        return {thread_schedule_state::terminated, invalid_thread_id};
     }
 
     // This thread function initiates the required set_state action (on behalf
     // of one of the threads#detail#set_thread_state functions).
     thread_result_type at_timer(policies::scheduler_base* scheduler,
-        std::chrono::steady_clock::time_point& abs_time,
+        std::chrono::steady_clock::time_point const& abs_time,
         thread_id_ref_type const& thrd, thread_schedule_state newstate,
         thread_restart_state newstate_ex, thread_priority priority,
         std::atomic<bool>* started, bool retry_on_active)
@@ -83,14 +78,12 @@ namespace hpx::threads::detail {
         {
             HPX_THROW_EXCEPTION(hpx::error::null_thread_id,
                 "threads::detail::at_timer", "null thread id encountered");
-            return thread_result_type(
-                thread_schedule_state::terminated, invalid_thread_id);
         }
 
         // create a new thread in suspended state, which will execute the
         // requested set_state when timer fires and will re-awaken this thread,
         // allowing the deadline_timer to go out of scope gracefully
-        thread_id_ref_type self_id = get_self_id();    // keep alive
+        thread_id_ref_type const self_id = get_self_id();    // keep alive
 
         std::shared_ptr<std::atomic<bool>> triggered(
             std::make_shared<std::atomic<bool>>(false));
@@ -136,13 +129,12 @@ namespace hpx::threads::detail {
         // this waits for the thread to be reactivated when the timer fired
         // if it returns signaled the timer has been canceled, otherwise
         // the timer fired and the wake_timer_thread above has been executed
-        thread_restart_state statex = get_self().yield(thread_result_type(
+        thread_restart_state const statex = get_self().yield(thread_result_type(
             thread_schedule_state::suspended, invalid_thread_id));
 
         HPX_ASSERT(statex == thread_restart_state::abort ||
             statex == thread_restart_state::timeout);
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (thread_restart_state::timeout != statex)    //-V601
         {
             triggered->store(true);
@@ -156,8 +148,7 @@ namespace hpx::threads::detail {
                 thrd.noref(), newstate, newstate_ex, priority);
         }
 
-        return thread_result_type(
-            thread_schedule_state::terminated, invalid_thread_id);
+        return {thread_schedule_state::terminated, invalid_thread_id};
     }
 
     // Set a timer to set the state of the given \a thread to the given new
@@ -178,7 +169,7 @@ namespace hpx::threads::detail {
             return invalid_thread_id;
         }
 
-        // this creates a new thread which creates the timer and handles the
+        // this creates a new thread that creates the timer and handles the
         // requested actions
         thread_init_data data(
             hpx::bind(&at_timer, scheduler, abs_time.value(),

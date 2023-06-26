@@ -6,6 +6,7 @@
 
 set(algorithms_headers
     hpx/algorithms/traits/is_pair.hpp
+    hpx/algorithms/traits/is_relocatable.hpp
     hpx/algorithms/traits/is_value_proxy.hpp
     hpx/algorithms/traits/pointer_category.hpp
     hpx/algorithms/traits/projected.hpp

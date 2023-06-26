@@ -43,7 +43,7 @@ namespace hpx {
             ar >> policy_;
             ar >> priority_;
             ar >> hint_.hint >> hint_.mode;
-            std::int8_t mode = 0;
+            std::uint8_t mode = 0;
             ar >> mode;
             hint_.placement_mode(
                 static_cast<hpx::threads::thread_placement_hint>(mode));
@@ -58,8 +58,8 @@ namespace hpx {
             ar << policy_;
             ar << priority_;
             ar << hint_.hint << hint_.mode
-               << static_cast<std::int8_t>(hint_.placement_mode())
-               << static_cast<std::int8_t>(hint_.sharing_mode());
+               << static_cast<std::uint8_t>(hint_.placement_mode())
+               << static_cast<std::uint8_t>(hint_.sharing_mode());
         }
     }    // namespace detail
 }    // namespace hpx

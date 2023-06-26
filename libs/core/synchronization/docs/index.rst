@@ -39,8 +39,8 @@ the C++ standard ones in |hpx| threads:
 * :cpp:class:`hpx::upgrade_to_unique_lock`
 * :cpp:class:`hpx::upgrade_lock`
 
-See :ref:`modules_lcos_local`, :ref:`modules_async_combinators`, and :ref:`modules_async`
-for higher level synchronization facilities.
+See :ref:`modules_lcos_local`, :ref:`modules_async_combinators`, and
+:ref:`modules_async_distributed` for higher level synchronization facilities.
 
 See the :ref:`API reference <modules_synchronization_api>` of this module for more
 details.

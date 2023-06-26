@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     // This template meta function can be used to extract the action type.
     template <typename Action, typename Enable = void>
@@ -19,4 +17,7 @@ namespace hpx { namespace traits {
         using local_result_type = typename type::local_result_type;
         using remote_result_type = typename type::remote_result_type;
     };
-}}    // namespace hpx::traits
+
+    template <typename Action>
+    using extract_action_t = typename extract_action<Action>::type;
+}    // namespace hpx::traits

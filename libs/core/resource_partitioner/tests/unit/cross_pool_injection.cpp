@@ -13,14 +13,14 @@
 // cross pool injection of tasks does not cause segfaults or other
 // problems such as lockups.
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/threadmanager.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>

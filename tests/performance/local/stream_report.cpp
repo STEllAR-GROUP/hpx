@@ -17,13 +17,13 @@
 #define BOOST_NO_CXX11_ALLOCATOR
 #endif
 
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/format.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/thread.hpp>
 #include <hpx/modules/compute.hpp>
-#include <hpx/modules/format.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/version.hpp>
 

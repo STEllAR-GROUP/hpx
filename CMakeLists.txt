@@ -58,10 +58,10 @@ endif()
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 9)
+set(HPX_VERSION_MINOR 10)
 set(HPX_VERSION_SUBMINOR 0)
 set(HPX_VERSION_DATE 20230502)
-set(HPX_VERSION_TAG "")
+set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
@@ -110,7 +110,7 @@ if(NOT HPX_CMAKE_LOGLEVEL)
 endif()
 
 # print initial diagnostics
-hpx_info("CMake version: ${CMAKE_VERSION}")
+hpx_info("CMake version: ${CMAKE_VERSION}, generator: ${CMAKE_GENERATOR}")
 hpx_info("HPX version: ${HPX_VERSION}")
 
 # ##############################################################################
@@ -373,9 +373,9 @@ endif()
 # The cmake Ninja generator runs out of memory if the modules are being built as
 # OBJECT libraries. In this case the fallback is to build whole-archive STATIC
 # libraries.
-set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
-if("${CMAKE_MAKE_PROGRAM}" STREQUAL "ninja")
-  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT OFF)
+if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
+  set(HPX_WITH_MODULES_AS_STATIC_LIBRARIES_DEFAULT ON)
 endif()
 
 hpx_option(
@@ -1623,6 +1623,8 @@ hpx_option(
 
 hpx_check_for_mm_prefetch(DEFINITIONS HPX_HAVE_MM_PREFETCH)
 
+hpx_check_for_pthread_setname_np(DEFINITIONS HPX_WITH_PTHREAD_SETNAME_NP)
+
 hpx_check_for_stable_inplace_merge(DEFINITIONS HPX_HAVE_STABLE_INPLACE_MERGE)
 
 if(NOT HPX_WITH_STABLE_INPLACE_MERGE)
@@ -1754,6 +1756,12 @@ if(WIN32)
     hpx_add_target_compile_option(-MP PUBLIC)
     # Increase the maximum size of object file sections
     hpx_add_target_compile_option(-bigobj PUBLIC)
+  elseif(MINGW)
+    if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
+      target_link_libraries(
+        hpx_base_libraries INTERFACE ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+      )
+    endif()
   endif()
 
   target_link_libraries(hpx_base_libraries INTERFACE psapi shlwapi)
@@ -1834,8 +1842,6 @@ if(HPX_WITH_COMPILER_WARNINGS)
 
   else() # Trial and error approach for any other compiler ...
     hpx_add_compile_flag_if_available(-Wall)
-    hpx_add_compile_flag_if_available(-Wextra)
-    hpx_add_compile_flag_if_available(-Wpedantic)
     hpx_add_compile_flag_if_available(-Wno-strict-aliasing)
     hpx_add_compile_flag_if_available(-Wno-sign-promo)
     hpx_add_compile_flag_if_available(-Wno-attributes)
@@ -1848,6 +1854,16 @@ if(HPX_WITH_COMPILER_WARNINGS)
         # caused by the use of std::destructive_interference_size
         hpx_add_compile_flag_if_available(-Wno-interference-size)
       endif()
+      if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER_EQUAL "13.0")
+        # gcc V13.x is overeager to report dangling references where there are
+        # none
+        hpx_add_compile_flag_if_available(-Wextra)
+        hpx_add_compile_flag_if_available(-Wpedantic)
+        hpx_add_compile_flag_if_available(-Wno-self-move)
+      endif()
+    else()
+      hpx_add_compile_flag_if_available(-Wextra)
+      hpx_add_compile_flag_if_available(-Wpedantic)
     endif()
 
     # We do not in general guarantee ABI compatibility between C++ standards, so

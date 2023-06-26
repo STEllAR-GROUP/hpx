@@ -17,13 +17,12 @@
 // This scheme is generally useful if HPX should be initialized from a shared
 // library and the main executable might not even be aware of this.
 
+#include <hpx/condition_variable.hpp>
+#include <hpx/functional.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/condition_variable.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/mutex.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
-#include <hpx/runtime_local/run_as_hpx_thread.hpp>
+#include <hpx/modules/runtime_local.hpp>
+#include <hpx/mutex.hpp>
+#include <hpx/thread.hpp>
 
 #include <mutex>
 #include <string>

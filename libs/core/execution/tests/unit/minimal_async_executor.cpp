@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -158,12 +158,12 @@ struct test_async_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor1> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_async_executor2 : test_async_executor1
 {
@@ -180,12 +180,12 @@ struct test_async_executor2 : test_async_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor2> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_async_executor3 : test_async_executor1
 {
@@ -206,12 +206,12 @@ struct test_async_executor3 : test_async_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor3> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_async_executor4 : test_async_executor1
 {
@@ -232,7 +232,7 @@ struct test_async_executor4 : test_async_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor4> : std::true_type
     {
@@ -242,7 +242,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_bulk_two_way_executor<test_async_executor4> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 struct test_async_executor5 : test_async_executor1
 {
@@ -257,12 +257,12 @@ struct test_async_executor5 : test_async_executor1
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor5> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

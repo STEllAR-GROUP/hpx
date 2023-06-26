@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,9 @@
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(io_service_headers hpx/io_service/io_service_pool.hpp
-                       hpx/io_service/io_service_thread_pool.hpp
+set(io_service_headers
+    hpx/io_service/io_service_pool.hpp hpx/io_service/io_service_pool_fwd.hpp
+    hpx/io_service/io_service_thread_pool.hpp
 )
 
 # cmake-format: off

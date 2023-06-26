@@ -11,7 +11,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concurrency/barrier.hpp>
 #include <hpx/concurrency/spinlock.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_configuration/runtime_configuration.hpp>
@@ -22,6 +22,7 @@
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/threadmanager/threadmanager_fwd.hpp>
+#include <hpx/timing/steady_clock.hpp>
 #include <hpx/topology/cpu_mask.hpp>
 
 #include <atomic>
@@ -140,7 +141,9 @@ namespace hpx { namespace threads {
 
         bool is_busy();
         bool is_idle();
+
         void wait();
+        bool wait_for(hpx::chrono::steady_duration const& rel_time);
 
         // \brief Suspend all thread pools.
         void suspend();
@@ -223,7 +226,8 @@ namespace hpx { namespace threads {
         /// raised. The exception will be routed through the notifier and the
         /// scheduler (which will result in it being passed to the runtime
         /// object, which in turn will report it to the console, etc.).
-        void report_error(std::size_t num_thread, std::exception_ptr const& e)
+        void report_error(
+            std::size_t num_thread, std::exception_ptr const& e) const
         {
             // propagate the error reporting to all pools, which in turn
             // will propagate to schedulers

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 The STE||AR-Group
+# Copyright (c) 2020-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(include_headers
     hpx/algorithm.hpp
-    hpx/any.hpp
     hpx/barrier.hpp
     hpx/channel.hpp
-    hpx/chrono.hpp
-    hpx/condition_variable.hpp
-    hpx/exception.hpp
-    hpx/execution.hpp
-    hpx/functional.hpp
+    hpx/compute.hpp
     hpx/future.hpp
-    hpx/generator.hpp
     hpx/hpx.hpp
+    hpx/latch.hpp
+    hpx/runtime.hpp
     hpx/include/actions.hpp
     hpx/include/agas.hpp
     hpx/include/applier.hpp
@@ -105,27 +101,12 @@ set(include_headers
     hpx/include/traits.hpp
     hpx/include/unseq.hpp
     hpx/include/util.hpp
-    hpx/latch.hpp
-    hpx/memory.hpp
-    hpx/mutex.hpp
-    hpx/numeric.hpp
-    hpx/optional.hpp
-    hpx/runtime.hpp
-    hpx/semaphore.hpp
-    hpx/shared_mutex.hpp
-    hpx/source_location.hpp
-    hpx/stop_token.hpp
-    hpx/system_error.hpp
-    hpx/task_block.hpp
-    hpx/thread.hpp
-    hpx/tuple.hpp
-    hpx/type_traits.hpp
-    hpx/unwrap.hpp
 )
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)
   set(include_optional_module_dependencies
       hpx_agas
+      hpx_async_colocated
       hpx_async_distributed
       hpx_runtime_components
       hpx_runtime_distributed

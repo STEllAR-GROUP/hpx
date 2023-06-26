@@ -4,15 +4,18 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// make available M_PI
+#define _USE_MATH_DEFINES
+
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/schedulers.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 //
 #include <cmath>
 #include <cstddef>
@@ -28,7 +31,7 @@
 // NB
 // this test needs to be updated as it no longer does what it is supposed to do
 
-namespace resource { namespace pools {
+namespace resource::pools {
     enum ids
     {
         DEFAULT = 0,
@@ -36,7 +39,7 @@ namespace resource { namespace pools {
         GPU = 2,
         MATRIX = 3,
     };
-}}    // namespace resource::pools
+}    // namespace resource::pools
 
 static bool use_pools = false;
 static int pool_threads = 1;

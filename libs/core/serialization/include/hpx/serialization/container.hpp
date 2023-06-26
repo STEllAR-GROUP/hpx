@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -44,6 +44,7 @@ namespace hpx::serialization {
         virtual void set_zero_copy_serialization_threshold(
             std::size_t zero_copy_serialization_threshold) = 0;
         virtual void load_binary(void* address, std::size_t count) = 0;
-        virtual void load_binary_chunk(void* address, std::size_t count) = 0;
+        virtual void load_binary_chunk(
+            void* address, std::size_t count, bool allow_zero_copy_receive) = 0;
     };
 }    // namespace hpx::serialization

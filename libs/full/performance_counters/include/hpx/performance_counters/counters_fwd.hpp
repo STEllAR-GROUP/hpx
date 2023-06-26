@@ -411,7 +411,7 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int);
+            serialization::output_archive& ar, const unsigned int) const;
         HPX_EXPORT void serialize(
             serialization::input_archive& ar, const unsigned int);
     };
@@ -507,7 +507,7 @@ namespace hpx { namespace performance_counters {
         friend class hpx::serialization::access;
 
         HPX_EXPORT void serialize(
-            serialization::output_archive& ar, const unsigned int);
+            serialization::output_archive& ar, const unsigned int) const;
         HPX_EXPORT void serialize(
             serialization::input_archive& ar, const unsigned int);
     };

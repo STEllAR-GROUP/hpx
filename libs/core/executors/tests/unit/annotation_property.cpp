@@ -7,13 +7,13 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/latch.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/latch.hpp>
 #include <hpx/modules/properties.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstdlib>
 #include <functional>

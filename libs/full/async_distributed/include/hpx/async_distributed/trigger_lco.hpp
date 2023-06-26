@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,9 +20,7 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/unused.hpp>
 
-#include <exception>
 #include <type_traits>
 #include <utility>
 
@@ -34,23 +32,18 @@ namespace hpx {
     // forward declare the required overload of post.
     template <typename Action, typename... Ts>
     bool post(hpx::id_type const& gid, Ts&&... vs);
-
-    template <typename Component, typename Signature, typename Derived,
-        typename... Ts>
-    inline bool post_c_p(
-        hpx::actions::basic_action<Component, Signature, Derived>,
-        hpx::id_type const& contgid, hpx::id_type const& gid, Ts&&... vs);
     /// \endcond
 
     /// \cond NOINTERNAL
     namespace detail {
+
         template <typename T>
         struct make_rvalue_impl
         {
-            typedef T&& type;
+            using type = T&&;
 
             template <typename U>
-            HPX_FORCEINLINE static T&& call(U& u)
+            HPX_FORCEINLINE static T&& call(U& u) noexcept
             {
                 return HPX_MOVE(u);
             }
@@ -59,7 +52,7 @@ namespace hpx {
         template <typename T>
         struct make_rvalue_impl<T const>
         {
-            typedef T type;
+            using type = T;
 
             template <typename U>
             HPX_FORCEINLINE static T call(U const& u)
@@ -71,7 +64,7 @@ namespace hpx {
         template <typename T>
         struct make_rvalue_impl<T&>
         {
-            typedef T type;
+            using type = T;
 
             HPX_FORCEINLINE static T call(T& u)
             {
@@ -82,7 +75,7 @@ namespace hpx {
         template <typename T>
         struct make_rvalue_impl<T const&>
         {
-            typedef T type;
+            using type = T;
 
             HPX_FORCEINLINE static T call(T const& u)
             {
@@ -92,14 +85,14 @@ namespace hpx {
 
         template <typename T>
         HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type make_rvalue(
-            typename std::remove_reference<T>::type& v)
+            std::remove_reference_t<T>& v)
         {
             return detail::make_rvalue_impl<T>::call(v);
         }
 
         template <typename T>
         HPX_FORCEINLINE typename detail::make_rvalue_impl<T>::type make_rvalue(
-            typename std::remove_reference<T>::type&& v)
+            std::remove_reference_t<T>&& v)
         {
             return detail::make_rvalue_impl<T>::call(v);
         }
@@ -161,21 +154,22 @@ namespace hpx {
 
     /// \cond NOINTERNAL
     template <typename Result>
-    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
-        Result&& t, bool move_credits)
+    void set_lco_value([[maybe_unused]] hpx::id_type const& id,
+        [[maybe_unused]] naming::address&& addr, [[maybe_unused]] Result&& t,
+        [[maybe_unused]] bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        typedef typename std::decay<Result>::type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            local_result_type;
+        using remote_result_type = std::decay_t<Result>;
+        using local_result_type =
+            typename traits::promise_local_result<remote_result_type>::type;
 
         if (components::get_base_type(addr.type_) ==
             components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<local_result_type,
-                remote_result_type,
-                traits::detail::component_tag>::set_value_action
-                set_value_action;
+            using set_value_action =
+                typename lcos::base_lco_with_value<local_result_type,
+                    remote_result_type,
+                    traits::detail::component_tag>::set_value_action;
 
             detail::set_lco_value<set_value_action>(
                 id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
@@ -187,39 +181,37 @@ namespace hpx {
                 components::get_base_type(addr.type_) ==
                     components::component_base_lco_with_value);
 
-            typedef typename lcos::base_lco_with_value<local_result_type,
-                remote_result_type,
-                traits::detail::managed_component_tag>::set_value_action
-                set_value_action;
+            using set_value_action =
+                typename lcos::base_lco_with_value<local_result_type,
+                    remote_result_type,
+                    traits::detail::managed_component_tag>::set_value_action;
 
             detail::set_lco_value<set_value_action>(
                 id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
         }
 #else
-        HPX_UNUSED(id);
-        HPX_UNUSED(addr);
-        HPX_UNUSED(t);
-        HPX_UNUSED(move_credits);
         HPX_ASSERT(false);
 #endif
     }
 
     template <typename Result>
-    void set_lco_value(hpx::id_type const& id, naming::address&& addr,
-        Result&& t, hpx::id_type const& cont, bool move_credits)
+    void set_lco_value([[maybe_unused]] hpx::id_type const& id,
+        [[maybe_unused]] naming::address&& addr, [[maybe_unused]] Result&& t,
+        [[maybe_unused]] hpx::id_type const& cont,
+        [[maybe_unused]] bool move_credits)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        typedef typename std::decay<Result>::type remote_result_type;
-        typedef typename traits::promise_local_result<remote_result_type>::type
-            local_result_type;
+        using remote_result_type = std::decay_t<Result>;
+        using local_result_type =
+            typename traits::promise_local_result<remote_result_type>::type;
 
         if (components::get_base_type(addr.type_) ==
             components::component_base_lco_with_value_unmanaged)
         {
-            typedef typename lcos::base_lco_with_value<local_result_type,
-                remote_result_type,
-                traits::detail::component_tag>::set_value_action
-                set_value_action;
+            using set_value_action =
+                typename lcos::base_lco_with_value<local_result_type,
+                    remote_result_type,
+                    traits::detail::component_tag>::set_value_action;
 
             detail::set_lco_value<local_result_type, remote_result_type,
                 set_value_action>(
@@ -231,21 +223,16 @@ namespace hpx {
                 components::get_base_type(addr.type_) ==
                     components::component_base_lco_with_value);
 
-            typedef typename lcos::base_lco_with_value<local_result_type,
-                remote_result_type,
-                traits::detail::managed_component_tag>::set_value_action
-                set_value_action;
+            using set_value_action =
+                typename lcos::base_lco_with_value<local_result_type,
+                    remote_result_type,
+                    traits::detail::managed_component_tag>::set_value_action;
 
             detail::set_lco_value<local_result_type, remote_result_type,
                 set_value_action>(
                 id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
         }
 #else
-        HPX_UNUSED(id);
-        HPX_UNUSED(addr);
-        HPX_UNUSED(t);
-        HPX_UNUSED(cont);
-        HPX_UNUSED(move_credits);
         HPX_ASSERT(false);
 #endif
     }

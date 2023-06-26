@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,8 @@ namespace hpx::threads::detail {
     io_service_thread_pool::io_service_thread_pool(
         hpx::threads::thread_pool_init_parameters const& init)
       : thread_pool_base(init)
-      , threads_(init.notifier_, init.name_.c_str())
+      , threads_(std::make_unique<util::io_service_pool>(
+            init.notifier_, init.name_.c_str()))
     {
     }
 
@@ -71,9 +72,10 @@ namespace hpx::threads::detail {
         return id;
     }
 
-    void io_service_thread_pool::report_error(
+    bool io_service_thread_pool::report_error(
         std::size_t /* num */, std::exception_ptr const& /* e */)
     {
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,7 @@ namespace hpx::threads::detail {
         HPX_ASSERT(l.owns_lock());
         HPX_UNUSED(l);
         util::barrier startup(1);
-        return threads_.run(num_threads, false, &startup);
+        return threads_->run(num_threads, false, &startup);
     }
 
     void io_service_thread_pool::stop(
@@ -122,12 +124,12 @@ namespace hpx::threads::detail {
     std::thread& io_service_thread_pool::get_os_thread_handle(
         std::size_t global_thread_num)
     {
-        return threads_.get_os_thread_handle(
+        return threads_->get_os_thread_handle(
             global_thread_num - this->thread_offset_);
     }
 
     std::size_t io_service_thread_pool::get_os_thread_count() const
     {
-        return threads_.size();
+        return threads_->size();
     }
 }    // namespace hpx::threads::detail

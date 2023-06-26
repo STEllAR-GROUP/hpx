@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/find.hpp>
 
 #include <cstddef>
 #include <iostream>

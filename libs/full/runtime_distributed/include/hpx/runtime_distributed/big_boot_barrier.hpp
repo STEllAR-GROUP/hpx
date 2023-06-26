@@ -15,7 +15,6 @@
 #include <hpx/allocator_support/aligned_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/queue.hpp>
-#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/naming_base/address.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,9 +10,6 @@
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>
-#include <cstdint>
-#include <tuple>
-#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
@@ -56,12 +53,18 @@ namespace hpx::threads::detail {
         {
         }
 
+        reset_tss_helper(reset_tss_helper const&) = delete;
+        reset_tss_helper(reset_tss_helper&&) = delete;
+        reset_tss_helper& operator=(reset_tss_helper const&) = delete;
+        reset_tss_helper& operator=(reset_tss_helper&&) = delete;
+
         ~reset_tss_helper()
         {
             set_global_thread_num_tss(global_thread_num_);
         }
 
-        constexpr std::size_t previous_global_thread_num() const noexcept
+        [[nodiscard]] constexpr std::size_t previous_global_thread_num()
+            const noexcept
         {
             return global_thread_num_;
         }

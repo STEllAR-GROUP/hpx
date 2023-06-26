@@ -18,7 +18,7 @@
 #include <utility>
 
 #include <Shlwapi.h>
-#include <windows.h>
+#include <libloaderapi.h>
 
 #if !defined(HPX_MSVC) && !defined(HPX_MINGW)
 #error                                                                         \
@@ -142,9 +142,17 @@ namespace hpx::util::plugin {
             static_assert(
                 std::is_pointer_v<SymbolType>, "std::is_pointer_v<SymbolType>");
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
             // Cast the to right type.
             auto address =
                 (SymbolType) GetProcAddress(dll_handle, symbol_name.c_str());
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
             if (nullptr == address)
             {
                 std::string const str = hpx::util::format(

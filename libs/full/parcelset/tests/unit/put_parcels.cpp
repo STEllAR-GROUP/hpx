@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,10 +6,10 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
+#include <hpx/experimental/task_group.hpp>
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/task_group.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -20,8 +20,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-std::size_t const vsize_default = 1024;
-std::size_t const numparcels_default = 10;
+constexpr std::size_t vsize_default = 1024;
+constexpr std::size_t numparcels_default = 10;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Action, typename T>
@@ -183,7 +183,7 @@ void test_mixed_arguments(hpx::id_type const& id)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-hpx::id_type test3(std::shared_ptr<hpx::experimental::task_group> tg)
+hpx::id_type test3(std::shared_ptr<hpx::experimental::task_group> const& tg)
 {
     tg->wait();
     return hpx::find_here();
@@ -227,7 +227,7 @@ void test_task_group_argument(hpx::id_type const& id)
         std::move(parcels));
 
     // now wait for task groups
-    for (auto& arg : args)
+    for (auto const& arg : args)
     {
         arg->wait();
     }
@@ -246,20 +246,22 @@ void print_counters(char const* name)
 {
     using namespace hpx::performance_counters;
 
-    std::vector<performance_counter> counters = discover_counters(name);
-
-    for (performance_counter const& c : counters)
+    hpx::error_code ec;
+    for (performance_counter const& c : discover_counters(name, ec))
     {
-        counter_value value = c.get_counter_value(hpx::launch::sync);
-        std::cout << "counter: " << c.get_name(hpx::launch::sync)
-                  << ", value: " << value.get_value<double>() << std::endl;
+        counter_value value = c.get_counter_value(hpx::launch::sync, ec);
+        if (!ec)
+        {
+            std::cout << "counter: " << c.get_name(hpx::launch::sync)
+                      << ", value: " << value.get_value<double>() << std::endl;
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    auto seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 
@@ -274,7 +276,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
         test_task_group_argument(id);
     }
 
-#if defined(HPX_HAVE_NETWORKING) && defined(PX_HAVE_PARCELPORT_COUNTERS)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_COUNTERS)
     if (hpx::is_networking_enabled())
     {
         // compare number of parcels with number of messages generated

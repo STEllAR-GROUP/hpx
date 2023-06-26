@@ -197,9 +197,10 @@ namespace hpx::parallel::execution {
                 int domain = -1;
 #else
                 // get the argument for the numa hint function from the predecessor future
-                auto const& predecessor_value = detail::future_extract_value()(
-                    HPX_FORWARD(Future, predecessor));
-                int domain = numa_function_(predecessor_value, ts...);
+                int domain =
+                    numa_function_(detail::future_extract_value()(
+                                       HPX_FORWARD(Future, predecessor)),
+                        ts...);
 #endif
 
                 gpx_deb.debug(debug::str<>("then_schedule"), "domain ", domain);
@@ -407,13 +408,10 @@ namespace hpx::parallel::execution {
             OuterFuture<hpx::tuple<InnerFutures...>>&& predecessor, Ts&&... ts)
         {
 #ifdef GUIDED_EXECUTOR_DEBUG
-            // get the tuple of futures from the predecessor future <tuple of futures>
-            auto const& predecessor_value =
-                detail::future_extract_value()(predecessor);
-
             // create a tuple of the unwrapped future values
-            auto unwrapped_futures_tuple = hpx::util::map_pack(
-                detail::future_extract_value{}, predecessor_value);
+            auto unwrapped_futures_tuple =
+                hpx::util::map_pack(detail::future_extract_value{},
+                    detail::future_extract_value()(predecessor));
 
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;

@@ -4,7 +4,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/command_line_handling_local/config/defines.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
+#if defined(HPX_COMMAND_LINE_HANDLING_HAVE_JSON_CONFIGURATION_FILES)
+#include <hpx/command_line_handling_local/json_config_file.hpp>
+#endif
 #include <hpx/datastructures/any.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
@@ -16,6 +20,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::local::detail {
@@ -154,8 +162,15 @@ namespace hpx::local::detail {
     std::vector<std::string> read_config_file_options(
         std::string const& filename, util::commandline_error_mode error_mode)
     {
-        std::vector<std::string> options;
+#if defined(HPX_COMMAND_LINE_HANDLING_HAVE_JSON_CONFIGURATION_FILES)
+        filesystem::path const cfgfile(filename);
+        if (cfgfile.extension() == ".json")
+        {
+            return read_json_config_file_options(filename, error_mode);
+        }
+#endif
 
+        std::vector<std::string> options;
         std::ifstream ifs(filename.c_str());
         if (!ifs.is_open())
         {
@@ -217,7 +232,7 @@ namespace hpx::local::detail {
             util::commandline_error_mode const mode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
             util::commandline_error_mode const notmode =
-                error_mode & util::commandline_error_mode::ignore_aliases;
+                error_mode & ~util::commandline_error_mode::ignore_aliases;
 
             store(get_commandline_parser(
                       command_line_parser(options)

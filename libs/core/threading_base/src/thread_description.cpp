@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
-#include <hpx/type_support/unused.hpp>
 #include <hpx/util/to_string.hpp>
 
 #include <ostream>
@@ -56,32 +55,34 @@ namespace hpx::threads {
     !defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
         if (altname != nullptr)
         {
-            type_ = data_type_description;
+            data_.type_ = data_type_description;
             data_.desc_ = altname;
             return;
         }
 
-        hpx::threads::thread_id_type id = hpx::threads::get_self_id();
+        hpx::threads::thread_id_type const id = hpx::threads::get_self_id();
         if (id)
         {
             // get the current task description
-            thread_description desc = hpx::threads::get_thread_description(id);
-            type_ = desc.kind();
+            thread_description const desc =
+                hpx::threads::get_thread_description(id);
+            data_.type_ = desc.kind();
+
             // if the current task has a description, use it.
-            if (type_ == data_type_description)
+            if (data_.type_ == data_type_description)
             {
                 data_.desc_ = desc.get_description();
             }
             else
             {
                 // otherwise, use the address of the task.
-                HPX_ASSERT(type_ == data_type_address);
+                HPX_ASSERT(data_.type_ == data_type_address);
                 data_.addr_ = desc.get_address();
             }
         }
         else
         {
-            type_ = data_type_description;
+            data_.type_ = data_type_description;
             data_.desc_ = "<unknown>";
         }
 #endif
@@ -102,7 +103,7 @@ namespace hpx::threads {
             HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "hpx::threads::set_thread_description",
                 "null thread id encountered");
-            return threads::thread_description();
+            return {};
         }
         if (&ec != &throws)
             ec = make_success_code();

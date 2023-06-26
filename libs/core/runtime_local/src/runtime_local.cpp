@@ -15,6 +15,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
@@ -296,14 +297,17 @@ namespace hpx {
       , on_error_func_(global_on_error_func)
       , result_(0)
       , main_pool_notifier_()
-      , main_pool_(main_pool_notifier_, "main_pool")
+      , main_pool_(std::make_unique<util::io_service_pool>(
+            main_pool_notifier_, "main_pool"))
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_()
-      , io_pool_(io_pool_notifier_, "io_pool")
+      , io_pool_(std::make_unique<util::io_service_pool>(
+            io_pool_notifier_, "io_pool"))
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_()
-      , timer_pool_(timer_pool_notifier_, "timer_pool")
+      , timer_pool_(std::make_unique<util::io_service_pool>(
+            timer_pool_notifier_, "timer_pool"))
 #endif
       , notifier_()
       , thread_manager_()
@@ -348,14 +352,17 @@ namespace hpx {
       , on_error_func_(global_on_error_func)
       , result_(0)
       , main_pool_notifier_()
-      , main_pool_(main_pool_notifier_, "main_pool")
+      , main_pool_(std::make_unique<util::io_service_pool>(
+            main_pool_notifier_, "main_pool"))
 #ifdef HPX_HAVE_IO_POOL
       , io_pool_notifier_()
-      , io_pool_(io_pool_notifier_, "io_pool")
+      , io_pool_(std::make_unique<util::io_service_pool>(
+            io_pool_notifier_, "io_pool"))
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
       , timer_pool_notifier_()
-      , timer_pool_(timer_pool_notifier_, "timer_pool")
+      , timer_pool_(std::make_unique<util::io_service_pool>(
+            timer_pool_notifier_, "timer_pool"))
 #endif
       , notifier_()
       , thread_manager_()
@@ -380,19 +387,19 @@ namespace hpx {
     {
         notifier_ = HPX_MOVE(notifier);
 
-        main_pool_.init(1);
+        main_pool_->init(1);
 #ifdef HPX_HAVE_IO_POOL
         io_pool_notifier_ = HPX_MOVE(io_pool_notifier);
-        io_pool_.init(rtcfg_.get_thread_pool_size("io_pool"));
+        io_pool_->init(rtcfg_.get_thread_pool_size("io_pool"));
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         timer_pool_notifier_ = HPX_MOVE(timer_pool_notifier);
-        timer_pool_.init(rtcfg_.get_thread_pool_size("timer_pool"));
+        timer_pool_->init(rtcfg_.get_thread_pool_size("timer_pool"));
 #endif
 
         thread_manager_.reset(new hpx::threads::threadmanager(rtcfg_,
 #ifdef HPX_HAVE_TIMER_POOL
-            timer_pool_,
+            *timer_pool_,
 #endif
             notifier_, network_background_callback));
     }
@@ -459,7 +466,7 @@ namespace hpx {
         // stop all services
         thread_manager_->stop();    // stops timer_pool_ as well
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_.stop();
+        io_pool_->stop();
 #endif
         LRT_(debug).format("~runtime_local(finished)");
 
@@ -1328,9 +1335,8 @@ namespace hpx {
             // the distributed runtime
             if (handle_print_bind != nullptr)
             {
-                hpx::program_options::options_description options;
                 result = hpx::local::detail::handle_late_commandline_options(
-                    get_config(), options, handle_print_bind);
+                    get_config(), get_app_options(), handle_print_bind);
                 if (result)
                 {
                     lbt_ << "runtime_local::run_helper: bootstrap "
@@ -1426,7 +1432,7 @@ namespace hpx {
 
 #ifdef HPX_HAVE_IO_POOL
         // start the io pool
-        io_pool_.run(false);
+        io_pool_->run(false);
         lbt_ << "(1st stage) runtime::start: started the application "
                 "I/O service pool";
 #endif
@@ -1521,7 +1527,7 @@ namespace hpx {
         wait_finalize();
 
         // stop main thread pool
-        main_pool_.stop();
+        main_pool_->stop();
     }
 
     int runtime::wait()
@@ -1545,7 +1551,7 @@ namespace hpx {
         }
 
         // use main thread to drive main thread pool
-        main_pool_.thread_run(0);
+        main_pool_->thread_run(0);
 
         // block main thread
         t.join();
@@ -1603,20 +1609,20 @@ namespace hpx {
 
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info).format("stop: stopping timer pool");
-        timer_pool_.stop();
+        timer_pool_->stop();
         if (blocking)
         {
-            timer_pool_.join();
-            timer_pool_.clear();
+            timer_pool_->join();
+            timer_pool_->clear();
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
         LTM_(info).format("stop: stopping io pool");
-        io_pool_.stop();
+        io_pool_->stop();
         if (blocking)
         {
-            io_pool_.join();
-            io_pool_.clear();
+            io_pool_->join();
+            io_pool_->clear();
         }
 #endif
     }
@@ -1660,10 +1666,10 @@ namespace hpx {
         thread_manager_->suspend();
 
 #ifdef HPX_HAVE_TIMER_POOL
-        timer_pool_.wait();
+        timer_pool_->wait();
 #endif
 #ifdef HPX_HAVE_IO_POOL
-        io_pool_.wait();
+        io_pool_->wait();
 #endif
 
         set_state(hpx::state::sleeping);
@@ -1978,19 +1984,18 @@ namespace hpx {
         HPX_ASSERT(name != nullptr);
 #ifdef HPX_HAVE_IO_POOL
         if (0 == std::strncmp(name, "io", 2))
-            return &io_pool_;
+            return io_pool_.get();
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         if (0 == std::strncmp(name, "timer", 5))
-            return &timer_pool_;
+            return timer_pool_.get();
 #endif
         if (0 == std::strncmp(name, "main", 4))    //-V112
-            return &main_pool_;
+            return main_pool_.get();
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
             "runtime::get_thread_pool", "unknown thread pool requested: {}",
             name);
-        return nullptr;
     }
 
     /// Register an external OS-thread with HPX

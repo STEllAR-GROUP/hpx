@@ -221,27 +221,22 @@ namespace hpx::util {
         // successfully waited for the function returns true.
         template <typename Predicate>
         bool yield_while_count_timeout(Predicate&& predicate,
-            std::size_t required_count, std::chrono::duration<double> timeout,
+            std::size_t required_count,
+            hpx::chrono::steady_duration const& rel_time,
             char const* thread_name = nullptr,
             bool allow_timed_suspension = true)
         {
-            // Seconds represented using a double
-            using duration_type = std::chrono::duration<double>;
-
             // Initialize timer only if needed
-            bool const use_timeout = timeout >= duration_type(0.0);
-            hpx::chrono::high_resolution_timer t(
-                hpx::chrono::high_resolution_timer::init::no_init);
+            bool const use_timeout =
+                rel_time.value() != std::chrono::steady_clock::duration(0);
 
-            if (use_timeout)
-            {
-                t.restart();
-            }
+            auto const abs_time = rel_time.from_now();
 
             std::size_t count = 0;
             for (std::size_t k = 0; /**/; ++k)
             {
-                if (use_timeout && duration_type(t.elapsed()) > timeout)
+                if (use_timeout &&
+                    abs_time <= std::chrono::steady_clock().now())
                 {
                     return false;
                 }

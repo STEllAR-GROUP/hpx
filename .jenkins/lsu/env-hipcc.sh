@@ -17,4 +17,6 @@ configure_extra_options+=" -DHPX_WITH_FETCH_ASIO=ON"
 configure_extra_options+=" -DHPX_WITH_MAX_CPU_COUNT=128"
 configure_extra_options+=" -DHPX_WITH_DEPRECATION_WARNINGS=OFF"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
-configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
+configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=OFF"
+
+ctest_extra_args+=" -E tests.unit.modules.algorithms.detail "

@@ -104,7 +104,10 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
         void dijkstra_make_black()
         {
-            get_runtime_support_ptr()->dijkstra_make_black();
+            if (auto* rtp = get_runtime_support_ptr(); rtp != nullptr)
+            {
+                rtp->dijkstra_make_black();
+            }
         }
 #endif
 
@@ -172,8 +175,12 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     components::server::runtime_support* get_runtime_support_ptr()
     {
-        return static_cast<components::server::runtime_support*>(
-            get_runtime_distributed().get_runtime_support_lva());
+        if (auto const* rt = get_runtime_distributed_ptr(); rt != nullptr)
+        {
+            return static_cast<components::server::runtime_support*>(
+                rt->get_runtime_support_lva());
+        }
+        return nullptr;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -443,7 +450,7 @@ namespace hpx {
 
 #ifdef HPX_HAVE_IO_POOL
         // start the io pool
-        io_pool_.run(false);
+        io_pool_->run(false);
         lbt_ << "(1st stage) runtime_distributed::start: started the "
                 "application "
                 "I/O service pool";
@@ -545,7 +552,7 @@ namespace hpx {
         runtime_support_->wait();
 
         // stop main thread pool
-        main_pool_.stop();
+        main_pool_->stop();
     }
 
     int runtime_distributed::wait()
@@ -569,7 +576,7 @@ namespace hpx {
         }
 
         // use main thread to drive main thread pool
-        main_pool_.thread_run(0);
+        main_pool_->thread_run(0);
 
         // block main thread
         t.join();
@@ -633,20 +640,20 @@ namespace hpx {
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         LTM_(info).format("stop: stopping timer pool");
-        timer_pool_.stop();
+        timer_pool_->stop();
         if (blocking)
         {
-            timer_pool_.join();
-            timer_pool_.clear();
+            timer_pool_->join();
+            timer_pool_->clear();
         }
 #endif
 #ifdef HPX_HAVE_IO_POOL
         LTM_(info).format("stop: stopping io pool");
-        io_pool_.stop();
+        io_pool_->stop();
         if (blocking)
         {
-            io_pool_.join();
-            io_pool_.clear();
+            io_pool_->join();
+            io_pool_->clear();
         }
 #endif
     }
@@ -1488,7 +1495,7 @@ namespace hpx {
         HPX_ASSERT(name != nullptr);
 #ifdef HPX_HAVE_IO_POOL
         if (name && 0 == std::strncmp(name, "io", 2))
-            return &io_pool_;
+            return io_pool_.get();
 #endif
 #if defined(HPX_HAVE_NETWORKING)
         if (name && 0 == std::strncmp(name, "parcel", 6))
@@ -1496,15 +1503,14 @@ namespace hpx {
 #endif
 #ifdef HPX_HAVE_TIMER_POOL
         if (name && 0 == std::strncmp(name, "timer", 5))
-            return &timer_pool_;
+            return timer_pool_.get();
 #endif
         if (name && 0 == std::strncmp(name, "main", 4))    //-V112
-            return &main_pool_;
+            return main_pool_.get();
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
             "runtime_distributed::get_thread_pool",
             "unknown thread pool requested: {}", name ? name : "<unknown>");
-        return nullptr;
     }
 
     /// Register an external OS-thread with HPX

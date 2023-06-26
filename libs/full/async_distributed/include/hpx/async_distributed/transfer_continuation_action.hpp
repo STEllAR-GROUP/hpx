@@ -35,7 +35,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
@@ -200,7 +200,7 @@ namespace hpx { namespace actions {
             data.description, data.parent_locality_id, data.parent_id);
 #endif
         hpx::detail::post_helper<typename base_type::derived_type>::call(
-            HPX_MOVE(data), HPX_MOVE(cont_), target, lva, comptype,
+            HPX_MOVE(data), HPX_MOVE(cont_), HPX_MOVE(target), lva, comptype,
             this->priority_, HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }
 
@@ -274,18 +274,16 @@ namespace hpx { namespace actions {
         auto* ptr = &detail::register_action<Action>::create_cont;
         (void) ptr;
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
-namespace hpx { namespace traits {
-    /// \cond NOINTERNAL
-    template <typename Action>
-    struct needs_automatic_registration<
-        hpx::actions::transfer_continuation_action<Action>>
-      : needs_automatic_registration<Action>
-    {
-    };
-    /// \endcond
-}}    // namespace hpx::traits
+/// \cond NOINTERNAL
+template <typename Action>
+struct hpx::traits::needs_automatic_registration<
+    hpx::actions::transfer_continuation_action<Action>>
+  : needs_automatic_registration<Action>
+{
+};
+/// \endcond
 
 #include <hpx/config/warnings_suffix.hpp>
 

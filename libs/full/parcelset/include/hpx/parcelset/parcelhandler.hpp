@@ -21,8 +21,7 @@
 #include <hpx/modules/timing.hpp>
 
 #include <hpx/components_base/component_type.hpp>
-#include <hpx/naming_base/address.hpp>
-#include <hpx/naming_base/id_type.hpp>
+#include <hpx/naming_base/gid_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>

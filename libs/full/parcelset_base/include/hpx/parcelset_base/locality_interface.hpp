@@ -12,9 +12,7 @@
 #include <hpx/modules/errors.hpp>
 
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
 
-#include <cstddef>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +25,6 @@ namespace hpx::parcelset {
     ///////////////////////////////////////////////////////////////////////////
     // initialize locality interface function wrappers
     struct locality_interface_functions& locality_init();
-
 }    // namespace hpx::parcelset
 
 #endif

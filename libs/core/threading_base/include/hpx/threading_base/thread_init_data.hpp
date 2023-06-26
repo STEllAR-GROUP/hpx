@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,14 +14,16 @@
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <utility>
+#ifdef HPX_HAVE_APEX
+#include <memory>
+#endif
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///////////////////////////////////////////////////////////////////////////
     class thread_init_data
     {
@@ -54,6 +56,7 @@ namespace hpx { namespace threads {
             }
         }
 
+        thread_init_data& operator=(thread_init_data const& rhs) = delete;
         thread_init_data& operator=(thread_init_data&& rhs) noexcept
         {
             func = HPX_MOVE(rhs.func);
@@ -68,7 +71,7 @@ namespace hpx { namespace threads {
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
             parent_locality_id = rhs.parent_locality_id;
-            parent_id = rhs.parent_id;
+            parent_id = HPX_MOVE(rhs.parent_id);
             parent_phase = rhs.parent_phase;
 #endif
 #ifdef HPX_HAVE_APEX
@@ -79,6 +82,7 @@ namespace hpx { namespace threads {
             return *this;
         }
 
+        thread_init_data(thread_init_data const& rhs) = delete;
         thread_init_data(thread_init_data&& rhs) noexcept
           : func(HPX_MOVE(rhs.func))
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
@@ -86,7 +90,7 @@ namespace hpx { namespace threads {
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
           , parent_locality_id(rhs.parent_locality_id)
-          , parent_id(rhs.parent_id)
+          , parent_id(HPX_MOVE(rhs.parent_id))
           , parent_phase(rhs.parent_phase)
 #endif
 #ifdef HPX_HAVE_APEX
@@ -105,7 +109,8 @@ namespace hpx { namespace threads {
         }
 
         template <typename F>
-        thread_init_data(F&& f, threads::thread_description const& desc,
+        thread_init_data(F&& f,
+            [[maybe_unused]] threads::thread_description const& desc,
             thread_priority priority_ = thread_priority::normal,
             thread_schedule_hint os_thread = thread_schedule_hint(),
             thread_stacksize stacksize_ = thread_stacksize::default_,
@@ -135,8 +140,6 @@ namespace hpx { namespace threads {
           , run_now(run_now_)
           , scheduler_base(scheduler_base_)
         {
-            HPX_UNUSED(desc);
-
             if (initial_state == thread_schedule_state::staged)
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -169,4 +172,4 @@ namespace hpx { namespace threads {
 
         policies::scheduler_base* scheduler_base;
     };
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

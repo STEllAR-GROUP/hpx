@@ -33,7 +33,7 @@ int main()
 #endif
 //]
 #else
-#include <hpx/local/thread.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/wrap_main.hpp>
 
 #include <iostream>

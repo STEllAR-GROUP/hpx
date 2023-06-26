@@ -22,6 +22,7 @@ tests.unit.modules.cache
 tests.unit.modules.checkpoint
 tests.unit.modules.checkpoint_base
 tests.unit.modules.collectives
+tests.unit.modules.command_line_handling_local
 tests.unit.modules.distribution_policies
 tests.unit.modules.execution
 tests.unit.modules.execution_base

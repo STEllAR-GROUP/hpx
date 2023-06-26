@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,13 +14,12 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/async_implementations_fwd.hpp>
 #include <hpx/async_distributed/packaged_action.hpp>
+#include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/components_base/traits/component_type_is_compatible.hpp>
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/futures/future.hpp>
-#include <hpx/futures/traits/future_access.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
@@ -31,28 +30,29 @@
 #include <cstddef>
 #include <utility>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     /// \cond NOINTERNAL
     ///////////////////////////////////////////////////////////////////////////
     struct keep_id_alive
     {
-        explicit keep_id_alive(hpx::id_type const& id)
-          : id_(id)
+        explicit keep_id_alive(hpx::id_type&& id) noexcept
+          : id_(HPX_MOVE(id))
         {
         }
 
-        void operator()() const {}
+        constexpr void operator()() const noexcept {}
 
         hpx::id_type id_;
     };
 
     template <typename T>
-    future<T> keep_alive(future<T>&& f, id_type const& id)
+    future<T> keep_alive(future<T>&& f, id_type id)
     {
         if (id.get_management_type() == hpx::id_type::management_type::managed)
         {
             traits::detail::get_shared_state(f)->set_on_completed(
-                hpx::detail::keep_id_alive(id));
+                hpx::detail::keep_id_alive(HPX_MOVE(id)));
         }
         return HPX_MOVE(f);
     }
@@ -60,26 +60,25 @@ namespace hpx { namespace detail {
     struct keep_id_and_ptr_alive
     {
         explicit keep_id_and_ptr_alive(
-            hpx::id_type const& id, components::pinned_ptr&& p)
-          : id_(id)
+            hpx::id_type&& id, components::pinned_ptr&& p) noexcept
+          : id_(HPX_MOVE(id))
           , p_(HPX_MOVE(p))
         {
         }
 
-        void operator()() const {}
+        constexpr void operator()() const noexcept {}
 
         hpx::id_type id_;
         components::pinned_ptr p_;
     };
 
     template <typename T>
-    future<T> keep_alive(
-        future<T>&& f, id_type const& id, components::pinned_ptr&& p)
+    future<T> keep_alive(future<T>&& f, id_type id, components::pinned_ptr&& p)
     {
         if (id.get_management_type() == hpx::id_type::management_type::managed)
         {
             traits::detail::get_shared_state(f)->set_on_completed(
-                hpx::detail::keep_id_and_ptr_alive(id, HPX_MOVE(p)));
+                hpx::detail::keep_id_and_ptr_alive(HPX_MOVE(id), HPX_MOVE(p)));
         }
         return HPX_MOVE(f);
     }
@@ -88,9 +87,11 @@ namespace hpx { namespace detail {
     class handle_managed_target
     {
     public:
-        HPX_NON_COPYABLE(handle_managed_target);
+        handle_managed_target(handle_managed_target const&) = delete;
+        handle_managed_target(handle_managed_target&&) = delete;
+        handle_managed_target& operator=(handle_managed_target const&) = delete;
+        handle_managed_target& operator=(handle_managed_target&&) = delete;
 
-    public:
         handle_managed_target(hpx::id_type const& id, future<Result>& f)
           : target_is_managed_(false)
           , id_(id)
@@ -111,16 +112,12 @@ namespace hpx { namespace detail {
             // as an unmanaged id
             if (target_is_managed_)
             {
-                typedef typename traits::detail::shared_state_ptr_for<
-                    future<Result>>::type shared_state_ptr;
-
-                shared_state_ptr const& state =
-                    traits::detail::get_shared_state(f_);
-                if (state)
+                if (auto const& state = traits::detail::get_shared_state(f_))
                 {
                     HPX_ASSERT(id_);
                     HPX_ASSERT(unmanaged_id_);
-                    state->set_on_completed(hpx::detail::keep_id_alive(id_));
+                    state->set_on_completed(
+                        hpx::detail::keep_id_alive(HPX_MOVE(id_)));
                 }
             }
         }
@@ -131,7 +128,7 @@ namespace hpx { namespace detail {
         }
 
         bool target_is_managed_;
-        hpx::id_type const& id_;
+        hpx::id_type id_;
         hpx::id_type unmanaged_id_;
         future<Result>& f_;
     };
@@ -146,10 +143,9 @@ namespace hpx { namespace detail {
         {
             try
             {
-                typedef typename Action::remote_result_type remote_result_type;
-
-                typedef traits::get_remote_result<Result, remote_result_type>
-                    get_remote_result_type;
+                using remote_result_type = typename Action::remote_result_type;
+                using get_remote_result_type =
+                    traits::get_remote_result<Result, remote_result_type>;
 
                 return make_ready_future(
                     get_remote_result_type::call(Action::execute_function(
@@ -166,7 +162,7 @@ namespace hpx { namespace detail {
     template <typename Action>
     bool can_invoke_locally()
     {
-        std::ptrdiff_t requested_stack_size =
+        std::ptrdiff_t const requested_stack_size =
             threads::get_stack_size(static_cast<threads::thread_stacksize>(
                 traits::action_stacksize<Action>::value));
         constexpr bool df = traits::action_decorate_function<Action>::value;
@@ -220,12 +216,12 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_remote_impl(launch::sync_policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
 
         future<result_type> f;
         {
@@ -240,12 +236,12 @@ namespace hpx { namespace detail {
 
     template <typename Action, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_remote_impl(launch::async_policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
 
         hpx::future<result_type> f;
         {
@@ -259,12 +255,12 @@ namespace hpx { namespace detail {
 
     template <typename Action, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_remote_impl(launch::deferred_policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
 
         hpx::future<result_type> f;
         {
@@ -280,7 +276,7 @@ namespace hpx { namespace detail {
     // generic function for dynamic launch policy
     template <typename Action, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_remote_impl(launch policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
@@ -309,10 +305,10 @@ namespace hpx { namespace detail {
     template <typename Action>
     struct action_invoker
     {
-        typedef typename Action::remote_result_type remote_result_type;
-        typedef typename Action::local_result_type result_type;
-        typedef traits::get_remote_result<result_type, remote_result_type>
-            get_remote_result_type;
+        using remote_result_type = typename Action::remote_result_type;
+        using result_type = typename Action::local_result_type;
+        using get_remote_result_type =
+            traits::get_remote_result<result_type, remote_result_type>;
 
         template <typename... Ts>
         HPX_FORCEINLINE result_type operator()(
@@ -323,11 +319,11 @@ namespace hpx { namespace detail {
                 Action::invoker(lva, comptype, HPX_FORWARD(Ts, vs)...));
         }
     };
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename Action>
     struct get_function_address<hpx::detail::action_invoker<Action>>
@@ -360,21 +356,21 @@ namespace hpx { namespace traits {
         }
     };
 #endif
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
 #endif
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_local_impl(launch policy, hpx::id_type const& id,
         naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
         Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
 
         if (policy == launch::sync || action_type::direct_execution::value)
         {
@@ -398,80 +394,60 @@ namespace hpx { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Action, typename Result, typename... Ts>
-    bool async_local_impl_all(launch policy, hpx::id_type const& id,
-        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
-        hpx::future<Result>& f, Ts&&... vs)
-    {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        //typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
-
-        // route launch policy through component
-        policy = traits::action_select_direct_execution<Action>::call(
-            policy, addr.address_);
-
-        if (traits::component_supports_migration<component_type>::call())
-        {
-            r = traits::action_was_object_migrated<Action>::call(
-                id, addr.address_);
-
-            if (!r.first)
-            {
-                f = async_local_impl<Action>(
-                    policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
-                return true;
-            }
-
-            // can't locally handle object if it is currently being migrated
-            return false;
-        }
-
-        f = async_local_impl<Action>(
-            policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
-
-        return true;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Launch, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_impl(Launch&& policy, hpx::id_type const& id, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
 
-        std::pair<bool, components::pinned_ptr> r;
-
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr) &&
-            can_invoke_locally<action_type>())
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
         {
-            hpx::future<result_type> f;
-            if (async_local_impl_all<Action>(
-                    policy, id, addr, r, f, HPX_FORWARD(Ts, vs)...))
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<Action>::call(
+                    id, addr.address_);
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                can_invoke_locally<action_type>() && !r.first)
             {
-                return f;
+                // route launch policy through component
+                launch const adapted_policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        policy, addr.address_);
+
+                return async_local_impl<Action>(
+                    adapted_policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
             }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr) &&
+                can_invoke_locally<action_type>())
+            {
+                // route launch policy through component
+                launch const adapted_policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        policy, addr.address_);
+
+                return async_local_impl<Action>(
+                    adapted_policy, id, addr, r, HPX_FORWARD(Ts, vs)...);
+            }
+
+            // fall through
         }
 
-        // Use of a moved from object: '(*<vs_0>)'
-        //
-        // We can safely disable the warning as we know that
-        // async_local_impl_all() has not touched the arguments if it returns
-        // false.
-#if defined(HPX_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 26800)
-#endif
-
+        // Note: the pinned_ptr is still being held, if necessary
         return async_remote_impl<Action>(HPX_FORWARD(Launch, policy), id,
             HPX_MOVE(addr), HPX_FORWARD(Ts, vs)...);
-
-#if defined(HPX_MSVC)
-#pragma warning(pop)
-#endif
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -479,48 +455,68 @@ namespace hpx { namespace detail {
     ///       this class
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_cb_impl(
         launch policy, hpx::id_type const& id, Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
+        using component_type = typename action_type::component_type;
 
-        std::pair<bool, components::pinned_ptr> r;
-
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr) &&
-            can_invoke_locally<action_type>())
-        {
-            // route launch policy through component
-            policy = traits::action_select_direct_execution<Action>::call(
-                policy, addr.address_);
 
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
+        {
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
                     id, addr.address_);
-                if (!r.first)
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                can_invoke_locally<action_type>() && !r.first)
+            {
+                // route launch policy through component
+                policy =
+                    traits::action_select_direct_execution<action_type>::call(
+                        policy, addr.address_);
+
+                if (policy == launch::sync ||
+                    action_type::direct_execution::value)
                 {
-                    if (policy == launch::sync ||
-                        action_type::direct_execution::value)
-                    {
-                        return hpx::detail::sync_local_invoke_cb<action_type,
-                            result_type>::call(id, HPX_MOVE(addr),
-                            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
-                    }
+                    return sync_local_invoke_cb<action_type, result_type>::call(
+                        id, HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                        HPX_FORWARD(Ts, vs)...);
                 }
             }
-            else if (policy == launch::sync ||
-                action_type::direct_execution::value)
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr) &&
+                can_invoke_locally<action_type>())
             {
-                return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, HPX_MOVE(addr),
-                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                // route launch policy through component
+                policy =
+                    traits::action_select_direct_execution<action_type>::call(
+                        policy, addr.address_);
+
+                if (policy == launch::sync ||
+                    action_type::direct_execution::value)
+                {
+                    return sync_local_invoke_cb<action_type, result_type>::call(
+                        id, HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                        HPX_FORWARD(Ts, vs)...);
+                }
             }
+
+            // fall through
         }
 
+        // Note: the pinned_ptr is still being held, if necessary
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
@@ -547,7 +543,6 @@ namespace hpx { namespace detail {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "async_cb_impl",
                     "unknown launch policy");
-                return f;
             }
         }
         return f;
@@ -555,38 +550,50 @@ namespace hpx { namespace detail {
 
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
+        using component_type = typename action_type::component_type;
 
-        std::pair<bool, components::pinned_ptr> r;
-
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
         {
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<Action>::call(
                     id, addr.address_);
-                if (!r.first)
-                {
-                    return hpx::detail::sync_local_invoke_cb<action_type,
-                        result_type>::call(id, HPX_MOVE(addr),
-                        HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
-                }
-            }
-            else
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                can_invoke_locally<action_type>() && !r.first)
             {
-                return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, HPX_MOVE(addr),
-                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                return sync_local_invoke_cb<action_type, result_type>::call(id,
+                    HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                    HPX_FORWARD(Ts, vs)...);
             }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr) &&
+                can_invoke_locally<action_type>())
+            {
+                return sync_local_invoke_cb<action_type, result_type>::call(id,
+                    HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                    HPX_FORWARD(Ts, vs)...);
+            }
+
+            // fall through
         }
 
+        // Note: the pinned_ptr is still being held, if necessary
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
@@ -602,48 +609,66 @@ namespace hpx { namespace detail {
 
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_cb_impl(hpx::detail::async_policy async_policy,
         hpx::id_type const& id, Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
-        typedef typename action_type::component_type component_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
+        using component_type = typename action_type::component_type;
 
-        std::pair<bool, components::pinned_ptr> r;
-
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
         naming::address addr;
-        if (agas::is_local_address_cached(id, addr))
-        {
-            // route launch policy through component
-            launch policy =
-                traits::action_select_direct_execution<Action>::call(
-                    async_policy, addr.address_);
 
-            if (traits::component_supports_migration<component_type>::call())
-            {
-                r = traits::action_was_object_migrated<Action>::call(
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
+        {
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<Action>::call(
                     id, addr.address_);
-                if (!r.first)
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                can_invoke_locally<action_type>() && !r.first)
+            {
+                launch const policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        async_policy, addr.address_);
+
+                if (policy == launch::sync ||
+                    action_type::direct_execution::value)
                 {
-                    if (policy == launch::sync ||
-                        action_type::direct_execution::value)
-                    {
-                        return hpx::detail::sync_local_invoke_cb<action_type,
-                            result_type>::call(id, HPX_MOVE(addr),
-                            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
-                    }
+                    return sync_local_invoke_cb<action_type, result_type>::call(
+                        id, HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                        HPX_FORWARD(Ts, vs)...);
                 }
             }
-            else if (policy == launch::sync ||
-                action_type::direct_execution::value)
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr) &&
+                can_invoke_locally<action_type>())
             {
-                return hpx::detail::sync_local_invoke_cb<action_type,
-                    result_type>::call(id, HPX_MOVE(addr),
-                    HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                launch const policy =
+                    traits::action_select_direct_execution<Action>::call(
+                        async_policy, addr.address_);
+
+                if (policy == launch::sync ||
+                    action_type::direct_execution::value)
+                {
+                    return sync_local_invoke_cb<action_type, result_type>::call(
+                        id, HPX_MOVE(addr), HPX_FORWARD(Callback, cb),
+                        HPX_FORWARD(Ts, vs)...);
+                }
             }
+
+            // fall through
         }
 
+        // Note: the pinned_ptr is still being held, if necessary
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
@@ -658,12 +683,12 @@ namespace hpx { namespace detail {
 
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
-        typename hpx::traits::extract_action<Action>::type::local_result_type>
+        typename hpx::traits::extract_action_t<Action>::local_result_type>
     async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::type action_type;
-        typedef typename action_type::local_result_type result_type;
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using result_type = typename action_type::local_result_type;
 
         naming::address addr;
         [[maybe_unused]] bool result = agas::is_local_address_cached(id, addr);
@@ -680,4 +705,4 @@ namespace hpx { namespace detail {
         return f;
     }
     /// \endcond
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

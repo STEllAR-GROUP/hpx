@@ -280,7 +280,6 @@ namespace hpx::when_all_vector_detail {
                     op_states[i].template emplace_f<operation_state_type>(
                         hpx::execution::experimental::connect, HPX_MOVE(sender),
                         when_all_vector_receiver{*this, i});
-                    );
 #endif
                     ++i;
                 }

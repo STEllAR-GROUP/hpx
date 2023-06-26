@@ -9,13 +9,12 @@
 // The test is intended to be used with a task plotting/profiling
 // tool to verify that high priority tasks run before low ones.
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <cstddef>
