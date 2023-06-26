@@ -44,7 +44,7 @@ namespace hpx::parcelset::policies::lci {
         postprocess_handler_ = HPX_MOVE(parcel_postprocess);
 
         // build header
-        while (LCI_mbuffer_alloc(pp_->device_eager, &header_buffer) != LCI_OK)
+        while (LCI_mbuffer_alloc(pp_->device, &header_buffer) != LCI_OK)
             continue;
         HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
         header_ = header(
@@ -138,14 +138,13 @@ namespace hpx::parcelset::policies::lci {
         LCI_error_t ret;
         if (config_t::protocol == config_t::protocol_t::putsendrecv)
         {
-            ret = LCI_putmna(pp_->endpoint_new_eager, header_buffer, dst_rank,
-                0, LCI_DEFAULT_COMP_REMOTE);
+            ret = LCI_putmna(pp_->endpoint_new, header_buffer, dst_rank, 0,
+                LCI_DEFAULT_COMP_REMOTE);
         }
         else
         {
             HPX_ASSERT(config_t::protocol == config_t::protocol_t::sendrecv);
-            ret =
-                LCI_sendmn(pp_->endpoint_new_eager, header_buffer, dst_rank, 0);
+            ret = LCI_sendmn(pp_->endpoint_new, header_buffer, dst_rank, 0);
         }
         if (ret == LCI_OK)
         {

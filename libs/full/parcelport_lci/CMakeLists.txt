@@ -29,6 +29,7 @@ set(parcelport_lci_headers
     hpx/parcelport_lci/completion_manager_base.hpp
     hpx/parcelport_lci/completion_manager/completion_manager_queue.hpp
     hpx/parcelport_lci/completion_manager/completion_manager_sync.hpp
+    hpx/parcelport_lci/completion_manager/completion_manager_sync_single.hpp
 )
 
 # cmake-format: off
