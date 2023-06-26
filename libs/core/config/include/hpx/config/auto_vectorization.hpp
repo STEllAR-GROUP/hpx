@@ -62,6 +62,9 @@
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
 
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+#define HPX_PRAGMA_SIMD_EARLYEXIT
+
 #define HPX_RESTRICT __restrict
 #define HPX_UNROLL HPX_PRAGMA(unroll)
 #define HPX_UNROLL_N(N) HPX_PRAGMA(unroll(N))
@@ -74,6 +77,9 @@
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
 
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+#define HPX_PRAGMA_SIMD_EARLYEXIT
+
 #define HPX_RESTRICT __restrict
 #define HPX_UNROLL HPX_PRAGMA(clang loop unroll(enable))
 #define HPX_UNROLL_N(N) HPX_PRAGMA(clang loop unroll_count(N))
@@ -85,6 +91,9 @@
 #define HPX_VECTORIZE
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
+
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+#define HPX_PRAGMA_SIMD_EARLYEXIT
 
 #define HPX_RESTRICT __restrict__
 // GCC does not have an auto unroll constant picker
@@ -99,6 +108,9 @@
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
 
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+#define HPX_PRAGMA_SIMD_EARLYEXIT
+
 #define HPX_RESTRICT
 #define HPX_UNROLL
 #define HPX_UNROLL_N(N)
@@ -111,6 +123,9 @@
 #define HPX_VECTORIZE
 #define HPX_VECTOR_REDUCTION(CLAUSE)
 #define HPX_DECLARE_SIMD
+
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+#define HPX_PRAGMA_SIMD_EARLYEXIT
 
 #define HPX_RESTRICT
 #define HPX_UNROLL
