@@ -69,6 +69,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
+    void (*on_finalize)() = nullptr;
+
     namespace detail {
 
         int init_helper(hpx::program_options::variables_map& /*vm*/,
@@ -150,6 +153,12 @@ namespace hpx {
             }
 
             rt->finalize(0);
+
+            // invoke user supplied finalizer
+            if (hpx::on_finalize != nullptr)
+            {
+                (*hpx::on_finalize)();
+            }
 
             return 0;
         }

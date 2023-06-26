@@ -221,4 +221,7 @@ namespace hpx {
         HPX_CORE_EXPORT int suspend(error_code& ec = throws);
         HPX_CORE_EXPORT int resume(error_code& ec = throws);
     }    // namespace local
+
+    // Allow applications to add a finalizer if HPX_MAIN is set
+    HPX_CORE_EXPORT extern void (*on_finalize)();
 }    // namespace hpx
