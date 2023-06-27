@@ -113,7 +113,6 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "add_event_callback", "could not get an event");
         }
-        check_cuda_error(cudaSetDevice(device));
         check_cuda_error(cudaEventRecord(event, stream));
 
         detail::add_to_event_callback_queue(
