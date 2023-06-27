@@ -89,7 +89,7 @@ namespace hpx::parallel::util {
         {
             if (f(*(first + i)))
             {
-                return first + i;
+                break;
             }
             ++i;
         }
@@ -153,11 +153,10 @@ namespace hpx::parallel::util {
 
         //Keep remainder scalar
         for (; outer_loop_ind != n; ++outer_loop_ind)
-            if ((f, *(first1 + outer_loop_ind), *(first2 + outer_loop_ind)))
-                return std::make_pair(
-                    first1 + outer_loop_ind, first2 + outer_loop_ind);
+            if (f(*(first1 + outer_loop_ind), *(first2 + outer_loop_ind)))
+                break;
 
-        return std::make_pair(last1, last2);
+        return std::make_pair(first1 + outer_loop_ind, first2 + outer_loop_ind);
 #endif    //HPX_EARLYEXIT_PRESENT
     }
 }    // namespace hpx::parallel::util

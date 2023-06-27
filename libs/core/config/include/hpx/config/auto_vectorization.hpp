@@ -27,16 +27,9 @@
 #define HPX_PRAGMA(x) _Pragma(#x)
 #endif
 
-// Use OpenMP backend for compilers that support OpenMP
-#if (_OPENMP >= 201307) || (__INTEL_COMPILER >= 1600) ||                       \
-    (defined(__clang__) && HPX_CLANG_VERSION >= 30700)
-
 #if (__INTEL_COMPILER >= 1600)
-#define HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA(vector unaligned)
-#else
-#define HPX_PRAGMA_VECTOR_UNALIGNED
-#endif
 
+// version specific pragmas to be defined at the beginning
 #if (__INTEL_COMPILER >= 1800)
 #define HPX_EARLYEXIT_PRESENT
 #define HPX_PRAGMA_SIMD_EARLYEXIT HPX_PRAGMA(omp simd early_exit)
@@ -44,6 +37,21 @@
 #define HPX_PRAGMA_SIMD_EARLYEXIT
 #endif
 
+#define HPX_IVDEP
+#define HPX_PRAGMA_VECTOR_UNALIGNED HPX_PRAGMA(vector unaligned)
+#define HPX_VECTORIZE HPX_PRAGMA(omp simd)
+#define HPX_VECTOR_REDUCTION(CLAUSE) HPX_PRAGMA(omp simd reduction(CLAUSE))
+#define HPX_DECLARE_SIMD HPX_PRAGMA(omp declare simd)
+
+#define HPX_RESTRICT
+#define HPX_UNROLL
+#define HPX_UNROLL_N(N)
+
+#define HPX_HAVE_VECTOR_REDUCTION
+
+#elif(_OPENMP >= 201307) || (defined(__clang__) && HPX_CLANG_VERSION >= 30700)
+
+#define HPX_PRAGMA_SIMD_EARLYEXIT
 #define HPX_IVDEP
 #define HPX_VECTORIZE HPX_PRAGMA(omp simd)
 #define HPX_VECTOR_REDUCTION(CLAUSE) HPX_PRAGMA(omp simd reduction(CLAUSE))
