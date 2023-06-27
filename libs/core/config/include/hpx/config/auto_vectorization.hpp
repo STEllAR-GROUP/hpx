@@ -61,6 +61,8 @@
 #define HPX_UNROLL
 #define HPX_UNROLL_N(N)
 
+#define HPX_PRAGMA_VECTOR_UNALIGNED
+
 #define HPX_HAVE_VECTOR_REDUCTION
 
 // Fallback to compiler-specific back-ends
