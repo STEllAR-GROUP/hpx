@@ -82,7 +82,8 @@ namespace hpx { namespace cuda { namespace experimental {
             check_cuda_error(cudaGetDeviceCount(&max_number_devices_));
             HPX_ASSERT_MSG(max_number_devices_ > 0,
                 "CUDA polling enabled and called, yet no CUDA device found!");
-            /* free_lists_.reserve(max_number_devices_); */
+            int original_device = 0;
+            check_cuda_error(cudaGetDevice(&original_device));
             for (int device = 0; device < max_number_devices_; device++)
             {
                 check_cuda_error(cudaSetDevice(device));
@@ -92,6 +93,9 @@ namespace hpx { namespace cuda { namespace experimental {
                     add_event_to_pool(device);
                 }
             }
+            // Restore original device -- avoids confusion about HPX switching
+            // devices for the current thread if only one device is used.
+            check_cuda_error(cudaSetDevice(original_device));
         }
 
         void add_event_to_pool(int device)
