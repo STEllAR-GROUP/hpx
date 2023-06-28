@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <utility>
 
+// Please use static assert and enforce Iter to be Random Access Iterator
 namespace hpx::parallel::util {
     /*
         Compiler and Hardware should also support vector operations for IterDiff,
@@ -120,7 +121,7 @@ namespace hpx::parallel::util {
             HPX_LANE_SIZE / sizeof(std::int32_t);
         alignas(HPX_LANE_SIZE) std::int32_t simd_lane[num_blocks] = {0};
 
-        std::size_t outer_loop_ind = 0;
+        IterDiff outer_loop_ind = 0;
         while (outer_loop_ind <= n - num_blocks)
         {
             std::int32_t found_flag = 0;
