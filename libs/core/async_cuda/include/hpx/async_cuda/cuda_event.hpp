@@ -29,7 +29,7 @@ namespace hpx { namespace cuda { namespace experimental {
         // on destruction, all objects in stack will be freed
         ~cuda_event_pool()
         {
-            HPX_ASSERT_MSG(free_lists_.size() !=
+            HPX_ASSERT_MSG(free_lists_.size() ==
                     static_cast<std::size_t>(max_number_devices_),
                 "Number of CUDA event pools does not match the number of "
                 "devices!");
