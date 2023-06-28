@@ -35,7 +35,6 @@ extern void launch_saxpy_kernel(
     hpx::cuda::experimental::cuda_executor& cudaexec, unsigned int& blocks,
     unsigned int& threads, void** args);
 
-
 // -------------------------------------------------------------------------
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -82,9 +81,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         auto fut = hpx::cuda::experimental::detail::get_future_with_event(
             device_stream);
         fut.get();
-        std::cout
-            << "get_future_with_event default ID test finished on device "
-            << device_id << std::endl;
+        std::cout << "get_future_with_event default ID test finished on device "
+                  << device_id << std::endl;
         hpx::cuda::experimental::check_cuda_error(
             cudaStreamDestroy(device_stream));
     }
