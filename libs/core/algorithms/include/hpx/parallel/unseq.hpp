@@ -9,5 +9,5 @@
 
 #include <hpx/parallel/unseq/loop.hpp>
 #include <hpx/parallel/unseq/reduce.hpp>
-#include <hpx/parallel/unseq/transform_loop.hpp>
 #include <hpx/parallel/unseq/simd_helpers.hpp>
+#include <hpx/parallel/unseq/transform_loop.hpp>
