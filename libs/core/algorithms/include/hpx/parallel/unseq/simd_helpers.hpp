@@ -114,8 +114,6 @@ namespace hpx::parallel::util {
 
         return std::make_pair(first1 + i, first2 + i);
 #else
-        Iter1 const last1 = first1 + n;
-        Iter2 const last2 = first2 + n;
 
         static constexpr std::int32_t num_blocks =
             HPX_LANE_SIZE / sizeof(std::int32_t);
