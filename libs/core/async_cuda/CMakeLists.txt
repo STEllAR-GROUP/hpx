@@ -36,7 +36,7 @@ set(async_cuda_compat_headers
 # cmake-format: on
 
 set(async_cuda_sources cuda_event_callback.cpp cuda_future.cpp cuda_target.cpp
-                       get_targets.cpp
+                       get_targets.cpp cuda_event.cpp
 )
 
 if(HPX_WITH_HIP AND TARGET roc::hipblas)

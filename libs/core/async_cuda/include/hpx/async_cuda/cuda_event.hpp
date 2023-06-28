@@ -1,5 +1,7 @@
+//  Copyright (c) 2023 Gregor Daiß
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2020 Teodor Nikolov
+//
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,16 +24,13 @@ namespace hpx { namespace cuda { namespace experimental {
     {
         static constexpr std::size_t initial_events_in_pool = 128;
 
-        static cuda_event_pool& get_event_pool()
-        {
-            static cuda_event_pool event_pool_;
-            return event_pool_;
-        }
+        HPX_CORE_EXPORT static cuda_event_pool& get_event_pool();
 
         // on destruction, all objects in stack will be freed
         ~cuda_event_pool()
         {
-            HPX_ASSERT_MSG(free_lists_.size() != max_number_devices_,
+            HPX_ASSERT_MSG(free_lists_.size() !=
+                    static_cast<std::size_t>(max_number_devices_),
                 "Number of CUDA event pools does not match the number of "
                 "devices!");
             for (int device = 0; device < max_number_devices_; device++)
