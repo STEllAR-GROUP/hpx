@@ -8,7 +8,7 @@
 #include <hpx/async_cuda/cuda_event.hpp>
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 
-namespace hpx { namespace cuda { namespace experimental { 
+namespace hpx { namespace cuda { namespace experimental {
     cuda_event_pool& cuda_event_pool::get_event_pool()
     {
         static cuda_event_pool event_pool_;
