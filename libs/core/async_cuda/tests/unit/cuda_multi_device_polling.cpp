@@ -46,27 +46,48 @@ int hpx_main(hpx::program_options::variables_map& vm)
     hpx::cuda::experimental::print_local_targets();
 
     int number_devices = 0;
-    hpx::cuda::experimental::check_cuda_error(cudaGetDeviceCount(&number_devices));
+    hpx::cuda::experimental::check_cuda_error(
+        cudaGetDeviceCount(&number_devices));
     HPX_ASSERT(number_devices > 0);
 
+    // Check if the futures complete when using executors on all devices
     std::vector<hpx::shared_future<void>> futs(number_devices);
-
-    for (auto device_id = 0; device_id < number_devices; device_id++) {
-      hpx::cuda::experimental::cuda_executor exec(
-          device_id, hpx::cuda::experimental::event_mode{});
-      auto fut = hpx::async(exec, cuda_trivial_kernel<double>,
-          static_cast<float>(device_id) + 1);
-      futs[device_id] = fut.then([device_id](hpx::future<void>&&) {
-          std::cout
-              << "Continuation for kernel future triggered on device executor "
-              << device_id << std::endl;
-      });
+    for (auto device_id = 0; device_id < number_devices; device_id++)
+    {
+        hpx::cuda::experimental::cuda_executor exec(
+            device_id, hpx::cuda::experimental::event_mode{});
+        auto fut = hpx::async(exec, cuda_trivial_kernel<float>,
+            static_cast<float>(device_id) + 1);
+        futs[device_id] = fut.then([device_id](hpx::future<void>&&) {
+            std::cout << "Continuation for kernel future triggered on device "
+                         "executor "
+                      << device_id << std::endl;
+        });
     }
-
     auto final_fut = hpx::when_all(futs);
     std::cout << "All executor test kernels launched! " << std::endl;
     final_fut.get();
     std::cout << "All executor test kernels finished! " << std::endl;
+
+    // Test to see if HPX correctly picks up the current device in case
+    // get_future_with_event is not given a device_id
+    for (auto device_id = 0; device_id < number_devices; device_id++)
+    {
+        hpx::cuda::experimental::check_cuda_error(cudaSetDevice(device_id));
+        cudaStream_t device_stream;
+        hpx::cuda::experimental::check_cuda_error(
+            cudaStreamCreate(&device_stream));
+        cuda_trivial_kernel<float>(
+            number_devices + device_id + 1, device_stream);
+        auto fut = hpx::cuda::experimental::detail::get_future_with_event(
+            device_stream);
+        fut.get();
+        std::cout
+            << "get_future_with_event default ID test finished on device "
+            << device_id << std::endl;
+        hpx::cuda::experimental::check_cuda_error(
+            cudaStreamDestroy(device_stream));
+    }
 
     return hpx::local::finalize();
 }
