@@ -8,8 +8,9 @@
 #include <hpx/parallel/unseq/simd_helpers.hpp>
 
 #include <algorithm>
-#include <assert.h>
+#include <cstddef>
 #include <random>
+#include <utility>
 #include <vector>
 
 int seed = std::random_device{}();
