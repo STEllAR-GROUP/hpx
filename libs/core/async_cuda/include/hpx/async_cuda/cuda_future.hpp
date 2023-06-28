@@ -1,3 +1,4 @@
+//  Copyright (c) 2023 Gregor Daiß
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Thomas Heller
 //  Copyright (c) 2016 Hartmut Kaiser
@@ -236,8 +237,8 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> get_future_with_event(
             Allocator const& a, cudaStream_t stream, int device = -1)
         {
-            if (device == -1) 
-              check_cuda_error(cudaGetDevice(&device));
+            if (device == -1)
+                check_cuda_error(cudaGetDevice(&device));
             return get_future<Allocator, event_mode>(a, stream, device);
         }
 

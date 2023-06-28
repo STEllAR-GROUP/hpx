@@ -73,8 +73,8 @@ namespace hpx { namespace cuda { namespace experimental {
         cuda_event_pool& operator=(cuda_event_pool const&) = delete;
 
     private:
-        // Private singleton constructor 
-        // Creates a bunch of events on initialization
+        // Private singleton constructor. Creates a initial_events_in_pool of
+        // events on initialization
         cuda_event_pool()
           : max_number_devices_(0)
         {
