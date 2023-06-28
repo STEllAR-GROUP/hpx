@@ -108,14 +108,6 @@ namespace hpx::parcelset::policies::lci {
             data_ = header_buffer;
         }
 
-        void reset() noexcept
-        {
-            if (data_ != nullptr)
-            {
-                free(data_);
-            }
-        }
-
         bool valid() const noexcept
         {
             return data_ != nullptr && signature() == MAGIC_SIGNATURE;
