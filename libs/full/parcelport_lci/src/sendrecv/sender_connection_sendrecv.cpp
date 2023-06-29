@@ -225,8 +225,9 @@ namespace hpx::parcelset::policies::lci {
                 }
                 segment_used = segment_to_use;
                 segment_to_use = LCI_SEGMENT_ALL;
+                auto ret_comp = completion;
                 completion = nullptr;
-                return {return_status_t::wait, completion};
+                return {return_status_t::wait, ret_comp};
             }
             else
             {
