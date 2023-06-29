@@ -60,9 +60,9 @@ namespace hpx { namespace cuda { namespace experimental {
                 if (original_device != device)
                     check_cuda_error(cudaSetDevice(device));
                 add_event_to_pool(device);
-                // reset to original device if required 
+                // reset to original device if required
                 if (original_device != device)
-                  check_cuda_error(cudaSetDevice(original_device));
+                    check_cuda_error(cudaSetDevice(original_device));
             }
             return true;
         }
