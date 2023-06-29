@@ -54,7 +54,15 @@ namespace hpx { namespace cuda { namespace experimental {
             // pop an event off the pool, if that fails, create a new one
             while (!free_lists_[device].pop(event))
             {
+                // Set correct device in case if required
+                int original_device = -1;
+                check_cuda_error(cudaGetDevice(&original_device));
+                if (original_device != device)
+                    check_cuda_error(cudaSetDevice(device));
                 add_event_to_pool(device);
+                // reset to original device if required 
+                if (original_device != device)
+                  check_cuda_error(cudaSetDevice(original_device));
             }
             return true;
         }
