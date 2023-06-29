@@ -30,6 +30,7 @@ namespace hpx::parcelset::policies::lci {
         sender_connection_base::handler_type&& handler,
         sender_connection_base::postprocess_handler_type&& parcel_postprocess)
     {
+        LCT_time_t async_write_start_time = LCT_now();
         load(HPX_FORWARD(handler_type, handler),
             HPX_FORWARD(postprocess_handler_type, parcel_postprocess));
         return_t ret = send();
@@ -41,11 +42,14 @@ namespace hpx::parcelset::policies::lci {
         {
             pp_->send_completion_manager->enqueue_completion(ret.completion);
         }
+        util::lci_environment::pcounter_add(
+            util::lci_environment::async_write_timer,
+            static_cast<int64_t>(LCT_now() - async_write_start_time));
     }
 
     sender_connection_base::return_t sender_connection_base::send()
     {
-        util::lci_environment::pcounter_start(util::lci_environment::send_timer);
+        auto start_time = LCT_now();
         return_t ret;
         const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
@@ -66,7 +70,7 @@ namespace hpx::parcelset::policies::lci {
                         while (pp_->background_work(
                             -1, parcelport_background_mode_all))
                             continue;
-                        sched_yield();
+                        hpx::this_thread::yield();
                     }
                     if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
@@ -93,7 +97,8 @@ namespace hpx::parcelset::policies::lci {
                 }
             }
         }
-        util::lci_environment::pcounter_end(util::lci_environment::send_timer);
+        util::lci_environment::pcounter_add(util::lci_environment::send_timer,
+            static_cast<int64_t>(LCT_now() - start_time));
         return ret;
     }
 

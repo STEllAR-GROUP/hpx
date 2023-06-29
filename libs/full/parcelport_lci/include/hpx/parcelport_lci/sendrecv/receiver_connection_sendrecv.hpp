@@ -70,6 +70,10 @@ namespace hpx::parcelset::policies::lci {
         std::vector<std::vector<char>> chunk_buffers_;
         parcelport* pp_;
         std::shared_ptr<receiver_connection_sendrecv>* sharedPtr_p;
+        // temporary data
+        LCI_segment_t segment_used;
+        // for profiling
+        LCT_time_t conn_start_time;
     };
 }    // namespace hpx::parcelset::policies::lci
 

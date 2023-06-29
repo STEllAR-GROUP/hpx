@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::lci {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         timer_.restart();
 #endif
-
+        conn_start_time = LCT_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -85,6 +85,9 @@ namespace hpx::parcelset::policies::lci {
                 "Rank %d Wrap around!\n", LCI_RANK);
         header_.set_tag(tag);
         send_chunks_idx = 0;
+        completion = nullptr;
+        segment_to_use = LCI_SEGMENT_ALL;
+        segment_used = LCI_SEGMENT_ALL;
         // set state
         profile_start_hook(header_);
         state.store(connection_state::initialized, std::memory_order_release);
@@ -193,12 +196,19 @@ namespace hpx::parcelset::policies::lci {
         }
         else
         {
+            if (config_t::reg_mem && segment_to_use == LCI_SEGMENT_ALL)
+            {
+                LCI_memory_register(
+                    pp_->device, address, length, &segment_to_use);
+            }
+            if (completion == nullptr)
+            {
+                completion = pp_->send_completion_manager->alloc_completion();
+            }
             LCI_lbuffer_t buffer;
-            buffer.segment = LCI_SEGMENT_ALL;
+            buffer.segment = segment_to_use;
             buffer.address = address;
             buffer.length = length;
-            LCI_comp_t completion =
-                pp_->send_completion_manager->alloc_completion();
             LCI_error_t ret = LCI_sendl(pp_->endpoint_followup, buffer,
                 dst_rank, tag, completion, sharedPtr_p);
             if (ret == LCI_OK)
@@ -208,6 +218,14 @@ namespace hpx::parcelset::policies::lci {
                     "sendl (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
                     original_tag, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
+                if (segment_used != LCI_SEGMENT_ALL)
+                {
+                    LCI_memory_deregister(&segment_used);
+                    segment_used = LCI_SEGMENT_ALL;
+                }
+                segment_used = segment_to_use;
+                segment_to_use = LCI_SEGMENT_ALL;
+                completion = nullptr;
                 return {return_status_t::wait, completion};
             }
             else
@@ -342,7 +360,17 @@ namespace hpx::parcelset::policies::lci {
         data_point_.time_ = timer_.elapsed_nanoseconds();
         pp_->add_sent_data(data_point_);
 #endif
+        if (segment_used != LCI_SEGMENT_ALL)
+        {
+            LCI_memory_deregister(&segment_used);
+            segment_used = LCI_SEGMENT_ALL;
+        }
+        HPX_ASSERT(completion == nullptr);
+        HPX_ASSERT(segment_to_use == LCI_SEGMENT_ALL);
         buffer_.clear();
+        util::lci_environment::pcounter_add(
+            util::lci_environment::send_conn_timer,
+            static_cast<int64_t>(LCT_now() - conn_start_time));
 
         if (postprocess_handler_)
         {

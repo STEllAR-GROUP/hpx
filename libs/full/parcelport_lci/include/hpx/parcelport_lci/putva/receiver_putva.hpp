@@ -37,17 +37,26 @@ namespace hpx::parcelset::policies::lci {
 
         bool background_work() noexcept
         {
-            // We first try to accept a new connection
+            bool did_some_work = false;
+
+            auto poll_comp_start = LCT_now();
             request_wrapper_t request;
             request.request = pp_->recv_new_completion_manager->poll();
+            util::lci_environment::pcounter_add(
+                util::lci_environment::poll_comp,
+                static_cast<int64_t>(LCT_now() - poll_comp_start));
 
             if (request.request.flag == LCI_OK)
             {
+                auto useful_bg_start = LCT_now();
                 HPX_ASSERT(request.request.flag == LCI_OK);
                 process_request(request.request);
-                return true;
+                util::lci_environment::pcounter_add(
+                    util::lci_environment::useful_bg_work,
+                    static_cast<int64_t>(LCT_now() - useful_bg_start));
+                did_some_work = true;
             }
-            return false;
+            return did_some_work;
         }
 
     private:

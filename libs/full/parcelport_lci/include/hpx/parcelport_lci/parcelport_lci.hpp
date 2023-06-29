@@ -250,7 +250,8 @@ namespace hpx::traits {
                 "protocol = putsendrecv\n"
                 "comp_type = queue\n"
                 "progress_type = rp\n"
-                "prepost_recv_num = 1\n";
+                "prepost_recv_num = 1\n"
+                "reg_mem = 1\n";
         }
     };
 }    // namespace hpx::traits

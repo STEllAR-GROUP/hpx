@@ -97,12 +97,13 @@ namespace hpx { namespace util {
     LCT_log_ctx_t lci_environment::log_ctx;
 #endif
     LCT_pcounter_ctx_t lci_environment::pcounter_ctx;
-    LCT_pcounter_handle_t lci_environment::send_conn_start;
-    LCT_pcounter_handle_t lci_environment::send_conn_end;
-    LCT_pcounter_handle_t lci_environment::recv_conn_start;
-    LCT_pcounter_handle_t lci_environment::recv_conn_end;
-    LCT_pcounter_handle_t lci_environment::send_timer;
-    LCT_pcounter_handle_t lci_environment::handle_packet;
+
+#define HPX_LCI_PCOUNTER_HANDLE_DEF(name)                                      \
+    LCT_pcounter_handle_t lci_environment::name;
+
+    HPX_LCI_PCOUNTER_NONE_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
+    HPX_LCI_PCOUNTER_TREND_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
+    HPX_LCI_PCOUNTER_TIMER_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DEF)
     ///////////////////////////////////////////////////////////////////////////
     void lci_environment::init(
         int*, char***, util::runtime_configuration& rtcfg)
@@ -159,12 +160,18 @@ namespace hpx { namespace util {
 #ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
         // initialize the performance counters
         pcounter_ctx = LCT_pcounter_ctx_alloc("hpx-lci");
-        send_conn_start = LCT_pcounter_register(pcounter_ctx, "send_conn_start", LCT_PCOUNTER_TREND);
-        send_conn_end = LCT_pcounter_register(pcounter_ctx, "send_conn_end", LCT_PCOUNTER_TREND);
-        recv_conn_start = LCT_pcounter_register(pcounter_ctx, "recv_conn_start", LCT_PCOUNTER_TREND);
-        recv_conn_end = LCT_pcounter_register(pcounter_ctx, "recv_conn_end", LCT_PCOUNTER_TREND);
-        send_timer = LCT_pcounter_register(pcounter_ctx, "send_timer", LCT_PCOUNTER_TIMER);
-        handle_packet = LCT_pcounter_register(pcounter_ctx, "handle_packet", LCT_PCOUNTER_TIMER);
+
+#define HPX_LCI_PCOUNTER_NONE_REGISTER(name)                                   \
+    name = LCT_pcounter_register(pcounter_ctx, #name, LCT_PCOUNTER_NONE);
+        HPX_LCI_PCOUNTER_NONE_FOR_EACH(HPX_LCI_PCOUNTER_NONE_REGISTER)
+
+#define HPX_LCI_PCOUNTER_TREND_REGISTER(name)                                  \
+    name = LCT_pcounter_register(pcounter_ctx, #name, LCT_PCOUNTER_TREND);
+        HPX_LCI_PCOUNTER_TREND_FOR_EACH(HPX_LCI_PCOUNTER_TREND_REGISTER)
+
+#define HPX_LCI_PCOUNTER_TIMER_REGISTER(name)                                  \
+    name = LCT_pcounter_register(pcounter_ctx, #name, LCT_PCOUNTER_TIMER);
+        HPX_LCI_PCOUNTER_TIMER_FOR_EACH(HPX_LCI_PCOUNTER_TIMER_REGISTER)
 #endif
         enabled_ = true;
     }

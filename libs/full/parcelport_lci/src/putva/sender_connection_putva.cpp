@@ -49,7 +49,7 @@ namespace hpx::parcelset::policies::lci {
         data_point_ = buffer_.data_point_;
         data_point_.time_ = hpx::chrono::high_resolution_clock::now();
 #endif
-
+        conn_start_time = LCT_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -97,7 +97,15 @@ namespace hpx::parcelset::policies::lci {
                 // data (non-zero-copy chunks)
                 iovec.lbuffers[i].address = buffer_.data_.data();
                 iovec.lbuffers[i].length = buffer_.data_.size();
-                iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                if (config_t::reg_mem)
+                {
+                    LCI_memory_register(pp_->device, iovec.lbuffers[i].address,
+                        iovec.lbuffers[i].length, &iovec.lbuffers[i].segment);
+                }
+                else
+                {
+                    iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                }
                 ++i;
             }
             if (num_zero_copy_chunks != 0)
@@ -112,7 +120,16 @@ namespace hpx::parcelset::policies::lci {
                         sizeof(parcel_buffer_type::transmission_chunk_type));
                     iovec.lbuffers[i].address = tchunks.data();
                     iovec.lbuffers[i].length = tchunks_length;
-                    iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                    if (config_t::reg_mem)
+                    {
+                        LCI_memory_register(pp_->device,
+                            iovec.lbuffers[i].address, iovec.lbuffers[i].length,
+                            &iovec.lbuffers[i].segment);
+                    }
+                    else
+                    {
+                        iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                    }
                     ++i;
                 }
                 // zero-copy chunks
@@ -126,7 +143,17 @@ namespace hpx::parcelset::policies::lci {
                         iovec.lbuffers[i].address =
                             const_cast<void*>(c.data_.cpos_);
                         iovec.lbuffers[i].length = c.size_;
-                        iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                        if (config_t::reg_mem)
+                        {
+                            LCI_memory_register(pp_->device,
+                                iovec.lbuffers[i].address,
+                                iovec.lbuffers[i].length,
+                                &iovec.lbuffers[i].segment);
+                        }
+                        else
+                        {
+                            iovec.lbuffers[i].segment = LCI_SEGMENT_ALL;
+                        }
                         ++i;
                     }
                 }
@@ -215,6 +242,13 @@ namespace hpx::parcelset::policies::lci {
         if (!is_eager)
         {
             HPX_ASSERT(iovec.count > 0);
+            for (int i = 0; i < iovec.count; ++i)
+            {
+                if (iovec.lbuffers[i].segment != LCI_SEGMENT_ALL)
+                {
+                    LCI_memory_deregister(&iovec.lbuffers[i].segment);
+                }
+            }
             free(iovec.lbuffers);
         }
         error_code ec;
@@ -235,6 +269,10 @@ namespace hpx::parcelset::policies::lci {
             hpx::chrono::high_resolution_clock::now() - data_point_.time_;
         pp_->add_sent_data(data_point_);
 #endif
+        util::lci_environment::pcounter_add(
+            util::lci_environment::send_conn_timer,
+            static_cast<int64_t>(LCT_now() - conn_start_time));
+
         if (postprocess_handler_)
         {
             // Return this connection to the connection cache.
