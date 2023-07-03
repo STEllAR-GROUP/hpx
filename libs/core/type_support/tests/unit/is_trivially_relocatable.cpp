@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/type_support/is_trivially_relocatable.hpp>
+#include <type_traits>
 
 #include <cassert>
 
@@ -55,6 +56,9 @@ static_assert(
 static_assert(
     hpx::is_trivially_relocatable_v<non_assignable_but_trivially_copyable>);
 
+// Non trivially copyable types should not be considered trivially
+// relocatable by default
+
 // Has non trivial copy constructor
 struct not_trivially_copyable_1
 {
@@ -84,11 +88,12 @@ struct not_trivially_copyable_3
     ~not_trivially_copyable_3();
 };
 
-// Non trivially copyable types are not trivially relocatable
-// Unless they are explicitly declared as such
 static_assert(!hpx::is_trivially_relocatable_v<not_trivially_copyable_1>);
 static_assert(!hpx::is_trivially_relocatable_v<not_trivially_copyable_2>);
 static_assert(!hpx::is_trivially_relocatable_v<not_trivially_copyable_2>);
+
+// The HPX_DECLARE_TRIVIALLY_RELOCATABLE macro declares types as trivially
+// relocatable
 
 // Not trivially copyable
 struct explicitly_trivially_relocatable_1
@@ -135,6 +140,90 @@ struct polymorphic
     virtual int f();
 };
 static_assert(!hpx::is_trivially_relocatable_v<polymorphic>);
+
+// Test that it is not breaking to declare an already known
+// trivially copyable type to be trivially relocatable
+struct trivially_copyable_explicitly_trivially_relocatable
+{
+    int i;
+    trivially_copyable_explicitly_trivially_relocatable(
+        trivially_copyable_explicitly_trivially_relocatable const&) = default;
+    trivially_copyable_explicitly_trivially_relocatable& operator=(
+        trivially_copyable_explicitly_trivially_relocatable const&) = default;
+    ~trivially_copyable_explicitly_trivially_relocatable() = default;
+};
+HPX_DECLARE_TRIVIALLY_RELOCATABLE(
+    trivially_copyable_explicitly_trivially_relocatable);
+
+static_assert(std::is_trivially_copyable_v<
+    trivially_copyable_explicitly_trivially_relocatable>);
+static_assert(hpx::is_trivially_relocatable_v<
+    trivially_copyable_explicitly_trivially_relocatable>);
+
+// Testing the HPX_DECLARE_TRIVIALLY_RELOCATABLE_TEMPLATE macro
+template <typename T, typename K>
+struct non_trivially_copyable
+{
+    non_trivially_copyable(non_trivially_copyable const&);
+    non_trivially_copyable operator=(non_trivially_copyable const&);
+    ~non_trivially_copyable();
+};
+
+static_assert(!std::is_trivially_copyable_v<non_trivially_copyable<int, int>>);
+
+HPX_DECLARE_TRIVIALLY_RELOCATABLE_TEMPLATE(non_trivially_copyable);
+static_assert(
+    hpx::is_trivially_relocatable_v<non_trivially_copyable<int, int>>);
+
+// Testing the HPX_DECLARE_TRIVIALLY_RELOCATABLE_TEMPLATE_IF macro
+struct trivially_relocatable_struct
+{
+};
+static_assert(hpx::is_trivially_relocatable_v<trivially_relocatable_struct>);
+
+struct non_trivially_relocatable_struct
+{
+    non_trivially_relocatable_struct(non_trivially_relocatable_struct const&);
+};
+static_assert(
+    !hpx::is_trivially_relocatable_v<non_trivially_relocatable_struct>);
+
+template <typename T, typename K>
+struct non_trivially_copyable_container
+{
+    T t;
+    K k;
+
+    non_trivially_copyable_container();
+    non_trivially_copyable_container(non_trivially_copyable_container const&);
+    non_trivially_copyable_container& operator=(
+        non_trivially_copyable_container const&);
+    ~non_trivially_copyable_container();
+};
+// If T is triviialy relocatable then non_trivially_copyable_container is
+// trivially relocatable too.
+
+template <typename T, typename K>
+struct my_metafunction
+  : std::bool_constant<hpx::is_trivially_relocatable_v<T> &&
+        hpx::is_trivially_relocatable_v<K>>
+{
+};
+
+HPX_DECLARE_TRIVIALLY_RELOCATABLE_TEMPLATE_IF(
+    non_trivially_copyable_container, my_metafunction)
+
+static_assert(hpx::is_trivially_relocatable_v<non_trivially_copyable_container<
+        trivially_relocatable_struct, trivially_relocatable_struct>>);
+static_assert(
+    !hpx::is_trivially_relocatable_v<non_trivially_copyable_container<
+        trivially_relocatable_struct, non_trivially_relocatable_struct>>);
+static_assert(
+    !hpx::is_trivially_relocatable_v<non_trivially_copyable_container<
+        non_trivially_relocatable_struct, trivially_relocatable_struct>>);
+static_assert(
+    !hpx::is_trivially_relocatable_v<non_trivially_copyable_container<
+        non_trivially_relocatable_struct, non_trivially_relocatable_struct>>);
 
 // Primitive data types are trivially relocatable
 static_assert(hpx::is_trivially_relocatable_v<int>,
