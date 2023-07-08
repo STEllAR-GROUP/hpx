@@ -1,3 +1,4 @@
+//  Copyright (c) 2023 Gregor Daiß
 //  Copyright (c) 2021 ETH Zurich
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Hartmut Kaiser
@@ -6,6 +7,8 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// hpxinspect:noascii
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
@@ -50,6 +53,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     {
         cudaEvent_t event;
         event_callback_function_type f;
+        int device;
     };
 
     using event_callback_queue_type =
@@ -104,17 +108,18 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
     }
 
     void add_event_callback(
-        event_callback_function_type&& f, cudaStream_t stream)
+        event_callback_function_type&& f, cudaStream_t stream, int device)
     {
         cudaEvent_t event;
-        if (!cuda_event_pool::get_event_pool().pop(event))
+        if (!cuda_event_pool::get_event_pool().pop(event, device))
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "add_event_callback", "could not get an event");
         }
         check_cuda_error(cudaEventRecord(event, stream));
 
-        detail::add_to_event_callback_queue(event_callback{event, HPX_MOVE(f)});
+        detail::add_to_event_callback_queue(
+            event_callback{event, HPX_MOVE(f), device});
     }
 
     // Background progress function for async CUDA operations. Checks for completed
@@ -177,7 +182,8 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                         "active events",
                         debug::dec<3>(get_number_of_active_events()));
                     continuation.f(status);
-                    pool.push(HPX_MOVE(continuation.event));
+                    pool.push(
+                        HPX_MOVE(continuation.event), continuation.device);
                     return true;
                 }),
             event_callback_vector.end());
@@ -199,7 +205,7 @@ namespace hpx { namespace cuda { namespace experimental { namespace detail {
                     "active events",
                     debug::dec<3>(get_number_of_active_events()));
                 continuation.f(status);
-                pool.push(HPX_MOVE(continuation.event));
+                pool.push(HPX_MOVE(continuation.event), continuation.device);
             }
         }
 
