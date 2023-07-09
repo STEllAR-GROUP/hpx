@@ -230,11 +230,17 @@ namespace hpx::lcos::detail {
 
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::threads::thread_description desc(f_, "async");
-            this->runs_child_ = spawner(
+            auto thrd = spawner(
                 [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
                     this_->template run_impl<Unwrap>(HPX_MOVE(f));
                 },
                 desc);
+
+            std::lock_guard<mutex_type> l(mtx_);
+            if (!this->base_type::is_ready())
+            {
+                this->runs_child_ = HPX_MOVE(thrd);
+            }
         }
 
     public:
