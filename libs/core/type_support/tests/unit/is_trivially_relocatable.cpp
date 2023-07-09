@@ -200,7 +200,7 @@ struct non_trivially_copyable_container
         non_trivially_copyable_container const&);
     ~non_trivially_copyable_container();
 };
-// If T is triviialy relocatable then non_trivially_copyable_container is
+// If T is trivially relocatable then non_trivially_copyable_container is
 // trivially relocatable too.
 
 template <typename T, typename K>
