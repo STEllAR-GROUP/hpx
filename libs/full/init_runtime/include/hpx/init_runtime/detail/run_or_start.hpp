@@ -13,10 +13,21 @@
 namespace hpx {
     /// \cond NOINTERNAL
     namespace detail {
+
         HPX_EXPORT int run_or_start(
             hpx::function<int(hpx::program_options::variables_map& vm)> const&
                 f,
             int argc, char** argv, init_params const& params, bool blocking);
+
+        HPX_EXPORT int init_impl(
+            hpx::function<int(hpx::program_options::variables_map&)> const& f,
+            int argc, char** argv, init_params const& params,
+            char const* hpx_prefix);
+
+        HPX_EXPORT bool start_impl(
+            hpx::function<int(hpx::program_options::variables_map&)> const& f,
+            int argc, char** argv, init_params const& params,
+            char const* hpx_prefix);
     }    // namespace detail
     /// \endcond
 }    // namespace hpx

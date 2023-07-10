@@ -5,10 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstdint>
@@ -43,12 +42,12 @@ struct additional_argument_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<additional_argument_executor> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 std::int32_t increment(additional_argument, std::int32_t i)

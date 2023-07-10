@@ -5,7 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 

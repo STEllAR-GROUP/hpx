@@ -7,14 +7,14 @@
 #define GUIDED_EXECUTOR_DEBUG 1
 
 #include <hpx/debugging/demangle_helper.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/functional.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
-#include <hpx/local/tuple.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/pack_traversal.hpp>
 #include <hpx/modules/resource_partitioner.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/pack_traversal/pack_traversal.hpp>
+#include <hpx/tuple.hpp>
 
 #include <chrono>
 #include <complex>
@@ -152,13 +152,9 @@ private:
         using result_type = util::detail::invoke_deferred_result_t<F,
             OuterFuture<hpx::tuple<InnerFutures...>>, Ts...>;
 
-        // get the tuple of futures from the predecessor future <tuple of futures>
-        const auto& predecessor_value =
-            future_extract_value().operator()(predecessor);
-
         // create a tuple of the unwrapped future values
-        auto unwrapped_futures_tuple =
-            util::map_pack(future_extract_value{}, predecessor_value);
+        auto unwrapped_futures_tuple = util::map_pack(future_extract_value{},
+            future_extract_value().operator()(predecessor));
 
         using namespace hpx::util::debug;
         std::cout << "when_all(fut) : Predecessor : "
@@ -239,12 +235,12 @@ private:
 // --------------------------------------------------------------------
 // set traits for executor to say it is an async executor
 // --------------------------------------------------------------------
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_two_way_executor<test_async_executor> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 template <typename T>
 T dummy_task(T val)
@@ -430,7 +426,7 @@ struct dummy_tag
 {
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct pool_numa_hint<dummy_tag>
     {
@@ -472,7 +468,7 @@ namespace hpx { namespace parallel { namespace execution {
             return 4;
         }
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 int hpx_main()
 {

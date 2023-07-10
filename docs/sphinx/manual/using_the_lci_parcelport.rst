@@ -7,9 +7,9 @@
 
 .. _using_the_lci_parcelport:
 
-==============
+========================
 Using the LCI parcelport
-==============
+========================
 
 .. _info_lci:
 
@@ -43,7 +43,7 @@ than the MPI parcelport.
 .. _build_lci_pp:
 
 Build |hpx| with the LCI parcelport
-==============================
+===================================
 
 While building |hpx|, you can specify a set of |cmake| variables to enable
 and configure the LCI parcelport. Below, there is a set of the most important
@@ -86,7 +86,7 @@ and frequently used CMake variables.
 .. _run_lci_pp:
 
 Run |hpx| with the LCI parcelport
-===============================
+=================================
 
 We use the same mechanisms as MPI to launch LCI, so you can use the same way you run MPI parcelport to run LCI
 parcelport. Typically, it would be ``hpxrun``, ``mpirun``, or ``srun``.
@@ -97,13 +97,29 @@ If you are using ``mpirun`` or ``srun``, you can just pass
 ``--hpx:ini=hpx.parcel.lci.priority=1000``, ``--hpx:ini=hpx.parcel.lci.enable=1``, and
 ``--hpx:ini=hpx.parcel.bootstrap=lci`` to the |hpx| applications.
 
+If you are running on a Cray machine, you need to pass `--mpi=pmix` or `--mpi=pmi2` to srun
+to enable the PMIx or PMI2 support of SLURM since LCI does not support the default Cray PMI.
+For example,
+
+.. code-block:: shell-session
+
+   $ srun --mpi=pmix [hpx application]
+
 .. _tune_lci_pp:
 
 Performance tuning of the LCI parcelport
 ========================================
 
-We encourage users to increase the zero-copy serialization threshold of LCI to ``8192`` (bytes) by
-either the cmake variable ``-DHPX_WITH_ZERO_COPY_SERIALIZATION_THRESHOLD=8192``
-(this will affect all the parcelports) or the command line option
-``--hpx:ini=hpx.parcel.lci.zero_copy_serialization_threshold=8192``
-(this will only affect the LCI parcelport).
+We encourage users to set the following environmental variables
+when using the LCI parcelport to get better performance.
+
+.. code-block:: shell-session
+
+   $ export LCI_SERVER_MAX_SENDS=1024
+   $ export LCI_SERVER_MAX_RECVS=4096
+   $ export LCI_SERVER_NUM_PKTS=65536
+   $ export LCI_SERVER_MAX_CQES=65536
+   $ export LCI_PACKET_SIZE=12288
+
+This setting needs roughly 800MB memory per process. The memory consumption mainly
+comes from the packets, which can be calculated using `LCI_SERVER_NUM_PKTS x LCI_PACKET_SIZE`.

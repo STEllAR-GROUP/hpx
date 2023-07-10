@@ -30,7 +30,7 @@ namespace hpx { namespace traits {
 
     template <typename Continuation, typename Enable = void>
     struct is_continuation
-      : detail::is_continuation_impl<typename std::decay<Continuation>::type>
+      : detail::is_continuation_impl<std::decay_t<Continuation>>
     {
     };
 

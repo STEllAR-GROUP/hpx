@@ -7,13 +7,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/functional/bind.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/condition_variable.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/mutex.hpp>
+#include <hpx/thread.hpp>
 
 #include <chrono>
 #include <mutex>
@@ -124,7 +124,8 @@ struct test_lock_times_out_if_other_thread_has_lock
     void locking_thread()
     {
         Lock lock(m, std::defer_lock);
-        lock.try_lock_for(std::chrono::milliseconds(50));
+        [[maybe_unused]] bool retval =
+            lock.try_lock_for(std::chrono::milliseconds(50));
 
         std::lock_guard<hpx::mutex> lk(done_mutex);
         locked = lock.owns_lock();

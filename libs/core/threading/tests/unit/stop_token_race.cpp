@@ -9,10 +9,10 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/datastructures/optional.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading.hpp>
+#include <hpx/optional.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <chrono>

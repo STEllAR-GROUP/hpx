@@ -55,8 +55,10 @@ namespace hpx::parcelset::policies::lci {
             {
                 ret = send_nb();
                 if (ret.status == return_status_t::retry &&
-                    config_t::progress_type ==
-                        config_t::progress_type_t::worker)
+                    (config_t::progress_type ==
+                            config_t::progress_type_t::worker ||
+                        config_t::progress_type ==
+                            config_t::progress_type_t::pthread_worker))
                     while (pp_->do_progress())
                         continue;
             } while (ret.status == return_status_t::retry);

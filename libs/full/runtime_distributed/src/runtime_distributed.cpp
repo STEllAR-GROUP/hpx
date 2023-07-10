@@ -23,6 +23,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/static_reinit.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -104,7 +105,10 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
         void dijkstra_make_black()
         {
-            get_runtime_support_ptr()->dijkstra_make_black();
+            if (auto* rtp = get_runtime_support_ptr(); rtp != nullptr)
+            {
+                rtp->dijkstra_make_black();
+            }
         }
 #endif
 
@@ -172,8 +176,12 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     components::server::runtime_support* get_runtime_support_ptr()
     {
-        return static_cast<components::server::runtime_support*>(
-            get_runtime_distributed().get_runtime_support_lva());
+        if (auto const* rt = get_runtime_distributed_ptr(); rt != nullptr)
+        {
+            return static_cast<components::server::runtime_support*>(
+                rt->get_runtime_support_lva());
+        }
+        return nullptr;
     }
 
     ///////////////////////////////////////////////////////////////////////////

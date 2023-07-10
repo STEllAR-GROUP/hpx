@@ -8,22 +8,20 @@
 
 #include <hpx/config.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) &&               \
+    !defined(HPX_MINGW)
 #include <windows.h>
 
 namespace hpx::util {
 
-    HPX_CORE_EXPORT void set_thread_name(
-        char const* /*threadName*/, DWORD /*dwThreadID*/ = DWORD(-1));
+    HPX_CORE_EXPORT void set_thread_name(char const* thread_name) noexcept;
 }    // namespace hpx::util
 
 #else
 
 namespace hpx::util {
 
-    inline constexpr void set_thread_name(char const* /*thread_name*/) noexcept
-    {
-    }
+    constexpr void set_thread_name(char const*) noexcept {}
 }    // namespace hpx::util
 
 #endif

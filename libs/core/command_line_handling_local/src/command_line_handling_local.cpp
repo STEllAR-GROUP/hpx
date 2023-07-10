@@ -35,6 +35,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 namespace hpx::local::detail {
 
     std::string runtime_configuration_string(command_line_handling const& cfg)
@@ -559,7 +563,6 @@ namespace hpx::local::detail {
         pu_offset_ =
             detail::handle_pu_offset(cfgmap, vm, static_cast<std::size_t>(-1));
 
-        // NOLINTNEXTLINE(bugprone-branch-clone)
         if (pu_offset_ != static_cast<std::size_t>(-1))
         {
 #if defined(__APPLE__)

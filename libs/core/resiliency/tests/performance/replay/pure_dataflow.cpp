@@ -18,10 +18,10 @@
 // computation. This example is still fully local but demonstrates nice
 // scalability on SMP machines.
 
+#include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/synchronization.hpp>
 

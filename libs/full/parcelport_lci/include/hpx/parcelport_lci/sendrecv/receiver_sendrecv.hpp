@@ -46,8 +46,8 @@ namespace hpx::parcelset::policies::lci {
                 {
                     LCI_comp_t completion =
                         pp_->recv_new_completion_manager->alloc_completion();
-                    LCI_recvmn(pp_->endpoint_new_eager, LCI_RANK_ANY, 0,
-                        completion, nullptr);
+                    LCI_recvmn(pp_->endpoint_new, LCI_RANK_ANY, 0, completion,
+                        nullptr);
                     pp_->recv_new_completion_manager->enqueue_completion(
                         completion);
                 }

@@ -18,6 +18,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/hpx_finalize.hpp>
+#include <hpx/hpx_main_winsocket.hpp>
 #include <hpx/hpx_suspend.hpp>
 #include <hpx/hpx_user_main_config.hpp>
 #include <hpx/init_runtime/detail/init_logging.hpp>
@@ -32,6 +33,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/parallel/util/detail/handle_exception_termination_handler.hpp>
+#include <hpx/prefix/find_prefix.hpp>
 #include <hpx/program_options/parsers.hpp>
 #include <hpx/program_options/variables_map.hpp>
 #include <hpx/resource_partitioner/partitioner.hpp>
@@ -71,23 +73,18 @@
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/runtime_distributed.hpp>
-#include <hpx/runtime_distributed/find_localities.hpp>
 #include <hpx/runtime_distributed/runtime_fwd.hpp>
 #include <hpx/runtime_distributed/runtime_support.hpp>
 #endif
 
-#if defined(HPX_NATIVE_MIC) || defined(__bgq__)
-#include <cstdlib>
-#endif
-
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <exception>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
-#include <new>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -108,6 +105,72 @@ namespace hpx::detail {
 
     // forward declarations only
     void console_print(std::string const&);
+
+    int init_impl(
+        hpx::function<int(hpx::program_options::variables_map&)> const& f,
+        int argc, char** argv, init_params const& params,
+        char const* hpx_prefix)
+    {
+        if (argc == 0 || argv == nullptr)
+        {
+            argc = hpx::local::detail::dummy_argc;
+            argv = hpx::local::detail::dummy_argv;
+        }
+
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+        // artificially force the apex shared library to be loaded by the
+        // application
+        apex::version();
+#endif
+#endif
+        util::set_hpx_prefix(hpx_prefix);
+#if defined(__FreeBSD__)
+        freebsd_environ = environ;
+#endif
+        // set a handler for std::abort, std::at_quick_exit, and std::atexit
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        [[maybe_unused]] int const ret = std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret == 0);
+#endif
+        return detail::run_or_start(f, argc, argv, params, true);
+    }
+
+    bool start_impl(
+        hpx::function<int(hpx::program_options::variables_map&)> const& f,
+        int argc, char** argv, init_params const& params,
+        char const* hpx_prefix)
+    {
+        if (argc == 0 || argv == nullptr)
+        {
+            argc = local::detail::dummy_argc;
+            argv = local::detail::dummy_argv;
+        }
+
+#if defined(HPX_WINDOWS)
+        detail::init_winsocket();
+#if defined(HPX_HAVE_APEX)
+        // artificially force the apex shared library to be loaded by the
+        // application
+        apex::version();
+#endif
+#endif
+        util::set_hpx_prefix(hpx_prefix);
+#if defined(__FreeBSD__)
+        freebsd_environ = environ;
+#endif
+        // set a handler for std::abort, std::at_quick_exit, and std::atexit
+        std::signal(SIGABRT, detail::on_abort);
+        std::atexit(detail::on_exit);
+#if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
+        [[maybe_unused]] int const ret = std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret == 0);
+#endif
+        return 0 == detail::run_or_start(f, argc, argv, params, false);
+    }
 }    // namespace hpx::detail
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
@@ -254,7 +317,7 @@ namespace hpx::detail {
     ///////////////////////////////////////////////////////////////////////////
     void list_symbolic_name(std::string const& name, hpx::id_type const& id)
     {
-        std::string str = hpx::util::format("{}, {}, {}", name, id,
+        std::string const str = hpx::util::format("{}, {}, {}", name, id,
             (id.get_management_type() == id_type::management_type::managed ?
                     "management_type::managed" :
                     "management_type::unmanaged"));
@@ -266,7 +329,7 @@ namespace hpx::detail {
         print(std::string("List of all registered symbolic names:"));
         print(std::string("--------------------------------------"));
 
-        std::map<std::string, hpx::id_type> entries =
+        std::map<std::string, hpx::id_type> const entries =
             agas::find_symbols(hpx::launch::sync);
 
         for (auto const& e : entries)
@@ -579,7 +642,8 @@ namespace hpx {
         {
             if (vm.count("hpx:app-config"))
             {
-                std::string config(vm["hpx:app-config"].as<std::string>());
+                std::string const config(
+                    vm["hpx:app-config"].as<std::string>());
                 rt.get_config().load_application_configuration(config.c_str());
             }
 
@@ -592,7 +656,7 @@ namespace hpx {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
             // Add startup function related to listing counter names or counter
             // infos (on console only).
-            bool print_counters_locally =
+            bool const print_counters_locally =
                 vm.count("hpx:print-counters-locally") != 0;
             if (mode == runtime_mode::console || print_counters_locally)
                 handle_list_and_print_options(rt, vm, print_counters_locally);
@@ -670,8 +734,8 @@ namespace hpx {
                 HPX_MOVE(startup), HPX_MOVE(shutdown));
 
             // pointer to runtime is stored in TLS
-            hpx::runtime* p = rt.release();
-            (void) p;
+            [[maybe_unused]] hpx::runtime const* p = rt.release();
+            HPX_ASSERT(p != nullptr);
 
             return 0;
         }
@@ -786,7 +850,7 @@ namespace hpx {
         {
             init_environment();
 
-            int result = 0;
+            int result;
             try
             {
                 // make sure the runtime system is not active yet
@@ -833,7 +897,7 @@ namespace hpx {
                         cmdline.rtcfg_.get_entry("hpx.affinity", ""),
                         cmdline.rtcfg_.get_entry("hpx.bind", ""),
                         hpx::util::get_entry_as<bool>(
-                            cmdline.rtcfg_, "hpx.use_process_mask", 0));
+                            cmdline.rtcfg_, "hpx.use_process_mask", false));
 
                     hpx::resource::partitioner rp =
                         hpx::resource::detail::make_partitioner(
@@ -976,9 +1040,9 @@ namespace hpx {
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         {
-            hpx::chrono::high_resolution_timer t;
-            double start_time = t.elapsed();
-            double current = 0.0;
+            hpx::chrono::high_resolution_timer const t;
+            double const start_time = t.elapsed();
+            double current;
             do
             {
                 current = t.elapsed();
@@ -999,6 +1063,11 @@ namespace hpx {
 
         rt->finalize(shutdown_timeout);
 
+        // invoke user supplied finalizer
+        if (hpx::on_finalize != nullptr)
+        {
+            (*hpx::on_finalize)();
+        }
         return 0;
     }
 
@@ -1028,9 +1097,9 @@ namespace hpx {
             localwait = detail::get_option("hpx.finalize_wait_time", -1.0);
 
         {
-            hpx::chrono::high_resolution_timer t;
-            double start_time = t.elapsed();
-            double current = 0.0;
+            hpx::chrono::high_resolution_timer const t;
+            double const start_time = t.elapsed();
+            double current;
             do
             {
                 current = t.elapsed();

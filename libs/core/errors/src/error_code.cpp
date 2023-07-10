@@ -79,6 +79,20 @@ namespace hpx {
         /*    */ ""};
     /// \endcond
 
+    // Return a textual representation of a given error code
+    char const* get_error_name(error value) noexcept
+    {
+        if (value >= hpx::error::success && value < hpx::error::last_error)
+        {
+            return error_names[static_cast<int>(value)];
+        }
+        if (value & hpx::error::system_error_flag)
+        {
+            return "system_error";
+        }
+        return "unknown";
+    }
+
     namespace detail {
 
         class hpx_category : public std::error_category
@@ -99,7 +113,7 @@ namespace hpx {
                 }
                 if (value & hpx::error::system_error_flag)
                 {
-                    return std::string("HPX(system_error)");
+                    return "HPX(system_error)";
                 }
                 return "HPX(unknown_error)";
             }

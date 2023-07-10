@@ -76,7 +76,7 @@ namespace tests { namespace client {
             base_type;
 
         ViewRegistrationListener(hpx::future<hpx::id_type> gid)
-          : base_type(move(gid))
+          : base_type(std::move(gid))
         {
             cout << "constructed listener client by future" << endl;
         }

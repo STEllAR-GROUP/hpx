@@ -9,7 +9,7 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/testing.hpp>
 

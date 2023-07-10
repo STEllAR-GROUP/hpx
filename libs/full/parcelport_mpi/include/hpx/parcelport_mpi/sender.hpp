@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c)      2023 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,20 +34,7 @@ namespace hpx::parcelset::policies::mpi {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-        // different versions of clang-format disagree
-        // clang-format off
-        sender() noexcept
-          : next_free_tag_request_((MPI_Request) (-1))
-          , next_free_tag_(-1)
-        {
-        }
-        // clang-format on
-
-        void run() noexcept
-        {
-            util::mpi_environment::scoped_lock l;
-            get_next_free_tag(l);
-        }
+        void run() noexcept {}
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)
         {
@@ -61,7 +49,7 @@ namespace hpx::parcelset::policies::mpi {
 
         int acquire_tag() noexcept
         {
-            return tag_provider_.acquire();
+            return tag_provider_.get_next_tag();
         }
 
         void send_messages(connection_ptr connection)
@@ -102,73 +90,13 @@ namespace hpx::parcelset::policies::mpi {
                 send_messages(HPX_MOVE(connection));
                 has_work = true;
             }
-            next_free_tag();
             return has_work;
         }
 
     private:
         tag_provider tag_provider_;
-
-        void next_free_tag() noexcept
-        {
-            int next_free = -1;
-            {
-                std::unique_lock l(next_free_tag_mtx_, std::try_to_lock);
-                if (l.owns_lock())
-                {
-                    next_free = next_free_tag_locked(l);
-                }
-            }
-
-            if (next_free != -1)
-            {
-                HPX_ASSERT(next_free > 1);
-                tag_provider_.release(next_free);
-            }
-        }
-
-        template <typename Lock>
-        int next_free_tag_locked([[maybe_unused]] Lock& lock) noexcept
-        {
-            HPX_ASSERT_OWNS_LOCK(lock);
-
-            util::mpi_environment::scoped_try_lock l;
-            if (l.locked)
-            {
-                int completed = 0;
-                [[maybe_unused]] int const ret = MPI_Test(
-                    &next_free_tag_request_, &completed, MPI_STATUS_IGNORE);
-                HPX_ASSERT(ret == MPI_SUCCESS);
-
-                if (completed)
-                {
-                    return get_next_free_tag(l);
-                }
-            }
-            return -1;
-        }
-
-        template <typename Lock>
-        int get_next_free_tag([[maybe_unused]] Lock& l) noexcept
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-
-            int const next_free = next_free_tag_;
-
-            [[maybe_unused]] int const ret = MPI_Irecv(&next_free_tag_, 1,
-                MPI_INT, MPI_ANY_SOURCE, 1,
-                util::mpi_environment::communicator(), &next_free_tag_request_);
-            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
-
-            return next_free;
-        }
-
         hpx::spinlock connections_mtx_;
         connection_list connections_;
-
-        hpx::spinlock next_free_tag_mtx_;
-        MPI_Request next_free_tag_request_;
-        int next_free_tag_;
     };
 }    // namespace hpx::parcelset::policies::mpi
 

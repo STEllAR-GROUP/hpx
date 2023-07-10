@@ -183,6 +183,11 @@ function(hpx_setup_target target)
     endif()
   endif()
 
+  if(("${_type}" STREQUAL "EXECUTABLE") AND MINGW)
+    # Increase the maximum size of object file sections
+    target_compile_options(${target} BEFORE PRIVATE "-Wa,-mbig-obj")
+  endif()
+
   if(target_COMPONENT_DEPENDENCIES)
     hpx_print_list(
       "DEBUG" "setup_target.${target} COMPONENT_DEPENDENCIES: "

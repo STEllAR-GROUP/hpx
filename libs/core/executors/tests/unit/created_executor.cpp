@@ -5,11 +5,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/functional/deferred_call.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/functional.hpp>
+#include <hpx/future.hpp>
+#include <hpx/init.hpp>
+#include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
@@ -57,7 +57,7 @@ struct void_parallel_executor : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_bulk_one_way_executor<void_parallel_executor> : std::true_type
     {
@@ -67,7 +67,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_bulk_two_way_executor<void_parallel_executor> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes

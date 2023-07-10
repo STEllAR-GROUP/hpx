@@ -54,7 +54,6 @@ namespace hpx::serialization {
         void serialize(Archive& ar, unsigned int)
         {
 #if !defined(HPX_SERIALIZATION_HAVE_ALL_TYPES_ARE_BITWISE_SERIALIZABLE)
-            // NOLINTNEXTLINE(bugprone-branch-clone)
             if (ar.disable_array_optimization() || ar.endianess_differs())
             {
                 // normal serialization

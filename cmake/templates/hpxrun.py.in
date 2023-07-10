@@ -422,6 +422,7 @@ Used by the tcp parcelport only.
             msg = 'Process 0 failed with an unexpected error '
             msg += 'code of ' + str(ret) + ' (expected ' + str(options.expected)
             msg += ')'
+            print(msg, sys.stderr)
             sys.exit(1)
         sys.exit(0)
 

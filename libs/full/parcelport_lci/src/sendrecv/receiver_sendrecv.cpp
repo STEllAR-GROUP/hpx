@@ -47,12 +47,11 @@ namespace hpx::parcelset::policies::lci {
             {
                 LCI_comp_t completion =
                     pp_->recv_new_completion_manager->alloc_completion();
-                LCI_recvmn(pp_->endpoint_new_eager, LCI_RANK_ANY, 0, completion,
-                    nullptr);
+                LCI_recvmn(
+                    pp_->endpoint_new, LCI_RANK_ANY, 0, completion, nullptr);
                 pp_->recv_new_completion_manager->enqueue_completion(
                     completion);
             }
-            HPX_ASSERT(request.request.flag == LCI_OK);
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug,
                 "accept_new (%d, %d, %d) length %lu\n", request.request.rank,

@@ -8,9 +8,9 @@
 // allocates too many os threads
 
 #include <hpx/init.hpp>
-#include <hpx/local/runtime.hpp>
-#include <hpx/local/thread.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/runtime.hpp>
+#include <hpx/thread.hpp>
 
 #include <cstddef>
 #include <iostream>

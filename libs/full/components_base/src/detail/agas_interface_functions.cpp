@@ -95,6 +95,12 @@ namespace hpx::agas::detail {
     bool (*is_local_address_cached_addr)(naming::gid_type const& gid,
         naming::address& addr, error_code& ec) = nullptr;
 
+    bool (*is_local_address_cached_addr_pinned_ptr)(naming::gid_type const& gid,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec) = nullptr;
+
     void (*update_cache_entry)(naming::gid_type const& gid,
         naming::address const& addr, std::uint64_t count, std::uint64_t offset,
         error_code& ec) = nullptr;
@@ -205,7 +211,8 @@ namespace hpx::agas::detail {
         naming::gid_type const& gid,
         hpx::move_only_function<components::pinned_ptr()>&& f) = nullptr;
 
-    void (*unmark_as_migrated)(naming::gid_type const& gid) = nullptr;
+    void (*unmark_as_migrated)(naming::gid_type const& gid,
+        hpx::move_only_function<void()>&& f) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     hpx::future<std::map<std::string, hpx::id_type>> (*find_symbols_async)(

@@ -192,6 +192,7 @@ namespace hpx::execution::experimental::detail {
                     // this means that none of set_value/set_error/set_stopped was
                     // called.
                     HPX_ASSERT(hpx::holds_alternative<stopped_type>(value));
+
                     if constexpr (Type == sync_wait_type::single)
                     {
                         using single_result_type = make_decayed_pack_t<
@@ -214,6 +215,7 @@ namespace hpx::execution::experimental::detail {
                 set_error_t, type&& r, Error&& error) noexcept
             {
                 using error_t = std::decay_t<Error>;
+
                 if constexpr (std::is_same_v<error_t, std::exception_ptr>)
                 {
                     r.state.value.template emplace<error_type>(

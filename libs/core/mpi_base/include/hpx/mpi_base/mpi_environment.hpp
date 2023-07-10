@@ -86,6 +86,8 @@ namespace hpx::util {
 
         using mutex_type = hpx::spinlock;
 
+        static int MPI_MAX_TAG;
+
     private:
         static mutex_type mtx_;
 

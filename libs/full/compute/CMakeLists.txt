@@ -17,9 +17,8 @@ set(compute_headers
 
 # cmake-format: off
 set(compute_compat_headers
-    hpx/compute.hpp => hpx/include/compute.hpp
-    hpx/compute/host/target.hpp => hpx/compute/host/distributed_target.hpp
-    hpx/util/functional/new.hpp => hpx/include/compute.hpp
+    hpx/compute/host/target.hpp => hpx/compute.hpp
+    hpx/util/functional/new.hpp => hpx/compute.hpp
 )
 # cmake-format: on
 

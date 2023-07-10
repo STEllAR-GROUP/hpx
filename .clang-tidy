@@ -11,6 +11,7 @@ Checks: >
     -bugprone-exception-escape,
     -bugprone-forward-declaration-namespace,
     -bugprone-macro-parentheses,
+    -bugprone-branch-clone,
     modernize-use-nullptr,
     misc-assert-side-effect
     misc-dangling-handle

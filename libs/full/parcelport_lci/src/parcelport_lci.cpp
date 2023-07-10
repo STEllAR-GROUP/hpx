@@ -17,6 +17,7 @@
 #include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/completion_manager/completion_manager_queue.hpp>
 #include <hpx/parcelport_lci/completion_manager/completion_manager_sync.hpp>
+#include <hpx/parcelport_lci/completion_manager/completion_manager_sync_single.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/putva/receiver_putva.hpp>
@@ -77,7 +78,9 @@ namespace hpx::parcelset::policies::lci {
     void parcelport::initialized()
     {
         if (util::lci_environment::enabled() &&
-            config_t::progress_type != config_t::progress_type_t::pthread)
+            config_t::progress_type != config_t::progress_type_t::pthread &&
+            config_t::progress_type !=
+                config_t::progress_type_t::pthread_worker)
         {
             join_prg_thread_if_running();
         }
@@ -156,13 +159,8 @@ namespace hpx::parcelset::policies::lci {
                 hpx::threads::get_self_id() != hpx::threads::invalid_thread_id)
             {
                 if (hpx::this_thread::get_pool() ==
-                    &hpx::resource::get_thread_pool("lci-progress-pool-eager"))
+                    &hpx::resource::get_thread_pool("lci-progress-pool"))
                     do_lci_progress = 1;
-                else if (config_t::use_two_device &&
-                    hpx::this_thread::get_pool() ==
-                        &hpx::resource::get_thread_pool(
-                            "lci-progress-pool-iovec"))
-                    do_lci_progress = 2;
             }
         }
 
@@ -174,7 +172,7 @@ namespace hpx::parcelset::policies::lci {
             int idle_loop_count = 0;
             while (idle_loop_count < max_idle_loop_count)
             {
-                while (util::lci_environment::do_progress(device_eager))
+                while (util::lci_environment::do_progress(device))
                 {
                     has_work = true;
                     idle_loop_count = 0;
@@ -187,7 +185,7 @@ namespace hpx::parcelset::policies::lci {
             int idle_loop_count = 0;
             while (idle_loop_count < max_idle_loop_count)
             {
-                while (util::lci_environment::do_progress(device_iovec))
+                while (util::lci_environment::do_progress(device))
                 {
                     has_work = true;
                     idle_loop_count = 0;
@@ -212,7 +210,9 @@ namespace hpx::parcelset::policies::lci {
         if (mode & parcelport_background_mode_send)
         {
             has_work = sender_p->background_work(num_thread);
-            if (config_t::progress_type == config_t::progress_type_t::worker)
+            if (config_t::progress_type == config_t::progress_type_t::worker ||
+                config_t::progress_type ==
+                    config_t::progress_type_t::pthread_worker)
                 do_progress();
             if (config_t::enable_lci_backlog_queue)
                 // try to send pending messages
@@ -223,7 +223,9 @@ namespace hpx::parcelset::policies::lci {
         if (mode & parcelport_background_mode_receive)
         {
             has_work = receiver_p->background_work() || has_work;
-            if (config_t::progress_type == config_t::progress_type_t::worker)
+            if (config_t::progress_type == config_t::progress_type_t::worker ||
+                config_t::progress_type ==
+                    config_t::progress_type_t::pthread_worker)
                 do_progress();
         }
         return has_work;
@@ -253,7 +255,9 @@ namespace hpx::parcelset::policies::lci {
         {
             bool has_work = sender_p->background_work(0);
             has_work = receiver_p->background_work() || has_work;
-            if (config_t::progress_type == config_t::progress_type_t::worker)
+            if (config_t::progress_type == config_t::progress_type_t::worker ||
+                config_t::progress_type ==
+                    config_t::progress_type_t::pthread_worker)
                 while (do_progress())
                     continue;
             if (has_work)
@@ -297,18 +301,22 @@ namespace hpx::parcelset::policies::lci {
     {
         HPX_UNUSED(rtcfg);
         // Create device
-        device_eager = LCI_UR_DEVICE;
-        if (config_t::use_two_device)
-            LCI_device_init(&device_iovec);
-        else
-            device_iovec = LCI_UR_DEVICE;
+        device = LCI_UR_DEVICE;
 
         // Create completion objects
         if (config_t::protocol == config_t::protocol_t::sendrecv &&
             config_t::completion_type == LCI_COMPLETION_SYNC)
         {
-            recv_new_completion_manager =
-                std::make_shared<completion_manager_sync>();
+            if (config_t::prepost_recv_num == 1)
+            {
+                recv_new_completion_manager =
+                    std::make_shared<completion_manager_sync_single>();
+            }
+            else
+            {
+                recv_new_completion_manager =
+                    std::make_shared<completion_manager_sync>();
+            }
         }
         else
         {
@@ -340,7 +348,7 @@ namespace hpx::parcelset::policies::lci {
             plist_, LCI_PORT_COMMAND, config_t::completion_type);
         LCI_plist_set_comp_type(
             plist_, LCI_PORT_MESSAGE, config_t::completion_type);
-        LCI_endpoint_init(&endpoint_followup, device_eager, plist_);
+        LCI_endpoint_init(&endpoint_followup, device, plist_);
         LCI_plist_set_default_comp(
             plist_, recv_new_completion_manager->get_completion_object());
         if (config_t::protocol == config_t::protocol_t::sendrecv &&
@@ -354,28 +362,15 @@ namespace hpx::parcelset::policies::lci {
         }
         if (config_t::protocol == config_t::protocol_t::sendrecv)
             LCI_plist_set_match_type(plist_, LCI_MATCH_TAG);
-        LCI_endpoint_init(&endpoint_new_eager, device_eager, plist_);
-        LCI_endpoint_init(&endpoint_new_iovec, device_iovec, plist_);
+        LCI_endpoint_init(&endpoint_new, device, plist_);
         LCI_plist_free(&plist_);
 
         // Create progress threads
         HPX_ASSERT(prg_thread_flag == false);
-        HPX_ASSERT(prg_thread_eager_p == nullptr);
-        HPX_ASSERT(prg_thread_iovec_p == nullptr);
+        HPX_ASSERT(prg_thread_p == nullptr);
         prg_thread_flag = true;
-        prg_thread_eager_p =
-            std::make_unique<std::thread>(progress_thread_fn, device_eager);
-        if (config_t::use_two_device)
-            prg_thread_iovec_p =
-                std::make_unique<std::thread>(progress_thread_fn, device_iovec);
-        if (config_t::progress_thread_core >= 0)
-        {
-            set_affinity(prg_thread_eager_p->native_handle(),
-                config_t::progress_thread_core);
-            if (config_t::use_two_device)
-                set_affinity(prg_thread_iovec_p->native_handle(),
-                    config_t::progress_thread_core + 1);
-        }
+        prg_thread_p =
+            std::make_unique<std::thread>(progress_thread_fn, device);
 
         // Create the sender and receiver
         switch (config_t::protocol)
@@ -398,27 +393,19 @@ namespace hpx::parcelset::policies::lci {
     {
         join_prg_thread_if_running();
         // free ep, rcq
-        LCI_endpoint_free(&endpoint_new_iovec);
         LCI_endpoint_free(&endpoint_followup);
-        LCI_endpoint_free(&endpoint_new_eager);
-        if (config_t::use_two_device)
-            LCI_device_free(&device_iovec);
+        LCI_endpoint_free(&endpoint_new);
     }
 
     void parcelport::join_prg_thread_if_running()
     {
-        if (prg_thread_eager_p || prg_thread_iovec_p)
+        if (prg_thread_p)
         {
             prg_thread_flag = false;
-            if (prg_thread_eager_p)
+            if (prg_thread_p)
             {
-                prg_thread_eager_p->join();
-                prg_thread_eager_p.reset();
-            }
-            if (prg_thread_iovec_p)
-            {
-                prg_thread_iovec_p->join();
-                prg_thread_iovec_p.reset();
+                prg_thread_p->join();
+                prg_thread_p.reset();
             }
         }
     }
@@ -426,9 +413,7 @@ namespace hpx::parcelset::policies::lci {
     bool parcelport::do_progress()
     {
         bool ret = false;
-        ret = util::lci_environment::do_progress(device_eager) || ret;
-        if (config_t::use_two_device)
-            ret = util::lci_environment::do_progress(device_iovec) || ret;
+        ret = util::lci_environment::do_progress(device) || ret;
         return ret;
     }
 }    // namespace hpx::parcelset::policies::lci

@@ -9,8 +9,8 @@
 // Clang V11 ICE's on this test
 #if !defined(HPX_CLANG_VERSION) || (HPX_CLANG_VERSION / 10000) != 11
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 namespace ex = hpx::execution::experimental;

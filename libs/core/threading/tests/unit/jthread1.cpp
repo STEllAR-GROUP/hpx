@@ -9,9 +9,9 @@
 //  Creative Commons Attribution 4.0 International License
 //  (http://creativecommons.org/licenses/by/4.0/).
 
-#include <hpx/local/init.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/modules/threading.hpp>
+#include <hpx/thread.hpp>
 
 #include <atomic>
 #include <chrono>
@@ -46,7 +46,7 @@ void test_jthread_without_token()
         });
 
         // wait until t has set all initial values
-        for (int i = 0; !all_set.load(); ++i)
+        for ([[maybe_unused]] int i = 0; !all_set.load(); ++i)
         {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -80,7 +80,8 @@ void test_jthread_with_token()
                 all_set.store(true);
 
                 // wait until interrupt is signaled
-                for (int i = 0; !stoptoken.stop_requested(); ++i)
+                for ([[maybe_unused]] int i = 0; !stoptoken.stop_requested();
+                     ++i)
                 {
                     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
@@ -90,7 +91,7 @@ void test_jthread_with_token()
             ssource.get_token());
 
         // wait until t has set all initial values
-        for (int i = 0; !all_set.load(); ++i)
+        for ([[maybe_unused]] int i = 0; !all_set.load(); ++i)
         {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -133,7 +134,7 @@ void test_join()
         hpx::jthread t([](hpx::stop_token stoken) {
             // wait until interrupt is signaled (due to calling request_stop()
             // for the token)
-            for (int i = 0; !stoken.stop_requested(); ++i)
+            for ([[maybe_unused]] int i = 0; !stoken.stop_requested(); ++i)
             {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
@@ -186,7 +187,7 @@ void test_detach()
 
             // wait until interrupt is signaled (due to calling request_stop()
             // for the token)
-            for (int i = 0; !stoken.stop_requested(); ++i)
+            for ([[maybe_unused]] int i = 0; !stoken.stop_requested(); ++i)
             {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
@@ -195,7 +196,7 @@ void test_detach()
         });
 
         // wait until t has set all initial values
-        for (int i = 0; !all_set.load(); ++i)
+        for ([[maybe_unused]] int i = 0; !all_set.load(); ++i)
         {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
@@ -246,7 +247,7 @@ void test_hpx_thread()
         bool caught_exception = false;
         try
         {
-            for (int i = 0;; ++i)
+            for ([[maybe_unused]] int i = 0;; ++i)
             {
                 if (shall_die.stop_requested())
                 {
@@ -274,7 +275,7 @@ void test_hpx_thread()
     });
 
     // wait until t has set all initial values
-    for (int i = 0; !all_set.load(); ++i)
+    for ([[maybe_unused]] int i = 0; !all_set.load(); ++i)
     {
         hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -424,14 +425,14 @@ void test_jthread_api()
                 all_set.store(true);
 
                 // wait until interrupt is signaled (due to destructor of t)
-                for (int i = 0; !stoken.stop_requested(); ++i)
+                for ([[maybe_unused]] int i = 0; !stoken.stop_requested(); ++i)
                 {
                     hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
             });
 
         // wait until t has set all initial values
-        for (int i = 0; !all_set.load(); ++i)
+        for ([[maybe_unused]] int i = 0; !all_set.load(); ++i)
         {
             hpx::this_thread::sleep_for(std::chrono::milliseconds(10));
         }

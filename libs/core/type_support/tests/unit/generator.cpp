@@ -13,7 +13,7 @@
 #if defined(HPX_HAVE_CXX20_COROUTINES) &&                                      \
     (!defined(HPX_CLANG_VERSION) || HPX_CLANG_VERSION >= 130000)
 
-#include <hpx/local/generator.hpp>
+#include <hpx/generator.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
@@ -40,7 +40,9 @@ namespace tests {
     {
         while (i != j)
         {
-            co_yield i++;
+            // gcc reports -Werrer,-Wunsequenced without retval
+            int retval = i++;
+            co_yield retval;
         }
     }
 
@@ -116,6 +118,7 @@ namespace tests {
     {
         co_yield X{1};    // OK
         X const x{2};
+
         co_yield x;               // OK
         co_yield std::move(x);    // OK: same as above
     }
@@ -200,7 +203,7 @@ namespace tests {
     };
 
     // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
     hpx::generator<int, void, std::allocator<std::byte>> stateless_example()
     {
         co_yield 42;
@@ -311,7 +314,7 @@ int main()
     }
 
     // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
     {
         std::vector const expected = {42};
         std::size_t i = 0;

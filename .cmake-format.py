@@ -352,6 +352,7 @@ with section("parse"):
                                                    'nargs': '1+'}},
     'add_hpx_module': { 'kwargs': { 'CMAKE_SUBDIRS': '+',
                                     'COMPAT_HEADERS': '+',
+                                    'GENERATED_HEADERS': '+',
                                     'DEPENDENCIES': '+',
                                     'EXCLUDE_FROM_GLOBAL_HEADER': '+',
                                     'ADD_TO_GLOBAL_HEADER': '+',

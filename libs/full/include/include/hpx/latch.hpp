@@ -7,4 +7,4 @@
 #pragma once
 
 #include <hpx/collectives/latch.hpp>
-#include <hpx/local/latch.hpp>
+#include <hpx/synchronization/latch.hpp>

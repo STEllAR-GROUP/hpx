@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@
 #include <hpx/components/get_ptr.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/traits/component_supports_migration.hpp>
-#include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_distributed/find_here.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
@@ -20,7 +19,7 @@
 #include <memory>
 #include <utility>
 
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -52,7 +51,7 @@ namespace hpx { namespace components { namespace server {
     //    a) It will delay the start of the migration operation until no more
     //       actions (threads) are pending or currently running for the object
     //       to be migrated (the object is unpinned).
-    //    b) It marks the object which is about to be migrated as 'was
+    //    b) It marks the object that is about to be migrated as 'was
     //       migrated'. This information is stored in the AGAS client side
     //       representation on locality B. It is used to forward all incoming
     //       parcels to the object's new locality. It is also used to force any
@@ -62,15 +61,15 @@ namespace hpx { namespace components { namespace server {
     //    c) It will trigger the actual migration operation (see step 2).
     //
     //    In order to keep track of any pending and currently running actions
-    //    (threads) for the object to migrate, any thread which is being
+    //    (threads) for the object to migrate, any thread that is being
     //    scheduled will pin the object. The object will be unpinned only once
     //    the scheduled thread has executed to completion. Any last unpinning
     //    of the object will release any possibly pending migration operations
     //    (see step 1a).
     //
     // 2) The migration is triggered by invoking the action
-    //    `trigger_migration_component_action` on the locality which is
-    //    responsible for managing the address resolution for the object which
+    //    `trigger_migration_component_action` on the locality that is
+    //    responsible for managing the address resolution for the object that
     //    has to be migrated (locality D).
     //
     //    The action `trigger_migration_component_action` performs 3 steps:
@@ -114,6 +113,7 @@ namespace hpx { namespace components { namespace server {
     // This will be executed on the locality where the object lives which is
     // to be migrated
     namespace detail {
+
         // trigger the actual migration
         template <typename Component, typename DistPolicy>
         future<id_type> migrate_component_postproc(
@@ -122,11 +122,11 @@ namespace hpx { namespace components { namespace server {
         {
             using components::stubs::runtime_support;
 
-            std::uint32_t pin_count = ptr->pin_count();
+            std::uint32_t const pin_count = ptr->pin_count();
 
             if (pin_count == ~0x0u)
             {
-                agas::unmark_as_migrated(to_migrate.get_gid());
+                ptr->unmark_as_migrated(to_migrate);
 
                 return hpx::make_exceptional_future<id_type>(
                     HPX_GET_EXCEPTION(hpx::error::invalid_status,
@@ -135,9 +135,9 @@ namespace hpx { namespace components { namespace server {
                         "that was already migrated"));
             }
 
-            if (pin_count > 1)
+            if (pin_count != 0)
             {
-                agas::unmark_as_migrated(to_migrate.get_gid());
+                ptr->unmark_as_migrated(to_migrate);
 
                 return hpx::make_exceptional_future<id_type>(
                     HPX_GET_EXCEPTION(hpx::error::migration_needs_retry,
@@ -152,7 +152,7 @@ namespace hpx { namespace components { namespace server {
                     ptr->mark_as_migrated();
                     if (f.has_exception())
                     {
-                        agas::unmark_as_migrated(to_migrate.get_gid());
+                        ptr->unmark_as_migrated(to_migrate);
                     }
                     return f.get();
                 });
@@ -163,27 +163,27 @@ namespace hpx { namespace components { namespace server {
     future<id_type> migrate_component(id_type const& to_migrate,
         naming::address const& addr, DistPolicy const& policy)
     {
+        // retrieve pointer to object (must be local)
+        // NOTE: this does not pin the object
+        std::shared_ptr<Component> ptr =
+            hpx::detail::get_ptr_for_migration<Component>(addr, to_migrate);
+
         // 'migration' to same locality as before is a no-op
         if (policy.get_next_target() == hpx::find_here())
         {
-            agas::unmark_as_migrated(to_migrate.get_gid());
+            ptr->unmark_as_migrated(to_migrate);
             return make_ready_future(to_migrate);
         }
 
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
-            agas::unmark_as_migrated(to_migrate.get_gid());
-
+            ptr->unmark_as_migrated(to_migrate);
             return hpx::make_exceptional_future<hpx::id_type>(
                 HPX_GET_EXCEPTION(hpx::error::invalid_status,
                     "hpx::components::server::migrate_component",
                     "attempting to migrate an instance of a component that "
                     "does not support migration"));
         }
-
-        // retrieve pointer to object (must be local)
-        std::shared_ptr<Component> ptr =
-            hpx::detail::get_ptr_for_migration<Component>(addr, to_migrate);
 
         // perform actual migration by sending data over to target locality
         return detail::migrate_component_postproc<Component>(
@@ -209,7 +209,7 @@ namespace hpx { namespace components { namespace server {
         DistPolicy const& policy, hpx::id_type const& id,
         naming::address const& addr)
     {
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(hpx::error::invalid_status,
@@ -228,19 +228,19 @@ namespace hpx { namespace components { namespace server {
         }
 
         // perform actual object migration
-        typedef migrate_component_action<Component, DistPolicy> action_type;
+        using action_type = migrate_component_action<Component, DistPolicy>;
 
-        // force unwrapping outer future
-        future<id_type> f = async<action_type>(id, to_migrate, addr, policy);
+        // force unwrapping of the outer future
+        future<id_type> f = async(action_type(), id, to_migrate, addr, policy);
 
         return f.then(
-            launch::sync, [=](future<id_type>&& f) -> future<id_type> {
+            launch::sync, [=](future<id_type>&& fut) -> future<id_type> {
                 agas::end_migration(to_migrate);
-                if (f.has_exception())
+                if (fut.has_exception())
                 {
                     try
                     {
-                        f.get();    // rethrow exception
+                        fut.get();    // rethrow exception
                     }
                     catch (hpx::exception const& e)
                     {
@@ -259,7 +259,7 @@ namespace hpx { namespace components { namespace server {
                         throw;
                     }
                 }
-                return HPX_MOVE(f);
+                return HPX_MOVE(fut);
             });
     }
 
@@ -282,7 +282,7 @@ namespace hpx { namespace components { namespace server {
     future<id_type> perform_migrate_component(
         id_type const& to_migrate, DistPolicy const& policy)
     {
-        if (!traits::component_supports_migration<Component>::call())
+        if constexpr (!traits::component_supports_migration<Component>::call())
         {
             return hpx::make_exceptional_future<id_type>(
                 HPX_GET_EXCEPTION(hpx::error::invalid_status,
@@ -291,59 +291,60 @@ namespace hpx { namespace components { namespace server {
                     "does not support migration"));
         }
 
+        auto start_migration_op =
+            [=](future<std::shared_ptr<Component>>&& f) -> future<id_type> {
+            std::shared_ptr<Component> ptr = f.get();
+
+            using bm_result = std::pair<hpx::id_type, naming::address>;
+
+            auto begin_migration_op =
+                [ptr = HPX_MOVE(ptr), to_migrate, policy](
+                    hpx::future<bm_result>&& bmf) mutable -> future<id_type> {
+                auto r = bmf.get();    // propagate exceptions
+
+                // Delay the start of the migration operation until no more
+                // actions (threads) are pending or currently running for the
+                // given object (until the object is unpinned).
+                future<void> trigger_migration =
+                    ptr->mark_as_migrated(to_migrate);
+
+                // Unpin the object, will trigger migration if this is the only
+                // pin-count.
+                ptr.reset();
+
+                // Once the migration is possible (object is not pinned anymore
+                // trigger the necessary actions)
+                auto migration_op = [=](future<void>&& f) -> future<id_type> {
+                    // end migration operation in case of error
+                    if (f.has_exception())
+                    {
+                        agas::end_migration(to_migrate);
+                    }
+
+                    f.get();    // rethrow exception
+
+                    // now trigger 2nd step of migration
+                    using action_type =
+                        trigger_migrate_component_action<Component, DistPolicy>;
+
+                    return async(action_type(),
+                        naming::get_locality_from_id(to_migrate), to_migrate,
+                        policy, r.first, r.second);
+                };
+
+                // run on separate thread
+                return trigger_migration.then(
+                    launch::async, HPX_MOVE(migration_op));
+            };
+
+            // mark object in AGAS as being migrated first
+            return agas::begin_migration(to_migrate)
+                .then(launch::sync, HPX_MOVE(begin_migration_op));
+        };
+
         // retrieve pointer to object (must be local)
         return hpx::get_ptr<Component>(to_migrate)
-            .then(launch::sync,
-                [=](future<std::shared_ptr<Component>>&& f) -> future<id_type> {
-                    std::shared_ptr<Component> ptr = f.get();
-
-                    using bm_result = std::pair<hpx::id_type, naming::address>;
-
-                    // mark object in AGAS as being migrated first
-                    return agas::begin_migration(to_migrate)
-                        .then(launch::sync,
-                            [ptr = HPX_MOVE(ptr), to_migrate, policy](
-                                hpx::future<bm_result>&& bmf) mutable
-                            -> future<id_type> {
-                                auto r = bmf.get();    // propagate exceptions
-
-                                // Delay the start of the migration operation until no
-                                // more actions (threads) are pending or currently
-                                // running for the given object (until the object is
-                                // unpinned).
-                                future<void> trigger_migration =
-                                    ptr->mark_as_migrated(to_migrate);
-
-                                // Unpin the object, will trigger migration if this is
-                                // the only pin-count.
-                                ptr = std::shared_ptr<Component>{};
-
-                                // Once the migration is possible (object is not pinned
-                                // anymore trigger the necessary actions)
-                                return trigger_migration.then(
-                                    launch::async,    // run on separate thread
-                                    [=](future<void>&& f) -> future<id_type> {
-                                        // end migration operation in case of error
-                                        if (f.has_exception())
-                                        {
-                                            agas::end_migration(to_migrate);
-                                        }
-
-                                        f.get();    // rethrow exception
-
-                                        // now trigger 2nd step of migration
-                                        typedef trigger_migrate_component_action<
-                                            Component, DistPolicy>
-                                            action_type;
-
-                                        return async<action_type>(
-                                            naming::get_locality_from_id(
-                                                to_migrate),
-                                            to_migrate, policy, r.first,
-                                            r.second);
-                                    });
-                            });
-                });
+            .then(launch::sync, HPX_MOVE(start_migration_op));
     }
 
     template <typename Component, typename DistPolicy>
@@ -354,4 +355,4 @@ namespace hpx { namespace components { namespace server {
             perform_migrate_component_action<Component, DistPolicy>>
     {
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

@@ -11,5 +11,7 @@ if [ "${build_type}" = "Debug" ]; then
     configure_extra_options+=" -DLCI_DEBUG=ON"
 fi
 
+ctest_extra_args+=" --verbose "
+
 hostname
 module avail

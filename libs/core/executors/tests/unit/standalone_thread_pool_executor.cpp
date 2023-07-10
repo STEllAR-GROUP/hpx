@@ -11,12 +11,12 @@
 // HPX runtime*. This test fails if thread pools, schedulers etc. assume that
 // the global runtime (configuration, thread manager, etc.) always exists.
 
-#include <hpx/local/execution.hpp>
-#include <hpx/local/future.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/modules/schedulers.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/thread_pools.hpp>
+#include <hpx/thread.hpp>
 
 #include <algorithm>
 #include <cstddef>

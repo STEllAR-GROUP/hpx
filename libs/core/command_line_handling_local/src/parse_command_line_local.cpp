@@ -17,6 +17,10 @@
 #include <utility>
 #include <vector>
 
+#if defined(HPX_HAVE_UNISTD_H)
+#include <unistd.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::local::detail {
 
@@ -217,7 +221,7 @@ namespace hpx::local::detail {
             util::commandline_error_mode const mode =
                 error_mode & util::commandline_error_mode::ignore_aliases;
             util::commandline_error_mode const notmode =
-                error_mode & util::commandline_error_mode::ignore_aliases;
+                error_mode & ~util::commandline_error_mode::ignore_aliases;
 
             store(get_commandline_parser(
                       command_line_parser(options)

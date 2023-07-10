@@ -4,9 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
-#include <hpx/local/init.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/init.hpp>
 
 #include <type_traits>
 #include <vector>
@@ -16,7 +16,7 @@ struct my_executor : hpx::execution::parallel_executor
 {
 };
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
     template <>
     struct is_one_way_executor<my_executor> : std::true_type
     {
@@ -31,7 +31,7 @@ namespace hpx { namespace parallel { namespace execution {
     struct is_bulk_two_way_executor<my_executor> : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main()

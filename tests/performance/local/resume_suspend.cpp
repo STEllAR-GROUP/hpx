@@ -8,13 +8,12 @@
 // runtime. This is meant to be compared to start_stop and
 // openmp_parallel_region.
 
-#include <hpx/execution_base/this_thread.hpp>
+#include <hpx/chrono.hpp>
+#include <hpx/execution.hpp>
+#include <hpx/future.hpp>
 #include <hpx/init.hpp>
-#include <hpx/local/chrono.hpp>
-#include <hpx/local/future.hpp>
 #include <hpx/modules/testing.hpp>
-
-#include <hpx/modules/program_options.hpp>
+#include <hpx/program_options.hpp>
 
 #include <cstddef>
 #include <cstdint>

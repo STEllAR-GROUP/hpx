@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <hpx/local/algorithm.hpp>
-#include <hpx/local/execution.hpp>
+#include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
 #include <cstddef>
 #include <iostream>

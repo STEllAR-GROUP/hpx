@@ -9,9 +9,9 @@
 
 #include <hpx/config.hpp>
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-#include <hpx/local/init.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/thread.hpp>
 
 #include <string>
 #include <vector>

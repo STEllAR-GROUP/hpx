@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -22,14 +22,12 @@
 #include <hpx/preprocessor/stringize.hpp>
 #include <hpx/preprocessor/strip_parens.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/type_support/decay.hpp>
 
-#include <cstdint>
 #include <iosfwd>
 #include <string>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     // declared in hpx/modules/naming.hpp
     // using component_type = std::int32_t;
@@ -98,31 +96,31 @@ namespace hpx { namespace components {
         hpx::move_only_function<bool(component_type)> const& f);
 
     /// \brief Return the string representation for a given component type id
-    HPX_EXPORT std::string const get_component_type_name(component_type type);
+    HPX_EXPORT std::string get_component_type_name(component_type type);
 
     /// The lower short word of the component type is the type of the component
     /// exposing the actions.
-    inline constexpr component_type get_base_type(component_type t) noexcept
+    constexpr component_type get_base_type(component_type t) noexcept
     {
-        return component_type(t & 0x3FF);
+        return static_cast<component_type>(t & 0x3FF);
     }
 
     /// The upper short word of the component is the actual component type
-    inline constexpr component_type get_derived_type(component_type t) noexcept
+    constexpr component_type get_derived_type(component_type t) noexcept
     {
-        return component_type((t >> 10) & 0x3FF);
+        return static_cast<component_type>((t >> 10) & 0x3FF);
     }
 
     /// A component derived from a base component exposing the actions needs to
     /// have a specially formatted component type.
-    inline constexpr component_type derived_component_type(
+    constexpr component_type derived_component_type(
         component_type derived, component_type base) noexcept
     {
-        return component_type(derived << 10 | base);
+        return static_cast<component_type>(derived << 10 | base);
     }
 
     /// \brief Verify the two given component types are matching (compatible)
-    inline constexpr bool types_are_compatible(
+    constexpr bool types_are_compatible(
         component_type lhs, component_type rhs) noexcept
     {
         // don't compare types if one of them is unknown
@@ -138,8 +136,8 @@ namespace hpx { namespace components {
             return true;
         }
 
-        component_type lhs_base = get_base_type(lhs);
-        component_type rhs_base = get_base_type(rhs);
+        component_type const lhs_base = get_base_type(lhs);
+        component_type const rhs_base = get_base_type(rhs);
 
         if (lhs_base == rhs_base)
         {
@@ -193,24 +191,24 @@ namespace hpx { namespace components {
     HPX_ALWAYS_EXPORT const char* get_component_base_name() noexcept;
 
     template <typename Component>
-    inline component_type get_component_type() noexcept
+    component_type get_component_type() noexcept
     {
         return traits::component_type_database<Component>::get();
     }
 
     template <typename Component>
-    inline void set_component_type(component_type type)
+    void set_component_type(component_type type)
     {
         traits::component_type_database<Component>::set(type);
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
-namespace hpx { namespace naming {
+namespace hpx::naming {
 
     // this is defined in this module as its implementation relies on
     // components::get_component_type_name()
     HPX_EXPORT std::ostream& operator<<(std::ostream&, address const&);
-}}    // namespace hpx::naming
+}    // namespace hpx::naming
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_GET_COMPONENT_TYPE(component)                               \

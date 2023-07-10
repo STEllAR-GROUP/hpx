@@ -17,7 +17,6 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <cstring>
@@ -186,8 +185,7 @@ namespace hpx::util::detail {
                     buffer = vtable::template allocate<T>(
                         storage, function_storage_size);
                 }
-                object = hpx::construct_at(
-                    static_cast<T*>(buffer), HPX_FORWARD(F, f));
+                object = ::new (buffer) T(HPX_FORWARD(F, f));
             }
             else
             {
