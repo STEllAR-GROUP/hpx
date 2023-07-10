@@ -4,8 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/algorithms/traits/is_relocatable.hpp>
-#include <hpx/algorithms/traits/pointer_category.hpp>
+#include <hpx/type_support/is_relocatable.hpp>
 
 #include <cassert>
 
@@ -13,58 +12,57 @@
 
 // Integral types are relocatable
 static_assert(hpx::is_relocatable_v<int>);
-static_assert(hpx::is_relocatable_v<const int>);
+static_assert(hpx::is_relocatable_v<int const>);
 static_assert(hpx::is_relocatable_v<int*>);
 static_assert(hpx::is_relocatable_v<int (*)()>);
 
 // Array types are not move-constructible and thus not relocatable
 static_assert(!hpx::is_relocatable_v<int[]>);
-static_assert(!hpx::is_relocatable_v<const int[]>);
+static_assert(!hpx::is_relocatable_v<int const[]>);
 static_assert(!hpx::is_relocatable_v<int[4]>);
-static_assert(!hpx::is_relocatable_v<const int[4]>);
+static_assert(!hpx::is_relocatable_v<int const[4]>);
 
 // Function types are not move-constructible and thus not relocatable
 static_assert(!hpx::is_relocatable_v<int()>);
 
 // Void types are not move-constructible and thus not relocatable
 static_assert(!hpx::is_relocatable_v<void>);
-static_assert(!hpx::is_relocatable_v<const void>);
+static_assert(!hpx::is_relocatable_v<void const>);
 
 // std::mutex is not relocatable
 static_assert(!hpx::is_relocatable_v<std::mutex>);
 
-struct NotDestructible
+struct not_destructible
 {
-    NotDestructible(const NotDestructible&);
-    NotDestructible(NotDestructible&&);
-    ~NotDestructible() = delete;
+    not_destructible(not_destructible const&);
+    not_destructible(not_destructible&&);
+    ~not_destructible() = delete;
 };
 
-static_assert(!hpx::is_relocatable_v<NotDestructible>);
-
-struct NotMoveConstructible
+static_assert(!hpx::is_relocatable_v<not_destructible>);
+struct not_move_constructible
 {
-    NotMoveConstructible(const NotMoveConstructible&);
-    NotMoveConstructible(NotMoveConstructible&&) = delete;
+    not_move_constructible(not_move_constructible const&);
+    not_move_constructible(not_move_constructible&&) = delete;
 };
 
-static_assert(!hpx::is_relocatable_v<NotMoveConstructible>);
+static_assert(!hpx::is_relocatable_v<not_move_constructible>);
 
-struct NotCopyConstructible
+struct not_copy_constructible
 {
-    NotCopyConstructible(const NotCopyConstructible&) = delete;
-    NotCopyConstructible(NotCopyConstructible&&);
+    not_copy_constructible(not_copy_constructible const&) = delete;
+    not_copy_constructible(not_copy_constructible&&);
 };
 
-static_assert(hpx::is_relocatable_v<NotCopyConstructible>);
+static_assert(hpx::is_relocatable_v<not_copy_constructible>);
 
 // reference types are relocatable
 static_assert(hpx::is_relocatable_v<int&>);
 static_assert(hpx::is_relocatable_v<int&&>);
 static_assert(hpx::is_relocatable_v<int (&)()>);
 static_assert(hpx::is_relocatable_v<std::mutex&>);
-static_assert(hpx::is_relocatable_v<NotMoveConstructible&>);
-static_assert(hpx::is_relocatable_v<NotCopyConstructible&>);
-static_assert(hpx::is_relocatable_v<NotDestructible&>);
+static_assert(hpx::is_relocatable_v<not_move_constructible&>);
+static_assert(hpx::is_relocatable_v<not_copy_constructible&>);
+static_assert(hpx::is_relocatable_v<not_destructible&>);
 
 int main(int, char*[]) {}
