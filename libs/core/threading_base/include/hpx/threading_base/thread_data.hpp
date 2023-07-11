@@ -9,6 +9,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
+
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/detail/combined_tagged_state.hpp>
@@ -18,7 +20,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 #if defined(HPX_HAVE_APEX)
@@ -31,9 +32,11 @@
 #include <forward_list>
 #include <memory>
 #include <mutex>
-#include <stack>
-#include <string>
 #include <utility>
+
+#if defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
+#include <string>
+#endif
 
 #include <hpx/config/warnings_prefix.hpp>
 
