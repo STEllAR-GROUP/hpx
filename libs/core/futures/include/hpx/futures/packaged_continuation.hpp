@@ -230,17 +230,11 @@ namespace hpx::lcos::detail {
 
             hpx::intrusive_ptr<continuation> this_(this);
             hpx::threads::thread_description desc(f_, "async");
-            auto thrd = spawner(
+            spawner(
                 [this_ = HPX_MOVE(this_), f = HPX_MOVE(f)]() mutable -> void {
                     this_->template run_impl<Unwrap>(HPX_MOVE(f));
                 },
-                desc);
-
-            std::lock_guard<mutex_type> l(mtx_);
-            if (!this->base_type::is_ready())
-            {
-                this->runs_child_ = HPX_MOVE(thrd);
-            }
+                desc, this->runs_child_);
         }
 
     public:
@@ -261,8 +255,8 @@ namespace hpx::lcos::detail {
                     if (this->is_ready())
                         return;    // nothing we can do
 
-                    // 26110: Caller failing to hold lock 'l'
 #if defined(HPX_MSVC)
+// 26110: Caller failing to hold lock 'l'
 #pragma warning(push)
 #pragma warning(disable : 26110)
 #endif
