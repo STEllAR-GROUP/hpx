@@ -51,6 +51,38 @@ namespace hpx::lcos::local::detail {
         std::int64_t lower_limit_;
         local::detail::condition_variable cond_;
     };
+
+    template <typename Mutex>
+    struct sliding_semaphore_data
+    {
+        sliding_semaphore_data(
+            std::int64_t max_difference, std::int64_t lower_limit) noexcept
+          : sem_(max_difference, lower_limit)
+          , count_(1)
+        {
+        }
+
+        mutable Mutex mtx_;
+        detail::sliding_semaphore sem_;
+
+    private:
+        friend void intrusive_ptr_add_ref(
+            sliding_semaphore_data<Mutex>* p) noexcept
+        {
+            ++p->count_;
+        }
+
+        friend void intrusive_ptr_release(
+            sliding_semaphore_data<Mutex>* p) noexcept
+        {
+            if (0 == --p->count_)
+            {
+                delete p;
+            }
+        }
+
+        hpx::util::atomic_count count_;
+    };
 }    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
