@@ -43,6 +43,12 @@ namespace hpx {
     };
 
     template <typename T>
+    // Arrays of trivially copyable types are trivially relocatable
+    struct is_trivially_relocatable<T[]> : std::is_trivially_copyable<T>
+    {
+    };
+
+    template <typename T>
     inline constexpr bool is_trivially_relocatable_v =
         is_trivially_relocatable<T>::value;
 }    // namespace hpx
