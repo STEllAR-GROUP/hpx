@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/synchronization/detail/sliding_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -43,8 +44,15 @@ namespace hpx {
     {
     private:
         using mutex_type = Mutex;
+        using data_type =
+            lcos::local::detail::sliding_semaphore_data<mutex_type>;
 
     public:
+        sliding_semaphore_var(sliding_semaphore_var const&) = delete;
+        sliding_semaphore_var& operator=(sliding_semaphore_var const&) = delete;
+        sliding_semaphore_var(sliding_semaphore_var&&) = delete;
+        sliding_semaphore_var& operator=(sliding_semaphore_var&&) = delete;
+
         /// \brief Construct a new sliding semaphore
         ///
         /// \param max_difference
@@ -55,7 +63,7 @@ namespace hpx {
         /// \param lower_limit  [in] The initial lower limit.
         explicit sliding_semaphore_var(
             std::int64_t max_difference, std::int64_t lower_limit = 0) noexcept
-          : sem_(max_difference, lower_limit)
+          : data_(new data_type(max_difference, lower_limit), false)
         {
         }
 
@@ -70,8 +78,9 @@ namespace hpx {
         void set_max_difference(
             std::int64_t max_difference, std::int64_t lower_limit = 0) noexcept
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            sem_.set_max_difference(l, max_difference, lower_limit);
+            auto data = data_; //keep alive
+            std::unique_lock<mutex_type> l(data->mtx_);
+            data->sem_.set_max_difference(l, max_difference, lower_limit);
         }
 
         /// \brief Wait for the semaphore to be signaled
@@ -82,8 +91,9 @@ namespace hpx {
         ///           set by signal() is larger than the max_difference.
         void wait(std::int64_t upper_limit)
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            sem_.wait(l, upper_limit);
+            auto data = data_;    //keep alive
+            std::unique_lock<mutex_type> l(data->mtx_);
+            data->sem_.wait(l, upper_limit);
         }
 
         /// \brief Try to wait for the semaphore to be signaled
@@ -97,8 +107,9 @@ namespace hpx {
         ///           would not block if it was calling wait().
         bool try_wait(std::int64_t upper_limit = 1)
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            return sem_.try_wait(l, upper_limit);
+            auto data = data_;    //keep alive
+            std::unique_lock<mutex_type> l(data->mtx_);
+            return data->sem_.try_wait(l, upper_limit);
         }
 
         /// \brief Signal the semaphore
@@ -110,19 +121,20 @@ namespace hpx {
         ///             limit plus the max_difference.
         void signal(std::int64_t lower_limit)
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            sem_.signal(HPX_MOVE(l), lower_limit);
+            auto data = data_;    //keep alive
+            std::unique_lock<mutex_type> l(data->mtx_);
+            data->sem_.signal(HPX_MOVE(l), lower_limit);
         }
 
         std::int64_t signal_all()
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            return sem_.signal_all(HPX_MOVE(l));
+            auto data = data_;    //keep alive
+            std::unique_lock<mutex_type> l(data->mtx_);
+            return data->sem_.signal_all(HPX_MOVE(l));
         }
 
     private:
-        mutable mutex_type mtx_;
-        lcos::local::detail::sliding_semaphore sem_;
+        hpx::intrusive_ptr<data_type> data_;
     };
 
     using sliding_semaphore = sliding_semaphore_var<>;

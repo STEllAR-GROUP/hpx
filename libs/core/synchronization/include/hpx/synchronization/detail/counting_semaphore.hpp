@@ -55,6 +55,37 @@ namespace hpx::lcos::local::detail {
         std::ptrdiff_t value_;
         local::detail::condition_variable cond_;
     };
+
+    template <typename Mutex>
+    struct counting_semaphore_data
+    {
+        counting_semaphore_data(std::ptrdiff_t value) noexcept
+          : sem_(value)
+          , count_(1)
+        {
+        }
+
+        mutable Mutex mtx_;
+        detail::counting_semaphore sem_;
+
+    private:
+        friend void intrusive_ptr_add_ref(
+            counting_semaphore_data<Mutex>* p) noexcept
+        {
+            ++p->count_;
+        }
+
+        friend void intrusive_ptr_release(
+            counting_semaphore_data<Mutex>* p) noexcept
+        {
+            if (0 == --p->count_)
+            {
+                delete p;
+            }
+        }
+
+        hpx::util::atomic_count count_;
+    };
 }    // namespace hpx::lcos::local::detail
 
 #if defined(HPX_MSVC_WARNING_PRAGMA)
