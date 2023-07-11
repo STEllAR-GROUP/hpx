@@ -180,7 +180,7 @@ static inline void am_poll_try() {
   // AM-based (udp/amudp, mpi/ammpi) serializing can hurt performance.
   //
 #if defined(GASNET_CONDUIT_IBV) || defined(GASNET_CONDUIT_UCX) || defined(GASNET_CONDUIT_ARIES) || defined(GASNET_CONDUIT_OFI)
-  std::lock_guard<hpx::spinlock> lk(gasnet_environment::pollingLock);
+    std::lock_guard<hpx::spinlock> lk(hpx::util::gasnet_environment::pollingLock);
     (void) gasnet_AMPoll();
 #else
     (void) gasnet_AMPoll();
