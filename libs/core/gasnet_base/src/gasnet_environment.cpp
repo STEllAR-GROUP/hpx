@@ -193,7 +193,7 @@ void wait_done_obj(done_t* done, bool do_yield)
   while (!done->flag) {
     am_poll_try();
     if (do_yield)
-      hpx::execution_base::this_thread::yield();
+      hpx::this_thread::yield();
   }
 }
 
