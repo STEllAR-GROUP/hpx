@@ -1177,6 +1177,30 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_OFI BOOL "Enable the GASNET-OFI based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_OFI)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_OFI)
+  endif()
+
+  hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_UCX BOOL "Enable the GASNET-UCX based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_UCX)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UCX)
+  endif()
+
+  hpx_option(
+    HPX_WITH_PARCELPORT_GASNET_IBV BOOL "Enable the GASNET-IBV based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_GASNET_IBV)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_IBV)
+  endif()
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )
