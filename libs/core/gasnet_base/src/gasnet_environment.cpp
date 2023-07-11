@@ -13,7 +13,7 @@
 #include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/local/thread.hpp>
+#include <hpx/thread.hpp>
 
 #include <boost/tokenizer.hpp>
 
@@ -193,7 +193,7 @@ void wait_done_obj(done_t* done, bool do_yield)
   while (!done->flag) {
     am_poll_try();
     if (do_yield)
-      hpx::this_thread::yield();
+      hpx::execution_base::this_thread::yield();
   }
 }
 
