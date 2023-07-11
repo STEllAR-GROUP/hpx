@@ -153,8 +153,8 @@ namespace hpx::lcos::detail {
     struct post_policy_spawner
     {
         template <typename F>
-        threads::thread_id_ref_type operator()(
-            F&& f, hpx::threads::thread_description desc) const
+        void operator()(F&& f, hpx::threads::thread_description desc,
+            threads::thread_id_ref_type& id) const
         {
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(HPX_FORWARD(F, f)),
@@ -163,7 +163,7 @@ namespace hpx::lcos::detail {
                 threads::thread_stacksize::default_,
                 threads::thread_schedule_state::pending);
 
-            return threads::register_thread(data);
+            threads::register_thread(data, id);
         }
     };
 
@@ -173,11 +173,11 @@ namespace hpx::lcos::detail {
         Executor exec;
 
         template <typename F>
-        threads::thread_id_ref_type operator()(
-            F&& f, hpx::threads::thread_description) const
+        void operator()(F&& f, hpx::threads::thread_description,
+            threads::thread_id_ref_type& id) const
         {
+            id = threads::invalid_thread_id;
             hpx::parallel::execution::post(exec, HPX_FORWARD(F, f));
-            return threads::invalid_thread_id;
         }
     };
 
