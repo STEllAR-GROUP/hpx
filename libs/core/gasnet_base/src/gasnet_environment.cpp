@@ -238,13 +238,14 @@ namespace hpx { namespace util {
         // - The parcelport is explicitly disabled
         // - The application is not run in an GASNET environment
         // - The TCP parcelport is enabled and has higher priority
+	//
         if (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) == 0 ||
-            (get_entry_as(cfg, "hpx.parcel.udp.enable", 1) &&
-                (get_entry_as(cfg, "hpx.parcel.udp.priority", 1) >
+            (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
+                (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))) ||
             (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.gasnet.priority", 1) >
-                    get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))))
+                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
             LBT_(info) << "GASNET support disabled via configuration settings\n";
             return false;
