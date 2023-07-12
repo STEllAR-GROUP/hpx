@@ -6,7 +6,8 @@
 
 function(add_hpx_test category name)
   set(options FAILURE_EXPECTED RUN_SERIAL NO_PARCELPORT_TCP NO_PARCELPORT_MPI
-              NO_PARCELPORT_LCI
+	  NO_PARCELPORT_LCI NO_PARCELPORT_GASNET_SMP NO_PARCELPORT_GASNET_UDP
+	  NO_PARCELPORT_GASNET_UCX NO_PARCELPORT_GASNET_OFI NO_PARCELPORT_GASNET_IBV
   )
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY TIMEOUT
                      RUNWRAPPER
@@ -171,6 +172,126 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.lci.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "lci" "-r" "mpi"
+                                              ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_GASNET AND HPX_WITH_PARCELPORT_GASNET_SMP AND NOT ${${name}_NO_PARCELPORT_GASNET_SMP})
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.gasnet.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r" "mpi"
+                                              ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_GASNET AND HPX_WITH_PARCELPORT_GASNET_UDP AND NOT ${${name}_NO_PARCELPORT_GASNET_UDP})
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.gasnet.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r" "mpi"
+                                              ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_GASNET AND HPX_WITH_PARCELPORT_GASNET_OFI AND NOT ${${name}_NO_PARCELPORT_GASNET_OFI})
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.gasnet.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r" "mpi"
+                                              ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_GASNET AND HPX_WITH_PARCELPORT_GASNET_UCX AND NOT ${${name}_NO_PARCELPORT_GASNET_UCX})
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.gasnet.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r" "mpi"
+                                              ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_GASNET AND HPX_WITH_PARCELPORT_GASNET_IBV AND NOT ${${name}_NO_PARCELPORT_GASNET_IBV})
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.gasnet.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r" "mpi"
                                               ${args}
         )
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
