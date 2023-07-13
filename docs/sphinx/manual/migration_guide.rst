@@ -12,7 +12,7 @@ Migration guide
 ===============
 
 The Migration Guide serves as a valuable resource for developers seeking to transition their
-parallel computing applications from different APIs (i.e. |openmp|, |tbb|) to |hpx|. |hpx|, an
+parallel computing applications from different APIs (i.e. |openmp|, |tbb|, |mpi|) to |hpx|. |hpx|, an
 advanced C++ library, offers a versatile and high-performance platform for parallel and distributed
 computing, providing a wide range of features and capabilities. This guide aims to assist developers
 in understanding the key differences between different APIs and |hpx|, and it provides step-by-step
@@ -1044,3 +1044,123 @@ task_group
 |hpx| drew inspiration from |tbb| to introduce the :cpp:func:`hpx::experimental::task_group`
 feature. Therefore, utilizing :cpp:func:`hpx::experimental::task_group` provides an
 equivalent functionality to `tbb::task_group`.
+
+|mpi|
+=====
+
+|mpi| is a standardized communication protocol and library that allows multiple processes or
+nodes in a parallel computing system to exchange data and coordinate their execution.
+
+MPI_send & MPI_recv
+-------------------
+
+Let's assume we have the following simple message passing code where each process sends a
+message to the next process in a circular manner. The exchanged message is modified and printed
+to the console.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstddef>
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    constexpr int times = 2;
+
+    int main(int argc, char *argv[]) {
+    MPI_Init(&argc, &argv);
+
+    int num_localities;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+    int this_locality;
+    MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+
+    int next_locality = (this_locality + 1) % num_localities;
+    std::vector<int> msg_vec = {0, 1};
+
+    int cnt = 0;
+    int msg = msg_vec[this_locality];
+
+    int recv_msg;
+    MPI_Request request_send, request_recv;
+    MPI_Status status;
+
+    while (cnt < times) {
+        cnt += 1;
+
+        MPI_Isend(&msg, 1, MPI_INT, next_locality, cnt, MPI_COMM_WORLD,
+                &request_send);
+        MPI_Irecv(&recv_msg, 1, MPI_INT, next_locality, cnt, MPI_COMM_WORLD,
+                &request_recv);
+
+        MPI_Wait(&request_send, &status);
+        MPI_Wait(&request_recv, &status);
+
+        std::cout << "Time: " << cnt << ", Locality " << this_locality
+                << " received msg: " << recv_msg << "\n";
+
+        recv_msg += 10;
+        msg = recv_msg;
+    }
+
+    MPI_Finalize();
+    return 0;
+    }
+
+|hpx| equivalent:
+
+.. literalinclude:: ../../libs/full/collectives/examples/channel_communicator.cpp
+   :start-after: //[doc
+   :end-before: //doc]
+
+To perform message passing between different processes in |hpx| we can use a channel communicator.
+To understand this example, let's focus on the `hpx_main()` function:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+- `create_channel_communicator` function is used to create a channel to serve the communication.
+  This function takes several arguments, including the launch policy (`hpx::launch::sync`), the
+  name of the communicator (`channel_communicator_name`), the number of localities, and the ID
+  of the current locality.
+- The communication follows a ring pattern, where each process (or locality) sends a message to
+  its neighbor in a circular manner. This means that the messages circulate around the localities,
+  ensuring that the communication wraps around when reaching the end of the locality sequence.
+  To achieve this, the `next_locality` variable is calculated as the ID of the next locality in
+  the ring.
+- The initial values for the communication are set (`msg_vec`, `cnt`, `msg`).
+- The `set()` function is called to send the message to the next locality in the ring. The message
+  is sent asynchronously and is associated with a tag (`cnt`).
+- The `get()` function is called to receive a message from the next locality. It is also associated
+  with the same tag as the `set()` operation.
+- The `setf.get()` call blocks until the message sending operation is complete.
+- A continuation is set up using the function `then()` to handle the received message.
+  Inside the continuation:
+
+  - The received message value (`rec_msg`) is retrieved using `f.get()`.
+
+  - The received message is printed to the console and then modified by adding 10.
+
+  - The `set()` and `get()` operations are repeated to send and receive the modified message to
+    the next locality.
+
+  - The `setf.get()` call blocks until the new message sending operation is complete.
+- The `done_msg.get()` call blocks until the continuation is complete for the current loop iteration.
+
+Having said that, we conclude to the following table:
+
+.. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  ==============================================================
+   |openmpi| function         |hpx| equivalent
+   =========================  ==============================================================
+   MPI_Comm_create            `hpx::collectives::create_channel_communicator()`
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Isend                  `hpx::collectives::set()`
+   MPI_Irecv                  `hpx::collectives::get()`
+   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
+   =========================  ==============================================================
