@@ -7,9 +7,9 @@
 
 .. _modules_parcelport_gasnet:
 
-==============
+=================
 parcelport_gasnet
-==============
+=================
 
 TODO: High-level description of the module.
 

@@ -126,7 +126,8 @@ namespace hpx::parcelset::policies::gasnet {
                 l.unlock();
                 header_lock.unlock();
 
-                // remote localities 'put' into the gasnet shared memory segment on this machine
+                // remote localities 'put' into the gasnet shared
+                // memory segment on this machine
                 //
                 res.reset(new connection_type(
                     hpx::util::gasnet_environment::rank(), h, pp_));
