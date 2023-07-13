@@ -23,7 +23,6 @@ function(add_hpx_module libname modulename)
       EXCLUDE_FROM_GLOBAL_HEADER
       ADD_TO_GLOBAL_HEADER
   )
-
   cmake_parse_arguments(
     ${modulename} "${options}" "${one_value_args}" "${multi_value_args}"
     ${ARGN}
