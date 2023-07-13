@@ -17,6 +17,7 @@
 #include <hpx/parcelport_gasnet/receiver_connection.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <deque>
 #include <iterator>
 #include <list>
@@ -24,7 +25,6 @@
 #include <mutex>
 #include <set>
 #include <utility>
-#include <chrono>
 
 namespace hpx::parcelset::policies::gasnet {
 
@@ -37,23 +37,29 @@ namespace hpx::parcelset::policies::gasnet {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-        struct exp_backoff {
+        struct exp_backoff
+        {
             int numTries;
             const static int maxRetries = 10;
 
-            void operator()() {
-                if(numTries <= maxRetries) {
+            void operator()()
+            {
+                if (numTries <= maxRetries)
+                {
                     gasnet_AMPoll();
-                    hpx::this_thread::suspend(std::chrono::microseconds(1 << numTries));
+                    hpx::this_thread::suspend(
+                        std::chrono::microseconds(1 << numTries));
                 }
-                else {
+                else
+                {
                     numTries = 0;
                 }
             }
         };
 
         explicit constexpr receiver(Parcelport& pp) noexcept
-          : pp_(pp), bo()
+          : pp_(pp)
+          , bo()
         {
         }
 
@@ -122,7 +128,8 @@ namespace hpx::parcelset::policies::gasnet {
 
                 // remote localities 'put' into the gasnet shared memory segment on this machine
                 //
-                res.reset(new connection_type(hpx::util::gasnet_environment::rank(), h, pp_));
+                res.reset(new connection_type(
+                    hpx::util::gasnet_environment::rank(), h, pp_));
                 return res;
             }
             return res;
@@ -133,8 +140,9 @@ namespace hpx::parcelset::policies::gasnet {
             header h = rcv_header_;
             rcv_header_.reset();
 
-            while(rcv_header_.data() == 0) {
-               bo();
+            while (rcv_header_.data() == 0)
+            {
+                bo();
             }
 
             return h;

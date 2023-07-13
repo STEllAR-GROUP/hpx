@@ -16,13 +16,13 @@
 #include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/timing.hpp>
 
+#include <hpx/gasnet_base/gasnet_environment.hpp>
 #include <hpx/parcelport_gasnet/header.hpp>
 #include <hpx/parcelport_gasnet/locality.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
 #include <hpx/parcelset_base/detail/gatherer.hpp>
 #include <hpx/parcelset_base/parcelport.hpp>
-#include <hpx/gasnet_base/gasnet_environment.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -152,25 +152,27 @@ namespace hpx::parcelset::policies::gasnet {
 
                 // compute + send the number of GASNET_PAGEs to send and the remainder number of bytes to a GASNET_PAGE
                 //
-                const std::size_t chunks[] = { static_cast<size_t>(header_.data_size_ / GASNET_PAGESIZE), static_cast<size_t>(header_.data_size_ % GASNET_PAGESIZE) };
+                const std::size_t chunks[] = {
+                    static_cast<size_t>(header_.data_size_ / GASNET_PAGESIZE),
+                    static_cast<size_t>(header_.data_size_ % GASNET_PAGESIZE)};
                 const std::size_t sizeof_chunks = sizeof(chunks);
-                std::memcpy(
-                   hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
-                   chunks, sizeof_chunks);
+                std::memcpy(hpx::util::gasnet_environment::segments
+                                [hpx::util::gasnet_environment::rank()]
+                                    .addr,
+                    chunks, sizeof_chunks);
 
                 // put from this localities gasnet shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
                 hpx::util::gasnet_environment::put(
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
-                    ),
+                        hpx::util::gasnet_environment::segments
+                            [hpx::util::gasnet_environment::rank()]
+                                .addr),
                     dst_,
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[dst_].addr
-                    ),
-                    sizeof_chunks
-                );
+                        hpx::util::gasnet_environment::segments[dst_].addr),
+                    sizeof_chunks);
             }
 
             state_ = sent_header;
@@ -190,22 +192,22 @@ namespace hpx::parcelset::policies::gasnet {
             if (!chunks.empty())
             {
                 hpx::util::gasnet_environment::scoped_lock l;
-                std::memcpy(
-                   hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
-                   chunks.data(),
-                   static_cast<int>(chunks.size() *
-                      sizeof(parcel_buffer_type::transmission_chunk_type))
-                ); 
+                std::memcpy(hpx::util::gasnet_environment::segments
+                                [hpx::util::gasnet_environment::rank()]
+                                    .addr,
+                    chunks.data(),
+                    static_cast<int>(chunks.size() *
+                        sizeof(parcel_buffer_type::transmission_chunk_type)));
 
-                gasnet_put_bulk(dst_, 
+                gasnet_put_bulk(dst_,
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[dst_].addr
-                    ),
+                        hpx::util::gasnet_environment::segments[dst_].addr),
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
-                    ),
-                    static_cast<int>(chunks.size() * sizeof(parcel_buffer_type::transmission_chunk_type))
-                );
+                        hpx::util::gasnet_environment::segments
+                            [hpx::util::gasnet_environment::rank()]
+                                .addr),
+                    static_cast<int>(chunks.size() *
+                        sizeof(parcel_buffer_type::transmission_chunk_type)));
             }
 
             state_ = sent_transmission_chunks;
@@ -223,20 +225,20 @@ namespace hpx::parcelset::policies::gasnet {
             if (!header_.piggy_back())
             {
                 hpx::util::gasnet_environment::scoped_lock l;
-                std::memcpy(
-                    hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
+                std::memcpy(hpx::util::gasnet_environment::segments
+                                [hpx::util::gasnet_environment::rank()]
+                                    .addr,
                     buffer_.data_.data(), buffer_.data_.size());
 
                 hpx::util::gasnet_environment::put(
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
-                    ),
+                        hpx::util::gasnet_environment::segments
+                            [hpx::util::gasnet_environment::rank()]
+                                .addr),
                     dst_,
                     static_cast<std::uint8_t*>(
-                       hpx::util::gasnet_environment::segments[dst_].addr
-                    ),
-                    buffer_.data_.size()
-                );
+                        hpx::util::gasnet_environment::segments[dst_].addr),
+                    buffer_.data_.size());
             }
             state_ = sent_data;
 
@@ -260,22 +262,20 @@ namespace hpx::parcelset::policies::gasnet {
 
                     hpx::util::gasnet_environment::scoped_lock l;
 
-                    std::memcpy(
-                       hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
-                       c.data_.cpos_,
-                       static_cast<int>(c.size_)
-                    );
+                    std::memcpy(hpx::util::gasnet_environment::segments
+                                    [hpx::util::gasnet_environment::rank()]
+                                        .addr,
+                        c.data_.cpos_, static_cast<int>(c.size_));
 
                     hpx::util::gasnet_environment::put(
                         static_cast<std::uint8_t*>(
-                            hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr
-                        ),
+                            hpx::util::gasnet_environment::segments
+                                [hpx::util::gasnet_environment::rank()]
+                                    .addr),
                         dst_,
                         static_cast<std::uint8_t*>(
-                           hpx::util::gasnet_environment::segments[dst_].addr
-                        ),
-                        static_cast<int>(c.size_)
-                    );
+                            hpx::util::gasnet_environment::segments[dst_].addr),
+                        static_cast<int>(c.size_));
                 }
 
                 ++chunks_idx_;

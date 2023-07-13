@@ -140,10 +140,12 @@ namespace hpx::parcelset::policies::gasnet {
         int get_next_free_tag() noexcept
         {
             int next_free = next_free_tag_;
-  
+
             hpx::util::gasnet_environment::scoped_lock l;
             std::memcpy(&next_free,
-                hpx::util::gasnet_environment::segments[hpx::util::gasnet_environment::rank()].addr,
+                hpx::util::gasnet_environment::segments
+                    [hpx::util::gasnet_environment::rank()]
+                        .addr,
                 sizeof(int));
 
             return next_free;

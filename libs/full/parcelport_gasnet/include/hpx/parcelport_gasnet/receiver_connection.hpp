@@ -138,8 +138,8 @@ namespace hpx::parcelset::policies::gasnet {
                 auto self_ = hpx::util::gasnet_environment::rank();
                 hpx::util::gasnet_environment::scoped_lock l;
                 std::memcpy(buffer_.data_.data(),
-                   hpx::util::gasnet_environment::segments[self_].addr,
-                   buffer_.data_.size());
+                    hpx::util::gasnet_environment::segments[self_].addr,
+                    buffer_.data_.size());
                 request_ptr_ = true;
             }
 
@@ -150,7 +150,6 @@ namespace hpx::parcelset::policies::gasnet {
 
         bool receive_chunks(std::size_t num_thread = -1)
         {
-
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 if (!request_done())
@@ -168,8 +167,8 @@ namespace hpx::parcelset::policies::gasnet {
                     auto self_ = hpx::util::gasnet_environment::rank();
                     hpx::util::gasnet_environment::scoped_lock l;
                     std::memcpy(c.data(),
-                       hpx::util::gasnet_environment::segments[self_].addr,
-                       c.size());
+                        hpx::util::gasnet_environment::segments[self_].addr,
+                        c.size());
                     request_ptr_ = true;
                 }
             }
@@ -193,8 +192,8 @@ namespace hpx::parcelset::policies::gasnet {
                 auto self_ = hpx::util::gasnet_environment::rank();
                 hpx::util::gasnet_environment::scoped_lock l;
                 std::memcpy(&tag_,
-                   hpx::util::gasnet_environment::segments[self_].addr,
-                   sizeof(int));
+                    hpx::util::gasnet_environment::segments[self_].addr,
+                    sizeof(int));
                 request_ptr_ = true;
             }
 

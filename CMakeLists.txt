@@ -588,7 +588,6 @@ if(APPLE
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
    OR HPX_WITH_PARCELPORT_LCI
-   OR HPX_WITH_PARCELPORT_GASNET
 )
   set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
 endif()
@@ -1234,7 +1233,10 @@ else(HPX_WITH_NETWORKING)
   )
 endif(HPX_WITH_NETWORKING)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+   OR HPX_WITH_ASYNC_MPI
+   OR ("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+)
   # mpi parcelport settings
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_ENV
@@ -2186,12 +2188,19 @@ add_hpx_library_headers_noglob(hpx_external)
 # Setup plugins (set here cause if we include it inside plugins, it will not be
 # defined in src/CMakeLists.txt where we call add_static_parcelports)
 include(HPX_SetupMPI) # must come before APEX
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+   OR HPX_WITH_ASYNC_MPI
+   OR ("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+)
   hpx_setup_mpi()
 endif()
-include(HPX_SetupLCI)
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  include(HPX_SetupLCI)
   hpx_setup_lci()
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
+  include(HPX_SetupGasnet)
+  hpx_setup_gasnet()
 endif()
 
 # Setup packages and subprojects

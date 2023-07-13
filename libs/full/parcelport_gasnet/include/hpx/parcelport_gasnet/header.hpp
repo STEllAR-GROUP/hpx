@@ -1,4 +1,4 @@
-//  Copyright (c) 2023      Christopher Taylor 
+//  Copyright (c) 2023      Christopher Taylor
 //  Copyright (c) 2013-2021 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Thomas Heller
 //

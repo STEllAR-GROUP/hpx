@@ -11,8 +11,8 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
-#include <hpx/modules/serialization.hpp>
 #include <hpx/modules/gasnet_base.hpp>
+#include <hpx/modules/serialization.hpp>
 
 #include <cstdint>
 
@@ -43,7 +43,7 @@ namespace hpx::parcelset::policies::gasnet {
 
         explicit constexpr operator bool() const noexcept
         {
-            return rank_ != ((unsigned int)-1);
+            return rank_ != ((unsigned int) -1);
         }
 
         HPX_EXPORT void save(serialization::output_archive& ar) const;

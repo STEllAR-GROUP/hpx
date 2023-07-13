@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 
-#include <hpx/modules/logging.hpp>
 #include <hpx/modules/gasnet_base.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/util.hpp>
 #include <hpx/thread.hpp>
@@ -19,76 +19,77 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <string>
 #include <cstring>
+#include <string>
 
 //
 // AM functions
 //
-typedef enum {
-  SIGNAL = 136,               // ack to a done_t via gasnet_AMReplyShortM()
-  SIGNAL_LONG,                // ack to a done_t via gasnet_AMReplyLongM()
-  DO_REPLY_PUT = 143,         // do a PUT here from another locale
-  DO_COPY_PAYLOAD             // copy AM payload to another address
+typedef enum
+{
+    SIGNAL = 136,          // ack to a done_t via gasnet_AMReplyShortM()
+    SIGNAL_LONG,           // ack to a done_t via gasnet_AMReplyLongM()
+    DO_REPLY_PUT = 143,    // do a PUT here from another locale
+    DO_COPY_PAYLOAD        // copy AM payload to another address
 } AM_handler_function_idx_t;
 
-typedef struct {
-  void* ack; // acknowledgement object
-  void* tgt; // target memory address
-  void* src; // source memory address
-  size_t size; // number of bytes.
+typedef struct
+{
+    void* ack;      // acknowledgement object
+    void* tgt;      // target memory address
+    void* src;      // source memory address
+    size_t size;    // number of bytes.
 } xfer_info_t;
 
 // Gasnet AM handler arguments are only 32 bits, so here we have
 // functions to get the 2 arguments for a 64-bit pointer,
 // and a function to reconstitute the pointer from the 2 arguments.
 //
-static inline
-gasnet_handlerarg_t get_arg_from_ptr0(uintptr_t addr)
+static inline gasnet_handlerarg_t get_arg_from_ptr0(uintptr_t addr)
 {
-  // This one returns the bottom 32 bits.
-  return ((gasnet_handlerarg_t)
-            ((((uint64_t) (addr)) << 32UL) >> 32UL));
+    // This one returns the bottom 32 bits.
+    return ((gasnet_handlerarg_t)((((uint64_t)(addr)) << 32UL) >> 32UL));
 }
-static inline
-gasnet_handlerarg_t get_arg_from_ptr1(uintptr_t addr)
+static inline gasnet_handlerarg_t get_arg_from_ptr1(uintptr_t addr)
 {
-  // this one returns the top 32 bits.
-  return ((gasnet_handlerarg_t)
-            (((uint64_t) (addr)) >> 32UL));
+    // this one returns the top 32 bits.
+    return ((gasnet_handlerarg_t)(((uint64_t)(addr)) >> 32UL));
 }
-static inline
-uintptr_t get_uintptr_from_args(gasnet_handlerarg_t a0, gasnet_handlerarg_t a1 )
+static inline uintptr_t get_uintptr_from_args(
+    gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
-  return (uintptr_t)
-           (((uint64_t) (uint32_t) a0)
-            | (((uint64_t) (uint32_t) a1) << 32UL));
+    return (uintptr_t)(
+        ((uint64_t)(uint32_t) a0) | (((uint64_t)(uint32_t) a1) << 32UL));
 }
-static inline
-void* get_ptr_from_args(gasnet_handlerarg_t a0, gasnet_handlerarg_t a1 )
+static inline void* get_ptr_from_args(
+    gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
-  return (void*) get_uintptr_from_args(a0, a1);
+    return (void*) get_uintptr_from_args(a0, a1);
 }
 
 // Build acknowledgement address arguments for gasnetAMRequest*() calls.
 //
-#define Arg0(addr) get_arg_from_ptr0((uintptr_t)addr)
-#define Arg1(addr) get_arg_from_ptr1((uintptr_t)addr)
+#define Arg0(addr) get_arg_from_ptr0((uintptr_t) addr)
+#define Arg1(addr) get_arg_from_ptr1((uintptr_t) addr)
 
 // The following macro is from the GASNet test.h distribution
 //
-#define GASNET_Safe(fncall) do {                                        \
-    int _retval;                                                        \
-    if ((_retval = fncall) != GASNET_OK) {                              \
-      fprintf(stderr, "ERROR calling: %s\n"                             \
-              " at: %s:%i\n"                                            \
-              " error: %s (%s)\n",                                      \
-              #fncall, __FILE__, __LINE__,                              \
-              gasnet_ErrorName(_retval), gasnet_ErrorDesc(_retval));    \
-      fflush(stderr);                                                   \
-      gasnet_exit(_retval);                                             \
-    }                                                                   \
-  } while(0)
+#define GASNET_Safe(fncall)                                                    \
+    do                                                                         \
+    {                                                                          \
+        int _retval;                                                           \
+        if ((_retval = fncall) != GASNET_OK)                                   \
+        {                                                                      \
+            fprintf(stderr,                                                    \
+                "ERROR calling: %s\n"                                          \
+                " at: %s:%i\n"                                                 \
+                " error: %s (%s)\n",                                           \
+                #fncall, __FILE__, __LINE__, gasnet_ErrorName(_retval),        \
+                gasnet_ErrorDesc(_retval));                                    \
+            fflush(stderr);                                                    \
+            gasnet_exit(_retval);                                              \
+        }                                                                      \
+    } while (0)
 
 // This is the type of object we use to manage GASNet acknowledgements.
 //
@@ -100,101 +101,105 @@ void* get_ptr_from_args(gasnet_handlerarg_t a0, gasnet_handlerarg_t a1 )
 // the condition for a BLOCKUNTIL can only be changed by the execution
 // of an AM handler.)
 //
-typedef struct {
-  std::atomic<std::uint32_t> count;
-  std::uint32_t         target;
-  volatile int          flag;
+typedef struct
+{
+    std::atomic<std::uint32_t> count;
+    std::uint32_t target;
+    volatile int flag;
 } done_t;
 
-static void AM_signal(gasnet_token_t token, gasnet_handlerarg_t a0, gasnet_handlerarg_t a1) {
-  done_t* done = (done_t*) get_ptr_from_args(a0, a1);
-  uint_least32_t prev;
-  prev = done->count.fetch_add(1, std::memory_order_seq_cst);
-  if (prev + 1 == done->target)
-    done->flag = 1;
+static void AM_signal(
+    gasnet_token_t token, gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
+{
+    done_t* done = (done_t*) get_ptr_from_args(a0, a1);
+    uint_least32_t prev;
+    prev = done->count.fetch_add(1, std::memory_order_seq_cst);
+    if (prev + 1 == done->target)
+        done->flag = 1;
 }
 
-static void AM_signal_long(gasnet_token_t token, void *buf, size_t nbytes,
-                           gasnet_handlerarg_t a0, gasnet_handlerarg_t a1) {
-  done_t* done = (done_t*) get_ptr_from_args(a0, a1);
-  uint_least32_t prev;
-  prev = done->count.fetch_add(1, std::memory_order_seq_cst);
-  if (prev + 1 == done->target)
-    done->flag = 1;
+static void AM_signal_long(gasnet_token_t token, void* buf, size_t nbytes,
+    gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
+{
+    done_t* done = (done_t*) get_ptr_from_args(a0, a1);
+    uint_least32_t prev;
+    prev = done->count.fetch_add(1, std::memory_order_seq_cst);
+    if (prev + 1 == done->target)
+        done->flag = 1;
 }
 
 // Put from arg->src (which is local to the AM handler) back to
 // arg->dst (which is local to the caller of this AM).
 // nbytes is < gasnet_AMMaxLongReply here (see chpl_comm_get).
 //
-static void AM_reply_put(gasnet_token_t token, void* buf, size_t nbytes) {
-   xfer_info_t* x = static_cast<xfer_info_t*>(buf);
+static void AM_reply_put(gasnet_token_t token, void* buf, size_t nbytes)
+{
+    xfer_info_t* x = static_cast<xfer_info_t*>(buf);
 
-   assert(nbytes == sizeof(xfer_info_t));
+    assert(nbytes == sizeof(xfer_info_t));
 
-   GASNET_Safe(gasnet_AMReplyLong2(token, SIGNAL_LONG,
-      x->src, x->size, x->tgt,
-      Arg0(x->ack), Arg1(x->ack)));
+    GASNET_Safe(gasnet_AMReplyLong2(token, SIGNAL_LONG, x->src, x->size, x->tgt,
+        Arg0(x->ack), Arg1(x->ack)));
 }
 
 // Copy from the payload in this active message to dst.
 //
-static
-void AM_copy_payload(gasnet_token_t token, void* buf, size_t nbytes,
-   gasnet_handlerarg_t ack0, gasnet_handlerarg_t ack1,
-   gasnet_handlerarg_t dst0, gasnet_handlerarg_t dst1)
+static void AM_copy_payload(gasnet_token_t token, void* buf, size_t nbytes,
+    gasnet_handlerarg_t ack0, gasnet_handlerarg_t ack1,
+    gasnet_handlerarg_t dst0, gasnet_handlerarg_t dst1)
 {
-   void* dst = get_ptr_from_args(dst0, dst1);
-   {
-      // would prefer to protect the memory segments
-      // associated with each node (n-node mutex)
-      // will require future work
-      //
-      std::lock_guard<hpx::mutex> lk(hpx::util::gasnet_environment::dshm_mut);
-      std::memcpy(dst, buf, nbytes);
-   }
+    void* dst = get_ptr_from_args(dst0, dst1);
+    {
+        // would prefer to protect the memory segments
+        // associated with each node (n-node mutex)
+        // will require future work
+        //
+        std::lock_guard<hpx::mutex> lk(hpx::util::gasnet_environment::dshm_mut);
+        std::memcpy(dst, buf, nbytes);
+    }
 
-   GASNET_Safe(gasnet_AMReplyShort2(token, SIGNAL, ack0, ack1));
+    GASNET_Safe(gasnet_AMReplyShort2(token, SIGNAL, ack0, ack1));
 }
 
-static gasnet_handlerentry_t ftable[] = {
-   {SIGNAL,        (void (*)())&AM_signal},
-   {SIGNAL_LONG,   (void (*)())&AM_signal_long},
-   {DO_REPLY_PUT,  (void (*)())&AM_reply_put},
-   {DO_COPY_PAYLOAD, (void (*)())&AM_copy_payload}
-};
+static gasnet_handlerentry_t ftable[] = {{SIGNAL, (void (*)()) & AM_signal},
+    {SIGNAL_LONG, (void (*)()) & AM_signal_long},
+    {DO_REPLY_PUT, (void (*)()) & AM_reply_put},
+    {DO_COPY_PAYLOAD, (void (*)()) & AM_copy_payload}};
 
 //
 // Initialize one of the above.
 //
-static inline
-void init_done_obj(done_t* done, int target) {
-  done->count.store(0, std::memory_order_seq_cst);
-  done->target = target;
-  done->flag = 0;
+static inline void init_done_obj(done_t* done, int target)
+{
+    done->count.store(0, std::memory_order_seq_cst);
+    done->target = target;
+    done->flag = 0;
 }
 
-static inline void am_poll_try() {
-  // Serialize polling for IBV, UCX, Aries, and OFI. Concurrent polling causes
-  // contention in these configurations. For other configurations that are
-  // AM-based (udp/amudp, mpi/ammpi) serializing can hurt performance.
-  //
-#if defined(GASNET_CONDUIT_IBV) || defined(GASNET_CONDUIT_UCX) || defined(GASNET_CONDUIT_ARIES) || defined(GASNET_CONDUIT_OFI)
-    std::lock_guard<hpx::spinlock> lk(hpx::util::gasnet_environment::pollingLock);
+static inline void am_poll_try()
+{
+    // Serialize polling for IBV, UCX, Aries, and OFI. Concurrent polling causes
+    // contention in these configurations. For other configurations that are
+    // AM-based (udp/amudp, mpi/ammpi) serializing can hurt performance.
+    //
+#if defined(GASNET_CONDUIT_IBV) || defined(GASNET_CONDUIT_UCX) ||              \
+    defined(GASNET_CONDUIT_ARIES) || defined(GASNET_CONDUIT_OFI)
+    std::lock_guard<hpx::spinlock> lk(
+        hpx::util::gasnet_environment::pollingLock);
     (void) gasnet_AMPoll();
 #else
     (void) gasnet_AMPoll();
 #endif
 }
 
-static inline
-void wait_done_obj(done_t* done, bool do_yield)
+static inline void wait_done_obj(done_t* done, bool do_yield)
 {
-  while (!done->flag) {
-    am_poll_try();
-    if (do_yield)
-      hpx::this_thread::yield();
-  }
+    while (!done->flag)
+    {
+        am_poll_try();
+        if (do_yield)
+            hpx::this_thread::yield();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -223,8 +228,9 @@ namespace hpx { namespace util {
                 }
             }
 
-            LBT_(info) << "No known GASNET environment variable found, disabling "
-                          "GASNET support\n";
+            LBT_(info)
+                << "No known GASNET environment variable found, disabling "
+                   "GASNET support\n";
             return false;
         }
     }    // namespace detail
@@ -238,7 +244,7 @@ namespace hpx { namespace util {
         // - The parcelport is explicitly disabled
         // - The application is not run in an GASNET environment
         // - The TCP parcelport is enabled and has higher priority
-	//
+        //
         if (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) == 0 ||
             (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
@@ -247,7 +253,8 @@ namespace hpx { namespace util {
                 (get_entry_as(cfg, "hpx.parcel.gasnet.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
         {
-            LBT_(info) << "GASNET support disabled via configuration settings\n";
+            LBT_(info)
+                << "GASNET support disabled via configuration settings\n";
             return false;
         }
 
@@ -272,59 +279,69 @@ namespace hpx { namespace util {
     gasnet_seginfo_t* gasnet_environment::segments = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    int gasnet_environment::init(
-        int* argc, char*** argv, const int minimal, const int required, int& provided)
+    int gasnet_environment::init(int* argc, char*** argv, const int minimal,
+        const int required, int& provided)
     {
-        if(!has_called_init_) {
-           gasnet_environment::init_val_ = gasnet_init(argc, argv);
-           has_called_init_ = true;
+        if (!has_called_init_)
+        {
+            gasnet_environment::init_val_ = gasnet_init(argc, argv);
+            has_called_init_ = true;
         }
 
-        if(gasnet_environment::init_val_ == GASNET_ERR_NOT_INIT) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET initialization error");
+        if (gasnet_environment::init_val_ == GASNET_ERR_NOT_INIT)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init",
+                "GASNET initialization error");
         }
-        else if(gasnet_environment::init_val_ == GASNET_ERR_RESOURCE) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET resource error");
+        else if (gasnet_environment::init_val_ == GASNET_ERR_RESOURCE)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init", "GASNET resource error");
         }
-        else if(gasnet_environment::init_val_ == GASNET_ERR_BAD_ARG) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET bad argument error");
+        else if (gasnet_environment::init_val_ == GASNET_ERR_BAD_ARG)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init",
+                "GASNET bad argument error");
         }
-        else if(gasnet_environment::init_val_ == GASNET_ERR_NOT_READY) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET not ready error");
-        }
-
-        if (provided < minimal) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET doesn't provide minimal requested thread level");
+        else if (gasnet_environment::init_val_ == GASNET_ERR_NOT_READY)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init",
+                "GASNET not ready error");
         }
 
-        if(gasnet_attach(nullptr, 0, gasnet_getMaxLocalSegmentSize(), 0) != GASNET_OK) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::init",
-               "GASNET failed to attach to memory");
+        if (provided < minimal)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init",
+                "GASNET doesn't provide minimal requested thread level");
+        }
+
+        if (gasnet_attach(nullptr, 0, gasnet_getMaxLocalSegmentSize(), 0) !=
+            GASNET_OK)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::init",
+                "GASNET failed to attach to memory");
         }
 
         // create a number of segments equal to the number of hardware
         // threads per machine (locality)
         //
         gasnet_environment::segments = new gasnet_seginfo_t[size()];
-        gasnet_environment::segment_mutex = new hpx::mutex[size()]; 
+        gasnet_environment::segment_mutex = new hpx::mutex[size()];
 
         GASNET_Safe(gasnet_getSegmentInfo(segments, size()));
 
         int retval;
 
         gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
-        while ((retval = gasnet_barrier_try(0, GASNET_BARRIERFLAG_ANONYMOUS)) == GASNET_ERR_NOT_READY) {}
+        while ((retval = gasnet_barrier_try(0, GASNET_BARRIERFLAG_ANONYMOUS)) ==
+            GASNET_ERR_NOT_READY)
+        {
+        }
         gasnet_barrier_try(0, GASNET_BARRIERFLAG_ANONYMOUS);
 
         gasnet_set_waitmode(GASNET_WAIT_BLOCK);
@@ -364,8 +381,8 @@ namespace hpx { namespace util {
 
             int msglen = 0;
             char message[1024 + 1];
-            std::snprintf(message, 1024+1, "%s\n", gasnet_ErrorDesc(retval));
-            msglen = strnlen(message, 1025+1);
+            std::snprintf(message, 1024 + 1, "%s\n", gasnet_ErrorDesc(retval));
+            msglen = strnlen(message, 1025 + 1);
 
             std::string msg("gasnet_environment::init: gasnet_init failed: ");
             msg = msg + message + ".";
@@ -389,10 +406,12 @@ namespace hpx { namespace util {
         gasnet_environment::segment_mutex = new hpx::mutex[size()];
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (this_rank == 0) {
+        if (this_rank == 0)
+        {
             rtcfg.mode_ = hpx::runtime_mode::console;
         }
-        else {
+        else
+        {
             rtcfg.mode_ = hpx::runtime_mode::worker;
         }
 #elif defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
@@ -402,7 +421,8 @@ namespace hpx { namespace util {
 #endif
 
         rtcfg.add_entry("hpx.parcel.gasnet.rank", std::to_string(this_rank));
-        rtcfg.add_entry("hpx.parcel.gasnet.processorname", get_processor_name());
+        rtcfg.add_entry(
+            "hpx.parcel.gasnet.processorname", get_processor_name());
     }
 
     std::string gasnet_environment::get_processor_name()
@@ -410,51 +430,60 @@ namespace hpx { namespace util {
         char name[1024 + 1] = {'\0'};
         const std::string rnkstr = std::to_string(rank());
         const int len = rnkstr.size();
-        if(1025 < len) {
-           HPX_THROW_EXCEPTION(invalid_status,
-               "hpx::util::gasnet_environment::get_processor_name",
-               "GASNET processor name is larger than 1025");
+        if (1025 < len)
+        {
+            HPX_THROW_EXCEPTION(invalid_status,
+                "hpx::util::gasnet_environment::get_processor_name",
+                "GASNET processor name is larger than 1025");
         }
         std::copy(std::begin(rnkstr), std::end(rnkstr), name);
         return name;
     }
 
-    bool gasnet_environment::gettable(const int node, void* start, const size_t len)
+    bool gasnet_environment::gettable(
+        const int node, void* start, const size_t len)
     {
-        const uintptr_t segstart = (uintptr_t) gasnet_environment::segments[node].addr;
-        const uintptr_t segend = segstart + gasnet_environment::segments[node].size;
+        const uintptr_t segstart =
+            (uintptr_t) gasnet_environment::segments[node].addr;
+        const uintptr_t segend =
+            segstart + gasnet_environment::segments[node].size;
         const uintptr_t reqstart = (uintptr_t) start;
         const uintptr_t reqend = reqstart + len;
 
-        return ( segstart <= reqstart &&
-            reqstart <= segend &&
-            segstart <= reqend &&
-            reqend <= segend);
+        return (segstart <= reqstart && reqstart <= segend &&
+            segstart <= reqend && reqend <= segend);
     }
 
-    void gasnet_environment::put(std::uint8_t * addr, const int node, std::uint8_t * raddr, const std::size_t size) {
+    void gasnet_environment::put(std::uint8_t* addr, const int node,
+        std::uint8_t* raddr, const std::size_t size)
+    {
         const bool in_remote_seg = gettable(node, raddr, size);
-        if(in_remote_seg) {
+        if (in_remote_seg)
+        {
             const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
-            gasnet_put(node, static_cast<void*>(raddr), static_cast<void*>(addr), size); 
+            gasnet_put(node, static_cast<void*>(raddr),
+                static_cast<void*>(addr), size);
         }
-        else {
+        else
+        {
             // tell the remote node to copy the data being sent
             //
             size_t max_chunk = gasnet_AMMaxMedium();
             size_t start = 0;
 
             // AMRequestMedium will send put; the active message handler
-            // will memcpy on the remote host 
+            // will memcpy on the remote host
             //
-            for(start = 0; start < size; start += max_chunk) {
+            for (start = 0; start < size; start += max_chunk)
+            {
                 size_t this_size;
                 void* addr_chunk;
                 void* raddr_chunk;
                 done_t done;
 
                 this_size = size - start;
-                if( this_size > max_chunk ) {
+                if (this_size > max_chunk)
+                {
                     this_size = max_chunk;
                 }
 
@@ -466,10 +495,8 @@ namespace hpx { namespace util {
                 // Send an AM over to ask for a them to copy the data
                 // passed in the active message (addr_chunk) to raddr_chunk.
                 GASNET_Safe(gasnet_AMRequestMedium4(node, DO_COPY_PAYLOAD,
-                                                addr_chunk, this_size,
-                                                Arg0(&done), Arg1(&done),
-                                                Arg0(raddr_chunk),
-                                                Arg1(raddr_chunk)));
+                    addr_chunk, this_size, Arg0(&done), Arg1(&done),
+                    Arg0(raddr_chunk), Arg1(raddr_chunk)));
 
                 // Wait for the PUT to complete.
                 wait_done_obj(&done, false);
@@ -477,13 +504,17 @@ namespace hpx { namespace util {
         }
     }
 
-    void gasnet_environment::get(std::uint8_t * addr, const int node, std::uint8_t * raddr, const std::size_t size) {
+    void gasnet_environment::get(std::uint8_t* addr, const int node,
+        std::uint8_t* raddr, const std::size_t size)
+    {
         bool remote_in_segment = false;
 
-        if (rank() == node) {
+        if (rank() == node)
+        {
             std::memmove(addr, raddr, size);
         }
-        else {
+        else
+        {
             // Handle remote address not in remote segment.
             // The GASNet Spec says:
             //   The source memory address for all gets and the target memory address
@@ -496,13 +527,15 @@ namespace hpx { namespace util {
             //
             remote_in_segment = gettable(node, raddr, size);
 
-            if( remote_in_segment ) {
+            if (remote_in_segment)
+            {
                 // If raddr is in the remote segment, do a normal gasnet_get.
                 // GASNet will handle the local portion not being in the segment.
                 //
-                gasnet_get(addr, node, raddr, size); // dest, node, src, size
+                gasnet_get(addr, node, raddr, size);    // dest, node, src, size
             }
-            else {
+            else
+            {
                 // If raddr is not in the remote segment, we need to send an
                 // active message; the other node will PUT back to us.
                 // The local side has to be in the registered memory segment.
@@ -518,9 +551,11 @@ namespace hpx { namespace util {
                 // do the GET into a temporary buffer instead, and then
                 // copy the result back.
                 //
-                if( ! local_in_segment ) {
+                if (!local_in_segment)
+                {
                     size_t buf_sz = size;
-                    if( buf_sz > max_chunk ) {
+                    if (buf_sz > max_chunk)
+                    {
                         buf_sz = max_chunk;
                     }
 
@@ -531,14 +566,16 @@ namespace hpx { namespace util {
                 // do a PUT on the remote locale back to here.
                 // But do it in chunks of size gasnet_AMMaxLongReply()
                 // since we use gasnet_AMReplyLong to do the PUT.
-                for(start = 0; start < size; start += max_chunk) {
+                for (start = 0; start < size; start += max_chunk)
+                {
                     size_t this_size;
                     void* addr_chunk;
                     xfer_info_t info;
                     done_t done;
 
                     this_size = size - start;
-                    if( this_size > max_chunk ) {
+                    if (this_size > max_chunk)
+                    {
                         this_size = max_chunk;
                     }
 
@@ -547,25 +584,27 @@ namespace hpx { namespace util {
                     init_done_obj(&done, 1);
 
                     info.ack = &done;
-                    info.tgt = local_buf?local_buf:addr_chunk;
+                    info.tgt = local_buf ? local_buf : addr_chunk;
                     info.src = ((char*) raddr) + start;
                     info.size = this_size;
 
                     // Send an AM over to ask for a PUT back to us
-                    GASNET_Safe(gasnet_AMRequestMedium0(node, DO_REPLY_PUT,
-                                                        &info, sizeof(info)));
+                    GASNET_Safe(gasnet_AMRequestMedium0(
+                        node, DO_REPLY_PUT, &info, sizeof(info)));
 
                     // Wait for the PUT to complete.
                     wait_done_obj(&done, false);
 
                     // Now copy from local_buf back to addr if necessary.
-                    if( local_buf ) {
+                    if (local_buf)
+                    {
                         std::memcpy(addr_chunk, local_buf, this_size);
                     }
                 }
 
                 // If we were using a temporary local buffer free it
-                if( local_buf ) {
+                if (local_buf)
+                {
                     free(local_buf);
                 }
             }
@@ -574,7 +613,8 @@ namespace hpx { namespace util {
 
     void gasnet_environment::finalize()
     {
-        if (enabled() && has_called_init()) {
+        if (enabled() && has_called_init())
+        {
             gasnet_exit(1);
         }
     }
