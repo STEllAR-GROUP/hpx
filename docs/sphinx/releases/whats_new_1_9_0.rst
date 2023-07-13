@@ -169,7 +169,7 @@ Closed pull requests
 * :hpx-pr:`6117` - Initialize buffer_allocate_time_ to 0
 * :hpx-pr:`6116` - Add new command line argument --hpx:loopback_network
 * :hpx-pr:`6115` - Modernize modules of levels 14, 15, and 16
-* :hpx-pr:`6114` - Enhance the formatting of the documentation
+* :hpx-pr:`6114` - Enhance the formatting of the documentation 
 * :hpx-pr:`6113` - Modernize modules in module level 11, 12, and 13
 * :hpx-pr:`6112` - Modernize modules from levels 9 and 10
 * :hpx-pr:`6111` - Modernize all modules from module level 8
@@ -247,7 +247,7 @@ Closed pull requests
 * :hpx-pr:`6030` - Adding parcelport initialization hook for resource partitioner operation
 * :hpx-pr:`6029` - Simplify startup code
 * :hpx-pr:`6027` - Add/Fix documentation in Public API page
-* :hpx-pr:`6026` - add option hpx:force_ipv4 to force resolving hostnames to ipv4 addresses
+* :hpx-pr:`6026` - add option hpx:force_ipv4 to force resolving hostnames to ipv4 adresses
 * :hpx-pr:`6025` - build(docs): remove leftover sections
 * :hpx-pr:`6023` - Minor fixes on "How to build on Windows"
 * :hpx-pr:`6022` - build(doxy): don't extract private members
@@ -273,11 +273,11 @@ Closed pull requests
 * :hpx-pr:`5990` - P2300 enhancements
 * :hpx-pr:`5989` - Fix missing documentation in Public API page
 * :hpx-pr:`5987` - Attempting to fix timed executor API
-* :hpx-pr:`5986` - Fix warnings when building docs
+* :hpx-pr:`5986` - Fix warnings when building docs 
 * :hpx-pr:`5985` - Re-add deprecated tag_policy_tag et.al. types that were removed in V1.8.1
 * :hpx-pr:`5981` - docs: add docs for condition_variable.hpp
 * :hpx-pr:`5980` - More work on execution::read
-* :hpx-pr:`5979` - Unsupported clang-v8 and clang-v9, switch LSU clang-v13 to C++17
+* :hpx-pr:`5979` - Unsupport clang-v8 and clang-v9, switch LSU clang-v13 to C++17
 * :hpx-pr:`5977` - fix: Compilation errors for -std=c++17 builders
 * :hpx-pr:`5975` - docs: fix & improve parallel algorithms documentation 5
 * :hpx-pr:`5974` - [P2300] Adapt get completion signatures for awaitable senders

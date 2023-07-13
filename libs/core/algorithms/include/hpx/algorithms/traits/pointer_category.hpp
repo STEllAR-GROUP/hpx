@@ -106,9 +106,6 @@ namespace hpx::traits {
 
         template <typename Source, typename Dest,
             bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
-        // Why do we need to check if the iterators are contiguous in the trivially
-        // copyable case? Is this category refering to buffers of 
-        // the underlying types or the individual objects?
         struct pointer_move_category
         {
             using type = std::conditional_t<
