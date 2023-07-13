@@ -151,7 +151,6 @@ namespace hpx::parcelset {
             // Stop the handling of connections.
             void do_stop()
             {
-                int retval;
                 while (do_background_work(0, parcelport_background_mode_all))
                 {
                     if (threads::get_self_ptr())
@@ -164,6 +163,8 @@ namespace hpx::parcelset {
                 if (stopped_.compare_exchange_strong(expected, true))
                 {
                     stopped_ = true;
+
+                    int retval;
                     gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
                     if ((retval = gasnet_barrier_wait(
                              0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK)
@@ -174,7 +175,6 @@ namespace hpx::parcelset {
                             "GASNET failed ",
                             std::string{gasnet_ErrorName(retval)}, " ",
                             std::string{gasnet_ErrorDesc(retval)});
-                        gasnet_exit(retval);
                     }
                 }
             }

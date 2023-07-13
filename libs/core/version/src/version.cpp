@@ -131,7 +131,7 @@ namespace hpx {
     }
 #endif
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
     std::string gasnet_version()
     {
@@ -304,7 +304,7 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
                                                 "  LCI: {}\n"
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
                                                 "  GASNET: {}\n"
 #endif
@@ -324,7 +324,7 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
             lci_version(),
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
             gasnet_version(),
 #endif

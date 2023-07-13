@@ -13,7 +13,6 @@ macro(hpx_setup_gasnet)
     find_package(PkgConfig REQUIRED QUIET COMPONENTS)
 
     hpx_info(
-      STATUS
       "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`"
     )
     pkg_search_module(
@@ -26,8 +25,6 @@ macro(hpx_setup_gasnet)
       include(HPX_SetupMPI)
       hpx_setup_mpi()
     endif()
-
-    target_link_directories(hpx_core PUBLIC ${GASNET_LIBRARY_DIRS})
 
     if(GASNET_CFLAGS)
       set(IS_PARAM "0")
@@ -542,7 +539,8 @@ macro(hpx_setup_gasnet)
       PkgConfig::GASNET PROPERTIES INTERFACE_LINK_OPTIONS "${GASNET_LDFLAGS}"
     )
     set_target_properties(
-      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES "${GASNET_LIBRARY_DIRS}"
+      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                   "${GASNET_LIBRARY_DIRS}"
     )
 
   endif()

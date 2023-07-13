@@ -11,6 +11,7 @@ module load boost/1.80.0-${build_type,,}
 module load hwloc
 module load openmpi
 module load pwrapi/1.1.1
+module load gasnet/2023.3.0
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
@@ -23,6 +24,7 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"

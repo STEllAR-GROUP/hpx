@@ -17,6 +17,8 @@
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 

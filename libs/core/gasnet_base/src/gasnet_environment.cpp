@@ -8,16 +8,17 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-
+#include <hpx/assert.hpp>
 #include <hpx/modules/gasnet_base.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/modules/string_util.hpp>
+#include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/util.hpp>
-#include <hpx/thread.hpp>
 
-#include <boost/tokenizer.hpp>
-
+#include <atomic>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -48,18 +49,24 @@ typedef struct
 static inline gasnet_handlerarg_t get_arg_from_ptr0(uintptr_t addr)
 {
     // This one returns the bottom 32 bits.
-    return ((gasnet_handlerarg_t)((((uint64_t)(addr)) << 32UL) >> 32UL));
+    // clang-format off
+    return ((gasnet_handlerarg_t) ((((uint64_t) (addr)) << 32UL) >> 32UL));
+    // clang-format on
 }
 static inline gasnet_handlerarg_t get_arg_from_ptr1(uintptr_t addr)
 {
     // this one returns the top 32 bits.
-    return ((gasnet_handlerarg_t)(((uint64_t)(addr)) >> 32UL));
+    // clang-format off
+    return ((gasnet_handlerarg_t) (((uint64_t) (addr)) >> 32UL));
+    // clang-format on
 }
 static inline uintptr_t get_uintptr_from_args(
     gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
-    return (uintptr_t)(
-        ((uint64_t)(uint32_t) a0) | (((uint64_t)(uint32_t) a1) << 32UL));
+    // clang-format off
+    return (uintptr_t) (((uint64_t) (uint32_t) a0) |
+        (((uint64_t) (uint32_t) a1) << 32UL));
+    // clang-format on
 }
 static inline void* get_ptr_from_args(
     gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
@@ -111,7 +118,7 @@ typedef struct
 static void AM_signal(
     gasnet_token_t token, gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
-    done_t* done = (done_t*) get_ptr_from_args(a0, a1);
+    done_t* done = reinterpret_cast<done_t*>(get_ptr_from_args(a0, a1));
     uint_least32_t prev;
     prev = done->count.fetch_add(1, std::memory_order_seq_cst);
     if (prev + 1 == done->target)
@@ -121,7 +128,7 @@ static void AM_signal(
 static void AM_signal_long(gasnet_token_t token, void* buf, size_t nbytes,
     gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
-    done_t* done = (done_t*) get_ptr_from_args(a0, a1);
+    done_t* done = reinterpret_cast<done_t*>(get_ptr_from_args(a0, a1));
     uint_least32_t prev;
     prev = done->count.fetch_add(1, std::memory_order_seq_cst);
     if (prev + 1 == done->target)
@@ -136,7 +143,7 @@ static void AM_reply_put(gasnet_token_t token, void* buf, size_t nbytes)
 {
     xfer_info_t* x = static_cast<xfer_info_t*>(buf);
 
-    assert(nbytes == sizeof(xfer_info_t));
+    HPX_ASSERT(nbytes == sizeof(xfer_info_t));
 
     GASNET_Safe(gasnet_AMReplyLong2(token, SIGNAL_LONG, x->src, x->size, x->tgt,
         Arg0(x->ack), Arg1(x->ack)));
@@ -198,12 +205,15 @@ static inline void wait_done_obj(done_t* done, bool do_yield)
     {
         am_poll_try();
         if (do_yield)
-            hpx::this_thread::yield();
+        {
+            this_thread::suspend(threads::thread_schedule_state::pending,
+                "gasnet::wait_done_obj");
+        }
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -213,9 +223,8 @@ namespace hpx { namespace util {
             std::string gasnet_environment_strings =
                 cfg.get_entry("hpx.parcel.gasnet.env", default_env);
 
-            boost::char_separator<char> sep(";,: ");
-            boost::tokenizer<boost::char_separator<char>> tokens(
-                gasnet_environment_strings, sep);
+            hpx::string_util::char_separator<char> sep(";,: ");
+            hpx::string_util::tokenizer tokens(gasnet_environment_strings, sep);
             for (auto const& tok : tokens)
             {
                 char* env = std::getenv(tok.c_str());
@@ -238,7 +247,7 @@ namespace hpx { namespace util {
     bool gasnet_environment::check_gasnet_environment(
         util::runtime_configuration const& cfg)
     {
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE))
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE)
         // We disable the GASNET parcelport if any of these hold:
         //
         // - The parcelport is explicitly disabled
@@ -259,13 +268,15 @@ namespace hpx { namespace util {
         }
 
         return true;
+#else
+        return false;
 #endif
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE))
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     hpx::spinlock gasnet_environment::pollingLock{};
     hpx::mutex gasnet_environment::dshm_mut{};
@@ -379,10 +390,8 @@ namespace hpx { namespace util {
 
             enabled_ = false;
 
-            int msglen = 0;
             char message[1024 + 1];
             std::snprintf(message, 1024 + 1, "%s\n", gasnet_ErrorDesc(retval));
-            msglen = strnlen(message, 1025 + 1);
 
             std::string msg("gasnet_environment::init: gasnet_init failed: ");
             msg = msg + message + ".";
@@ -477,8 +486,6 @@ namespace hpx { namespace util {
             for (start = 0; start < size; start += max_chunk)
             {
                 size_t this_size;
-                void* addr_chunk;
-                void* raddr_chunk;
                 done_t done;
 
                 this_size = size - start;
@@ -487,8 +494,8 @@ namespace hpx { namespace util {
                     this_size = max_chunk;
                 }
 
-                addr_chunk = ((char*) addr) + start;
-                raddr_chunk = ((char*) raddr) + start;
+                void* addr_chunk = addr + start;
+                void* raddr_chunk = raddr + start;
 
                 init_done_obj(&done, 1);
 
@@ -507,8 +514,6 @@ namespace hpx { namespace util {
     void gasnet_environment::get(std::uint8_t* addr, const int node,
         std::uint8_t* raddr, const std::size_t size)
     {
-        bool remote_in_segment = false;
-
         if (rank() == node)
         {
             std::memmove(addr, raddr, size);
@@ -525,7 +530,7 @@ namespace hpx { namespace util {
             // In other words, it is OK if the local side of a GET or PUT
             // is not in the registered memory region.
             //
-            remote_in_segment = gettable(node, raddr, size);
+            bool remote_in_segment = gettable(node, raddr, size);
 
             if (remote_in_segment)
             {
@@ -560,7 +565,7 @@ namespace hpx { namespace util {
                     }
 
                     local_buf = calloc(1, buf_sz);
-                    assert(gettable(node, local_buf, buf_sz));
+                    HPX_ASSERT(gettable(node, local_buf, buf_sz));
                 }
 
                 // do a PUT on the remote locale back to here.
@@ -579,13 +584,13 @@ namespace hpx { namespace util {
                         this_size = max_chunk;
                     }
 
-                    addr_chunk = ((char*) addr) + start;
+                    addr_chunk = addr + start;
 
                     init_done_obj(&done, 1);
 
                     info.ack = &done;
                     info.tgt = local_buf ? local_buf : addr_chunk;
-                    info.src = ((char*) raddr) + start;
+                    info.src = raddr + start;
                     info.size = this_size;
 
                     // Send an AM over to ask for a PUT back to us
@@ -691,6 +696,6 @@ namespace hpx { namespace util {
             mtx_.unlock();
         }
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #endif

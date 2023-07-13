@@ -19,6 +19,7 @@
 #include <hpx/parcelport_gasnet/tag_provider.hpp>
 
 #include <algorithm>
+#include <cstring>
 #include <iterator>
 #include <list>
 #include <memory>

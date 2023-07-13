@@ -25,6 +25,8 @@
 #include <hpx/parcelset_base/parcelport.hpp>
 
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <memory>
 #include <system_error>
 #include <utility>
@@ -150,7 +152,8 @@ namespace hpx::parcelset::policies::gasnet {
                 hpx::util::gasnet_environment::scoped_lock l;
                 HPX_ASSERT(state_ == initialized);
 
-                // compute + send the number of GASNET_PAGEs to send and the remainder number of bytes to a GASNET_PAGE
+                // compute + send the number of GASNET_PAGEs to send and the
+                // remainder number of bytes to a GASNET_PAGE
                 //
                 const std::size_t chunks[] = {
                     static_cast<size_t>(header_.data_size_ / GASNET_PAGESIZE),
