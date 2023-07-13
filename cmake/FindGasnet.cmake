@@ -7,50 +7,16 @@
 #
 macro(find_gasnet)
 
-set(GASNET_MPI_FOUND FALSE)
-set(GASNET_UDP_FOUND FALSE)
-set(GASNET_SMP_FOUND FALSE)
-set(GASNET_OFI_FOUND FALSE)
-set(GASNET_UCX_FOUND FALSE)
-set(GASNET_IBV_FOUND FALSE)
-
 find_package(PkgConfig REQUIRED QUIET COMPONENTS)
 
-if(HPX_WITH_PARCELPORT_GASNET_MPI)
+if(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "mpi")
    message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
    pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-mpi-par)
    set(GASNET_MPI_FOUND TRUE)
    hpx_setup_mpi()
-endif()
-
-if(HPX_WITH_PARCELPORT_GASNET_UDP)
+else()
    message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
-   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-udp-par)
-   set(GASNET_UDP_FOUND TRUE)
-endif()
-
-if(HPX_WITH_PARCELPORT_GASNET_SMP)
-   message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
-   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-smp-par)
-   set(GASNET_SMP_FOUND TRUE)
-endif()
-
-if(HPX_WITH_PARCELPORT_GASNET_OFI)
-   message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
-   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-ofi-par)
-   set(GASNET_OFI_FOUND TRUE)
-endif()
-
-if(HPX_WITH_PARCELPORT_GASNET_UCX)
-   message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
-   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-ucx-par)
-   set(GASNET_UCX_FOUND TRUE)
-endif()
-
-if(HPX_WITH_PARCELPORT_GASNET_IBV)
-   message(STATUS "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`")
-   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-ibv-par)
-   set(GASNET_IBV_FOUND TRUE)
+   pkg_search_module(GASNET REQUIRED IMPORTED_TARGET GLOBAL gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par)
 endif()
 
 target_link_directories(hpx_core PUBLIC ${GASNET_LIBRARY_DIRS})
