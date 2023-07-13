@@ -63,6 +63,11 @@ namespace hpx {
     {
     };
 
+    template <typename T, int size>
+    struct is_trivially_relocatable<T[size]> : is_trivially_relocatable<T>
+    {
+    };
+
     template <typename T>
     inline constexpr bool is_trivially_relocatable_v =
         is_trivially_relocatable<T>::value;
