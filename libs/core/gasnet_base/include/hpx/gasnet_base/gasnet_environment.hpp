@@ -9,13 +9,13 @@
 
 #include <hpx/config.hpp>
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||      \
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
 
 #include <hpx/gasnet_base/gasnet.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/mutex.hpp>
+#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstdlib>
 #include <string>
@@ -44,9 +44,11 @@ namespace hpx { namespace util {
 
         static bool gettable(const int node, void* start, const size_t len);
 
-        static void put(std::uint8_t * addr, const int rank, std::uint8_t * raddr, const std::size_t size);
+        static void put(std::uint8_t* addr, const int rank, std::uint8_t* raddr,
+            const std::size_t size);
 
-        static void get(std::uint8_t * addr, const int rank, std::uint8_t * raddr, const std::size_t size);
+        static void get(std::uint8_t* addr, const int rank, std::uint8_t* raddr,
+            const std::size_t size);
 
         struct HPX_CORE_EXPORT scoped_lock
         {

@@ -196,17 +196,9 @@ def run_mpi(cmd, localities, verbose):
     subproc(exec_cmd)
 
 # Run with amudprun
-# This is executing mpiexec with the "-np" option set to the number of localities
+# This is executing amudprun with the "-np" option set to the number of localities
 def run_gasnet(cmd, localities, verbose):
-    mpiexec = 'amudprun'
-    if mpiexec == '':
-        mpiexec = 'amudprun'
-    if mpiexec == '':
-        msg = 'amudprun not available on this platform. '
-        msg += 'Please rerun CMake with HPX_PARCELPORT_GASNET=True.'
-        print(msg, sys.stderr)
-        sys.exit(1)
-    exec_cmd = [mpiexec, '-np', str(localities)] + cmd
+    exec_cmd = ['amudprun', '-np', str(localities)] + cmd
     if verbose:
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
@@ -381,13 +373,13 @@ Used by the tcp parcelport only.
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-      , help='Which parcelport to use (Options are: mpi, lci, gaset, tcp) '
+      , help='Which parcelport to use (Options are: mpi, lci, gasnet, tcp) '
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
-      , help='Which runwrapper to use (Options are: none, mpi, srun, jsrun) '
+      , help='Which runwrapper to use (Options are: none, mpi, gasnet, srun, jsrun) '
              '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'

@@ -6,7 +6,9 @@
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples.modules.parcelport_gasnet)
-  add_hpx_pseudo_dependencies(examples.modules examples.modules.parcelport_gasnet)
+  add_hpx_pseudo_dependencies(
+    examples.modules examples.modules.parcelport_gasnet
+  )
   if(HPX_WITH_TESTS AND HPX_WITH_TESTS_EXAMPLES)
     add_hpx_pseudo_target(tests.examples.modules.parcelport_gasnet)
     add_hpx_pseudo_dependencies(

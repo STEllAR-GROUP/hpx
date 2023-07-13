@@ -588,7 +588,6 @@ if(APPLE
    OR HPX_WITH_CUDA
    OR HPX_WITH_HIP
    OR HPX_WITH_PARCELPORT_LCI
-   OR HPX_WITH_PARCELPORT_GASNET
 )
   set(HPX_WITH_PKGCONFIG_DEFAULT OFF)
 endif()
@@ -1150,37 +1149,11 @@ if(HPX_WITH_NETWORKING)
   )
   if(HPX_WITH_PARCELPORT_GASNET)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_CONDUIT
-    STRING
-    "Define which conduit to use for the gasnet parcelport"
-    "udp"
-    STRINGS "smp;udp;mpi;ofi;ucx;ibv"
-  )
-
-  if(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "mpi")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_MPI)
-    set(HPX_WITH_PARCELPORT_GASNET_MPI ON)
-  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "smp")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_SMP)
-    set(HPX_WITH_PARCELPORT_GASNET_SMP ON)
-  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ibv")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_IBV)
-    set(HPX_WITH_PARCELPORT_GASNET_IBV ON)
-  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ofi")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_OFI)
-    set(HPX_WITH_PARCELPORT_GASNET_OFI ON)
-  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ucx")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_UCX)
-    set(HPX_WITH_PARCELPORT_GASNET_UCX ON)
-  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "udp")
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_UDP)
-    set(HPX_WITH_PARCELPORT_GASNET_UDP ON)
-  else()
-    hpx_add_config_define(HPX_WITH_PARCELPORT_GASNET_UDP)
-    set(HPX_WITH_PARCELPORT_GASNET_UDP ON)
+    hpx_option(
+      HPX_WITH_PARCELPORT_GASNET_CONDUIT STRING
+      "Define which conduit to use for the gasnet parcelport" "udp"
+      STRINGS "smp;udp;mpi;ofi;ucx;ibv"
+    )
   endif()
 
   hpx_option(
@@ -1220,7 +1193,10 @@ else(HPX_WITH_NETWORKING)
   )
 endif(HPX_WITH_NETWORKING)
 
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+   OR HPX_WITH_ASYNC_MPI
+   OR ("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+)
   # mpi parcelport settings
   hpx_option(
     HPX_WITH_PARCELPORT_MPI_ENV
@@ -2165,12 +2141,19 @@ add_hpx_library_headers_noglob(hpx_external)
 # Setup plugins (set here cause if we include it inside plugins, it will not be
 # defined in src/CMakeLists.txt where we call add_static_parcelports)
 include(HPX_SetupMPI) # must come before APEX
-if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI) OR HPX_WITH_ASYNC_MPI OR HPX_WITH_PARCELPORT_GASNET_MPI)
+if((HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_MPI)
+   OR HPX_WITH_ASYNC_MPI
+   OR ("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+)
   hpx_setup_mpi()
 endif()
-include(HPX_SetupLCI)
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
+  include(HPX_SetupLCI)
   hpx_setup_lci()
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
+  include(HPX_SetupGasnet)
+  hpx_setup_gasnet()
 endif()
 
 # Setup packages and subprojects

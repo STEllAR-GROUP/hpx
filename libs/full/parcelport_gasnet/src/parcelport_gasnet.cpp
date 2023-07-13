@@ -106,7 +106,7 @@ namespace hpx::parcelset {
             static std::size_t background_threads(
                 util::runtime_configuration const& ini)
             {
-/*
+                /*
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.gasnet.background_threads",
                     HPX_HAVE_PARCELPORT_GASNET_BACKGROUND_THREADS);
@@ -160,18 +160,20 @@ namespace hpx::parcelset {
                             "gasnet::parcelport::do_stop");
                 }
 
-
                 bool expected = false;
                 if (stopped_.compare_exchange_strong(expected, true))
                 {
                     stopped_ = true;
                     gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
-                    if((retval = gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK) {
+                    if ((retval = gasnet_barrier_wait(
+                             0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK)
+                    {
                         // throw exception
                         HPX_THROW_EXCEPTION(invalid_status,
-                           "hpx::util::gasnet_environment::init",
-                           "GASNET failed ", std::string{gasnet_ErrorName(retval)}, " ",
-                           std::string{gasnet_ErrorDesc(retval)});
+                            "hpx::util::gasnet_environment::init",
+                            "GASNET failed ",
+                            std::string{gasnet_ErrorName(retval)}, " ",
+                            std::string{gasnet_ErrorDesc(retval)});
                         gasnet_exit(retval);
                     }
                 }
@@ -291,12 +293,14 @@ namespace hpx::traits {
             return "1";
         }
 
-        static void init(int* argc, char*** argv, util::command_line_handling& cfg)
+        static void init(
+            int* argc, char*** argv, util::command_line_handling& cfg)
         {
             util::gasnet_environment::init(argc, argv, cfg.rtcfg_);
             cfg.num_localities_ =
                 static_cast<std::size_t>(util::gasnet_environment::size());
-            cfg.node_ = static_cast<std::size_t>(util::gasnet_environment::rank());
+            cfg.node_ =
+                static_cast<std::size_t>(util::gasnet_environment::rank());
         }
 
         // by default no additional initialization using the resource

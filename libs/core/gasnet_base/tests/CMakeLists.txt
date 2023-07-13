@@ -10,7 +10,9 @@ include(HPX_Option)
 if(HPX_WITH_TESTS)
   if(HPX_WITH_TESTS_UNIT)
     add_hpx_pseudo_target(tests.unit.modules.gasnet_base)
-    add_hpx_pseudo_dependencies(tests.unit.modules tests.unit.modules.gasnet_base)
+    add_hpx_pseudo_dependencies(
+      tests.unit.modules tests.unit.modules.gasnet_base
+    )
     add_subdirectory(unit)
   endif()
 
