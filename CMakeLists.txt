@@ -1153,51 +1153,27 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_MPI BOOL "Enable the GASNET-MPI based parcelport." OFF
-    CATEGORY "Parcelport"
+    HPX_WITH_PARCELPORT_GASNET_CONDUIT
+    STRING
+    "Define which conduit to use for the gasnet parcelport"
+    "udp"
+    STRINGS "smp;udp;mpi;ofi;ucx;ibv"
   )
-  if(HPX_WITH_PARCELPORT_GASNET_MPI)
+
+  if(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "mpi")
     hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_MPI)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_SMP BOOL "Enable the GASNET-SMP based parcelport." OFF
-    CATEGORY "Parcelport"
-  )
-  if(HPX_WITH_PARCELPORT_GASNET_SMP)
+  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "smp")
     hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_SMP)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_UDP BOOL "Enable the GASNET-UDP based parcelport." OFF
-    CATEGORY "Parcelport"
-  )
-  if(HPX_WITH_PARCELPORT_GASNET_UDP)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UDP)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_OFI BOOL "Enable the GASNET-OFI based parcelport." OFF
-    CATEGORY "Parcelport"
-  )
-  if(HPX_WITH_PARCELPORT_GASNET_OFI)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_OFI)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_UCX BOOL "Enable the GASNET-UCX based parcelport." OFF
-    CATEGORY "Parcelport"
-  )
-  if(HPX_WITH_PARCELPORT_GASNET_UCX)
-    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UCX)
-  endif()
-
-  hpx_option(
-    HPX_WITH_PARCELPORT_GASNET_IBV BOOL "Enable the GASNET-IBV based parcelport." OFF
-    CATEGORY "Parcelport"
-  )
-  if(HPX_WITH_PARCELPORT_GASNET_IBV)
+  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ibv")
     hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_IBV)
+  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ofi")
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_OFI)
+  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "ucx")
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UCX)
+  elseif(HPX_WITH_PARCELPORT_GASNET_CONDUIT AND ${HPX_WITH_PARCELPORT_GASNET_CONDUIT} STREQUAL "udp")
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UDP)
+  else()
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET_UDP)
   endif()
 
   hpx_option(
