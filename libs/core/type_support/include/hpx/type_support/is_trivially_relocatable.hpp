@@ -42,9 +42,24 @@ namespace hpx {
     {
     };
 
+    // Constness, Volatility, References, Arrays are ignored
     template <typename T>
-    // Arrays of trivially copyable types are trivially relocatable
-    struct is_trivially_relocatable<T[]> : std::is_trivially_relocatable<T>
+    struct is_trivially_relocatable<T const> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T volatile> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T&> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T[]> : is_trivially_relocatable<T>
     {
     };
 
