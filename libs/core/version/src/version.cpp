@@ -53,6 +53,11 @@
 #define OPENSHMEM_CONDUIT_NAME_STR OPENSHMEM_CONDUIT_NAME_STR_HELPER(HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT)
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+#include <gasnet.h>
+#endif
+
 #include <hwloc.h>
 
 #include <algorithm>
