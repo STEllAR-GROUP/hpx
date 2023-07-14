@@ -49,7 +49,8 @@
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
 #include <shmem.h>
 
-#define OPENSHMEM_CONDUIT_NAME_STR "HPX_WITH_PARCELPORT_OPENSHMEM"
+#define OPENSHMEM_CONDUIT_NAME_STR_HELPER(x) #x
+#define OPENSHMEM_CONDUIT_NAME_STR OPENSHMEM_CONDUIT_NAME_STR_HELPER(HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT)
 #endif
 
 #include <hwloc.h>
@@ -150,7 +151,7 @@ namespace hpx {
         strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':'
              << major << ':'
              << minor << '-'
-             << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
+             << "OPENSHMEM_CONDUIT:" << ;
         return strm.str();
     }
 #endif
@@ -163,7 +164,7 @@ namespace hpx {
         strm << "GASNET_VERSION:" << GASNET_RELEASE_VERSION_MAJOR << ':'
 	     << GASNET_RELEASE_VERSION_MINOR << ':'
 	     << GASNET_RELEASE_VERSION_PATCH << '-'
-	     << "GASNET_CONDUIT:" << GASNET_CONDUIT_NAME_STR;
+	     << "GASNET_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
