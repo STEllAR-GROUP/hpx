@@ -151,7 +151,7 @@ namespace hpx {
         strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':'
              << major << ':'
              << minor << '-'
-             << "OPENSHMEM_CONDUIT:" << ;
+             << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
@@ -162,9 +162,9 @@ namespace hpx {
     {
         std::ostringstream strm;
         strm << "GASNET_VERSION:" << GASNET_RELEASE_VERSION_MAJOR << ':'
-	     << GASNET_RELEASE_VERSION_MINOR << ':'
-	     << GASNET_RELEASE_VERSION_PATCH << '-'
-	     << "GASNET_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
+             << GASNET_RELEASE_VERSION_MINOR << ':'
+             << GASNET_RELEASE_VERSION_PATCH << '-'
+             << "GASNET_CONDUIT:" << GASNET_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
