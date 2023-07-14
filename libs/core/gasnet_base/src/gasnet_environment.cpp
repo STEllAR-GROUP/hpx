@@ -206,7 +206,7 @@ static inline void wait_done_obj(done_t* done, bool do_yield)
         am_poll_try();
         if (do_yield)
         {
-            this_thread::suspend(threads::thread_schedule_state::pending,
+		hpx::this_thread::suspend(hpx::threads::thread_schedule_state::pending,
                 "gasnet::wait_done_obj");
         }
     }
