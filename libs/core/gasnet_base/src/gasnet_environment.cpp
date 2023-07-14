@@ -301,31 +301,31 @@ namespace hpx::util {
 
         if (gasnet_environment::init_val_ == GASNET_ERR_NOT_INIT)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init",
                 "GASNET initialization error");
         }
         else if (gasnet_environment::init_val_ == GASNET_ERR_RESOURCE)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::vinvalid_status,
                 "hpx::util::gasnet_environment::init", "GASNET resource error");
         }
         else if (gasnet_environment::init_val_ == GASNET_ERR_BAD_ARG)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init",
                 "GASNET bad argument error");
         }
         else if (gasnet_environment::init_val_ == GASNET_ERR_NOT_READY)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init",
                 "GASNET not ready error");
         }
 
         if (provided < minimal)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init",
                 "GASNET doesn't provide minimal requested thread level");
         }
@@ -333,7 +333,7 @@ namespace hpx::util {
         if (gasnet_attach(nullptr, 0, gasnet_getMaxLocalSegmentSize(), 0) !=
             GASNET_OK)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init",
                 "GASNET failed to attach to memory");
         }
@@ -441,7 +441,7 @@ namespace hpx::util {
         const int len = rnkstr.size();
         if (1025 < len)
         {
-            HPX_THROW_EXCEPTION(invalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::get_processor_name",
                 "GASNET processor name is larger than 1025");
         }
