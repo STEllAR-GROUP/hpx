@@ -349,11 +349,7 @@ namespace hpx::util {
         int retval;
 
         gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
-        while ((retval = gasnet_barrier_try(0, GASNET_BARRIERFLAG_ANONYMOUS)) ==
-            GASNET_ERR_NOT_READY)
-        {
-        }
-        gasnet_barrier_try(0, GASNET_BARRIERFLAG_ANONYMOUS);
+        gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS);
 
         gasnet_set_waitmode(GASNET_WAIT_BLOCK);
 
