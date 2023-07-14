@@ -46,6 +46,11 @@
 #include <lci.h>
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+#include<gasnet.h>
+#endif
+
 #include <hwloc.h>
 
 #include <algorithm>

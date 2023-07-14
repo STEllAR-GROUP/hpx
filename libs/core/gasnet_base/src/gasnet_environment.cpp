@@ -308,7 +308,7 @@ namespace hpx::util {
         }
         else if (gasnet_environment::init_val_ == GASNET_ERR_RESOURCE)
         {
-            HPX_THROW_EXCEPTION(error::vinvalid_status,
+            HPX_THROW_EXCEPTION(error::invalid_status,
                 "hpx::util::gasnet_environment::init", "GASNET resource error");
         }
         else if (gasnet_environment::init_val_ == GASNET_ERR_BAD_ARG)
