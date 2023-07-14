@@ -170,7 +170,7 @@ namespace hpx::parcelset {
                              0, GASNET_BARRIERFLAG_ANONYMOUS)) != GASNET_OK)
                     {
                         // throw exception
-                        HPX_THROW_EXCEPTION(invalid_status,
+                        HPX_THROW_EXCEPTION(error::invalid_status,
                             "hpx::util::gasnet_environment::init",
                             "GASNET failed ",
                             std::string{gasnet_ErrorName(retval)}, " ",
