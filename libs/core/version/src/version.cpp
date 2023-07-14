@@ -160,7 +160,10 @@ namespace hpx {
     std::string gasnet_version()
     {
         std::ostringstream strm;
-        strm << "GASNET";
+        strm << "GASNET_VERSION:" << GASNET_RELEASE_VERSION_MAJOR << ':'
+	     << GASNET_RELEASE_VERSION_MINOR << ':'
+	     << GASNET_RELEASE_VERSION_PATCH << '-'
+	     << "GASNET_CONDUIT:" << GASNET_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
