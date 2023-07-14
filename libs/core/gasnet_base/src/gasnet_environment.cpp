@@ -342,6 +342,8 @@ namespace hpx::util {
         // create a number of segments equal to the number of hardware
         // threads per machine (locality)
         //
+        //segments.resize(hpx::threads::hardware_concurrency() * size());
+        //
         gasnet_environment::segments = new gasnet_seginfo_t[size()];
         gasnet_environment::segment_mutex = new hpx::mutex[size()];
 
@@ -402,14 +404,6 @@ namespace hpx::util {
         }
 
         this_rank = rank();
-        // need to figure this out to improve efficiency; create
-        // a number of segments equal to the number of hardware
-        // threads per machine (locality)
-        //
-        //segments.resize(hpx::threads::hardware_concurrency() * size());
-        //
-        gasnet_environment::segments = new gasnet_seginfo_t[size()];
-        gasnet_environment::segment_mutex = new hpx::mutex[size()];
 
 #if defined(HPX_HAVE_NETWORKING)
         if (this_rank == 0)
