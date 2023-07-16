@@ -199,17 +199,12 @@ namespace hpx::parallel {
         Iter sequential_uninitialized_default_construct(
             ExPolicy&&, Iter first, Sent last)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
+            using value_type = typename std::iterator_traits<Iter>::value_type;
 
             return util::loop_with_cleanup(
                 HPX_FORWARD(ExPolicy, policy), first, last,
-                [](InIter it) -> void {
-                    ::new (std::addressof(*it)) value_type;
-                },
-                [](InIter it) -> void {
-                    std::destroy_at(std::addressof(*it));
-                });
+                [](Iter it) -> void { ::new (std::addressof(*it)) value_type; },
+                [](Iter it) -> void { std::destroy_at(std::addressof(*it)); });
         }
 
         template <typename ExPolicy, typename InIter>
