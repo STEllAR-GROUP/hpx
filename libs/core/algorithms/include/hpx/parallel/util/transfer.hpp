@@ -373,7 +373,7 @@ namespace hpx::parallel::util {
                     typename std::iterator_traits<InIter>::value_type;
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    loop_with_cleanup_n::call(
+                    hpx::parallel::util::loop_with_cleanup_n::call(
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it) -> void {
                             hpx::construct_at(std::addressof(*current), *first);
@@ -434,7 +434,7 @@ namespace hpx::parallel::util {
                     typename std::iterator_traits<InIter>::value_type;
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    util::loop_with_cleanup_n::call(
+                    hpx::parallel::util::loop_with_cleanup_n::call(
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it) -> void {
                             hpx::construct_at(
