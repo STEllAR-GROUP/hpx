@@ -195,62 +195,21 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename ExPolicy, typename Iter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
-                !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+        template <typename ExPolicy, typename Iter, typename Sent>
         Iter sequential_uninitialized_default_construct(
             ExPolicy&&, Iter first, Sent last)
         {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
+            using value_type =
+                typename std::iterator_traits<InIter>::value_type;
 
-            Iter s_first = first;
-            try
-            {
-                for (/* */; first != last; ++first)
-                {
-                    ::new (std::addressof(*first)) value_type;
-                }
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
-        }
-
-        template <typename ExPolicy, typename Iter, typename Sent,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-        Iter sequential_uninitialized_default_construct(
-            ExPolicy&&, Iter first, Sent last)
-        {
-            using value_type = typename std::iterator_traits<Iter>::value_type;
-
-            Iter s_first = first;
-            try
-            {
-                // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                for (/* */; first != last; ++first)
-                {
-                    ::new (std::addressof(*first)) value_type;
-                }
-                // clang-format on
-
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
+            return util::loop_with_cleanup(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                [](InIter it) -> void {
+                    ::new (std::addressof(*it)) value_type;
+                },
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
         template <typename ExPolicy, typename InIter>
