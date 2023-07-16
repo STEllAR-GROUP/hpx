@@ -15,6 +15,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/unseq/simd_helpers.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
@@ -149,11 +150,12 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-
+        template <typename Iterator, typename ExPolicy>
+        struct loop_pred;
         // Helper class to repeatedly call a function starting from a given
         // iterator position till the predicate returns true.
         template <typename Iterator>
-        struct loop_pred
+        struct loop_pred<Iterator, void>
         {
             ///////////////////////////////////////////////////////////////////
             template <typename Begin, typename End, typename Pred>
@@ -170,6 +172,39 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
+    ///////////////////////////////////////////////////////////////////////////
+    namespace detail {
+
+        // Helper class to repeatedly call a function starting from a given
+        // iterator position till the predicate returns true.
+        template <typename Iterator, typename ExPolicy>
+        struct loop_pred
+        {
+            ///////////////////////////////////////////////////////////////////
+            template <typename Begin, typename End, typename Pred>
+            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+                Begin it, End end, Pred&& pred)
+            {
+                if constexpr (hpx::is_unsequenced_execution_policy_v<
+                                  ExPolicy> &&
+                    hpx::traits::is_random_access_iterator_v<Begin>)
+                {
+                    return unseq_first_n(
+                        it, std::distance(it, end), HPX_FORWARD(Pred, pred));
+                }
+                else
+                {
+                    for (/**/; it != end; ++it)
+                    {
+                        if (HPX_INVOKE(pred, it))
+                            return it;
+                    }
+                    return it;
+                }
+            }
+        };
+    }    // namespace detail
+
     template <typename ExPolicy>
     struct loop_pred_t final
       : hpx::functional::detail::tag_fallback<loop_pred_t<ExPolicy>>
@@ -180,7 +215,7 @@ namespace hpx::parallel::util {
         tag_fallback_invoke(hpx::parallel::util::loop_pred_t<ExPolicy>,
             Begin begin, End end, Pred&& pred)
         {
-            return detail::loop_pred<Begin>::call(
+            return detail::loop_pred<Begin, ExPolicy>::call(
                 begin, end, HPX_FORWARD(Pred, pred));
         }
     };
