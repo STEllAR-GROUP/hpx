@@ -198,8 +198,7 @@ namespace hpx::parallel {
         Iter sequential_uninitialized_default_construct(
             ExPolicy&& policy, Iter first, Sent last)
         {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
+            using value_type = typename std::iterator_traits<Iter>::value_type;
 
             return util::loop_with_cleanup(
                 HPX_FORWARD(ExPolicy, policy), first, last,
