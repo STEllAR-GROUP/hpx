@@ -254,11 +254,10 @@ namespace hpx::parallel::util {
                 {
                     std::size_t count(num & std::size_t(-4));    // -V112
 
-                    //clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (std::size_t i = 0;
-                                                            i < count;
-                                                            (void) ++it, ++dest,
-                                                            i += 4)    // -V112
+                    // clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (std::size_t i = 0; i < count; (void) ++it, ++dest,
+                                     i += 4)    // -V112
                     {
                         HPX_INVOKE(f, it, dest);
                         HPX_INVOKE(f, ++it, ++dest);
@@ -266,9 +265,8 @@ namespace hpx::parallel::util {
                         HPX_INVOKE(f, ++it, ++dest);
                     }
 
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE for (/**/; count < num;
-                                                            (void) ++count,
-                                                            ++it, ++dest)
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    for (/**/; count < num; (void) ++count, ++it, ++dest)
                     {
                         HPX_INVOKE(f, it, dest);
                     }

@@ -364,62 +364,23 @@ namespace hpx::parallel::util {
         template <typename Category, typename Enable>
         struct uninit_copy_n_helper
         {
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                HPX_CONCEPT_REQUIRES_(
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+            template <typename ExPolicy, typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                ExPolicy, InIter first, std::size_t num, OutIter dest)
+                ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
+                using value_type =
+                    typename std::iterator_traits<InIter>::value_type;
 
-                try
-                {
-                    for (std::size_t i = 0; i < num;
-                         ++i, ++current, ++first)    //-V112
-                    {
-                        hpx::construct_at(std::addressof(*current), *first);
-                    }
-                    return in_out_result<InIter, OutIter>{
-                        HPX_MOVE(first), HPX_MOVE(current)};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        std::destroy_at(std::addressof(*dest));
-                    }
-                    throw;
-                }
-            }
-
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                ExPolicy, InIter first, std::size_t num, OutIter dest)
-            {
-                OutIter current = dest;
-                try
-                {
-                    // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < num; ++i, ++current, ++first)    //-V112
-                    {
-                        hpx::construct_at(std::addressof(*current), *first);
-                    }
-                    // clang-format on
-
-                    return in_out_result<InIter, OutIter>{
-                        HPX_MOVE(first), HPX_MOVE(current)};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        std::destroy_at(std::addressof(*dest));
-                    }
-                    throw;
-                }
+                return in_out_result<InIter, OutIter>{std::next(first, num),
+                    util::loop_with_cleanup_n::call(
+                        HPX_FORWARD(ExPolicy, policy), first, num, dest,
+                        [](InIter it) -> void {
+                            hpx::construct_at(std::addressof(*current), *first);
+                        },
+                        [](InIter it) -> void {
+                            std::destroy_at(std::addressof(*it));
+                        })};
             }
         };
 
@@ -464,65 +425,24 @@ namespace hpx::parallel::util {
         template <typename Category, typename Enable>
         struct uninit_move_n_helper
         {
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                HPX_CONCEPT_REQUIRES_(
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+            template <typename ExPolicy, typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 ExPolicy, InIter first, std::size_t num, OutIter dest)
             {
                 OutIter current = dest;
+                using value_type =
+                    typename std::iterator_traits<InIter>::value_type;
 
-                try
-                {
-                    for (std::size_t i = 0; i < num;
-                         ++i, ++current, ++first)    //-V112
-                    {
-                        hpx::construct_at(
-                            std::addressof(*current), HPX_MOVE(*first));
-                    }
-                    return in_out_result<InIter, OutIter>{
-                        HPX_MOVE(first), HPX_MOVE(current)};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        std::destroy_at(std::addressof(*dest));
-                    }
-                    throw;
-                }
-            }
-
-            template <typename ExPolicy, typename InIter, typename OutIter,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                ExPolicy, InIter first, std::size_t num, OutIter dest)
-            {
-                OutIter current = dest;
-                try
-                {
-                    // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
-                    for (std::size_t i = 0; i < num;
-                         ++i, ++current, ++first)    //-V112
-                    {
-                        hpx::construct_at(
-                            std::addressof(*current), HPX_MOVE(*first));
-                    }
-                    // clang-format on
-
-                    return in_out_result<InIter, OutIter>{
-                        HPX_MOVE(first), HPX_MOVE(current)};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        std::destroy_at(std::addressof(*dest));
-                    }
-                    throw;
-                }
+                return in_out_result<InIter, OutIter>{std::next(first, num),
+                    util::loop_with_cleanup_n::call(
+                        HPX_FORWARD(ExPolicy, policy), first, num, dest,
+                        [](InIter it) -> void {
+                            hpx::construct_at(
+                                std::addressof(*current), HPX_MOVE(*first));
+                        },
+                        [](InIter it) -> void {
+                            std::destroy_at(std::addressof(*it));
+                        })};
             }
         };
 
