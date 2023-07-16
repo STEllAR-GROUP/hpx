@@ -18,13 +18,12 @@
 
 namespace hpx::parcelset::policies::lci {
     bool config_t::is_initialized = false;
-    bool config_t::use_two_device;
     bool config_t::enable_send_immediate;
     bool config_t::enable_lci_backlog_queue;
     config_t::protocol_t config_t::protocol;
     LCI_comp_type_t config_t::completion_type;
     config_t::progress_type_t config_t::progress_type;
-    int config_t::progress_thread_core;
+    int config_t::progress_thread_num;
     int config_t::prepost_recv_num;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
@@ -37,8 +36,6 @@ namespace hpx::parcelset::policies::lci {
             rtcfg, "hpx.parcel.lci.sendimm", false /* Does not matter*/);
         enable_lci_backlog_queue = util::get_entry_as<bool>(
             rtcfg, "hpx.parcel.lci.backlog_queue", false /* Does not matter*/);
-        use_two_device = util::get_entry_as<bool>(
-            rtcfg, "hpx.parcel.lci.use_two_device", false);
         // set protocol to use
         std::string protocol_str = util::get_entry_as<std::string>(
             rtcfg, "hpx.parcel.lci.protocol", "");
@@ -89,24 +86,20 @@ namespace hpx::parcelset::policies::lci {
         {
             progress_type = progress_type_t::worker;
         }
+        else if (progress_type_str == "pthread_worker")
+        {
+            progress_type = progress_type_t::pthread_worker;
+        }
         else
         {
             throw std::runtime_error(
                 "Unknown progress type " + progress_type_str);
         }
-        progress_thread_core =
-            util::get_entry_as(rtcfg, "hpx.parcel.lci.prg_thread_core", -1);
+        progress_thread_num =
+            util::get_entry_as(rtcfg, "hpx.parcel.lci.prg_thread_num", -1);
         prepost_recv_num =
             util::get_entry_as(rtcfg, "hpx.parcel.lci.prepost_recv_num", 1);
 
-        if (protocol == protocol_t::sendrecv)
-        {
-            if (use_two_device)
-            {
-                use_two_device = false;
-                fprintf(stderr, "WARNING: set use_two_device to false!\n");
-            }
-        }
         if (!enable_send_immediate && enable_lci_backlog_queue)
         {
             enable_lci_backlog_queue = false;
@@ -119,12 +112,6 @@ namespace hpx::parcelset::policies::lci {
         {
             progress_type = progress_type_t::pthread;
             fprintf(stderr, "WARNING: set progress_type to pthread!\n");
-        }
-        if (use_two_device && progress_type == progress_type_t::rp &&
-            num_threads <= 2)
-        {
-            use_two_device = false;
-            fprintf(stderr, "WARNING: set use_two_device to false!\n");
         }
     }
 }    // namespace hpx::parcelset::policies::lci

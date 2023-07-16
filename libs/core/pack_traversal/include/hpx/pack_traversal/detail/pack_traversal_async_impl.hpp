@@ -531,7 +531,14 @@ namespace hpx::util::detail {
             {
                 for (/**/; !range.is_finished(); ++range)
                 {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
                     async_traverse_one(range);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 130000
+#pragma GCC diagnostic pop
+#endif
                     if (is_detached())    // test before increment
                         break;
                 }

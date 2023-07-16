@@ -52,10 +52,6 @@ namespace hpx::lcos {
         /// derived objects
         virtual ~base_lco();
 
-        /// \brief finalize() will be called just before the instance gets
-        ///        destructed
-        virtual void finalize();
-
         /// The \a function set_event_nonvirt is called whenever a
         /// \a set_event_action is applied on a instance of a LCO. This function
         /// just forwards to the virtual function \a set_event, which is

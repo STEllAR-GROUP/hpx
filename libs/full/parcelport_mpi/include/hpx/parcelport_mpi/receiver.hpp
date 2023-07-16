@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c)      2023 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,13 +24,13 @@
 #include <mutex>
 #include <set>
 #include <utility>
+#include <vector>
 
 namespace hpx::parcelset::policies::mpi {
 
     template <typename Parcelport>
     struct receiver
     {
-        using header_list = std::list<std::pair<int, header>>;
         using handles_header_type = std::set<std::pair<int, int>>;
         using connection_type = receiver_connection<Parcelport>;
         using connection_ptr = std::shared_ptr<connection_type>;
@@ -38,15 +39,14 @@ namespace hpx::parcelset::policies::mpi {
         explicit constexpr receiver(Parcelport& pp) noexcept
           : pp_(pp)
           , hdr_request_(0)
+          , header_buffer_(pp.get_zero_copy_serialization_threshold())
         {
         }
 
         void run() noexcept
         {
             util::mpi_environment::scoped_lock l;
-
-            [[maybe_unused]] header h;
-            new_header(l, h);
+            post_new_header(l);
         }
 
         bool background_work() noexcept
@@ -112,14 +112,20 @@ namespace hpx::parcelset::policies::mpi {
                 MPI_Status status;
                 if (request_done_locked(l, hdr_request_, &status))
                 {
-                    header h;
-                    new_header(l, h);
+                    int recv_size = 0;
+                    [[maybe_unused]] int ret =
+                        MPI_Get_count(&status, MPI_CHAR, &recv_size);
+                    HPX_ASSERT(ret == MPI_SUCCESS);
+                    std::vector<char> recv_header(header_buffer_.begin(),
+                        header_buffer_.begin() + recv_size);
+
+                    post_new_header(l);
 
                     l.unlock();
                     header_lock.unlock();
 
                     return std::make_shared<connection_type>(
-                        status.MPI_SOURCE, h, pp_);
+                        status.MPI_SOURCE, HPX_MOVE(recv_header), pp_);
                 }
             }
 
@@ -131,15 +137,11 @@ namespace hpx::parcelset::policies::mpi {
         }
 
         template <typename Lock>
-        void new_header([[maybe_unused]] Lock& l, header& h) noexcept
+        void post_new_header([[maybe_unused]] Lock& l) noexcept
         {
             HPX_ASSERT_OWNS_LOCK(l);
-
-            h = rcv_header_;
-            rcv_header_.reset();
-
-            [[maybe_unused]] int const ret = MPI_Irecv(rcv_header_.data(),
-                header::data_size_, MPI_BYTE, MPI_ANY_SOURCE, 0,
+            [[maybe_unused]] int const ret = MPI_Irecv(header_buffer_.data(),
+                header_buffer_.size(), MPI_BYTE, MPI_ANY_SOURCE, 0,
                 util::mpi_environment::communicator(), &hdr_request_);
             HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
         }
@@ -148,7 +150,7 @@ namespace hpx::parcelset::policies::mpi {
 
         hpx::spinlock headers_mtx_;
         MPI_Request hdr_request_;
-        header rcv_header_;
+        std::vector<char> header_buffer_;
 
         hpx::spinlock handles_header_mtx_;
         handles_header_type handles_header_;

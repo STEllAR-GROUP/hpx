@@ -12,10 +12,10 @@ Migration guide
 ===============
 
 The Migration Guide serves as a valuable resource for developers seeking to transition their
-parallel computing applications from different APIs (i.e. |openmp|) to |hpx|. |hpx|, an advanced C++
-library, offers a versatile and high-performance platform for parallel and distributed computing,
-providing a wide range of features and capabilities. This guide aims to assist developers in
-understanding the key differences between different APIs and |hpx|, and it provides step-by-step
+parallel computing applications from different APIs (i.e. |openmp|, |tbb|) to |hpx|. |hpx|, an
+advanced C++ library, offers a versatile and high-performance platform for parallel and distributed
+computing, providing a wide range of features and capabilities. This guide aims to assist developers
+in understanding the key differences between different APIs and |hpx|, and it provides step-by-step
 instructions for converting code to |hpx| code effectively.
 
 Some general steps that can be used to migrate code to |hpx| code are the following:
@@ -68,7 +68,7 @@ Parallel for loop
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
+    #include <hpx/algorithm.hpp>
 
     hpx::experimental::for_loop(hpx::execution::par, 0, n, [&](int i) {
         // loop body
@@ -76,7 +76,7 @@ Parallel for loop
 
 
 In the above code, the |openmp| `#pragma omp parallel for` directive is replaced with
-`hpx::experimental::for_loop` from the |hpx| library. The loop body within the lambda
+:cpp:func:`hpx::experimental::for_loop` from the |hpx| library. The loop body within the lambda
 function will be executed in parallel for each iteration.
 
 Private variables
@@ -97,7 +97,7 @@ Private variables
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
+    #include <hpx/algorithm.hpp>
 
     hpx::experimental::for_loop(hpx::execution::par, 0, n, [&](int i) {
             int x = 0; // Declare 'x' as a local variable inside the loop body
@@ -126,7 +126,7 @@ Shared variables
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
+    #include <hpx/algorithm.hpp>
 
     std::atomic<int> x = 0; // Declare 'x' as a shared variable outside the loop
 
@@ -153,8 +153,8 @@ Number of threads
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/execution/executors/num_cores.hpp>
+    #include <hpx/algorithm.hpp>
+    #include <hpx/execution.hpp>
 
     hpx::execution::experimental::num_cores nc(2);
 
@@ -164,8 +164,9 @@ Number of threads
 
 
 To declare the number of threads to be used for the parallel region, you can use
-`hpx::execution::experimental::num_cores` and pass the number of cores (`nc`) to the `for_loop`
-using `hpx::execution::par.with(nc)`. This example uses 2 threads for the parallel loop.
+`hpx::execution::experimental::num_cores` and pass the number of cores (`nc`) to
+:cpp:func:`hpx::experimental::for_loop` using `hpx::execution::par.with(nc)`.
+This example uses 2 threads for the parallel loop.
 
 Reduction
 ^^^^^^^^^
@@ -186,8 +187,8 @@ Reduction
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/execution/executors/num_cores.hpp>
+    #include <hpx/algorithm.hpp>
+    #include <hpx/execution.hpp>
 
     int s = 0;
 
@@ -222,8 +223,8 @@ Schedule
 
 .. code-block:: c++
 
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/execution/executors/static_chunk_size.hpp>
+    #include <hpx/algorithm.hpp>
+    #include <hpx/execution.hpp>
 
     hpx::execution::experimental::static_chunk_size cs(1000);
 
@@ -233,23 +234,23 @@ Schedule
 
 To define the scheduling type, you can use the corresponding execution policy from
 `hpx::execution::experimental`, define the chunk size (cs, here declared as 1000) and pass
-it to the `for_loop` using `hpx::execution::par.with(cs)`.
+it to the to :cpp:func:`hpx::experimental::for_loop` using `hpx::execution::par.with(cs)`.
 
 Accordingly, other types of scheduling are available and can be used in a similar manner:
 
 .. code-block:: c++
 
-    #include <hpx/execution/executors/dynamic_chunk_size.hpp>
+    #include <hpx/execution.hpp>
     hpx::execution::experimental::dynamic_chunk_size cs(1000);
 
 .. code-block:: c++
 
-    #include <hpx/execution/executors/guided_chunk_size.hpp>
+    #include <hpx/execution.hpp>
     hpx::execution::experimental::guided_chunk_size cs(1000);
 
 .. code-block:: c++
 
-    #include <hpx/execution/executors/auto_chunk_size.hpp>
+    #include <hpx/execution.hpp>
     hpx::execution::experimental::auto_chunk_size cs(1000);
 
 
@@ -272,6 +273,8 @@ Accordingly, other types of scheduling are available and can be used in a simila
 
 .. code-block:: c++
 
+    #include <hpx/mutex.hpp>
+
     hpx::mutex mtx;
 
     {   // parallel code
@@ -282,8 +285,8 @@ Accordingly, other types of scheduling are available and can be used in a simila
     }
 
 To make sure that only one thread accesses a specific code within a parallel section
-you can use `hpx::mutex` and `std::scoped_lock` to take ownership of the given mutex `mtx`.
-For more information about mutexes please refer to :ref:`mutex`.
+you can use :cpp:class:`hpx::mutex` and `std::scoped_lock` to take ownership of the given
+mutex `mtx`. For more information about mutexes please refer to :ref:`mutex`.
 
 |openmp| tasks
 --------------
@@ -315,22 +318,22 @@ or
 
 .. code-block:: c++
 
-    #include <hpx/async_base/post.hpp>
+    #include <hpx/future.hpp>
 
     hpx::post([](){
         // task code
     }); // fire and forget
 
-The tasks in |hpx| can be defined simply by using the `async` function and passing as argument
-the code you wish to run asynchronously. Another alternative is to use `post` which is a
+The tasks in |hpx| can be defined simply by using the :cpp:func:`async` function and passing as argument
+the code you wish to run asynchronously. Another alternative is to use :cpp:func:`post` which is a
 fire-and-forget method.
 
-.. note::
+.. tip::
 
     If you think you will like to synchronize your tasks later on, we suggest you use
-    `hpx::async` which provides synchronization options, while `hpx::post` explicitly states
-    that there is no return value or way to synchronize with the function execution.
-    Synchronization options are listed below.
+    :cpp:func:`hpx::async` which provides synchronization options, while :cpp:func:`hpx::post`
+    explicitly states that there is no return value or way to synchronize with the function
+    execution. Synchronization options are listed below.
 
 Task wait
 ^^^^^^^^^
@@ -359,7 +362,7 @@ Task wait
 
     // code after completion of task
 
-The `get()` function can be used to ensure that the task created with `hpx::async`
+The `get()` function can be used to ensure that the task created with :cpp:func:`hpx::async`
 is completed before the code continues executing beyond that point.
 
 Multiple tasks synchronization
@@ -401,7 +404,7 @@ Multiple tasks synchronization
     });
 
 
-If you would like to synchronize multiple tasks, you can use the `hpx::when_all` function
+If you would like to synchronize multiple tasks, you can use the :cpp:func:`hpx::when_all` function
 to define which futures have to be ready and the `then()` function to declare what should
 be executed once these futures are ready.
 
@@ -428,7 +431,6 @@ Dependencies
 .. code-block:: c++
 
     #include <hpx/future.hpp>
-    #include <hpx/async_base/dataflow.hpp>
 
     int a = 10;
     int b = 20;
@@ -441,19 +443,19 @@ Dependencies
     auto future_b = hpx::make_ready_future(b);
 
     // Create a task that depends on 'a' and 'b' and executes 'task_code'
-    auto future_c = hpx::dataflow([](){
-                                        // task code
-                                        return 100;
-                                      },
-                                      future_a,
-                                      future_b);
+    auto future_c = hpx::dataflow(
+        []() {
+            // task code
+            return 100;
+        },
+        future_a, future_b);
 
     c = future_c.get();
 
-If one of the arguments of `hpx::dataflow` is a future, then it will wait for the
+If one of the arguments of :cpp:func:`hpx::dataflow` is a future, then it will wait for the
 future to be ready to launch the thread. Hence, to define the dependencies of tasks
 you have to create futures representing the variables that create dependencies and pass
-them as arguments to `hpx::dataflow`. `get()` is used to save the result of the future
+them as arguments to :cpp:func:`hpx::dataflow`. `get()` is used to save the result of the future
 to the desired variable.
 
 
@@ -491,7 +493,7 @@ or
 
 .. code-block:: c++
 
-    #include <hpx/async_base/post.hpp>
+    #include <hpx/future.hpp>
 
     auto future_outer = hpx::post([](){ // fire and forget
         // Outer task code
@@ -501,8 +503,9 @@ or
         });
     });
 
-If you have nested tasks, you can simply use nested `hpx::async` or `hpx::post` calls.
-The implementation is similar if you want to take care of synchronization:
+If you have nested tasks, you can simply use nested :cpp:func:`hpx::async` or
+:cpp:func:`hpx::post` calls. The implementation is similar if you want to take
+care of synchronization:
 
 |openmp| code:
 
@@ -523,15 +526,15 @@ The implementation is similar if you want to take care of synchronization:
 
     #include <hpx/future.hpp>
 
-    auto future_outer = hpx::async([](){
+    auto future_outer = hpx::async([]() {
         // Outer task code
 
-        hpx::async([](){
+        hpx::async([]() {
             // Inner task code
-        }).get(); // Wait for the inner task to complete
+        }).get();    // Wait for the inner task to complete
     });
 
-    future_outer.get(); // Wait for the outer task to complete
+    future_outer.get();    // Wait for the outer task to complete
 
 
 Task yield
@@ -553,7 +556,7 @@ Task yield
 .. code-block:: c++
 
     #include <hpx/future.hpp>
-    #include <hpx/threading/thread.hpp>
+    #include <hpx/thread.hpp>
 
     auto future = hpx::async([](){
         // code before yielding
@@ -564,8 +567,8 @@ Task yield
 
     // code after yielding
 
-After creating a task using `hpx::async`, `hpx::this_thread::yield()` can be used to
-reschedule the execution of threads, allowing other threads to run.
+After creating a task using :cpp:func:`hpx::async`, :cpp:func:`hpx::this_thread::yield`
+can be used to reschedule the execution of threads, allowing other threads to run.
 
 Task group
 ^^^^^^^^^^
@@ -592,7 +595,7 @@ Task group
 
 .. code-block:: c++
 
-    #include <hpx/experimental/task_group.hpp>
+    #include <hpx/task_group.hpp>
 
     // Declare a task group
     hpx::experimental::task_group tg;
@@ -608,7 +611,7 @@ Task group
     // Wait for the task group
     tg.wait();
 
-To create task groups, you can use `hpx::experimental::task_group`. The function
+To create task groups, you can use :cpp:class:`hpx::experimental::task_group`. The function
 `run()` can be used to run each task within the task group, while `wait()` can be used to
 achieve synchronization. If you do not care about waiting for the task group to complete
 its execution, you can simply remove the `wait()` function.
@@ -646,9 +649,399 @@ its execution, you can simply remove the `wait()` function.
     hpx::wait_all(future_section1, future_section2);
 
 Unlike tasks, there is an implicit synchronization barrier at the end of each `sections``
-directive in |openmp|. This synchronization is achieved using `hpx::wait_all` function.
+directive in |openmp|. This synchronization is achieved using :cpp:func:`hpx::wait_all` function.
 
 .. note::
 
     If the `nowait` clause is used in the `sections` directive, then you can just remove
-    the `hpx::wait_all` function while keeping the rest of the code as it is.
+    the :cpp:func:`hpx::wait_all` function while keeping the rest of the code as it is.
+
+|tbb|
+=====
+
+|tbb| provides a high-level interface for parallelism and concurrent programming using
+standard ISO C++ code. Below are some examples on how to convert |tbb| to |hpx| code:
+
+parallel_for
+------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    auto values = std::vector<double>(10000);
+
+    tbb::parallel_for( tbb::blocked_range<int>(0,values.size()),
+                        [&](tbb::blocked_range<int> r)
+    {
+        for (int i=r.begin(); i<r.end(); ++i)
+        {
+            // loop body
+        }
+    });
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/algorithm.hpp>
+
+    auto values = std::vector<double>(10000);
+
+    hpx::experimental::for_loop(hpx::execution::par, 0, values.size(), [&](int i) {
+        // loop body
+    });
+
+
+In the above code, `tbb::parallel_for` is replaced with :cpp:func:`hpx::experimental::for_loop`
+from the |hpx| library. The loop body within the lambda function will be executed in
+parallel for each iteration.
+
+parallel_for_each
+-----------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    auto values = std::vector<double>(10000);
+
+    tbb::parallel_for_each(values.begin(), values.end(), [&](){
+        // loop body
+    });
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/algorithm.hpp>
+
+    auto values = std::vector<double>(10000);
+
+    hpx::for_each(hpx::execution::par, values.begin(), values.end(), [&](){
+        // loop body
+    });
+
+By utilizing :cpp:func:`hpx::for_each`` and specifying a parallel execution policy with
+`hpx::execution::par`, it is possible to transform `tbb::parallel_for_each`` into its
+equivalent counterpart in |hpx|.
+
+parallel_invoke
+---------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    tbb::parallel_invoke(task1, task2, task3);
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/future.hpp>
+
+    hpx::wait_all(hpx::async(task1), hpx::async(task2), hpx::async(task3));
+
+To convert `tbb::parallel_invoke` to |hpx|, we use :cpp:func:`hpx::async` to asynchronously
+execute each task, which returns a future representing the result of each task.
+We then pass these futures to :cpp:func:`hpx::when_all`, which waits for all the futures
+to complete before returning.
+
+
+parallel_pipeline
+-----------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    tbb::parallel_pipeline(4,
+        tbb::make_filter<void, int>(tbb::filter::serial_in_order,
+            [](tbb::flow_control& fc) -> int {
+                // Generate numbers from 1 to 10
+                static int i = 1;
+                if (i <= 10) {
+                    return i++;
+                }
+                else {
+                    fc.stop();
+                    return 0;
+                }
+            }) &
+        tbb::make_filter<int, int>(tbb::filter::parallel,
+            [](int num) -> int {
+                // Multiply each number by 2
+                return num * 2;
+            }) &
+        tbb::make_filter<int, void>(tbb::filter::serial_in_order,
+            [](int num) {
+                // Print the results
+                std::cout << num << " ";
+            })
+    );
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <vector>
+    #include <ranges>
+    #include <hpx/algorithm.hpp>
+
+    // generate the values
+    auto range = std::views::iota(1) | std::views::take(10);
+
+    // materialize the output vector
+    std::vector<int> results(10);
+
+    // in parallel execution of pipeline and transformation
+    hpx::ranges::transform(
+        hpx::execution::par, range, result.begin(), [](int i) { return 2 * i; });
+
+    // print the modified vector
+    for (int i : result)
+    {
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+
+The line `auto range = std::views::iota(1) | std::views::take(10);` generates a range of values using
+the `std::views::iota` function. It starts from the value 1 and generates an infinite sequence of
+incrementing values. The `std::views::take(10)` function is then applied to limit the sequence to the
+first 10 values. The result is stored in the `range` variable.
+
+.. hint::
+
+    A view is a lightweight object that represents a particular view of a sequence or range. It acts as
+    a read-only interface to the original data, providing a way to query and traverse the elements
+    without making any copies or modifications.
+
+    Views can be composed and chained together to form complex pipelines of operations. These operations
+    are evaluated lazily, meaning that the actual computation is performed only when the result is
+    needed or consumed.
+
+Since views perform lazy evaluation, we use `std::vector<int> results(10);` to meterialize the vector
+that will store the transformed values. The `hpx::ranges::transform` function is then used to perform
+a parallel transformation on the range. The transformed values will be written to the `results` vector.
+
+.. hint::
+
+    Ranges enable loop fusion by combining multiple operations into a single parallel loop, eliminating
+    waiting time and reducing overhead. Using ranges, you can express these operations as a pipeline of
+    transformations on a sequence of elements. This pipeline is evaluated in a single pass, performing
+    all the desired operations in parallel without the need to wait between them.
+
+    In addition, |hpx| enhances the benefits of range fusion by offering parallel execution policies,
+    which can be used to optimize the execution of the fused loop across multiple threads.
+
+
+parallel_reduce
+---------------
+
+Reduction
+^^^^^^^^^
+
+|tbb| code:
+
+.. code-block:: c++
+
+    auto values = std::vector<double>{1,2,3,4,5,6,7,8,9};
+
+    auto total = tbb::parallel_reduce(
+                    tbb::blocked_range<int>(0,values.size()),
+                    0.0,
+                    [&](tbb::blocked_range<int> r, double running_total)
+                    {
+                        for (int i=r.begin(); i<r.end(); ++i)
+                        {
+                            running_total += values[i];
+                        }
+
+
+                        return running_total;
+                    },
+                    std::plus<double>());
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/numeric.hpp>
+
+    auto values = std::vector<double>{1,2,3,4,5,6,7,8,9};
+
+    auto total = hpx::reduce(
+        hpx::execution::par, values.begin(), values.end(), 0, std::plus{});
+
+By utilizing :cpp:func:`hpx::reduce` and specifying a parallel execution policy with
+`hpx::execution::par`, it is possible to transform `tbb::parallel_reduce`` into its
+equivalent counterpart in |hpx|. As demonstrated in the previous example, the management
+of intermediate results is seamlessly handled internally by |hpx|, eliminating the need
+for explicit consideration.
+
+Transformation & Reduction
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+|tbb| code:
+
+.. code-block:: c++
+
+    auto values = std::vector<double>{1,2,3,4,5,6,7,8,9};
+
+    auto transform_function(double current_value){
+        // transformation code
+    }
+
+    auto total = tbb::parallel_reduce(
+                    tbb::blocked_range<int>(0,values.size()),
+                    0.0,
+                    [&](tbb::blocked_range<int> r, double transformed_val)
+                    {
+                        for (int i=r.begin(); i<r.end(); ++i)
+                        {
+                            transformed_val += transform_function(values[i]);
+                        }
+                        return transformed_val;
+                    },
+                    std::plus<double>());
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/numeric.hpp>
+
+    auto values = std::vector<double>{1,2,3,4,5,6,7,8,9};
+
+    auto transform_function(double current_value)
+    {
+        // transformation code
+    }
+
+    auto total = hpx::transform_reduce(hpx::execution::par, values.begin(),
+        values.end(), 0, std::plus{},
+        [&](double current_value) { return transform_function(current_value); });
+
+In situations where certain values require transformation before the reduction process,
+|hpx| provides a straightforward solution through :cpp:func:`hpx::transform_reduce`. The
+`transform_function()` allows for the application of the desired transformation to each value.
+
+parallel_scan
+-------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    tbb::parallel_scan(tbb::blocked_range<size_t>(0, input.size()),
+        0,
+        [&input, &output](const tbb::blocked_range<size_t>& range, int& partial_sum, bool is_final_scan) {
+            for (size_t i = range.begin(); i != range.end(); ++i) {
+                partial_sum += input[i];
+                if (is_final_scan) {
+                    output[i] = partial_sum;
+                }
+            }
+            return partial_sum;
+        },
+        [](int left_sum, int right_sum) {
+            return left_sum + right_sum;
+        }
+    );
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/numeric.hpp>
+
+    hpx::inclusive_scan(hpx::execution::par, input.begin(), input.end(),
+        output.begin(),
+        [](const int& left, const int& right) { return left + right; });
+
+:cpp:func:`hpx::inclusive_scan` with `hpx::execution::par` as execution policy
+ can be used to perform a prefix scan in parallel. The management of intermediate
+results is seamlessly handled internally by |hpx|, eliminating the need
+for explicit consideration. `input.begin()` and `input.end()` refer to the beginning
+and end of the sequence of elements the algorithm will be applied to respectively.
+`output.begin()` refers to the beginning of the destination, while the last argument
+specifies the function which will be invoked for each of the values of the input sequence.
+
+.. seealso::
+
+Apart from :cpp:func:`hpx::inclusive_scan`, |hpx| provides its users with :cpp:func:`hpx::exclusive_scan`.
+The key difference between inclusive scan and exclusive scan lies in the treatment of the current element
+during the scan operation. In an inclusive scan, each element in the output sequence includes the
+contribution of the corresponding element in the input sequence, while in an exclusive scan, the current
+element in the input sequence does not contribute to the corresponding element in the output sequence.
+
+
+parallel_sort
+-------------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    std::vector<int> numbers = {9, 2, 7, 1, 5, 3};
+
+    tbb::parallel_sort(numbers.begin(), numbers.end());
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/algorithm.hpp>
+
+    std::vector<int> numbers = {9, 2, 7, 1, 5, 3};
+
+    hpx::sort(hpx::execution::par, numbers.begin(), numbers.end());
+
+:cpp:func:`hpx::sort` provides an equivalent functionality to `tbb::parallel_sort`.
+When given a parallel execution policy with `hpx::execution::par`, the algorithm employs
+parallel execution, allowing for efficient sorting across available threads.
+
+task_group
+----------
+
+|tbb| code:
+
+.. code-block:: c++
+
+    // Declare a task group
+    tbb::task_group tg;
+
+    // Run the tasks
+    tg.run(task1);
+    tg.run(task2);
+
+    // Wait for the task group
+    tg.wait();
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    #include <hpx/task_group.hpp>
+
+    // Declare a task group
+    hpx::experimental::task_group tg;
+
+    // Run the tasks
+    tg.run(task1);
+    tg.run(task2);
+
+    // Wait for the task group
+    tg.wait();
+
+|hpx| drew inspiration from |tbb| to introduce the :cpp:func:`hpx::experimental::task_group`
+feature. Therefore, utilizing :cpp:func:`hpx::experimental::task_group` provides an
+equivalent functionality to `tbb::task_group`.

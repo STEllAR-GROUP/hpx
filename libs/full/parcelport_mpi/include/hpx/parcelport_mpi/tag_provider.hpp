@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c)      2023 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +13,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/synchronization.hpp>
 
+#include <atomic>
 #include <deque>
 #include <limits>
 #include <mutex>
@@ -21,40 +23,20 @@ namespace hpx::parcelset::policies::mpi {
     struct tag_provider
     {
         tag_provider()
-          : next_tag_(2)
+          : next_tag(0)
         {
         }
 
-        [[nodiscard]] int acquire() noexcept
+        [[nodiscard]] int get_next_tag() noexcept
         {
-            int tag = -1;
-            std::lock_guard l(mtx_);
-            if (free_tags_.empty())
-            {
-                HPX_ASSERT(next_tag_ < (std::numeric_limits<int>::max)());
-                tag = next_tag_++;
-            }
-            else
-            {
-                tag = free_tags_.front();
-                free_tags_.pop_front();
-            }
-            HPX_ASSERT(tag > 1);
+            // Tag 0 is reserved for header message
+            int tag = next_tag.fetch_add(1, std::memory_order_relaxed) %
+                    (util::mpi_environment::MPI_MAX_TAG - 1) +
+                1;
             return tag;
         }
 
-        void release(int tag)
-        {
-            HPX_ASSERT(tag > 1);
-            std::lock_guard l(mtx_);
-            HPX_ASSERT(tag < next_tag_);
-
-            free_tags_.push_back(tag);
-        }
-
-        hpx::spinlock mtx_;
-        int next_tag_;
-        std::deque<int> free_tags_;
+        std::atomic<int> next_tag;
     };
 }    // namespace hpx::parcelset::policies::mpi
 

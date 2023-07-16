@@ -736,8 +736,10 @@ namespace hpx::agas {
         naming::gid_type const id(
             naming::detail::get_stripped_gid_except_dont_cache(gid));
 
+#if defined(HPX_HAVE_NETWORKING)
         // migratable objects should be handled by the function below
         HPX_ASSERT(!naming::detail::is_migratable(gid));
+#endif
 
         // Try to resolve the address of the GID from the locally available
         // information.

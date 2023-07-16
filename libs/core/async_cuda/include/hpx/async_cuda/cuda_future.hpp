@@ -1,3 +1,4 @@
+//  Copyright (c) 2023 Gregor Daiß
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Thomas Heller
 //  Copyright (c) 2016 Hartmut Kaiser
@@ -5,6 +6,8 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// hpxinspect:noascii
 
 #pragma once
 
@@ -81,7 +84,7 @@ namespace hpx { namespace cuda { namespace experimental {
             future_data() {}
 
             future_data(init_no_addref no_addref, other_allocator const& alloc,
-                cudaStream_t stream)
+                cudaStream_t stream, int device)
               : lcos::detail::future_data_allocator<void, Allocator,
                     future_data>(no_addref, alloc)
             {
@@ -104,7 +107,7 @@ namespace hpx { namespace cuda { namespace experimental {
                                     status)));
                         }
                     },
-                    stream);
+                    stream, device);
             }
         };
 
@@ -183,7 +186,8 @@ namespace hpx { namespace cuda { namespace experimental {
         // main API call to get a future from a stream using allocator, and the
         // specified mode
         template <typename Allocator, typename Mode>
-        hpx::future<void> get_future(Allocator const& a, cudaStream_t stream)
+        hpx::future<void> get_future(
+            Allocator const& a, cudaStream_t stream, int device)
         {
             using shared_state = future_data<Allocator, Mode>;
 
@@ -200,7 +204,19 @@ namespace hpx { namespace cuda { namespace experimental {
             unique_ptr p(traits::allocate(alloc, 1),
                 hpx::util::allocator_deleter<other_allocator>{alloc});
 
-            traits::construct(alloc, p.get(), init_no_addref{}, alloc, stream);
+            static_assert(std::is_same_v<Mode, event_mode> ||
+                    std::is_same_v<Mode, callback_mode>,
+                "get_future mode not supported!");
+            if constexpr (std::is_same_v<Mode, event_mode>)
+            {
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, stream, device);
+            }
+            else if constexpr (std::is_same_v<Mode, callback_mode>)
+            {
+                traits::construct(
+                    alloc, p.get(), init_no_addref{}, alloc, stream);
+            }
 
             return hpx::traits::future_access<future<void>>::create(
                 p.release(), false);
@@ -212,16 +228,20 @@ namespace hpx { namespace cuda { namespace experimental {
         hpx::future<void> get_future_with_callback(
             Allocator const& a, cudaStream_t stream)
         {
-            return get_future<Allocator, callback_mode>(a, stream);
+            // device id 0 will be dropped in callback mode - can be
+            // an arbitrary number here
+            return get_future<Allocator, callback_mode>(a, stream, 0);
         }
 
         // -------------------------------------------------------------
         // main API call to get a future from a stream using allocator
         template <typename Allocator>
         hpx::future<void> get_future_with_event(
-            Allocator const& a, cudaStream_t stream)
+            Allocator const& a, cudaStream_t stream, int device = -1)
         {
-            return get_future<Allocator, event_mode>(a, stream);
+            if (device == -1)
+                check_cuda_error(cudaGetDevice(&device));
+            return get_future<Allocator, event_mode>(a, stream, device);
         }
 
         // -------------------------------------------------------------
@@ -231,7 +251,8 @@ namespace hpx { namespace cuda { namespace experimental {
 
         // -------------------------------------------------------------
         // non allocator version of : get future with an event set
-        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(cudaStream_t);
+        HPX_CORE_EXPORT hpx::future<void> get_future_with_event(
+            cudaStream_t stream, int device = -1);
     }    // namespace detail
 }}}      // namespace hpx::cuda::experimental
 

@@ -315,8 +315,10 @@ struct bitset_test
         Bitset c(rhs);
         b = std::move(c);
 
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 130000
         // NOLINTNEXTLINE(clang-diagnostic-self-assign-overloaded)
         b = std::move(b);    // self assignment check
+#endif
 
         // NOLINTNEXTLINE(bugprone-use-after-move)
         HPX_TEST(b == rhs);
