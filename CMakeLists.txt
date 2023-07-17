@@ -1148,11 +1148,14 @@ if(HPX_WITH_NETWORKING)
     CATEGORY "Parcelport"
   )
   if(HPX_WITH_PARCELPORT_GASNET)
+    if(...is cray aries available)
+      set(additional_conduits ";aries"
+    endif()
     hpx_add_config_define(HPX_HAVE_PARCELPORT_GASNET)
     hpx_option(
       HPX_WITH_PARCELPORT_GASNET_CONDUIT STRING
       "Define which conduit to use for the gasnet parcelport" "udp"
-      STRINGS "smp;udp;mpi;ofi;ucx;ibv;aries"
+      STRINGS "smp;udp;mpi;ofi;ucx;ibv" ${additional_conduits}
     )
   endif()
 
