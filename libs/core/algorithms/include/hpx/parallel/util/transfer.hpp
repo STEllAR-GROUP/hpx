@@ -369,10 +369,6 @@ namespace hpx::parallel::util {
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
             {
-                OutIter current = dest;
-                using value_type =
-                    typename std::iterator_traits<InIter>::value_type;
-
                 return in_out_result<InIter, OutIter>{std::next(first, num),
                     ::hpx::parallel::util::detail::loop_with_cleanup_n<InIter>::
                         call(
@@ -432,10 +428,6 @@ namespace hpx::parallel::util {
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
                 ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
             {
-                OutIter current = dest;
-                using value_type =
-                    typename std::iterator_traits<InIter>::value_type;
-
                 return in_out_result<InIter, OutIter>{std::next(first, num),
                     ::hpx::parallel::util::detail::loop_with_cleanup_n<InIter>::
                         call(
