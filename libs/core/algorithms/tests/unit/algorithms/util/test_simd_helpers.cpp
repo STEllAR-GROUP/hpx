@@ -36,7 +36,7 @@ void test_unseq_first_n1_dispatch2(std::size_t length, std::size_t first_index)
         i++;
     });
 
-    auto f = [](T t) { return t; };
+    auto f = [](auto t) { return *t; };
 
     auto iter_test = hpx::parallel::util::unseq_first_n(
         v.begin(), static_cast<T>(length), f);
@@ -80,7 +80,7 @@ void test_unseq_first_n2_dispatch2(std::size_t length, std::size_t first_index)
         idx++;
     }
 
-    auto f = [](T t1, T t2) { return t1 && t2; };
+    auto f = [](auto t1, auto t2) { return *t1 && *t2; };
 
     auto iter_pair_test = hpx::parallel::util::unseq2_first_n(
         v1.begin(), v2.begin(), static_cast<T>(length), f);
