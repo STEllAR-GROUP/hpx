@@ -116,7 +116,8 @@ void fold_left_first_with_iter_test_dispatch_2(IteratorTag)
 
 void fold_left_first_with_iter_test_dispatch_1()
 {
-    fold_left_first_with_iter_test_dispatch_2(std::random_access_iterator_tag());
+    fold_left_first_with_iter_test_dispatch_2(
+        std::random_access_iterator_tag());
     fold_left_first_with_iter_test_dispatch_2(std::forward_iterator_tag());
 }
 
