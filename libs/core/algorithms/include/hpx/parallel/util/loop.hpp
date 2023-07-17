@@ -747,7 +747,6 @@ namespace hpx::parallel::util {
     }
 
     namespace detail {
-
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
         template <typename IterCat>

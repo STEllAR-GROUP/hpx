@@ -197,7 +197,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename Sent>
         Iter sequential_uninitialized_default_construct(
-            ExPolicy&&, Iter first, Sent last)
+            ExPolicy&& policy, Iter first, Sent last)
         {
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
