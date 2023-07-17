@@ -13,6 +13,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
+#include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
 #include <algorithm>
@@ -373,14 +374,16 @@ namespace hpx::parallel::util {
                     typename std::iterator_traits<InIter>::value_type;
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    hpx::parallel::util::loop_with_cleanup_n::call(
-                        HPX_FORWARD(ExPolicy, policy), first, num, dest,
-                        [](InIter it) -> void {
-                            hpx::construct_at(std::addressof(*current), *first);
-                        },
-                        [](InIter it) -> void {
-                            std::destroy_at(std::addressof(*it));
-                        })};
+                    ::hpx::parallel::util::detail::loop_with_cleanup_n<InIter>::
+                        call(
+                            HPX_FORWARD(ExPolicy, policy), first, num, dest,
+                            [](InIter it, OutIter current) -> void {
+                                hpx::construct_at(
+                                    std::addressof(*current), *it);
+                            },
+                            [](OutIter it) -> void {
+                                std::destroy_at(std::addressof(*it));
+                            })};
             }
         };
 
@@ -434,15 +437,16 @@ namespace hpx::parallel::util {
                     typename std::iterator_traits<InIter>::value_type;
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    hpx::parallel::util::loop_with_cleanup_n::call(
-                        HPX_FORWARD(ExPolicy, policy), first, num, dest,
-                        [](InIter it) -> void {
-                            hpx::construct_at(
-                                std::addressof(*current), HPX_MOVE(*it));
-                        },
-                        [](InIter it) -> void {
-                            std::destroy_at(std::addressof(*it));
-                        })};
+                    ::hpx::parallel::util::detail::loop_with_cleanup_n<InIter>::
+                        call(
+                            HPX_FORWARD(ExPolicy, policy), first, num, dest,
+                            [](InIter it, OutIter current) -> void {
+                                hpx::construct_at(
+                                    std::addressof(*current), HPX_MOVE(*it));
+                            },
+                            [](OutIter it) -> void {
+                                std::destroy_at(std::addressof(*it));
+                            })};
             }
         };
 
