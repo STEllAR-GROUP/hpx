@@ -362,7 +362,7 @@ namespace hpx::parallel::util {
     // helpers for uninit_copy_n
     namespace detail {
         // Customization point for optimizing copy_n operations
-        template <typename Category, typename Enable>
+        template <typename Category, typename Dummy>
         struct uninit_copy_n_helper
         {
             template <typename ExPolicy, typename InIter, typename OutIter>
