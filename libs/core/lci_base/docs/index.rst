@@ -11,7 +11,7 @@
 lci_base
 ========
 
-This module provides helper functionality for detecting MPI environments.
+This module provides helper functionality for detecting LCI environments.
 
 See the :ref:`API reference <modules_lci_base_api>` of this module for more
 details.

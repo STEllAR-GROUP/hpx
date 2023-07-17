@@ -20,6 +20,7 @@
 #include <hpx/parcelset_base/locality.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #include <hpx/parcelset_base/parcel_interface.hpp>
+#include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -28,6 +29,8 @@
 #include <string>
 
 namespace hpx::parcelset {
+
+    parcel empty_parcel;
 
     bool parcel::is_valid() const
     {

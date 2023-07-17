@@ -7,8 +7,13 @@
 #pragma once
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
-// On Windows, make sure winsock.h is not included even if windows.h is included
-// before winsock2.h
-#define _WINSOCKAPI_
+// On Windows, include winsock2.h as early as possible to make sure its seen by
+// the compiler before #including windows.h
 #include <winsock2.h>
 #endif
+
+namespace asio {
+
+    // forward declaration
+    class io_context;
+}    // namespace asio

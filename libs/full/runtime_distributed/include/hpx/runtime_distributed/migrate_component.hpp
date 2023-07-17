@@ -49,16 +49,21 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline std::enable_if_t<traits::is_component<Component>::value &&
-            traits::is_distribution_policy<DistPolicy>::value,
+    std::enable_if_t<traits::is_component_v<Component> &&
+            traits::is_distribution_policy_v<DistPolicy>,
         future<hpx::id_type>>
 #endif
-    migrate(hpx::id_type const& to_migrate, DistPolicy const& policy)
+    migrate(hpx::id_type const& to_migrate,
+        [[maybe_unused]] DistPolicy const& policy)
     {
+#if defined(HPX_HAVE_NETWORKING)
         using action_type =
             server::perform_migrate_component_action<Component, DistPolicy>;
         return hpx::detail::async_colocated<action_type>(
             to_migrate, to_migrate, policy);
+#else
+        return hpx::make_ready_future(to_migrate);
+#endif
     }
 
     /// Migrate the given component to the specified target locality
@@ -133,8 +138,7 @@ namespace hpx { namespace components {
 #if defined(DOXYGEN)
     future<hpx::id_type>
 #else
-    inline std::enable_if_t<traits::is_component<Component>::value,
-        future<hpx::id_type>>
+    std::enable_if_t<traits::is_component_v<Component>, future<hpx::id_type>>
 #endif
     migrate(hpx::id_type const& to_migrate, hpx::id_type const& target_locality)
     {

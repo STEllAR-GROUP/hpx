@@ -1,5 +1,6 @@
 //  Copyright (c) 2007-2021 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
+//  Copyright (c)      2023 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -86,12 +87,14 @@ namespace hpx::parcelset::policies::mpi {
         {
         }
 
-        template <typename Handler, typename ParcelPostprocess>
+        using handler_type = hpx::move_only_function<void(error_code const&)>;
+        using post_handler_type = hpx::move_only_function<void(
+            error_code const&, parcelset::locality const&,
+            std::shared_ptr<sender_connection>)>;
         void async_write(
-            Handler&& handler, ParcelPostprocess&& parcel_postprocess)
+            handler_type&& handler, post_handler_type&& parcel_postprocess)
         {
             HPX_ASSERT(!handler_);
-            HPX_ASSERT(!postprocess_handler_);
             HPX_ASSERT(!buffer_.data_.empty());
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -101,24 +104,28 @@ namespace hpx::parcelset::policies::mpi {
             request_ptr_ = nullptr;
             chunks_idx_ = 0;
             tag_ = acquire_tag(sender_);
-            header_.init(buffer_, tag_);
+            header_buffer.resize(header::get_header_size(
+                buffer_, pp_->get_zero_copy_serialization_threshold()));
+            header_ = header(buffer_, static_cast<char*>(header_buffer.data()),
+                header_buffer.size());
+            header_.set_tag(tag_);
             header_.assert_valid();
 
             state_ = initialized;
 
-            handler_ = HPX_FORWARD(Handler, handler);
+            handler_ = HPX_MOVE(handler);
 
             if (!send())
             {
-                postprocess_handler_ =
-                    HPX_FORWARD(ParcelPostprocess, parcel_postprocess);
+                postprocess_handler_ = HPX_MOVE(parcel_postprocess);
                 add_connection(sender_, shared_from_this());
             }
             else
             {
                 HPX_ASSERT(!handler_);
                 error_code ec;
-                parcel_postprocess(ec, there_, shared_from_this());
+                if (parcel_postprocess)
+                    parcel_postprocess(ec, there_, shared_from_this());
             }
         }
 
@@ -154,8 +161,8 @@ namespace hpx::parcelset::policies::mpi {
                 HPX_ASSERT(state_ == initialized);
                 HPX_ASSERT(request_ptr_ == nullptr);
 
-                [[maybe_unused]] int const ret = MPI_Isend(header_.data(),
-                    header::data_size_, MPI_BYTE, dst_, 0,
+                [[maybe_unused]] int const ret = MPI_Isend(header_buffer.data(),
+                    (int) header_buffer.size(), MPI_BYTE, dst_, 0,
                     util::mpi_environment::communicator(), &request_);
                 HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
 
@@ -178,7 +185,7 @@ namespace hpx::parcelset::policies::mpi {
             HPX_ASSERT(request_ptr_ == nullptr);
 
             auto const& chunks = buffer_.transmission_chunks_;
-            if (!chunks.empty())
+            if (!chunks.empty() && !header_.piggy_back_tchunk())
             {
                 util::mpi_environment::scoped_lock l;
 
@@ -204,7 +211,7 @@ namespace hpx::parcelset::policies::mpi {
                 return false;
             }
 
-            if (!header_.piggy_back())
+            if (!header_.piggy_back_data())
             {
                 util::mpi_environment::scoped_lock l;
 
@@ -307,14 +314,10 @@ namespace hpx::parcelset::policies::mpi {
         int tag_;
         int dst_;
 
-        using handler_type = hpx::move_only_function<void(error_code const&)>;
         handler_type handler_;
-
-        using post_handler_type = hpx::move_only_function<void(
-            error_code const&, parcelset::locality const&,
-            std::shared_ptr<sender_connection>)>;
         post_handler_type postprocess_handler_;
 
+        std::vector<char> header_buffer;
         header header_;
 
         MPI_Request request_;

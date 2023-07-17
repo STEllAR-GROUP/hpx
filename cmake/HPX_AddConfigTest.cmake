@@ -278,6 +278,15 @@ function(hpx_check_for_cxx11_std_atomic)
     unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
   endif()
 
+  # we shouldn't delete this key if the user has pre-set the atomic libraries to
+  # use
+  if(HPX_CXX11_STD_ATOMIC_LIBRARIES)
+    set(__std_atomic_libraries
+        TRUE
+        CACHE STRING "std::atomics need separate library" FORCE
+    )
+  endif()
+
   # first see if we can build atomics with no -latomics
   add_hpx_config_test(
     HPX_WITH_CXX11_ATOMIC
@@ -301,11 +310,17 @@ function(hpx_check_for_cxx11_std_atomic)
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
         FILE ${ARGN}
       )
-      if(NOT HPX_WITH_CXX11_ATOMIC)
-        unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
-        unset(HPX_WITH_CXX11_ATOMIC CACHE)
+      if(HPX_WITH_CXX11_ATOMIC)
+        set(__std_atomic_libraries
+            TRUE
+            CACHE STRING "std::atomics need separate library" FORCE
+        )
       endif()
     endif()
+  endif()
+
+  if(NOT HPX_WITH_CXX11_ATOMIC)
+    hpx_error("HPX needs support for C++11 std::atomic")
   endif()
 endfunction()
 
@@ -334,11 +349,15 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
       )
       if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
         # Adding -latomic did not help, so we don't attempt to link to it later
-        unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
+        # but only if normal atomics don't require it
+        if(NOT __std_atomic_libraries)
+          unset(HPX_CXX11_STD_ATOMIC_LIBRARIES CACHE)
+        endif()
         unset(HPX_WITH_CXX11_ATOMIC_128BIT CACHE)
       endif()
     endif()
   endif()
+  unset(__std_atomic_libraries CACHE)
 endfunction()
 
 # ##############################################################################
@@ -346,6 +365,15 @@ function(hpx_check_for_cxx11_std_shared_ptr_lwg3018)
   add_hpx_config_test(
     HPX_WITH_CXX11_SHARED_PTR_LWG3018
     SOURCE cmake/tests/cxx11_std_shared_ptr_lwg3018.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_cxx14_delete_operator_with_size)
+  add_hpx_config_test(
+    HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE
+    SOURCE cmake/tests/cxx_14_delete_operator_with_size.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -493,6 +521,15 @@ function(hpx_check_for_cxx20_perfect_pack_capture)
   add_hpx_config_test(
     HPX_WITH_CXX20_PERFECT_PACK_CAPTURE
     SOURCE cmake/tests/cxx20_perfect_pack_capture.cpp
+    FILE ${ARGN}
+  )
+endfunction()
+
+# ##############################################################################
+function(hpx_check_for_pthread_setname_np)
+  add_hpx_config_test(
+    HPX_WITH_PTHREAD_SETNAME_NP
+    SOURCE cmake/tests/set_thread_name.cpp
     FILE ${ARGN}
   )
 endfunction()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,13 +11,16 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/thread_support/atomic_count.hpp>
 
 #include <climits>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -30,7 +33,39 @@ namespace hpx {
 
         struct empty_oncompletion
         {
-            inline constexpr void operator()() const noexcept {}
+            constexpr void operator()() const noexcept {}
+        };
+
+        struct barrier_data;
+
+        HPX_CORE_EXPORT void intrusive_ptr_add_ref(barrier_data* p) noexcept;
+        HPX_CORE_EXPORT void intrusive_ptr_release(barrier_data* p) noexcept;
+
+        struct barrier_data
+        {
+            using mutex_type = hpx::spinlock;
+
+            barrier_data() noexcept
+              : count_(1)
+            {
+            }
+
+            barrier_data(barrier_data const&) = delete;
+            barrier_data(barrier_data&&) = delete;
+            barrier_data& operator=(barrier_data const&) = delete;
+            barrier_data& operator=(barrier_data&&) = delete;
+
+            ~barrier_data() = default;
+
+            mutable mutex_type mtx_;
+
+        private:
+            friend HPX_CORE_EXPORT void intrusive_ptr_add_ref(
+                barrier_data*) noexcept;
+            friend HPX_CORE_EXPORT void intrusive_ptr_release(
+                barrier_data*) noexcept;
+
+            hpx::util::atomic_count count_;
         };
     }    // namespace detail
     /// \endcond
@@ -98,7 +133,10 @@ namespace hpx {
     {
     public:
         /// \cond NOINTERNAL
-        HPX_NON_COPYABLE(barrier);
+        barrier(barrier const&) = delete;
+        barrier(barrier&&) = delete;
+        barrier& operator=(barrier const&) = delete;
+        barrier& operator=(barrier&&) = delete;
         /// \endcond
 
     private:
@@ -127,7 +165,8 @@ namespace hpx {
         ///                 constructor.
         constexpr explicit barrier(
             std::ptrdiff_t expected, OnCompletion completion = OnCompletion())
-          : expected_(expected)
+          : mtx_(new detail::barrier_data(), false)
+          , expected_(expected)
           , arrived_(expected)
           , completion_(HPX_MOVE(completion))
           , phase_(false)
@@ -137,6 +176,8 @@ namespace hpx {
             HPX_ASSERT(expected >= 0 && expected <= (max)());
             // clang-format on
         }
+
+        ~barrier() = default;
 
     private:
         /// \cond NOINTERNAL
@@ -184,7 +225,8 @@ namespace hpx {
         ///        to start.- end note]
         [[nodiscard]] arrival_token arrive(std::ptrdiff_t update = 1)
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            auto const mtx = mtx_;    // keep alive
+            std::unique_lock<mutex_type> l(mtx->mtx_);
             return arrive_locked(l, update);
         }
 
@@ -205,23 +247,23 @@ namespace hpx {
         ///                 types ([thread.mutex.requirements.mutex]).
         void wait(arrival_token&& old_phase) const
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            auto const mtx = mtx_;    // keep alive
+            std::unique_lock<mutex_type> l(mtx->mtx_);
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT_LOCKED(l, phase_ != old_phase);
             }
         }
 
         /// Effects:        Equivalent to: wait(arrive()).
         void arrive_and_wait()
         {
-            std::unique_lock<mutex_type> l(mtx_);
-            arrival_token old_phase = arrive_locked(l, 1);
+            auto const mtx = mtx_;    // keep alive
+            std::unique_lock<mutex_type> l(mtx->mtx_);
+            arrival_token const old_phase = arrive_locked(l, 1);
             if (phase_ == old_phase)
             {
                 cond_.wait(l, "barrier::wait");
-                HPX_ASSERT_LOCKED(l, phase_ != old_phase);    //-V547
             }
         }
 
@@ -244,14 +286,15 @@ namespace hpx {
         ///                 step for the current phase to start.- end note]
         void arrive_and_drop()
         {
-            std::unique_lock<mutex_type> l(mtx_);
+            auto const mtx = mtx_;    // keep alive
+            std::unique_lock<mutex_type> l(mtx->mtx_);
             HPX_ASSERT_LOCKED(l, expected_ > 0);
             --expected_;
             [[maybe_unused]] bool result = arrive_locked(l, 1);
         }
 
     private:
-        mutable mutex_type mtx_;
+        hpx::intrusive_ptr<detail::barrier_data> mtx_;
         mutable hpx::lcos::local::detail::condition_variable cond_;
 
         std::ptrdiff_t expected_;
@@ -274,8 +317,7 @@ namespace hpx {
         //         allowing to synchronize a given number of \a threads.
         class HPX_CORE_EXPORT barrier
         {
-        private:
-            typedef hpx::spinlock mutex_type;
+            using mutex_type = hpx::spinlock;
 
             static constexpr std::size_t barrier_flag =
                 static_cast<std::size_t>(1)
@@ -287,6 +329,12 @@ namespace hpx {
             // \param expected The number of participating threads
             //
             explicit barrier(std::size_t expected);
+
+            barrier(barrier const&) = delete;
+            barrier(barrier&&) = delete;
+            barrier& operator=(barrier const&) = delete;
+            barrier& operator=(barrier&&) = delete;
+
             ~barrier();
 
             // The function \a wait will block the number of entering \a threads

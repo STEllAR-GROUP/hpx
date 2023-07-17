@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2018-2021 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <mutex>
 
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     base_component::~base_component()
     {
@@ -48,7 +48,7 @@ namespace hpx { namespace components { namespace detail {
 
                 if (!agas::bind_gid_local(gid_, addr))
                 {
-                    naming::gid_type g = gid_;
+                    naming::gid_type const g = gid_;
                     gid_ = naming::invalid_gid;    // invalidate GID
 
                     HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
@@ -65,7 +65,7 @@ namespace hpx { namespace components { namespace detail {
                 if (!agas::bind(
                         launch::sync, gid_, addr, agas::get_locality_id()))
                 {
-                    naming::gid_type g = gid_;
+                    naming::gid_type const g = gid_;
                     gid_ = naming::invalid_gid;    // invalidate GID
 
                     HPX_THROW_EXCEPTION(hpx::error::duplicate_component_address,
@@ -112,7 +112,7 @@ namespace hpx { namespace components { namespace detail {
             }
 
             naming::detail::set_credit_for_gid(
-                gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+                gid_, static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL));
             gid_ = naming::replace_component_type(gid_, addr.type_);
             gid_ = naming::replace_locality_id(gid_, agas::get_locality_id());
 
@@ -140,19 +140,18 @@ namespace hpx { namespace components { namespace detail {
         return gid;
     }
 
-    hpx::id_type base_component::get_id(naming::gid_type gid) const
+    hpx::id_type base_component::get_id(naming::gid_type gid)
     {
         // all credits should have been taken already
         HPX_ASSERT(!naming::detail::has_credits(gid));
 
         // any (subsequent) invocation causes the credits to be replenished
         agas::replenish_credits(gid);
-        return hpx::id_type(gid, hpx::id_type::management_type::managed);
+        return {gid, hpx::id_type::management_type::managed};
     }
 
-    hpx::id_type base_component::get_unmanaged_id(
-        naming::gid_type const& gid) const
+    hpx::id_type base_component::get_unmanaged_id(naming::gid_type const& gid)
     {
-        return hpx::id_type(gid, hpx::id_type::management_type::managed);
+        return {gid, hpx::id_type::management_type::managed};
     }
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/type_support/bit_cast.hpp>
 
 #include <cstdint>
 
@@ -20,7 +21,7 @@ HPX_PLAIN_ACTION_ID(hpx::components::server::destroy_component,
     hpx_destroy_component_action, hpx::actions::free_component_action_id)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     void destroy_component(
@@ -31,19 +32,19 @@ namespace hpx { namespace components { namespace server {
                 agas::get_locality_id() ||
             agas::is_local_address_cached(gid, addr))
         {
-            // Check if component was migrated, we are not interested in
-            // pinning the object as it is supposed to be destroyed anyways
-            // that is, no one else has a handle to it anymore
-            auto r =
-                agas::was_object_migrated(gid, []() { return pinned_ptr(); });
+            // Check if component was migrated, we are not interested in pinning
+            // the object as it is supposed to be destroyed anyways that is, no
+            // one else has a handle to it anymore
 
             // The object is local, we can destroy it locally...
-            if (!r.first)
+            if (auto const r = agas::was_object_migrated(
+                    gid, []() { return pinned_ptr(); });
+                !r.first)
             {
                 if (naming::refers_to_virtual_memory(gid))
                 {
                     // simply delete the memory
-                    delete[] reinterpret_cast<std::uint8_t*>(gid.get_lsb());
+                    delete[] hpx::bit_cast<std::uint8_t*>(gid.get_lsb());
                     return;
                 }
 
@@ -58,7 +59,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         // apply remotely (only if runtime is not stopping)
-        hpx::id_type id = get_colocation_id(launch::sync,
+        hpx::id_type const id = get_colocation_id(launch::sync,
             hpx::id_type(gid, hpx::id_type::management_type::unmanaged));
 
         hpx_destroy_component_action()(id, gid, addr);
@@ -75,4 +76,4 @@ namespace hpx { namespace components { namespace server {
     };
 
     destroy_interface_function destroy_init;
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

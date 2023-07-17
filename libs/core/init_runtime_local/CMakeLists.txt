@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2020 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,9 +12,7 @@ set(init_runtime_local_headers hpx/init_runtime_local/detail/init_logging.hpp
                                hpx/init_runtime_local/init_runtime_local.hpp
 )
 
-if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
-  set(init_runtime_local_headers ${init_runtime_local_headers} hpx/init.hpp)
-endif()
+set(generated_init_runtime_local_headers hpx/init.hpp)
 
 set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
 
@@ -32,6 +30,7 @@ add_hpx_module(
   SOURCES ${init_runtime_local_sources}
   HEADERS ${init_runtime_local_headers}
   COMPAT_HEADERS ${init_runtime_local_compat_headers}
+  GENERATED_HEADERS ${generated_init_runtime_local_headers}
   MODULE_DEPENDENCIES
     hpx_algorithms
     hpx_command_line_handling_local

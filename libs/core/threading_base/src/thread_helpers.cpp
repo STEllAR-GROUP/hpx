@@ -612,7 +612,8 @@ namespace hpx::this_thread {
         return (std::numeric_limits<std::ptrdiff_t>::max)();
     }
 
-    bool has_sufficient_stack_space(std::size_t space_needed) noexcept
+    bool has_sufficient_stack_space(
+        [[maybe_unused]] std::size_t space_needed) noexcept
     {
         if (nullptr == hpx::threads::get_self_ptr())
             return false;

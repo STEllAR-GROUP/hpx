@@ -15,6 +15,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/memory.hpp>
 
+#include <array>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -97,14 +98,14 @@ namespace hpx::distributed {
         ///
         /// \returns This function returns once all participants have entered
         /// the barrier (have called \a wait).
-        void wait();
+        void wait() const;
 
         /// Wait until each participant entered the barrier. Must be called by
         /// all participants
         ///
         /// \returns a future that becomes ready once all participants have
         /// entered the barrier (have called \a wait).
-        hpx::future<void> wait(hpx::launch::async_policy);
+        hpx::future<void> wait(hpx::launch::async_policy) const;
 
         /// \cond NOINTERNAL
         // Resets this barrier instance.
@@ -113,8 +114,8 @@ namespace hpx::distributed {
         void detach();
 
         // Get the instance of the global barrier
-        static barrier& get_global_barrier();
-        static barrier create_global_barrier();
+        static std::array<barrier, 2>& get_global_barrier();
+        static std::array<barrier, 2> create_global_barrier();
         /// \endcond
 
         /// Perform a global synchronization using the default global barrier

@@ -20,7 +20,7 @@ displayed when the assertion fires. This behavior can be modified by using
 :cpp:func:`hpx::assertion::set_assertion_handler`. When HPX initializes, it uses
 this function to specify a more elaborate assertion handler. If your application
 needs to customize this, it needs to do so before calling
-:cpp:func:`hpx::hpx_init`, :cpp:func:`hpx::hpx_main` or using the C-main
+:cpp:func:`hpx::init`, :ref:`hpx_main <starting_hpx>` or using the C-main
 wrappers.
 
 

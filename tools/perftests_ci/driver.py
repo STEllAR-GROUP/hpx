@@ -126,7 +126,12 @@ if buildinfo:
               type=str,
               help='extra arguments to pass to the test\nWarning prefer = to \
               space to assign values to hpx options')
-    def run(local, run_output, targets_and_opts):
+    @args.arg('--n_executions',
+              default=1,
+              type=int,
+              help='number of executions of the benchmark executable, whose \
+              results are then merged together')
+    def run(local, run_output, targets_and_opts, n_executions):
         # options
         targets_and_opts = ' '.join(targets_and_opts).lstrip()
 
@@ -136,7 +141,7 @@ if buildinfo:
         mkdirp(run_output)
 
         import perftest
-        data = perftest.run(local, targets_and_opts)
+        data = perftest.run(local, targets_and_opts, n_executions)
         with open(run_output, 'w') as outfile:
             json.dump(data, outfile, indent='  ')
             log.info(f'Successfully saved perftests output to {run_output}')

@@ -36,13 +36,16 @@
 #include <hpx/coroutines/config/defines.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/coroutines/detail/swap_context.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
-#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <system_error>
 
+#if defined(HPX_HAVE_COROUTINE_COUNTERS)
+#include <hpx/util/get_and_reset_value.hpp>
+
+#include <atomic>
+#endif
 #if defined(HPX_HAVE_ADDRESS_SANITIZER)
 #include <processthreadsapi.h>
 #include <sanitizer/asan_interface.h>

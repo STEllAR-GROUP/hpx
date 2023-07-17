@@ -23,7 +23,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
+
     ///////////////////////////////////////////////////////////////////////////
     class HPX_MIGRATE_TO_STORAGE_EXPORT component_storage
       : public component_base<component_storage>
@@ -48,7 +49,7 @@ namespace hpx { namespace components { namespace server {
     private:
         hpx::unordered_map<naming::gid_type, std::vector<char>> data_;
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::components::server::component_storage::migrate_to_here_action,

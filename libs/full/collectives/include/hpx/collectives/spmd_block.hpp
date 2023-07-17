@@ -25,6 +25,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/type_support/pack.hpp>
 
+#include <array>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -52,6 +54,38 @@ namespace hpx { namespace lcos {
         using table_type =
             std::map<std::set<std::size_t>, std::shared_ptr<barrier_type>>;
 
+        struct barrier
+        {
+            static std::array<hpx::distributed::barrier, 2> create_barriers(
+                std::string const& name, std::size_t num_images,
+                std::size_t image_id)
+            {
+                return {{hpx::distributed::barrier(
+                             name + "_barrier0_", num_images, image_id),
+                    hpx::distributed::barrier(
+                        name + "_barrier1_", num_images, image_id)}};
+            }
+
+            barrier(std::string const& name, std::size_t num_images,
+                std::size_t image_id)
+              : generation(0)
+              , barriers(create_barriers(name, num_images, image_id))
+            {
+            }
+
+            void wait()
+            {
+                barriers[++generation % 2].wait();
+            }
+            auto wait(hpx::launch::async_policy const& l)
+            {
+                return barriers[++generation % 2].wait(l);
+            }
+
+            std::atomic<std::size_t> generation;
+            std::array<hpx::distributed::barrier, 2> barriers;
+        };
+
     public:
         spmd_block() = default;
 
@@ -62,8 +96,7 @@ namespace hpx { namespace lcos {
           , images_per_locality_(images_per_locality)
           , num_images_(num_images)
           , image_id_(image_id)
-          , barrier_(std::make_shared<hpx::distributed::barrier>(
-                name_ + "_barrier", num_images_, image_id_))
+          , barrier_(std::make_shared<barrier>(name, num_images, image_id))
         {
         }
 
@@ -98,7 +131,7 @@ namespace hpx { namespace lcos {
             using list_type = std::set<std::size_t>;
 
             typename table_type::iterator table_it(barriers_.find(images));
-            typename list_type::iterator image_it(images.find(image_id_));
+            typename list_type::iterator const image_it(images.find(image_id_));
 
             // Is current image in the input list?
             if (image_it != images.end())
@@ -232,7 +265,7 @@ namespace hpx { namespace lcos {
         // Note : barrier is stored as a pointer because
         // hpx::distributed::barrier default constructor does not exist (Needed
         // by spmd_block::spmd_block())
-        mutable std::shared_ptr<hpx::distributed::barrier> barrier_;
+        mutable std::shared_ptr<barrier> barrier_;
         mutable table_type barriers_;
 
     private:

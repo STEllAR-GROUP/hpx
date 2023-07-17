@@ -8,7 +8,6 @@
 
 #if defined(HPX_HAVE_PAPI)
 
-#include <hpx/config/asio.hpp>
 #include <hpx/components/performance_counters/papi/util/papi.hpp>
 #include <hpx/modules/command_line_handling.hpp>
 #include <hpx/modules/errors.hpp>
@@ -16,6 +15,9 @@
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/runtime_local.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/ip/host_name.hpp>
 
 #include <cstdint>

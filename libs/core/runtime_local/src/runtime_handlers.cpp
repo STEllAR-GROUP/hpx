@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/debugging/backtrace.hpp>
+#include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
@@ -18,9 +19,11 @@
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
+#include <winsock2.h>
+#endif
 #include <asio/io_context.hpp>
 
 #include <cstddef>

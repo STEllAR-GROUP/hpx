@@ -9,8 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/async_distributed/continuation.hpp>
-#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/format.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
@@ -23,7 +21,6 @@
 #include <hpx/util/insert_checked.hpp>
 
 #include <atomic>
-#include <cstddef>
 #include <cstdint>
 #include <list>
 #include <memory>
@@ -42,8 +39,8 @@ namespace hpx::agas {
 
     hpx::id_type bootstrap_primary_namespace_id()
     {
-        return hpx::id_type(agas::primary_ns_msb, agas::primary_ns_lsb,
-            hpx::id_type::management_type::unmanaged);
+        return {agas::primary_ns_msb, agas::primary_ns_lsb,
+            hpx::id_type::management_type::unmanaged};
     }
 }    // namespace hpx::agas
 
@@ -69,13 +66,13 @@ namespace hpx::agas::server {
             launch::sync, instance_name_, get_unmanaged_id().get_gid(), ec);
     }
 
-    void primary_namespace::unregister_server_instance(error_code& ec)
+    void primary_namespace::unregister_server_instance(error_code& ec) const
     {
         agas::unregister_name(launch::sync, instance_name_, ec);
         this->base_type::finalize();
     }
 
-    void primary_namespace::finalize()
+    void primary_namespace::finalize() const
     {
         if (!instance_name_.empty())
         {
@@ -109,10 +106,10 @@ namespace hpx::agas::server {
             return std::make_pair(hpx::invalid_id, naming::address());
         }
 
-        migration_table_type::iterator it = migrating_objects_.find(id);
+        auto it = migrating_objects_.find(id);
         if (it == migrating_objects_.end())
         {
-            std::pair<migration_table_type::iterator, bool> p =
+            std::pair<migration_table_type::iterator, bool> const p =
                 migrating_objects_.emplace(std::piecewise_construct,
                     std::forward_as_tuple(id), std::forward_as_tuple());
             HPX_ASSERT(p.second);
@@ -120,7 +117,7 @@ namespace hpx::agas::server {
         }
         else
         {
-            HPX_ASSERT(hpx::get<0>(it->second) == false);
+            HPX_ASSERT(!hpx::get<0>(it->second));
         }
 
         // flag this id as being migrated
@@ -145,8 +142,8 @@ namespace hpx::agas::server {
 
         using hpx::get;
 
-        migration_table_type::iterator it = migrating_objects_.find(id);
-        if (it != migrating_objects_.end())
+        if (auto const it = migrating_objects_.find(id);
+            it != migrating_objects_.end())
         {
             // flag this id as not being migrated anymore
             get<0>(it->second) = false;
@@ -172,8 +169,8 @@ namespace hpx::agas::server {
 
         using hpx::get;
 
-        migration_table_type::iterator it = migrating_objects_.find(id);
-        if (it != migrating_objects_.end())
+        if (auto const it = migrating_objects_.find(id);
+            it != migrating_objects_.end())
         {
             if (get<0>(it->second))
             {
@@ -204,15 +201,15 @@ namespace hpx::agas::server {
         counter_data_.increment_bind_gid_count();
         using hpx::get;
 
-        naming::gid_type gid = id;
+        naming::gid_type const gid = id;
         naming::detail::strip_internal_bits_from_gid(id);
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gva_table_type::iterator it = gvas_.lower_bound(id),
-                                 begin = gvas_.begin(), end = gvas_.end();
+        auto const begin = gvas_.begin();
+        auto const end = gvas_.end();
 
-        if (it != end)
+        if (auto it = gvas_.lower_bound(id); it != end)
         {
             // If we got an exact match, this is a request to update an existing
             // binding (e.g. move semantics).
@@ -227,8 +224,6 @@ namespace hpx::agas::server {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                         "primary_namespace::bind_gid",
                         "cannot rebind gids for non-migratable objects");
-
-                    return false;
                 }
 
                 gva& gaddr = it->second.first;
@@ -333,7 +328,7 @@ namespace hpx::agas::server {
             return true;
         }
 
-        naming::gid_type upper_bound(id + (g.count - 1));
+        naming::gid_type const upper_bound(id + (g.count - 1));
 
         if (HPX_UNLIKELY(id.get_msb() != upper_bound.get_msb()))
         {
@@ -382,8 +377,9 @@ namespace hpx::agas::server {
     {
         naming::gid_type locality = naming::get_locality_from_gid(id);
         gva addr(locality,
-            naming::detail::get_component_type_from_gid(id.get_msb()), 1,
-            id.get_lsb());
+            static_cast<std::uint32_t>(
+                naming::detail::get_component_type_from_gid(id.get_msb())),
+            1, id.get_lsb());
         return primary_namespace::resolved_type(id, addr, locality);
     }
 
@@ -438,8 +434,8 @@ namespace hpx::agas::server {
 
     hpx::id_type primary_namespace::colocate(naming::gid_type const& id)
     {
-        return hpx::id_type(hpx::get<2>(resolve_gid(id)),
-            hpx::id_type::management_type::unmanaged);
+        return {hpx::get<2>(resolve_gid(id)),
+            hpx::id_type::management_type::unmanaged};
     }
 
     naming::address primary_namespace::unbind_gid(
@@ -454,9 +450,8 @@ namespace hpx::agas::server {
 
         std::unique_lock<mutex_type> l(mutex_);
 
-        gva_table_type::iterator it = gvas_.find(id), end = gvas_.end();
-
-        if (it != end)
+        auto const it = gvas_.find(id);
+        if (auto const end = gvas_.end(); it != end)
         {
             if (HPX_UNLIKELY(it->second.first.count != count))
             {
@@ -466,7 +461,7 @@ namespace hpx::agas::server {
                     "primary_namespace::unbind_gid", "block sizes must match");
             }
 
-            gva_table_data_type data = it->second;
+            gva_table_data_type const data = it->second;
 
             gvas_.erase(it);
 
@@ -477,24 +472,25 @@ namespace hpx::agas::server {
                 id, count, data.first, data.second);
 
             gva g = data.first;
-            return naming::address(g.prefix, g.type, g.lva());
+            return {g.prefix, g.type, g.lva()};
         }
 
         // non-migratable gids are not bound
         if (naming::refers_to_local_lva(id) &&
             !naming::refers_to_virtual_memory(id))
         {
-            naming::gid_type locality = naming::get_locality_from_gid(id);
+            naming::gid_type const locality = naming::get_locality_from_gid(id);
             gva g(locality,
-                naming::detail::get_component_type_from_gid(id.get_msb()), 0,
-                id.get_lsb());
+                static_cast<std::uint32_t>(
+                    naming::detail::get_component_type_from_gid(id.get_msb())),
+                0, id.get_lsb());
 
             LAGAS_(info).format(
                 "primary_namespace::unbind_gid, gid({1}), count({2}), "
                 "gva({3}), locality({4})",
                 id, count, g, g.prefix);
 
-            return naming::address(g.prefix, g.type, g.lva());
+            return {g.prefix, g.type, g.lva()};
         }
 
         l.unlock();
@@ -504,7 +500,7 @@ namespace hpx::agas::server {
             "response(no_success)",
             id, count);
 
-        return naming::address();
+        return {};
     }    // }}}
 
     std::int64_t primary_namespace::increment_credit(
@@ -525,17 +521,12 @@ namespace hpx::agas::server {
         if (credits > 0)
         {
             increment(lower, upper, credits, hpx::throws);
-            return 0;
-        }
-        else
-        {
-            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                "primary_namespace::increment_credit",
-                "invalid credit count of {1}", credits);
-            return 0;
+            return credits;
         }
 
-        return credits;
+        HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+            "primary_namespace::increment_credit",
+            "invalid credit count of {1}", credits);
     }
 
     std::vector<std::int64_t> primary_namespace::decrement_credit(
@@ -677,7 +668,8 @@ namespace hpx::agas::server {
 
     ///////////////////////////////////////////////////////////////////////////////
     void primary_namespace::increment(naming::gid_type const& lower,
-        naming::gid_type const& upper, std::int64_t& credits, error_code& ec)
+        naming::gid_type const& upper, std::int64_t const& credits,
+        error_code& ec)
     {    // {{{ increment implementation
         std::unique_lock<mutex_type> l(mutex_);
 
@@ -716,14 +708,14 @@ namespace hpx::agas::server {
 
         for (naming::gid_type raw = lower; raw != upper; ++raw)
         {
-            refcnt_table_type::iterator it = refcnts_.find(raw);
+            auto it = refcnts_.find(raw);
             if (it == refcnts_.end())
             {
                 std::int64_t count =
                     static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL) +
                     credits;
 
-                std::pair<refcnt_table_type::iterator, bool> p =
+                std::pair<refcnt_table_type::iterator, bool> const p =
                     refcnts_.insert(refcnt_table_type::value_type(raw, count));
                 if (!p.second)
                 {
@@ -764,11 +756,11 @@ namespace hpx::agas::server {
 
         using hpx::get;
 
-        typedef refcnt_table_type::iterator iterator;
+        using iterator = refcnt_table_type::iterator;
 
         for (iterator const& it : free_list)
         {
-            typedef refcnt_table_type::key_type key_type;
+            using key_type = refcnt_table_type::key_type;
 
             // The mapping's key space.
             key_type gid = it->first;
@@ -891,7 +883,7 @@ namespace hpx::agas::server {
             std::list<refcnt_table_type::iterator> free_list;    //-V826
             for (naming::gid_type raw = lower; raw != upper; ++raw)
             {
-                refcnt_table_type::iterator it = refcnts_.find(raw);
+                auto it = refcnts_.find(raw);
                 if (it == refcnts_.end())
                 {
                     if (credits >
@@ -904,7 +896,9 @@ namespace hpx::agas::server {
                             "negative entry in reference count table, "
                             "raw({1}), refcount({2})",
                             raw,
-                            std::int64_t(HPX_GLOBALCREDIT_INITIAL) - credits);
+                            static_cast<std::int64_t>(
+                                HPX_GLOBALCREDIT_INITIAL) -
+                                credits);
                         return;
                     }
 
@@ -962,8 +956,8 @@ namespace hpx::agas::server {
 
     ///////////////////////////////////////////////////////////////////////////////
     void primary_namespace::free_components_sync(
-        free_entry_list_type& free_list, naming::gid_type const& lower,
-        naming::gid_type const& upper, error_code& ec)
+        free_entry_list_type const& free_list, naming::gid_type const& lower,
+        naming::gid_type const& upper, error_code& ec) const
     {
         using hpx::get;
 
@@ -993,7 +987,7 @@ namespace hpx::agas::server {
             naming::address addr(e.locality_, e.gva_.type, e.gva_.lva());
             if (e.locality_ == locality_)
             {
-                auto deleter = components::deleter(e.gva_.type);
+                auto const deleter = components::deleter(e.gva_.type);
                 if (deleter == nullptr)
                 {
                     HPX_THROWS_IF(ec, hpx::error::internal_server_error,
@@ -1048,10 +1042,10 @@ namespace hpx::agas::server {
         naming::gid_type id = gid;
         naming::detail::strip_internal_bits_from_gid(id);
 
-        gva_table_type::const_iterator it = gvas_.lower_bound(id),
-                                       begin = gvas_.begin(), end = gvas_.end();
+        gva_table_type::const_iterator it = gvas_.lower_bound(id);
+        gva_table_type::const_iterator const begin = gvas_.begin();
 
-        if (it != end)
+        if (gva_table_type::const_iterator const end = gvas_.end(); it != end)
         {
             // Check for exact match
             if (it->first == id)
@@ -1065,7 +1059,7 @@ namespace hpx::agas::server {
 
             // We need to decrement the iterator, first we check that it's safe
             // to do this.
-            else if (it != begin)
+            if (it != begin)
             {
                 --it;
 

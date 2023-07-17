@@ -69,6 +69,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
+    void (*on_finalize)() = nullptr;
+
     namespace detail {
 
         int init_helper(hpx::program_options::variables_map& /*vm*/,
@@ -150,6 +153,12 @@ namespace hpx {
             }
 
             rt->finalize(0);
+
+            // invoke user supplied finalizer
+            if (hpx::on_finalize != nullptr)
+            {
+                (*hpx::on_finalize)();
+            }
 
             return 0;
         }
@@ -516,6 +525,9 @@ namespace hpx {
                     // Command line handling should have updated this by now.
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
+
+                    // Store application defined command line options
+                    rt->set_app_options(params.desc_cmdline);
 
                     result = run_or_start(blocking, HPX_MOVE(rt), cmdline,
                         HPX_MOVE(params.startup), HPX_MOVE(params.shutdown));

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
-#include <hpx/coroutines/detail/get_stack_pointer.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/function.hpp>
@@ -22,7 +21,6 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
-#include <hpx/threading_base/annotated_function.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -33,7 +31,6 @@
 #include <exception>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -242,7 +239,12 @@ namespace hpx::lcos::detail {
         using result_type = util::unused_type;
         using init_no_addref = future_data_refcnt_base::init_no_addref;
 
-        virtual ~future_data_base();
+        future_data_base(future_data_base const&) = delete;
+        future_data_base(future_data_base&&) = delete;
+        future_data_base& operator=(future_data_base const&) = delete;
+        future_data_base& operator=(future_data_base&&) = delete;
+
+        ~future_data_base() override;
 
         enum state
         {
@@ -319,6 +321,7 @@ namespace hpx::lcos::detail {
     protected:
         mutable mutex_type mtx_;
         std::atomic<state> state_;    // current state
+
         completed_callback_vector_type on_completed_;
         local::detail::condition_variable cond_;    // threads waiting in read
     };
@@ -375,7 +378,7 @@ namespace hpx::lcos::detail {
         future_data_base(init_no_addref no_addref, std::in_place_t, Ts&&... ts)
           : base_type(no_addref)
         {
-            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
             state_.store(value, std::memory_order_relaxed);
         }
@@ -384,11 +387,16 @@ namespace hpx::lcos::detail {
             init_no_addref no_addref, std::exception_ptr e) noexcept
           : base_type(no_addref)
         {
-            std::exception_ptr* exception_ptr =
+            auto* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             hpx::construct_at(exception_ptr, HPX_MOVE(e));
             state_.store(exception, std::memory_order_relaxed);
         }
+
+        future_data_base(future_data_base const&) = delete;
+        future_data_base(future_data_base&&) = delete;
+        future_data_base& operator=(future_data_base const&) = delete;
+        future_data_base& operator=(future_data_base&&) = delete;
 
         ~future_data_base() noexcept override
         {
@@ -430,6 +438,8 @@ namespace hpx::lcos::detail {
         template <typename... Ts>
         void set_value(Ts&&... ts)
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             // Note: it is safe to access the data store as no other thread
             //       should access it concurrently. There shouldn't be any
             //       threads attempting to read the value as the state is still
@@ -437,7 +447,7 @@ namespace hpx::lcos::detail {
             //       attempting to set the value by definition.
 
             // set the data
-            result_type* value_ptr = reinterpret_cast<result_type*>(&storage_);
+            auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
             construct(value_ptr, HPX_FORWARD(Ts, ts)...);
 
             // At this point the lock needs to be acquired to safely access the
@@ -460,7 +470,6 @@ namespace hpx::lcos::detail {
                 HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_value",
                     "data has already been set for this future");
-                return;
             }
 
             // 26111: Caller failing to release lock 'this->mtx_'
@@ -501,6 +510,8 @@ namespace hpx::lcos::detail {
 
         void set_exception(std::exception_ptr data) override
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             // Note: it is safe to access the data store as no other thread
             //       should access it concurrently. There shouldn't be any
             //       threads attempting to read the value as the state is still
@@ -508,7 +519,7 @@ namespace hpx::lcos::detail {
             //       attempting to set the value by definition.
 
             // set the data
-            std::exception_ptr* exception_ptr =
+            auto* exception_ptr =
                 reinterpret_cast<std::exception_ptr*>(&storage_);
             hpx::construct_at(exception_ptr, HPX_MOVE(data));
 
@@ -532,7 +543,6 @@ namespace hpx::lcos::detail {
                 HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                     "future_data_base::set_exception",
                     "data has already been set for this future");
-                return;
             }
 
             // 26111: Caller failing to release lock 'this->mtx_'
@@ -620,14 +630,13 @@ namespace hpx::lcos::detail {
             {
             case value:
             {
-                result_type* value_ptr =
-                    reinterpret_cast<result_type*>(&storage_);
+                auto* value_ptr = reinterpret_cast<result_type*>(&storage_);
                 std::destroy_at(value_ptr);
                 break;
             }
             case exception:
             {
-                std::exception_ptr* exception_ptr =
+                auto* exception_ptr =
                     reinterpret_cast<std::exception_ptr*>(&storage_);
                 std::destroy_at(exception_ptr);
                 break;
@@ -683,6 +692,11 @@ namespace hpx::lcos::detail {
           : future_data_base<Result>(no_addref, HPX_MOVE(e))
         {
         }
+
+        future_data(future_data const&) = delete;
+        future_data(future_data&&) = delete;
+        future_data& operator=(future_data const&) = delete;
+        future_data& operator=(future_data&&) = delete;
 
         ~future_data() noexcept override = default;
     };
@@ -775,7 +789,8 @@ namespace hpx::lcos::detail {
                 threads::thread_schedule_hint(),
                 threads::thread_stacksize::current,
                 threads::thread_schedule_state::suspended, true);
-            threads::thread_id_ref_type id = threads::register_thread(data, ec);
+            threads::thread_id_ref_type const id =
+                threads::register_thread(data, ec);
             if (ec)
             {
                 // thread creation failed, report error to the new future
@@ -893,7 +908,6 @@ namespace hpx::lcos::detail {
                 HPX_THROW_EXCEPTION(hpx::error::task_already_started,
                     "task_base::check_started",
                     "this task has already been started");
-                return;
             }
             started_ = true;
         }
@@ -1010,6 +1024,9 @@ namespace hpx::lcos::detail {
 
         void cancel() override
         {
+            hpx::intrusive_ptr<cancelable_task_base> this_(
+                this);    // keep alive
+
             std::unique_lock<mutex_type> l(mtx_);
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
@@ -1056,13 +1073,11 @@ namespace hpx::lcos::detail {
     };
 }    // namespace hpx::lcos::detail
 
-namespace hpx::traits::detail {
-
-    template <typename R, typename Allocator>
-    struct shared_state_allocator<lcos::detail::future_data<R>, Allocator>
-    {
-        using type = lcos::detail::future_data_allocator<R, Allocator>;
-    };
-}    // namespace hpx::traits::detail
+template <typename R, typename Allocator>
+struct hpx::traits::detail::shared_state_allocator<
+    hpx::lcos::detail::future_data<R>, Allocator>
+{
+    using type = hpx::lcos::detail::future_data_allocator<R, Allocator>;
+};
 
 #include <hpx/config/warnings_suffix.hpp>

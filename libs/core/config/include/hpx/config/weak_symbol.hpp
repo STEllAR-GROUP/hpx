@@ -6,7 +6,8 @@
 
 #pragma once
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(_MSC_VER)
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(_MSC_VER) &&         \
+    !defined(HPX_MINGW)
 #define HPX_WEAK_SYMBOL __attribute__((weak))
 #else
 #define HPX_WEAK_SYMBOL

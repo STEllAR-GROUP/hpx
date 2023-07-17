@@ -33,7 +33,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
@@ -60,7 +60,7 @@ namespace hpx { namespace actions {
         explicit transfer_action(Ts&&... vs);
 
         template <typename... Ts>
-        transfer_action(threads::thread_priority priority, Ts&&... vs);
+        explicit transfer_action(threads::thread_priority priority, Ts&&... vs);
 
         bool has_continuation() const override;
 
@@ -182,7 +182,7 @@ namespace hpx { namespace actions {
             data.description, data.parent_locality_id, data.parent_id);
 #endif
         hpx::detail::post_helper<typename base_type::derived_type>::call(
-            HPX_MOVE(data), target, lva, comptype, this->priority_,
+            HPX_MOVE(data), HPX_MOVE(target), lva, comptype, this->priority_,
             HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }
 
@@ -252,17 +252,16 @@ namespace hpx { namespace actions {
         auto* ptr = &detail::register_action<Action>::create;
         (void) ptr;
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
-namespace hpx::traits {
-    /// \cond NOINTERNAL
-    template <typename Action>
-    struct needs_automatic_registration<hpx::actions::transfer_action<Action>>
-      : needs_automatic_registration<Action>
-    {
-    };
-    /// \endcond
-}    // namespace hpx::traits
+/// \cond NOINTERNAL
+template <typename Action>
+struct hpx::traits::needs_automatic_registration<
+    hpx::actions::transfer_action<Action>>
+  : needs_automatic_registration<Action>
+{
+};
+/// \endcond
 
 #include <hpx/config/warnings_suffix.hpp>
 

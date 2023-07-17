@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     struct HPX_EXPORT performance_counter
@@ -35,7 +35,7 @@ namespace hpx { namespace performance_counters {
 
         performance_counter() = default;
 
-        performance_counter(std::string const& name);
+        explicit performance_counter(std::string const& name);
 
         performance_counter(
             std::string const& name, hpx::id_type const& locality);
@@ -60,36 +60,35 @@ namespace hpx { namespace performance_counters {
         counter_info get_info(
             launch::sync_policy, error_code& ec = throws) const;
 
-        future<counter_value> get_counter_value(bool reset = false);
+        future<counter_value> get_counter_value(bool reset) const;
         counter_value get_counter_value(
-            launch::sync_policy, bool reset = false, error_code& ec = throws);
+            launch::sync_policy, bool reset, error_code& ec = throws) const;
 
         future<counter_value> get_counter_value() const;
         counter_value get_counter_value(
             launch::sync_policy, error_code& ec = throws) const;
 
-        future<counter_values_array> get_counter_values_array(
-            bool reset = false);
+        future<counter_values_array> get_counter_values_array(bool reset) const;
         counter_values_array get_counter_values_array(
-            launch::sync_policy, bool reset = false, error_code& ec = throws);
+            launch::sync_policy, bool reset, error_code& ec = throws) const;
 
         future<counter_values_array> get_counter_values_array() const;
         counter_values_array get_counter_values_array(
             launch::sync_policy, error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
-        future<bool> start();
-        bool start(launch::sync_policy, error_code& ec = throws);
+        future<bool> start() const;
+        bool start(launch::sync_policy, error_code& ec = throws) const;
 
-        future<bool> stop();
-        bool stop(launch::sync_policy, error_code& ec = throws);
+        future<bool> stop() const;
+        bool stop(launch::sync_policy, error_code& ec = throws) const;
 
-        future<void> reset();
-        void reset(launch::sync_policy, error_code& ec = throws);
+        future<void> reset() const;
+        void reset(launch::sync_policy, error_code& ec = throws) const;
 
-        future<void> reinit(bool reset = true);
-        void reinit(
-            launch::sync_policy, bool reset = true, error_code& ec = throws);
+        future<void> reinit(bool reset = true) const;
+        void reinit(launch::sync_policy, bool reset = true,
+            error_code& ec = throws) const;
 
         ///////////////////////////////////////////////////////////////////////
         future<std::string> get_name() const;
@@ -120,19 +119,19 @@ namespace hpx { namespace performance_counters {
         template <typename T>
         future<T> get_value() const
         {
-            return get_counter_value().then(hpx::launch::sync,
+            return get_counter_value(false).then(hpx::launch::sync,
                 hpx::bind_front(&performance_counter::extract_value<T>));
         }
         template <typename T>
         T get_value(launch::sync_policy, error_code& ec = throws) const
         {
-            return get_counter_value(launch::sync).get_value<T>(ec);
+            return get_counter_value(launch::sync, false).get_value<T>(ec);
         }
     };
 
     // Return all counters matching the given name (with optional wild cards).
     HPX_EXPORT std::vector<performance_counter> discover_counters(
         std::string const& name, error_code& ec = throws);
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters
 
 #include <hpx/config/warnings_suffix.hpp>

@@ -55,9 +55,9 @@
 #include <vector>
 
 #if defined(HPX_MSVC)
-#include <dbghelp.h>
-#include <winbase.h>
 #include <windows.h>
+
+#include <dbghelp.h>
 #endif
 
 namespace hpx::util::stack_trace {

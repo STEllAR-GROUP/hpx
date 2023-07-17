@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,14 +19,15 @@
 #include <hpx/type_support/pack.hpp>
 
 #include <cstddef>
-#include <system_error>
 #include <type_traits>
 #include <utility>
 
 namespace hpx {
+
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Action, typename Callback, typename... Ts>
         bool post_r_p_cb(naming::address&& addr, hpx::id_type const& id,
             threads::thread_priority priority, Callback&& cb, Ts&&... vs)
@@ -108,6 +109,7 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
         bool post_r_p_cb(naming::address&& addr, Continuation&& c,
@@ -146,24 +148,19 @@ namespace hpx {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "post_p_cb",
                 "the target (destination) does not match the action type ({})",
                 hpx::actions::detail::get_action_name<Action>());
-            return false;
         }
 
         // Determine whether the gid is local or remote
-        if (naming::get_locality_id_from_gid(addr.locality_) ==
-            agas::get_locality_id())
+        if (addr &&
+            naming::get_locality_id_from_gid(addr.locality_) ==
+                agas::get_locality_id())
         {
             // apply locally
-            bool result =
+            bool const result =
                 hpx::detail::post_l_p<Action>(HPX_FORWARD(Continuation, c), gid,
                     HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
 
-            // invoke callback
-#if defined(HPX_HAVE_NETWORKING)
-            cb(std::error_code(), parcelset::parcel());
-#else
-            cb();
-#endif
+            detail::invoke_callback(HPX_FORWARD(Callback, cb));
             return result;
         }
 
@@ -249,17 +246,16 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Action, typename Callback, typename... Ts>
         bool post_c_p_cb(naming::address&& addr, hpx::id_type const& contgid,
             hpx::id_type const& gid, threads::thread_priority priority,
             Callback&& cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::remote_result_type
-                    remote_result_type;
-            typedef
-                typename hpx::traits::extract_action<Action>::local_result_type
-                    local_result_type;
+            using remote_result_type = typename hpx::traits::extract_action<
+                Action>::remote_result_type;
+            using local_result_type =
+                typename hpx::traits::extract_action<Action>::local_result_type;
 
             return post_r_p_cb<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
@@ -272,12 +268,10 @@ namespace hpx {
         bool post_c_cb(naming::address&& addr, hpx::id_type const& contgid,
             hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
         {
-            typedef
-                typename hpx::traits::extract_action<Action>::remote_result_type
-                    remote_result_type;
-            typedef
-                typename hpx::traits::extract_action<Action>::local_result_type
-                    local_result_type;
+            using remote_result_type = typename hpx::traits::extract_action<
+                Action>::remote_result_type;
+            using local_result_type =
+                typename hpx::traits::extract_action<Action>::local_result_type;
 
             return post_r_p_cb<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
@@ -293,10 +287,10 @@ namespace hpx {
     bool post_c_p_cb(hpx::id_type const& contgid, hpx::id_type const& gid,
         threads::thread_priority priority, Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef typename hpx::traits::extract_action<Action>::local_result_type
-            local_result_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using local_result_type =
+            typename hpx::traits::extract_action<Action>::local_result_type;
 
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
@@ -308,10 +302,10 @@ namespace hpx {
     bool post_c_cb(hpx::id_type const& contgid, hpx::id_type const& gid,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef typename hpx::traits::extract_action<Action>::local_result_type
-            local_result_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using local_result_type =
+            typename hpx::traits::extract_action<Action>::local_result_type;
 
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
@@ -325,10 +319,10 @@ namespace hpx {
         hpx::id_type const& gid, threads::thread_priority priority,
         Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef typename hpx::traits::extract_action<Action>::local_result_type
-            local_result_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using local_result_type =
+            typename hpx::traits::extract_action<Action>::local_result_type;
 
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
@@ -341,10 +335,10 @@ namespace hpx {
     bool post_c_cb(hpx::id_type const& contgid, naming::address&& addr,
         hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        typedef typename hpx::traits::extract_action<Action>::remote_result_type
-            remote_result_type;
-        typedef typename hpx::traits::extract_action<Action>::local_result_type
-            local_result_type;
+        using remote_result_type =
+            typename hpx::traits::extract_action<Action>::remote_result_type;
+        using local_result_type =
+            typename hpx::traits::extract_action<Action>::local_result_type;
 
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
@@ -358,7 +352,7 @@ namespace hpx {
         struct post_c_p_cb_impl
         {
         public:
-            typedef hpx::tuple<Ts...> tuple_type;
+            using tuple_type = hpx::tuple<Ts...>;
 
             template <typename... Ts_>
             post_c_p_cb_impl(hpx::id_type const& contid, naming::address&& addr,
@@ -432,9 +426,8 @@ namespace hpx {
             hpx::id_type const& id, threads::thread_priority p, Callback&& cb,
             Ts&&... vs)
         {
-            typedef post_c_p_cb_impl<Action, std::decay_t<Callback>,
-                std::decay_t<Ts>...>
-                result_type;
+            using result_type = post_c_p_cb_impl<Action, std::decay_t<Callback>,
+                std::decay_t<Ts>...>;
 
             return result_type(contid, HPX_MOVE(addr), id, p,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);

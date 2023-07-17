@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,19 +18,15 @@
 #include <hpx/components_base/server/wrapper_heap_list.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 #include <hpx/components_base/traits/managed_component_policies.hpp>
-#include <hpx/functional/move_only_function.hpp>
 #include <hpx/modules/errors.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail_adl_barrier {
@@ -195,9 +191,9 @@ namespace hpx { namespace components {
         HPX_NON_COPYABLE(managed_component_base);
 
     public:
-        using this_component_type = typename std::conditional<
-            std::is_same<Component, detail::this_type>::value,
-            managed_component_base, Component>::type;
+        using this_component_type =
+            std::conditional_t<std::is_same_v<Component, detail::this_type>,
+                managed_component_base, Component>;
 
         using wrapped_type = this_component_type;
 
@@ -299,19 +295,21 @@ namespace hpx { namespace components {
     /// full network round trip to the AGAS service for each of the allocated
     /// instances.
     ///
-    /// \tparam Component
-    /// \tparam Derived
+    /// \tparam Component Component type
+    /// \tparam Derived Most derived component type
     ///
     template <typename Component, typename Derived>
     class managed_component
     {
     public:
-        HPX_NON_COPYABLE(managed_component);
+        managed_component(managed_component const&) = delete;
+        managed_component(managed_component&&) = delete;
+        managed_component& operator=(managed_component const&) = delete;
+        managed_component& operator=(managed_component&&) = delete;
 
-    public:
-        using derived_type = typename std::conditional<
-            std::is_same<Derived, detail::this_type>::value, managed_component,
-            Derived>::type;
+        using derived_type =
+            std::conditional_t<std::is_same_v<Derived, detail::this_type>,
+                managed_component, Derived>;
 
         using wrapped_type = Component;
         using type_holder = Component;
@@ -325,7 +323,7 @@ namespace hpx { namespace components {
         /// wrapped instance. This constructor takes ownership of the
         /// passed pointer.
         ///
-        /// \param c    [in] The pointer to the wrapped instance. The
+        /// \param comp [in] The pointer to the wrapped instance. The
         ///             managed_component takes ownership of this pointer.
         explicit managed_component(Component* comp)
           : component_(comp)
@@ -336,7 +334,6 @@ namespace hpx { namespace components {
             intrusive_ptr_add_ref(this);
         }
 
-    public:
         // Construct a managed_component instance holding a new wrapped instance
         managed_component()
           : component_(nullptr)
@@ -358,7 +355,6 @@ namespace hpx { namespace components {
             intrusive_ptr_add_ref(this);
         }
 
-    public:
         // The destructor releases any wrapped instances
         ~managed_component()
         {
@@ -410,7 +406,6 @@ namespace hpx { namespace components {
             return get();
         }
 
-    public:
         ///////////////////////////////////////////////////////////////////////
         // The managed_component behaves just like the wrapped object
         Component* operator->()
@@ -442,7 +437,6 @@ namespace hpx { namespace components {
                 get_base_gid(), hpx::id_type::management_type::unmanaged);
         }
 
-    public:
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
         {
@@ -451,14 +445,12 @@ namespace hpx { namespace components {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "managed_component::get_base_gid",
                     "managed_components must be assigned new gids on creation");
-                return naming::invalid_gid;
             }
 
             return component_heap<managed_component>().get_gid(
                 const_cast<managed_component*>(this));
         }
 
-    public:
         // reference counting
         template <typename C, typename D>
         friend void intrusive_ptr_add_ref(managed_component<C, D>* p) noexcept;
@@ -507,4 +499,4 @@ namespace hpx { namespace components {
         HPX_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components

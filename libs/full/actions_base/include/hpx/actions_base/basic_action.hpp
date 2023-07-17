@@ -292,13 +292,6 @@ namespace hpx::actions {
             hpx::id_type target, naming::address_type lva,
             naming::component_type comptype, Ts&&... vs)
         {
-            if (target &&
-                target.get_management_type() ==
-                    hpx::id_type::management_type::unmanaged)
-            {
-                target = {};
-            }
-
             using thread_function = detail::thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,
                 thread_function(
@@ -315,13 +308,6 @@ namespace hpx::actions {
             naming::address_type lva, naming::component_type comptype,
             Ts&&... vs)
         {
-            if (target &&
-                target.get_management_type() ==
-                    hpx::id_type::management_type::unmanaged)
-            {
-                target = {};
-            }
-
             using thread_function =
                 detail::continuation_thread_function<Derived>;
             return traits::action_decorate_function<Derived>::call(lva,

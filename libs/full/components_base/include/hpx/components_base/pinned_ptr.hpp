@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,19 +13,13 @@
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/modules/naming_base.hpp>
 
-#include <type_traits>
-#include <utility>
-
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         class pinned_ptr_base
         {
-        public:
-            pinned_ptr_base(pinned_ptr_base const&) = delete;
-            pinned_ptr_base& operator=(pinned_ptr_base const&) = delete;
-
         public:
             constexpr pinned_ptr_base() noexcept = default;
 
@@ -35,6 +29,11 @@ namespace hpx { namespace components {
             {
             }
 
+            pinned_ptr_base(pinned_ptr_base const&) = delete;
+            pinned_ptr_base(pinned_ptr_base&&) = delete;
+            pinned_ptr_base& operator=(pinned_ptr_base const&) = delete;
+            pinned_ptr_base& operator=(pinned_ptr_base&&) = delete;
+
             virtual ~pinned_ptr_base() = default;
 
         protected:
@@ -42,7 +41,7 @@ namespace hpx { namespace components {
         };
 
         template <typename Component>
-        class pinned_ptr : public pinned_ptr_base
+        class pinned_ptr final : public pinned_ptr_base
         {
         public:
             explicit pinned_ptr(naming::address_type lva) noexcept
@@ -54,6 +53,11 @@ namespace hpx { namespace components {
                 traits::component_pin_support<Component>::pin(
                     get_lva<Component>::call(this->lva_));
             }
+
+            pinned_ptr(pinned_ptr const&) = delete;
+            pinned_ptr(pinned_ptr&&) = delete;
+            pinned_ptr& operator=(pinned_ptr const&) = delete;
+            pinned_ptr& operator=(pinned_ptr&&) = delete;
 
             ~pinned_ptr() override
             {
@@ -67,7 +71,6 @@ namespace hpx { namespace components {
     ///////////////////////////////////////////////////////////////////////////
     class pinned_ptr
     {
-    private:
         template <typename T>
         struct id
         {
@@ -80,7 +83,7 @@ namespace hpx { namespace components {
         }
 
     public:
-        constexpr pinned_ptr() = default;
+        constexpr pinned_ptr() noexcept = default;
 
         ~pinned_ptr()
         {
@@ -105,8 +108,13 @@ namespace hpx { namespace components {
             return *this;
         }
 
+        explicit constexpr operator bool() const noexcept
+        {
+            return data_ != nullptr;
+        }
+
         template <typename Component>
-        static pinned_ptr create(naming::address_type lva)
+        static pinned_ptr create([[maybe_unused]] naming::address_type lva)
         {
             using component_type = std::remove_cv_t<Component>;
             if constexpr (traits::component_decorates_action_v<component_type>)
@@ -117,7 +125,6 @@ namespace hpx { namespace components {
             else
             {
                 // created pinned_ptr does not pin object it refers to
-                (void) lva;
                 return pinned_ptr{};
             }
         }
@@ -125,4 +132,4 @@ namespace hpx { namespace components {
     private:
         detail::pinned_ptr_base* data_ = nullptr;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

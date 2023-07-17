@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2020 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -146,7 +146,8 @@ namespace hpx::agas::server {
         struct update_time_on_exit;
 
     public:
-        // data structure holding all counters for the omponent_namespace component
+        // data structure holding all counters for the component_namespace
+        // component
         struct counter_data
         {
         public:
@@ -210,16 +211,22 @@ namespace hpx::agas::server {
             api_counter_data route_;    // primary_ns_
 #endif
 
-            api_counter_data bind_gid_;       // primary_ns_bind_gid
-            api_counter_data resolve_gid_;    // primary_ns_resolve_gid
-            api_counter_data unbind_gid_;     // primary_ns_unbind_gid
-            api_counter_data
-                increment_credit_;    // primary_ns_increment_credit
-            api_counter_data
-                decrement_credit_;                // primary_ns_decrement_credit
-            api_counter_data allocate_;           // primary_ns_allocate
-            api_counter_data begin_migration_;    // primary_ns_begin_migration
-            api_counter_data end_migration_;      // primary_ns_end_migration
+            // primary_ns_bind_gid
+            api_counter_data bind_gid_;
+            // primary_ns_resolve_gid
+            api_counter_data resolve_gid_;
+            // primary_ns_unbind_gid
+            api_counter_data unbind_gid_;
+            // primary_ns_increment_credit
+            api_counter_data increment_credit_;
+            // primary_ns_decrement_credit
+            api_counter_data decrement_credit_;
+            // primary_ns_allocate
+            api_counter_data allocate_;
+            // primary_ns_begin_migration
+            api_counter_data begin_migration_;
+            // primary_ns_end_migration
+            api_counter_data end_migration_;
         };
 
         counter_data counter_data_;
@@ -241,14 +248,12 @@ namespace hpx::agas::server {
     public:
         primary_namespace()
           : base_type(agas::primary_ns_msb, agas::primary_ns_lsb)
-          , mutex_()
-          , instance_name_()
           , next_id_(naming::invalid_gid)
           , locality_(naming::invalid_gid)
         {
         }
 
-        void finalize();
+        void finalize() const;
 
         void set_local_locality(naming::gid_type const& g)
         {
@@ -260,7 +265,7 @@ namespace hpx::agas::server {
             std::uint32_t locality_id = naming::invalid_locality_id,
             error_code& ec = throws);
 
-        void unregister_server_instance(error_code& ec = throws);
+        void unregister_server_instance(error_code& ec = throws) const;
 
 #if defined(HPX_HAVE_NETWORKING)
         void route(parcelset::parcel&& p);
@@ -299,13 +304,13 @@ namespace hpx::agas::server {
             error_code& ec);
 
         void increment(naming::gid_type const& lower,
-            naming::gid_type const& upper, std::int64_t& credits,
+            naming::gid_type const& upper, std::int64_t const& credits,
             error_code& ec);
 
         ///////////////////////////////////////////////////////////////////////////
         struct free_entry
         {
-            free_entry(agas::gva gva, naming::gid_type const& gid,
+            free_entry(agas::gva const& gva, naming::gid_type const& gid,
                 naming::gid_type const& loc)
               : gva_(gva)
               , gid_(gid)
@@ -332,9 +337,9 @@ namespace hpx::agas::server {
             naming::gid_type const& lower, naming::gid_type const& upper,
             std::int64_t credits, error_code& ec);
 
-        void free_components_sync(free_entry_list_type& free_list,
+        void free_components_sync(free_entry_list_type const& free_list,
             naming::gid_type const& lower, naming::gid_type const& upper,
-            error_code& ec);
+            error_code& ec) const;
 
     public:
         HPX_DEFINE_COMPONENT_ACTION(primary_namespace, allocate)
@@ -439,22 +444,19 @@ HPX_REGISTER_BASE_LCO_WITH_VALUE_DECLARATION(
     std::vector<std::int64_t>, vector_std_int64_type)
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE) && defined(HPX_HAVE_NETWORKING)
-namespace hpx::traits {
-
-    // Parcel routing forwards the binary filter request to the routed action
-    template <>
-    struct action_get_embedded_parcel<
-        agas::server::primary_namespace::route_action>
+// Parcel routing forwards the binary filter request to the routed action
+template <>
+struct hpx::traits::action_get_embedded_parcel<
+    hpx::agas::server::primary_namespace::route_action>
+{
+    static hpx::optional<hpx::parcelset::parcel> call(
+        hpx::actions::transfer_base_action<
+            hpx::agas::server::primary_namespace::route_action> const& act)
     {
-        static hpx::optional<parcelset::parcel> call(
-            hpx::actions::transfer_base_action<
-                agas::server::primary_namespace::route_action> const& act)
-        {
-            auto p = hpx::actions::get<0>(act);
-            return hpx::optional<parcelset::parcel>(HPX_MOVE(p));
-        }
-    };
-}    // namespace hpx::traits
+        auto p = hpx::actions::get<0>(act);
+        return hpx::optional<hpx::parcelset::parcel>(HPX_MOVE(p));
+    }
+};    // namespace hpx::traits
 #endif
 
 #include <hpx/config/warnings_suffix.hpp>

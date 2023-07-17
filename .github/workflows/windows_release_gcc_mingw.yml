@@ -1,0 +1,62 @@
+# Copyright (c) 2023 The STE||AR-Group
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: Windows CI (Release, gcc/mingw toolset)
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: '3.22.x'
+    - name: Install dependencies
+      run: |
+        choco install ninja -y
+        md C:\projects
+        $client = new-object System.Net.WebClient
+        $client.DownloadFile("https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.7z","C:\projects\boost_1_78_0.7z")
+        7z x C:\projects\boost_1_78_0.7z -y -oC:\projects\boost
+        cd C:\projects\boost\boost_1_78_0
+        .\bootstrap.bat gcc
+        .\b2.exe `
+            link=shared `
+            variant=release `
+            architecture=x86 `
+            address-model=64 `
+            threading=multi `
+            --with-iostreams `
+            --build-type=complete `
+            install
+        $client.DownloadFile("https://download.open-mpi.org/release/hwloc/v2.8/hwloc-win64-build-2.8.0.zip","C:\projects\hwloc-win64-build-2.8.0.zip")
+        7z x C:\projects\hwloc-win64-build-2.8.0.zip -y -oC:\projects
+    - name: Configure
+      shell: bash
+      run: |
+          cmake . -Bbuild -G'Ninja' \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_CXX_COMPILER=g++ \
+              -DBOOST_ROOT="C:\Boost" \
+              -DHWLOC_ROOT="C:\projects\hwloc-win64-build-2.8.0" \
+              -DHPX_WITH_CXX_STANDARD=20 \
+              -DHPX_WITH_STATIC_LINKING=ON \
+              -DHPX_WITH_MALLOC=system \
+              -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_PKGCONFIG=OFF \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_UNIT=ON \
+              -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
+              -DHPX_WITH_MODULES_AS_STATIC_LIBRARIES=OFF
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --config Release -- -j 2

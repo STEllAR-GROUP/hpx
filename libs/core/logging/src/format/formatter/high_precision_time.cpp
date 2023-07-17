@@ -17,6 +17,7 @@
 #include <hpx/logging/format/formatters.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/modules/format.hpp>
 
 #include <chrono>
@@ -29,6 +30,8 @@
 
 #if !(defined(__linux) || defined(linux) || defined(__linux__) ||              \
     defined(__FreeBSD__) || defined(__APPLE__) || defined(HPX_MSVC))
+#include <hpx/modules/thread_support.hpp>
+
 #include <mutex>
 #endif
 
@@ -56,15 +59,19 @@ namespace hpx::util::logging::formatter {
             std::tm local_tm;
             localtime_r(&tt, &local_tm);
 #elif defined(HPX_MSVC)
-            std::tm local_tm;
-            localtime_s(&local_tm, &tt);
+            std::tm local_tm{};
+            [[maybe_unused]] auto const err = localtime_s(&local_tm, &tt);
+            HPX_ASSERT(err == 0);
 #else
             // fall back to non-thread-safe version on other platforms
-            std::tm local_tm;
+            std::tm local_tm{};
             {
                 static hpx::util::detail::spinlock mutex;
                 std::lock_guard<hpx::util::detail::spinlock> ul(mutex);
-                local_tm = *std::localtime(&tt);
+                if (auto const* lt = std::localtime(&tt); lt != nullptr)
+                {
+                    local_tm = *lt;
+                }
             }
 #endif
 

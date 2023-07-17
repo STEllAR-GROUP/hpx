@@ -129,6 +129,16 @@ namespace hpx::agas::detail::impl {
         return naming::get_agas_client().is_local_address_cached(gid, addr, ec);
     }
 
+    bool is_local_address_cached_addr_pinned_ptr(naming::gid_type const& gid,
+        naming::address& addr, std::pair<bool, components::pinned_ptr>& r,
+        hpx::move_only_function<std::pair<bool, components::pinned_ptr>(
+            naming::address const&)>&& f,
+        error_code& ec)
+    {
+        return naming::get_agas_client().is_local_address_cached(
+            gid, addr, r, HPX_MOVE(f), ec);
+    }
+
     void update_cache_entry(naming::gid_type const& gid,
         naming::address const& addr, std::uint64_t count, std::uint64_t offset,
         error_code& ec)
@@ -463,9 +473,10 @@ namespace hpx::agas::detail::impl {
         return naming::get_agas_client().was_object_migrated(gid, HPX_MOVE(f));
     }
 
-    void unmark_as_migrated(naming::gid_type const& gid)
+    void unmark_as_migrated(
+        naming::gid_type const& gid, hpx::move_only_function<void()>&& f)
     {
-        return naming::get_agas_client().unmark_as_migrated(gid);
+        return naming::get_agas_client().unmark_as_migrated(gid, HPX_MOVE(f));
     }
 
     hpx::future<symbol_namespace::iterate_names_return_type> find_symbols_async(
@@ -562,6 +573,8 @@ namespace hpx::agas {
                 &detail::impl::is_local_address_cached;
             detail::is_local_address_cached_addr =
                 &detail::impl::is_local_address_cached_addr;
+            detail::is_local_address_cached_addr_pinned_ptr =
+                &detail::impl::is_local_address_cached_addr_pinned_ptr;
             detail::update_cache_entry = &detail::impl::update_cache_entry;
 
             detail::is_local_lva_encoded_address =

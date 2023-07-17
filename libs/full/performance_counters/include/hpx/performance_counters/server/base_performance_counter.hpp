@@ -48,7 +48,7 @@ namespace hpx { namespace performance_counters { namespace server {
         using base_type_holder = base_performance_counter;
 
         // finalize() will be called just before the instance gets destructed
-        constexpr void finalize() {}
+        static constexpr void finalize() noexcept {}
 
         static components::component_type get_component_type() noexcept
         {

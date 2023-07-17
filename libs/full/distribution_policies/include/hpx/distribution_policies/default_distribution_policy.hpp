@@ -16,7 +16,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/dataflow.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
-#include <hpx/async_distributed/packaged_action.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
@@ -376,13 +375,10 @@ namespace hpx {
     using hpx::components::default_distribution_policy;
     using hpx::components::default_layout;
 
-    namespace traits {
-
-        template <>
-        struct is_distribution_policy<components::default_distribution_policy>
-          : std::true_type
-        {
-        };
-    }    // namespace traits
+    template <>
+    struct traits::is_distribution_policy<
+        components::default_distribution_policy> : std::true_type
+    {
+    };    // namespace traits
 }    // namespace hpx
 /// \endcond

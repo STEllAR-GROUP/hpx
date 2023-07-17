@@ -31,7 +31,9 @@ foreach(test ${tests})
   )
 
   target_include_directories(${test}_test SYSTEM PRIVATE ${CUDA_INCLUDE_DIRS})
-  add_hpx_unit_test("modules.parcelset" ${test} ${${test}_PARAMETERS})
+  add_hpx_unit_test(
+    "modules.parcelset" ${test} ${${test}_PARAMETERS} RUN_SERIAL
+  )
 
 endforeach()
 
@@ -40,6 +42,7 @@ add_hpx_unit_test(
   "modules.parcelset" zero_copy_parcel_no_array_optimization
   EXECUTABLE zero_copy_parcel
   PSEUDO_DEPS_NAME zero_copy_parcel ${zero_copy_parcel_PARAMETERS}
+  RUN_SERIAL
   ARGS --hpx:ini=hpx.parcel.array_optimization=0
 )
 
@@ -47,6 +50,7 @@ add_hpx_unit_test(
   "modules.parcelset" zero_copy_parcel_no_zero_copy_optimization
   EXECUTABLE zero_copy_parcel
   PSEUDO_DEPS_NAME zero_copy_parcel ${zero_copy_parcel_PARAMETERS}
+  RUN_SERIAL
   ARGS --hpx:ini=hpx.parcel.zero_copy_optimization=0
 )
 
@@ -54,5 +58,6 @@ add_hpx_unit_test(
   "modules.parcelset" zero_copy_parcel_no_zero_copy_receive_optimization
   EXECUTABLE zero_copy_parcel
   PSEUDO_DEPS_NAME zero_copy_parcel ${zero_copy_parcel_PARAMETERS}
+  RUN_SERIAL
   ARGS --hpx:ini=hpx.parcel.zero_copy_receive_optimization=0
 )

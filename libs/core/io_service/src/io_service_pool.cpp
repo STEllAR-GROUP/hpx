@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
 //
 //  Parts of this code were taken from the Boost.Asio library
@@ -21,7 +21,6 @@
 #include <cstddef>
 #include <memory>
 #include <mutex>
-#include <stdexcept>
 #include <thread>
 #include <utility>
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2016 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c)      2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -22,12 +22,14 @@
 #include <utility>
 #include <vector>
 
+constexpr std::size_t N = 50;
+
 ///////////////////////////////////////////////////////////////////////////////
 struct dummy_server : hpx::components::component_base<dummy_server>
 {
     dummy_server() = default;
 
-    hpx::id_type call() const
+    [[nodiscard]] hpx::id_type call() const
     {
         return hpx::find_here();
     }
@@ -35,19 +37,19 @@ struct dummy_server : hpx::components::component_base<dummy_server>
     HPX_DEFINE_COMPONENT_ACTION(dummy_server, call)
 };
 
-typedef hpx::components::component<dummy_server> dummy_server_type;
+using dummy_server_type = hpx::components::component<dummy_server>;
 HPX_REGISTER_COMPONENT(dummy_server_type, dummy_server)
 
-typedef dummy_server::call_action dummy_action;
+using dummy_action = dummy_server::call_action;
 HPX_REGISTER_ACTION(dummy_action)
 
 struct dummy_client : hpx::components::client_base<dummy_client, dummy_server>
 {
-    typedef hpx::components::client_base<dummy_client, dummy_server> base_type;
+    using base_type = hpx::components::client_base<dummy_client, dummy_server>;
 
     dummy_client() = default;
 
-    dummy_client(hpx::id_type const& id)
+    explicit dummy_client(hpx::id_type const& id)
       : base_type(id)
     {
     }
@@ -56,7 +58,7 @@ struct dummy_client : hpx::components::client_base<dummy_client, dummy_server>
     {
     }
 
-    hpx::id_type call() const
+    [[nodiscard]] hpx::id_type call() const
     {
         return hpx::async<dummy_action>(this->get_id()).get();
     }
@@ -67,90 +69,90 @@ struct test_server
   : hpx::components::migration_support<
         hpx::components::component_base<test_server>>
 {
-    typedef hpx::components::migration_support<
-        hpx::components::component_base<test_server>>
-        base_type;
+    using base_type = hpx::components::migration_support<
+        hpx::components::component_base<test_server>>;
 
-    test_server(int data = 0)
+    explicit test_server(int data = 0)
       : data_(data)
     {
     }
-    ~test_server() {}
+    ~test_server() = default;
 
-    hpx::id_type call() const
+    [[nodiscard]] hpx::id_type call() const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
         return hpx::find_here();
     }
 
     void busy_work() const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
         hpx::this_thread::sleep_for(std::chrono::seconds(1));
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
     }
 
-    hpx::future<void> lazy_busy_work() const
+    [[nodiscard]] hpx::future<void> lazy_busy_work() const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
 
         auto f = hpx::make_ready_future_after(std::chrono::seconds(1));
 
         return f.then([this](hpx::future<void>&& f) -> void {
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
             f.get();
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
         });
     }
 
-    int get_data() const
+    [[nodiscard]] int get_data() const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
         return data_;
     }
 
-    hpx::future<int> lazy_get_data() const
+    [[nodiscard]] hpx::future<int> lazy_get_data() const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
 
         auto f = hpx::make_ready_future(data_);
 
         return f.then([this](hpx::future<int>&& f) -> int {
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
-            auto result = f.get();
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
+            auto const result = f.get();
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
             return result;
         });
     }
 
-    dummy_client lazy_get_client(hpx::id_type there) const
+    [[nodiscard]] dummy_client lazy_get_client(hpx::id_type const& there) const
     {
-        HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+        HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
 
         auto f = dummy_client(hpx::new_<dummy_server>(there));
 
         return f.then([this](dummy_client&& f) -> hpx::id_type {
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
             auto result = f.get();
-            HPX_TEST_NEQ(pin_count(), std::uint32_t(0));
+            HPX_TEST_NEQ(pin_count(), static_cast<std::uint32_t>(0));
             return result;
         });
     }
 
-    // Components which should be migrated using hpx::migrate<> need to
-    // be Serializable and CopyConstructable. Components can be
-    // MoveConstructable in which case the serialized data is moved into the
-    // component's constructor.
+    // Components that should be migrated using hpx::migrate<> need to be
+    // Serializable and CopyConstructable. Components can be MoveConstructable
+    // in which case the serialized data is moved into the component's
+    // constructor.
     test_server(test_server const& rhs)
       : base_type(rhs)
       , data_(rhs.data_)
     {
     }
 
-    test_server(test_server&& rhs)
+    test_server(test_server&& rhs) noexcept
       : base_type(std::move(rhs))
       , data_(rhs.data_)
     {
+        rhs.data_ = 0;
     }
 
     test_server& operator=(test_server const& rhs)
@@ -158,9 +160,10 @@ struct test_server
         data_ = rhs.data_;
         return *this;
     }
-    test_server& operator=(test_server&& rhs)
+    test_server& operator=(test_server&& rhs) noexcept
     {
         data_ = rhs.data_;
+        rhs.data_ = 0;
         return *this;
     }
 
@@ -187,83 +190,84 @@ private:
     int data_;
 };
 
-typedef hpx::components::component<test_server> server_type;
+using server_type = hpx::components::component<test_server>;
 HPX_REGISTER_COMPONENT(server_type, test_server)
 
-typedef test_server::call_action call_action;
+using call_action = test_server::call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action)
 HPX_REGISTER_ACTION(call_action)
 
-typedef test_server::busy_work_action busy_work_action;
+using busy_work_action = test_server::busy_work_action;
 HPX_REGISTER_ACTION_DECLARATION(busy_work_action)
 HPX_REGISTER_ACTION(busy_work_action)
 
-typedef test_server::lazy_busy_work_action lazy_busy_work_action;
+using lazy_busy_work_action = test_server::lazy_busy_work_action;
 HPX_REGISTER_ACTION_DECLARATION(lazy_busy_work_action)
 HPX_REGISTER_ACTION(lazy_busy_work_action)
 
-typedef test_server::get_data_action get_data_action;
+using get_data_action = test_server::get_data_action;
 HPX_REGISTER_ACTION_DECLARATION(get_data_action)
 HPX_REGISTER_ACTION(get_data_action)
 
-typedef test_server::lazy_get_data_action lazy_get_data_action;
+using lazy_get_data_action = test_server::lazy_get_data_action;
 HPX_REGISTER_ACTION_DECLARATION(lazy_get_data_action)
 HPX_REGISTER_ACTION(lazy_get_data_action)
 
-typedef test_server::lazy_get_client_action lazy_get_client_action;
+using lazy_get_client_action = test_server::lazy_get_client_action;
 HPX_REGISTER_ACTION_DECLARATION(lazy_get_client_action)
 HPX_REGISTER_ACTION(lazy_get_client_action)
 
 struct test_client : hpx::components::client_base<test_client, test_server>
 {
-    typedef hpx::components::client_base<test_client, test_server> base_type;
+    using base_type = hpx::components::client_base<test_client, test_server>;
 
-    test_client() {}
+    test_client() = default;
     test_client(hpx::shared_future<hpx::id_type> const& id)
       : base_type(id)
     {
     }
-    test_client(hpx::id_type&& id)
+    explicit test_client(hpx::id_type&& id)
       : base_type(std::move(id))
     {
     }
 
-    hpx::id_type call() const
+    [[nodiscard]] hpx::id_type call() const
     {
         return call_action()(this->get_id());
     }
 
-    hpx::future<void> busy_work() const
+    [[nodiscard]] hpx::future<void> busy_work() const
     {
         return hpx::async<busy_work_action>(this->get_id());
     }
 
-    hpx::future<void> lazy_busy_work() const
+    [[nodiscard]] hpx::future<void> lazy_busy_work() const
     {
         return hpx::async<lazy_busy_work_action>(this->get_id());
     }
 
-    int get_data() const
+    [[nodiscard]] int get_data() const
     {
         return get_data_action()(this->get_id());
     }
 
-    int lazy_get_data() const
+    [[nodiscard]] int lazy_get_data() const
     {
         return lazy_get_data_action()(this->get_id()).get();
     }
 
-    dummy_client lazy_get_client(hpx::id_type there) const
+    [[nodiscard]] dummy_client lazy_get_client(hpx::id_type const& there) const
     {
         return lazy_get_client_action()(this->get_id(), there);
     }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-bool test_migrate_component(hpx::id_type source, hpx::id_type target)
+bool test_migrate_component(
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -273,7 +277,7 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
         HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
@@ -294,10 +298,11 @@ bool test_migrate_component(hpx::id_type source, hpx::id_type target)
     return true;
 }
 
-bool test_migrate_lazy_component(hpx::id_type source, hpx::id_type target)
+bool test_migrate_lazy_component(
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -307,7 +312,7 @@ bool test_migrate_lazy_component(hpx::id_type source, hpx::id_type target)
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
         HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
@@ -329,10 +334,10 @@ bool test_migrate_lazy_component(hpx::id_type source, hpx::id_type target)
 }
 
 bool test_migrate_lazy_component_client(
-    hpx::id_type source, hpx::id_type target)
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -342,7 +347,7 @@ bool test_migrate_lazy_component_client(
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         // wait for migration to be done
         HPX_TEST_NEQ(hpx::invalid_id, t2.get_id());
@@ -364,10 +369,11 @@ bool test_migrate_lazy_component_client(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
+bool test_migrate_busy_component(
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -375,12 +381,12 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
     HPX_TEST_EQ(t1.get_data(), 42);
 
     // add some concurrent busy work
-    hpx::future<void> busy_work = t1.busy_work();
+    hpx::future<void> const busy_work = t1.busy_work();
 
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         HPX_TEST_EQ(t1.get_data(), 42);
 
@@ -407,10 +413,11 @@ bool test_migrate_busy_component(hpx::id_type source, hpx::id_type target)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-bool test_migrate_lazy_busy_component(hpx::id_type source, hpx::id_type target)
+bool test_migrate_lazy_busy_component(
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -418,12 +425,12 @@ bool test_migrate_lazy_busy_component(hpx::id_type source, hpx::id_type target)
     HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
     // add some concurrent busy work
-    hpx::future<void> lazy_busy_work = t1.lazy_busy_work();
+    hpx::future<void> const lazy_busy_work = t1.lazy_busy_work();
 
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
@@ -450,10 +457,10 @@ bool test_migrate_lazy_busy_component(hpx::id_type source, hpx::id_type target)
 }
 
 bool test_migrate_lazy_busy_component_client(
-    hpx::id_type source, hpx::id_type target)
+    hpx::id_type const& source, hpx::id_type const& target)
 {
     // create component on given locality
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
@@ -461,12 +468,12 @@ bool test_migrate_lazy_busy_component_client(
     HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
     // add some concurrent busy work
-    hpx::future<void> lazy_busy_work = t1.lazy_busy_work();
+    hpx::future<void> const lazy_busy_work = t1.lazy_busy_work();
 
     try
     {
         // migrate t1 to the target
-        test_client t2(hpx::components::migrate(t1, target));
+        test_client const t2(hpx::components::migrate(t1, target));
 
         HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
@@ -495,14 +502,12 @@ bool test_migrate_lazy_busy_component_client(
 ////////////////////////////////////////////////////////////////////////////////
 bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.get_data(), 42);
-
-    std::size_t N = 100;
 
     try
     {
@@ -511,7 +516,7 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
         for (std::size_t i = 0; i < N; ++i)
         {
             // migrate t1 to the target (loc2)
-            test_client t2(hpx::components::migrate(t1, target));
+            test_client const t2(hpx::components::migrate(t1, target));
 
             HPX_TEST_EQ(t1.get_data(), 42);
 
@@ -543,14 +548,12 @@ bool test_migrate_component2(hpx::id_type source, hpx::id_type target)
 
 bool test_migrate_lazy_component2(hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.lazy_get_data(), 42);
-
-    std::size_t N = 100;
 
     try
     {
@@ -559,7 +562,7 @@ bool test_migrate_lazy_component2(hpx::id_type source, hpx::id_type target)
         for (std::size_t i = 0; i < N; ++i)
         {
             // migrate t1 to the target (loc2)
-            test_client t2(hpx::components::migrate(t1, target));
+            test_client const t2(hpx::components::migrate(t1, target));
 
             HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
@@ -592,14 +595,12 @@ bool test_migrate_lazy_component2(hpx::id_type source, hpx::id_type target)
 bool test_migrate_lazy_component_client2(
     hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
-
-    std::size_t N = 100;
 
     try
     {
@@ -608,7 +609,7 @@ bool test_migrate_lazy_component_client2(
         for (std::size_t i = 0; i < N; ++i)
         {
             // migrate t1 to the target (loc2)
-            test_client t2(hpx::components::migrate(t1, target));
+            test_client const t2(hpx::components::migrate(t1, target));
 
             HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
@@ -641,23 +642,21 @@ bool test_migrate_lazy_component_client2(
 
 bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.get_data(), 42);
 
-    std::size_t N = 100;
-
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times
     hpx::future<void> migrate_future =
-        hpx::async([source, target, t1, N]() mutable {
+        hpx::async([source, target, t1]() mutable {
             for (std::size_t i = 0; i < N; ++i)
             {
                 // migrate t1 to the target (loc2)
-                test_client t2(hpx::components::migrate(t1, target));
+                test_client const t2(hpx::components::migrate(t1, target));
 
                 HPX_TEST_EQ(t1.get_data(), 42);
 
@@ -679,9 +678,9 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
             hpx::cout << std::endl;
         });
 
-    // Second, we generate tons of work which should automatically follow
+    // Second, we generate tons of work that should automatically follow
     // the migration.
-    hpx::future<void> create_work = hpx::async([t1, N]() {
+    hpx::future<void> create_work = hpx::async([t1]() {
         for (std::size_t i = 0; i < 2 * N; ++i)
         {
             hpx::cout << hpx::naming::get_locality_id_from_id(t1.call())
@@ -711,23 +710,21 @@ bool test_migrate_busy_component2(hpx::id_type source, hpx::id_type target)
 
 bool test_migrate_lazy_busy_component2(hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.get_data(), 42);
 
-    std::size_t N = 100;
-
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times
     hpx::future<void> migrate_future =
-        hpx::async([source, target, t1, N]() mutable {
+        hpx::async([source, target, t1]() mutable {
             for (std::size_t i = 0; i < N; ++i)
             {
                 // migrate t1 to the target (loc2)
-                test_client t2(hpx::components::migrate(t1, target));
+                test_client const t2(hpx::components::migrate(t1, target));
 
                 HPX_TEST_EQ(t1.lazy_get_data(), 42);
 
@@ -749,9 +746,9 @@ bool test_migrate_lazy_busy_component2(hpx::id_type source, hpx::id_type target)
             hpx::cout << std::endl;
         });
 
-    // Second, we generate tons of work which should automatically follow
+    // Second, we generate tons of work that should automatically follow
     // the migration.
-    hpx::future<void> create_work = hpx::async([t1, N]() {
+    hpx::future<void> create_work = hpx::async([t1]() {
         for (std::size_t i = 0; i < 2 * N; ++i)
         {
             hpx::cout << hpx::naming::get_locality_id_from_id(t1.call())
@@ -782,23 +779,21 @@ bool test_migrate_lazy_busy_component2(hpx::id_type source, hpx::id_type target)
 bool test_migrate_lazy_busy_component_client2(
     hpx::id_type source, hpx::id_type target)
 {
-    test_client t1 = hpx::new_<test_client>(source, 42);
+    test_client const t1 = hpx::new_<test_client>(source, 42);
     HPX_TEST_NEQ(hpx::invalid_id, t1.get_id());
 
     // the new object should live on the source locality
     HPX_TEST_EQ(t1.call(), source);
     HPX_TEST_EQ(t1.get_data(), 42);
 
-    std::size_t N = 100;
-
     // First, spawn a thread (locally) that will migrate the object between
     // source and target a few times
     hpx::future<void> migrate_future =
-        hpx::async([source, target, t1, N]() mutable {
+        hpx::async([source, target, t1]() mutable {
             for (std::size_t i = 0; i < N; ++i)
             {
                 // migrate t1 to the target (loc2)
-                test_client t2(hpx::components::migrate(t1, target));
+                test_client const t2(hpx::components::migrate(t1, target));
 
                 HPX_TEST_EQ(t1.lazy_get_client(target).call(), target);
 
@@ -820,9 +815,9 @@ bool test_migrate_lazy_busy_component_client2(
             hpx::cout << std::endl;
         });
 
-    // Second, we generate tons of work which should automatically follow
+    // Second, we generate tons of work that should automatically follow
     // the migration.
-    hpx::future<void> create_work = hpx::async([t1, N, target]() {
+    hpx::future<void> create_work = hpx::async([t1, target]() {
         for (std::size_t i = 0; i < 2 * N; ++i)
         {
             hpx::cout << hpx::naming::get_locality_id_from_id(t1.call())
@@ -853,7 +848,7 @@ bool test_migrate_lazy_busy_component_client2(
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
+    std::vector<hpx::id_type> const localities = hpx::find_all_localities();
 
     for (hpx::id_type const& id : localities)
     {

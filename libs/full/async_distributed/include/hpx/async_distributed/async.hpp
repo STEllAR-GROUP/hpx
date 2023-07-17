@@ -26,7 +26,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/futures/traits/promise_local_result.hpp>
 #include <hpx/naming_base/id_type.hpp>
-#include <hpx/type_support/identity.hpp>
 #include <hpx/type_support/lazy_enable_if.hpp>
 
 #include <type_traits>
@@ -299,20 +298,16 @@ namespace hpx::detail {
 
 #include <hpx/async_distributed/sync.hpp>
 
-namespace hpx::detail {
-
-    // bound action
-    template <typename Bound>
-    struct async_dispatch<Bound,
-        std::enable_if_t<hpx::is_bound_action_v<Bound>>>
+// bound action
+template <typename Bound>
+struct hpx::detail::async_dispatch<Bound,
+    std::enable_if_t<hpx::is_bound_action_v<Bound>>>
+{
+    template <typename Action, typename Is, typename... Ts, typename... Us>
+    HPX_FORCEINLINE static hpx::future<
+        typename hpx::detail::bound_action<Action, Is, Ts...>::result_type>
+    call(hpx::detail::bound_action<Action, Is, Ts...> const& bound, Us&&... vs)
     {
-        template <typename Action, typename Is, typename... Ts, typename... Us>
-        HPX_FORCEINLINE static hpx::future<
-            typename hpx::detail::bound_action<Action, Is, Ts...>::result_type>
-        call(hpx::detail::bound_action<Action, Is, Ts...> const& bound,
-            Us&&... vs)
-        {
-            return bound.async(HPX_FORWARD(Us, vs)...);
-        }
-    };
-}    // namespace hpx::detail
+        return bound.async(HPX_FORWARD(Us, vs)...);
+    }
+};

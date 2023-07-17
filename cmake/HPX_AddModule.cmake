@@ -15,6 +15,7 @@ function(add_hpx_module libname modulename)
       SOURCES
       HEADERS
       COMPAT_HEADERS
+      GENERATED_HEADERS
       OBJECTS
       DEPENDENCIES
       MODULE_DEPENDENCIES
@@ -158,6 +159,29 @@ function(add_hpx_module libname modulename)
       "${global_header}"
     )
     set(generated_headers ${global_header})
+  endif()
+
+  # some headers files have to be generated, remove the `.in` file extension
+  if(${modulename}_GENERATED_HEADERS)
+    set(generated_file_base "${CMAKE_CURRENT_BINARY_DIR}/include")
+    if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+      foreach(file_to_generate ${${modulename}_GENERATED_HEADERS})
+        configure_file(
+          ${HEADER_ROOT}/${file_to_generate}.in
+          ${generated_file_base}/${file_to_generate} COPYONLY
+        )
+        set(generated_headers ${generated_headers}
+                              ${generated_file_base}/${file_to_generate}
+        )
+      endforeach()
+    else()
+      foreach(file_to_generate ${${modulename}_GENERATED_HEADERS})
+        if(EXISTS ${file_to_generate})
+          hpx_warn("Removing zombie generated header: ${file_to_generate}")
+          file(REMOVE ${file_to_generate})
+        endif()
+      endforeach()
+    endif()
   endif()
 
   set(has_config_info)
@@ -426,9 +450,17 @@ function(add_hpx_module libname modulename)
     endforeach()
   endif()
 
+  # install cmake files specific to this module
+  install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+    COMPONENT ${modulename}
+    OPTIONAL
+  )
+
   # Link modules to their higher-level libraries
   if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES)
-    if(UNIX)
+    if(UNIX OR MINGW)
       if(APPLE)
         set(_module_target "-Wl,-all_load" "hpx_${modulename}")
       else()

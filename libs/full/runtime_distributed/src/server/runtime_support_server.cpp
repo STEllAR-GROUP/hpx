@@ -26,6 +26,7 @@
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/string_util.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/modules/threadmanager.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/performance_counters/counters.hpp>
@@ -231,8 +232,10 @@ namespace hpx { namespace components { namespace server {
     }
 
     void runtime_support::send_dijkstra_termination_token(
-        std::uint32_t target_locality_id, std::uint32_t initiating_locality_id,
-        std::uint32_t num_localities, bool dijkstra_token)
+        [[maybe_unused]] std::uint32_t target_locality_id,
+        [[maybe_unused]] std::uint32_t initiating_locality_id,
+        [[maybe_unused]] std::uint32_t num_localities,
+        [[maybe_unused]] bool dijkstra_token)
     {
         // First wait for this locality to become passive. We do this by
         // periodically checking the number of still running threads.
@@ -242,7 +245,9 @@ namespace hpx { namespace components { namespace server {
         threads::threadmanager& tm =
             hpx::applier::get_applier().get_thread_manager();
 
-        tm.wait();
+        // if the threading system is not finished running after a small amount
+        // of time we assume that more work has to be done
+        bool const passive = tm.wait_for(std::chrono::milliseconds(10));
         tm.cleanup_terminated(true);
 
         // Now this locality has become passive, thus we can send the token
@@ -253,7 +258,7 @@ namespace hpx { namespace components { namespace server {
         // being white it leaves the color of the token unchanged.
         {
             std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
-            if (dijkstra_color_)
+            if (!passive || dijkstra_color_)
                 dijkstra_token = true;
 
             // Rule 5: Upon transmission of the token to machine nr.i, machine
@@ -262,15 +267,18 @@ namespace hpx { namespace components { namespace server {
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        hpx::id_type id(naming::get_id_from_locality_id(target_locality_id));
-        hpx::post<dijkstra_termination_action>(
-            id, initiating_locality_id, num_localities, dijkstra_token);
+        hpx::latch l(2);
+        hpx::id_type const id(
+            naming::get_id_from_locality_id(target_locality_id));
+        hpx::post_cb<dijkstra_termination_action>(
+            id,
+            [&l](std::error_code const&, parcelset::parcel const&) {
+                l.count_down(1);
+            },
+            initiating_locality_id, num_localities, dijkstra_token);
+        l.arrive_and_wait();
 #else
         HPX_ASSERT(false);
-        HPX_UNUSED(target_locality_id);
-        HPX_UNUSED(initiating_locality_id);
-        HPX_UNUSED(num_localities);
-        HPX_UNUSED(dijkstra_token);
 #endif
     }
 
@@ -298,7 +306,7 @@ namespace hpx { namespace components { namespace server {
                 dijkstra_color_ = true;    // unsuccessful termination
             }
 
-            dijkstra_cond_.notify_one();
+            dijkstra_cond_->count_down(1);
             return;
         }
 
@@ -360,20 +368,21 @@ namespace hpx { namespace components { namespace server {
                 // Rule 4: Machine nr.0 initiates a probe by making itself white
                 // and sending a white token to machine nr.N - 1.
                 dijkstra_color_ = false;    // start off with white
+                dijkstra_cond_ = std::make_unique<hpx::latch>(2);
 
                 {
                     unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities,
                         dijkstra_color_);
+
+                    LRT_(info).format(
+                        "runtime_support::dijkstra_termination_detection: "
+                        "wait for token to come back to us.");
+
+                    // wait for token to come back to us
+                    dijkstra_cond_->arrive_and_wait(1);
                 }
-
-                LRT_(info).format(
-                    "runtime_support::dijkstra_termination_detection: "
-                    "wait for token to come back to us.");
-
-                // wait for token to come back to us
-                dijkstra_cond_.wait(l);
 
                 // Rule 3: After the completion of an unsuccessful probe, machine
                 // nr.0 initiates a next probe.
@@ -389,6 +398,8 @@ namespace hpx { namespace components { namespace server {
                 }
 
             } while (dijkstra_color_);
+
+            dijkstra_cond_.reset();
         }
 
         return count;
@@ -614,10 +625,10 @@ namespace hpx { namespace components { namespace server {
                 unlock_guard<std::mutex> ul(mtx_);
 
                 util::runtime_configuration& cfg = get_runtime().get_config();
-                std::size_t shutdown_check_count =
+                std::size_t const shutdown_check_count =
                     util::get_entry_as<std::size_t>(
                         cfg, "hpx.shutdown_check_count", 10);
-                bool success = util::detail::yield_while_count_timeout(
+                bool const success = util::detail::yield_while_count_timeout(
                     [&tm] {
                         tm.cleanup_terminated(true);
                         return tm.is_busy();
@@ -643,7 +654,7 @@ namespace hpx { namespace components { namespace server {
                 }
 
                 // Drop the locality from the partition table.
-                naming::gid_type here = agas_client.get_local_locality();
+                naming::gid_type const here = agas_client.get_local_locality();
 
                 // unregister fixed components
                 agas_client.unbind_local(
@@ -767,6 +778,7 @@ namespace hpx { namespace components { namespace server {
 
         // collect additional command-line options
         hpx::program_options::options_description options;
+        options.add(get_runtime().get_app_options());
 
         // then dynamic ones
         naming::resolver_client& client = naming::get_agas_client();
@@ -1682,8 +1694,8 @@ namespace hpx { namespace components { namespace server {
     ///////////////////////////////////////////////////////////////////////////
     // Load all components from the ini files found in the configuration
     bool runtime_support::load_plugins(util::section& ini,
-        hpx::program_options::options_description& options,
-        std::set<std::string>& startup_handled)
+        [[maybe_unused]] hpx::program_options::options_description& options,
+        [[maybe_unused]] std::set<std::string>& startup_handled)
     {
         // load all components as described in the configuration information
         if (!ini.has_section("hpx.plugins"))

@@ -177,75 +177,69 @@ namespace hpx::lcos::detail {
     using registered_name_tracker = std::string;
 }    // namespace hpx::lcos::detail
 
-namespace hpx::util {
+// This is explicitly instantiated to ensure that the id is stable across shared
+// libraries.
+template <>
+struct hpx::util::extra_data_helper<hpx::lcos::detail::registered_name_tracker>
+{
+    HPX_EXPORT static extra_data_id_type id() noexcept;
+    HPX_EXPORT static void reset(lcos::detail::registered_name_tracker*);
+};    // namespace hpx::util
 
-    // This is explicitly instantiated to ensure that the id is stable across
-    // shared libraries.
-    template <>
-    struct extra_data_helper<lcos::detail::registered_name_tracker>
+// Specialization for shared state of id_type, additionally (optionally) holds a
+// registered name for the object it refers to.
+template <>
+struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
+  : future_data_base<id_type>
+{
+    HPX_NON_COPYABLE(future_data);
+
+    using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
+
+    future_data() = default;
+
+    explicit future_data(init_no_addref no_addref)
+      : future_data_base(no_addref)
     {
-        HPX_EXPORT static extra_data_id_type id() noexcept;
-        HPX_EXPORT static void reset(lcos::detail::registered_name_tracker*);
-    };
-}    // namespace hpx::util
+    }
 
-namespace hpx::lcos::detail {
-
-    // Specialization for shared state of id_type, additionally (optionally)
-    // holds a registered name for the object it refers to.
-    template <>
-    struct HPX_EXPORT future_data<hpx::id_type> : future_data_base<id_type>
+    template <typename... T>
+    future_data(init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
+      : future_data_base(no_addref, in_place, HPX_FORWARD(T, ts)...)
     {
-        HPX_NON_COPYABLE(future_data);
+    }
 
-        using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
+    future_data(init_no_addref no_addref, std::exception_ptr const& e)
+      : future_data_base(no_addref, e)
+    {
+    }
+    future_data(init_no_addref no_addref, std::exception_ptr&& e)
+      : future_data_base(no_addref, HPX_MOVE(e))
+    {
+    }
 
-        future_data() = default;
+    ~future_data() noexcept override;
 
-        explicit future_data(init_no_addref no_addref)
-          : future_data_base(no_addref)
-        {
-        }
+    [[nodiscard]] std::string const& get_registered_name() const noexcept;
+    void set_registered_name(std::string name);
+    bool register_as(std::string name, bool manage_lifetime);
 
-        template <typename... T>
-        future_data(
-            init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
-          : future_data_base(no_addref, in_place, HPX_FORWARD(T, ts)...)
-        {
-        }
+    // access extra data stored
+    template <typename T>
+    T& get_extra_data()
+    {
+        return extra_data_.get<T>();
+    }
 
-        future_data(init_no_addref no_addref, std::exception_ptr const& e)
-          : future_data_base(no_addref, e)
-        {
-        }
-        future_data(init_no_addref no_addref, std::exception_ptr&& e)
-          : future_data_base(no_addref, HPX_MOVE(e))
-        {
-        }
+    // try accessing extra data stored, might return nullptr
+    template <typename T>
+    [[nodiscard]] T* try_get_extra_data() const noexcept
+    {
+        return extra_data_.try_get<T>();
+    }
 
-        ~future_data() noexcept override;
-
-        [[nodiscard]] std::string const& get_registered_name() const noexcept;
-        void set_registered_name(std::string name);
-        bool register_as(std::string name, bool manage_lifetime);
-
-        // access extra data stored
-        template <typename T>
-        T& get_extra_data()
-        {
-            return extra_data_.get<T>();
-        }
-
-        // try accessing extra data stored, might return nullptr
-        template <typename T>
-        [[nodiscard]] T* try_get_extra_data() const noexcept
-        {
-            return extra_data_.try_get<T>();
-        }
-
-        util::extra_data extra_data_;
-    };
-}    // namespace hpx::lcos::detail
+    util::extra_data extra_data_;
+};    // namespace hpx::lcos::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::components {
@@ -409,9 +403,9 @@ namespace hpx::components {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        hpx::id_type const& get_id() const
+        hpx::id_type const& get_id(error_code& ec = hpx::throws) const
         {
-            return get();
+            return get(ec);
         }
 
         [[nodiscard]] naming::gid_type const& get_raw_gid() const
@@ -450,18 +444,25 @@ namespace hpx::components {
         ///////////////////////////////////////////////////////////////////////
         // Exposition only: interface mimicking future
 
-        id_type const& get() const
+        id_type const& get(error_code& ec = hpx::throws) const
         {
             if (!shared_state_)
             {
-                HPX_THROW_EXCEPTION(hpx::error::no_state,
-                    "client_base::get_gid",
+                HPX_THROWS_IF(ec, hpx::error::no_state, "client_base::get_gid",
                     "this client_base has no valid shared state");
+                return hpx::invalid_id;
+            }
+
+            auto* result = shared_state_->get_result(ec);
+            if (result == nullptr)
+            {
+                HPX_THROWS_IF(ec, hpx::error::no_state, "client_base::get_gid",
+                    "this client_base has no valid shared state");
+                return hpx::invalid_id;
             }
 
             // no error has been reported, return the result
-            return lcos::detail::future_value<id_type>::get(
-                *shared_state_->get_result());
+            return lcos::detail::future_value<id_type>::get(*result);
         }
 
         // Returns: true if the shared state is ready, false if it isn't.
