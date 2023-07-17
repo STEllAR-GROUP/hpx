@@ -43,12 +43,86 @@ void fold_right_test_dispatch_2(IteratorTag)
 void fold_right_test_dispatch_1()
 {
     fold_right_test_dispatch_2(std::random_access_iterator_tag());
-    // fold_right_test_dispatch_2(std::forward_iterator_tag());
 }
 
 void fold_right_test_dispatch()
 {
     fold_right_test_dispatch_1();
+}
+
+template <typename IteratorTag>
+void fold_left_first_test_dispatch_2(IteratorTag)
+{
+    fold_left_first_test1(IteratorTag());
+    fold_left_first_test1(hpx::execution::seq, IteratorTag());
+    fold_left_first_test1(hpx::execution::par, IteratorTag());
+}
+
+void fold_left_first_test_dispatch_1()
+{
+    fold_left_first_test_dispatch_2(std::random_access_iterator_tag());
+    fold_left_first_test_dispatch_2(std::forward_iterator_tag());
+}
+
+void fold_left_first_test_dispatch()
+{
+    fold_left_first_test_dispatch_1();
+}
+
+template <typename IteratorTag>
+void fold_right_first_test_dispatch_2(IteratorTag)
+{
+    fold_right_first_test1(IteratorTag());
+    fold_right_first_test1(hpx::execution::seq, IteratorTag());
+    fold_right_first_test1(hpx::execution::par, IteratorTag());
+}
+
+void fold_right_first_test_dispatch_1()
+{
+    fold_right_first_test_dispatch_2(std::random_access_iterator_tag());
+}
+
+void fold_right_first_test_dispatch()
+{
+    fold_right_first_test_dispatch_1();
+}
+
+template <typename IteratorTag>
+void fold_left_with_iter_test_dispatch_2(IteratorTag)
+{
+    fold_left_with_iter_test1(IteratorTag());
+    fold_left_with_iter_test1(hpx::execution::seq, IteratorTag());
+    fold_left_with_iter_test1(hpx::execution::par, IteratorTag());
+}
+
+void fold_left_with_iter_test_dispatch_1()
+{
+    fold_left_with_iter_test_dispatch_2(std::random_access_iterator_tag());
+    fold_left_with_iter_test_dispatch_2(std::forward_iterator_tag());
+}
+
+void fold_left_with_iter_test_dispatch()
+{
+    fold_left_with_iter_test_dispatch_1();
+}
+
+template <typename IteratorTag>
+void fold_left_first_with_iter_test_dispatch_2(IteratorTag)
+{
+    fold_left_first_with_iter_test1(IteratorTag());
+    fold_left_first_with_iter_test1(hpx::execution::seq, IteratorTag());
+    fold_left_first_with_iter_test1(hpx::execution::par, IteratorTag());
+}
+
+void fold_left_first_with_iter_test_dispatch_1()
+{
+    fold_left_first_with_iter_test_dispatch_2(std::random_access_iterator_tag());
+    fold_left_first_with_iter_test_dispatch_2(std::forward_iterator_tag());
+}
+
+void fold_left_first_with_iter_test_dispatch()
+{
+    fold_left_first_with_iter_test_dispatch_1();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +137,12 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     fold_left_test_dispatch();
     fold_right_test_dispatch();
+
+    fold_left_first_test_dispatch();
+    fold_right_first_test_dispatch();
+
+    fold_left_with_iter_test_dispatch();
+    fold_left_first_with_iter_test_dispatch();
 
     return hpx::local::finalize();
 }
