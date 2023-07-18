@@ -30,7 +30,7 @@ namespace hpx::parallel::util {
                 InIter HPX_RESTRICT it, std::size_t num, F&& f)
             {
                 // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                HPX_VECTORIZE
                 for (std::size_t i = 0; i != num; ++i)
                 {
                     HPX_INVOKE(f, it);
@@ -61,7 +61,7 @@ namespace hpx::parallel::util {
                 InIter HPX_RESTRICT it, std::size_t num, F&& f)
             {
                 // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                HPX_VECTORIZE
                 for (std::size_t i = 0; i != num; ++i)
                 {
                     HPX_INVOKE(f, *it);
@@ -149,7 +149,7 @@ namespace hpx::parallel::util {
                     std::size_t const num = std::distance(it1, last1);
 
                     // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    HPX_VECTORIZE
                     for (std::size_t i = 0; i != num; ++i)
                     {
                         HPX_INVOKE(f, it1, it2);
@@ -177,7 +177,7 @@ namespace hpx::parallel::util {
                 F&& f)
             {
                 // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                HPX_VECTORIZE
                 for (std::size_t i = 0; i != num; ++i)
                 {
                     HPX_INVOKE(f, *it, base_idx);
