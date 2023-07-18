@@ -465,6 +465,22 @@ elseif(HPX_WITH_PARALLEL_LINK_JOBS)
   hpx_warn("Job pooling is only available with Ninja generators.")
 endif()
 
+hpx_option(
+  HPX_HAVE_SIMD_BACKEND
+  STRING
+  "Simd Backend to use for vectorization. Defaults to OMP, other possible options are NONE (compiler assisted vectorization)"
+  "OMP"
+  CATEGORY "Build Targets"
+)
+
+if(NOT HPX_HAVE_SIMD_BACKEND)
+  set(HPX_HAVE_SIMD_BACKEND "OMP")
+endif()
+
+if(HPX_HAVE_SIMD_BACKEND STREQUAL "OMP")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp-simd")
+endif()
+
 # disable all tests if HPX_WITH_TESTS=OFF
 if(NOT HPX_WITH_TESTS)
   hpx_set_option(
