@@ -821,7 +821,7 @@ namespace hpx::parallel::util {
 
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
-        template <typename IterCat>
+        template <typename IterCat, typename Dummy = void>
         struct loop_idx_n
         {
             ///////////////////////////////////////////////////////////////////
@@ -859,8 +859,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <>
-        struct loop_idx_n<std::random_access_iterator_tag>
+        template <typename ExPolicy>
+        struct loop_idx_n<std::random_access_iterator_tag, ExPolicy>
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
@@ -928,7 +928,7 @@ namespace hpx::parallel::util {
             std::size_t base_idx, Iter it, std::size_t count, F&& f)
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
-            return detail::loop_idx_n<cat>::call(
+            return detail::loop_idx_n<cat, ExPolicy>::call(
                 base_idx, it, count, HPX_FORWARD(F, f));
         }
 
@@ -939,7 +939,7 @@ namespace hpx::parallel::util {
             F&& f)
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
-            return detail::loop_idx_n<cat>::call(
+            return detail::loop_idx_n<cat, ExPolicy>::call(
                 base_idx, it, count, tok, HPX_FORWARD(F, f));
         }
     };
