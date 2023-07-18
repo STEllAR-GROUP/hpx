@@ -185,22 +185,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, Pred&& pred)
             {
-                if constexpr (hpx::is_unsequenced_execution_policy_v<
-                                  ExPolicy> &&
-                    hpx::traits::is_random_access_iterator_v<Begin>)
+                for (/**/; it != end; ++it)
                 {
-                    return unseq_first_n(
-                        it, std::distance(it, end), HPX_FORWARD(Pred, pred));
+                    if (HPX_INVOKE(pred, it))
+                        return it;
                 }
-                else
-                {
-                    for (/**/; it != end; ++it)
-                    {
-                        if (HPX_INVOKE(pred, it))
-                            return it;
-                    }
-                    return it;
-                }
+                return it;
             }
         };
     }    // namespace detail
@@ -219,6 +209,27 @@ namespace hpx::parallel::util {
                 begin, end, HPX_FORWARD(Pred, pred));
         }
     };
+
+    template <typename Begin, typename End, typename Pred,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_pred_t<hpx::execution::unsequenced_policy>,
+        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
+    {
+        return unseq_first_n(
+            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
+    }
+
+    template <typename Begin, typename End, typename Pred,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_pred_t<
+            hpx::execution::unsequenced_task_policy>,
+        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
+    {
+        return unseq_first_n(
+            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
+    }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
@@ -1161,7 +1172,7 @@ namespace hpx::parallel::util {
 
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position.
-        template <typename IterCat>
+        template <typename IterCat, typename Dummy = void>
         struct loop_idx_n
         {
             ///////////////////////////////////////////////////////////////////
@@ -1199,8 +1210,8 @@ namespace hpx::parallel::util {
             }
         };
 
-        template <>
-        struct loop_idx_n<std::random_access_iterator_tag>
+        template <typename ExPolicy>
+        struct loop_idx_n<std::random_access_iterator_tag, ExPolicy>
         {
             ///////////////////////////////////////////////////////////////////
             // handle sequences of non-futures
@@ -1268,7 +1279,7 @@ namespace hpx::parallel::util {
             std::size_t base_idx, Iter it, std::size_t count, F&& f)
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
-            return detail::loop_idx_n<cat>::call(
+            return detail::loop_idx_n<cat, ExPolicy>::call(
                 base_idx, it, count, HPX_FORWARD(F, f));
         }
 
@@ -1279,7 +1290,7 @@ namespace hpx::parallel::util {
             F&& f)
         {
             using cat = typename std::iterator_traits<Iter>::iterator_category;
-            return detail::loop_idx_n<cat>::call(
+            return detail::loop_idx_n<cat, ExPolicy>::call(
                 base_idx, it, count, tok, HPX_FORWARD(F, f));
         }
     };
