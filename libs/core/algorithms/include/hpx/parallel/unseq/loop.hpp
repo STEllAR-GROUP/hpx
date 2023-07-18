@@ -26,7 +26,7 @@ namespace hpx::parallel::util {
         struct unseq_loop_n
         {
             template <typename InIter, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr InIter call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static InIter call(
                 InIter HPX_RESTRICT it, std::size_t num, F&& f)
             {
                 // clang-format off
@@ -77,7 +77,7 @@ namespace hpx::parallel::util {
         struct unseq_loop
         {
             template <typename Begin, typename End, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
                 if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)
@@ -112,7 +112,7 @@ namespace hpx::parallel::util {
         struct unseq_loop_ind
         {
             template <typename Begin, typename End, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
+            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 Begin HPX_RESTRICT it, End HPX_RESTRICT end, F&& f)
             {
                 if constexpr (hpx::traits::is_random_access_iterator_v<Begin>)

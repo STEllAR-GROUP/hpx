@@ -37,7 +37,7 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    HPX_VECTORIZE
                     for (std::size_t i = 0; i != num; ++i)
                     {
                         *dest = HPX_INVOKE(f, it);
@@ -87,7 +87,7 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    HPX_VECTORIZE
                     for (std::size_t i = 0; i != num; ++i)
                     {
                         *dest = HPX_INVOKE(f, *it);
@@ -253,7 +253,7 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    HPX_VECTORIZE
                     for (std::size_t i = 0; i != num; ++i)
                     {
                         *dest = HPX_INVOKE(f, first1, first2);
@@ -414,7 +414,7 @@ namespace hpx::parallel::util {
                 if constexpr (iterators_are_random_access)
                 {
                     // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
+                    HPX_VECTORIZE
                     for (std::size_t i = 0; i != num; ++i)
                     {
                         *dest = HPX_INVOKE(f, *first1, *first2);
