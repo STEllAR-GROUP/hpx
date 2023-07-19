@@ -143,8 +143,8 @@ namespace hpx::lcos::local {
                     {
                         HPX_ASSERT(
                             this->runs_child_ == threads::invalid_thread_id);
-                        this->runs_child_ =
-                            threads::register_thread(data, pool, ec);
+                        threads::register_thread(
+                            data, pool, this->runs_child_, ec);
                         return this->runs_child_;
                     }
 
@@ -164,8 +164,7 @@ namespace hpx::lcos::local {
                         threads::thread_schedule_state::suspended, true);
 
                     HPX_ASSERT(this->runs_child_ == threads::invalid_thread_id);
-                    this->runs_child_ =
-                        threads::register_thread(data, pool, ec);
+                    threads::register_thread(data, pool, this->runs_child_, ec);
 
                     // now run the thread
                     threads::set_thread_state(this->runs_child_.noref(),
