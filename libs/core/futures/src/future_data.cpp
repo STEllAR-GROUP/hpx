@@ -122,7 +122,7 @@ namespace hpx::lcos::detail {
             return false;
         }
 
-        auto state = this->state_.load(std::memory_order_acquire);
+        auto const state = this->state_.load(std::memory_order_acquire);
         if (state != this->empty)
         {
             return false;
