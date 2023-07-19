@@ -90,7 +90,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init += HPX_INVOKE(conv, *it);
                 ++it;
@@ -104,7 +104,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(- : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init -= HPX_INVOKE(conv, *it);
                 ++it;
@@ -118,7 +118,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(* : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init *= HPX_INVOKE(conv, *it);
                 ++it;
@@ -132,7 +132,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(& : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init &= HPX_INVOKE(conv, *it);
                 ++it;
@@ -146,7 +146,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(| : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init |= HPX_INVOKE(conv, *it);
                 ++it;
@@ -160,7 +160,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(^ : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init ^= HPX_INVOKE(conv, *it);
                 ++it;
@@ -174,7 +174,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(&& : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init = HPX_INVOKE(conv, *it) && init;
                 ++it;
@@ -188,7 +188,7 @@ namespace hpx::parallel::util::detail {
         reduce(Iter1 it, std::size_t count, T init, Reduce /* */, Convert conv)
         {
             HPX_VECTOR_REDUCTION(|| : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init = HPX_INVOKE(conv, *it) || init;
                 ++it;
@@ -206,7 +206,7 @@ namespace hpx::parallel::util::detail {
             // To small, just run sequential
             if (count <= 2 * block_size)
             {
-                for (std::size_t i = 0; i != count; ++i)
+                for (std::size_t i = 0; i < count; ++i)
                 {
                     init = HPX_INVOKE(r, init, HPX_INVOKE(conv, *it));
                     ++it;
@@ -244,7 +244,7 @@ namespace hpx::parallel::util::detail {
                 count -= limit;
 
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i != count; ++i)
+                for (std::size_t i = 0; i < count; ++i)
                 {
                     tblock[i] = HPX_INVOKE(r, tblock[i], HPX_INVOKE(conv, *it));
                     ++it;
@@ -280,7 +280,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(+ : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init += HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -296,7 +296,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(- : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init -= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -312,7 +312,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(* : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init *= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -328,7 +328,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(& : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init &= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -344,7 +344,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(| : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init |= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -360,7 +360,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(^ : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init ^= HPX_INVOKE(conv, *it1, *it2);
                 ++it1, ++it2;
@@ -376,7 +376,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(&& : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init = HPX_INVOKE(conv, *it1, *it2) && init;
                 ++it1, ++it2;
@@ -392,7 +392,7 @@ namespace hpx::parallel::util::detail {
             Convert conv)
         {
             HPX_VECTOR_REDUCTION(|| : init)
-            for (std::size_t i = 0; i != count; ++i)
+            for (std::size_t i = 0; i < count; ++i)
             {
                 init = HPX_INVOKE(conv, *it1, *it2) || init;
                 ++it1, ++it2;
@@ -413,7 +413,7 @@ namespace hpx::parallel::util::detail {
             // To small, just run sequential
             if (count <= 2 * block_size)
             {
-                for (std::size_t i = 0; i != count; ++i)
+                for (std::size_t i = 0; i < count; ++i)
                 {
                     init = HPX_INVOKE(r, init, HPX_INVOKE(conv, *it1, *it2));
                     ++it1, ++it2;
@@ -454,7 +454,7 @@ namespace hpx::parallel::util::detail {
                 count -= limit;
 
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i != count; ++i)
+                for (std::size_t i = 0; i < count; ++i)
                 {
                     tblock[i] =
                         HPX_INVOKE(r, tblock[i], HPX_INVOKE(conv, *it1, *it2));
