@@ -135,10 +135,9 @@ namespace hpx::parallel::util {
         struct unseq_loop2
         {
             template <typename InIter1, typename InIter2, typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr std::pair<InIter1, InIter2>
-                call(InIter1 HPX_RESTRICT it1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT it2, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter1, InIter2>
+            call(InIter1 HPX_RESTRICT it1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT it2, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&

@@ -25,10 +25,9 @@ namespace hpx::parallel::util {
         struct unseq_transform_loop_n
         {
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
-                call(InIter HPX_RESTRICT it, std::size_t num,
-                    OutIter HPX_RESTRICT dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            call(InIter HPX_RESTRICT it, std::size_t num,
+                OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter> &&
@@ -75,10 +74,9 @@ namespace hpx::parallel::util {
         struct unseq_transform_loop_n_ind
         {
             template <typename InIter, typename OutIter, typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr std::pair<InIter, OutIter>
-                call(InIter HPX_RESTRICT it, std::size_t num,
-                    OutIter HPX_RESTRICT dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static std::pair<InIter, OutIter>
+            call(InIter HPX_RESTRICT it, std::size_t num,
+                OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter> &&
@@ -126,8 +124,7 @@ namespace hpx::parallel::util {
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_out_result<InIter,
-                    OutIter>
+                HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
                 call(InIter HPX_RESTRICT it, InIter HPX_RESTRICT last,
                     OutIter HPX_RESTRICT dest, F&& f)
             {
@@ -183,8 +180,7 @@ namespace hpx::parallel::util {
         {
             template <typename InIter, typename OutIter, typename F>
             HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_out_result<InIter,
-                    OutIter>
+                HPX_FORCEINLINE static util::in_out_result<InIter, OutIter>
                 call(InIter HPX_RESTRICT it, InIter HPX_RESTRICT last,
                     OutIter HPX_RESTRICT dest, F&& f)
             {
@@ -240,10 +236,11 @@ namespace hpx::parallel::util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
-                InIter2, OutIter>
-            call(InIter1 HPX_RESTRICT first1, std::size_t num,
-                InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest, F&& f)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static hpx::tuple<InIter1, InIter2, OutIter>
+                call(InIter1 HPX_RESTRICT first1, std::size_t num,
+                    InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest,
+                    F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -294,12 +291,10 @@ namespace hpx::parallel::util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_in_out_result<InIter1,
-                    InIter2, OutIter>
-                call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest,
-                    F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -328,12 +323,11 @@ namespace hpx::parallel::util {
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_in_out_result<InIter1,
-                    InIter2, OutIter>
-                call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT first2, InIter2 HPX_RESTRICT last2,
-                    OutIter dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT first2, InIter2 HPX_RESTRICT last2,
+                OutIter dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -401,10 +395,11 @@ namespace hpx::parallel::util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr hpx::tuple<InIter1,
-                InIter2, OutIter>
-            call(InIter1 HPX_RESTRICT first1, std::size_t num,
-                InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest, F&& f)
+            HPX_HOST_DEVICE
+                HPX_FORCEINLINE static hpx::tuple<InIter1, InIter2, OutIter>
+                call(InIter1 HPX_RESTRICT first1, std::size_t num,
+                    InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest,
+                    F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -455,12 +450,10 @@ namespace hpx::parallel::util {
         {
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_in_out_result<InIter1,
-                    InIter2, OutIter>
-                call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest,
-                    F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT first2, OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
@@ -489,12 +482,11 @@ namespace hpx::parallel::util {
 
             template <typename InIter1, typename InIter2, typename OutIter,
                 typename F>
-            HPX_HOST_DEVICE
-                HPX_FORCEINLINE static constexpr util::in_in_out_result<InIter1,
-                    InIter2, OutIter>
-                call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
-                    InIter2 HPX_RESTRICT first2, InIter2 HPX_RESTRICT last2,
-                    OutIter HPX_RESTRICT dest, F&& f)
+            HPX_HOST_DEVICE HPX_FORCEINLINE static util::in_in_out_result<
+                InIter1, InIter2, OutIter>
+            call(InIter1 HPX_RESTRICT first1, InIter1 HPX_RESTRICT last1,
+                InIter2 HPX_RESTRICT first2, InIter2 HPX_RESTRICT last2,
+                OutIter HPX_RESTRICT dest, F&& f)
             {
                 constexpr bool iterators_are_random_access =
                     hpx::traits::is_random_access_iterator_v<InIter1> &&
