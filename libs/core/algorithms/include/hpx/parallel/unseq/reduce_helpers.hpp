@@ -232,7 +232,7 @@ namespace hpx::parallel::util::detail {
                      i += block_size)
                 {
                     HPX_VECTORIZE
-                    for (std::size_t j = 0; j != block_size; ++j)
+                    for (std::size_t j = 0; j < block_size; ++j)
                     {
                         tblock[j] = HPX_INVOKE(
                             r, tblock[j], HPX_INVOKE(conv, *(it + j)));
@@ -251,7 +251,7 @@ namespace hpx::parallel::util::detail {
                 }
 
                 // Merge
-                for (std::size_t i = 0; i != block_size; ++i)
+                for (std::size_t i = 0; i < block_size; ++i)
                 {
                     init = HPX_INVOKE(r, init, tblock[i]);
                 }
@@ -425,7 +425,7 @@ namespace hpx::parallel::util::detail {
                 T* tblock = reinterpret_cast<T*>(block);
 
                 // Initialize block[i] = r(f(2*i), f(2*i + 1))
-                for (std::size_t i = 0; i != block_size; ++i)
+                for (std::size_t i = 0; i < block_size; ++i)
                 {
                     hpx::construct_at(tblock + i,
                         HPX_INVOKE(r, HPX_INVOKE(conv, *it1, *it2),
@@ -441,7 +441,7 @@ namespace hpx::parallel::util::detail {
                      i += block_size)
                 {
                     HPX_VECTORIZE
-                    for (std::size_t j = 0; j != block_size; ++j)
+                    for (std::size_t j = 0; j < block_size; ++j)
                     {
                         tblock[j] = HPX_INVOKE(r, tblock[j],
                             HPX_INVOKE(conv, *(it1 + j), *(it2 + j)));
@@ -462,14 +462,14 @@ namespace hpx::parallel::util::detail {
                 }
 
                 // Merge
-                for (std::size_t i = 0; i != block_size; ++i)
+                for (std::size_t i = 0; i < block_size; ++i)
                 {
                     init = HPX_INVOKE(r, init, tblock[i]);
                 }
 
                 // Cleanup resources
                 HPX_VECTORIZE
-                for (std::size_t i = 0; i != block_size; ++i)
+                for (std::size_t i = 0; i < block_size; ++i)
                 {
                     std::destroy_at(std::addressof(tblock[i]));
                 }

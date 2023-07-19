@@ -37,7 +37,7 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_VECTORIZE
-                    for (std::size_t i = 0; i != num; ++i)
+                    for (std::size_t i = 0; i < num; ++i)
                     {
                         *dest = HPX_INVOKE(f, it);
                         ++it, ++dest;
@@ -86,7 +86,7 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_VECTORIZE
-                    for (std::size_t i = 0; i != num; ++i)
+                    for (std::size_t i = 0; i < num; ++i)
                     {
                         *dest = HPX_INVOKE(f, *it);
                         ++it, ++dest;
@@ -251,7 +251,7 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_VECTORIZE
-                    for (std::size_t i = 0; i != num; ++i)
+                    for (std::size_t i = 0; i < num; ++i)
                     {
                         *dest = HPX_INVOKE(f, first1, first2);
                         ++first1, ++first2, ++dest;
@@ -410,7 +410,7 @@ namespace hpx::parallel::util {
                 {
                     // clang-format off
                     HPX_VECTORIZE
-                    for (std::size_t i = 0; i != num; ++i)
+                    for (std::size_t i = 0; i < num; ++i)
                     {
                         *dest = HPX_INVOKE(f, *first1, *first2);
                         ++first1, ++first2, ++dest;
