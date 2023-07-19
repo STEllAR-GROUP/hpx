@@ -74,7 +74,7 @@ You may see an error message that looks a bit like this:
 
 .. code-block:: text
 
-   Could NOT find TCMalloc (missing: TCMALLOC_LIBRARY TCMALLOC_INCLUDE_DIR)
+   Could NOT find TCMalloc (missing: Tcmalloc_LIBRARY Tcmalloc_INCLUDE_DIR)
    ERROR: HPX_WITH_MALLOC was set to tcmalloc, but tcmalloc could not be
    found.  Valid options for HPX_WITH_MALLOC are: system, tcmalloc, jemalloc,
    mimalloc, tbbmalloc, and custom
@@ -117,7 +117,7 @@ following flag on your |hpx| application CMake configuration:
 |hpx|-application build type conformance
 ----------------------------------------
 
-Your application’s build type should align with the HPX build type. For example, if you specified 
+Your application's build type should align with the HPX build type. For example, if you specified 
 ``-DCMAKE_BUILD_TYPE=Debug`` during the |hpx| compilation, then your application needs to be compiled 
 with the same flag. We recommend keeping a separate build folder for different build types and just 
 point accordingly to the type you want by using ``-DHPX_DIR=<build_dir>/lib/cmake/HPX``.

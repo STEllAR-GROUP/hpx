@@ -7,58 +7,67 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(TBBMALLOC_ROOT AND NOT Tbbmalloc_ROOT)
+  set(Tbbmalloc_ROOT
+      ${TBBMALLOC_ROOT}
+      CACHE PATH "TBBMalloc base directory"
+  )
+  unset(TBBMALLOC_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(PC_TBBMALLOC QUIET libtbbmalloc)
+pkg_check_modules(PC_Tbbmalloc QUIET libtbbmalloc)
 
 find_path(
-  TBBMALLOC_INCLUDE_DIR tbb/scalable_allocator.h
-  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
-        ${PC_TBBMALLOC_INCLUDEDIR} ${PC_TBBMALLOC_INCLUDE_DIRS}
+  Tbbmalloc_INCLUDE_DIR tbb/scalable_allocator.h
+  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+        ${PC_Tbbmalloc_INCLUDEDIR} ${PC_Tbbmalloc_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
-set(TBBMALLOC_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
-if(TBBMALLOC_PLATFORM STREQUAL "mic")
-  set(TBBMALLOC_PATH_SUFFIX "lib/mic")
+set(Tbbmalloc_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
+if(Tbbmalloc_PLATFORM STREQUAL "mic")
+  set(Tbbmalloc_PATH_SUFFIX "lib/mic")
 endif()
-if(TBBMALLOC_PLATFORM STREQUAL "mic-knl")
-  set(TBBMALLOC_PATH_SUFFIX "lib/intel64_lin_mic")
+if(Tbbmalloc_PLATFORM STREQUAL "mic-knl")
+  set(Tbbmalloc_PATH_SUFFIX "lib/intel64_lin_mic")
 endif()
 
-message("${TBBMALLOC_ROOT} ${TBBMALLOC_PATH_SUFFIX} ${TBBMALLOC_PLATFORM}")
+message("${Tbbmalloc_ROOT} ${Tbbmalloc_PATH_SUFFIX} ${Tbbmalloc_PLATFORM}")
 
 find_library(
-  TBBMALLOC_LIBRARY
+  Tbbmalloc_LIBRARY
   NAMES tbbmalloc libtbbmalloc
-  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
-        ${PC_TBBMALLOC_LIBDIR} ${PC_TBBMALLOC_LIBRARY_DIRS}
-  PATH_SUFFIXES ${TBBMALLOC_PATH_SUFFIX} lib lib64
+  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+        ${PC_Tbbmalloc_LIBDIR} ${PC_Tbbmalloc_LIBRARY_DIRS}
+  PATH_SUFFIXES ${Tbbmalloc_PATH_SUFFIX} lib lib64
 )
 
 find_library(
-  TBBMALLOC_PROXY_LIBRARY
+  Tbbmalloc_PROXY_LIBRARY
   NAMES tbbmalloc_proxy libtbbmalloc_proxy
-  HINTS ${TBBMALLOC_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
-        ${PC_TBBMALLOC_LIBDIR} ${PC_TBBMALLOC_LIBRARY_DIRS}
-  PATH_SUFFIXES ${TBBMALLOC_PATH_SUFFIX} lib lib64
+  HINTS ${Tbbmalloc_ROOT} ENV TBBMALLOC_ROOT ${HPX_TBBMALLOC_ROOT}
+        ${PC_Tbbmalloc_LIBDIR} ${PC_Tbbmalloc_LIBRARY_DIRS}
+  PATH_SUFFIXES ${Tbbmalloc_PATH_SUFFIX} lib lib64
 )
 
-# Set TBBMALLOC_ROOT in case the other hints are used
-if(NOT TBBMALLOC_ROOT AND "$ENV{TBBMALLOC_ROOT}")
-  set(TBBMALLOC_ROOT $ENV{TBBMALLOC_ROOT})
-elseif(NOT TBBMALLOC_ROOT)
-  string(REPLACE "/include" "" TBBMALLOC_ROOT "${TBBMALLOC_INCLUDE_DIR}")
+# Set Tbbmalloc_ROOT in case the other hints are used
+if(NOT Tbbmalloc_ROOT AND "$ENV{TBBMALLOC_ROOT}")
+  set(Tbbmalloc_ROOT $ENV{TBBMALLOC_ROOT})
+elseif(NOT Tbbmalloc_ROOT)
+  string(REPLACE "/include" "" Tbbmalloc_ROOT "${Tbbmalloc_INCLUDE_DIR}")
 endif()
 
-set(TBBMALLOC_LIBRARIES ${TBBMALLOC_LIBRARY} ${TBBMALLOC_PROXY_LIBRARY})
-set(TBBMALLOC_INCLUDE_DIRS ${TBBMALLOC_INCLUDE_DIR})
+set(Tbbmalloc_LIBRARIES ${Tbbmalloc_LIBRARY} ${Tbbmalloc_PROXY_LIBRARY})
+set(Tbbmalloc_INCLUDE_DIRS ${Tbbmalloc_INCLUDE_DIR})
 
 find_package_handle_standard_args(
-  TBBmalloc DEFAULT_MSG TBBMALLOC_LIBRARY TBBMALLOC_PROXY_LIBRARY
-  TBBMALLOC_INCLUDE_DIR
+  TBBmalloc DEFAULT_MSG Tbbmalloc_LIBRARY Tbbmalloc_PROXY_LIBRARY
+  Tbbmalloc_INCLUDE_DIR
 )
 
-foreach(v TBBMALLOC_ROOT TBBMALLOC_PLATFORM)
+foreach(v Tbbmalloc_ROOT Tbbmalloc_PLATFORM)
   get_property(
     _type
     CACHE ${v}
@@ -73,6 +82,6 @@ foreach(v TBBMALLOC_ROOT TBBMALLOC_PLATFORM)
 endforeach()
 
 mark_as_advanced(
-  TBBMALLOC_ROOT TBBMALLOC_LIBRARY TBBMALLOC_PROXY_LIBRARY
-  TBBMALLOC_INCLUDE_DIR
+  Tbbmalloc_ROOT Tbbmalloc_LIBRARY Tbbmalloc_PROXY_LIBRARY
+  Tbbmalloc_INCLUDE_DIR
 )

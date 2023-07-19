@@ -1,5 +1,5 @@
 # Copyright (c)      2014 Thomas Heller
-# Copyright (c) 2007-2012 Hartmut Kaiser
+# Copyright (c) 2007-2023 Hartmut Kaiser
 # Copyright (c) 2010-2011 Matt Anderson
 # Copyright (c) 2011      Bryce Lelbach
 #
@@ -8,70 +8,79 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET Hwloc::hwloc)
+  # compatibility with older CMake versions
+  if(HWLOC_ROOT AND NOT Hwloc_ROOT)
+    set(Hwloc_ROOT
+        ${HWLOC_ROOT}
+        CACHE PATH "Hwloc base directory"
+    )
+    unset(HWLOC_ROOT CACHE)
+  endif()
+
   find_package(PkgConfig QUIET)
   pkg_check_modules(PC_HWLOC QUIET hwloc)
 
   find_path(
-    HWLOC_INCLUDE_DIR hwloc.h
-    HINTS ${HWLOC_ROOT}
+    Hwloc_INCLUDE_DIR hwloc.h
+    HINTS ${Hwloc_ROOT}
           ENV
           HWLOC_ROOT
           ${HPX_HWLOC_ROOT}
-          ${PC_HWLOC_MINIMAL_INCLUDEDIR}
-          ${PC_HWLOC_MINIMAL_INCLUDE_DIRS}
-          ${PC_HWLOC_INCLUDEDIR}
-          ${PC_HWLOC_INCLUDE_DIRS}
+          ${PC_Hwloc_MINIMAL_INCLUDEDIR}
+          ${PC_Hwloc_MINIMAL_INCLUDE_DIRS}
+          ${PC_Hwloc_INCLUDEDIR}
+          ${PC_Hwloc_INCLUDE_DIRS}
     PATH_SUFFIXES include
   )
 
   find_library(
-    HWLOC_LIBRARY
+    Hwloc_LIBRARY
     NAMES libhwloc.so hwloc
-    HINTS ${HWLOC_ROOT}
+    HINTS ${Hwloc_ROOT}
           ENV
           HWLOC_ROOT
-          ${HPX_HWLOC_ROOT}
-          ${PC_HWLOC_MINIMAL_LIBDIR}
-          ${PC_HWLOC_MINIMAL_LIBRARY_DIRS}
-          ${PC_HWLOC_LIBDIR}
-          ${PC_HWLOC_LIBRARY_DIRS}
+          ${HPX_Hwloc_ROOT}
+          ${PC_Hwloc_MINIMAL_LIBDIR}
+          ${PC_Hwloc_MINIMAL_LIBRARY_DIRS}
+          ${PC_Hwloc_LIBDIR}
+          ${PC_Hwloc_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64
   )
 
-  # Set HWLOC_ROOT in case the other hints are used
-  if(HWLOC_ROOT)
+  # Set Hwloc_ROOT in case the other hints are used
+  if(Hwloc_ROOT)
     # The call to file is for compatibility with windows paths
-    file(TO_CMAKE_PATH ${HWLOC_ROOT} HWLOC_ROOT)
+    file(TO_CMAKE_PATH ${Hwloc_ROOT} Hwloc_ROOT)
   elseif("$ENV{HWLOC_ROOT}")
-    file(TO_CMAKE_PATH $ENV{HWLOC_ROOT} HWLOC_ROOT)
+    file(TO_CMAKE_PATH $ENV{HWLOC_ROOT} Hwloc_ROOT)
   else()
-    file(TO_CMAKE_PATH "${HWLOC_INCLUDE_DIR}" HWLOC_INCLUDE_DIR)
-    string(REPLACE "/include" "" HWLOC_ROOT "${HWLOC_INCLUDE_DIR}")
+    file(TO_CMAKE_PATH "${Hwloc_INCLUDE_DIR}" Hwloc_INCLUDE_DIR)
+    string(REPLACE "/include" "" Hwloc_ROOT "${Hwloc_INCLUDE_DIR}")
   endif()
 
-  set(HWLOC_LIBRARIES ${HWLOC_LIBRARY})
-  set(HWLOC_INCLUDE_DIRS ${HWLOC_INCLUDE_DIR})
+  set(Hwloc_LIBRARIES ${Hwloc_LIBRARY})
+  set(Hwloc_INCLUDE_DIRS ${Hwloc_INCLUDE_DIR})
 
   find_package_handle_standard_args(
-    Hwloc DEFAULT_MSG HWLOC_LIBRARY HWLOC_INCLUDE_DIR
+    Hwloc DEFAULT_MSG Hwloc_LIBRARY Hwloc_INCLUDE_DIR
   )
 
   get_property(
     _type
-    CACHE HWLOC_ROOT
+    CACHE Hwloc_ROOT
     PROPERTY TYPE
   )
   if(_type)
-    set_property(CACHE HWLOC_ROOT PROPERTY ADVANCED 1)
+    set_property(CACHE Hwloc_ROOT PROPERTY ADVANCED 1)
     if("x${_type}" STREQUAL "xUNINITIALIZED")
-      set_property(CACHE HWLOC_ROOT PROPERTY TYPE PATH)
+      set_property(CACHE Hwloc_ROOT PROPERTY TYPE PATH)
     endif()
   endif()
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
-  target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
-
-  target_link_libraries(Hwloc::hwloc INTERFACE ${HWLOC_LIBRARIES})
+  target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${Hwloc_INCLUDE_DIR})
+  target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARIES})
   mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
 
+  mark_as_advanced(Hwloc_ROOT Hwloc_LIBRARY Hwloc_INCLUDE_DIR)
 endif()

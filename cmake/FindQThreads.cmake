@@ -5,43 +5,52 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(QTHREADS_ROOT AND NOT Qthreads_ROOT)
+  set(Qthreads_ROOT
+      ${QTHREADS_ROOT}
+      CACHE PATH "QThreads base directory"
+  )
+  unset(QTHREADS_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(PC_QTHREADS QUIET swarm)
+pkg_check_modules(PC_Qthreads QUIET swarm)
 
 find_path(
-  QTHREADS_INCLUDE_DIR qthread/qthread.h
-  HINTS ${QTHREADS_ROOT} ENV QTHREADS_ROOT ${PC_QTHREADS_INCLUDEDIR}
-        ${PC_QTHREADS_INCLUDE_DIRS}
+  Qthreads_INCLUDE_DIR qthread/qthread.h
+  HINTS ${Qthreads_ROOT} ENV QTHREADS_ROOT ${PC_Qthreads_INCLUDEDIR}
+        ${PC_Qthreads_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
 find_library(
-  QTHREADS_LIBRARY
+  Qthreads_LIBRARY
   NAMES qthread libqthread
-  HINTS ${QTHREADS_ROOT} ENV QTHREADS_ROOT ${PC_QTHREADS_LIBDIR}
-        ${PC_QTHREADS_LIBRARY_DIRS}
+  HINTS ${Qthreads_ROOT} ENV QTHREADS_ROOT ${PC_Qthreads_LIBDIR}
+        ${PC_Qthreads_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
 
-# Set QTHREADS_ROOT in case the other hints are used
-if(QTHREADS_ROOT)
+# Set Qthreads_ROOT in case the other hints are used
+if(Qthreads_ROOT)
   # The call to file is for compatibility with windows paths
-  file(TO_CMAKE_PATH ${QTHREADS_ROOT} QTHREADS_ROOT)
+  file(TO_CMAKE_PATH ${Qthreads_ROOT} Qthreads_ROOT)
 elseif("$ENV{QTHREADS_ROOT}")
-  file(TO_CMAKE_PATH $ENV{QTHREADS_ROOT} QTHREADS_ROOT)
+  file(TO_CMAKE_PATH $ENV{QTHREADS_ROOT} Qthreads_ROOT)
 else()
-  file(TO_CMAKE_PATH "${QTHREADS_INCLUDE_DIR}" QTHREADS_INCLUDE_DIR)
-  string(REPLACE "/include" "" QTHREADS_ROOT "${QTHREADS_INCLUDE_DIR}")
+  file(TO_CMAKE_PATH "${Qthreads_INCLUDE_DIR}" Qthreads_INCLUDE_DIR)
+  string(REPLACE "/include" "" Qthreads_ROOT "${Qthreads_INCLUDE_DIR}")
 endif()
 
-set(QTHREADS_LIBRARIES ${QTHREADS_LIBRARY})
-set(QTHREADS_INCLUDE_DIRS ${QTHREADS_INCLUDE_DIR})
+set(Qthreads_LIBRARIES ${Qthreads_LIBRARY})
+set(Qthreads_INCLUDE_DIRS ${Qthreads_INCLUDE_DIR})
 
 find_package_handle_standard_args(
-  QThreads DEFAULT_MSG QTHREADS_LIBRARY QTHREADS_INCLUDE_DIR
+  QThreads DEFAULT_MSG Qthreads_LIBRARY Qthreads_INCLUDE_DIR
 )
 
-foreach(v QTHREADS_ROOT)
+foreach(v Qthreads_ROOT)
   get_property(
     _type
     CACHE ${v}
@@ -55,4 +64,4 @@ foreach(v QTHREADS_ROOT)
   endif()
 endforeach()
 
-mark_as_advanced(QTHREADS_ROOT QTHREADS_LIBRARY QTHREADS_INCLUDE_DIR)
+mark_as_advanced(Qthreads_ROOT Qthreads_LIBRARY Qthreads_INCLUDE_DIR)

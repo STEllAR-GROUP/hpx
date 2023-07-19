@@ -8,48 +8,57 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(MSR_ROOT AND NOT Msr_ROOT)
+  set(Msr_ROOT
+      ${MSR_ROOT}
+      CACHE PATH "Msr base directory"
+  )
+  unset(MSR_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
 pkg_check_modules(PC_MSR QUIET libmsr)
 
 find_path(
-  MSR_INCLUDE_DIR msr_core.h
-  HINTS ${MSR_ROOT} ENV MSR_ROOT ${PC_MSR_INCLUDEDIR} ${PC_MSR_INCLUDE_DIRS}
+  Msr_INCLUDE_DIR msr_core.h
+  HINTS ${Msr_ROOT} ENV MSR_ROOT ${PC_Msr_INCLUDEDIR} ${PC_Msr_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
 find_library(
-  MSR_LIBRARY
+  Msr_LIBRARY
   NAMES msr libmsr
-  HINTS ${MSR_ROOT} ENV MSR_ROOT ${PC_MSR_LIBDIR} ${PC_MSR_LIBRARY_DIRS}
+  HINTS ${Msr_ROOT} ENV MSR_ROOT ${PC_Msr_LIBDIR} ${PC_Msr_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
 
-# Set MSR_ROOT in case the other hints are used
-if(MSR_ROOT)
+# Set Msr_ROOT in case the other hints are used
+if(Msr_ROOT)
   # The call to file is for compatibility with windows paths
-  file(TO_CMAKE_PATH ${MSR_ROOT} MSR_ROOT)
+  file(TO_CMAKE_PATH ${Msr_ROOT} Msr_ROOT)
 elseif("$ENV{MSR_ROOT}")
-  file(TO_CMAKE_PATH $ENV{MSR_ROOT} MSR_ROOT)
+  file(TO_CMAKE_PATH $ENV{MSR_ROOT} Msr_ROOT)
 else()
-  file(TO_CMAKE_PATH "${MSR_INCLUDE_DIR}" MSR_INCLUDE_DIR)
-  string(REPLACE "/include" "" MSR_ROOT "${MSR_INCLUDE_DIR}")
+  file(TO_CMAKE_PATH "${Msr_INCLUDE_DIR}" Msr_INCLUDE_DIR)
+  string(REPLACE "/include" "" Msr_ROOT "${Msr_INCLUDE_DIR}")
 endif()
 
-set(MSR_LIBRARIES ${MSR_LIBRARY})
-set(MSR_INCLUDE_DIRS ${MSR_INCLUDE_DIR})
+set(Msr_LIBRARIES ${Msr_LIBRARY})
+set(Msr_INCLUDE_DIRS ${Msr_INCLUDE_DIR})
 
-find_package_handle_standard_args(MSR DEFAULT_MSG MSR_LIBRARY MSR_INCLUDE_DIR)
+find_package_handle_standard_args(MSR DEFAULT_MSG Msr_LIBRARY Msr_INCLUDE_DIR)
 
 get_property(
   _type
-  CACHE MSR_ROOT
+  CACHE Msr_ROOT
   PROPERTY TYPE
 )
 if(_type)
-  set_property(CACHE MSR_ROOT PROPERTY ADVANCED 1)
+  set_property(CACHE Msr_ROOT PROPERTY ADVANCED 1)
   if("x${_type}" STREQUAL "xUNINITIALIZED")
-    set_property(CACHE MSR_ROOT PROPERTY TYPE PATH)
+    set_property(CACHE Msr_ROOT PROPERTY TYPE PATH)
   endif()
 endif()
 
-mark_as_advanced(MSR_ROOT MSR_LIBRARY MSR_INCLUDE_DIR)
+mark_as_advanced(Msr_ROOT Msr_LIBRARY Msr_INCLUDE_DIR)

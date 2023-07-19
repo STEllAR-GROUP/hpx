@@ -8,70 +8,79 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET PWR::pwr)
+  # compatibility with older CMake versions
+  if(PWR_ROOT AND NOT Pwr_ROOT)
+    set(Pwr_ROOT
+        ${PWR_ROOT}
+        CACHE PATH "PWR base directory"
+    )
+    unset(PWR_ROOT CACHE)
+  endif()
+
   find_package(PkgConfig QUIET)
-  pkg_check_modules(PC_PWR QUIET pwr)
-  if(NOT PC_PWR_FOUND)
-    pkg_check_modules(PC_PWR pwrapi QUIET)
+  pkg_check_modules(PC_Pwr QUIET pwr)
+  if(NOT PC_Pwr_FOUND)
+    pkg_check_modules(PC_Pwr pwrapi QUIET)
   endif()
 
   find_path(
-    PWR_INCLUDE_DIR pwr.h
-    HINTS ${PWR_ROOT}
+    Pwr_INCLUDE_DIR pwr.h
+    HINTS ${Pwr_ROOT}
           ENV
           PWR_ROOT
-          ${HPX_PWR_ROOT}
-          ${PC_PWR_MINIMAL_INCLUDEDIR}
-          ${PC_PWR_MINIMAL_INCLUDE_DIRS}
-          ${PC_PWR_INCLUDEDIR}
-          ${PC_PWR_INCLUDE_DIRS}
+          ${HPX_Pwr_ROOT}
+          ${PC_Pwr_MINIMAL_INCLUDEDIR}
+          ${PC_Pwr_MINIMAL_INCLUDE_DIRS}
+          ${PC_Pwr_INCLUDEDIR}
+          ${PC_Pwr_INCLUDE_DIRS}
     PATH_SUFFIXES include
   )
 
   find_library(
-    PWR_LIBRARY
+    Pwr_LIBRARY
     NAMES pwr libpwr
-    HINTS ${PWR_ROOT}
+    HINTS ${Pwr_ROOT}
           ENV
           PWR_ROOT
-          ${HPX_PWR_ROOT}
-          ${PC_PWR_MINIMAL_LIBDIR}
-          ${PC_PWR_MINIMAL_LIBRARY_DIRS}
-          ${PC_PWR_LIBDIR}
-          ${PC_PWR_LIBRARY_DIRS}
+          ${HPX_Pwr_ROOT}
+          ${PC_Pwr_MINIMAL_LIBDIR}
+          ${PC_Pwr_MINIMAL_LIBRARY_DIRS}
+          ${PC_Pwr_LIBDIR}
+          ${PC_Pwr_LIBRARY_DIRS}
     PATH_SUFFIXES lib lib64
   )
 
-  # Set PWR_ROOT in case the other hints are used
-  if(PWR_ROOT)
+  # Set Pwr_ROOT in case the other hints are used
+  if(Pwr_ROOT)
     # The call to file is for compatibility with windows paths
-    file(TO_CMAKE_PATH ${PWR_ROOT} PWR_ROOT)
+    file(TO_CMAKE_PATH ${Pwr_ROOT} Pwr_ROOT)
   elseif("$ENV{PWR_ROOT}")
-    file(TO_CMAKE_PATH $ENV{PWR_ROOT} PWR_ROOT)
+    file(TO_CMAKE_PATH $ENV{PWR_ROOT} Pwr_ROOT)
   else()
-    file(TO_CMAKE_PATH "${PWR_INCLUDE_DIR}" PWR_INCLUDE_DIR)
-    string(REPLACE "/include" "" PWR_ROOT "${PWR_INCLUDE_DIR}")
+    file(TO_CMAKE_PATH "${Pwr_INCLUDE_DIR}" Pwr_INCLUDE_DIR)
+    string(REPLACE "/include" "" Pwr_ROOT "${Pwr_INCLUDE_DIR}")
   endif()
 
-  set(PWR_LIBRARIES ${PWR_LIBRARY})
-  set(PWR_INCLUDE_DIRS ${PWR_INCLUDE_DIR})
+  set(Pwr_LIBRARIES ${Pwr_LIBRARY})
+  set(Pwr_INCLUDE_DIRS ${Pwr_INCLUDE_DIR})
 
-  find_package_handle_standard_args(PWR DEFAULT_MSG PWR_LIBRARY PWR_INCLUDE_DIR)
+  find_package_handle_standard_args(PWR DEFAULT_MSG Pwr_LIBRARY Pwr_INCLUDE_DIR)
 
   get_property(
     _type
-    CACHE PWR_ROOT
+    CACHE Pwr_ROOT
     PROPERTY TYPE
   )
   if(_type)
-    set_property(CACHE PWR_ROOT PROPERTY ADVANCED 1)
+    set_property(CACHE Pwr_ROOT PROPERTY ADVANCED 1)
     if("x${_type}" STREQUAL "xUNINITIALIZED")
-      set_property(CACHE PWR_ROOT PROPERTY TYPE PATH)
+      set_property(CACHE Pwr_ROOT PROPERTY TYPE PATH)
     endif()
   endif()
 
   add_library(PWR::pwr INTERFACE IMPORTED)
-  target_include_directories(PWR::pwr SYSTEM INTERFACE ${PWR_INCLUDE_DIR})
-  target_link_libraries(PWR::pwr INTERFACE ${PWR_LIBRARIES})
+  target_include_directories(PWR::pwr SYSTEM INTERFACE ${Pwr_INCLUDE_DIR})
+  target_link_libraries(PWR::pwr INTERFACE ${Pwr_LIBRARIES})
 
-  mark_as_advanced(PWR_ROOT PWR_LIBRARY PWR_INCLUDE_DIR)
+  mark_as_advanced(Pwr_ROOT Pwr_LIBRARY Pwr_INCLUDE_DIR)
 endif()

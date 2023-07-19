@@ -7,38 +7,47 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(RDMACM_ROOT AND NOT Rdmacm_ROOT)
+  set(Rdmacm_ROOT
+      ${RDMACM_ROOT}
+      CACHE PATH "RDMACM base directory"
+  )
+  unset(RDMACM_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(PC_RDMACM QUIET libibverbs)
+pkg_check_modules(PC_Rdmacm QUIET libibverbs)
 
 find_path(
-  RDMACM_INCLUDE_DIR rdma/rdma_cma.h
-  HINTS ${RDMACM_ROOT} ENV RDMACM_ROOT ${PC_RDMACM_INCLUDEDIR}
-        ${PC_RDMACM_INCLUDE_DIRS}
+  Rdmacm_INCLUDE_DIR rdma/rdma_cma.h
+  HINTS ${Rdmacm_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_INCLUDEDIR}
+        ${PC_Rdmacm_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
 find_library(
-  RDMACM_LIBRARY
+  Rdmacm_LIBRARY
   NAMES rdmacm librdmacm
-  HINTS ${RDMACM_ROOT} ENV RDMACM_ROOT ${PC_RDMACM_LIBDIR}
-        ${PC_RDMACM_LIBRARY_DIRS}
+  HINTS ${Rdmacm_ROOT} ENV RDMACM_ROOT ${PC_Rdmacm_LIBDIR}
+        ${PC_Rdmacm_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
 
-set(RDMACM_LIBRARIES
-    ${RDMACM_LIBRARY}
+set(Rdmacm_LIBRARIES
+    ${Rdmacm_LIBRARY}
     CACHE INTERNAL ""
 )
-set(RDMACM_INCLUDE_DIRS
-    ${RDMACM_INCLUDE_DIR}
+set(Rdmacm_INCLUDE_DIRS
+    ${Rdmacm_INCLUDE_DIR}
     CACHE INTERNAL ""
 )
 
 find_package_handle_standard_args(
-  Rdmacm DEFAULT_MSG RDMACM_LIBRARY RDMACM_INCLUDE_DIR
+  Rdmacm DEFAULT_MSG Rdmacm_LIBRARY Rdmacm_INCLUDE_DIR
 )
 
-foreach(v RDMACM_ROOT)
+foreach(v Rdmacm_ROOT)
   get_property(
     _type
     CACHE ${v}
@@ -52,4 +61,4 @@ foreach(v RDMACM_ROOT)
   endif()
 endforeach()
 
-mark_as_advanced(RDMACM_ROOT RDMACM_LIBRARY RDMACM_INCLUDE_DIR)
+mark_as_advanced(Rdmacm_ROOT Rdmacm_LIBRARY Rdmacm_INCLUDE_DIR)

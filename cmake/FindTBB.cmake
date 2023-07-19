@@ -5,38 +5,47 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(TBB_ROOT AND NOT Tbb_ROOT)
+  set(Tbb_ROOT
+      ${TBB_ROOT}
+      CACHE PATH "TBB base directory"
+  )
+  unset(TBB_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(PC_TBB QUIET libtbb)
+pkg_check_modules(PC_Tbb QUIET libtbb)
 
 find_path(
-  TBB_INCLUDE_DIR tbb/tbb.h
-  HINTS ${TBB_ROOT} ENV TBB_ROOT ${PC_TBB_INCLUDEDIR} ${PC_TBB_INCLUDE_DIRS}
+  Tbb_INCLUDE_DIR tbb/tbb.h
+  HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_INCLUDEDIR} ${PC_Tbb_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
-set(TBB_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
-if(TBB_PLATFORM STREQUAL "mic")
-  set(TBB_PATH_SUFFIX "lib/mic")
+set(Tbb_PATH_SUFFIX "lib/intel64" "lib/intel64/gcc4.4")
+if(Tbb_PLATFORM STREQUAL "mic")
+  set(Tbb_PATH_SUFFIX "lib/mic")
 endif()
-if(TBB_PLATFORM STREQUAL "mic-knl")
-  set(TBB_PATH_SUFFIX "lib/intel64_lin_mic")
+if(Tbb_PLATFORM STREQUAL "mic-knl")
+  set(Tbb_PATH_SUFFIX "lib/intel64_lin_mic")
 endif()
 
 find_library(
-  TBB_PROXY_LIBRARY
+  Tbb_PROXY_LIBRARY
   NAMES tbb libtbb
-  HINTS ${TBB_ROOT} ENV TBB_ROOT ${PC_TBB_LIBDIR} ${PC_TBB_LIBRARY_DIRS}
-  PATH_SUFFIXES ${TBB_PATH_SUFFIX} lib lib64
+  HINTS ${Tbb_ROOT} ENV TBB_ROOT ${PC_Tbb_LIBDIR} ${PC_Tbb_LIBRARY_DIRS}
+  PATH_SUFFIXES ${Tbb_PATH_SUFFIX} lib lib64
 )
 
-set(TBB_LIBRARIES ${TBB_LIBRARY} ${TBB_PROXY_LIBRARY})
-set(TBB_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
+set(Tbb_LIBRARIES ${Tbb_LIBRARY} ${Tbb_PROXY_LIBRARY})
+set(Tbb_INCLUDE_DIRS ${Tbb_INCLUDE_DIR})
 
 find_package_handle_standard_args(
-  TBBmalloc DEFAULT_MSG TBB_LIBRARY TBB_PROXY_LIBRARY TBB_INCLUDE_DIR
+  TBBmalloc DEFAULT_MSG Tbb_LIBRARY Tbb_PROXY_LIBRARY Tbb_INCLUDE_DIR
 )
 
-foreach(v TBB_ROOT TBB_PLATFORM)
+foreach(v Tbb_ROOT Tbb_PLATFORM)
   get_property(
     _type
     CACHE ${v}
@@ -50,4 +59,4 @@ foreach(v TBB_ROOT TBB_PLATFORM)
   endif()
 endforeach()
 
-mark_as_advanced(TBB_ROOT TBB_LIBRARY TBB_PROXY_LIBRARY TBB_INCLUDE_DIR)
+mark_as_advanced(Tbb_ROOT Tbb_LIBRARY Tbb_PROXY_LIBRARY Tbb_INCLUDE_DIR)
