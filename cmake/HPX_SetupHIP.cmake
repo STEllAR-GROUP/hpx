@@ -23,7 +23,7 @@ if(HPX_WITH_HIP AND NOT TARGET roc::hipblas)
   if(NOT hipblas_FOUND)
     hpx_warn(
       "Hipblas could not be found, the blas parts will therefore be disabled.\n\
-      You can reconfigure specifying HIPBLAS_ROOT to enable hipblas"
+      You can reconfigure specifying HIPBLAS_ROOT environment variable to enable hipblas"
     )
     set(HPX_WITH_GPUBLAS OFF)
   else()

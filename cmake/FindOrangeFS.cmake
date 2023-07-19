@@ -5,44 +5,53 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# compatibility with older CMake versions
+if(ORANGEFS_ROOT AND NOT Orangefs_ROOT)
+  set(Orangefs_ROOT
+      ${ORANGEFS_ROOT}
+      CACHE PATH "OrangeFS base directory"
+  )
+  unset(ORANGEFS_ROOT CACHE)
+endif()
+
 find_package(PkgConfig QUIET)
-pkg_check_modules(PC_ORANGEFS QUIET orangefs)
+pkg_check_modules(PC_Orangefs QUIET orangefs)
 
 find_path(
-  ORANGEFS_INCLUDE_DIR
+  Orangefs_INCLUDE_DIR
   NAMES pxfs.h orange.h
-  HINTS ${ORANGEFS_ROOT} ENV ORANGEFS_ROOT ${PC_ORANGEFS_INCLUDEDIR}
-        ${PC_ORANGEFS_INCLUDE_DIRS}
+  HINTS ${Orangefs_ROOT} ENV Orangefs_ROOT ${PC_Orangefs_INCLUDEDIR}
+        ${PC_Orangefs_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
 find_library(
-  ORANGEFS_LIBRARY
+  Orangefs_LIBRARY
   NAMES pvfs2 # orangefs pvfs2 orangefsposix
-  HINTS ${ORANGEFS_ROOT} ENV ORANGEFS_ROOT ${PC_ORANGEFS_LIBDIR}
-        ${PC_ORANGEFS_LIBRARY_DIRS}
+  HINTS ${Orangefs_ROOT} ENV ORANGEFS_ROOT ${PC_Orangefs_LIBDIR}
+        ${PC_Orangefs_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
 
-# Set ORANGEFS_ROOT in case the other hints are used
-if(ORANGEFS_ROOT)
+# Set Orangefs_ROOT in case the other hints are used
+if(Orangefs_ROOT)
   # The call to file is for compatibility with windows paths
-  file(TO_CMAKE_PATH ${ORANGEFS_ROOT} ORANGEFS_ROOT)
+  file(TO_CMAKE_PATH ${Orangefs_ROOT} Orangefs_ROOT)
 elseif("$ENV{ORANGEFS_ROOT}")
-  file(TO_CMAKE_PATH $ENV{ORANGEFS_ROOT} ORANGEFS_ROOT)
+  file(TO_CMAKE_PATH $ENV{ORANGEFS_ROOT} Orangefs_ROOT)
 else()
-  file(TO_CMAKE_PATH "${ORANGEFS_INCLUDE_DIR}" ORANGEFS_INCLUDE_DIR)
-  string(REPLACE "/include" "" ORANGEFS_ROOT "${ORANGEFS_INCLUDE_DIR}")
+  file(TO_CMAKE_PATH "${Orangefs_INCLUDE_DIR}" Orangefs_INCLUDE_DIR)
+  string(REPLACE "/include" "" Orangefs_ROOT "${Orangefs_INCLUDE_DIR}")
 endif()
 
-set(ORANGEFS_LIBRARIES ${ORANGEFS_LIBRARY})
-set(ORANGEFS_INCLUDE_DIRS ${ORANGEFS_INCLUDE_DIR})
+set(Orangefs_LIBRARIES ${Orangefs_LIBRARY})
+set(Orangefs_INCLUDE_DIRS ${Orangefs_INCLUDE_DIR})
 
 find_package_handle_standard_args(
-  OrangeFS DEFAULT_MSG ORANGEFS_LIBRARY ORANGEFS_INCLUDE_DIR
+  OrangeFS DEFAULT_MSG Orangefs_LIBRARY Orangefs_INCLUDE_DIR
 )
 
-foreach(v ORANGEFS_ROOT)
+foreach(v Orangefs_ROOT)
   get_property(
     _type
     CACHE ${v}
@@ -56,4 +65,4 @@ foreach(v ORANGEFS_ROOT)
   endif()
 endforeach()
 
-mark_as_advanced(ORANGEFS_ROOT ORANGEFS_LIBRARY ORANGEFS_INCLUDE_DIR)
+mark_as_advanced(Orangefs_ROOT Orangefs_LIBRARY Orangefs_INCLUDE_DIR)

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,10 @@
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   # In case find_package(HPX) is called multiple times
   if(NOT TARGET Boost::filesystem)
-    find_package(Boost ${Boost_MINIMUM_VERSION} MODULE COMPONENTS filesystem)
+    find_package(
+      Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE
+      COMPONENTS filesystem
+    )
 
     if(NOT Boost_FILESYSTEM_FOUND)
       hpx_error(

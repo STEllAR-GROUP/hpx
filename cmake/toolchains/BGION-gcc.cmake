@@ -85,8 +85,8 @@ set(HPX_HIDDEN_VISIBILITY
 #
 # Convenience setup for jb @ bbpbg2.cscs.ch
 #
-set(BOOST_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/boost_1_56_0")
-set(HWLOC_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/hwloc-1.8.1")
+set(Boost_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/boost_1_56_0")
+set(Hwloc_ROOT "/gpfs/bbp.cscs.ch/home/biddisco/apps/gcc-4.8.2/hwloc-1.8.1")
 
 set(CMAKE_BUILD_TYPE
     "Debug"

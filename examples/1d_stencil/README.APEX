@@ -7,7 +7,7 @@ configure HPX with APEX:
 cmake ... \
 -DHPX_WITH_APEX=TRUE \
 -DAPEX_WITH_ACTIVEHARMONY=TRUE \
--DACTIVEHARMONY_ROOT=<path-to-activeharmony> \
+-DActiveharmony_ROOT=<path-to-activeharmony> \
 ...
 
 Then to execute the example:

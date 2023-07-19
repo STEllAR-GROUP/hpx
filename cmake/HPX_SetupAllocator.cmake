@@ -43,12 +43,12 @@ if(NOT TARGET hpx_dependencies_allocator)
     # TCMALLOC
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "TCMALLOC")
       find_package(TCMalloc)
-      if(NOT TCMALLOC_LIBRARIES)
+      if(NOT Tcmalloc_LIBRARIES)
         hpx_error(${allocator_error})
       endif()
 
       target_link_libraries(
-        hpx_dependencies_allocator INTERFACE ${TCMALLOC_LIBRARIES}
+        hpx_dependencies_allocator INTERFACE ${Tcmalloc_LIBRARIES}
       )
 
       if(MSVC)
@@ -63,15 +63,15 @@ if(NOT TARGET hpx_dependencies_allocator)
     # JEMALLOC
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "JEMALLOC")
       find_package(Jemalloc)
-      if(NOT JEMALLOC_LIBRARIES)
+      if(NOT Jemalloc_LIBRARIES)
         hpx_error(${allocator_error})
       endif()
       target_include_directories(
-        hpx_dependencies_allocator INTERFACE ${JEMALLOC_INCLUDE_DIR}
-                                             ${JEMALLOC_ADDITIONAL_INCLUDE_DIR}
+        hpx_dependencies_allocator INTERFACE ${Jemalloc_INCLUDE_DIR}
+                                             ${Jemalloc_ADDITIONAL_INCLUDE_DIR}
       )
       target_link_libraries(
-        hpx_dependencies_allocator INTERFACE ${JEMALLOC_LIBRARIES}
+        hpx_dependencies_allocator INTERFACE ${Jemalloc_LIBRARIES}
       )
     endif()
 
@@ -96,7 +96,7 @@ if(NOT TARGET hpx_dependencies_allocator)
     # TBBMALLOC
     if("${HPX_WITH_MALLOC_UPPER}" STREQUAL "TBBMALLOC")
       find_package(TBBmalloc)
-      if(NOT TBBMALLOC_LIBRARY AND NOT TBBMALLOC_PROXY_LIBRARY)
+      if(NOT Tbbmalloc_LIBRARY AND NOT Tbbmalloc_PROXY_LIBRARY)
         hpx_error(${allocator_error})
       endif()
       if(MSVC)
@@ -105,8 +105,8 @@ if(NOT TARGET hpx_dependencies_allocator)
         )
       endif()
       target_link_libraries(
-        hpx_dependencies_allocator INTERFACE ${TBBMALLOC_LIBRARY}
-                                             ${TBBMALLOC_PROXY_LIBRARY}
+        hpx_dependencies_allocator INTERFACE ${Tbbmalloc_LIBRARY}
+                                             ${Tbbmalloc_PROXY_LIBRARY}
       )
     endif()
 
@@ -135,9 +135,9 @@ if(NOT TARGET hpx_dependencies_allocator)
   if((NOT HPX_WITH_APEX) AND HPX_WITH_ITTNOTIFY)
 
     find_package(Amplifier)
-    if(NOT AMPLIFIER_FOUND)
+    if(NOT Amplifier_FOUND)
       hpx_error(
-        "Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify AMPLIFIER_ROOT to point to the root of your Amplifier installation"
+        "Intel Amplifier could not be found and HPX_WITH_ITTNOTIFY=On, please specify Amplifier_ROOT to point to the root of your Amplifier installation"
       )
     endif()
 
