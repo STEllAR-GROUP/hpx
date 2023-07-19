@@ -5,6 +5,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
+
+  # compatibility with older CMake versions
+  if(EVE_ROOT AND NOT Eve_ROOT)
+    set(Eve_ROOT
+        ${EVE_ROOT}
+        CACHE PATH "Eve base directory"
+    )
+    unset(EVE_ROOT CACHE)
+  endif()
+
   if(HPX_WITH_FETCH_EVE)
     if(FETCHCONTENT_SOURCE_DIR_EVE)
       hpx_info(
@@ -12,7 +22,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
       )
     else()
       hpx_info(
-        "HPX_WITH_FETCH_EVE=${HPX_WITH_FETCH_EVE}, EVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_EVE_TAG=${HPX_WITH_EVE_TAG})"
+        "HPX_WITH_FETCH_EVE=${HPX_WITH_FETCH_EVE}, EVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_Eve_TAG=${HPX_WITH_Eve_TAG})"
       )
     endif()
     include(FetchContent)
@@ -26,11 +36,11 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
     if(NOT eve_POPULATED)
       fetchcontent_populate(eve)
     endif()
-    set(EVE_ROOT ${eve_SOURCE_DIR})
+    set(Eve_ROOT ${eve_SOURCE_DIR})
 
     add_library(eve INTERFACE)
     target_include_directories(
-      eve SYSTEM INTERFACE $<BUILD_INTERFACE:${EVE_ROOT}/include/>
+      eve SYSTEM INTERFACE $<BUILD_INTERFACE:${Eve_ROOT}/include/>
                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
 
@@ -41,7 +51,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
     )
 
     install(
-      DIRECTORY ${EVE_ROOT}/include/
+      DIRECTORY ${Eve_ROOT}/include/
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
       COMPONENT core
       FILES_MATCHING
@@ -66,10 +76,10 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE") AND NOT TARGET eve::eve)
     add_library(eve::eve ALIAS eve)
 
   else()
-    if(EVE_ROOT)
-      find_package(eve REQUIRED PATHS ${EVE_ROOT})
+    if(Eve_ROOT)
+      find_package(eve REQUIRED PATHS ${Eve_ROOT})
     else()
-      hpx_error("EVE_ROOT not set")
+      hpx_error("Eve_ROOT not set")
     endif()
   endif()
 endif()

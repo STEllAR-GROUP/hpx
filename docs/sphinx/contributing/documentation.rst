@@ -41,15 +41,15 @@ manager, you can install them using the Python package manager ``pip``:
 You may need to set the following CMake variables to make sure CMake can
 find the required dependencies.
 
-.. option:: DOXYGEN_ROOT:PATH
+.. option:: Doxygen_ROOT:PATH
 
    Specifies where to look for the installation of the |doxygen|_ tool.
 
-.. option:: SPHINX_ROOT:PATH
+.. option:: Sphinx_ROOT:PATH
 
    Specifies where to look for the installation of the |sphinx|_ tool.
 
-.. option:: BREATHE_APIDOC_ROOT:PATH
+.. option:: Breathe_APIDOC_ROOT:PATH
 
    Specifies where to look for the installation of the |breathe|_ tool.
 

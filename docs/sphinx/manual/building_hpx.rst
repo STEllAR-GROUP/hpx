@@ -196,10 +196,10 @@ known to |cmake|, the following gets you started:
 
     .. code-block:: shell-session
 
-        $ cmake -DBOOST_ROOT=/path/to/boost
-              -DHWLOC_ROOT=/path/to/hwloc
-              -DTCMALLOC_ROOT=/path/to/tcmalloc
-              -DJEMALLOC_ROOT=/path/to/jemalloc
+        $ cmake -DBoost_ROOT=/path/to/boost
+              -DHwloc_ROOT=/path/to/hwloc
+              -DTcmalloc_ROOT=/path/to/tcmalloc
+              -DJemalloc_ROOT=/path/to/jemalloc
               [other CMake variable definitions]
               /path/to/source/tree
 
@@ -207,7 +207,7 @@ known to |cmake|, the following gets you started:
 
     .. code-block:: shell-session
 
-        $ cmake -DBOOST_ROOT=~/packages/boost -DHWLOC_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
+        $ cmake -DBoost_ROOT=~/packages/boost -DHwloc_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
    * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
 
@@ -290,14 +290,14 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
   in any way. Instead, it will generate Visual Studio Solution Files, which
   will build |hpx| packages out of the |hpx| source tree.
 
-* Set three new environment variables (in CMake, not in Windows environment):
-  ``BOOST_ROOT``, ``HWLOC_ROOT``, ``ASIO_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
+* Set new configuration variables (in CMake, not in Windows environment):
+  ``Boost_ROOT``, ``Hwloc_ROOT``, ``Asio_ROOT``, ``CMAKE_INSTALL_PREFIX``. The meaning of
   these variables is as follows:
 
-  * ``BOOST_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
-  * ``HWLOC_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
+  * ``Boost_ROOT`` the |hpx| root directory of the unpacked Boost headers/cpp files.
+  * ``Hwloc_ROOT`` the |hpx| root directory of the unpacked Portable Hardware Locality
     files.
-  * ``ASIO_ROOT`` the |hpx| root directory of the unpacked ASIO files. Alternatively use
+  * ``Asio_ROOT`` the |hpx| root directory of the unpacked ASIO files. Alternatively use
     ``HPX_WITH_FETCH_ASIO`` with value ``True``.
   * ``CMAKE_INSTALL_PREFIX`` the |hpx| root directory where the future builds of |hpx|
     should be installed.
@@ -320,13 +320,13 @@ To build |hpx| under Windows 10 x64 with Visual Studio 2015:
 
      Example CMake adding entry.
 
-  Alternatively, users could provide ``BOOST_LIBRARYDIR`` instead of
-  ``BOOST_ROOT``; the difference is that ``BOOST_LIBRARYDIR`` should point to
+  Alternatively, users could provide ``Boost_LIBRARYDIR`` instead of
+  ``Boost_ROOT``; the difference is that ``Boost_LIBRARYDIR`` should point to
   the subdirectory inside Boost root where all the compiled DLLs/LIBs are. For
-  example, ``BOOST_LIBRARYDIR`` may point to the ``bin.v2`` subdirectory under
+  example, ``Boost_LIBRARYDIR`` may point to the ``bin.v2`` subdirectory under
   the Boost rootdir. It is important to keep the meanings of these two variables
-  separated from each other: ``BOOST_DIR`` points to the ROOT folder of the
-  Boost library. ``BOOST_LIBRARYDIR`` points to the subdir inside the Boost root
+  separated from each other: ``Boost_DIR`` points to the ROOT folder of the
+  Boost library. ``Boost_LIBRARYDIR`` points to the subdir inside the Boost root
   folder where the compiled binaries are.
 
 * Click the 'Configure' button of CMake-GUI. You will be immediately presented with a

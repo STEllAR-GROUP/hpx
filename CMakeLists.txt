@@ -1278,7 +1278,7 @@ hpx_option(
 )
 if(HPX_WITH_EXAMPLES_TBB)
   find_package(TBB)
-  if(NOT TBB_FOUND)
+  if(NOT Tbb_FOUND)
     set(HPX_WITH_EXAMPLES_TBB OFF)
   endif()
 endif()
@@ -1290,7 +1290,7 @@ hpx_option(
 )
 if(HPX_WITH_EXAMPLES_QTHREADS)
   find_package(QThreads)
-  if(NOT QTHREADS_FOUND)
+  if(NOT Qthreads_FOUND)
     set(HPX_WITH_EXAMPLES_QTHREADS OFF)
   endif()
 endif()
@@ -1303,7 +1303,7 @@ hpx_option(
 )
 if(HPX_WITH_EXAMPLES_HDF5)
   find_package(HDF5 COMPONENTS CXX)
-  if(NOT HDF5_FOUND)
+  if(NOT Hdf5_FOUND)
     set(HPX_WITH_EXAMPLES_HDF5 OFF)
   endif()
 endif()
@@ -1318,7 +1318,7 @@ if(NOT "${HPX_PLATFORM_UC}" STREQUAL "BLUEGENEQ")
   )
   if(HPX_WITH_EXAMPLES_QT4)
     find_package(Qt4)
-    if(NOT QT4_FOUND)
+    if(NOT Qt4_FOUND)
       set(HPX_WITH_EXAMPLES_QT4 OFF)
     endif()
   endif()
@@ -2323,12 +2323,23 @@ add_subdirectory(components)
 # ##############################################################################
 # Tests
 # ##############################################################################
-find_package(PythonInterp)
+if(POLICY CMP0148)
+  find_package(Python COMPONENTS Interpreter)
+  if(NOT Python_FOUND)
+    hpx_warn(
+      "A python interpreter could not be found. The test suite can not be run automatically."
+    )
+  endif()
 
-if(NOT PYTHONINTERP_FOUND)
-  hpx_warn(
-    "A python interpreter could not be found. The test suite can not be run automatically."
-  )
+else()
+  find_package(PythonInterp)
+  if(NOT PYTHONINTERP_FOUND)
+    hpx_warn(
+      "A python interpreter could not be found. The test suite can not be run automatically."
+    )
+  else()
+    set(Python_EXECUTABLE ${PYTHON_EXECUTABLE})
+  endif()
 endif()
 
 if(HPX_WITH_TESTS)
@@ -2354,7 +2365,7 @@ if(HPX_WITH_TOOLS OR HPX_WITH_TESTS_BENCHMARKS)
 endif()
 
 # Configure hpxrun.py
-if(PYTHONINTERP_FOUND)
+if(PYTHONINTERP_FOUND OR Python_FOUND)
   configure_file(
     "${PROJECT_SOURCE_DIR}/cmake/templates/hpxrun.py.in"
     "${PROJECT_BINARY_DIR}/bin/hpxrun.py" @ONLY
@@ -2479,7 +2490,7 @@ endif()
 # ##############################################################################
 # installation instructions
 # ##############################################################################
-if(PYTHONINTERP_FOUND)
+if(PYTHONINTERP_FOUND OR Python_FOUND)
   install(
     FILES "${PROJECT_BINARY_DIR}/bin/hpxrun.py"
     DESTINATION ${CMAKE_INSTALL_BINDIR}

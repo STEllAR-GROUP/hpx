@@ -11,14 +11,14 @@ if(HPX_WITH_DOCUMENTATION)
   find_package(Sphinx)
   find_package(Breathe)
 
-  if(NOT SPHINX_FOUND)
+  if(NOT Sphinx_FOUND)
     hpx_error(
-      "Sphinx is unavailable, sphinx documentation generation disabled. Set SPHINX_ROOT to your sphinx-build installation directory."
+      "Sphinx is unavailable, sphinx documentation generation disabled. Set Sphinx_ROOT to your sphinx-build installation directory."
     )
     set(HPX_WITH_DOCUMENTATION OFF)
-  elseif(NOT BREATHE_FOUND)
+  elseif(NOT Breathe_FOUND)
     hpx_error(
-      "Breathe is unavailable, sphinx documentation generation disabled. Set BREATHE_APIDOC_ROOT to your breathe-apidoc installation directory."
+      "Breathe is unavailable, sphinx documentation generation disabled. Set Breathe_APIDOC_ROOT to your breathe-apidoc installation directory."
     )
     set(HPX_WITH_DOCUMENTATION OFF)
   elseif(NOT DOXYGEN_FOUND)

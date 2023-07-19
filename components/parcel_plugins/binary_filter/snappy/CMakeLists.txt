@@ -11,14 +11,14 @@ endif()
 include(HPX_AddLibrary)
 
 find_package(Snappy)
-if(NOT SNAPPY_FOUND)
+if(NOT Snappy_FOUND)
   hpx_error("Snappy could not be found and HPX_WITH_COMPRESSION_SNAPPY=ON, \
     please specify SNAPPY_ROOT to point to the correct location or set \
     HPX_WITH_COMPRESSION_SNAPPY to OFF"
   )
 endif()
 
-hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${SNAPPY_FOUND}")
+hpx_debug("add_snappy_module" "SNAPPY_FOUND: ${Snappy_FOUND}")
 
 add_hpx_library(
   compression_snappy INTERNAL_FLAGS PLUGIN
@@ -30,13 +30,14 @@ add_hpx_library(
           "hpx/binary_filter/snappy_serialization_filter.hpp"
           "hpx/binary_filter/snappy_serialization_filter_registration.hpp"
   PREPEND_HEADER_ROOT INSTALL_HEADERS
-  FOLDER "Core/Plugins/Compression" ${HPX_WITH_UNITY_BUILD_OPTION}
+  FOLDER "Core/Plugins/Compression"
+  DEPENDENCIES ${Snappy_LIBRARY} ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_include_directories(
-  compression_snappy SYSTEM PRIVATE ${SNAPPY_INCLUDE_DIR}
+  compression_snappy SYSTEM PRIVATE ${Snappy_INCLUDE_DIR}
 )
-target_link_directories(compression_snappy PRIVATE ${SNAPPY_LIBRARY_DIR})
+target_link_directories(compression_snappy PRIVATE ${Snappy_LIBRARY_DIR})
 
 target_link_libraries(
   compression_snappy PUBLIC Boost::iostreams ${SNAPPY_LIBRARY}

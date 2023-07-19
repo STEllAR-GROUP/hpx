@@ -198,10 +198,10 @@ echo
 echo "Successfully built Boost ${DOT_VERSION}"
 echo
 echo "Debug root:"
-echo "  BOOST_ROOT=$DIRECTORY/debug"
+echo "  Boost_ROOT=$DIRECTORY/debug"
 echo
 echo "Release root:"
-echo "  BOOST_ROOT=$DIRECTORY/release"
+echo "  Boost_ROOT=$DIRECTORY/release"
 
 
 

@@ -3407,7 +3407,7 @@ It can be added as a ``git`` submodule by turning on the option :option:`HPX_WIT
 during |cmake| configuration. |tau|_ is an optional dependency when using |apex|.
 
 To build |hpx| with |apex|, add :option:`HPX_WITH_APEX`\ ``=ON``, and,
-optionally, ``TAU_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
+optionally, ``Tau_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
 addition, you can override the tag used for |apex| with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
 instructions on using |apex| with |hpx|.

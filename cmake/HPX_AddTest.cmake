@@ -82,9 +82,13 @@ function(add_hpx_test category name)
     set(_script_location ${PROJECT_BINARY_DIR})
   endif()
 
+  if(PYTHON_EXECUTABLE AND NOT Python_EXECUTABLE)
+    set(Python_EXECUTABLE ${PYTHON_EXECUTABLE})
+  endif()
+
   # cmake-format: off
   set(cmd
-      "${PYTHON_EXECUTABLE}"
+      "${Python_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
       ${CMAKE_CROSSCOMPILING_EMULATOR}
       ${_exe}
