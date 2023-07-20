@@ -117,7 +117,8 @@ namespace hpx::lcos::detail {
     bool future_data_base<traits::detail::future_data_void>::execute_thread()
     {
         // we try to directly execute the thread exactly once
-        if (!runs_child_)
+        threads::thread_id_ref_type runs_child = runs_child_;
+        if (!runs_child)
         {
             return false;
         }
@@ -129,7 +130,6 @@ namespace hpx::lcos::detail {
         }
 
         // this thread would block on the future
-        threads::thread_id_ref_type runs_child = runs_child_;
 
         auto* thrd = get_thread_id_data(runs_child);
         HPX_UNUSED(thrd);    // might be unused
