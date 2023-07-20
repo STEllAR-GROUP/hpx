@@ -157,32 +157,62 @@ macro(hpx_setup_gasnet)
       list(LENGTH LIB_LIST IDX)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
-        set(NEWLINK "SHELL:-Wl,--whole-archive ")
-        foreach(X IN ITEMS ${LIB_LIST})
-          set(DIRSTR "")
-          string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
-          foreach(Y IN ITEMS ${DIR_LIST})
-            find_library(
-              FOUND_LIB
-              NAMES ${X} "lib${X}" "lib${X}.a"
-              PATHS ${Y}
-              HINTS ${Y} NO_CACHE
-              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-            )
 
-            list(LENGTH FOUND_LIB IDX)
-            if(NOT "${IDX}" EQUAL "0")
-              string(APPEND NEWLINK "${FOUND_LIB}")
-              set(FOUND_LIB "")
-            endif()
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
+
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
           endforeach()
-        endforeach()
-        string(APPEND NEWLINK " -Wl,--no-whole-archive")
-        string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
-                    "${NEWLINK}" IDX
-        )
-        if("${IDX}" EQUAL "-1")
-          list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          endif()
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
+
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
+          endforeach()
+          string(FIND "SHELL:-Wl,-force_load"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          endif()
         endif()
       endif()
     endif()
@@ -246,33 +276,62 @@ macro(hpx_setup_gasnet)
       list(LENGTH LIB_LIST IDX)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
-        set(NEWLINK "SHELL:-Wl,--whole-archive ")
-        foreach(X IN ITEMS ${LIB_LIST})
-          set(DIRSTR "")
-          string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
-          foreach(Y IN ITEMS ${DIR_LIST})
-            find_library(
-              FOUND_LIB
-              NAMES ${X} "lib${X}" "lib${X}.a"
-              PATHS ${Y}
-              HINTS ${Y} NO_CACHE
-              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-            )
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
 
-            list(LENGTH FOUND_LIB IDX)
-            if(NOT "${IDX}" EQUAL "0")
-              string(APPEND NEWLINK "${FOUND_LIB}")
-              set(FOUND_LIB "")
-            endif()
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
           endforeach()
-        endforeach()
-        string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(APPEND NEWLINK " -Wl,--no-whole-archive")
 
-        string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
-                    "${NEWLINK}" IDX
-        )
-        if("${IDX}" EQUAL "-1")
-          list(APPEND GASNET_LDFLAGS_OTHER "${NEWLINK}")
+          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS_OTHER "${NEWLINK}")
+          endif()
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
+
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
+          endforeach()
+          string(FIND "SHELL:-Wl,-force_load"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          endif()
         endif()
       endif()
 
@@ -409,34 +468,63 @@ macro(hpx_setup_gasnet)
       list(LENGTH LIB_LIST IDX)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
-        set(NEWLINK "SHELL:-Wl,--whole-archive ")
-        foreach(X IN ITEMS ${LIB_LIST})
-          set(DIRSTR "")
-          string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
-          foreach(Y IN ITEMS ${DIR_LIST})
-            find_library(
-              FOUND_LIB
-              NAMES ${X} "lib${X}" "lib${X}.a"
-              PATHS ${Y}
-              HINTS ${Y} NO_CACHE
-              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-            )
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
 
-            list(LENGTH FOUND_LIB IDX)
+              list(LENGTH FOUND_LIB IDX)
 
-            if(NOT "${IDX}" EQUAL "0")
-              string(APPEND NEWLINK "${FOUND_LIB}")
-              set(FOUND_LIB "")
-            endif()
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
           endforeach()
-        endforeach()
-        string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(APPEND NEWLINK " -Wl,--no-whole-archive")
 
-        string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
-                    "${NEWLINK}" IDX
-        )
-        if("${IDX}" EQUAL "-1")
-          list(APPEND GASNET_STATIC_LDFLAGS "${NEWLINK}")
+          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_STATIC_LDFLAGS "${NEWLINK}")
+          endif()
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
+
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
+          endforeach()
+          string(FIND "SHELL:-Wl,-force_load"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          endif()
         endif()
       endif()
     endif()
@@ -500,34 +588,63 @@ macro(hpx_setup_gasnet)
       list(LENGTH LIB_LIST IDX)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
-        set(NEWLINK "SHELL:-Wl,--whole-archive ")
-        foreach(X IN ITEMS ${LIB_LIST})
-          set(DIRSTR "")
-          string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
-          foreach(Y IN ITEMS ${DIR_LIST})
-            find_library(
-              FOUND_LIB
-              NAMES ${X} "lib${X}" "lib${X}.a"
-              PATHS ${Y}
-              HINTS ${Y} NO_CACHE
-              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-            )
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
 
-            list(LENGTH FOUND_LIB IDX)
+              list(LENGTH FOUND_LIB IDX)
 
-            message(STATUS "${FOUND_LIB} ${X}")
-            if(NOT "${IDX}" EQUAL "0")
-              string(APPEND NEWLINK "${FOUND_LIB}")
-              set(FOUND_LIB "")
-            endif()
+              message(STATUS "${FOUND_LIB} ${X}")
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
           endforeach()
-        endforeach()
-        string(APPEND NEWLINK " -Wl,--no-whole-archive")
-        string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
-                    "${NEWLINK}" IDX
-        )
-        if("${IDX}" EQUAL "-1")
-          list(APPEND GASNET_STATIC_LDFLAGS_OTHER "${NEWLINK}")
+          string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_STATIC_LDFLAGS_OTHER "${NEWLINK}")
+          endif()
+        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+          foreach(X IN ITEMS ${LIB_LIST})
+            set(DIRSTR "")
+            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            foreach(Y IN ITEMS ${DIR_LIST})
+              find_library(
+                FOUND_LIB
+                NAMES ${X} "lib${X}" "lib${X}.a"
+                PATHS ${Y}
+                HINTS ${Y} NO_CACHE
+                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+              )
+
+              list(LENGTH FOUND_LIB IDX)
+              if(NOT "${IDX}" EQUAL "0")
+                string(APPEND NEWLINK "${FOUND_LIB}")
+                set(FOUND_LIB "")
+              endif()
+            endforeach()
+          endforeach()
+          string(FIND "SHELL:-Wl,-force_load"
+                      "${NEWLINK}" IDX
+          )
+          if("${IDX}" EQUAL "-1")
+            list(APPEND GASNET_LDFLAGS "${NEWLINK}")
+          endif()
         endif()
       endif()
     endif()
