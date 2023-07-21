@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -30,8 +30,9 @@
 /// ``HPX_VERSION_FULL & 0x00FF00 == HPX_VERSION_MINOR``
 /// ``HPX_VERSION_FULL & 0x0000FF == HPX_VERSION_SUBMINOR``
 #define HPX_VERSION_FULL                                                       \
-    ((HPX_VERSION_MAJOR << 16) | (HPX_VERSION_MINOR << 8) |                    \
-        HPX_VERSION_SUBMINOR)
+    ((HPX_PP_CAT(0x, HPX_VERSION_MAJOR) << 16) |                               \
+        (HPX_PP_CAT(0x, HPX_VERSION_MINOR) << 8) |                             \
+        HPX_PP_CAT(0x, HPX_VERSION_SUBMINOR))
 
 /// Evaluates to the release date of this HPX version in the format YYYYMMDD.
 #define HPX_VERSION_DATE @HPX_VERSION_DATE@
