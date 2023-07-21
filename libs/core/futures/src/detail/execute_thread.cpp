@@ -201,7 +201,11 @@ namespace hpx::threads::detail {
             set_thread_state(thrd.noref(), thread_schedule_state::pending,
                 thread_restart_state::signaled);
             auto* scheduler = thrdptr->get_scheduler_base();
-            scheduler->schedule_thread_last(thrd, thread_schedule_hint());
+
+            auto const hint = thread_schedule_hint(static_cast<std::int16_t>(
+                thrdptr->get_last_worker_thread_num()));
+            scheduler->schedule_thread_last(HPX_MOVE(thrd), hint);
+            scheduler->do_some_work(hint.hint);
         }
 
         HPX_ASSERT(state_val != thread_schedule_state::terminated);

@@ -774,7 +774,7 @@ namespace hpx::threads {
 
     HPX_FORCEINLINE coroutine_type::result_type thread_data::invoke_directly()
     {
-        HPX_ASSERT(runs_as_child());
+        HPX_ASSERT(runs_as_child(std::memory_order_relaxed));
 
         if (is_stackless())
         {

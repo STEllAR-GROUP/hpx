@@ -77,7 +77,7 @@ namespace hpx::threads {
                 set_state_ex(thread_restart_state::signaled));
 
             if (result.first == thread_schedule_state::terminated &&
-                runs_as_child())
+                runs_as_child(std::memory_order_relaxed))
             {
                 result.first = thread_schedule_state::deleted;
             }
