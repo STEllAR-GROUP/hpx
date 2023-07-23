@@ -17,7 +17,15 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <gasnet.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
