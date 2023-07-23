@@ -26,7 +26,6 @@
 #if !defined(OPENSHMEM_PAGESIZE)
 // GASNet default pagesize is 16384
 #define OPENSHMEM_PER_RANK_PAGESIZE 16384
-//#define OPENSHMEM_PER_RANK_PAGESIZE 4194304
 #endif
 
 namespace hpx { namespace util {
