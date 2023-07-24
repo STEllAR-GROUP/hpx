@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <deque>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -113,7 +112,7 @@ namespace hpx::parcelset::policies::mpi {
                 if (request_done_locked(l, hdr_request_, &status))
                 {
                     int recv_size = 0;
-                    [[maybe_unused]] int ret =
+                    [[maybe_unused]] int const ret =
                         MPI_Get_count(&status, MPI_CHAR, &recv_size);
                     HPX_ASSERT(ret == MPI_SUCCESS);
                     std::vector<char> recv_header(header_buffer_.begin(),
@@ -141,8 +140,9 @@ namespace hpx::parcelset::policies::mpi {
         {
             HPX_ASSERT_OWNS_LOCK(l);
             [[maybe_unused]] int const ret = MPI_Irecv(header_buffer_.data(),
-                header_buffer_.size(), MPI_BYTE, MPI_ANY_SOURCE, 0,
-                util::mpi_environment::communicator(), &hdr_request_);
+                static_cast<int>(header_buffer_.size()), MPI_BYTE,
+                MPI_ANY_SOURCE, 0, util::mpi_environment::communicator(),
+                &hdr_request_);
             HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
         }
 
