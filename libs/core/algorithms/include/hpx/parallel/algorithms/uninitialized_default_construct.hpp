@@ -239,13 +239,12 @@ namespace hpx::parallel {
             }
 
             using partition_result_type = std::pair<FwdIter, FwdIter>;
-            util::cancellation_token<util::detail::no_data> tok;
 
             return util::partitioner_with_cleanup<ExPolicy, FwdIter,
                 partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [tok, policy](FwdIter it, std::size_t part_size) mutable
+                    [policy](FwdIter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_default_construct_n(
