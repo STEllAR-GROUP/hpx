@@ -30,27 +30,29 @@ void test_scheduler(
     hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=" +
-        std::to_string(((std::min)(std::size_t(4),
-            std::size_t(hpx::threads::hardware_concurrency()))))};
+        std::to_string(((std::min)(static_cast<std::size_t>(4),
+            static_cast<std::size_t>(hpx::threads::hardware_concurrency()))))};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("default", scheduler);
     };
 
-    hpx::local::start(nullptr, argc, argv, init_args);
+    HPX_TEST(hpx::local::start(nullptr, argc, argv, init_args));
 
     hpx::threads::thread_pool_base& default_pool =
         hpx::resource::get_thread_pool("default");
     std::size_t const default_pool_threads =
         hpx::resource::get_num_threads("default");
 
-    hpx::chrono::high_resolution_timer t;
+    hpx::chrono::high_resolution_timer const t;
 
     while (t.elapsed() < 2)
     {
+        std::atomic count_tasks = default_pool_threads * 10000;
+
         for (std::size_t i = 0; i < default_pool_threads * 10000; ++i)
         {
-            hpx::post([]() {});
+            hpx::post([&]() { --count_tasks; });
         }
 
         bool suspended = false;
@@ -72,6 +74,12 @@ void test_scheduler(
         {
             std::this_thread::yield();
         }
+
+        // wait for tasks finish running
+        while (count_tasks.load() != 0)
+        {
+            std::this_thread::yield();
+        }
     }
 
     hpx::post([]() { hpx::local::finalize(); });
@@ -81,7 +89,7 @@ void test_scheduler(
 
 int main(int argc, char* argv[])
 {
-    std::vector<hpx::resource::scheduling_policy> schedulers = {
+    std::vector<hpx::resource::scheduling_policy> const schedulers = {
         hpx::resource::scheduling_policy::local,
         hpx::resource::scheduling_policy::local_priority_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
