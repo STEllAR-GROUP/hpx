@@ -229,10 +229,24 @@ namespace hpx::threads::detail {
         if (!threads_.empty())
         {
             // wait for all work to be done before requesting threads to shut
-            // down
+            // down, but only if all threads were successfully initialized
             if (blocking)
             {
-                wait();
+                bool must_wait = true;
+                for (const auto& thread : threads_)
+                {
+                    // skip this if already stopped
+                    if (!thread.joinable())
+                    {
+                        must_wait = false;
+                        break;
+                    }
+                }
+
+                if (must_wait)
+                {
+                    wait();
+                }
             }
 
             // wake up if suspended
@@ -329,9 +343,9 @@ namespace hpx::threads::detail {
                 // get_pu_mask expects index according to ordering of masks
                 // in affinity_data::affinity_masks_
                 // which is in order of occupied PU
-                LTM_(info).format(
-                    "run: {} create OS thread {}: will run on processing units "
-                    "within this mask: {}",
+                LTM_(info).format("run: {} create OS thread {}: will run "
+                                  "on processing units "
+                                  "within this mask: {}",
                     id_.name(), global_thread_num,
                     hpx::threads::to_string(mask));
 
@@ -352,8 +366,7 @@ namespace hpx::threads::detail {
                 "run: {} failed with: {}", id_.name(), e.what());
 
             // trigger the barrier
-            pool_threads -= (thread_num + 1);
-            while (pool_threads-- != 0)
+            while (thread_num-- != 0)
                 startup->wait();
 
             stop_locked(l);
@@ -1908,10 +1921,10 @@ namespace hpx::threads::detail {
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
-        hpx::state oldstate = state.exchange(hpx::state::initialized);
+        [[maybe_unused]] hpx::state const oldstate =
+            state.exchange(hpx::state::initialized);
         HPX_ASSERT(oldstate == hpx::state::stopped ||
             oldstate == hpx::state::initialized);
-        HPX_UNUSED(oldstate);
 
         threads_[virt_core] = std::thread(&scheduled_thread_pool::thread_func,
             this, virt_core, thread_num, HPX_MOVE(startup));
@@ -1941,7 +1954,7 @@ namespace hpx::threads::detail {
             sched_->Scheduler::get_state(virt_core);
 
         // inform the scheduler to stop the virtual core
-        hpx::state oldstate = state.exchange(hpx::state::stopping);
+        hpx::state const oldstate = state.exchange(hpx::state::stopping);
 
         if (oldstate > hpx::state::stopping)
         {

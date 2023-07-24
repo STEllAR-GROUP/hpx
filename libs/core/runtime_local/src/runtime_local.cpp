@@ -1424,7 +1424,6 @@ namespace hpx {
         // see: http://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=100319
         _isatty(0);
 #endif
-        // {{{ early startup code - local
 
         // initialize instrumentation system
 #ifdef HPX_HAVE_APEX
@@ -1448,9 +1447,13 @@ namespace hpx {
                 "I/O service pool";
 #endif
         // start the thread manager
-        thread_manager_->run();
+        if (!thread_manager_->run())
+        {
+            std::cerr << "runtime::start: failed to start threadmanager\n";
+            return -1;
+        }
+
         lbt_ << "(1st stage) runtime::start: started threadmanager";
-        // }}}
 
         // {{{ launch main
         // register the given main function with the thread manager
@@ -1473,13 +1476,11 @@ namespace hpx {
         {
             return wait();    // wait for the shutdown_action to be executed
         }
-        else
-        {
-            // wait for at least hpx::state::running
-            util::yield_while(
-                [this]() { return get_state() < hpx::state::running; },
-                "runtime::start");
-        }
+
+        // wait for at least hpx::state::running
+        util::yield_while(
+            [this]() { return get_state() < hpx::state::running; },
+            "runtime::start");
 
         return 0;    // return zero as we don't know the outcome of hpx_main yet
     }

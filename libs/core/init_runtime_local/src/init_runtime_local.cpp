@@ -357,14 +357,14 @@ namespace hpx {
                 }
 
                 // non-blocking version
-                start(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
-                    HPX_MOVE(shutdown));
+                int const result = start(*rt, cfg.hpx_main_f_, cfg.vm_,
+                    HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 // pointer to runtime is stored in TLS
                 hpx::runtime* p = rt.release();
                 (void) p;
 
-                return 0;
+                return result;
             }
 
             ////////////////////////////////////////////////////////////////////////
