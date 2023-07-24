@@ -58,6 +58,13 @@
 #include <gasnet.h>
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+#include <shmem.h>
+
+#define OPENSHMEM_CONDUIT_NAME_STR "HPX_WITH_PARCELPORT_OPENSHMEM"
+#endif
+
 #include <hwloc.h>
 
 #include <algorithm>
@@ -170,6 +177,25 @@ namespace hpx {
              << GASNET_RELEASE_VERSION_MINOR << ':'
              << GASNET_RELEASE_VERSION_PATCH << '-'
              << "GASNET_CONDUIT:" << GASNET_CONDUIT_NAME_STR;
+        return strm.str();
+    }
+#endif
+
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+    std::string openshmem_version()
+    {
+        int major = 0;
+        int minor = 0;
+        shmem_info_get_version(&major, &minor);
+        char vendor_cstr[SHMEM_MAX_NAME_LEN];
+        shmem_info_get_name(vendor_cstr);
+
+        std::ostringstream strm;
+        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':'
+             << major << ':'
+             << minor << '-'
+             << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
@@ -341,6 +367,10 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
                                                 "  OPENSHMEM: {}\n"
 #endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+                                                "  OPENSHMEM: {}\n"
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
                                                 "  MPI: {}\n"
@@ -358,6 +388,10 @@ namespace hpx {
             lci_version(),
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
+            openshmem_version(),
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
             openshmem_version(),
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \

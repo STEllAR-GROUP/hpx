@@ -24,6 +24,9 @@
 #if defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
 #include <hpx/modules/openshmem_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+#include <hpx/modules/openshmem_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>

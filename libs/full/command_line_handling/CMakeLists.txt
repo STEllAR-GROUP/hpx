@@ -39,6 +39,11 @@ if(HPX_WITH_PARCELPORT_OPENSHMEM)
   hpx_setup_openshmem()
   set(additional_dependencies ${additional_dependencies} PkgConfig::OPENSHMEM)
 endif()
+if(HPX_WITH_PARCELPORT_OPENSHMEM)
+  include(HPX_SetupOpenSHMEM)
+  hpx_setup_openshmem()
+  set(additional_dependencies ${additional_dependencies} PkgConfig::OPENSHMEM)
+endif()
 
 include(HPX_AddModule)
 add_hpx_module(

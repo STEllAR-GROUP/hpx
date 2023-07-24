@@ -42,6 +42,7 @@ set(_hpx_core_modules
     functional
     futures
     gasnet_base
+    openshmem_base
     hardware
     hashing
     include_local

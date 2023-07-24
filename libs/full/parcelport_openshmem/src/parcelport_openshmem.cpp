@@ -110,7 +110,7 @@ namespace hpx::parcelset {
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.openshmem.background_threads",
                     HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS);
-*/
+                */
                 return 1UL;
             }
 
