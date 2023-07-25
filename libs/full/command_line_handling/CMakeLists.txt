@@ -34,6 +34,11 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   hpx_setup_lci()
   set(additional_dependencies ${additional_dependencies} LCI::LCI)
 endif()
+if(HPX_WITH_PARCELPORT_OPENSHMEM)
+  include(HPX_SetupOpenSHMEM)
+  hpx_setup_openshmem()
+  set(additional_dependencies ${additional_dependencies} PkgConfig::OPENSHMEM)
+endif()
 
 include(HPX_AddModule)
 add_hpx_module(

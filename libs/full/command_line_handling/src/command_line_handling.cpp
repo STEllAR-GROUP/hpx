@@ -21,6 +21,9 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+#include <hpx/modules/openshmem_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
@@ -987,7 +990,16 @@ namespace hpx::util {
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
         }
 #endif
-
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+        if (util::openshmem_environment::check_openshmem_environment(rtcfg_))
+        {
+            util::openshmem_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::openshmem_environment::size());
+            node_ = static_cast<std::size_t>(util::openshmem_environment::rank());
+        }
+#endif
         // load plugin modules (after first pass of command line handling, so
         // that settings given on command line could propagate to modules)
         std::vector<std::shared_ptr<plugins::plugin_registry_base>>

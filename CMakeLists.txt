@@ -1144,6 +1144,19 @@ if(HPX_WITH_NETWORKING)
   )
 
   hpx_option(
+    HPX_WITH_PARCELPORT_OPENSHMEM BOOL "Enable the OPENSHMEM based parcelport." OFF
+    CATEGORY "Parcelport"
+  )
+  if(HPX_WITH_PARCELPORT_OPENSHMEM)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_OPENSHMEM)
+    hpx_option(
+      HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT STRING
+      "Define which conduit to use for the gasnet parcelport" "sos"
+      STRINGS "sos;ucx"
+    )
+  endif()
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )

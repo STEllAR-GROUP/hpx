@@ -195,6 +195,14 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
+# Run with oshrun 
+# This is executing amudprun with the "-np" option set to the number of localities
+def run_openshmem(cmd, localities, verbose):
+    exec_cmd = ['oshrun', '-np', str(localities)] + cmd
+    if verbose:
+        print('Executing command: ' + ' '.join(exec_cmd))
+    subproc(exec_cmd)
+
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
 def run_srun(cmd, localities, verbose):
@@ -218,6 +226,9 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'mpi':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
+    if runwrapper == 'openshmem':
+        assert nodes is None, "nodes option only valid with tcp parcelport."
+        run_openshmem(cmd, localities, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)

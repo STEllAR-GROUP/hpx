@@ -32,6 +32,7 @@ set(_hpx_full_modules
     naming
     naming_base
     parcelport_lci
+    parcelport_openshmem
     parcelport_libfabric
     parcelport_mpi
     parcelport_tcp
