@@ -24,8 +24,9 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 #if !defined(OPENSHMEM_PAGESIZE)
-#define OPENSHMEM_PAGESIZE 16384
-#define OPENSHMEM_PER_RANK_PAGESIZE 4194304
+// GASNet default pagesize is 16384
+#define OPENSHMEM_PER_RANK_PAGESIZE 16384
+//#define OPENSHMEM_PER_RANK_PAGESIZE 4194304
 #endif
 
 namespace hpx { namespace util {
