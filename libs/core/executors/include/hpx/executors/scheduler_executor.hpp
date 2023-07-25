@@ -130,17 +130,25 @@ namespace hpx::execution::experimental {
         using future_type = hpx::future<T>;
 
     private:
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend auto tag_invoke(
             hpx::parallel::execution::processing_units_count_t tag,
-            scheduler_executor const& exec,
-            hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
-            std::size_t = 0)
+            Parameters&& params, scheduler_executor const& exec,
+            hpx::chrono::steady_duration const& duration =
+                hpx::chrono::null_duration,
+            std::size_t num_cores = 0)
             -> decltype(std::declval<
                 hpx::parallel::execution::processing_units_count_t>()(
-                std::declval<BaseScheduler>(),
+                std::declval<Parameters>(), std::declval<BaseScheduler>(),
                 std::declval<hpx::chrono::steady_duration>(), 0))
         {
-            return tag(exec.sched_);
+            return tag(HPX_FORWARD(Parameters, params), exec.sched_, duration,
+                num_cores);
         }
 
         // NonBlockingOneWayExecutor interface

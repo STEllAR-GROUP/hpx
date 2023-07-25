@@ -58,6 +58,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        simd_task_policy_shim<Executor_, Parameters_>,
+                        simd_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr simd_task_policy_shim(
+                simd_task_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    simd_task_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            simd_task_policy_shim& operator=(
+                simd_task_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    simd_task_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -70,7 +96,8 @@ namespace hpx::execution {
     ///
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the sequenced_policy.
-    using simd_task_policy = detail::simd_task_policy_shim<sequenced_executor>;
+    using simd_task_policy = detail::simd_task_policy_shim<sequenced_executor,
+        hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     namespace detail {
 
@@ -96,6 +123,30 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<simd_policy_shim<Executor_, Parameters_>,
+                        simd_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr simd_policy_shim(
+                simd_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(simd_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            simd_policy_shim& operator=(
+                simd_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    simd_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -104,7 +155,8 @@ namespace hpx::execution {
     /// The class simd_policy is an execution policy type used as a unique type
     /// to disambiguate parallel algorithm overloading and require that a
     /// parallel algorithm's execution may not be parallelized.
-    using simd_policy = detail::simd_policy_shim<sequenced_executor>;
+    using simd_policy = detail::simd_policy_shim<sequenced_executor,
+        hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     /// Default sequential execution policy object.
     inline constexpr simd_policy simd{};
@@ -135,6 +187,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        par_simd_task_policy_shim<Executor_, Parameters_>,
+                        par_simd_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr par_simd_task_policy_shim(
+                par_simd_task_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    par_simd_task_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            par_simd_task_policy_shim& operator=(
+                par_simd_task_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(par_simd_task_policy_shim(
+                    rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -147,7 +225,8 @@ namespace hpx::execution {
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the parallel_policy.
     using par_simd_task_policy =
-        detail::par_simd_task_policy_shim<parallel_executor>;
+        detail::par_simd_task_policy_shim<parallel_executor,
+            hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     namespace detail {
 
@@ -174,6 +253,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        par_simd_policy_shim<Executor_, Parameters_>,
+                        par_simd_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr par_simd_policy_shim(
+                par_simd_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    par_simd_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            par_simd_policy_shim& operator=(
+                par_simd_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    par_simd_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -185,7 +290,8 @@ namespace hpx::execution {
     ///
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the parallel_policy.
-    using par_simd_policy = detail::par_simd_policy_shim<parallel_executor>;
+    using par_simd_policy = detail::par_simd_policy_shim<parallel_executor,
+        hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     /// Default data-parallel execution policy object.
     inline constexpr par_simd_policy par_simd{};

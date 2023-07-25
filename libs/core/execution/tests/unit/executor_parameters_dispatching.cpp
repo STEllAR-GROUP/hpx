@@ -27,10 +27,7 @@ std::atomic<std::size_t> exec_count(0);
 
 struct test_executor_get_chunk_size : hpx::execution::parallel_executor
 {
-    test_executor_get_chunk_size()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_get_chunk_size() = default;
 
     template <typename Parameters>
     static std::size_t get_chunk_size(Parameters&& /* params */,
@@ -42,12 +39,11 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_get_chunk_size> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<
+    test_executor_get_chunk_size> : std::true_type
+{
+};
 
 struct test_chunk_size
 {
@@ -61,14 +57,11 @@ struct test_chunk_size
     }
 };
 
-namespace hpx::parallel::execution {
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<test_chunk_size> : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<test_chunk_size>
+  : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_get_chunk_size()
@@ -80,8 +73,8 @@ void test_get_chunk_size()
         hpx::parallel::execution::get_chunk_size(
             test_chunk_size{}, hpx::execution::par.executor(), 1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -91,8 +84,8 @@ void test_get_chunk_size()
         hpx::parallel::execution::get_chunk_size(test_chunk_size{},
             hpx::execution::par.executor(), hpx::chrono::null_duration, 1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -102,8 +95,8 @@ void test_get_chunk_size()
         hpx::parallel::execution::get_chunk_size(
             test_chunk_size{}, test_executor_get_chunk_size{}, 1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 
     {
@@ -113,8 +106,8 @@ void test_get_chunk_size()
         hpx::parallel::execution::get_chunk_size(test_chunk_size{},
             test_executor_get_chunk_size{}, hpx::chrono::null_duration, 1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -123,10 +116,7 @@ void test_get_chunk_size()
 
 struct test_executor_measure_iteration : hpx::execution::parallel_executor
 {
-    test_executor_measure_iteration()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_measure_iteration() = default;
 
     template <typename Parameters, typename F>
     static auto measure_iteration(Parameters&&, F&&, std::size_t)
@@ -136,12 +126,11 @@ struct test_executor_measure_iteration : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_measure_iteration> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<
+    test_executor_measure_iteration> : std::true_type
+{
+};
 
 struct test_measure_iteration
 {
@@ -153,14 +142,11 @@ struct test_measure_iteration
     }
 };
 
-namespace hpx::parallel::execution {
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<test_measure_iteration> : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<test_measure_iteration>
+  : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_get_measure_iteration()
@@ -173,8 +159,8 @@ void test_get_measure_iteration()
             test_measure_iteration{}, hpx::execution::par.executor(),
             [](std::size_t) { return 0; }, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -185,8 +171,8 @@ void test_get_measure_iteration()
             test_measure_iteration{}, test_executor_measure_iteration{},
             [](std::size_t) { return 0; }, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -196,10 +182,7 @@ void test_get_measure_iteration()
 struct test_executor_maximal_number_of_chunks
   : hpx::execution::parallel_executor
 {
-    test_executor_maximal_number_of_chunks()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_maximal_number_of_chunks() = default;
 
     template <typename Parameters>
     static std::size_t maximal_number_of_chunks(
@@ -210,18 +193,16 @@ struct test_executor_maximal_number_of_chunks
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_maximal_number_of_chunks>
-      : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<
+    test_executor_maximal_number_of_chunks> : std::true_type
+{
+};
 
 struct test_number_of_chunks
 {
     template <typename Executor>
-    std::size_t maximal_number_of_chunks(
+    static std::size_t maximal_number_of_chunks(
         Executor&&, std::size_t, std::size_t num_tasks)
     {
         ++params_count;
@@ -229,12 +210,11 @@ struct test_number_of_chunks
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<test_number_of_chunks> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<test_number_of_chunks>
+  : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_maximal_number_of_chunks()
@@ -246,8 +226,8 @@ void test_maximal_number_of_chunks()
         hpx::parallel::execution::maximal_number_of_chunks(
             test_number_of_chunks{}, hpx::execution::par.executor(), 1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -258,8 +238,8 @@ void test_maximal_number_of_chunks()
             test_number_of_chunks{}, test_executor_maximal_number_of_chunks{},
             1, 1);
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -269,10 +249,7 @@ void test_maximal_number_of_chunks()
 struct test_executor_reset_thread_distribution
   : hpx::execution::parallel_executor
 {
-    test_executor_reset_thread_distribution()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_reset_thread_distribution() = default;
 
     template <typename Parameters>
     static void reset_thread_distribution(Parameters&&)
@@ -281,29 +258,26 @@ struct test_executor_reset_thread_distribution
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_reset_thread_distribution>
-      : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<
+    test_executor_reset_thread_distribution> : std::true_type
+{
+};
 
 struct test_thread_distribution
 {
     template <typename Executor>
-    void reset_thread_distribution(Executor&&)
+    static void reset_thread_distribution(Executor&&)
     {
         ++params_count;
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<test_thread_distribution> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    test_thread_distribution> : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_reset_thread_distribution()
@@ -315,8 +289,8 @@ void test_reset_thread_distribution()
         hpx::parallel::execution::reset_thread_distribution(
             test_thread_distribution{}, hpx::execution::par.executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -327,8 +301,8 @@ void test_reset_thread_distribution()
             test_thread_distribution{},
             test_executor_reset_thread_distribution{});
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -337,10 +311,7 @@ void test_reset_thread_distribution()
 
 struct test_executor_processing_units_count : hpx::execution::parallel_executor
 {
-    test_executor_processing_units_count()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_processing_units_count() = default;
 
     template <typename Parameters>
     static std::size_t processing_units_count(
@@ -351,31 +322,30 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_processing_units_count>
-      : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<
+    test_executor_processing_units_count> : std::true_type
+{
+};
 
 struct test_processing_units
 {
     template <typename Executor>
-    static std::size_t processing_units_count(
-        Executor&&, hpx::chrono::steady_duration const&, std::size_t)
+    friend std::size_t tag_invoke(
+        hpx::parallel::execution::processing_units_count_t,
+        test_processing_units, Executor&&, hpx::chrono::steady_duration const&,
+        std::size_t)
     {
         ++params_count;
         return 1;
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<test_processing_units> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<test_processing_units>
+  : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_processing_units_count()
@@ -386,7 +356,7 @@ void test_processing_units_count()
         hpx::parallel::execution::processing_units_count(
             test_processing_units{}, hpx::execution::parallel_executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -397,8 +367,8 @@ void test_processing_units_count()
             test_processing_units{}, test_executor_processing_units_count{},
             hpx::chrono::null_duration, 0);
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -407,38 +377,35 @@ void test_processing_units_count()
         auto p = hpx::parallel::execution::with_processing_units_count(
             hpx::execution::par, 2);
 
-        std::size_t num_cores =
+        std::size_t const num_cores =
             hpx::parallel::execution::processing_units_count(
                 test_processing_units{}, p.executor());
 
-        HPX_TEST_EQ(num_cores, std::size_t(2));
-        HPX_TEST_EQ(params_count, std::size_t(0));
+        HPX_TEST_EQ(num_cores, static_cast<std::size_t>(2));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
     }
 
     {
-        params_count = 0;
-
         hpx::execution::experimental::num_cores nc(2);
         auto p = hpx::parallel::execution::with_processing_units_count(
             hpx::execution::par, nc);
 
-        std::size_t num_cores =
+        std::size_t const num_cores =
             hpx::parallel::execution::processing_units_count(
-                test_processing_units{}, p.executor(),
+                hpx::parallel::execution::null_parameters, p.executor(),
                 hpx::chrono::null_duration, 0);
 
-        HPX_TEST_EQ(num_cores, std::size_t(2));
-        HPX_TEST_EQ(params_count, std::size_t(0));
+        HPX_TEST_EQ(num_cores, static_cast<std::size_t>(2));
     }
 
     {
         auto p = hpx::parallel::execution::with_processing_units_count(
             hpx::execution::par, 2);
 
-        std::size_t num_cores =
+        std::size_t const num_cores =
             hpx::parallel::execution::processing_units_count(p);
 
-        HPX_TEST_EQ(num_cores, std::size_t(2));
+        HPX_TEST_EQ(num_cores, static_cast<std::size_t>(2));
     }
 }
 
@@ -447,64 +414,59 @@ void test_processing_units_count()
 
 struct test_executor_begin_end : hpx::execution::parallel_executor
 {
-    test_executor_begin_end()
-      : hpx::execution::parallel_executor()
-    {
-    }
+    test_executor_begin_end() = default;
 
     template <typename Parameters>
-    void mark_begin_execution(Parameters&&)
+    static void mark_begin_execution(Parameters&&)
     {
         ++exec_count;
     }
 
     template <typename Parameters>
-    void mark_end_of_scheduling(Parameters&&)
+    static void mark_end_of_scheduling(Parameters&&)
     {
         ++exec_count;
     }
 
     template <typename Parameters>
-    void mark_end_execution(Parameters&&)
+    static void mark_end_execution(Parameters&&)
     {
         ++exec_count;
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_two_way_executor<test_executor_begin_end> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_two_way_executor<test_executor_begin_end>
+  : std::true_type
+{
+};
 
 struct test_begin_end
 {
     template <typename Executor>
-    void mark_begin_execution(Executor&&)
+    static void mark_begin_execution(Executor&&)
     {
         ++params_count;
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor&&)
+    static void mark_end_of_scheduling(Executor&&)
     {
         ++params_count;
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor&&)
+    static void mark_end_execution(Executor&&)
     {
         ++params_count;
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<test_begin_end> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<test_begin_end>
+  : std::true_type
+{
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 void test_mark_begin_execution()
@@ -516,8 +478,8 @@ void test_mark_begin_execution()
         hpx::parallel::execution::mark_begin_execution(
             test_begin_end{}, hpx::execution::par.executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -527,8 +489,8 @@ void test_mark_begin_execution()
         hpx::parallel::execution::mark_begin_execution(
             test_begin_end{}, test_executor_begin_end{});
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -541,8 +503,8 @@ void test_mark_end_of_scheduling()
         hpx::parallel::execution::mark_end_of_scheduling(
             test_begin_end{}, hpx::execution::par.executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -552,8 +514,8 @@ void test_mark_end_of_scheduling()
         hpx::parallel::execution::mark_end_of_scheduling(
             test_begin_end{}, test_executor_begin_end{});
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 
@@ -566,8 +528,8 @@ void test_mark_end_execution()
         hpx::parallel::execution::mark_end_execution(
             test_begin_end{}, hpx::execution::par.executor());
 
-        HPX_TEST_EQ(params_count, std::size_t(1));
-        HPX_TEST_EQ(exec_count, std::size_t(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 
     {
@@ -577,8 +539,8 @@ void test_mark_end_execution()
         hpx::parallel::execution::mark_end_execution(
             test_begin_end{}, test_executor_begin_end{});
 
-        HPX_TEST_EQ(params_count, std::size_t(0));
-        HPX_TEST_EQ(exec_count, std::size_t(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
 }
 

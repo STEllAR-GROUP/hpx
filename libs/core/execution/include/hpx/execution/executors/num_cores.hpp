@@ -36,6 +36,15 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         // discover the number of cores to use for parallelization
         template <typename Executor>
+        friend std::size_t tag_invoke(
+            hpx::parallel::execution::processing_units_count_t,
+            num_cores params, Executor&&, hpx::chrono::steady_duration const&,
+            std::size_t) noexcept
+        {
+            return params.num_cores_;
+        }
+
+        template <typename Executor>
         constexpr std::size_t processing_units_count(Executor&&,
             hpx::chrono::steady_duration const&, std::size_t) const noexcept
         {
