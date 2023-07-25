@@ -78,7 +78,7 @@ namespace hpx {
         void set_max_difference(
             std::int64_t max_difference, std::int64_t lower_limit = 0) noexcept
         {
-            auto data = data_; //keep alive
+            auto data = data_;    //keep alive
             std::unique_lock<mutex_type> l(data->mtx_);
             data->sem_.set_max_difference(l, max_difference, lower_limit);
         }
