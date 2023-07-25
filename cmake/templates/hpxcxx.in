@@ -39,8 +39,8 @@ pkgconfpath += [
     os.path.join("@HPX_CONF_PREFIX@","lib64","pkgconfig"),     # install directory
     os.path.join(os.path.dirname(sys.argv[0]),"..","lib","pkgconfig"),
     os.path.join("opt","hpx","lib","pkgconfig"),
-    os.path.join("usr","bin","hpx","lib","pkgconfig"),
-    os.path.join("usr","local","bin","hpx","lib","pkgconfig"),
+    os.path.join("/usr","bin","hpx","lib","pkgconfig"),
+    os.path.join("/usr","local","bin","hpx","lib","pkgconfig"),
     os.path.join(os.environ["HOME"],"install","hpx","lib","pkgconfig"),
     os.path.join(os.environ["HOME"],"hpx","lib","pkgconfig")
     ]
@@ -54,14 +54,14 @@ Usage: hpxcxx -c flags files
 The hpxcxx command requires that you build either
 a component, an application, or that you specify
 the -c flag. If you are building against a debug
-build, you need to specify -g.
-If release-with-debug-info, specify -rd
-If minsize-release specify -mr. All other flags
+build, you need to specify --db.
+If release-with-debug-info, specify --rd
+If minsize-release specify --mr. All other flags
 are passed through to the underlying C++ compiler.
 """)
     sys.exit(2)
 
-pkgconf_suffix = ['_release', '_relwithdebuginfo', '_debug', '_minsizerel']
+pkgconf_suffix = '_release'
 i = 1
 while i < len(sys.argv):
 
@@ -76,6 +76,7 @@ while i < len(sys.argv):
     elif sys.argv[i].startswith('--exe='):
         output=sys.argv[i][6:]
         app = output
+        #args += ['-o',app+'.exe']
         application = True
     elif sys.argv[i].startswith('--comp='):
         app_name = sys.argv[i][7:]
@@ -93,15 +94,12 @@ while i < len(sys.argv):
     elif sys.argv[i] == '-c':
         minusc = True
         pass
-    elif sys.argv[i].startswith('-g'):
-        pkgconf_suffix = ['_debug']
-        args += [sys.argv[i]]
-    elif sys.argv[i] == '--rd':
-        pkgconf_suffix = ['_relwithdebuginfo']
-    elif sys.argv[i] == '--mr':
-        pkgconf_suffix = ['_minsizerel']
-    elif sys.argv[i] == '-r':
-        pkgconf_suffix = ['_release']
+    elif sys.argv[i].startswith('-db'):
+        pkgconf_suffix = '_debug'
+    elif sys.argv[i].startswith('--rd'):
+        pkgconf_suffix = '_relwithdebuginfo'
+    elif sys.argv[i].startswith('--mr'):
+        pkgconf_suffix = '_minsizerel'
     else:
         args += [sys.argv[i]]
 
@@ -109,12 +107,11 @@ while i < len(sys.argv):
 
 pkgconf = None
 for path in pkgconfpath:
-    if pkgconf is not None:
-        break
-    for suffix in pkgconf_suffix:
+    for suffix in [pkgconf_suffix, "_release", "_relwithdebuginfo","_debug","_minsizerel"]:
         hpath = os.path.join(path,"hpx_application")+suffix+".pc"
         if os.path.exists(hpath):
             pkgconf = path
+            pkgconf_suffix = suffix
             break
 
 if pkgconf == None:
@@ -128,11 +125,11 @@ else:
     os.environ[pkg] = pkgconf
 
 if application:
-    args += ["`pkg-config --cflags --libs hpx_application" + suffix + "`"]
+    args += ["`pkg-config --cflags --libs hpx_application" + pkgconf_suffix + "`"]
 elif component:
-    args += ["`pkg-config --cflags --libs hpx_component" + suffix + "`"]
+    args += ["`pkg-config --cflags --libs hpx_component" + pkgconf_suffix + "`"]
 else:
-    args += ["`pkg-config --cflags hpx_application" + suffix + "`"]
+    args += ["`pkg-config --cflags hpx_application" + pkgconf_suffix + "`"]
 
 if not component and not application and not minusc:
     usage()
