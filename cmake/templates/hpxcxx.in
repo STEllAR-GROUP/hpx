@@ -107,7 +107,7 @@ while i < len(sys.argv):
 
 pkgconf = None
 for path in pkgconfpath:
-    for suffix in [pkgconf_suffix, "_release", "_relwithdebuginfo","_debug"]:
+    for suffix in [pkgconf_suffix, "_release", "_relwithdebuginfo","_debug","_minsizerel"]:
         hpath = os.path.join(path,"hpx_application")+suffix+".pc"
         if os.path.exists(hpath):
             pkgconf = path
