@@ -155,22 +155,20 @@ namespace hpx::parcelset::policies::openshmem {
                 // compute + send the number of OPENSHMEM_PAGEs to send and the
                 // remainder number of bytes to a OPENSHMEM_PAGE
                 //
-                std::size_t chunks[] = {
-                    static_cast<size_t>(header_.data_size_ / OPENSHMEM_PER_RANK_PAGESIZE),
-                    static_cast<size_t>(header_.data_size_ % OPENSHMEM_PER_RANK_PAGESIZE)};
+                std::size_t chunks[] = {static_cast<size_t>(header_.data_size_ /
+                                            OPENSHMEM_PER_RANK_PAGESIZE),
+                    static_cast<size_t>(
+                        header_.data_size_ % OPENSHMEM_PER_RANK_PAGESIZE)};
                 const std::size_t sizeof_chunks = sizeof(chunks);
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
                 hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(chunks),
-                    dst_,
+                    reinterpret_cast<std::uint8_t*>(chunks), dst_,
                     static_cast<std::uint8_t*>(
                         hpx::util::openshmem_environment::segments[dst_].addr),
-                    sizeof_chunks,
-                    &hpx::util::openshmem_environment::rcv
-                );
+                    sizeof_chunks, &hpx::util::openshmem_environment::rcv);
             }
 
             state_ = sent_header;
@@ -191,16 +189,14 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 hpx::util::openshmem_environment::scoped_lock l;
                 hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(chunks.data()),
-                    dst_,
+                    reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
                     static_cast<std::uint8_t*>(
                         hpx::util::openshmem_environment::segments
                             [hpx::util::openshmem_environment::rank()]
                                 .addr),
                     static_cast<int>(chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)),
-                    &hpx::util::openshmem_environment::rcv
-                );
+                    &hpx::util::openshmem_environment::rcv);
             }
 
             state_ = sent_transmission_chunks;
@@ -219,13 +215,11 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 hpx::util::openshmem_environment::scoped_lock l;
                 hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(buffer_.data_.data()),
-                    dst_,
+                    reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
                     static_cast<std::uint8_t*>(
                         hpx::util::openshmem_environment::segments[dst_].addr),
                     buffer_.data_.size(),
-                    &hpx::util::openshmem_environment::rcv
-                );
+                    &hpx::util::openshmem_environment::rcv);
             }
             state_ = sent_data;
 
@@ -252,14 +246,13 @@ namespace hpx::parcelset::policies::openshmem {
                         reinterpret_cast<const std::uint8_t*>(c.data_.cpos_),
                         dst_,
                         static_cast<std::uint8_t*>(
-                            hpx::util::openshmem_environment::segments[dst_].addr),
+                            hpx::util::openshmem_environment::segments[dst_]
+                                .addr),
                         static_cast<int>(c.size_),
-                        &hpx::util::openshmem_environment::rcv
-                    );
+                        &hpx::util::openshmem_environment::rcv);
 
                     hpx::util::openshmem_environment::wait_until(
-                        1, &hpx::util::openshmem_environment::xmt
-                    );
+                        1, &hpx::util::openshmem_environment::xmt);
                     hpx::util::openshmem_environment::xmt = 0;
                 }
 

@@ -11,8 +11,8 @@
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
 
-#include <hpx/openshmem_base/openshmem.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
+#include <hpx/openshmem_base/openshmem.hpp>
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
@@ -31,14 +31,16 @@
 
 namespace hpx { namespace util {
 
-    struct openshmem_seginfo_t {
-        std::uint8_t *addr;
-        std::uint8_t *size;
+    struct openshmem_seginfo_t
+    {
+        std::uint8_t* addr;
+        std::uint8_t* size;
     };
 
     struct HPX_CORE_EXPORT openshmem_environment
     {
-        static bool check_openshmem_environment(runtime_configuration const& cfg);
+        static bool check_openshmem_environment(
+            runtime_configuration const& cfg);
 
         static int init(int* argc, char*** argv, int& provided);
         static void init(int* argc, char*** argv, runtime_configuration& cfg);
@@ -53,13 +55,13 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
-        static void put_signal(const std::uint8_t* addr, const int rank, std::uint8_t* raddr,
-            const std::size_t size, unsigned int * sigaddr);
+        static void put_signal(const std::uint8_t* addr, const int rank,
+            std::uint8_t* raddr, const std::size_t size, unsigned int* sigaddr);
 
-        static void wait_until(const unsigned int value, unsigned int * sigaddr);
+        static void wait_until(const unsigned int value, unsigned int* sigaddr);
 
-        static void get(std::uint8_t* addr, const int rank, const std::uint8_t* raddr,
-            const std::size_t size);
+        static void get(std::uint8_t* addr, const int rank,
+            const std::uint8_t* raddr, const std::size_t size);
 
         static void global_barrier();
 
@@ -98,7 +100,7 @@ namespace hpx { namespace util {
         static int init_val_;
         static hpx::mutex* segment_mutex;
         static openshmem_seginfo_t* segments;
-        static std::uint8_t * shmem_buffer;
+        static std::uint8_t* shmem_buffer;
         static unsigned int rcv;
         static unsigned int xmt;
     };
@@ -115,7 +117,8 @@ namespace hpx { namespace util {
 namespace hpx { namespace util {
     struct HPX_CORE_EXPORT openshmem_environment
     {
-        static bool check_openshmem_environment(runtime_configuration const& cfg);
+        static bool check_openshmem_environment(
+            runtime_configuration const& cfg);
     };
 }}    // namespace hpx::util
 

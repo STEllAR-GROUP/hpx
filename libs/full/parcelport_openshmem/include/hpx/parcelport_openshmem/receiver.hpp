@@ -42,11 +42,14 @@ namespace hpx::parcelset::policies::openshmem {
             int numTries;
             const static int maxRetries = 10;
 
-            void operator()(unsigned int * addr)
+            void operator()(unsigned int* addr)
             {
                 if (numTries <= maxRetries)
                 {
-                    if(shmem_uint_test(addr, SHMEM_CMP_EQ, 1)) { return; }
+                    if (shmem_uint_test(addr, SHMEM_CMP_EQ, 1))
+                    {
+                        return;
+                    }
                     hpx::this_thread::suspend(
                         std::chrono::microseconds(1 << numTries));
                 }

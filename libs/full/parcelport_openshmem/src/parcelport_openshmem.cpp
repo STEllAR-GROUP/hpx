@@ -106,7 +106,7 @@ namespace hpx::parcelset {
             static std::size_t background_threads(
                 util::runtime_configuration const& ini)
             {
-/*
+                /*
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.openshmem.background_threads",
                     HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS);
@@ -307,6 +307,7 @@ namespace hpx::traits {
     };
 }    // namespace hpx::traits
 
-HPX_REGISTER_PARCELPORT(hpx::parcelset::policies::openshmem::parcelport, openshmem)
+HPX_REGISTER_PARCELPORT(
+    hpx::parcelset::policies::openshmem::parcelport, openshmem)
 
 #endif
