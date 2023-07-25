@@ -17,6 +17,7 @@ struct my_executor : hpx::execution::parallel_executor
 };
 
 namespace hpx::parallel::execution {
+
     template <>
     struct is_one_way_executor<my_executor> : std::true_type
     {

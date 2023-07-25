@@ -64,6 +64,16 @@ namespace hpx::parallel::execution {
 
     ///////////////////////////////////////////////////////////////////////////
     // define customization points
+    inline constexpr struct null_parameters_t
+    {
+    } null_parameters{};
+
+    /// \cond NOINTERNAL
+    template <>
+    struct is_executor_parameters<null_parameters_t> : std::true_type
+    {
+    };
+    /// \endcond
 
     /// Return the number of invocations of the given function \a f which should
     /// be combined into a single task
@@ -287,7 +297,7 @@ namespace hpx::parallel::execution {
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
@@ -295,22 +305,23 @@ namespace hpx::parallel::execution {
             hpx::chrono::steady_duration const& iteration_duration,
             std::size_t num_tasks)
         {
-            return detail::processing_units_count_fn_helper<void,
-                std::decay_t<Executor>>::call(HPX_FORWARD(Executor, exec),
-                iteration_duration, num_tasks);
+            return detail::processing_units_count_fn_helper<null_parameters_t,
+                std::decay_t<Executor>>::call(null_parameters,
+                HPX_FORWARD(Executor, exec), iteration_duration, num_tasks);
         }
 
         // clang-format off
         template <typename Executor,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_executor_any<Executor>::value
+                hpx::traits::is_executor_any_v<Executor>
             )>
         // clang-format on
         friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
             processing_units_count_t tag, Executor&& exec,
             std::size_t num_tasks = 0)
         {
-            return tag(HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
+            return tag(hpx::parallel::execution::null_parameters,
+                HPX_FORWARD(Executor, exec), hpx::chrono::null_duration,
                 num_tasks);
         }
     } processing_units_count{};

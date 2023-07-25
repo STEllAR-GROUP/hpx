@@ -6,25 +6,26 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// This is the fourth in a series of examples demonstrating the development of
-// a fully distributed solver for a simple 1D heat distribution problem.
+// This is the fourth in a series of examples demonstrating the development of a
+// fully distributed solver for a simple 1D heat distribution problem.
 //
 // This example builds on example three. It futurizes the code from that
 // example. Compared to example two this code runs much more efficiently. It
 // allows for changing the amount of work executed in one HPX thread which
-// enables tuning the performance for the optimal grain size of the
-// computation. This example is still fully local but demonstrates nice
-// scalability on SMP machines.
+// enables tuning the performance for the optimal grain size of the computation.
+// This example is still fully local but demonstrates nice scalability on SMP
+// machines.
 //
 // In this variation of stencil we use the save_checkpoint and
-// revive_checkpint functions to back up the state of the application
-// every n time steps.
+// restore_checkpoint functions to back up the state of the application every n
+// time steps.
 //
 
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/checkpoint.hpp>
 #include <hpx/modules/iterator_support.hpp>
 #include <hpx/modules/serialization.hpp>
@@ -63,16 +64,12 @@ inline std::size_t idx(std::size_t i, int dir, std::size_t size)
 struct partition_data
 {
 private:
-    typedef hpx::serialization::serialize_buffer<double> buffer_type;
+    using buffer_type = hpx::serialization::serialize_buffer<double>;
 
 public:
-    partition_data()
-      : data_()
-      , size_(0)
-    {
-    }
+    partition_data() = default;
 
-    partition_data(std::size_t size)
+    explicit partition_data(std::size_t size)
       : data_(std::allocator<double>().allocate(size), size, buffer_type::take)
       , size_(size)
     {
@@ -82,12 +79,12 @@ public:
       : data_(std::allocator<double>().allocate(size), size, buffer_type::take)
       , size_(size)
     {
-        double base_value = double(initial_value * size);
+        double const base_value = static_cast<double>(initial_value * size);
         for (std::size_t i = 0; i != size; ++i)
-            data_[i] = base_value + double(i);
+            data_[i] = base_value + static_cast<double>(i);
     }
 
-    partition_data(const partition_data& old_part)
+    partition_data(partition_data const& old_part)
       : data_(std::allocator<double>().allocate(old_part.size()),
             old_part.size(), buffer_type::take)
       , size_(old_part.size())
@@ -114,12 +111,12 @@ public:
 
 private:
     buffer_type data_;
-    std::size_t size_;
+    std::size_t size_ = 0;
 
     // Serialization Definitions
     friend class hpx::serialization::access;
     template <typename Volume>
-    void serialize(Volume& vol, const unsigned int)
+    void serialize(Volume& vol, unsigned int const)
     {
         // clang-format off
         vol & data_ & size_;
@@ -153,12 +150,12 @@ struct backup
       , file_name_(file_name)
     {
     }
-    backup(backup&& old)
+    backup(backup&& old) noexcept
       : bin(std::move(old.bin))
       , file_name_(std::move(old.file_name_))
     {
     }
-    ~backup() {}
+    ~backup() = default;
 
     void save(partition_data const& status, std::size_t index)
     {
@@ -167,9 +164,10 @@ struct backup
 
     void write()
     {
-        hpx::util::checkpoint archive_data =
+        hpx::util::checkpoint const archive_data =
             hpx::util::save_checkpoint(hpx::launch::sync, bin);
-        // Make sure file stream is bianary for Windows/Mac machines
+
+        // Make sure file stream is binary for Windows/Mac machines
         std::ofstream file_archive(
             file_name_, std::ios::binary | std::ios::out);
         if (file_archive.is_open())
@@ -180,20 +178,19 @@ struct backup
         {
             std::cout << "Error opening file!" << std::endl;
         }
-        file_archive.close();
     }
 
     void revive(std::vector<std::vector<hpx::shared_future<partition_data>>>& U,
         std::size_t nx)
     {
         hpx::util::checkpoint temp_archive;
-        // Make sure file stream is bianary for Windows/Mac machines
+        // Make sure file stream is binary for Windows/Mac machines
         std::ifstream ist(file_name_, std::ios::binary | std::ios::in);
         ist >> temp_archive;
         hpx::util::restore_checkpoint(temp_archive, bin);
         for (std::size_t i = 0; i < U[0].size(); i++)
         {
-            partition_data temp(nx, double(i));
+            partition_data temp(nx, static_cast<double>(i));
             hpx::util::restore_checkpoint(bin[i], temp);
             //Check
             for (std::size_t e = 0; e < temp.size(); e++)
@@ -206,7 +203,8 @@ struct backup
     }
 };
 
-void print(std::vector<std::vector<hpx::shared_future<partition_data>>> U)
+void print(
+    std::vector<std::vector<hpx::shared_future<partition_data>>> const& U)
 {
     for (std::size_t out = 0; out < U[0].size(); out++)
     {
@@ -220,7 +218,7 @@ void print(std::vector<std::vector<hpx::shared_future<partition_data>>> U)
     }
     std::cout << std::endl;
 }
-void print_space(std::vector<hpx::shared_future<partition_data>> next)
+void print_space(std::vector<hpx::shared_future<partition_data>> const& next)
 {
     for (std::size_t out = 0; out < next.size(); out++)
     {
@@ -239,8 +237,8 @@ void print_space(std::vector<hpx::shared_future<partition_data>> next)
 struct stepper
 {
     // Our data for one time step
-    typedef hpx::shared_future<partition_data> partition;
-    typedef std::vector<partition> space;
+    using partition = hpx::shared_future<partition_data>;
+    using space = std::vector<partition>;
 
     // Our operator
     static double heat(double left, double middle, double right)
@@ -253,7 +251,7 @@ struct stepper
     static partition_data heat_part(partition_data const& left,
         partition_data const& middle, partition_data const& right)
     {
-        std::size_t size = middle.size();
+        std::size_t const size = middle.size();
         partition_data next(size);
 
         next[0] = heat(left[size - 1], middle[0], middle[1]);
@@ -270,8 +268,9 @@ struct stepper
 
     // do all the work on 'np' partitions, 'nx' data points each, for 'nt'
     // time steps, limit depth of dependency tree to 'nd'
-    hpx::future<space> do_work(std::size_t np, std::size_t nx, std::size_t nt,
-        std::uint64_t nd, std::uint64_t cp, std::string rsf, std::string fn)
+    static hpx::future<space> do_work(std::size_t np, std::size_t nx,
+        std::size_t nt, std::uint64_t nd, std::uint64_t cp, std::string rsf,
+        std::string fn)
     {
         using hpx::dataflow;
         using hpx::unwrapping;
@@ -302,7 +301,8 @@ struct stepper
         auto range = hpx::util::counting_shape(np);
         using hpx::execution::par;
         hpx::ranges::for_each(par, range, [&U, nx](std::size_t i) {
-            U[0][i] = hpx::make_ready_future(partition_data(nx, double(i)));
+            U[0][i] = hpx::make_ready_future(
+                partition_data(nx, static_cast<double>(i)));
         });
 
         //Initialize from backup
@@ -404,16 +404,18 @@ struct stepper
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    std::uint64_t np = vm["np"].as<std::uint64_t>();    // Number of partitions.
-    std::uint64_t nx =
+    std::uint64_t const np =
+        vm["np"].as<std::uint64_t>();    // Number of partitions.
+    std::uint64_t const nx =
         vm["nx"].as<std::uint64_t>();    // Number of grid points.
-    std::uint64_t nt = vm["nt"].as<std::uint64_t>();    // Number of steps.
-    std::uint64_t nd =
+    std::uint64_t const nt =
+        vm["nt"].as<std::uint64_t>();    // Number of steps.
+    std::uint64_t const nd =
         vm["nd"].as<std::uint64_t>();    // Max depth of dep tree.
-    std::uint64_t cp =
+    std::uint64_t const cp =
         vm["cp"].as<std::uint64_t>();    // Num. steps to checkpoint
-    std::string rsf = vm["restart-file"].as<std::string>();
-    std::string fn = vm["output-file"].as<std::string>();
+    std::string const rsf = vm["restart-file"].as<std::string>();
+    std::string const fn = vm["output-file"].as<std::string>();
 
     if (vm.count("no-header"))
         header = false;
@@ -422,7 +424,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     stepper step;
 
     // Measure execution time.
-    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
+    std::uint64_t const t = hpx::chrono::high_resolution_clock::now();
 
     // Execute nt time steps on nx grid points and print the final solution.
     hpx::future<stepper::space> result =
@@ -431,7 +433,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     stepper::space solution = result.get();
     hpx::wait_all(solution);
 
-    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
+    std::uint64_t const elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     // Print the final solution
     if (vm.count("results"))

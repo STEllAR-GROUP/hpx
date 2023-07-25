@@ -130,11 +130,16 @@ namespace hpx::execution {
         {
         }
 
-        constexpr explicit parallel_policy_executor(
-            Policy l =
-                parallel::execution::detail::get_default_policy<Policy>::call())
+        constexpr explicit parallel_policy_executor(Policy l)
           : pool_(nullptr)
           , policy_(l)
+        {
+        }
+
+        constexpr parallel_policy_executor()
+          : pool_(nullptr)
+          , policy_(
+                parallel::execution::detail::get_default_policy<Policy>::call())
         {
         }
 
@@ -175,18 +180,29 @@ namespace hpx::execution {
         // property implementations
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        friend constexpr parallel_policy_executor tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, parallel_policy_executor>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
-            parallel_policy_executor const& exec, char const* annotation)
+            Executor_ const& exec, char const* annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ = annotation;
             return exec_with_annotation;
         }
 
-        friend parallel_policy_executor tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            parallel_policy_executor const& exec, std::string annotation)
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, parallel_policy_executor>
+            )>
+        // clang-format on
+        friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
+            Executor_ const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
@@ -202,18 +218,29 @@ namespace hpx::execution {
         }
 #endif
 
-        friend constexpr parallel_policy_executor tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, parallel_policy_executor>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::parallel::execution::with_processing_units_count_t,
-            parallel_policy_executor const& exec,
-            std::size_t num_cores) noexcept
+            Executor_ const& exec, std::size_t num_cores) noexcept
         {
             auto exec_with_num_cores = exec;
             exec_with_num_cores.num_cores_ = num_cores;
             return exec_with_num_cores;
         }
 
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t,
+            hpx::parallel::execution::processing_units_count_t, Parameters&&,
             parallel_policy_executor const& exec,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
@@ -221,10 +248,15 @@ namespace hpx::execution {
             return exec.get_num_cores();
         }
 
-        friend constexpr parallel_policy_executor tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, parallel_policy_executor>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
-            parallel_policy_executor const& exec,
-            std::size_t first_core) noexcept
+            Executor_ const& exec, std::size_t first_core) noexcept
         {
             auto exec_with_first_core = exec;
             exec_with_first_core.first_core_ = first_core;

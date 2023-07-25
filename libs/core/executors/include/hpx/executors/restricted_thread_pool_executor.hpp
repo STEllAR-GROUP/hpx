@@ -148,18 +148,23 @@ namespace hpx::parallel::execution {
         friend decltype(auto) tag_invoke(
             Tag tag, restricted_policy_executor const& exec)
         {
-            return hpx::functional::tag_invoke(
-                tag, exec.generate_executor(exec.get_current_thread_num()));
+            return tag(exec.generate_executor(exec.get_current_thread_num()));
         }
 
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend constexpr std::size_t tag_invoke(
             hpx::parallel::execution::processing_units_count_t tag,
-            restricted_policy_executor const& exec,
+            Parameters&& params, restricted_policy_executor const& exec,
             hpx::chrono::steady_duration const& duration =
                 hpx::chrono::null_duration,
             std::size_t num_tasks = 0)
         {
-            return hpx::functional::tag_invoke(tag,
+            return tag(HPX_FORWARD(Parameters, params),
                 exec.generate_executor(exec.get_current_thread_num()), duration,
                 num_tasks);
         }
@@ -242,7 +247,7 @@ namespace hpx::parallel::execution {
         /// \endcond
 
     private:
-        std::uint16_t const first_thread_;
+        std::uint16_t first_thread_;
         mutable std::atomic<std::size_t> os_thread_;
 
         embedded_executor exec_;
