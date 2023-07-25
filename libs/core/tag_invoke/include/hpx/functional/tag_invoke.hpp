@@ -237,7 +237,7 @@ namespace hpx::functional {
                     meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
-                noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+                noexcept(is_nothrow_tag_invocable_v<Tag, Args&&...>)
                     -> tag_invoke_result_t<Tag, Args...>
             {
                 return tag_invoke(

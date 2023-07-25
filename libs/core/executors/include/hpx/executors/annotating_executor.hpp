@@ -203,7 +203,7 @@ namespace hpx::execution::experimental {
         }
 
         std::decay_t<BaseExecutor> exec_;
-        char const* const annotation_ = nullptr;
+        char const* annotation_ = nullptr;
         /// \endcond
     };
 
@@ -212,7 +212,7 @@ namespace hpx::execution::experimental {
     template <typename Tag, typename BaseExecutor,typename Property,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-            )>
+        )>
     // clang-format on
     auto tag_invoke(
         Tag tag, annotating_executor<BaseExecutor> const& exec, Property&& prop)
@@ -227,7 +227,7 @@ namespace hpx::execution::experimental {
     template <typename Tag, typename BaseExecutor,
         HPX_CONCEPT_REQUIRES_(
             hpx::execution::experimental::is_scheduling_property_v<Tag>
-            )>
+        )>
     // clang-format on
     auto tag_invoke(Tag tag, annotating_executor<BaseExecutor> const& exec)
         -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
@@ -259,7 +259,7 @@ namespace hpx::execution::experimental {
     template <typename Executor,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_executor_any_v<Executor>
-            )>
+        )>
     // clang-format on
     constexpr auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, char const* annotation)
@@ -272,7 +272,7 @@ namespace hpx::execution::experimental {
     template <typename Executor,
         HPX_CONCEPT_REQUIRES_(
             hpx::traits::is_executor_any_v<Executor>
-            )>
+        )>
     // clang-format on
     auto tag_fallback_invoke(
         with_annotation_t, Executor&& exec, std::string annotation)

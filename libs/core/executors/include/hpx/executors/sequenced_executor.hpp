@@ -185,18 +185,29 @@ namespace hpx::execution {
         }
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-        friend constexpr sequenced_executor tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, sequenced_executor>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
-            sequenced_executor const& exec, char const* annotation)
+            Executor_ const& exec, char const* annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ = annotation;
             return exec_with_annotation;
         }
 
-        friend sequenced_executor tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            sequenced_executor const& exec, std::string annotation)
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, sequenced_executor>
+            )>
+        // clang-format on
+        friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
+            Executor_ const& exec, std::string annotation)
         {
             auto exec_with_annotation = exec;
             exec_with_annotation.annotation_ =
@@ -212,8 +223,14 @@ namespace hpx::execution {
         }
 #endif
 
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t,
+            hpx::parallel::execution::processing_units_count_t, Parameters&&,
             sequenced_executor const&,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)

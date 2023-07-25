@@ -124,10 +124,7 @@ namespace hpx::execution {
 
             // The type of the associated executor parameters object which is
             // associated with this execution policy
-            using executor_parameters_type =
-                std::conditional_t<std::is_void_v<decayed_parameters_type>,
-                    hpx::traits::executor_parameters_type_t<executor_type>,
-                    decayed_parameters_type>;
+            using executor_parameters_type = decayed_parameters_type;
 
             // The category of the execution agents created by this execution
             // policy.
@@ -284,6 +281,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        sequenced_task_policy_shim<Executor_, Parameters_>,
+                        sequenced_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr sequenced_task_policy_shim(
+                sequenced_task_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(sequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            sequenced_task_policy_shim& operator=(
+                sequenced_task_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(sequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -297,7 +320,8 @@ namespace hpx::execution {
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the sequenced_policy.
     using sequenced_task_policy =
-        detail::sequenced_task_policy_shim<sequenced_executor>;
+        detail::sequenced_task_policy_shim<sequenced_executor,
+            hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     namespace detail {
 
@@ -324,6 +348,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        sequenced_policy_shim<Executor_, Parameters_>,
+                        sequenced_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr sequenced_policy_shim(
+                sequenced_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    sequenced_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            sequenced_policy_shim& operator=(
+                sequenced_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    sequenced_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -332,7 +382,8 @@ namespace hpx::execution {
     /// The class sequenced_policy is an execution policy type used as a unique
     /// type to disambiguate parallel algorithm overloading and require that a
     /// parallel algorithm's execution may not be parallelized.
-    using sequenced_policy = detail::sequenced_policy_shim<sequenced_executor>;
+    using sequenced_policy = detail::sequenced_policy_shim<sequenced_executor,
+        hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     /// Default sequential execution policy object.
     inline constexpr sequenced_policy seq{};
@@ -364,6 +415,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        parallel_task_policy_shim<Executor_, Parameters_>,
+                        parallel_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr parallel_task_policy_shim(
+                parallel_task_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    parallel_task_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            parallel_task_policy_shim& operator=(
+                parallel_task_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(parallel_task_policy_shim(
+                    rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -376,7 +453,8 @@ namespace hpx::execution {
     /// The algorithm returns a future representing the result of the
     /// corresponding algorithm when invoked with the parallel_policy.
     using parallel_task_policy =
-        detail::parallel_task_policy_shim<parallel_executor>;
+        detail::parallel_task_policy_shim<parallel_executor,
+            hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     namespace detail {
 
@@ -402,6 +480,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        parallel_policy_shim<Executor_, Parameters_>,
+                        parallel_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr parallel_policy_shim(
+                parallel_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    parallel_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            parallel_policy_shim& operator=(
+                parallel_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    parallel_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -410,7 +514,8 @@ namespace hpx::execution {
     /// The class parallel_policy is an execution policy type used as a unique
     /// type to disambiguate parallel algorithm overloading and indicate that a
     /// parallel algorithm's execution may be parallelized.
-    using parallel_policy = detail::parallel_policy_shim<parallel_executor>;
+    using parallel_policy = detail::parallel_policy_shim<parallel_executor,
+        hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     /// Default parallel execution policy object.
     inline constexpr parallel_policy par{};
@@ -443,6 +548,34 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<parallel_unsequenced_task_policy_shim<
+                                        Executor_, Parameters_>,
+                        parallel_unsequenced_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr parallel_unsequenced_task_policy_shim(
+                parallel_unsequenced_task_policy_shim<Executor_,
+                    Parameters_> const& rhs)
+              : base_type(parallel_unsequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            parallel_unsequenced_task_policy_shim& operator=(
+                parallel_unsequenced_task_policy_shim<Executor_,
+                    Parameters_> const& rhs)
+            {
+                base_type::operator=(parallel_unsequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -453,7 +586,8 @@ namespace hpx::execution {
     /// and indicate that a parallel algorithm's execution may be parallelized
     /// and vectorized.
     using parallel_unsequenced_task_policy =
-        detail::parallel_unsequenced_task_policy_shim<parallel_executor>;
+        detail::parallel_unsequenced_task_policy_shim<parallel_executor,
+            hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     namespace detail {
 
@@ -480,6 +614,34 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<parallel_unsequenced_policy_shim<Executor_,
+                                        Parameters_>,
+                        parallel_unsequenced_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr parallel_unsequenced_policy_shim(
+                parallel_unsequenced_policy_shim<Executor_, Parameters_> const&
+                    rhs)
+              : base_type(parallel_unsequenced_policy_shim(
+                    rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            parallel_unsequenced_policy_shim& operator=(
+                parallel_unsequenced_policy_shim<Executor_, Parameters_> const&
+                    rhs)
+            {
+                base_type::operator=(
+                    parallel_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -490,7 +652,8 @@ namespace hpx::execution {
     /// indicate that a parallel algorithm's execution may be parallelized and
     /// vectorized.
     using parallel_unsequenced_policy =
-        detail::parallel_unsequenced_policy_shim<parallel_executor>;
+        detail::parallel_unsequenced_policy_shim<parallel_executor,
+            hpx::traits::executor_parameters_type_t<parallel_executor>>;
 
     /// Default vector execution policy object.
     inline constexpr parallel_unsequenced_policy par_unseq{};
@@ -524,6 +687,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        unsequenced_task_policy_shim<Executor_, Parameters_>,
+                        unsequenced_task_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr unsequenced_task_policy_shim(
+                unsequenced_task_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(unsequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            unsequenced_task_policy_shim& operator=(
+                unsequenced_task_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(unsequenced_task_policy_shim(
+                    rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -533,7 +722,8 @@ namespace hpx::execution {
     /// unique type to disambiguate parallel algorithm overloading and indicate
     /// that a parallel algorithm's execution may be vectorized.
     using unsequenced_task_policy =
-        detail::unsequenced_task_policy_shim<sequenced_executor>;
+        detail::unsequenced_task_policy_shim<sequenced_executor,
+            hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     namespace detail {
 
@@ -559,6 +749,32 @@ namespace hpx::execution {
                     HPX_FORWARD(Parameters_, params))
             {
             }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    !std::is_same_v<
+                        unsequenced_policy_shim<Executor_, Parameters_>,
+                        unsequenced_policy_shim> &&
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            explicit constexpr unsequenced_policy_shim(
+                unsequenced_policy_shim<Executor_, Parameters_> const& rhs)
+              : base_type(
+                    unsequenced_policy_shim(rhs.executor(), rhs.parameters()))
+            {
+            }
+
+            template <typename Executor_, typename Parameters_,
+                typename = std::enable_if_t<
+                    std::is_convertible_v<Executor_, Executor> &&
+                    std::is_convertible_v<Parameters_, Parameters>>>
+            unsequenced_policy_shim& operator=(
+                unsequenced_policy_shim<Executor_, Parameters_> const& rhs)
+            {
+                base_type::operator=(
+                    unsequenced_policy_shim(rhs.executor(), rhs.parameters()));
+                return *this;
+            }
             /// \endcond
         };
     }    // namespace detail
@@ -568,7 +784,8 @@ namespace hpx::execution {
     /// unique type to disambiguate parallel algorithm overloading and indicate
     /// that a parallel algorithm's execution may be vectorized.
     using unsequenced_policy =
-        detail::unsequenced_policy_shim<sequenced_executor>;
+        detail::unsequenced_policy_shim<sequenced_executor,
+            hpx::traits::executor_parameters_type_t<sequenced_executor>>;
 
     /// Default vector execution policy object.
     inline constexpr unsequenced_policy unseq{};

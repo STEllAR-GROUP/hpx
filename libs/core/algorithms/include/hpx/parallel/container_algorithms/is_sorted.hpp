@@ -508,7 +508,7 @@ namespace hpx { namespace ranges {
 
 namespace hpx::ranges {
 
-    inline constexpr struct is_sorted_t final
+    inline constexpr struct is_sorted_t
       : hpx::detail::tag_parallel_algorithm<is_sorted_t>
     {
     private:

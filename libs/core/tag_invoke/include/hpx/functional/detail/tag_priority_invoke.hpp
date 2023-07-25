@@ -258,7 +258,7 @@ namespace hpx::functional::detail {
                         enable_tag_override_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
-                noexcept(is_nothrow_tag_override_invocable_v<Tag, Args...>)
+                noexcept(is_nothrow_tag_override_invocable_v<Tag, Args&&...>)
                     -> tag_override_invoke_result_t<Tag, Args&&...>
             {
                 return tag_override_invoke(
@@ -274,7 +274,7 @@ namespace hpx::functional::detail {
                         meta::invoke<Enable, enable_tag_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
-                noexcept(is_nothrow_tag_invocable_v<Tag, Args...>)
+                noexcept(is_nothrow_tag_invocable_v<Tag, Args&&...>)
                     -> tag_invoke_result_t<Tag, Args&&...>
             {
                 return tag_invoke(
@@ -292,7 +292,7 @@ namespace hpx::functional::detail {
                         enable_tag_fallback_invoke_t, Args&&...>>>>
             HPX_HOST_DEVICE HPX_FORCEINLINE constexpr auto operator()(
                 Args&&... args) const
-                noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args...>)
+                noexcept(is_nothrow_tag_fallback_invocable_v<Tag, Args&&...>)
                     -> tag_fallback_invoke_result_t<Tag, Args&&...>
             {
                 return tag_fallback_invoke(

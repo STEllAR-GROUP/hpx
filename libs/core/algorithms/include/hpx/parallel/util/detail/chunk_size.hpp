@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/async_base/scheduling_properties.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
@@ -16,6 +17,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/parallel/util/detail/chunk_size_iterator.hpp>
+#include <hpx/properties/property.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -132,7 +134,7 @@ namespace hpx::parallel::util::detail {
     template <typename ExPolicy, typename IterOrR,
         typename Stride = std::size_t>
     hpx::util::iterator_range<chunk_size_iterator<IterOrR>>
-    get_bulk_iteration_shape(ExPolicy&& policy, IterOrR& it_or_r,
+    get_bulk_iteration_shape(ExPolicy& policy, IterOrR& it_or_r,
         std::size_t& count, Stride s = Stride(1))
     {
         if (count == 0)
@@ -166,6 +168,10 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
+
         auto shape_begin = chunk_size_iterator(it_or_r, chunk_size, count);
         auto shape_end = chunk_size_iterator(last, chunk_size, count, count);
 
@@ -175,7 +181,7 @@ namespace hpx::parallel::util::detail {
     template <typename ExPolicy, typename Future, typename F1, typename IterOrR,
         typename Stride = std::size_t>
     hpx::util::iterator_range<chunk_size_iterator<IterOrR>>
-    get_bulk_iteration_shape(ExPolicy&& policy, std::vector<Future>& workitems,
+    get_bulk_iteration_shape(ExPolicy& policy, std::vector<Future>& workitems,
         F1&& f1, IterOrR& it_or_r, std::size_t& count, Stride s = Stride(1))
     {
         if (count == 0)
@@ -241,6 +247,10 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
+
         auto shape_begin = chunk_size_iterator(it_or_r, chunk_size, count);
         auto shape_end = chunk_size_iterator(last, chunk_size, count, count);
 
@@ -250,7 +260,7 @@ namespace hpx::parallel::util::detail {
     template <typename ExPolicy, typename IterOrR,
         typename Stride = std::size_t>
     std::vector<hpx::tuple<IterOrR, std::size_t>>
-    get_bulk_iteration_shape_variable(ExPolicy&& policy, IterOrR& it_or_r,
+    get_bulk_iteration_shape_variable(ExPolicy& policy, IterOrR& it_or_r,
         std::size_t& count, Stride s = Stride(1))
     {
         using tuple_type = hpx::tuple<IterOrR, std::size_t>;
@@ -308,27 +318,31 @@ namespace hpx::parallel::util::detail {
         }
         // clang-format on
 
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
+
         return shape;
     }
 
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
         typename Stride = std::size_t>
-    decltype(auto) get_bulk_iteration_shape(std::false_type, ExPolicy&& policy,
+    decltype(auto) get_bulk_iteration_shape(std::false_type, ExPolicy& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter& begin,
         std::size_t& count, Stride s = Stride(1))
     {
-        return get_bulk_iteration_shape(HPX_FORWARD(ExPolicy, policy),
-            workitems, HPX_FORWARD(F1, f1), begin, count, s);
+        return get_bulk_iteration_shape(
+            policy, workitems, HPX_FORWARD(F1, f1), begin, count, s);
     }
 
     template <typename ExPolicy, typename Future, typename F1, typename FwdIter,
         typename Stride = std::size_t>
-    decltype(auto) get_bulk_iteration_shape(std::true_type, ExPolicy&& policy,
+    decltype(auto) get_bulk_iteration_shape(std::true_type, ExPolicy& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter& begin,
         std::size_t& count, Stride s = Stride(1))
     {
-        return get_bulk_iteration_shape_variable(HPX_FORWARD(ExPolicy, policy),
-            workitems, HPX_FORWARD(F1, f1), begin, count, s);
+        return get_bulk_iteration_shape_variable(
+            policy, workitems, HPX_FORWARD(F1, f1), begin, count, s);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -360,7 +374,7 @@ namespace hpx::parallel::util::detail {
         typename Stride = std::size_t>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
-    get_bulk_iteration_shape_idx(ExPolicy&& policy, FwdIter begin,
+    get_bulk_iteration_shape_idx(ExPolicy& policy, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
         using iterator =
@@ -397,6 +411,13 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
+
+        using iterator =
+            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
+
         iterator shape_begin(begin, chunk_size, count, 0, 0);
         iterator shape_end(last, chunk_size, count, count, 0);
 
@@ -407,7 +428,7 @@ namespace hpx::parallel::util::detail {
         typename Stride = std::size_t>
     hpx::util::iterator_range<
         parallel::util::detail::chunk_size_idx_iterator<FwdIter>>
-    get_bulk_iteration_shape_idx(ExPolicy&& policy,
+    get_bulk_iteration_shape_idx(ExPolicy& policy,
         std::vector<Future>& workitems, F1&& f1, FwdIter begin,
         std::size_t count, Stride s = Stride(1))
     {
@@ -475,6 +496,13 @@ namespace hpx::parallel::util::detail {
             // clang-format on
         }
 
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
+
+        using iterator =
+            parallel::util::detail::chunk_size_idx_iterator<FwdIter>;
+
         iterator shape_begin(begin, chunk_size, count, 0, base_idx);
         iterator shape_end(last, chunk_size, count, count, base_idx);
 
@@ -484,7 +512,7 @@ namespace hpx::parallel::util::detail {
     template <typename ExPolicy, typename FwdIter,
         typename Stride = std::size_t>
     std::vector<hpx::tuple<FwdIter, std::size_t, std::size_t>>
-    get_bulk_iteration_shape_idx_variable(ExPolicy&& policy, FwdIter first,
+    get_bulk_iteration_shape_idx_variable(ExPolicy& policy, FwdIter first,
         std::size_t count, Stride s = Stride(1))
     {
         using tuple_type = hpx::tuple<FwdIter, std::size_t, std::size_t>;
@@ -542,6 +570,10 @@ namespace hpx::parallel::util::detail {
             base_idx += chunk;
         }
         // clang-format on
+
+        // update executor with new values
+        policy = hpx::experimental::prefer(
+            execution::with_processing_units_count, policy, cores);
 
         return shape;
     }

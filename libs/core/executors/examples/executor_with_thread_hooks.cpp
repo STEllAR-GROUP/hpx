@@ -168,6 +168,12 @@ namespace executor_example {
                 std::forward<Future>(predecessor), std::forward<Ts>(ts)...);
         }
 
+        [[nodiscard]] constexpr std::decay_t<BaseExecutor> const& get_executor()
+            const noexcept
+        {
+            return exec_;
+        }
+
     private:
         using thread_hook = hpx::function<void()>;
 
