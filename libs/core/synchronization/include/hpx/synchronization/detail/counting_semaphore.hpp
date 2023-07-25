@@ -59,7 +59,7 @@ namespace hpx::lcos::local::detail {
     template <typename Mutex>
     struct counting_semaphore_data
     {
-        counting_semaphore_data(std::ptrdiff_t value) noexcept
+        explicit counting_semaphore_data(std::ptrdiff_t value) noexcept
           : sem_(value)
           , count_(1)
         {
