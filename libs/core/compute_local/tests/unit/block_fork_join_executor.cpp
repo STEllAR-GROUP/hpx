@@ -153,6 +153,137 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
     HPX_TEST(caught_exception);
 }
 
+static std::atomic<std::size_t> count1{0};
+static std::atomic<std::size_t> count2{0};
+static std::atomic<std::size_t> count3{0};
+static std::atomic<std::size_t> count4{0};
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_homogeneous(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_homogeneous\n";
+
+    auto f1 = [] { ++count1; };
+
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(2));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f1, f1, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(5));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(
+        exec, f1, f1, f1, f1, f1, f1, f1, f1, f1, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(11));
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync\n";
+
+    auto f1 = [] { ++count1; };
+    auto f2 = [] { ++count2; };
+    auto f3 = [] { ++count3; };
+    auto f4 = [] { ++count4; };
+
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f2);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    count3 = 0;
+    count4 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f2, f3, f4, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count3.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count4.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    count3 = 0;
+    count4 = 0;
+    hpx::parallel::execution::sync_invoke(
+        exec, f1, f2, f3, f4, f1, f4, f1, f2, f3, f4, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(4));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count3.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count4.load(), static_cast<std::size_t>(3));
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_homogeneous_exception(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_homogeneous_exception\n";
+
+    auto f1 = [] { throw std::runtime_error("test"); };
+
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::parallel::execution::sync_invoke(exec, f1, f1, f1);
+        HPX_TEST(false);
+    }
+    catch (std::runtime_error const& /*e*/)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_exception(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_exception\n";
+
+    auto f1 = [] {};
+    auto f2 = [] { throw std::runtime_error("test"); };
+
+    block_fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::parallel::execution::sync_invoke(exec, f1, f2);
+        HPX_TEST(false);
+    }
+    catch (std::runtime_error const& /*e*/)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
 template <typename... ExecutorArgs>
 void test_executor(hpx::threads::thread_priority priority,
     hpx::threads::thread_stacksize stacksize,
@@ -165,6 +296,11 @@ void test_executor(hpx::threads::thread_priority priority,
     test_bulk_async(priority, stacksize, schedule);
     test_bulk_sync_exception(priority, stacksize, schedule);
     test_bulk_async_exception(priority, stacksize, schedule);
+
+    test_invoke_sync_homogeneous(priority, stacksize, schedule);
+    test_invoke_sync(priority, stacksize, schedule);
+    test_invoke_sync_homogeneous_exception(priority, stacksize, schedule);
+    test_invoke_sync_exception(priority, stacksize, schedule);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
