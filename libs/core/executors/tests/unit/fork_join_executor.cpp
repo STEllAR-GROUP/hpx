@@ -25,7 +25,10 @@
 
 using hpx::execution::experimental::fork_join_executor;
 
-static std::atomic<std::size_t> count{0};
+static std::atomic<std::size_t> count1{0};
+static std::atomic<std::size_t> count2{0};
+static std::atomic<std::size_t> count3{0};
+static std::atomic<std::size_t> count4{0};
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename... ExecutorArgs>
@@ -33,23 +36,23 @@ void test_processing_mask(ExecutorArgs&&... args)
 {
     std::cerr << "test_processing_mask\n";
 
-    auto& rp = hpx::resource::get_partitioner();
+    auto const& rp = hpx::resource::get_partitioner();
     auto const& expected_mask =
         rp.get_used_pus_mask(hpx::get_worker_thread_num());
 
     fork_join_executor exec{expected_mask, std::forward<ExecutorArgs>(args)...};
-    auto pus_mask =
+    auto const pus_mask =
         hpx::execution::experimental::get_processing_units_mask(exec);
     HPX_TEST(pus_mask == expected_mask);
 
-    auto cores_mask = hpx::execution::experimental::get_cores_mask(exec);
+    auto const cores_mask = hpx::execution::experimental::get_cores_mask(exec);
     HPX_TEST(cores_mask == expected_mask);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void bulk_test(int, int passed_through)    //-V813
 {
-    ++count;
+    ++count1;
     HPX_TEST_EQ(passed_through, 42);
 }
 
@@ -58,8 +61,8 @@ void test_bulk_sync(ExecutorArgs&&... args)
 {
     std::cerr << "test_bulk_sync\n";
 
-    count = 0;
-    std::size_t const n = 107;
+    count1 = 0;
+    constexpr std::size_t n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
 
@@ -69,10 +72,10 @@ void test_bulk_sync(ExecutorArgs&&... args)
     fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
     hpx::parallel::execution::bulk_sync_execute(
         exec, hpx::bind(&bulk_test, _1, _2), v, 42);
-    HPX_TEST_EQ(count.load(), n);
+    HPX_TEST_EQ(count1.load(), n);
 
     hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, 42);
-    HPX_TEST_EQ(count.load(), 2 * n);
+    HPX_TEST_EQ(count1.load(), 2 * n);
 }
 
 template <typename... ExecutorArgs>
@@ -80,7 +83,7 @@ void test_bulk_async(ExecutorArgs&&... args)
 {
     std::cerr << "test_bulk_async\n";
 
-    count = 0;
+    count1 = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
@@ -92,12 +95,12 @@ void test_bulk_async(ExecutorArgs&&... args)
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
                       exec, hpx::bind(&bulk_test, _1, _2), v, 42))
         .get();
-    HPX_TEST_EQ(count.load(), n);
+    HPX_TEST_EQ(count1.load(), n);
 
     hpx::when_all(
         hpx::parallel::execution::bulk_async_execute(exec, &bulk_test, v, 42))
         .get();
-    HPX_TEST_EQ(count.load(), 2 * n);
+    HPX_TEST_EQ(count1.load(), 2 * n);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,7 +115,7 @@ void test_bulk_sync_exception(ExecutorArgs&&... args)
 {
     std::cerr << "test_bulk_sync_exception\n";
 
-    count = 0;
+    count1 = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
@@ -143,7 +146,7 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
 {
     std::cerr << "test_bulk_async_exception\n";
 
-    count = 0;
+    count1 = 0;
     std::size_t const n = 107;
     std::vector<int> v(n);
     std::iota(std::begin(v), std::end(v), std::rand());
@@ -156,6 +159,132 @@ void test_bulk_async_exception(ExecutorArgs&&... args)
             exec, &bulk_test_exception, v, 42);
         r.get();
 
+        HPX_TEST(false);
+    }
+    catch (std::runtime_error const& /*e*/)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_homogeneous(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_homogeneous\n";
+
+    auto f1 = [] { ++count1; };
+
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(2));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f1, f1, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(5));
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(
+        exec, f1, f1, f1, f1, f1, f1, f1, f1, f1, f1, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(11));
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync\n";
+
+    auto f1 = [] { ++count1; };
+    auto f2 = [] { ++count2; };
+    auto f3 = [] { ++count3; };
+    auto f4 = [] { ++count4; };
+
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    count1 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f2);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    count3 = 0;
+    count4 = 0;
+    hpx::parallel::execution::sync_invoke(exec, f1, f2, f3, f4, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count3.load(), static_cast<std::size_t>(1));
+    HPX_TEST_EQ(count4.load(), static_cast<std::size_t>(1));
+
+    count1 = 0;
+    count2 = 0;
+    count3 = 0;
+    count4 = 0;
+    hpx::parallel::execution::sync_invoke(
+        exec, f1, f2, f3, f4, f1, f4, f1, f2, f3, f4, f1);
+    HPX_TEST_EQ(count1.load(), static_cast<std::size_t>(4));
+    HPX_TEST_EQ(count2.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count3.load(), static_cast<std::size_t>(2));
+    HPX_TEST_EQ(count4.load(), static_cast<std::size_t>(3));
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_homogeneous_exception(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_homogeneous_exception\n";
+
+    auto f1 = [] { throw std::runtime_error("test"); };
+
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::parallel::execution::sync_invoke(exec, f1, f1, f1);
+        HPX_TEST(false);
+    }
+    catch (std::runtime_error const& /*e*/)
+    {
+        caught_exception = true;
+    }
+    catch (...)
+    {
+        HPX_TEST(false);
+    }
+
+    HPX_TEST(caught_exception);
+}
+
+template <typename... ExecutorArgs>
+void test_invoke_sync_exception(ExecutorArgs&&... args)
+{
+    std::cerr << "test_invoke_sync_exception\n";
+
+    auto f1 = [] {};
+    auto f2 = [] { throw std::runtime_error("test"); };
+
+    fork_join_executor exec{std::forward<ExecutorArgs>(args)...};
+
+    bool caught_exception = false;
+    try
+    {
+        hpx::parallel::execution::sync_invoke(exec, f1, f2);
         HPX_TEST(false);
     }
     catch (std::runtime_error const& /*e*/)
@@ -192,6 +321,11 @@ void test_executor(hpx::threads::thread_priority priority,
     test_bulk_async(priority, stacksize, schedule);
     test_bulk_sync_exception(priority, stacksize, schedule);
     test_bulk_async_exception(priority, stacksize, schedule);
+
+    test_invoke_sync_homogeneous(priority, stacksize, schedule);
+    test_invoke_sync(priority, stacksize, schedule);
+    test_invoke_sync_homogeneous_exception(priority, stacksize, schedule);
+    test_invoke_sync_exception(priority, stacksize, schedule);
 
     test_processing_mask(priority, stacksize, schedule);
 }
