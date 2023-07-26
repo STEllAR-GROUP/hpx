@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Gregor Dai√ü
+//  Copyright (c) 2023 Gregor Daiﬂ
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,7 @@ extern void launch_saxpy_kernel(
     unsigned int& threads, void** args);
 
 // -------------------------------------------------------------------------
-int hpx_main(hpx::program_options::variables_map& vm)
+int hpx_main(hpx::program_options::variables_map&)
 {
     // install cuda future polling handler
     hpx::cuda::experimental::enable_user_polling poll("default");
