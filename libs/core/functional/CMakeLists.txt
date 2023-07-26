@@ -13,6 +13,7 @@ set(functional_headers
     hpx/functional/detail/empty_function.hpp
     hpx/functional/detail/function_registration.hpp
     hpx/functional/detail/reset_function.hpp
+    hpx/functional/detail/runtime_get.hpp
     hpx/functional/detail/vtable/callable_vtable.hpp
     hpx/functional/detail/vtable/copyable_vtable.hpp
     hpx/functional/detail/vtable/function_vtable.hpp

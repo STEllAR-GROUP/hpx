@@ -300,7 +300,7 @@ namespace hpx::parallel::util::detail {
                 // wait for all tasks to finish
                 if (hpx::wait_all_nothrow(items))
                 {
-                    // always rethrow workitems has at least one exceptional
+                    // always rethrow if items has at least one exceptional
                     // future
                     handle_local_exceptions::call(items);
                 }
@@ -324,7 +324,7 @@ namespace hpx::parallel::util::detail {
                 // wait for all tasks to finish
                 if (hpx::wait_all_nothrow(items))
                 {
-                    // always rethrow workitems has at least one exceptional
+                    // always rethrow if items has at least one exceptional
                     // future
                     handle_local_exceptions::call(items);
                 }
