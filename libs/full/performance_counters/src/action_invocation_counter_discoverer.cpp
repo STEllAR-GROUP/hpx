@@ -62,7 +62,14 @@ namespace hpx { namespace performance_counters {
                 return f(cinfo, ec) && !ec;
             }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
             p.parameters_ = "*";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
 
         if (p.parameters_.find_first_of("*?[]") != std::string::npos)
