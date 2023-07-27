@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/memory/serialization/intrusive_ptr.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/steady_clock.hpp>
