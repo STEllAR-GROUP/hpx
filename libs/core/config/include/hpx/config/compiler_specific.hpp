@@ -160,6 +160,11 @@
 #endif
 #define HPX_HOST_DEVICE HPX_HOST HPX_DEVICE
 
+// Define this AFTER HPX_[DEVICE|HOST] for SYCL
+// as we do not want the __device__ modifiers
+#if defined(HPX_HAVE_SYCL)
+#  define HPX_COMPUTE_CODE
+#endif
 
 #if !defined(HPX_CDECL)
 #define HPX_CDECL
