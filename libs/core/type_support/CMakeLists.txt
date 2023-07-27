@@ -22,6 +22,7 @@ set(type_support_headers
     hpx/type_support/lazy_enable_if.hpp
     hpx/type_support/pack.hpp
     hpx/type_support/meta.hpp
+    hpx/type_support/relocate_at.hpp
     hpx/type_support/static.hpp
     hpx/type_support/unwrap_ref.hpp
     hpx/type_support/unused.hpp
