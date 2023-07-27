@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -74,6 +74,12 @@ namespace hpx::parallel::execution {
 
         template <typename Executor, typename Enable = void>
         struct bulk_then_execute_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct async_invoke_fn_helper;
+
+        template <typename Executor, typename Enable = void>
+        struct sync_invoke_fn_helper;
         /// \endcond
     }    // namespace detail
 
@@ -466,4 +472,85 @@ namespace hpx::parallel::execution {
                 HPX_FORWARD(Future, predecessor), HPX_FORWARD(Ts, ts)...);
         }
     } bulk_then_execute{};
+
+    /// Asynchronously invoke the given set of nullary functions, each on its
+    /// own execution agent
+    ///
+    /// This creates a group of function invocations whose ordering is given by
+    /// the execution_category associated with the executor.
+    ///
+    /// All exceptions thrown by invocations of the functions are reported in a
+    /// manner consistent with parallel algorithm execution through the returned
+    /// future.
+    ///
+    /// \param exec  [in] The executor object to use for scheduling of the
+    ///              functions \a fs.
+    /// \param fs    [in] The functions which will be scheduled using the
+    ///              given executor.
+    ///
+    /// \returns The return type of \a executor_type::async_invoke if defined by
+    ///          \a executor_type. Otherwise a future<void>
+    ///          representing finishing the execution of all functions \a fs.
+    ///
+    /// \note This calls exec.async_invoke(fs...) if it exists; otherwise it
+    ///       executes async_execute(fs) for each fs.
+    ///
+    inline constexpr struct async_invoke_t final
+      : hpx::functional::detail::tag_fallback<async_invoke_t>
+    {
+    private:
+        // clang-format off
+        template <typename Executor, typename F, typename... Fs,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            async_invoke_t, Executor&& exec, F&& f, Fs&&... fs)
+        {
+            return detail::async_invoke_fn_helper<std::decay_t<Executor>>::call(
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Fs, fs)...);
+        }
+    } async_invoke{};
+
+    /// Synchronously invoke the given set of nullary functions, each on its own
+    /// execution agent
+    ///
+    /// This creates a group of function invocations whose ordering is given by
+    /// the execution_category associated with the executor.
+    ///
+    /// All exceptions thrown by invocations of the functions are reported in a
+    /// manner consistent with parallel algorithm execution through the returned
+    /// future.
+    ///
+    /// \param exec  [in] The executor object to use for scheduling of the
+    ///              functions \a fs.
+    /// \param fs    [in] The functions which will be scheduled using the
+    ///              given executor.
+    ///
+    /// \returns The return type of \a executor_type::async_invoke if defined by
+    ///          \a executor_type.
+    ///
+    /// \note This calls exec.sync_invoke(fs...) if it exists; otherwise it
+    ///       executes sync_execute(fs) for each fs.
+    ///
+    inline constexpr struct sync_invoke_t final
+      : hpx::functional::detail::tag_fallback<sync_invoke_t>
+    {
+    private:
+        // clang-format off
+        template <typename Executor, typename F, typename... Fs,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_invocable_v<F> && (std::is_invocable_v<Fs> && ...)
+            )>
+        // clang-format on
+        friend HPX_FORCEINLINE decltype(auto) tag_fallback_invoke(
+            sync_invoke_t, Executor&& exec, F&& f, Fs&&... fs)
+        {
+            return detail::sync_invoke_fn_helper<std::decay_t<Executor>>::call(
+                HPX_FORWARD(Executor, exec), HPX_FORWARD(F, f),
+                HPX_FORWARD(Fs, fs)...);
+        }
+    } sync_invoke{};
 }    // namespace hpx::parallel::execution

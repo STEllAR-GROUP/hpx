@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //  Copyright (c) 2017 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,6 +15,7 @@
 
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
+#include <hpx/async_combinators/when_all.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/executors/fused_bulk_execute.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
@@ -1423,4 +1424,74 @@ namespace hpx::parallel::execution {
         };
     }    // namespace detail
     /// \endcond
+
+    /// \cond NOINTERNAL
+    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
+        // async_invoke()
+
+        template <typename Executor, typename Enable>
+        struct async_invoke_fn_helper
+        {
+            template <typename Executor_, typename... Fs>
+            HPX_FORCEINLINE static hpx::future<void> call(
+                Executor_&& exec, Fs&&... fs)
+            {
+                std::vector<hpx::traits::executor_future_t<Executor, void>>
+                    results;
+                results.reserve(sizeof...(Fs));
+
+                (results.push_back(hpx::parallel::execution::async_execute(
+                     exec, HPX_FORWARD(Fs, fs))),
+                    ...);
+
+                return hpx::when_all(HPX_MOVE(results));
+            }
+
+            template <typename Executor_, typename... Fs>
+            struct result
+            {
+                // clang-format off
+                using type = decltype(call(
+                    std::declval<Executor_>(), std::declval<Fs>()...));
+                // clang-format on
+            };
+        };
+    }    // namespace detail
+    /// \endcond
+
+    /// \cond NOINTERNAL
+    namespace detail {
+        ///////////////////////////////////////////////////////////////////////
+        // sync_invoke()
+
+        template <typename Executor, typename Enable>
+        struct sync_invoke_fn_helper
+        {
+            template <typename Executor_, typename... Fs>
+            HPX_FORCEINLINE static auto call(Executor_&& exec, Fs&&... fs)
+            {
+                std::vector<hpx::traits::executor_future_t<Executor, void>>
+                    results;
+                results.reserve(sizeof...(Fs));
+
+                (results.push_back(hpx::parallel::execution::async_execute(
+                     exec, HPX_FORWARD(Fs, fs))),
+                    ...);
+
+                hpx::wait_all(HPX_MOVE(results));
+            }
+
+            template <typename Executor_, typename... Fs>
+            struct result
+            {
+                // clang-format off
+                using type = decltype(call(
+                    std::declval<Executor_>(), std::declval<Fs>()...));
+                // clang-format on
+            };
+        };
+    }    // namespace detail
+    /// \endcond
+
 }    // namespace hpx::parallel::execution
