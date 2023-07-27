@@ -739,8 +739,15 @@ namespace hpx::local::detail {
             auto const end = unregistered_options.end();
             for (auto it = unregistered_options.begin(); it != end; ++it)
             {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
                 unregistered_options_cmd_line +=
                     " " + detail::encode_and_enquote(*it);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
             }
 
             ini_config_.emplace_back("hpx.unknown_cmd_line!=" +

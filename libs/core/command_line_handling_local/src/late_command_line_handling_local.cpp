@@ -22,7 +22,14 @@ namespace hpx::local::detail {
     {
         if (arg.find_first_of(" \t\"") != std::string::npos)
         {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
             return std::string("\"") + HPX_MOVE(arg) + "\"";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
         return arg;
     }
