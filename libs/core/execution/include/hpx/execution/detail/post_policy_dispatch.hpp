@@ -37,16 +37,14 @@ namespace hpx::detail {
             hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
+            // run_as_child doesn't make sense if we _post_ a tasks
             auto hint = policy.hint();
             if (hint.runs_as_child_mode() ==
                 hpx::threads::thread_execution_hint::run_as_child)
             {
-                if (!pool->get_scheduler()->supports_direct_execution())
-                {
-                    hint.runs_as_child_mode(
-                        hpx::threads::thread_execution_hint::none);
-                    policy.set_hint(hint);
-                }
+                hint.runs_as_child_mode(
+                    hpx::threads::thread_execution_hint::none);
+                policy.set_hint(hint);
             }
 
             threads::thread_init_data data(
@@ -76,18 +74,8 @@ namespace hpx::detail {
             hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
+            // run_as_child doesn't make sense if we _post_ a tasks
             auto hint = policy.hint();
-            if (hint.runs_as_child_mode() ==
-                hpx::threads::thread_execution_hint::run_as_child)
-            {
-                if (!pool->get_scheduler()->supports_direct_execution())
-                {
-                    hint.runs_as_child_mode(
-                        hpx::threads::thread_execution_hint::none);
-                    policy.set_hint(hint);
-                }
-            }
-
             threads::thread_init_data data(
                 threads::make_thread_function_nullary(hpx::util::deferred_call(
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)),
@@ -95,13 +83,14 @@ namespace hpx::detail {
                 threads::thread_schedule_hint(
                     threads::thread_schedule_hint_mode::thread,
                     static_cast<std::int16_t>(get_worker_thread_num()),
-                    hint.placement_mode(), hint.runs_as_child_mode()),
+                    hint.placement_mode(),
+                    hpx::threads::thread_execution_hint::none),
                 policy.stacksize(),
                 threads::thread_schedule_state::pending_do_not_schedule, true);
 
-            threads::thread_id_ref_type tid =
+            threads::thread_id_ref_type const tid =
                 threads::register_thread(data, pool);
-            threads::thread_id_type tid_self = threads::get_self_id();
+            threads::thread_id_type const tid_self = threads::get_self_id();
 
             // make sure this thread is executed last
             if (tid && tid_self &&
@@ -181,52 +170,29 @@ namespace hpx::detail {
         {
             HPX_ASSERT(pool != nullptr);
 
-            auto hint = policy.hint();
-            if (hint.runs_as_child_mode() ==
-                hpx::threads::thread_execution_hint::run_as_child)
-            {
-                if (!pool->get_scheduler()->supports_direct_execution())
-                {
-                    hint.runs_as_child_mode(
-                        hpx::threads::thread_execution_hint::none);
-                    policy.set_hint(hint);
-                }
-            }
-
+            // run_as_child doesn't make sense if we _post_ a tasks
             if (policy == launch::sync)
             {
-                auto mod_policy = launch::sync_policy(
-                    policy.priority(), policy.stacksize(), hint);
-
                 post_policy_dispatch<launch::sync_policy>::call(
-                    HPX_MOVE(mod_policy), desc, pool, HPX_FORWARD(F, f),
+                    HPX_MOVE(policy), desc, pool, HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...);
             }
             else if (policy == launch::deferred)
             {
-                auto mod_policy = launch::deferred_policy(
-                    policy.priority(), policy.stacksize(), hint);
-
                 post_policy_dispatch<launch::deferred_policy>::call(
-                    HPX_MOVE(mod_policy), desc, pool, HPX_FORWARD(F, f),
+                    HPX_MOVE(policy), desc, pool, HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...);
             }
             else if (policy == launch::fork)
             {
-                auto mod_policy = launch::fork_policy(
-                    policy.priority(), policy.stacksize(), hint);
-
                 post_policy_dispatch<launch::fork_policy>::call(
-                    HPX_MOVE(mod_policy), desc, pool, HPX_FORWARD(F, f),
+                    HPX_MOVE(policy), desc, pool, HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...);
             }
             else
             {
-                auto mod_policy = launch::async_policy(
-                    policy.priority(), policy.stacksize(), hint);
-
                 post_policy_dispatch<launch::async_policy>::call(
-                    HPX_MOVE(mod_policy), desc, pool, HPX_FORWARD(F, f),
+                    HPX_MOVE(policy), desc, pool, HPX_FORWARD(F, f),
                     HPX_FORWARD(Ts, ts)...);
             }
         }

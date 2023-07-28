@@ -148,7 +148,7 @@ namespace hpx::detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy&& policy, hpx::threads::thread_description const& desc,
+        call(Policy policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool);
@@ -172,10 +172,8 @@ namespace hpx::detail {
             lcos::local::futures_factory<result_type()> p(
                 util::deferred_call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
-            threads::thread_id_ref_type tid =
-                p.post(pool, desc.get_description(), HPX_MOVE(policy));
-
-            if (tid)
+            if (threads::thread_id_ref_type tid =
+                    p.post(pool, desc.get_description(), HPX_MOVE(policy)))
             {
                 auto runs_as_child = hint.runs_as_child_mode();
                 if (runs_as_child ==
@@ -230,7 +228,7 @@ namespace hpx::detail {
         HPX_FORCEINLINE static std::enable_if_t<
             traits::detail::is_deferred_invocable_v<F, Ts...>,
             hpx::future<util::detail::invoke_deferred_result_t<F, Ts...>>>
-        call(Policy&& policy, hpx::threads::thread_description const& desc,
+        call(Policy policy, hpx::threads::thread_description const& desc,
             threads::thread_pool_base* pool, F&& f, Ts&&... ts)
         {
             HPX_ASSERT(pool != nullptr);
@@ -258,7 +256,7 @@ namespace hpx::detail {
                 p.post(pool, desc.get_description(), policy);
 
             // make sure this thread is executed last
-            threads::thread_id_type tid_self = threads::get_self_id();
+            threads::thread_id_type const tid_self = threads::get_self_id();
             if (tid && tid_self &&
                 get_thread_id_data(tid)->get_scheduler_base() ==
                     get_thread_id_data(tid_self)->get_scheduler_base())
