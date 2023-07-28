@@ -1176,9 +1176,6 @@ namespace hpx::threads::policies {
                         parameters_.small_stacksize_, thread_id_addref::no);
                 HPX_ASSERT(p);
 
-                // We initialize the stack eagerly
-                p->init();
-
                 // Finally, store the thread for later use
                 thread_heap_small_.emplace_back(p);
             }
