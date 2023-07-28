@@ -46,10 +46,15 @@ int hpx_main()
 
     hpx::threads::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
-    hpx::execution::parallel_executor worker_exec(
+    hpx::execution::parallel_executor exec(
         &hpx::resource::get_thread_pool("worker"));
     std::size_t const worker_pool_threads =
         hpx::resource::get_num_threads("worker");
+
+    hpx::threads::thread_schedule_hint hint;
+    hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+    auto worker_exec = hpx::execution::experimental::with_hint(exec, hint);
 
     {
         // Suspend and resume pool with future
