@@ -37,7 +37,6 @@ int non_trivially_relocatable_struct::count = 0;
 static_assert(
     !hpx::is_trivially_relocatable_v<non_trivially_relocatable_struct>);
 
-
 struct trivially_relocatable_struct
 {
     static int count;

@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
     int a[10];
     int b[10];
 
-    int (*p)[10] = &a;
-    int (*q)[10] = &b;
+    int(*p)[10] = &a;
+    int(*q)[10] = &b;
 
     hpx::relocate_at(p, q);
 }

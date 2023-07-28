@@ -28,10 +28,10 @@ namespace hpx {
         template <typename InIter, typename FwdIter>
         struct choose_uninitialized_relocate_helper
         {
-        //     using in_type = typename std::remove_reference_t<
-        //         decltype(*std::declval<InIter>())>;
-        //     using out_type = typename std::remove_reference_t<
-        //         decltype(*std::declval<FwdIter>())>;
+            //     using in_type = typename std::remove_reference_t<
+            //         decltype(*std::declval<InIter>())>;
+            //     using out_type = typename std::remove_reference_t<
+            //         decltype(*std::declval<FwdIter>())>;
 
             using in_type = typename std::iterator_traits<InIter>::value_type;
             using out_type = typename std::iterator_traits<FwdIter>::value_type;

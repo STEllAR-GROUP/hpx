@@ -13,8 +13,8 @@ int main(int argc, char* argv[])
     int a[10];
     int b[10];
 
-    int (*p)[10] = &a;
-    int (*q)[10] = &b;
+    int(*p)[10] = &a;
+    int(*q)[10] = &b;
 
-    hpx::uninitialized_relocate(p, p+1, q);
+    hpx::uninitialized_relocate(p, p + 1, q);
 }
