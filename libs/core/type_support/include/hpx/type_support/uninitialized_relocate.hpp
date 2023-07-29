@@ -25,6 +25,13 @@ namespace hpx {
 
     namespace detail {
 
+        enum struct relocate_strategy
+        {
+            buffer_memcpy = 0,
+            for_loop_nothrow,
+            for_loop_try_catch
+        };
+
         template <typename InIter, typename FwdIter>
         struct choose_uninitialized_relocate_helper
         {
@@ -55,17 +62,18 @@ namespace hpx {
             // Checks if the move constructor is noexcept to skip
             // the try-catch block
 
-            using type = std::integral_constant<int,
-                    is_buffer_memcpyable       ? 0 : // memcpy
-                    can_move_construct_nothrow ? 1 : // for loop nothrow
-                                                 2>; // for loop try-catch
-
-            constexpr static int value = type::value;
+            // Using an enum to distinguish implementations
+            constexpr static relocate_strategy value = is_buffer_memcpyable ?
+                relocate_strategy::buffer_memcpy :
+                can_move_construct_nothrow ?
+                relocate_strategy::for_loop_nothrow :
+                relocate_strategy::for_loop_try_catch;
         };
 
         template <typename InIter, typename FwdIter,
-            std::enable_if_t<choose_uninitialized_relocate_helper<InIter,
-                                 FwdIter>::value == 0,
+            std::enable_if_t<
+                choose_uninitialized_relocate_helper<InIter, FwdIter>::value ==
+                    relocate_strategy::buffer_memcpy,
                 int> = 0>
         FwdIter uninitialized_relocate_helper(
             InIter first, InIter last, FwdIter dst) noexcept
@@ -93,8 +101,9 @@ namespace hpx {
         }
 
         template <typename InIter, typename FwdIter,
-            std::enable_if_t<choose_uninitialized_relocate_helper<InIter,
-                                 FwdIter>::value == 1,
+            std::enable_if_t<
+                choose_uninitialized_relocate_helper<InIter, FwdIter>::value ==
+                    relocate_strategy::for_loop_nothrow,
                 int> = 0>
         FwdIter uninitialized_relocate_helper(
             InIter first, InIter last, FwdIter dst) noexcept
@@ -109,8 +118,9 @@ namespace hpx {
         }
 
         template <typename InIter, typename FwdIter,
-            std::enable_if_t<choose_uninitialized_relocate_helper<InIter,
-                                 FwdIter>::value == 2,
+            std::enable_if_t<
+                choose_uninitialized_relocate_helper<InIter, FwdIter>::value ==
+                    relocate_strategy::for_loop_try_catch,
                 int> = 0>
         FwdIter uninitialized_relocate_helper(
             InIter first, InIter last, FwdIter dst)
@@ -148,7 +158,7 @@ namespace hpx {
     FwdIter
     uninitialized_relocate(InIter first, InIter last, FwdIter dst) noexcept(
         detail::choose_uninitialized_relocate_helper<InIter, FwdIter>::value !=
-        2)
+        detail::relocate_strategy::for_loop_try_catch)
     // maybe noexcept(auto)?
     {
         static_assert(detail::choose_uninitialized_relocate_helper<InIter,
