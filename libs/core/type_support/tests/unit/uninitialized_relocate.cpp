@@ -18,12 +18,12 @@ struct trivially_relocatable_struct
     static int dtor_count;
     int data;
 
-    trivially_relocatable_struct(int data)
+    explicit trivially_relocatable_struct(int data)
       : data(data)
     {
         count++;
     }
-    trivially_relocatable_struct(trivially_relocatable_struct&& other)
+    explicit trivially_relocatable_struct(trivially_relocatable_struct&& other)
       : data(other.data)
     {
         move_count++;
@@ -52,13 +52,13 @@ struct non_trivially_relocatable_struct
     static int dtor_count;
     int data;
 
-    non_trivially_relocatable_struct(int data)
+    explicit non_trivially_relocatable_struct(int data)
       : data(data)
     {
         count++;
     }
     // mark as noexcept to enter simpler relocation path
-    non_trivially_relocatable_struct(
+    explicit non_trivially_relocatable_struct(
         non_trivially_relocatable_struct&& other) noexcept
       : data(other.data)
     {
@@ -89,13 +89,13 @@ struct non_trivially_relocatable_struct_throwing
 
     int data;
 
-    non_trivially_relocatable_struct_throwing(int data)
+    explicit non_trivially_relocatable_struct_throwing(int data)
       : data(data)
     {
         count++;
     }
     // do not mark as noexcept to enter try-catch relocation path
-    non_trivially_relocatable_struct_throwing(
+    explicit non_trivially_relocatable_struct_throwing(
         non_trivially_relocatable_struct_throwing&& other)
       : data(other.data)
     {
