@@ -23,7 +23,7 @@ struct trivially_relocatable_struct
     {
         count++;
     }
-    explicit trivially_relocatable_struct(trivially_relocatable_struct&& other)
+    trivially_relocatable_struct(trivially_relocatable_struct&& other)
       : data(other.data)
     {
         move_count++;
@@ -58,7 +58,7 @@ struct non_trivially_relocatable_struct
         count++;
     }
     // mark as noexcept to enter simpler relocation path
-    explicit non_trivially_relocatable_struct(
+    non_trivially_relocatable_struct(
         non_trivially_relocatable_struct&& other) noexcept
       : data(other.data)
     {
@@ -95,7 +95,7 @@ struct non_trivially_relocatable_struct_throwing
         count++;
     }
     // do not mark as noexcept to enter try-catch relocation path
-    explicit non_trivially_relocatable_struct_throwing(
+    non_trivially_relocatable_struct_throwing(
         non_trivially_relocatable_struct_throwing&& other)
       : data(other.data)
     {
