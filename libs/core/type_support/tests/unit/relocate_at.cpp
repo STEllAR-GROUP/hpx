@@ -14,7 +14,7 @@ struct non_trivially_relocatable_struct
     static int count;
     int data;
 
-    non_trivially_relocatable_struct(int data)
+    explicit non_trivially_relocatable_struct(int data)
       : data(data)
     {
         count++;
@@ -42,7 +42,7 @@ struct trivially_relocatable_struct
     static int count;
     int data;
 
-    trivially_relocatable_struct(int data)
+    explicit trivially_relocatable_struct(int data)
       : data(data)
     {
         count++;
