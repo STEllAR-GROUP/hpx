@@ -297,7 +297,7 @@ namespace hpx { namespace threads {
             }
         }
 
-        void reset_thread_distribution()
+        void reset_thread_distribution() noexcept
         {
             for (auto& pool_iter : pools_)
             {

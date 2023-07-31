@@ -23,19 +23,20 @@
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(
-    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+std::size_t const max_threads = (std::min)(static_cast<std::size_t>(4),
+    static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
 {
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(std::size_t(max_threads), num_threads);
+    HPX_TEST_EQ(static_cast<std::size_t>(max_threads), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(max_threads));
+    HPX_TEST_EQ(
+        tp.get_active_os_thread_count(), static_cast<std::size_t>(max_threads));
 
     {
         // Check number of used resources
@@ -43,7 +44,7 @@ int hpx_main()
              ++thread_num)
         {
             hpx::threads::suspend_processing_unit(tp, thread_num).get();
-            HPX_TEST_EQ(std::size_t(num_threads - thread_num - 1),
+            HPX_TEST_EQ(static_cast<std::size_t>(num_threads - thread_num - 1),
                 tp.get_active_os_thread_count());
         }
 
@@ -51,8 +52,8 @@ int hpx_main()
              ++thread_num)
         {
             hpx::threads::resume_processing_unit(tp, thread_num).get();
-            HPX_TEST_EQ(
-                std::size_t(thread_num + 2), tp.get_active_os_thread_count());
+            HPX_TEST_EQ(static_cast<std::size_t>(thread_num + 2),
+                tp.get_active_os_thread_count());
         }
     }
 
@@ -61,7 +62,7 @@ int hpx_main()
 
         // NOTE: This only works as long as there is another OS thread which has
         // no work and is able to steal.
-        std::size_t worker_thread_num = hpx::get_worker_thread_num();
+        std::size_t const worker_thread_num = hpx::get_worker_thread_num();
         hpx::threads::suspend_processing_unit(tp, worker_thread_num).get();
         hpx::threads::resume_processing_unit(tp, worker_thread_num).get();
     }
@@ -150,13 +151,20 @@ int hpx_main()
         std::size_t thread_num = 0;
         bool up = true;
         std::vector<hpx::future<void>> fs;
-        hpx::chrono::high_resolution_timer t;
+
+        hpx::threads::thread_schedule_hint hint;
+        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+        hpx::launch::async_policy policy;
+        policy.set_hint(hint);
+
+        hpx::chrono::high_resolution_timer const t;
         while (t.elapsed() < 2)
         {
             for (std::size_t i = 0;
                  i < hpx::resource::get_num_threads("default") * 10; ++i)
             {
-                fs.push_back(hpx::async([]() {}));
+                fs.push_back(hpx::async(policy, []() {}));
             }
 
             if (up)
@@ -189,7 +197,7 @@ int hpx_main()
             }
         }
 
-        hpx::when_all(std::move(fs)).get();
+        hpx::wait_all(std::move(fs));
 
         // Don't exit with suspended pus
         for (std::size_t thread_num_resume = 0; thread_num_resume < thread_num;
@@ -226,7 +234,7 @@ int main(int argc, char* argv[])
 
     {
         // These schedulers should succeed
-        std::vector<hpx::resource::scheduling_policy> schedulers = {
+        std::vector<hpx::resource::scheduling_policy> const schedulers = {
             hpx::resource::scheduling_policy::local,
             hpx::resource::scheduling_policy::local_priority_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
@@ -247,7 +255,7 @@ int main(int argc, char* argv[])
 
     {
         // These schedulers should fail
-        std::vector<hpx::resource::scheduling_policy> schedulers = {
+        std::vector<hpx::resource::scheduling_policy> const schedulers = {
             hpx::resource::scheduling_policy::static_,
             hpx::resource::scheduling_policy::static_priority,
         };

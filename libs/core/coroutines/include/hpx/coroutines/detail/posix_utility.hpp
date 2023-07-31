@@ -83,16 +83,21 @@ namespace hpx::threads::coroutines::detail::posix {
 
     inline void* alloc_stack(std::size_t size)
     {
-        void* real_stack =
-            ::mmap(nullptr, size + EXEC_PAGESIZE, PROT_READ | PROT_WRITE,
-#if defined(__APPLE__)
-                MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
-#elif defined(__FreeBSD__)
-                MAP_PRIVATE | MAP_ANON,
-#else
-                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+#if defined(HPX_HAVE_THREAD_GUARD_PAGE)
+        if (use_guard_pages)
+        {
+            size += EXEC_PAGESIZE;
+        }
 #endif
-                -1, 0);
+        void* real_stack = ::mmap(nullptr, size, PROT_READ | PROT_WRITE,
+#if defined(__APPLE__)
+            MAP_PRIVATE | MAP_ANON | MAP_NORESERVE,
+#elif defined(__FreeBSD__)
+            MAP_PRIVATE | MAP_ANON,
+#else
+            MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+#endif
+            -1, 0);
 
         if (real_stack == MAP_FAILED)
         {
@@ -112,7 +117,7 @@ namespace hpx::threads::coroutines::detail::posix {
 #if defined(HPX_HAVE_THREAD_GUARD_PAGE)
         if (use_guard_pages)
         {
-            // Add a guard page.
+            // Set the guard page.
             ::mprotect(real_stack, EXEC_PAGESIZE, PROT_NONE);
 
             void** stack = static_cast<void**>(real_stack) +

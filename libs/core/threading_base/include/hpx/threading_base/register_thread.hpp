@@ -97,6 +97,7 @@ namespace hpx::threads {
     ///
     /// \param data       [in] The data to use for creating the thread.
     /// \param pool       [in] The thread pool to use for launching the work.
+    /// \param id         [out] The id of the newly created thread (if applicable)
     /// \param ec         [in,out] This represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws the
     ///                   function will throw on error instead.
@@ -111,14 +112,21 @@ namespace hpx::threads {
     ///                   throw but returns the result code using the parameter
     ///                   \a ec. Otherwise it throws an instance
     ///                   of hpx#exception.
-    inline threads::thread_id_ref_type register_thread(
-        threads::thread_init_data& data, threads::thread_pool_base* pool,
+    inline void register_thread(threads::thread_init_data& data,
+        threads::thread_pool_base* pool, threads::thread_id_ref_type& id,
         error_code& ec = throws)
     {
         HPX_ASSERT(pool);
         data.run_now = true;
-        threads::thread_id_ref_type id = threads::invalid_thread_id;
         pool->create_thread(data, id, ec);
+    }
+
+    inline threads::thread_id_ref_type register_thread(
+        threads::thread_init_data& data, threads::thread_pool_base* pool,
+        error_code& ec = throws)
+    {
+        threads::thread_id_ref_type id = threads::invalid_thread_id;
+        register_thread(data, pool, id, ec);
         return id;
     }
 
@@ -128,6 +136,7 @@ namespace hpx::threads {
     ///        on an HPX thread.
     ///
     /// \param data       [in] The data to use for creating the thread.
+    /// \param id         [out] The id of the newly created thread (if applicable)
     /// \param ec         [in,out] This represents the error status on exit,
     ///                   if this is pre-initialized to \a hpx#throws the
     ///                   function will throw on error instead.
@@ -141,6 +150,12 @@ namespace hpx::threads {
     ///                   \a hpx#throws this function doesn't throw but returns
     ///                   the result code using the parameter \a ec. Otherwise
     ///                   it throws an instance of hpx#exception.
+    inline void register_thread(threads::thread_init_data& data,
+        threads::thread_id_ref_type& id, error_code& ec = throws)
+    {
+        register_thread(data, detail::get_self_or_default_pool(), id, ec);
+    }
+
     inline threads::thread_id_ref_type register_thread(
         threads::thread_init_data& data, error_code& ec = throws)
     {

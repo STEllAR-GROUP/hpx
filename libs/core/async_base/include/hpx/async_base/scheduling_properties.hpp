@@ -64,6 +64,11 @@ namespace hpx::execution::experimental {
     {
     } with_priority{};
 
+    template <>
+    struct is_scheduling_property<with_priority_t> : std::true_type
+    {
+    };
+
     inline constexpr struct get_priority_t final
       : hpx::functional::detail::tag_fallback<get_priority_t>
     {
@@ -87,6 +92,11 @@ namespace hpx::execution::experimental {
       : detail::property_base<with_stacksize_t>
     {
     } with_stacksize{};
+
+    template <>
+    struct is_scheduling_property<with_stacksize_t> : std::true_type
+    {
+    };
 
     inline constexpr struct get_stacksize_t final
       : hpx::functional::detail::tag_fallback<get_stacksize_t>
@@ -112,6 +122,11 @@ namespace hpx::execution::experimental {
     {
     } with_hint{};
 
+    template <>
+    struct is_scheduling_property<with_hint_t> : std::true_type
+    {
+    };
+
     inline constexpr struct get_hint_t final
       : hpx::functional::detail::tag_fallback<get_hint_t>
     {
@@ -135,6 +150,11 @@ namespace hpx::execution::experimental {
       : detail::property_base<with_annotation_t>
     {
     } with_annotation{};
+
+    template <>
+    struct is_scheduling_property<with_annotation_t> : std::true_type
+    {
+    };
 
     inline constexpr struct get_annotation_t final
       : hpx::functional::detail::tag_fallback<get_annotation_t>

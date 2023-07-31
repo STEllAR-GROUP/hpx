@@ -66,10 +66,12 @@ namespace hpx::threads {
         if (k < 4)    //-V112
         {
         }
+#if defined(HPX_SMT_PAUSE)
         else if (k < 16)
         {
             HPX_SMT_PAUSE;
         }
+#endif
         else if (k < 32 || k & 1)    //-V112
         {
             do_yield(desc, hpx::threads::thread_schedule_state::pending_boost);

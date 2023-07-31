@@ -1,4 +1,4 @@
-# Copyright (c) 2017 Hartmut Kaiser
+# Copyright (c) 2017-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,13 +33,24 @@ set(used_pus_PARAMETERS THREADS_PER_LOCALITY 4 RUN_SERIAL)
 
 set(scheduler_priority_check_PARAMETERS THREADS_PER_LOCALITY -1)
 set(shutdown_suspended_pus_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_runtime_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_thread_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_thread_external_PARAMETERS THREADS_PER_LOCALITY 4)
-set(suspend_thread_timed_PARAMETERS THREADS_PER_LOCALITY 4)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  set(additional_parameters "--hpx:ini=hpx.stacks.use_guard_pages=0")
+endif()
+
+set(suspend_disabled_PARAMETERS THREADS_PER_LOCALITY 4 ${additional_parameters})
+set(suspend_pool_PARAMETERS THREADS_PER_LOCALITY 4 ${additional_parameters})
+set(suspend_pool_external_PARAMETERS THREADS_PER_LOCALITY 4
+                                     ${additional_parameters}
+)
+set(suspend_runtime_PARAMETERS THREADS_PER_LOCALITY 4 ${additional_parameters})
+set(suspend_thread_PARAMETERS THREADS_PER_LOCALITY 4 ${additional_parameters})
+set(suspend_thread_external_PARAMETERS THREADS_PER_LOCALITY 4
+                                       ${additional_parameters}
+)
+set(suspend_thread_timed_PARAMETERS THREADS_PER_LOCALITY 4
+                                    ${additional_parameters}
+)
 
 foreach(test ${tests})
   set(sources ${test}.cpp)

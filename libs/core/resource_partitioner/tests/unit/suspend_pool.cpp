@@ -19,15 +19,13 @@
 #include <hpx/semaphore.hpp>
 #include <hpx/thread.hpp>
 
-#include <atomic>
 #include <cstddef>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-std::size_t const max_threads = (std::min)(
-    std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+std::size_t const max_threads = (std::min)(static_cast<std::size_t>(4),
+    static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
 
 int hpx_main()
 {
@@ -48,14 +46,19 @@ int hpx_main()
 
     hpx::threads::thread_pool_base& worker_pool =
         hpx::resource::get_thread_pool("worker");
-    hpx::execution::parallel_executor worker_exec(
+    hpx::execution::parallel_executor exec(
         &hpx::resource::get_thread_pool("worker"));
     std::size_t const worker_pool_threads =
         hpx::resource::get_num_threads("worker");
 
+    hpx::threads::thread_schedule_hint hint;
+    hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+    auto worker_exec = hpx::execution::experimental::with_hint(exec, hint);
+
     {
         // Suspend and resume pool with future
-        hpx::chrono::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer const t;
 
         while (t.elapsed() < 1)
         {
@@ -78,7 +81,7 @@ int hpx_main()
     {
         // Suspend and resume pool with callback
         hpx::counting_semaphore_var<> sem;
-        hpx::chrono::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer const t;
 
         while (t.elapsed() < 1)
         {
@@ -106,7 +109,7 @@ int hpx_main()
 
     {
         // Suspend pool with some threads already suspended
-        hpx::chrono::high_resolution_timer t;
+        hpx::chrono::high_resolution_timer const t;
 
         while (t.elapsed() < 1)
         {
@@ -144,7 +147,9 @@ void test_scheduler(
     init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
     init_args.rp_callback = [scheduler](auto& rp,
                                 hpx::program_options::variables_map const&) {
-        rp.create_thread_pool("worker", scheduler);
+        rp.create_thread_pool("worker", scheduler,
+            hpx::threads::policies::scheduler_mode::default_ |
+                hpx::threads::policies::scheduler_mode::enable_elasticity);
 
         std::size_t const worker_pool_threads = max_threads - 1;
         HPX_ASSERT(worker_pool_threads >= 1);
@@ -173,7 +178,7 @@ int main(int argc, char* argv[])
 {
     HPX_ASSERT(max_threads >= 2);
 
-    std::vector<hpx::resource::scheduling_policy> schedulers = {
+    std::vector<hpx::resource::scheduling_policy> const schedulers = {
         hpx::resource::scheduling_policy::local,
         hpx::resource::scheduling_policy::local_priority_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)

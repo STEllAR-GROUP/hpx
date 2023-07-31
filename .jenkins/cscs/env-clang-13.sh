@@ -30,6 +30,7 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_SPINLOCK_DEADLOCK_DETECTION=ON"
 configure_extra_options+=" -DHPX_WITH_UNITY_BUILD=ON"
+configure_extra_options+=" -DHPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD=ON"
 
 # enable extra counters to verify everything compiles
 configure_extra_options+=" -DHPX_WITH_BACKGROUND_THREAD_COUNTERS=ON"

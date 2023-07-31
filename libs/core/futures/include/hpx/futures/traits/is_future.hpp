@@ -66,13 +66,12 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename... Ts>
-    struct is_future_any : hpx::util::any_of<is_future<Ts>...>
-    {
-    };
+    using is_future_any = hpx::util::any_of<is_future<Ts>...>;
 
     template <typename... Ts>
     inline constexpr bool is_future_any_v = is_future_any<Ts...>::value;
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Future>
     struct is_ref_wrapped_future : std::false_type
     {

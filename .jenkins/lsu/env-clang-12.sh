@@ -32,3 +32,5 @@ configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
 # testing the topology code under conditions close to those on FreeBSD.
 configure_extra_options+=" -DHPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING=ON"
+
+configure_extra_options+=" -DHPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD=ON"

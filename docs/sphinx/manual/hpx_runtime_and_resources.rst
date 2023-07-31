@@ -42,12 +42,11 @@ turned on, work stealing is done from queues associated with the same NUMA domai
 first, only after that work is stolen from other NUMA domains.
 
 This scheduler is enabled at build time by default using the FIFO
-(first-in-first-out) queing policy. This policy can be invoked using
+(first-in-first-out) queueing policy. This policy can be invoked using
 :option:`--hpx:queuing`\ ``local-priority-fifo``. The scheduler can also be
 enabled using the LIFO (last-in-first-out) policy. This is not the default
 policy and must be invoked using the command line option
-:option:`--hpx:queuing`\
-``=local-priority-lifo``.
+:option:`--hpx:queuing`\ ``local-priority-lifo``.
 
 Static priority scheduling policy
 ---------------------------------
@@ -63,7 +62,7 @@ robin fashion. There is no thread stealing in this policy.
 Local scheduling policy
 -----------------------
 
-* invoke using: :option:`--hpx:queuing`\ ``=local`` (or ``-ql``)
+* invoke using: :option:`--hpx:queuing`\ ``local`` (or ``-ql``)
 * flag to turn on for build: ``HPX_THREAD_SCHEDULERS=all`` or
   ``HPX_THREAD_SCHEDULERS=local``
 
@@ -73,7 +72,7 @@ thread pulls its tasks (user threads).
 Static scheduling policy
 ------------------------
 
-* invoke using: :option:`--hpx:queuing`\ ``=static``
+* invoke using: :option:`--hpx:queuing`\ ``static``
 * flag to turn on for build: ``HPX_THREAD_SCHEDULERS=all`` or
   ``HPX_THREAD_SCHEDULERS=static``
 
@@ -84,7 +83,7 @@ robin fashion. There is no thread stealing in this policy.
 Priority ABP scheduling policy
 ------------------------------
 
-* invoke using: :option:`--hpx:queuing`\ ``=abp-priority-fifo``
+* invoke using: :option:`--hpx:queuing`\ ``abp-priority-fifo``
 * flag to turn on for build: ``HPX_THREAD_SCHEDULERS=all`` or
   ``HPX_THREAD_SCHEDULERS=abp-priority``
 
@@ -102,8 +101,8 @@ domain first, only after that work is stolen from other NUMA domains.
 
 This scheduler can be used with two underlying queuing policies (FIFO:
 first-in-first-out, and LIFO: last-in-first-out). In order to use the LIFO
-policy use the command line option :option:`--hpx:queuing`\
-``=abp-priority-lifo``.
+policy use the command line option
+:option:`--hpx:queuing`\ ``=abp-priority-lifo``.
 
 ..
     Questions, concerns and notes:

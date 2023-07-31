@@ -123,6 +123,11 @@ namespace hpx::threads::coroutines::detail {
 
         virtual thread_id_type get_thread_id() const noexcept = 0;
 
+        virtual thread_id_type get_outer_thread_id() const noexcept
+        {
+            return get_thread_id();
+        }
+
         virtual std::size_t get_thread_phase() const noexcept = 0;
 
         virtual std::ptrdiff_t get_available_stack_space() const noexcept = 0;

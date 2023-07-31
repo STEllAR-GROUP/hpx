@@ -133,7 +133,7 @@ namespace hpx::threads::detail {
     void scheduled_thread_pool<Scheduler>::print_pool(std::ostream& os) const
     {
         os << "[pool \"" << id_.name() << "\", #" << id_.index()    //-V128
-           << "] with scheduler " << Scheduler::get_scheduler_name()
+           << "] with scheduler: " << Scheduler::get_scheduler_name()
            << "\nis running on PUs : \n";
         os << hpx::threads::to_string(get_used_processing_units())
 #ifdef HPX_HAVE_MAX_CPU_COUNT
@@ -184,7 +184,8 @@ namespace hpx::threads::detail {
         std::size_t num_thread) const
     {
         HPX_ASSERT(num_thread != static_cast<std::size_t>(-1));
-        return sched_->Scheduler::get_state(num_thread).load();
+        return sched_->Scheduler::get_state(num_thread)
+            .load(std::memory_order_acquire);
     }
 
     template <typename Scheduler>
@@ -228,10 +229,24 @@ namespace hpx::threads::detail {
         if (!threads_.empty())
         {
             // wait for all work to be done before requesting threads to shut
-            // down
+            // down, but only if all threads were successfully initialized
             if (blocking)
             {
-                wait();
+                bool must_wait = true;
+                for (const auto& thread : threads_)
+                {
+                    // skip this if already stopped
+                    if (!thread.joinable())
+                    {
+                        must_wait = false;
+                        break;
+                    }
+                }
+
+                if (must_wait)
+                {
+                    wait();
+                }
             }
 
             // wake up if suspended
@@ -328,9 +343,9 @@ namespace hpx::threads::detail {
                 // get_pu_mask expects index according to ordering of masks
                 // in affinity_data::affinity_masks_
                 // which is in order of occupied PU
-                LTM_(info).format(
-                    "run: {} create OS thread {}: will run on processing units "
-                    "within this mask: {}",
+                LTM_(info).format("run: {} create OS thread {}: will run "
+                                  "on processing units "
+                                  "within this mask: {}",
                     id_.name(), global_thread_num,
                     hpx::threads::to_string(mask));
 
@@ -351,8 +366,7 @@ namespace hpx::threads::detail {
                 "run: {} failed with: {}", id_.name(), e.what());
 
             // trigger the barrier
-            pool_threads -= (thread_num + 1);
-            while (pool_threads-- != 0)
+            while (thread_num-- != 0)
                 startup->wait();
 
             stop_locked(l);
@@ -620,6 +634,14 @@ namespace hpx::threads::detail {
             return;
         }
 
+        if (data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child_mode(
+                hpx::threads::thread_execution_hint::none);
+        }
+
         detail::create_thread(sched_.get(), data, id, ec);    //-V601
 
         // update statistics
@@ -639,6 +661,14 @@ namespace hpx::threads::detail {
                 "thread_pool<Scheduler>::create_work",
                 "invalid state: thread pool is not running");
             return invalid_thread_id;
+        }
+
+        if (data.schedulehint.runs_as_child_mode() ==
+                hpx::threads::thread_execution_hint::run_as_child &&
+            !sched_->Scheduler::supports_direct_execution())
+        {
+            data.schedulehint.runs_as_child_mode(
+                hpx::threads::thread_execution_hint::none);
         }
 
         thread_id_ref_type id =
@@ -1891,10 +1921,10 @@ namespace hpx::threads::detail {
 
         std::atomic<hpx::state>& state =
             sched_->Scheduler::get_state(virt_core);
-        hpx::state oldstate = state.exchange(hpx::state::initialized);
+        [[maybe_unused]] hpx::state const oldstate =
+            state.exchange(hpx::state::initialized);
         HPX_ASSERT(oldstate == hpx::state::stopped ||
             oldstate == hpx::state::initialized);
-        HPX_UNUSED(oldstate);
 
         threads_[virt_core] = std::thread(&scheduled_thread_pool::thread_func,
             this, virt_core, thread_num, HPX_MOVE(startup));
@@ -1924,7 +1954,7 @@ namespace hpx::threads::detail {
             sched_->Scheduler::get_state(virt_core);
 
         // inform the scheduler to stop the virtual core
-        hpx::state oldstate = state.exchange(hpx::state::stopping);
+        hpx::state const oldstate = state.exchange(hpx::state::stopping);
 
         if (oldstate > hpx::state::stopping)
         {

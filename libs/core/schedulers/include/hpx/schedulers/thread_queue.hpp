@@ -398,8 +398,12 @@ namespace hpx::threads::policies {
                     thread_id_type tid(todelete);
                     --terminated_items_count_;
 
-                    // this thread has to be in this map
-                    HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
+                    // this thread has to be managed by this queue, it may have
+                    // ended up on the terminate threads list more than once,
+                    // however
+                    HPX_ASSERT(
+                        &get_thread_id_data(tid)->get_queue<thread_queue>() ==
+                        this);
 
                     if (thread_map_.erase(tid) != 0)
                     {
@@ -426,9 +430,12 @@ namespace hpx::threads::policies {
                     thread_id_type tid(todelete);
                     --terminated_items_count_;
 
-                    // this thread has to be in this map, except if it has changed
-                    // its priority, then it could be elsewhere
-                    HPX_ASSERT(thread_map_.find(tid) != thread_map_.end());
+                    // this thread has to be managed by this queue, it may have
+                    // ended up on the terminate threads list more than once,
+                    // however
+                    HPX_ASSERT(
+                        &get_thread_id_data(tid)->get_queue<thread_queue>() ==
+                        this);
 
                     if (thread_map_.erase(tid) != 0)
                     {
@@ -888,6 +895,7 @@ namespace hpx::threads::policies {
             threads::thread_id_ref_type thrd, bool other_end = false)
         {
             ++work_items_count_.data_;
+
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
             work_items_.push(new thread_description{HPX_MOVE(thrd),
                                  hpx::chrono::high_resolution_clock::now()},
@@ -1167,9 +1175,6 @@ namespace hpx::threads::policies {
                     threads::thread_data_stackful::create(init_data, this,
                         parameters_.small_stacksize_, thread_id_addref::no);
                 HPX_ASSERT(p);
-
-                // We initialize the stack eagerly
-                p->init();
 
                 // Finally, store the thread for later use
                 thread_heap_small_.emplace_back(p);

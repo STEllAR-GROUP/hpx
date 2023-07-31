@@ -22,7 +22,7 @@ namespace hpx::threads::coroutines::detail {
     {
     public:
         explicit coroutine_stackful_self(
-            impl_type* pimpl, coroutine_self* next_self = nullptr) noexcept
+            coroutine_impl* pimpl, coroutine_self* next_self = nullptr) noexcept
           : coroutine_self(next_self)
           , pimpl_(pimpl)
         {
@@ -138,7 +138,7 @@ namespace hpx::threads::coroutines::detail {
             return pimpl_->get_continuation_recursion_count();
         }
 
-    private:
+    protected:
         coroutine_impl* get_impl() noexcept override
         {
             return pimpl_;

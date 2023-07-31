@@ -357,14 +357,14 @@ namespace hpx {
                 }
 
                 // non-blocking version
-                start(*rt, cfg.hpx_main_f_, cfg.vm_, HPX_MOVE(startup),
-                    HPX_MOVE(shutdown));
+                int const result = start(*rt, cfg.hpx_main_f_, cfg.vm_,
+                    HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 // pointer to runtime is stored in TLS
                 hpx::runtime* p = rt.release();
                 (void) p;
 
-                return 0;
+                return result;
             }
 
             ////////////////////////////////////////////////////////////////////////
@@ -499,6 +499,9 @@ namespace hpx {
                                 result = 0;
                             return result;
                         }
+
+                        rp.assign_cores(hpx::util::get_entry_as<std::size_t>(
+                            cmdline.rtcfg_, "hpx.first_used_core", 0));
 
                         // If thread_pools initialization in user main
                         if (params.rp_callback)

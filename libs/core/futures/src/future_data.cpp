@@ -8,13 +8,16 @@
 #include <hpx/futures/future.hpp>
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/move_only_function.hpp>
+#include <hpx/futures/detail/execute_thread.hpp>
 #include <hpx/futures/futures_factory.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/modules/memory.hpp>
 
 #include <cstddef>
@@ -95,8 +98,68 @@ namespace hpx::lcos::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    future_data_base<traits::detail::future_data_void>::~future_data_base() =
-        default;
+    future_data_base<traits::detail::future_data_void>::~future_data_base()
+    {
+        if (runs_child_ != threads::invalid_thread_id)
+        {
+            auto* thrd = get_thread_id_data(runs_child_);
+            (void) thrd;
+            LTM_(debug).format(
+                "task_object::~task_object({}), description({}): "
+                "destroy runs_as_child thread",
+                thrd, thrd->get_description(), thrd->get_thread_phase());
+
+            runs_child_ = threads::invalid_thread_id;
+        }
+    }
+
+    // try to performed scoped execution of the associated thread (if any)
+    bool future_data_base<traits::detail::future_data_void>::execute_thread()
+    {
+        // we try to directly execute the thread exactly once
+        threads::thread_id_ref_type runs_child = runs_child_;
+        if (!runs_child)
+        {
+            return false;
+        }
+
+        auto const state = this->state_.load(std::memory_order_acquire);
+        if (state != this->empty)
+        {
+            return false;
+        }
+
+        // this thread would block on the future
+
+        auto* thrd = get_thread_id_data(runs_child);
+        HPX_UNUSED(thrd);    // might be unused
+
+        LTM_(debug).format("task_object::get_result_void: attempting to "
+                           "directly execute child({}), description({})",
+            thrd, thrd->get_description());
+
+        if (threads::detail::execute_thread(HPX_MOVE(runs_child)))
+        {
+            // don't try running this twice
+            runs_child_.reset();
+
+            LTM_(debug).format("task_object::get_result_void: successfully "
+                               "directly executed child({}), description({})",
+                thrd, thrd->get_description());
+
+            // thread terminated, mark as being destroyed
+            HPX_ASSERT(thrd->get_state().state() ==
+                threads::thread_schedule_state::deleted);
+
+            return true;
+        }
+
+        LTM_(debug).format("task_object::get_result_void: failed to "
+                           "directly execute child({}), description({})",
+            thrd, thrd->get_description());
+
+        return false;
+    }
 
     static util::unused_type unused_;
 
@@ -111,8 +174,8 @@ namespace hpx::lcos::detail {
             return nullptr;
         }
 
-        // No locking is required. Once a future has been made ready, which
-        // is a postcondition of wait, either:
+        // No locking is required. Once a future has been made ready, which is a
+        // postcondition of wait, either:
         //
         // - there is only one writer (future), or
         // - there are multiple readers only (shared_future, lock hurts
@@ -139,16 +202,15 @@ namespace hpx::lcos::detail {
             return nullptr;
         }
 
-        // the thread has been re-activated by one of the actions
-        // supported by this promise (see promise::set_event
-        // and promise::set_exception).
+        // the thread has been re-activated by one of the actions supported by
+        // this promise (see promise::set_event and promise::set_exception).
         if (s == exception)
         {
             auto const* exception_ptr =
                 static_cast<std::exception_ptr const*>(storage);
 
-            // an error has been reported in the meantime, throw or set
-            // the error code
+            // an error has been reported in the meantime, throw or set the
+            // error code
             if (&ec == &throws)
             {
                 std::rethrow_exception(*exception_ptr);
@@ -171,8 +233,8 @@ namespace hpx::lcos::detail {
                 on_completed();
             },
             [&](std::exception_ptr ep) {
-                // If the completion handler throws an exception, there's nothing
-                // we can do, report the exception and terminate.
+                // If the completion handler throws an exception, there's
+                // nothing we can do, report the exception and terminate.
                 if (run_on_completed_error_handler)
                 {
                     run_on_completed_error_handler(HPX_MOVE(ep));
@@ -193,15 +255,14 @@ namespace hpx::lcos::detail {
         }
     }
 
-    // make sure continuation invocation does not recurse deeper than
-    // allowed
+    // make sure continuation invocation does not recurse deeper than allowed
     template <typename Callback>
     void
     future_data_base<traits::detail::future_data_void>::handle_on_completed(
         Callback&& on_completed)
     {
-        // We need to run the completion on a new thread if we are on a
-        // non HPX thread.
+        // We need to run the completion on a new thread if we are on a non HPX
+        // thread.
 #if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
         bool recurse_asynchronously =
             !this_thread::has_sufficient_stack_space();
@@ -219,7 +280,6 @@ namespace hpx::lcos::detail {
         else
         {
             // re-spawn continuation on a new thread
-
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     // clang-format off

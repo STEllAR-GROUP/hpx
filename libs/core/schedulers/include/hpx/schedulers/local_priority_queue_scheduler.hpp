@@ -1632,7 +1632,7 @@ namespace hpx::threads::policies {
             queues_[num_thread].data_->on_error(num_thread, e);
         }
 
-        void reset_thread_distribution() override
+        void reset_thread_distribution() noexcept override
         {
             curr_queue_.store(0, std::memory_order_release);
         }
