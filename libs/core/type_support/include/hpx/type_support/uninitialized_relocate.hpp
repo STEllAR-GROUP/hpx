@@ -90,7 +90,8 @@ namespace hpx {
                 void* dst_void = const_cast<void*>(
                     static_cast<const void*>(std::addressof(*dst)));
 
-                std::byte* first_byte = reinterpret_cast<std::byte*>(first_void);
+                std::byte* first_byte =
+                    reinterpret_cast<std::byte*>(first_void);
                 std::byte* last_byte = reinterpret_cast<std::byte*>(last_void);
 
                 auto n_bytes = std::distance(first_byte, last_byte);
