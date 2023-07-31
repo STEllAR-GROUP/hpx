@@ -158,7 +158,7 @@ static_assert(
     hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1 (
         &&)[10]>);
 static_assert(hpx::is_trivially_relocatable_v<
-    explicitly_trivially_relocatable_1 const volatile &>);
+    explicitly_trivially_relocatable_1 const volatile&>);
 
 // Trivial relocatability is not inherited
 struct derived_from_explicitly_trivially_relocatable
