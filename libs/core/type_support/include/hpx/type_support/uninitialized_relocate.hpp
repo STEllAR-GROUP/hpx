@@ -82,16 +82,23 @@ namespace hpx {
 
             if (n_objects != 0)
             {
-                std::byte* first_byte =
-                    reinterpret_cast<std::byte*>(std::addressof(*first));
-                std::byte* last_byte =
-                    reinterpret_cast<std::byte*>(std::addressof(*last));
+                void* first_void = const_cast<void*>(
+                    static_cast<const void*>(std::addressof(*first)));
+                void* last_void = const_cast<void*>(
+                    static_cast<const void*>(std::addressof(*last)));
+
+                void* dst_void = const_cast<void*>(
+                    static_cast<const void*>(std::addressof(*dst)));
+
+                std::byte* first_byte = reinterpret_cast<std::byte*>(first_void);
+                std::byte* last_byte = reinterpret_cast<std::byte*>(last_void);
 
                 auto n_bytes = std::distance(first_byte, last_byte);
 
-                void* dst_void = static_cast<void*>(std::addressof(*dst));
-                void* first_void = static_cast<void*>(std::addressof(*first));
-
+                // Ideally we would want to convey to the compiler
+                // That the new buffer actually contains objects
+                // within their lifetime. But this is not possible
+                // with current language features.
                 std::memmove(dst_void, first_void, n_bytes);
 
                 dst += n_objects;

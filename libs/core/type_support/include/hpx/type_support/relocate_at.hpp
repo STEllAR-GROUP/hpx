@@ -59,7 +59,11 @@ namespace hpx {
             std::enable_if_t<relocate_using_memmove<T>, int> = 0>
         T* relocate_at_helper(T* src, T* dst) noexcept
         {
-            std::memmove(dst, src, sizeof(T));
+            void* dst_void = const_cast<void*>(static_cast<const void*>(dst));
+            void* src_void = const_cast<void*>(static_cast<const void*>(src));
+
+            std::memmove(dst_void, src_void, sizeof(T));
+
             return std::launder(dst);
         };
 
