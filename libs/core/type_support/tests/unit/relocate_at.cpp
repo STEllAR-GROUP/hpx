@@ -113,7 +113,8 @@ int hpx_main()
 
         hpx::relocate_at(ptr1, ptr2);
 
-        // count = 1 + 0 (relocation on trivially relocatable objects does not trigger move constructors
+        // count = 1 + 0 (relocation on trivially relocatable 
+        // objects does not trigger move constructors
         // or destructors); no object is destroyed or created
         HPX_TEST(trivially_relocatable_struct::count == 1);
         HPX_TEST(ptr2->data == 1234);

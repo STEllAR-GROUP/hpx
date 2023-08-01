@@ -167,7 +167,6 @@ namespace hpx {
     uninitialized_relocate(InIter first, InIter last, FwdIter dst) noexcept(
         detail::choose_uninitialized_relocate_helper<InIter, FwdIter>::value !=
         detail::relocate_strategy::for_loop_try_catch)
-    // maybe noexcept(auto)?
     {
         static_assert(detail::choose_uninitialized_relocate_helper<InIter,
                           FwdIter>::valid_relocation,
