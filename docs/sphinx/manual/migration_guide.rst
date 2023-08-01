@@ -1051,7 +1051,7 @@ equivalent functionality to `tbb::task_group`.
 |mpi| is a standardized communication protocol and library that allows multiple processes or
 nodes in a parallel computing system to exchange data and coordinate their execution.
 
-MPI_send & MPI_recv
+MPI_Send & MPI_Recv
 -------------------
 
 Let's assume we have the following simple message passing code where each process sends a
@@ -1164,3 +1164,104 @@ Having said that, we conclude to the following table:
    MPI_Irecv                  `hpx::collectives::get()`
    MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
    =========================  ==============================================================
+
+MPI_Gather
+----------
+
+The following code gathers data from all processes to the root process and verifies
+the gathered data in the root process.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <mpi.h>
+
+    int main(int argc, char* argv[])
+    {
+        int num_localities, this_locality;
+        int gather_data[10];
+
+        // Initialize MPI
+        MPI_Init(&argc, &argv);
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+
+        // Test functionality based on immediate local result value
+        for (int i = 0; i < 10; ++i)
+        {
+            if (this_locality == 0)
+            {
+                int value = 42;
+                MPI_Gather(&value, 1, MPI_INT, gather_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+                if (this_locality == 0)
+                {
+                    for (int j = 0; j < num_localities; ++j)
+                    {
+                        // Verify gathered data
+                        assert(j + 42 == gather_data[j]);
+                    }
+                }
+            }
+            else
+            {
+                int value = this_locality + 42;
+                MPI_Gather(&value, 1, MPI_INT, nullptr, 0, MPI_INT, 0, MPI_COMM_WORLD);
+            }
+        }
+
+        // Finalize MPI
+        MPI_Finalize();
+
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. literalinclude:: ../../libs/full/collectives/tests/unit/gather.cpp
+   :start-after: //[doc
+   :end-before: //doc]
+
+|hpx| uses two functions to implement the functionality of `MPI_Gather`: `hpx::gather_here` and
+`hpx::gather_there`. `hpx::gather_here` is gathering data from all localities to the locality
+with ID 0 (root locality). `hpx::gather_there` allows non-root localities to participate in the
+gather operation by sending data to the root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - the `hpx::gather_here` function is used to perform the gather operation. It collects data from all
+    other localities into the `overall_result` future object. The function arguments provide the necessary
+    information, such as the base name   for the gather operation (`gather_direct_basename`), the value
+    to be gathered (`value`), the number   of localities (`num_localities`), the current locality ID
+    (`this_locality`), and the generation number (related to the gather operation).
+
+  - The `get()` member function of the `overall_result` future is used to retrieve the gathered data.
+
+  - The next `for` loop is used to verify the correctness of the gathered data (`sol`). `HPX_TEST`
+    is a macro provided by the |hpx| testing utilities to perform similar testing withthe Standard
+    C++ macro `assert`.
+
+- If the current locality is not the root:
+
+  - The `hpx::gather_there` function is used to participate in the gather operation initiated by
+    the root locality. It sends the data (in this case, the value `this_locality + 42`) to the root
+    locality, indicating that it should be included in the gathering.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the gather operation
+    to complete for this locality.
+
+
+.. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  =====================================================================
+   |openmpi| function         |hpx| equivalent
+   =========================  =====================================================================
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
+   =========================  =====================================================================
