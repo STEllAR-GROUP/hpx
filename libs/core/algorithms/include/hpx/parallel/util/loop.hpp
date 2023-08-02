@@ -616,14 +616,13 @@ namespace hpx::parallel::util {
         // Helper class to repeatedly call a function a given number of times
         // starting from a given iterator position. If an exception is thrown,
         // the given cleanup function will be called.
-        struct loop_with_cleanup
+        struct loop_with_cleanup final
+          : hpx::functional::detail::tag_fallback<loop_with_cleanup>
         {
             ///////////////////////////////////////////////////////////////////
             template <typename ExPolicy, typename FwdIter, typename F,
-                typename Sent, typename Cleanup,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            static FwdIter call(
+                typename Sent, typename Cleanup>
+            static FwdIter unseq_call(
                 ExPolicy&&, FwdIter first, Sent last, F&& f, Cleanup&& cleanup)
             {
                 FwdIter it = first;
@@ -648,11 +647,10 @@ namespace hpx::parallel::util {
             }
 
             template <typename ExPolicy, typename FwdIter, typename F,
-                typename Sent, typename Cleanup,
-                HPX_CONCEPT_REQUIRES_(
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            static FwdIter call(
-                ExPolicy&&, FwdIter first, Sent last, F&& f, Cleanup&& cleanup)
+                typename Sent, typename Cleanup>
+            friend FwdIter tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_with_cleanup, ExPolicy&&,
+                FwdIter first, Sent last, F&& f, Cleanup&& cleanup)
             {
                 FwdIter it = first;
                 try
@@ -671,22 +669,17 @@ namespace hpx::parallel::util {
                 }
             }
 
-            template <typename ExPolicy, typename Iter, typename FwdIter,
-                typename F, typename Cleanup,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            static FwdIter call(ExPolicy&&, Iter it, Iter last, FwdIter dest,
-                F&& f, Cleanup&& cleanup)
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename FwdIter, typename F, typename Cleanup>
+            friend FwdIter tag_fallback_invoke(
+                hpx::parallel::util::detail::loop_with_cleanup, ExPolicy&&,
+                Iter it, Sent last, FwdIter dest, F&& f, Cleanup&& cleanup)
             {
                 FwdIter base = dest;
                 try
                 {
-                    // clang-format off
-                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                     for (/**/; it != last; (void) ++it, ++dest)
                         f(it, dest);
-                    // clang-format on
-
                     return dest;
                 }
                 catch (...)
@@ -699,18 +692,20 @@ namespace hpx::parallel::util {
                 }
             }
 
-            template <typename ExPolicy, typename Iter, typename FwdIter,
-                typename F, typename Cleanup,
-                HPX_CONCEPT_REQUIRES_(
-                    !hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
-            static FwdIter call(ExPolicy&&, Iter it, Iter last, FwdIter dest,
-                F&& f, Cleanup&& cleanup)
+            template <typename ExPolicy, typename Iter, typename Sent,
+                typename FwdIter, typename F, typename Cleanup>
+            static FwdIter unseq_call(ExPolicy&&, Iter it, Sent last,
+                FwdIter dest, F&& f, Cleanup&& cleanup)
             {
                 FwdIter base = dest;
                 try
                 {
+                    // clang-format off
+                    HPX_IVDEP HPX_UNROLL HPX_VECTORIZE
                     for (/**/; it != last; (void) ++it, ++dest)
                         f(it, dest);
+                    // clang-format on
+
                     return dest;
                 }
                 catch (...)
@@ -725,25 +720,72 @@ namespace hpx::parallel::util {
         };
     }    // namespace detail
 
-    template <typename ExPolicy, typename Begin, typename End, typename F,
-        typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
-    HPX_FORCEINLINE constexpr Begin loop_with_cleanup(ExPolicy&& policy,
-        Begin first, End last, Begin dest, F&& f, Cleanup&& cleanup)
+#if !defined(HPX_COMPUTE_DEVICE_CODE)
+    inline constexpr detail::loop_with_cleanup loop_with_cleanup =
+        detail::loop_with_cleanup{};
+#else
+    template <typename ExPolicy, typename Begin, typename Sent, typename F,
+        typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_with_cleanup(
+        ExPolicy&& policy, Begin begin, Sent end, F&& f, Cleanup&& cleanup)
     {
-        return detail::loop_with_cleanup::call(HPX_FORWARD(ExPolicy, policy),
-            first, last, dest, HPX_FORWARD(F, f),
+        return hpx::parallel::util::detail::loop_with_cleanup{}(
+            HPX_FORWARD(ExPolicy, policy), begin, end, HPX_FORWARD(F, f),
             HPX_FORWARD(Cleanup, cleanup));
     }
 
-    template <typename ExPolicy, typename Begin, typename End, typename F,
-        typename Cleanup,
-        HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>)>
-    HPX_FORCEINLINE constexpr Begin loop_with_cleanup(
-        ExPolicy&& policy, Begin first, End last, F&& f, Cleanup&& cleanup)
+    template <typename ExPolicy, typename Begin, typename Sent, typename Begin2,
+        typename F, typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Begin loop_with_cleanup(
+        ExPolicy&& policy, Begin begin, Sent end, Begin2 dest, F&& f,
+        Cleanup&& cleanup)
     {
-        return detail::loop_with_cleanup::call(HPX_FORWARD(ExPolicy, policy),
-            first, last, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+        return hpx::parallel::util::detail::loop_with_cleanup{}(
+            HPX_FORWARD(ExPolicy, policy), begin, end, dest, HPX_FORWARD(F, f),
+            HPX_FORWARD(Cleanup, cleanup));
+    }
+#endif
+
+    template <typename Begin, typename Sent, typename F, typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::detail::loop_with_cleanup,
+        hpx::execution::unsequenced_policy, Begin HPX_RESTRICT begin, Sent end,
+        F&& f, Cleanup&& cleanup)
+    {
+        return hpx::parallel::util::detail::loop_with_cleanup::unseq_call(
+            begin, end, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+    }
+
+    template <typename Begin, typename Sent, typename F, typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::detail::loop_with_cleanup,
+        hpx::execution::unsequenced_task_policy, Begin HPX_RESTRICT begin,
+        Sent end, F&& f, Cleanup&& cleanup)
+    {
+        return hpx::parallel::util::detail::loop_with_cleanup::unseq_call(
+            begin, end, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+    }
+
+    template <typename Begin, typename Sent, typename Begin2, typename F,
+        typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::detail::loop_with_cleanup,
+        hpx::execution::unsequenced_policy, Begin HPX_RESTRICT begin, Sent end,
+        Begin2 dest, F&& f, Cleanup&& cleanup)
+    {
+        return hpx::parallel::util::detail::loop_with_cleanup::unseq_call(
+            begin, end, dest, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
+    }
+
+    template <typename Begin, typename Sent, typename Begin2, typename F,
+        typename Cleanup>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::detail::loop_with_cleanup,
+        hpx::execution::unsequenced_task_policy, Begin HPX_RESTRICT begin,
+        Sent end, Begin2 dest, F&& f, Cleanup&& cleanup)
+    {
+        return hpx::parallel::util::detail::loop_with_cleanup::unseq_call(
+            begin, end, dest, HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
     }
 
     namespace detail {
@@ -994,7 +1036,6 @@ namespace hpx::parallel::util {
     HPX_FORCEINLINE constexpr Iter loop_with_cleanup_n_with_token(
         Iter it, std::size_t count, CancelToken& tok, F&& f, Cleanup&& cleanup)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n::call_with_token(
             ::hpx::execution::seq, it, count, tok, HPX_FORWARD(F, f),
             HPX_FORWARD(Cleanup, cleanup));
@@ -1008,7 +1049,6 @@ namespace hpx::parallel::util {
         std::size_t count, FwdIter dest, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n::call_with_token(
             ::hpx::execution::seq, it, count, dest, tok, HPX_FORWARD(F, f),
             HPX_FORWARD(Cleanup, cleanup));
@@ -1022,7 +1062,6 @@ namespace hpx::parallel::util {
         ExPolicy&& policy, Iter it, std::size_t count, CancelToken& tok, F&& f,
         Cleanup&& cleanup)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n::call_with_token(
             HPX_FORWARD(ExPolicy, policy), it, count, tok, HPX_FORWARD(F, f),
             HPX_FORWARD(Cleanup, cleanup));
@@ -1037,7 +1076,6 @@ namespace hpx::parallel::util {
         ExPolicy&& policy, Iter it, std::size_t count, FwdIter dest,
         CancelToken& tok, F&& f, Cleanup&& cleanup)
     {
-        using cat = typename std::iterator_traits<Iter>::iterator_category;
         return detail::loop_with_cleanup_n::call_with_token(
             HPX_FORWARD(ExPolicy, policy), it, count, dest, tok,
             HPX_FORWARD(F, f), HPX_FORWARD(Cleanup, cleanup));
