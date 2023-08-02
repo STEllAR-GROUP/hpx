@@ -150,7 +150,7 @@ namespace hpx { namespace util {
 #ifdef HPX_HAVE_PARCELPORT_LCI_LOG
         const char* const log_levels[] = {"none", "profile", "debug"};
         log_ctx = LCT_log_ctx_alloc(log_levels,
-            sizeof(log_levels) / sizeof(log_levels[0]), "hpx_lci",
+            sizeof(log_levels) / sizeof(log_levels[0]), 0, "hpx_lci",
             getenv("HPX_LCI_LOG_OUTFILE"), getenv("HPX_LCI_LOG_LEVEL"),
             getenv("HPX_LCI_LOG_WHITELIST"), getenv("HPX_LCI_LOG_BLACKLIST"));
         log_level = static_cast<log_level_t>(LCT_log_get_level(log_ctx));
