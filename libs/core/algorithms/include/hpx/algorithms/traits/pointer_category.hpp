@@ -1,5 +1,6 @@
 //  Copyright (c) 2016-2023 Hartmut Kaiser
 //  Copyright (c) 2016 John Biddiscombe
+//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +9,7 @@
 #pragma once
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/type_support/is_relocatable.hpp>
+#include <hpx/type_support/is_trivially_relocatable.hpp>
 
 #include <type_traits>
 
@@ -25,7 +26,11 @@ namespace hpx::traits {
     {
     };
 
-    struct relocatable_pointer_tag : general_pointer_tag
+    struct trivially_relocatable_pointer_tag : general_pointer_tag
+    {
+    };
+
+    struct nothrow_relocatable_pointer_tag : general_pointer_tag
     {
     };
 
@@ -143,10 +148,25 @@ namespace hpx::traits {
             bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
         struct pointer_relocate_category
         {
-            using type = std::conditional_t<
-                std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
-                    is_relocatable_v<iter_value_t<Source>>,
-                relocatable_pointer_tag, general_pointer_tag>;
+            using type_src = iter_value_t<Source>;
+            using type_dst = iter_value_t<Dest>;
+
+            constexpr static bool memcpy_legal =
+                !std::is_volatile_v<type_src> && !std::is_volatile_v<type_dst>;
+
+            constexpr static bool is_buffer_memcpyable =
+                is_relocatable_from_v<type_src, type_dst> &&
+                is_trivially_relocatable_v<type_src> &&
+                iterators_are_contiguous_v<Source, Dest> && memcpy_legal;
+
+            constexpr static bool can_move_construct_nothrow =
+                std::is_nothrow_constructible_v<out_type,
+                    std::add_rvalue_reference_t<in_type>>;
+
+            using type = std::conditional_t<is_buffer_memcpyable,
+                trivially_relocatable_pointer_tag,
+                std::conditional_t<is_buffer_memcpyable,
+                    nothrow_relocatable_pointer_tag, general_pointer_tag>>;
         };
 
         template <typename Source, typename Dest>
