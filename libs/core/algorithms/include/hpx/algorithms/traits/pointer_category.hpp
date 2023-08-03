@@ -160,8 +160,8 @@ namespace hpx::traits {
                 iterators_are_contiguous_v<Source, Dest> && memcpy_legal;
 
             constexpr static bool can_move_construct_nothrow =
-                std::is_nothrow_constructible_v<out_type,
-                    std::add_rvalue_reference_t<in_type>>;
+                std::is_nothrow_constructible_v<type_src,
+                    std::add_rvalue_reference_t<type_dst>>;
 
             using type = std::conditional_t<is_buffer_memcpyable,
                 trivially_relocatable_pointer_tag,
