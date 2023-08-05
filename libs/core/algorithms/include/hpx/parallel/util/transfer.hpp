@@ -370,7 +370,7 @@ namespace hpx::parallel::util {
                 ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
             {
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    ::hpx::parallel::util::detail::loop_with_cleanup_n::call(
+                    ::hpx::parallel::util::loop_with_cleanup_n(
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it, OutIter current) -> void {
                             hpx::construct_at(std::addressof(*current), *it);
@@ -427,7 +427,7 @@ namespace hpx::parallel::util {
                 ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
             {
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    ::hpx::parallel::util::detail::loop_with_cleanup_n::call(
+                    ::hpx::parallel::util::loop_with_cleanup_n(
                         HPX_FORWARD(ExPolicy, policy), first, num, dest,
                         [](InIter it, OutIter current) -> void {
                             hpx::construct_at(
