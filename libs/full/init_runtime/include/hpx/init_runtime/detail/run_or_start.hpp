@@ -22,12 +22,12 @@ namespace hpx {
         HPX_EXPORT int init_impl(
             hpx::function<int(hpx::program_options::variables_map&)> const& f,
             int argc, char** argv, init_params const& params,
-            char const* hpx_prefix);
+            char const* hpx_prefix, char** env);
 
         HPX_EXPORT bool start_impl(
             hpx::function<int(hpx::program_options::variables_map&)> const& f,
             int argc, char** argv, init_params const& params,
-            char const* hpx_prefix);
+            char const* hpx_prefix, char** env);
     }    // namespace detail
     /// \endcond
 }    // namespace hpx
