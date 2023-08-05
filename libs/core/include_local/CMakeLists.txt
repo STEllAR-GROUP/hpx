@@ -42,7 +42,7 @@ set(generated_include_local_headers
     hpx/runtime.hpp
 )
 
-# The headers in hpx/local/ were deprecated in HPX V1.10.0
+# The headers in hpx/local/ were deprecated in HPX V1.9.1
 # cmake-format: off
 set(include_local_compat_headers
     hpx/local/algorithm.hpp => hpx/algorithm.hpp
