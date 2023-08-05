@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 
 #include <hpx/concurrency/spinlock_pool.hpp>
 #include <hpx/coroutines/coroutine.hpp>
