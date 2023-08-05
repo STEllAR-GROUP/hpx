@@ -171,7 +171,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -214,10 +213,8 @@ namespace hpx::parallel {
             using value_type =
                 typename std::iterator_traits<InIter>::value_type;
 
-            util::cancellation_token<util::detail::no_data> tok;
-
-            return util::loop_with_cleanup_n_with_token(
-                HPX_FORWARD(ExPolicy, policy), first, count, tok,
+            return util::loop_with_cleanup_n(
+                HPX_FORWARD(ExPolicy, policy), first, count,
                 [](InIter it) -> void {
                     ::new (std::addressof(*it)) value_type;
                 },

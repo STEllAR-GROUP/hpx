@@ -170,7 +170,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -214,10 +213,8 @@ namespace hpx::parallel {
         InIter sequential_uninitialized_fill_n(
             ExPolicy&& policy, InIter first, std::size_t count, T const& value)
         {
-            util::cancellation_token<util::detail::no_data> tok;
-
-            return util::loop_with_cleanup_n_with_token(
-                HPX_FORWARD(ExPolicy, policy), first, count, tok,
+            return util::loop_with_cleanup_n(
+                HPX_FORWARD(ExPolicy, policy), first, count,
                 [&value](InIter it) -> void {
                     hpx::construct_at(std::addressof(*it), value);
                 },
@@ -240,12 +237,11 @@ namespace hpx::parallel {
 
             using partition_result_type = std::pair<Iter, Iter>;
 
-            util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<ExPolicy, Iter,
                 partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [value, tok, policy](Iter it, std::size_t part_size) mutable
+                    [value, policy](Iter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_fill_n(
