@@ -170,7 +170,6 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -196,35 +195,26 @@ namespace hpx::parallel {
 
         // provide our own implementation of std::uninitialized_fill as some
         // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter, typename Sent, typename T>
-        InIter std_uninitialized_fill(InIter first, Sent last, T const& value)
+        template <typename ExPolicy, typename InIter, typename Sent, typename T>
+        InIter sequential_uninitialized_fill(
+            ExPolicy&& policy, InIter first, Sent last, T const& value)
         {
-            InIter current = first;
-            try
-            {
-                for (/* */; current != last; ++current)
-                {
-                    hpx::construct_at(std::addressof(*current), value);
-                }
-                return current;
-            }
-            catch (...)
-            {
-                for (/* */; first != current; ++first)
-                {
-                    std::destroy_at(std::addressof(*first));
-                }
-                throw;
-            }
+            return util::loop_with_cleanup(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                [&value](InIter it) -> void {
+                    hpx::construct_at(std::addressof(*it), value);
+                },
+                [](InIter it) -> void {
+                    std::destroy_at(std::addressof(*it));
+                });
         }
 
-        template <typename InIter, typename T>
-        InIter sequential_uninitialized_fill_n(InIter first, std::size_t count,
-            T const& value,
-            util::cancellation_token<util::detail::no_data>& tok)
+        template <typename ExPolicy, typename InIter, typename T>
+        InIter sequential_uninitialized_fill_n(
+            ExPolicy&& policy, InIter first, std::size_t count, T const& value)
         {
-            return util::loop_with_cleanup_n_with_token(
-                first, count, tok,
+            return util::loop_with_cleanup_n(
+                HPX_FORWARD(ExPolicy, policy), first, count,
                 [&value](InIter it) -> void {
                     hpx::construct_at(std::addressof(*it), value);
                 },
@@ -236,7 +226,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename T>
         util::detail::algorithm_result_t<ExPolicy, Iter>
-        parallel_sequential_uninitialized_fill_n(
+        parallel_uninitialized_fill_n(
             ExPolicy&& policy, Iter first, std::size_t count, T const& value)
         {
             if (count == 0)
@@ -247,16 +237,16 @@ namespace hpx::parallel {
 
             using partition_result_type = std::pair<Iter, Iter>;
 
-            util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<ExPolicy, Iter,
                 partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [value, tok](Iter it, std::size_t part_size) mutable
+                    [value, policy](Iter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_fill_n(
-                                it, part_size, value, tok));
+                                HPX_FORWARD(ExPolicy, policy), it, part_size,
+                                value));
                     },
                     // finalize, called once if no error occurred
                     [first, count](auto&& data) mutable -> Iter {
@@ -290,9 +280,10 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Sent, typename T>
             static Iter sequential(
-                ExPolicy, Iter first, Sent last, T const& value)
+                ExPolicy&& policy, Iter first, Sent last, T const& value)
             {
-                return std_uninitialized_fill(first, last, value);
+                return sequential_uninitialized_fill(
+                    HPX_FORWARD(ExPolicy, policy), first, last, value);
             }
 
             template <typename ExPolicy, typename Sent, typename T>
@@ -303,7 +294,7 @@ namespace hpx::parallel {
                     return util::detail::algorithm_result<ExPolicy, Iter>::get(
                         HPX_MOVE(first));
 
-                return parallel_sequential_uninitialized_fill_n(
+                return parallel_uninitialized_fill_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), value);
             }
@@ -315,32 +306,6 @@ namespace hpx::parallel {
     // uninitialized_fill_n
     namespace detail {
         /// \cond NOINTERNAL
-
-        // provide our own implementation of std::uninitialized_fill_n as some
-        // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter, typename Size, typename T>
-        InIter std_uninitialized_fill_n(
-            InIter first, Size count, T const& value)
-        {
-            InIter current = first;
-            try
-            {
-                for (/* */; count > 0; ++current, (void) --count)
-                {
-                    hpx::construct_at(std::addressof(*current), value);
-                }
-                return current;
-            }
-            catch (...)
-            {
-                for (/* */; first != current; ++first)
-                {
-                    std::destroy_at(std::addressof(*first));
-                }
-                throw;
-            }
-        }
-
         template <typename Iter>
         struct uninitialized_fill_n
           : public algorithm<uninitialized_fill_n<Iter>, Iter>
@@ -351,10 +316,11 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename T>
-            static Iter sequential(
-                ExPolicy, Iter first, std::size_t count, T const& value)
+            static Iter sequential(ExPolicy&& policy, Iter first,
+                std::size_t count, T const& value)
             {
-                return std_uninitialized_fill_n(first, count, value);
+                return sequential_uninitialized_fill_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, value);
             }
 
             template <typename ExPolicy, typename T>
@@ -362,7 +328,7 @@ namespace hpx::parallel {
                 ExPolicy&& policy, Iter first, std::size_t count,
                 T const& value)
             {
-                return parallel_sequential_uninitialized_fill_n(
+                return parallel_uninitialized_fill_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, value);
             }
         };

@@ -166,11 +166,11 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
+#include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
@@ -193,44 +193,28 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
-        // provide our own implementation of
-        // std::uninitialized_default_construct as some versions of MSVC
-        // horribly fail at compiling it for some types T
-        template <typename Iter, typename Sent>
-        Iter std_uninitialized_default_construct(Iter first, Sent last)
+        ///////////////////////////////////////////////////////////////////////
+        template <typename ExPolicy, typename Iter, typename Sent>
+        Iter sequential_uninitialized_default_construct(
+            ExPolicy&& policy, Iter first, Sent last)
         {
             using value_type = typename std::iterator_traits<Iter>::value_type;
 
-            Iter s_first = first;
-            try
-            {
-                for (/* */; first != last; ++first)
-                {
-                    ::new (std::addressof(*first)) value_type;
-                }
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
+            return util::loop_with_cleanup(
+                HPX_FORWARD(ExPolicy, policy), first, last,
+                [](Iter it) -> void { ::new (std::addressof(*it)) value_type; },
+                [](Iter it) -> void { std::destroy_at(std::addressof(*it)); });
         }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename InIter>
-        InIter sequential_uninitialized_default_construct_n(InIter first,
-            std::size_t count,
-            util::cancellation_token<util::detail::no_data>& tok)
+        template <typename ExPolicy, typename InIter>
+        InIter sequential_uninitialized_default_construct_n(
+            ExPolicy&& policy, InIter first, std::size_t count)
         {
             using value_type =
                 typename std::iterator_traits<InIter>::value_type;
 
-            return util::loop_with_cleanup_n_with_token(
-                first, count, tok,
+            return util::loop_with_cleanup_n(
+                HPX_FORWARD(ExPolicy, policy), first, count,
                 [](InIter it) -> void {
                     ::new (std::addressof(*it)) value_type;
                 },
@@ -242,7 +226,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename FwdIter>
         util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        parallel_sequential_uninitialized_default_construct_n(
+        parallel_uninitialized_default_construct_n(
             ExPolicy&& policy, FwdIter first, std::size_t count)
         {
             if (count == 0)
@@ -253,16 +237,15 @@ namespace hpx::parallel {
 
             using partition_result_type = std::pair<FwdIter, FwdIter>;
 
-            util::cancellation_token<util::detail::no_data> tok;
             return util::partitioner_with_cleanup<ExPolicy, FwdIter,
                 partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
-                    [tok](FwdIter it, std::size_t part_size) mutable
+                    [policy](FwdIter it, std::size_t part_size) mutable
                     -> partition_result_type {
                         return std::make_pair(it,
                             sequential_uninitialized_default_construct_n(
-                                it, part_size, tok));
+                                HPX_FORWARD(ExPolicy, policy), it, part_size));
                     },
                     // finalize, called once if no error occurred
                     [first, count](auto&& data) mutable -> FwdIter {
@@ -295,16 +278,18 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Sent>
-            static FwdIter sequential(ExPolicy, FwdIter first, Sent last)
+            static FwdIter sequential(
+                ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return std_uninitialized_default_construct(first, last);
+                return sequential_uninitialized_default_construct(
+                    HPX_FORWARD(ExPolicy, policy), first, last);
             }
 
             template <typename ExPolicy, typename Sent>
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, Sent last)
             {
-                return parallel_sequential_uninitialized_default_construct_n(
+                return parallel_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last));
             }
@@ -316,34 +301,6 @@ namespace hpx::parallel {
     // uninitialized_default_construct_n
     namespace detail {
         /// \cond NOINTERNAL
-
-        // provide our own implementation of std::uninitialized_default_construct as some
-        // versions of MSVC horribly fail at compiling it for some types T
-        template <typename InIter>
-        InIter std_uninitialized_default_construct_n(
-            InIter first, std::size_t count)
-        {
-            using value_type =
-                typename std::iterator_traits<InIter>::value_type;
-
-            InIter s_first = first;
-            try
-            {
-                for (/* */; count != 0; (void) ++first, --count)
-                {
-                    ::new (std::addressof(*first)) value_type;
-                }
-                return first;
-            }
-            catch (...)
-            {
-                for (/* */; s_first != first; ++s_first)
-                {
-                    std::destroy_at(std::addressof(*s_first));
-                }
-                throw;
-            }
-        }
 
         template <typename FwdIter>
         struct uninitialized_default_construct_n
@@ -358,16 +315,17 @@ namespace hpx::parallel {
 
             template <typename ExPolicy>
             static FwdIter sequential(
-                ExPolicy, FwdIter first, std::size_t count)
+                ExPolicy&& policy, FwdIter first, std::size_t count)
             {
-                return std_uninitialized_default_construct_n(first, count);
+                return sequential_uninitialized_default_construct_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count);
             }
 
             template <typename ExPolicy>
             static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
                 ExPolicy&& policy, FwdIter first, std::size_t count)
             {
-                return parallel_sequential_uninitialized_default_construct_n(
+                return parallel_uninitialized_default_construct_n(
                     HPX_FORWARD(ExPolicy, policy), first, count);
             }
         };
@@ -383,13 +341,14 @@ namespace hpx {
       : hpx::detail::tag_parallel_algorithm<uninitialized_default_construct_t>
     {
         // clang-format off
-        template <typename FwdIter,
+        template <typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<Sent>
             )>
         // clang-format on
         friend void tag_fallback_invoke(
-            hpx::uninitialized_default_construct_t, FwdIter first, FwdIter last)
+            hpx::uninitialized_default_construct_t, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -399,15 +358,16 @@ namespace hpx {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename FwdIter,
+        template <typename ExPolicy, typename FwdIter, typename Sent,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<Sent>
             )>
         // clang-format on
         friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
         tag_fallback_invoke(hpx::uninitialized_default_construct_t,
-            ExPolicy&& policy, FwdIter first, FwdIter last)
+            ExPolicy&& policy, FwdIter first, Sent last)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");

@@ -198,18 +198,20 @@ namespace hpx {
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/util/cancellation_token.hpp>
+#include <hpx/parallel/unseq/loop.hpp>
 #include <hpx/parallel/util/detail/algorithm_result.hpp>
 #include <hpx/parallel/util/detail/clear_container.hpp>
 #include <hpx/parallel/util/detail/sender_util.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/parallel/util/transfer.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
 #include <algorithm>
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -223,51 +225,11 @@ namespace hpx::parallel {
         /// \cond NOINTERNAL
 
         ///////////////////////////////////////////////////////////////////////
-        template <typename InIter1, typename FwdIter2, typename Cond>
-        util::in_out_result<InIter1, FwdIter2> sequential_uninitialized_copy(
-            InIter1 first, FwdIter2 dest, Cond cond)
-        {
-            FwdIter2 current = dest;
-            try
-            {
-                for (/* */; cond(first, current); (void) ++first, ++current)
-                {
-                    hpx::construct_at(std::addressof(*current), *first);
-                }
-                return util::in_out_result<InIter1, FwdIter2>{first, current};
-            }
-            catch (...)
-            {
-                for (/* */; dest != current; ++dest)
-                {
-                    std::destroy_at(std::addressof(*dest));
-                }
-                throw;
-            }
-        }
 
-        ///////////////////////////////////////////////////////////////////////
-        template <typename InIter1, typename InIter2>
-        util::in_out_result<InIter1, InIter2> sequential_uninitialized_copy_n(
-            InIter1 first, std::size_t count, InIter2 dest,
-            util::cancellation_token<util::detail::no_data>& tok)
-        {
-            return {std::next(first, count),
-                util::loop_with_cleanup_n_with_token(
-                    first, count, dest, tok,
-                    [](InIter1 it, InIter2 dest) -> void {
-                        hpx::construct_at(std::addressof(*dest), *it);
-                    },
-                    [](InIter2 dest) -> void {
-                        std::destroy_at(std::addressof(*dest));
-                    })};
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         template <typename ExPolicy, typename Iter, typename FwdIter2>
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<Iter, FwdIter2>>::type
-        parallel_sequential_uninitialized_copy_n(
+        parallel_uninitialized_copy_n(
             ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
         {
             if (count == 0)
@@ -280,22 +242,21 @@ namespace hpx::parallel {
             using zip_iterator = hpx::util::zip_iterator<Iter, FwdIter2>;
             using partition_result_type = std::pair<FwdIter2, FwdIter2>;
 
-            util::cancellation_token<util::detail::no_data> tok;
-
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<Iter, FwdIter2>, partition_result_type>::
                 call(
                     HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
                     count,
-                    [tok](zip_iterator t, std::size_t part_size) mutable
+                    [policy](zip_iterator t, std::size_t part_size) mutable
                     -> partition_result_type {
                         using hpx::get;
                         auto iters = t.get_iterator_tuple();
                         FwdIter2 dest = get<1>(iters);
                         return std::make_pair(dest,
                             util::get_second_element(
-                                sequential_uninitialized_copy_n(
-                                    get<0>(iters), part_size, dest, tok)));
+                                hpx::parallel::util::uninit_copy_n(
+                                    HPX_FORWARD(ExPolicy, policy),
+                                    get<0>(iters), part_size, dest)));
                     },
                     // finalize, called once if no error occurred
                     [dest, first, count](auto&& data) mutable
@@ -332,12 +293,11 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename InIter1, typename Sent,
                 typename FwdIter2>
             static util::in_out_result<InIter1, FwdIter2> sequential(
-                ExPolicy, InIter1 first, Sent last, FwdIter2 dest)
+                ExPolicy&& policy, InIter1 first, Sent last, FwdIter2 dest)
             {
-                return sequential_uninitialized_copy(
-                    first, dest, [last](InIter1 first, FwdIter2) -> bool {
-                        return first != last;
-                    });
+                std::size_t n = std::distance(first, last);
+                return hpx::parallel::util::uninit_copy_n(
+                    HPX_FORWARD(ExPolicy, policy), first, n, dest);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
@@ -346,7 +306,7 @@ namespace hpx::parallel {
                 util::in_out_result<Iter, FwdIter2>>::type
             parallel(ExPolicy&& policy, Iter first, Sent last, FwdIter2 dest)
             {
-                return parallel_sequential_uninitialized_copy_n(
+                return parallel_uninitialized_copy_n(
                     HPX_FORWARD(ExPolicy, policy), first,
                     detail::distance(first, last), dest);
             }
@@ -371,13 +331,16 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename InIter1, typename Sent1,
                 typename FwdIter2, typename Sent2>
-            static util::in_out_result<InIter1, FwdIter2> sequential(ExPolicy,
-                InIter1 first, Sent1 last, FwdIter2 dest, Sent2 last_d)
+            static util::in_out_result<InIter1, FwdIter2> sequential(
+                ExPolicy&& policy, InIter1 first, Sent1 last, FwdIter2 dest,
+                Sent2 last_d)
             {
-                return sequential_uninitialized_copy(first, dest,
-                    [last, last_d](InIter1 first, FwdIter2 current) -> bool {
-                        return !(first == last || current == last_d);
-                    });
+                std::size_t const dist1 = detail::distance(first, last);
+                std::size_t const dist2 = detail::distance(dest, last_d);
+                std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
+
+                return hpx::parallel::util::uninit_copy_n(
+                    HPX_FORWARD(ExPolicy, policy), first, dist, dest);
             }
 
             template <typename ExPolicy, typename Iter, typename Sent1,
@@ -391,7 +354,7 @@ namespace hpx::parallel {
                 std::size_t const dist2 = detail::distance(dest, last_d);
                 std::size_t dist = dist1 <= dist2 ? dist1 : dist2;
 
-                return parallel_sequential_uninitialized_copy_n(
+                return parallel_uninitialized_copy_n(
                     HPX_FORWARD(ExPolicy, policy), first, dist, dest);
             }
         };
@@ -413,28 +376,16 @@ namespace hpx::parallel {
             {
             }
 
-            template <typename ExPolicy, typename InIter, typename FwdIter2>
+            // non vectorized overload
+            template <typename ExPolicy, typename InIter, typename FwdIter2,
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
             static util::in_out_result<InIter, FwdIter2> sequential(
-                ExPolicy, InIter first, std::size_t count, FwdIter2 dest)
+                ExPolicy&& policy, InIter first, std::size_t count,
+                FwdIter2 dest)
             {
-                FwdIter2 current = dest;
-                try
-                {
-                    for (/* */; count > 0; ++first, (void) ++current, --count)
-                    {
-                        hpx::construct_at(std::addressof(*current), *first);
-                    }
-                    return util::in_out_result<InIter, FwdIter2>{
-                        first, current};
-                }
-                catch (...)
-                {
-                    for (/* */; dest != current; ++dest)
-                    {
-                        std::destroy_at(std::addressof(*dest));
-                    }
-                    throw;
-                }
+                return hpx::parallel::util::uninit_copy_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
 
             template <typename ExPolicy, typename Iter, typename FwdIter2>
@@ -443,7 +394,7 @@ namespace hpx::parallel {
             parallel(
                 ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
             {
-                return parallel_sequential_uninitialized_copy_n(
+                return parallel_uninitialized_copy_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
         };
