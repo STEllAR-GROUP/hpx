@@ -155,7 +155,7 @@ static_assert(hpx::is_trivially_relocatable_v<
 static_assert(hpx::is_trivially_relocatable_v<
     explicitly_trivially_relocatable_1 (&)[10]>);
 static_assert(
-    hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1 (
+    hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1(
         &&)[10]>);
 static_assert(hpx::is_trivially_relocatable_v<
     explicitly_trivially_relocatable_1 const volatile&>);
