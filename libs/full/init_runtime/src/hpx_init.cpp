@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -109,7 +109,7 @@ namespace hpx::detail {
     int init_impl(
         hpx::function<int(hpx::program_options::variables_map&)> const& f,
         int argc, char** argv, init_params const& params,
-        char const* hpx_prefix)
+        char const* hpx_prefix, [[maybe_unused]] char** env)
     {
         if (argc == 0 || argv == nullptr)
         {
@@ -127,7 +127,7 @@ namespace hpx::detail {
 #endif
         util::set_hpx_prefix(hpx_prefix);
 #if defined(__FreeBSD__)
-        freebsd_environ = environ;
+        freebsd_environ = env;
 #endif
         // set a handler for std::abort, std::at_quick_exit, and std::atexit
         std::signal(SIGABRT, detail::on_abort);
@@ -142,7 +142,7 @@ namespace hpx::detail {
     bool start_impl(
         hpx::function<int(hpx::program_options::variables_map&)> const& f,
         int argc, char** argv, init_params const& params,
-        char const* hpx_prefix)
+        char const* hpx_prefix, [[maybe_unused]] char** env)
     {
         if (argc == 0 || argv == nullptr)
         {
@@ -160,7 +160,7 @@ namespace hpx::detail {
 #endif
         util::set_hpx_prefix(hpx_prefix);
 #if defined(__FreeBSD__)
-        freebsd_environ = environ;
+        freebsd_environ = env;
 #endif
         // set a handler for std::abort, std::at_quick_exit, and std::atexit
         std::signal(SIGABRT, detail::on_abort);

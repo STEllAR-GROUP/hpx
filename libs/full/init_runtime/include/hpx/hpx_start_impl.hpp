@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/assert.hpp>
+#include <hpx/debugging/environ.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/hpx_start.hpp>
@@ -24,8 +25,7 @@
 #include <utility>
 
 #if defined(__FreeBSD__)
-extern HPX_EXPORT char** freebsd_environ;
-extern char** environ;
+extern char** environ;    // available in executables only
 #endif
 
 #if defined(HPX_WINDOWS) && defined(HPX_HAVE_APEX)
@@ -57,7 +57,8 @@ namespace hpx {
         std::function<int(hpx::program_options::variables_map&)> f, int argc,
         char** argv, init_params const& params)
     {
-        return detail::start_impl(HPX_MOVE(f), argc, argv, params, HPX_PREFIX);
+        return detail::start_impl(
+            HPX_MOVE(f), argc, argv, params, HPX_PREFIX, environ);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -74,7 +75,7 @@ namespace hpx {
         hpx::function<int(hpx::program_options::variables_map&)> main_f =
             hpx::bind_back(detail::init_helper, HPX_MOVE(f));
         return detail::start_impl(
-            HPX_MOVE(main_f), argc, argv, params, HPX_PREFIX);
+            HPX_MOVE(main_f), argc, argv, params, HPX_PREFIX, environ);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -87,8 +88,8 @@ namespace hpx {
     /// with the runtime system's execution.
     inline bool start(int argc, char** argv, init_params const& params)
     {
-        return detail::start_impl(
-            hpx_startup::get_main_func(), argc, argv, params, HPX_PREFIX);
+        return detail::start_impl(hpx_startup::get_main_func(), argc, argv,
+            params, HPX_PREFIX, environ);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -104,7 +105,7 @@ namespace hpx {
     {
         hpx::function<int(hpx::program_options::variables_map&)> main_f;
         return detail::start_impl(
-            HPX_MOVE(main_f), argc, argv, params, HPX_PREFIX);
+            HPX_MOVE(main_f), argc, argv, params, HPX_PREFIX, environ);
     }
 
     /// \brief Main non-blocking entry point for launching the HPX runtime system.
@@ -119,6 +120,6 @@ namespace hpx {
     {
         return detail::start_impl(hpx_startup::get_main_func(),
             hpx::local::detail::dummy_argc, hpx::local::detail::dummy_argv,
-            params, HPX_PREFIX);
+            params, HPX_PREFIX, environ);
     }
 }    // namespace hpx
