@@ -450,7 +450,7 @@ namespace hpx::execution {
                 hpx::threads::do_not_combine_tasks(
                     exec.policy().get_hint().sharing_mode());
 
-            if (exec.hierarchical_threshold_ == 0 && !do_not_combine_tasks)
+            if (!do_not_combine_tasks)
             {
                 return parallel::execution::detail::
                     index_queue_bulk_async_execute(desc, pool,
@@ -562,7 +562,7 @@ namespace hpx::execution {
 
     private:
         /// \cond NOINTERNAL
-        static constexpr std::size_t hierarchical_threshold_default_ = 0;
+        static constexpr std::size_t hierarchical_threshold_default_ = 6;
 
         threads::thread_pool_base* pool_;
         Policy policy_;
