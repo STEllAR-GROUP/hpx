@@ -13,6 +13,7 @@
 #include <hpx/parallel/unseq/reduce_helpers.hpp>
 #include <hpx/type_support/construct_at.hpp>
 
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -20,7 +21,6 @@
 #include <type_traits>
 #include <utility>
 
-// Please use static assert and enforce Iter to be Random Access Iterator
 namespace hpx::parallel::util {
     /*
         Compiler and Hardware should also support vector operations for IterDiff,

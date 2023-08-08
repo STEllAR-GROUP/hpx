@@ -10,6 +10,7 @@
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -105,34 +106,9 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        template <typename Iterator, typename ExPolicy>
-        struct loop_pred;
         // Helper class to repeatedly call a function starting from a given
         // iterator position till the predicate returns true.
         template <typename Iterator>
-        struct loop_pred<Iterator, void>
-        {
-            ///////////////////////////////////////////////////////////////////
-            template <typename Begin, typename End, typename Pred>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                Begin it, End end, Pred&& pred)
-            {
-                for (/**/; it != end; ++it)
-                {
-                    if (HPX_INVOKE(pred, it))
-                        return it;
-                }
-                return it;
-            }
-        };
-    }    // namespace detail
-
-    ///////////////////////////////////////////////////////////////////////////
-    namespace detail {
-
-        // Helper class to repeatedly call a function starting from a given
-        // iterator position till the predicate returns true.
-        template <typename Iterator, typename ExPolicy>
         struct loop_pred
         {
             ///////////////////////////////////////////////////////////////////
@@ -160,7 +136,7 @@ namespace hpx::parallel::util {
         tag_fallback_invoke(hpx::parallel::util::loop_pred_t<ExPolicy>,
             Begin begin, End end, Pred&& pred)
         {
-            return detail::loop_pred<Begin, ExPolicy>::call(
+            return detail::loop_pred<Begin>::call(
                 begin, end, HPX_FORWARD(Pred, pred));
         }
     };
