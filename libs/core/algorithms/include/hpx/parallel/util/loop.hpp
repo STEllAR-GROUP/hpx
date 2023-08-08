@@ -140,22 +140,12 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
                 Begin it, End end, Pred&& pred)
             {
-                if constexpr (hpx::is_unsequenced_execution_policy_v<
-                                  ExPolicy> &&
-                    hpx::traits::is_random_access_iterator_v<Begin>)
+                for (/**/; it != end; ++it)
                 {
-                    return unseq_first_n(
-                        it, std::distance(it, end), HPX_FORWARD(Pred, pred));
+                    if (HPX_INVOKE(pred, it))
+                        return it;
                 }
-                else
-                {
-                    for (/**/; it != end; ++it)
-                    {
-                        if (HPX_INVOKE(pred, it))
-                            return it;
-                    }
-                    return it;
-                }
+                return it;
             }
         };
     }    // namespace detail
@@ -174,6 +164,27 @@ namespace hpx::parallel::util {
                 begin, end, HPX_FORWARD(Pred, pred));
         }
     };
+
+    template <typename Begin, typename End, typename Pred,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_pred_t<hpx::execution::unsequenced_policy>,
+        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
+    {
+        return unseq_first_n(
+            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
+    }
+
+    template <typename Begin, typename End, typename Pred,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_pred_t<
+            hpx::execution::unsequenced_task_policy>,
+        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
+    {
+        return unseq_first_n(
+            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
+    }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
