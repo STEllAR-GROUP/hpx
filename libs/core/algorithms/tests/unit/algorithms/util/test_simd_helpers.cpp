@@ -23,7 +23,7 @@ void test_unseq_first_n1_dispatch2(std::size_t length, std::size_t first_index)
 {
     first_index = first_index % length;
 
-    std::vector<T> v(length, static_cast<T>(0));
+    std::vector<T> v(length);
     std::size_t i = 0;
 
     std::for_each(v.begin(), v.end(), [&](T& t) {
