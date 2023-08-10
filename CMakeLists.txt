@@ -2201,6 +2201,21 @@ hpx_add_config_define(HPX_HAVE_GIT_COMMIT "\"${HPX_WITH_GIT_COMMIT}\"")
 hpx_include(SetOutputPaths)
 
 # ##############################################################################
+# Fixing git tag, if necessary
+hpx_info("HPX_WITH_GIT_TAG: " ${HPX_WITH_GIT_TAG})
+hpx_info("HPX_WITH_GIT_BRANCH: " ${HPX_WITH_GIT_BRANCH})
+
+if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
+                                                      STREQUAL "x")
+)
+  string(REGEX MATCH "^release-[0-9]+.[0-9]+.X$" matched ${HPX_WITH_GIT_BRANCH})
+  if(matched)
+    set(HPX_WITH_GIT_TAG "v${HPX_VERSION}")
+    hpx_info("Setting HPX_WITH_GIT_TAG to: " "${HPX_WITH_GIT_TAG}")
+  endif()
+endif()
+
+# ##############################################################################
 # Add custom targets for tests
 # ##############################################################################
 if(HPX_WITH_TESTS)
