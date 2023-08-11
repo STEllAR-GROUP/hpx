@@ -10,6 +10,7 @@
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/actions_base/plain_action.hpp>
 #include <hpx/agas/addressing_service.hpp>
+#include <hpx/agas_base/route.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_distributed/continuation.hpp>
@@ -41,32 +42,28 @@ HPX_PLAIN_ACTION_ID(hpx::detail::update_agas_cache, update_agas_cache_action,
 
 namespace hpx::agas::server {
 
-    void primary_namespace::route(parcelset::parcel&& p)
+    void route_impl(primary_namespace& server, parcelset::parcel&& p)
     {
-        LPT_(debug).format("primary_namespace::route: {}", p.parcel_id());
-
-        util::scoped_timer<std::atomic<std::int64_t>> update(
-            counter_data_.route_.time_, counter_data_.route_.enabled_);
-        counter_data_.increment_route_count();
+        LPT_(debug).format("agas::server::route_impl: {}", p.parcel_id());
 
         naming::gid_type const& gid = p.destination();
         naming::address& addr = p.addr();
-        resolved_type cache_address;
+        primary_namespace::resolved_type cache_address;
 
         // resolve destination addresses, we should be able to resolve all of
         // them, otherwise it's an error
         {
-            std::unique_lock<mutex_type> l(mutex_);
+            std::unique_lock<primary_namespace::mutex_type> l(server.mutex());
 
             error_code& ec = throws;
 
             // wait for any migration to be completed
             if (naming::detail::is_migratable(gid))
             {
-                wait_for_migration_locked(l, gid, ec);
+                server.wait_for_migration_locked(l, gid, ec);
             }
 
-            cache_address = resolve_gid_locked(l, gid, ec);
+            cache_address = server.resolve_gid_locked(l, gid, ec);
 
             if (ec || hpx::get<0>(cache_address) == naming::invalid_gid)
             {
@@ -133,6 +130,17 @@ namespace hpx::agas::server {
             }
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    struct init_route_function
+    {
+        init_route_function()
+        {
+            server::route = &route_impl;
+        }
+    };
+
+    init_route_function init;
 }    // namespace hpx::agas::server
 
 #endif

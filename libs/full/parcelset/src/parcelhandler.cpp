@@ -33,9 +33,9 @@
 
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/naming_base/gid_type.hpp>
+#include <hpx/parcelset/init_parcelports.hpp>
 #include <hpx/parcelset/message_handler_fwd.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
-#include <hpx/parcelset/static_parcelports.hpp>
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>
 #include <hpx/parcelset_base/policies/message_handler.hpp>
 #include <hpx/plugin_factories/parcelport_factory_base.hpp>

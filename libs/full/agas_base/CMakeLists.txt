@@ -20,6 +20,7 @@ set(agas_base_headers
     hpx/agas_base/gva.hpp
     hpx/agas_base/locality_namespace.hpp
     hpx/agas_base/primary_namespace.hpp
+    hpx/agas_base/route.hpp
     hpx/agas_base/server/component_namespace.hpp
     hpx/agas_base/server/locality_namespace.hpp
     hpx/agas_base/server/primary_namespace.hpp
