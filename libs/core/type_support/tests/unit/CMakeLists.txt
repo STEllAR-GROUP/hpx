@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests relocate_at uninitialized_relocate)
+set(tests relocate_at)
 
 if(HPX_WITH_CXX20_COROUTINES)
   set(tests ${tests} generator)
@@ -35,7 +35,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
   set(compile_tests is_relocatable is_trivially_relocatable)
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
-    set(fail_compile_tests fail_relocate_at fail_uninitialized_relocate)
+    set(fail_compile_tests fail_relocate_at)
     foreach(fail_compile_test ${fail_compile_tests})
       set(${fail_compile_test}_FLAGS FAILURE_EXPECTED)
     endforeach()
