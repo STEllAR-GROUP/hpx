@@ -39,7 +39,8 @@ namespace hpx::naming {
             gid_type& id, std::int64_t debit);
 
         HPX_EXPORT std::int64_t fill_credit_for_gid(gid_type& id,
-            std::int64_t credits = std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            std::int64_t credits = static_cast<std::int64_t>(
+                HPX_GLOBALCREDIT_INITIAL));
 
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT gid_type move_gid(gid_type& id);
@@ -58,7 +59,7 @@ namespace hpx::naming {
             std::unique_lock<gid_type::mutex_type>& l, gid_type& id);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_EXPORT void decrement_refcnt(id_type_impl* gid) noexcept;
+        HPX_EXPORT void decrement_refcnt(id_type_impl const* gid) noexcept;
 
         ///////////////////////////////////////////////////////////////////////
         // credit management (called during serialization), this function

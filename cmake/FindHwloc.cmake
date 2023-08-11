@@ -26,7 +26,7 @@ if(NOT TARGET Hwloc::hwloc)
 
   find_library(
     HWLOC_LIBRARY
-    NAMES hwloc libhwloc
+    NAMES libhwloc.so hwloc
     HINTS ${HWLOC_ROOT}
           ENV
           HWLOC_ROOT
@@ -70,7 +70,8 @@ if(NOT TARGET Hwloc::hwloc)
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc SYSTEM INTERFACE ${HWLOC_INCLUDE_DIR})
-  target_link_libraries(Hwloc::hwloc INTERFACE ${HWLOC_LIBRARIES})
 
+  target_link_libraries(Hwloc::hwloc INTERFACE ${HWLOC_LIBRARIES})
   mark_as_advanced(HWLOC_ROOT HWLOC_LIBRARY HWLOC_INCLUDE_DIR)
+
 endif()

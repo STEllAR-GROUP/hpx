@@ -100,13 +100,7 @@ target_include_directories(
 )
 
 target_link_libraries(hpx_full PUBLIC hpx_base_libraries)
-
-if((NOT HPX_WITH_STATIC_LINKING) AND (("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-                                      OR (APPLE))
-)
-  set_target_properties(hpx_full PROPERTIES POSITION_INDEPENDENT_CODE ON)
-endif()
-
+set_target_properties(hpx_full PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_definitions(hpx_full PRIVATE HPX_COMPONENT_NAME=hpx HPX_EXPORTS)
 
 # ##############################################################################
@@ -340,6 +334,11 @@ foreach(lib ${HPX_LIBS})
   endif()
 
   add_subdirectory(${lib})
+
+  set(_hpx_${lib}_modules
+      ${_hpx_${lib}_modules}
+      PARENT_SCOPE
+  )
 endforeach()
 
 # add_hpx_module populates HPX_ENABLED_MODULES

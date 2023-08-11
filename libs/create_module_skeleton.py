@@ -2,6 +2,7 @@
 '''
 Copyright (c) 2019-2020 ETH Zurich
 Copyright (c) 2018      Thomas Heller
+Copyright (c) 2022-2023 Hartmut Kaiser
 
 SPDX-License-Identifier: BSL-1.0
 Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,14 +25,14 @@ module_name = sys.argv[2]
 header_str = '=' * len(module_name)
 
 
-cmake_root_header = f'''# Copyright (c) 2019-2021 The STE||AR-Group
+cmake_root_header = f'''# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 '''
 
-cmake_header = f'''# Copyright (c) 2020-2021 The STE||AR-Group
+cmake_header = f'''# Copyright (c) 2020-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,7 +41,7 @@ cmake_header = f'''# Copyright (c) 2020-2021 The STE||AR-Group
 
 readme_template = f'''
 ..
-    Copyright (c) 2020-2021 The STE||AR-Group
+    Copyright (c) 2020-2023 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -57,7 +58,7 @@ Documentation can be found `here
 '''
 
 index_rst = f'''..
-    Copyright (c) 2020-2021 The STE||AR-Group
+    Copyright (c) 2020-2023 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -255,7 +256,7 @@ header_name_str = "Main |hpx| modules" if lib_name == "full" else lib_name.capit
 header_underline_str = '=' * len(header_name_str)
 
 modules_rst = f'''..
-    Copyright (c) 2018-2021 The STE||AR-Group
+    Copyright (c) 2018-2023 The STE||AR-Group
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
