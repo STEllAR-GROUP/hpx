@@ -472,11 +472,14 @@ namespace hpx {
         lbt_ << "(1st stage) runtime_distributed::start: launching "
                 "run_helper HPX thread";
 
-        threads::thread_init_data data(
-            hpx::bind(&runtime_distributed::run_helper, this, func,
-                std::ref(result_)),
-            "run_helper", threads::thread_priority::normal,
-            threads::thread_schedule_hint(0), threads::thread_stacksize::large);
+        threads::thread_function_type thread_func =
+            threads::make_thread_function(
+                hpx::bind(&runtime_distributed::run_helper, this, func,
+                    std::ref(result_)));
+
+        threads::thread_init_data data(HPX_MOVE(thread_func), "run_helper",
+            threads::thread_priority::normal, threads::thread_schedule_hint(0),
+            threads::thread_stacksize::large);
 
         this->runtime::starting();
         threads::thread_id_ref_type id = threads::invalid_thread_id;
