@@ -32,15 +32,17 @@ set(include_local_headers
     hpx/experimental/task_group.hpp
 )
 
-set(generated_include_local_headers
-    hpx/algorithm.hpp
-    hpx/barrier.hpp
-    hpx/channel.hpp
-    hpx/compute.hpp
-    hpx/future.hpp
-    hpx/latch.hpp
-    hpx/runtime.hpp
-)
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(generated_include_local_headers
+      hpx/algorithm.hpp
+      hpx/barrier.hpp
+      hpx/channel.hpp
+      hpx/compute.hpp
+      hpx/future.hpp
+      hpx/latch.hpp
+      hpx/runtime.hpp
+  )
+endif()
 
 # The headers in hpx/local/ were deprecated in HPX V1.9.1
 # cmake-format: off

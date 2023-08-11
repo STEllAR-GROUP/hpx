@@ -35,6 +35,7 @@ set(_hpx_full_modules
     parcelport_libfabric
     parcelport_mpi
     parcelport_tcp
+    parcelports
     parcelset
     parcelset_base
     performance_counters
@@ -51,5 +52,14 @@ hpx_info("")
 hpx_info("  Configuring libhpx modules:")
 
 foreach(module ${_hpx_full_modules})
-  add_subdirectory(${module})
+  # the parcelports module is handled explicitly after all other modules have
+  # been processed (see HPX_ParcelPorts.cmake)
+  if(NOT (${module} STREQUAL "parcelports"))
+    add_subdirectory(${module})
+  endif()
 endforeach()
+
+set(_hpx_full_modules
+    ${_hpx_full_modules}
+    PARENT_SCOPE
+)

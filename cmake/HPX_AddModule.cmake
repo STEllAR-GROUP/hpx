@@ -176,10 +176,9 @@ function(add_hpx_module libname modulename)
       endforeach()
     else()
       foreach(file_to_generate ${${modulename}_GENERATED_HEADERS})
-        if(EXISTS ${file_to_generate})
-          hpx_warn("Removing zombie generated header: ${file_to_generate}")
-          file(REMOVE ${file_to_generate})
-        endif()
+        set(generated_headers ${generated_headers}
+                              ${generated_file_base}/${file_to_generate}
+        )
       endforeach()
     endif()
   endif()
@@ -284,8 +283,8 @@ function(add_hpx_module libname modulename)
         list(FIND _hpx_${libname}_modules ${dep} dep_index)
         if(${dep_index} EQUAL -1)
           hpx_error(
-            "The module ${dep} should not be be listed in MODULE_DEPENDENCIES "
-            "for module hpx_${modulename}"
+            "The module hpx_${dep} should not be be listed in MODULE_DEPENDENCIES "
+            "for '${libname}' module hpx_${modulename}"
           )
         endif()
       endif()
