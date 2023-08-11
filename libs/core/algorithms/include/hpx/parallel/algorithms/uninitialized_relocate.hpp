@@ -41,8 +41,65 @@ namespace hpx::parallel {
     namespace detail {
         /// \cond NOINTERNAL
 
+        ///////////////////////////////////////////////////////////////////////
+
+        template <typename ExPolicy, typename Iter, typename FwdIter2>
+        typename util::detail::algorithm_result<ExPolicy,
+            util::in_out_result<Iter, FwdIter2>>::type
+        parallel_uninitialized_relocate_n(
+            ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
+        {
+            if (count == 0)
+            {
+                return util::detail::algorithm_result<ExPolicy,
+                    util::in_out_result<Iter, FwdIter2>>::
+                    get(util::in_out_result<Iter, FwdIter2>{first, dest});
+            }
+
+            using zip_iterator = hpx::util::zip_iterator<Iter, FwdIter2>;
+            using partition_result_type = std::pair<FwdIter2, FwdIter2>;
+
+            return util::partitioner_with_cleanup<ExPolicy,
+                util::in_out_result<Iter, FwdIter2>, partition_result_type>::
+                call(
+                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
+                    count,
+                    [policy](zip_iterator t, std::size_t part_size) mutable
+                    -> partition_result_type {
+                        using hpx::get;
+
+                        auto iters = t.get_iterator_tuple();
+
+                        Iter part_source = get<0>(iters);
+                        FwdIter2 part_dest = get<1>(iters);
+
+                        return std::make_pair(dest,
+                            util::get_second_element(
+                                hpx::parallel::util::uninit_relocate_n(
+                                    HPX_FORWARD(ExPolicy, policy), part_source,
+                                    part_size, part_dest)));
+                    },
+                    // finalize, called once if no error occurred
+                    [dest, first, count](auto&& data) mutable
+                    -> util::in_out_result<Iter, FwdIter2> {
+                        // make sure iterators embedded in function object that is
+                        // attached to futures are invalidated
+                        util::detail::clear_container(data);
+
+                        std::advance(first, count);
+                        std::advance(dest, count);
+                        return util::in_out_result<Iter, FwdIter2>{first, dest};
+                    },
+                    // cleanup function, called for each partition which
+                    // didn't fail, but only if at least one failed
+                    [](partition_result_type&& r) -> void {
+                        std::destroy(r.first, r.second);
+                    });
+        }
+
         /////////////////////////////////////////////////////////////////////////////
         // uninitialized_relocate_n
+
         /// \cond NOINTERNAL
         template <typename IterPair>
         struct uninitialized_relocate_n
@@ -63,6 +120,16 @@ namespace hpx::parallel {
                 FwdIter2 dest)
             {
                 return hpx::parallel::util::uninit_relocate_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest);
+            }
+
+            template <typename ExPolicy, typename Iter, typename FwdIter2>
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<Iter, FwdIter2>>
+            parallel(
+                ExPolicy&& policy, Iter first, std::size_t count, FwdIter2 dest)
+            {
+                return parallel_uninitialized_relocate_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
         };
@@ -91,6 +158,18 @@ namespace hpx::parallel {
                 auto count = std::distance(first, last);
 
                 return hpx::parallel::util::uninit_relocate_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest);
+            }
+
+            template <typename ExPolicy, typename Iter, typename FwdIter2>
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<InIter, FwdIter2>>
+            parallel(
+                ExPolicy&& policy, InIter first, InIter last, FwdIter2 dest)
+            {
+                auto count = std::distance(first, last);
+
+                return parallel_uninitialized_relocate_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
         };
