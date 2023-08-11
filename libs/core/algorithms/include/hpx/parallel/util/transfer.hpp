@@ -38,6 +38,9 @@ namespace hpx::parallel::util {
         template <typename Category, typename Enable = void>
         struct move_n_helper;
 
+        template <typename Category, typename Enable = void>
+        struct uninit_relocate_n_helper;
+
         ///////////////////////////////////////////////////////////////////////
         template <typename T>
         HPX_FORCEINLINE std::enable_if_t<std::is_pointer_v<T>, char*> to_ptr(
@@ -347,5 +350,117 @@ namespace hpx::parallel::util {
             hpx::traits::pointer_move_category_t<std::decay_t<InIter>,
                 std::decay_t<OutIter>>;
         return detail::move_n_helper<category>::call(first, count, dest);
+    }
+
+    // helpers for uninit_relocate_n
+    namespace detail {
+        // Customization point for optimizing unitialized_relocate_n operations
+        template <typename Category, typename Dummy>
+        struct uninit_relocate_n_helper
+        {
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy&& policy, InIter first, std::size_t num, OutIter dest)
+            {
+                using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
+
+                zip_iterator t = hpx::util::zip_iterator(first, dest);
+
+                return in_out_result<InIter, OutIter>{std::next(first, num),
+                    hpx::get<1>(
+                        ::hpx::parallel::util::loop_with_manual_cleanup_n(
+                            HPX_FORWARD(ExPolicy, policy), t, num,
+                            [](zip_iterator current) -> void {
+                                auto& [current_first, current_dest] =
+                                    current.get_iterator_tuple();
+
+                                hpx::relocate_at(std::addressof(*current_first),
+                                    std::addressof(*current_dest));
+                            },
+                            [first, dest](zip_iterator iter_at_fail) -> void {
+                                auto& [current_first, current_dest] =
+                                    iter_at_fail.get_iterator_tuple();
+
+                                // destroy all objects constructed so far
+                                std::destroy(dest, current_dest);
+                                // destroy all the objects not relocated yet
+                                std::destroy(
+                                    current_first + 1, std::next(first, num));
+
+                                // This is done to minimize the number of
+                                // objects in an invalid state in case of
+                                // an exception.
+
+                                throw;
+                            })
+                            .get_iterator_tuple())};
+            }
+        };
+
+        // Customization point for optimizing relocate_n operations
+        template <typename Dummy>
+        struct uninit_relocate_n_helper<
+            hpx::traits::nothrow_relocatable_pointer_tag, Dummy>
+        {
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
+                ExPolicy&& policy, InIter first, std::size_t num,
+                OutIter dest) noexcept
+            {
+                using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
+
+                zip_iterator t = hpx::util::make_zip_iterator(first, dest);
+
+                return in_out_result<InIter, OutIter>{std::next(first, num),
+                    ::hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                        HPX_FORWARD(ExPolicy, policy), t, num,
+                        [](zip_iterator it) -> void {
+                            using hpx::get;
+
+                            auto iters = it.get_iterator_tuple();
+
+                            InIter current_first = get<0>(iters);
+                            OutIter current_dest = get<1>(iters);
+
+                            hpx::relocate_at(std::addressof(*current_first),
+                                std::addressof(*current_dest));
+                        })};
+            }
+        };
+
+        template <typename Dummy>
+        struct uninit_relocate_n_helper<
+            hpx::traits::trivially_relocatable_pointer_tag, Dummy>
+        {
+            template <typename ExPolicy, typename InIter, typename OutIter>
+            HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(ExPolicy,
+                InIter first, std::size_t count, OutIter dest) noexcept
+            {
+                return copy_memmove(first, count, dest);
+            }
+        };
+    }    // namespace detail
+
+    template <typename InIter, typename OutIter>
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_relocate_n(
+        InIter first, std::size_t count, OutIter dest)
+    {
+        using category =
+            hpx::traits::pointer_relocate_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
+
+        return detail::uninit_relocate_n_helper<category>::call(
+            hpx::execution::seq, first, count, dest);
+    }
+
+    template <typename ExPolicy, typename InIter, typename OutIter>
+    HPX_FORCEINLINE constexpr in_out_result<InIter, OutIter> uninit_relocate_n(
+        ExPolicy&& policy, InIter first, std::size_t count, OutIter dest)
+    {
+        using category =
+            hpx::traits::pointer_relocate_category_t<std::decay_t<InIter>,
+                std::decay_t<OutIter>>;
+        return detail::uninit_relocate_n_helper<category>::call(
+            HPX_FORWARD(ExPolicy, policy), first, count, dest);
     }
 }    // namespace hpx::parallel::util
