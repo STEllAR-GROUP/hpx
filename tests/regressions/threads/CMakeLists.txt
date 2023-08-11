@@ -7,6 +7,7 @@
 
 set(tests
     block_os_threads_1036
+    main_thread_exit_callbacks
     run_as_hpx_thread_exceptions_3304
     run_as_os_thread_lockup_2991
     stackless_self_4155
