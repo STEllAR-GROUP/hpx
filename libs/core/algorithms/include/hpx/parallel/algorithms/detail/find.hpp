@@ -45,7 +45,6 @@ namespace hpx::parallel::detail {
             std::size_t base_idx, FwdIter part_begin, std::size_t part_count,
             Token& tok, T const& val, Proj&& proj)
         {
-            // TODO
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&val, &proj, &tok](auto& v, std::size_t i) -> void {
                     if (HPX_INVOKE(proj, v) == val)
@@ -102,7 +101,6 @@ namespace hpx::parallel::detail {
             sequential_find_if_t<ExPolicy>, FwdIter part_begin,
             std::size_t part_count, Token& tok, F&& op, Proj&& proj)
         {
-            // TODO
             util::loop_n<std::decay_t<ExPolicy>>(part_begin, part_count, tok,
                 [&op, &tok, &proj](auto const& curr) {
                     if (HPX_INVOKE(op, HPX_INVOKE(proj, *curr)))
@@ -118,7 +116,6 @@ namespace hpx::parallel::detail {
             FwdIter part_begin, std::size_t part_count, Token& tok, F&& f,
             Proj&& proj)
         {
-            // TODO
             util::loop_idx_n<ExPolicy>(base_idx, part_begin, part_count, tok,
                 [&f, &proj, &tok](auto& v, std::size_t i) -> void {
                     if (HPX_INVOKE(f, HPX_INVOKE(proj, v)))
