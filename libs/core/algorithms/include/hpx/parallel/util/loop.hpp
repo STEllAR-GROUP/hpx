@@ -141,22 +141,12 @@ namespace hpx::parallel::util {
         }
     };
 
-    template <typename Begin, typename End, typename Pred,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
+    template <typename Begin, typename End, typename Pred, typename ExPolicy,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>&&
+                hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
     HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_pred_t<hpx::execution::unsequenced_policy>,
-        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
-    {
-        return unseq_first_n(
-            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
-    }
-
-    template <typename Begin, typename End, typename Pred,
-        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>)>
-    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
-        hpx::parallel::util::loop_pred_t<
-            hpx::execution::unsequenced_task_policy>,
-        Begin HPX_RESTRICT begin, End HPX_RESTRICT end, Pred&& pred)
+        hpx::parallel::util::loop_pred_t<ExPolicy>, Begin HPX_RESTRICT begin,
+        End HPX_RESTRICT end, Pred&& pred)
     {
         return unseq_first_n(
             begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
