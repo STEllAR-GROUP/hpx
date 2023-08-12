@@ -247,12 +247,13 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        template <typename Iter, typename Sent, typename Pred, typename Proj>
+        template <typename ExPolicy, typename Iter, typename Sent,
+            typename Pred, typename Proj>
         constexpr Iter sequential_remove_if(
-            Iter first, Sent last, Pred pred, Proj proj)
+            ExPolicy, Iter first, Sent last, Pred pred, Proj proj)
         {
-            first = hpx::parallel::detail::sequential_find_if<
-                hpx::execution::sequenced_policy>(first, last, pred, proj);
+            first = hpx::parallel::detail::sequential_find_if<ExPolicy>(
+                first, last, pred, proj);
 
             if (first != last)
             {
@@ -275,11 +276,12 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Pred, typename Proj>
-            static constexpr Iter sequential(
-                ExPolicy, Iter first, Sent last, Pred&& pred, Proj&& proj)
+            static constexpr Iter sequential(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
-                return sequential_remove_if(first, last,
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
+                return sequential_remove_if(HPX_FORWARD(ExPolicy, policy),
+                    first, last, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj, proj));
             }
 
             template <typename ExPolicy, typename Iter, typename Sent,
