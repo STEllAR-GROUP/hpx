@@ -151,7 +151,7 @@ namespace hpx::traits {
             using type_dst = iter_value_t<Dest>;
 
             constexpr static bool valid_relocation =
-                is_relocatable_from_v<out_type, in_type>;
+                is_relocatable_from_v<type_src, type_dst>;
 
             constexpr static bool memcpy_legal =
                 !std::is_volatile_v<type_src> && !std::is_volatile_v<type_dst>;

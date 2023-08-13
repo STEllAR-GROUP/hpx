@@ -10,6 +10,7 @@
 #include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 
@@ -366,34 +367,34 @@ namespace hpx::parallel::util {
 
                 zip_iterator t = hpx::util::zip_iterator(first, dest);
 
-                return in_out_result<InIter, OutIter>{std::next(first, num),
-                    hpx::get<1>(
-                        ::hpx::parallel::util::loop_with_manual_cleanup_n(
-                            HPX_FORWARD(ExPolicy, policy), t, num,
-                            [](zip_iterator current) -> void {
-                                auto& [current_first, current_dest] =
-                                    current.get_iterator_tuple();
+                InIter last = std::next(first, num);
 
-                                hpx::relocate_at(std::addressof(*current_first),
-                                    std::addressof(*current_dest));
-                            },
-                            [first, dest](zip_iterator iter_at_fail) -> void {
-                                auto& [current_first, current_dest] =
-                                    iter_at_fail.get_iterator_tuple();
+                return in_out_result<InIter, OutIter>{last,
+                    hpx::get<
+                        1>(::hpx::parallel::util::loop_with_manual_cleanup_n(
+                        HPX_FORWARD(ExPolicy, policy), t, num,
+                        [](zip_iterator current) -> void {
+                            auto& [current_first, current_dest] =
+                                current.get_iterator_tuple();
 
-                                // destroy all objects constructed so far
-                                std::destroy(dest, current_dest);
-                                // destroy all the objects not relocated yet
-                                std::destroy(
-                                    current_first + 1, std::next(first, num));
+                            hpx::relocate_at(std::addressof(*current_first),
+                                std::addressof(*current_dest));
+                        },
+                        [first, last, dest](zip_iterator iter_at_fail) -> void {
+                            auto& [current_first, current_dest] =
+                                iter_at_fail.get_iterator_tuple();
 
-                                // This is done to minimize the number of
-                                // objects in an invalid state in case of
-                                // an exception.
+                            // destroy all objects constructed so far
+                            std::destroy(dest, current_dest);
+                            // destroy all the objects not relocated yet
+                            std::destroy(current_first + 1, last);
 
-                                throw;
-                            })
-                            .get_iterator_tuple())};
+                            // This is done to minimize the number of
+                            // objects in an invalid state in case of
+                            // an exception.
+
+                            throw;
+                        }).get_iterator_tuple())};
             }
         };
 

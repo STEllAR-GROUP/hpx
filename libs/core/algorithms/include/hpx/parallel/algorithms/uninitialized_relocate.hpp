@@ -73,7 +73,8 @@ namespace hpx::parallel {
                         Iter part_source = get<0>(iters);
                         FwdIter2 part_dest = get<1>(iters);
 
-                        return std::make_pair(dest,
+                        // returns (dest begin, dest end)
+                        return std::make_pair(part_dest,
                             util::get_second_element(
                                 hpx::parallel::util::uninit_relocate_n(
                                     HPX_FORWARD(ExPolicy, policy), part_source,
@@ -161,7 +162,7 @@ namespace hpx::parallel {
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
             }
 
-            template <typename ExPolicy, typename Iter, typename FwdIter2>
+            template <typename ExPolicy, typename InIter, typename FwdIter2>
             static util::detail::algorithm_result_t<ExPolicy,
                 util::in_out_result<InIter, FwdIter2>>
             parallel(
@@ -198,19 +199,19 @@ namespace hpx {
             InIter first, Size count,
             FwdIter dest) noexcept(std::is_same_v<hpx::traits::
                                                       pointer_relocate_category<
-                                                          FwdIter1, FwdIter2>,
+                                                          InIter, FwdIter>,
                                        hpx::traits::
                                            nothrow_relocatable_pointer_tag> ||
             std::is_same_v<
-                hpx::traits::pointer_relocate_category<FwdIter1, FwdIter2>,
+                hpx::traits::pointer_relocate_category<InIter, FwdIter>,
                 hpx::traits::trivially_relocatable_pointer_tag>)
         {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "Required at least input iterator.");
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
-            static_assert(hpx::traits::pointer_relocate_category<FwdIter1,
-                              FwdIter2>::valid_relocation,
+            static_assert(hpx::traits::pointer_relocate_category<InIter,
+                              FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
                 "ill-formed");
 
