@@ -16,5 +16,5 @@ int main(int argc, char* argv[])
     int(*p)[10] = &a;
     int(*q)[10] = &b;
 
-    hpx::relocate_at(p, q);
+    hpx::experimental::relocate_at(p, q);
 }

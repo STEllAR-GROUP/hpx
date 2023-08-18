@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/is_relocatable.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
@@ -17,34 +18,35 @@
 #include <memory>
 #endif
 
-namespace hpx {
-
-    namespace detail {
+namespace hpx::detail {
 #if __cplusplus <= 201703L
-// pre c++17 std::destroy_at can be used only on non-array types
-        template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
+    // pre c++17 std::destroy_at can be used only on non-array types
+    template <typename T,
+        HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
 #else
-// c++17 std::destroy_at can be used on array types, destructing each element
-        template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
+    // c++17 std::destroy_at can be used on array types, destructing each element
+    template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
 #endif
-        struct destroy_guard
+    struct destroy_guard
+    {
+        T* t;
+        explicit destroy_guard(T* t)
+          : t(t)
         {
-            T* t;
-            explicit destroy_guard(T* t)
-              : t(t)
-            {
-            }
-            ~destroy_guard()
-            {
-                std::destroy_at(t);
-            }
-        };
-    }    // namespace detail
+        }
+        ~destroy_guard()
+        {
+            std::destroy_at(t);
+        }
+    };
+}    // namespace hpx::detail
 
 #if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
-    using std::relocate;
-    using std::relocate_at;
+using std::relocate;
+using std::relocate_at;
 #else
+
+namespace hpx::experimental {
 
     namespace detail {
 
@@ -80,6 +82,8 @@ namespace hpx {
             // has non-throwing move constructor
             std::is_nothrow_move_constructible_v<T>)
         {
+            using hpx::detail::destroy_guard;
+
             destroy_guard g(src);
             return hpx::construct_at(dst, HPX_MOVE(*src));
         };
@@ -102,7 +106,9 @@ namespace hpx {
         static_assert(
             hpx::is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
 
-        detail::destroy_guard g(src);
+        using hpx::detail::destroy_guard;
+
+        destroy_guard g(src);
         return HPX_MOVE(*src);
     }
 
@@ -120,6 +126,6 @@ namespace hpx {
     }
     */
 
-#endif    // defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
+#endif    // !defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
 
-}    // namespace hpx
+}    // namespace hpx::experimental
