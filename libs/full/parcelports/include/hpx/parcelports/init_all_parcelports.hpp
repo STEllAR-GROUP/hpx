@@ -10,10 +10,10 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 
-namespace hpx::parcelset
-{
+namespace hpx::parcelset {
+
     // force linking with this module
     HPX_EXPORT void init_all_parcelports();
-}
+}    // namespace hpx::parcelset
 
 #endif

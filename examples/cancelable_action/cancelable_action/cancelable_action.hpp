@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2011 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,21 +11,21 @@
 #include <hpx/assert.hpp>
 #include <hpx/include/components.hpp>
 
-#include "stubs/cancelable_action.hpp"
+#include "server/cancelable_action.hpp"
 
 #include <utility>
 
 namespace examples {
+
     ///////////////////////////////////////////////////////////////////////////
     // Client side representation for for the \a server::cancelable_action
     // component.
     class cancelable_action
       : public hpx::components::client_base<cancelable_action,
-            stubs::cancelable_action>
+            server::cancelable_action>
     {
-        typedef hpx::components::client_base<cancelable_action,
-            stubs::cancelable_action>
-            base_type;
+        using base_type = hpx::components::client_base<cancelable_action,
+            server::cancelable_action>;
 
     public:
         // Default construct an empty client side representation (not
@@ -45,16 +45,18 @@ namespace examples {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void do_it(hpx::error_code& ec = hpx::throws)
+        void do_it(hpx::error_code& ec = hpx::throws) const
         {
+            using action_type = server::cancelable_action::do_it_action;
             HPX_ASSERT(this->get_id());
-            this->base_type::do_it(this->get_id(), ec);
+            hpx::async<action_type>(this->get_id()).get(ec);
         }
 
-        void cancel_it()
+        void cancel_it() const
         {
+            using action_type = server::cancelable_action::cancel_it_action;
             HPX_ASSERT(this->get_id());
-            this->base_type::cancel_it(this->get_id());
+            hpx::post<action_type>(this->get_id());
         }
     };
 }    // namespace examples
