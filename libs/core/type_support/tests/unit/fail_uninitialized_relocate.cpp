@@ -16,5 +16,5 @@ int main(int argc, char* argv[])
     int(*p)[10] = &a;
     int(*q)[10] = &b;
 
-    hpx::uninitialized_relocate(p, p + 1, q);
+    hpx::experimental::uninitialized_relocate(p, p + 1, q);
 }
