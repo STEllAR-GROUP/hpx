@@ -150,7 +150,7 @@ int hpx_main()
         HPX_TEST(trivially_relocatable_struct::count == N);
 
         // relocate them to ptr2
-        hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        hpx::experimental::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
 
         // All creations - destructions balance out
         HPX_TEST(trivially_relocatable_struct::count == N);
@@ -193,7 +193,7 @@ int hpx_main()
         HPX_TEST(non_trivially_relocatable_struct::count == N);
 
         // relocate them to ptr2
-        hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        hpx::experimental::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
 
         // All creations - destructions balance out
         HPX_TEST(non_trivially_relocatable_struct::count == N);
@@ -240,7 +240,7 @@ int hpx_main()
         // relocate them to ptr2
         try
         {
-            hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+            hpx::experimental::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
             HPX_TEST(false);    // should never reach this
         }
         catch (int forty_two)
