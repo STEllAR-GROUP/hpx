@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/hpx_init.hpp>
@@ -12,7 +13,7 @@
 #include "cancelable_action/cancelable_action.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-void interrupt_do_it(examples::cancelable_action ca)
+void interrupt_do_it(examples::cancelable_action const& ca)
 {
     // wait for one second before interrupting the (possibly remote) operation
     hpx::this_thread::sleep_for(std::chrono::seconds(1));
