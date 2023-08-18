@@ -144,7 +144,6 @@ namespace hpx::experimental {
                     // destroy all objects other that the one
                     // that caused the exception
                     // (relocate_at already destroyed that one)
-
                     // destroy all objects constructed so far
                     std::destroy(original_dst, dst);
                     // destroy all the objects not relocated yet
