@@ -42,6 +42,60 @@ namespace hpx {
     {
     };
 
+    // Constness, Volatility, References, Arrays are ignored
+    template <typename T>
+    struct is_trivially_relocatable<T const> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T volatile> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T const volatile>
+      : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T&> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T&&> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T>
+    struct is_trivially_relocatable<T[]> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T, int size>
+    struct is_trivially_relocatable<T[size]> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T, int size>
+    struct is_trivially_relocatable<T const[size]> : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T, int size>
+    struct is_trivially_relocatable<T volatile[size]>
+      : is_trivially_relocatable<T>
+    {
+    };
+
+    template <typename T, int size>
+    struct is_trivially_relocatable<T const volatile[size]>
+      : is_trivially_relocatable<T>
+    {
+    };
+
     template <typename T>
     inline constexpr bool is_trivially_relocatable_v =
         is_trivially_relocatable<T>::value;
