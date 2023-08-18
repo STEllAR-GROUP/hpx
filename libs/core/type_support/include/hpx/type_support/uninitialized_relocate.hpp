@@ -17,7 +17,7 @@
 #include <memory>
 #endif
 
-namespace hpx {
+namespace hpx::experimental {
 
 #if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
     using std::uninitialized_relocate;
@@ -114,7 +114,7 @@ namespace hpx {
             for (; first != last; ++first, ++dst)
             {
                 // the move + destroy version will be used
-                hpx::relocate_at(std::addressof(*first), std::addressof(*dst));
+                hpx::experimental::relocate_at(std::addressof(*first), std::addressof(*dst));
             }
 
             return dst;
@@ -135,7 +135,7 @@ namespace hpx {
                 try
                 {
                     // the move + destroy version will be used
-                    hpx::relocate_at(
+                    hpx::experimental::relocate_at(
                         std::addressof(*first), std::addressof(*dst));
                 }
                 catch (...)
