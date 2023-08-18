@@ -130,11 +130,17 @@ namespace hpx::detail {
         freebsd_environ = environ;
 #endif
         // set a handler for std::abort, std::at_quick_exit, and std::atexit
-        std::signal(SIGABRT, detail::on_abort);
-        std::atexit(detail::on_exit);
+        [[maybe_unused]] auto const prev_signal =
+            std::signal(SIGABRT, detail::on_abort);
+        HPX_ASSERT(prev_signal != SIG_ERR);
+
+        [[maybe_unused]] auto const ret_at_exit = std::atexit(detail::on_exit);
+        HPX_ASSERT(ret_at_exit == 0);
+
 #if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-        [[maybe_unused]] int const ret = std::at_quick_exit(detail::on_exit);
-        HPX_ASSERT(ret == 0);
+        [[maybe_unused]] auto const ret_at_quick_exit =
+            std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret_at_quick_exit == 0);
 #endif
         return detail::run_or_start(f, argc, argv, params, true);
     }
@@ -163,11 +169,17 @@ namespace hpx::detail {
         freebsd_environ = environ;
 #endif
         // set a handler for std::abort, std::at_quick_exit, and std::atexit
-        std::signal(SIGABRT, detail::on_abort);
-        std::atexit(detail::on_exit);
+        [[maybe_unused]] auto const prev_signal =
+            std::signal(SIGABRT, detail::on_abort);
+        HPX_ASSERT(prev_signal != SIG_ERR);
+
+        [[maybe_unused]] auto const ret_atexit = std::atexit(detail::on_exit);
+        HPX_ASSERT(ret_atexit == 0);
+
 #if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-        [[maybe_unused]] int const ret = std::at_quick_exit(detail::on_exit);
-        HPX_ASSERT(ret == 0);
+        [[maybe_unused]] auto const ret_at_quick_exit =
+            std::at_quick_exit(detail::on_exit);
+        HPX_ASSERT(ret_at_quick_exit == 0);
 #endif
         return 0 == detail::run_or_start(f, argc, argv, params, false);
     }
@@ -870,15 +882,15 @@ namespace hpx {
                     hpx_startup::user_main_config(params.cfg), f};
 #endif
 
+                std::vector<
+                    std::shared_ptr<components::component_registry_base>>
+                    component_registries;
+
                 // scope exception handling to resource partitioner initialization
                 // any exception thrown during run_or_start below are handled
                 // separately
                 try
                 {
-                    std::vector<
-                        std::shared_ptr<components::component_registry_base>>
-                        component_registries;
-
                     result = cmdline.call(
                         params.desc_cmdline, argc, argv, component_registries);
 
@@ -902,13 +914,6 @@ namespace hpx {
                     hpx::resource::partitioner rp =
                         hpx::resource::detail::make_partitioner(
                             params.rp_mode, cmdline.rtcfg_, affinity_data);
-
-                    for (auto& registry : component_registries)
-                    {
-                        hpx::register_startup_function([registry]() {
-                            registry->register_component_type();
-                        });
-                    }
 
                     activate_global_options(cmdline, argc, argv);
 
@@ -964,6 +969,13 @@ namespace hpx {
                 default:
                 {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
+                    for (auto const& registry : component_registries)
+                    {
+                        hpx::register_startup_function([registry]() {
+                            registry->register_component_type();
+                        });
+                    }
+
                     LPROGRESS_ << "creating distributed runtime";
                     rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_,
                         &hpx::detail::pre_main, &hpx::detail::post_main));
@@ -1011,7 +1023,7 @@ namespace hpx {
                 }
                 catch (hpx::util::bad_lexical_cast const&)
                 {
-                    ;    // do nothing
+                    // do nothing
                 }
             }
             return default_;
@@ -1112,9 +1124,8 @@ namespace hpx {
         if (std::abs(shutdown_timeout + 1.0) < 1e-16)
             shutdown_timeout = detail::get_option("hpx.shutdown_timeout", -1.0);
 
-        components::server::runtime_support* p =
-            static_cast<components::server::runtime_support*>(
-                get_runtime_distributed().get_runtime_support_lva());
+        auto* p = static_cast<components::server::runtime_support*>(
+            get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)
         {
@@ -1147,9 +1158,8 @@ namespace hpx {
         }
 
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
-        components::server::runtime_support* p =
-            static_cast<components::server::runtime_support*>(
-                get_runtime_distributed().get_runtime_support_lva());
+        auto* p = static_cast<components::server::runtime_support*>(
+            get_runtime_distributed().get_runtime_support_lva());
 
         if (nullptr == p)
         {
