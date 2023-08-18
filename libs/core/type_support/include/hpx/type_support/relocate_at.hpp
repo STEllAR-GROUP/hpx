@@ -20,7 +20,13 @@
 namespace hpx {
 
     namespace detail {
-        template <typename T>
+#if __cplusplus <= 201703L
+// pre c++17 std::destroy_at can be used only on non-array types
+        template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
+#else
+// c++17 std::destroy_at can be used on array types, destructing each element
+        template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
+#endif
         struct destroy_guard
         {
             T* t;
