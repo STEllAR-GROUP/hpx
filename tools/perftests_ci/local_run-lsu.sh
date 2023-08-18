@@ -7,7 +7,7 @@
 
 # To execute from the build directory
 
-src_dir=${1:-~/projects/hpx}
+src_dir=${1:-~/hpx}
 build_dir=$PWD
 
 # Clean old artifacts if any
