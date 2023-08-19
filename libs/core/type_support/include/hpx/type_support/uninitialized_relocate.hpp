@@ -114,7 +114,8 @@ namespace hpx::experimental {
             for (; first != last; ++first, ++dst)
             {
                 // the move + destroy version will be used
-                hpx::experimental::relocate_at(std::addressof(*first), std::addressof(*dst));
+                hpx::experimental::relocate_at(
+                    std::addressof(*first), std::addressof(*dst));
             }
 
             return dst;
@@ -171,4 +172,4 @@ namespace hpx::experimental {
 
 #endif    // defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
 
-}    // namespace hpx
+}    // namespace hpx::experimental
