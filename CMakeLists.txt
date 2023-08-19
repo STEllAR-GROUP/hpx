@@ -547,7 +547,7 @@ hpx_option(
 hpx_option(
   HPX_WITH_FETCH_SIMD_SORT
   BOOL
-  "Use FetchContent to fetch Eve. By default an installed Eve will be used. (default: On)"
+  "Use FetchContent to fetch x86-simd-sort. By default an installed x86-simd-sort will be used. (default: On)"
   ON
   CATEGORY "Build Targets"
   ADVANCED
