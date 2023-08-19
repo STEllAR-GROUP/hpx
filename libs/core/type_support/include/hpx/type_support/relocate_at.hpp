@@ -87,6 +87,43 @@ namespace hpx::experimental {
             destroy_guard g(src);
             return hpx::construct_at(dst, HPX_MOVE(*src));
         };
+
+        template <typename T>
+        T relocate_helper(T* src) noexcept(
+            std::is_nothrow_move_constructible_v<T>)
+        {
+            using hpx::detail::destroy_guard;
+
+            destroy_guard g(src);
+            return HPX_MOVE(*src);
+        }
+
+        /*
+        P1144 also proposes a version of relocate that does not call the 
+        move constructor and instead memmoves the bytes of src to dest.
+
+        Giving an interface like:
+
+            T dest = relocate(std::addressof(src));
+
+        That results in a valid T object (dest) without calling any 
+        constructor or destructor.
+        
+        This is not possible to do with the current C++ standard.
+
+        One of the proposed ways to implement this uses a hypothetical
+        attribute "do_not_construct" and NRVO.
+
+        Implementation:
+
+        template <class T, std::enable_if_t<relocate_using_memmove<T>, int> = 0>
+        T relocate(T* source)
+        {
+            __attribute__((do_not_construct)) T t; // hypothetical attribute
+            std::memmove(std::addressof(t), source, sizeof(T));
+            return t;  // NRVO
+        }
+        */
     }    // namespace detail
 
     template <typename T>
@@ -106,25 +143,8 @@ namespace hpx::experimental {
         static_assert(
             hpx::is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
 
-        using hpx::detail::destroy_guard;
-
-        destroy_guard g(src);
-        return HPX_MOVE(*src);
+        return detail::relocate_helper(src);
     }
-
-    /*
-    Memmove codegen. This part relies on UB, so it's not used. It's here for
-        reference. More info on this:
-
-    https://quuxplusone.github.io/blog/2022/05/18/std-relocate/
-
-    template <class T>
-    T relocate(T* source)
-    {
-        auto magic = (T(*)(void*, size_t)) memcpy;
-        return magic(source, sizeof(T));
-    }
-    */
 
 #endif    // !defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
 
