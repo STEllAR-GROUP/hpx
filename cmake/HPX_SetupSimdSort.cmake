@@ -11,7 +11,7 @@ if(HPX_WITH_FETCH_SIMD_SORT)
     )
   else()
     hpx_info(
-      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, EVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SIMD_SORT_TAG=${HPX_WITH_SIMD_SORT_TAG})"
+      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SIMD_SORT_TAG=${HPX_WITH_SIMD_SORT_TAG})"
     )
   endif()
   include(FetchContent)
