@@ -20,7 +20,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-void run_barrier_test1(std::vector<size_t> locs)
+void run_barrier_test1(std::vector<size_t> const& locs)
 {
     auto loc_it = std::find(locs.begin(), locs.end(), hpx::get_locality_id());
     if (loc_it == locs.end())
@@ -28,20 +28,20 @@ void run_barrier_test1(std::vector<size_t> locs)
 
     std::size_t barrier_rank = std::distance(locs.begin(), loc_it);
 
-    std::string barrier_name =
-        "/loc_list/barrier" + std::to_string(locs[0]) + std::to_string(locs[1]);
+    std::string barrier_name = "/loc_list/barrier1" + std::to_string(locs[0]) +
+        std::to_string(locs[1]);
     hpx::distributed::barrier b(barrier_name, locs.size(), barrier_rank);
     b.wait();
 }
 
-void run_barrier_test2(std::vector<size_t> locs)
+void run_barrier_test2(std::vector<size_t> const& locs)
 {
     auto loc_it = std::find(locs.begin(), locs.end(), hpx::get_locality_id());
     if (loc_it == locs.end())
         return;
 
-    std::string barrier_name =
-        "/loc_list/barrier" + std::to_string(locs[0]) + std::to_string(locs[1]);
+    std::string barrier_name = "/loc_list/barrier2" + std::to_string(locs[0]) +
+        std::to_string(locs[1]);
     hpx::distributed::barrier b(barrier_name, locs, hpx::get_locality_id());
     b.wait();
 }
@@ -53,12 +53,15 @@ int hpx_main()
     std::vector<size_t> locs_0{0, 1};
     run_barrier_test1(locs_0);
     run_barrier_test2(locs_0);
+
     std::vector<size_t> locs_1{0, 2};
     run_barrier_test1(locs_1);
     run_barrier_test2(locs_1);
+
     std::vector<size_t> locs_2{1, 2};
     run_barrier_test1(locs_2);
     run_barrier_test2(locs_2);
+
     return hpx::finalize();
 }
 
