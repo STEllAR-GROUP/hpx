@@ -7,7 +7,7 @@
 if(HPX_WITH_FETCH_SIMD_SORT)
   if(FETCHCONTENT_SOURCE_DIR_SIMD_SORT)
     hpx_info(
-      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, EVE will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_EVE=${FETCHCONTENT_SOURCE_DIR_EVE})"
+      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_EVE=${FETCHCONTENT_SOURCE_DIR_EVE})"
     )
   else()
     hpx_info(
