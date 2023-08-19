@@ -553,7 +553,7 @@ hpx_option(
   ADVANCED
 )
 hpx_option(
-  HPX_WITH_SIMD_SORT_TAG STRING "Eve repository tag or branch" "v2.0"
+  HPX_WITH_SIMD_SORT_TAG STRING "x86-simd-sort repository tag or branch" "v2.0"
   CATEGORY "Build Targets"
   ADVANCED
 )
