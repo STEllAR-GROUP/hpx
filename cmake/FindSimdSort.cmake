@@ -34,8 +34,8 @@ if(NOT TARGET SimdSort::simdsort)
   # \t]+\"+[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+\"[ \t]*" ) # Extracts the dotted
   # version number in quotation marks as # SIMD_SORT_VERSION_STRING string(REGEX
   # REPLACE "#define EVE_LIB_VERSION \"([0-9]+\.[0-9]+\.[0-9]+\.[0-9])\"" "\\1"
-  # SIMD_SORT_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}" ) else() hpx_error( "Could
-  # not find EVE_ROOT/include/eve/version.hpp. Please check your eve
+  # SIMD_SORT_VERSION_STRING "${EVE_VERSION_DEFINE_LINE}" ) else() hpx_error(
+  # "Could not find EVE_ROOT/include/eve/version.hpp. Please check your eve
   # installation" ) endif()
 
   include(FindPackageHandleStandardArgs)
@@ -50,5 +50,7 @@ if(NOT TARGET SimdSort::simdsort)
     SimdSort::simdsort SYSTEM INTERFACE ${SIMD_SORT_INCLUDE_DIR}
   )
 
-  mark_as_advanced(SIMD_SORT_ROOT SIMD_SORT_INCLUDE_DIR SIMD_SORT_VERSION_STRING)
+  mark_as_advanced(
+    SIMD_SORT_ROOT SIMD_SORT_INCLUDE_DIR SIMD_SORT_VERSION_STRING
+  )
 endif()
