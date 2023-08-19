@@ -30,14 +30,15 @@ add_hpx_library(
           "hpx/binary_filter/bzip2_serialization_filter.hpp"
           "hpx/binary_filter/bzip2_serialization_filter_registration.hpp"
   PREPEND_HEADER_ROOT INSTALL_HEADERS
-  FOLDER "Core/Plugins/Compression"
-  DEPENDENCIES ${BZIP2_LIBRARIES} ${HPX_WITH_UNITY_BUILD_OPTION}
+  FOLDER "Core/Plugins/Compression" ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_include_directories(
   compression_bzip2 SYSTEM PRIVATE ${BZIP2_INCLUDE_DIR}
 )
-target_link_libraries(compression_bzip2 PUBLIC Boost::iostreams)
+target_link_libraries(
+  compression_bzip2 PUBLIC Boost::iostreams ${BZIP2_LIBRARIES}
+)
 
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.bzip2 compression_bzip2

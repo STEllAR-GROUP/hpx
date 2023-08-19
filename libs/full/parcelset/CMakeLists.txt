@@ -14,6 +14,7 @@ set(parcelset_headers
     hpx/parcelset/detail/parcel_await.hpp
     hpx/parcelset/detail/message_handler_interface_functions.hpp
     hpx/parcelset/encode_parcels.hpp
+    hpx/parcelset/init_parcelports.hpp
     hpx/parcelset/message_handler_fwd.hpp
     hpx/parcelset/parcel.hpp
     hpx/parcelset/parcelhandler.hpp

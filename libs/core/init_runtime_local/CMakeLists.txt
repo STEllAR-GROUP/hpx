@@ -12,7 +12,9 @@ set(init_runtime_local_headers hpx/init_runtime_local/detail/init_logging.hpp
                                hpx/init_runtime_local/init_runtime_local.hpp
 )
 
-set(generated_init_runtime_local_headers hpx/init.hpp)
+if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
+  set(generated_init_runtime_local_headers hpx/init.hpp)
+endif()
 
 set(init_runtime_local_sources init_logging.cpp init_runtime_local.cpp)
 

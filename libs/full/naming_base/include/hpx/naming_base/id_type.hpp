@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -32,8 +32,10 @@ namespace hpx {
         HPX_EXPORT void intrusive_ptr_add_ref(id_type_impl* p) noexcept;
         HPX_EXPORT void intrusive_ptr_release(id_type_impl* p) noexcept;
 
-        HPX_EXPORT void gid_managed_deleter(id_type_impl* p) noexcept;
-        HPX_EXPORT void gid_unmanaged_deleter(id_type_impl* p) noexcept;
+        extern HPX_EXPORT void (*gid_managed_deleter)(
+            id_type_impl const* p) noexcept;
+        extern HPX_EXPORT void (*gid_unmanaged_deleter)(
+            id_type_impl const* p) noexcept;
     }    // namespace naming::detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -96,6 +98,8 @@ namespace hpx {
         id_type& operator=(id_type const& o) = default;
         id_type& operator=(id_type&& o) noexcept = default;
 
+        ~id_type() = default;
+
         naming::gid_type& get_gid();
         naming::gid_type const& get_gid() const;
 
@@ -104,7 +108,7 @@ namespace hpx {
         management_type get_management_type() const noexcept;
 
         id_type& operator++();
-        id_type operator++(int);
+        id_type operator++(int) const;
 
         explicit operator bool() const noexcept;
 
@@ -121,11 +125,11 @@ namespace hpx {
 
         // access the internal parts of the gid
         std::uint64_t get_msb() const;
-        void set_msb(std::uint64_t msb);
+        void set_msb(std::uint64_t msb) const;
 
         std::uint64_t get_lsb() const;
-        void set_lsb(std::uint64_t lsb);
-        void set_lsb(void* lsb);
+        void set_lsb(std::uint64_t lsb) const;
+        void set_lsb(void* lsb) const;
 
         // Convert this id into an unmanaged one (in-place) - Use with maximum
         // care, or better, don't use this at all.
@@ -164,14 +168,14 @@ namespace hpx {
         inline id_type get_id_from_locality_id(
             std::uint32_t locality_id) noexcept
         {
-            return id_type((std::uint64_t(locality_id) + 1)
+            return {(static_cast<std::uint64_t>(locality_id) + 1)
                     << naming::gid_type::locality_id_shift,
-                0, id_type::management_type::unmanaged);
+                0, id_type::management_type::unmanaged};
         }
 
         inline std::uint32_t get_locality_id_from_id(id_type const& id) noexcept
         {
-            return std::uint32_t(
+            return static_cast<std::uint32_t>(
                        id.get_msb() >> naming::gid_type::locality_id_shift) -
                 1;
         }
@@ -200,10 +204,13 @@ namespace hpx {
         struct id_type_impl : gid_type
         {
         public:
-            HPX_NON_COPYABLE(id_type_impl);
+            id_type_impl(id_type_impl const&) = delete;
+            id_type_impl(id_type_impl&&) = delete;
+            id_type_impl& operator=(id_type_impl const&) = delete;
+            id_type_impl& operator=(id_type_impl&&) = delete;
 
         private:
-            using deleter_type = void (*)(detail::id_type_impl*) noexcept;
+            using deleter_type = void (*)(detail::id_type_impl const*) noexcept;
             static deleter_type get_deleter(
                 id_type::management_type t) noexcept;
 
@@ -245,6 +252,8 @@ namespace hpx {
             {
             }
 
+            ~id_type_impl() = default;
+
             constexpr id_type::management_type get_management_type()
                 const noexcept
             {
@@ -282,12 +291,6 @@ namespace hpx {
             }
 
         private:
-            // custom deleter for id_type_impl
-            friend HPX_EXPORT void gid_managed_deleter(
-                id_type_impl* p) noexcept;
-            friend HPX_EXPORT void gid_unmanaged_deleter(
-                id_type_impl* p) noexcept;
-
             // reference counting
             friend HPX_EXPORT void intrusive_ptr_add_ref(
                 id_type_impl* p) noexcept;
@@ -389,7 +392,7 @@ namespace hpx {
     {
         return gid_->get_msb();
     }
-    inline void id_type::set_msb(std::uint64_t msb)
+    inline void id_type::set_msb(std::uint64_t msb) const
     {
         gid_->set_msb(msb);
     }
@@ -398,11 +401,11 @@ namespace hpx {
     {
         return gid_->get_lsb();
     }
-    inline void id_type::set_lsb(std::uint64_t lsb)
+    inline void id_type::set_lsb(std::uint64_t lsb) const
     {
         gid_->set_lsb(lsb);
     }
-    inline void id_type::set_lsb(void* lsb)
+    inline void id_type::set_lsb(void* lsb) const
     {
         gid_->set_lsb(lsb);
     }

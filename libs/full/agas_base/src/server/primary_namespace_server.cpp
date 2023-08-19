@@ -7,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/agas_base/route.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -1118,6 +1119,19 @@ namespace hpx::agas::server {
 
         return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
     }
+
+#if defined(HPX_HAVE_NETWORKING)
+    void (*route)(primary_namespace& server, parcelset::parcel&& p) = nullptr;
+
+    void primary_namespace::route(parcelset::parcel&& p)
+    {
+        util::scoped_timer<std::atomic<std::int64_t>> update(
+            counter_data_.route_.time_, counter_data_.route_.enabled_);
+        counter_data_.increment_route_count();
+
+        (*server::route)(*this, HPX_MOVE(p));
+    }
+#endif
 
     // access current counter values
     std::int64_t primary_namespace::counter_data::get_bind_gid_count(bool reset)

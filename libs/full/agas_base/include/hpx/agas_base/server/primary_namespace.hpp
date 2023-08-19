@@ -126,6 +126,11 @@ namespace hpx::agas::server {
         using resolved_type =
             hpx::tuple<naming::gid_type, gva, naming::gid_type>;
 
+        mutex_type& mutex()
+        {
+            return mutex_;
+        }
+
     private:
         // REVIEW: Separate mutexes might reduce contention here. This has to be
         // investigated carefully.
@@ -241,6 +246,7 @@ namespace hpx::agas::server {
             char const* func_name);
 #endif
 
+    public:
         // helper function
         void wait_for_migration_locked(std::unique_lock<mutex_type>& l,
             naming::gid_type const& id, error_code& ec);
@@ -295,10 +301,10 @@ namespace hpx::agas::server {
         std::pair<naming::gid_type, naming::gid_type> allocate(
             std::uint64_t count);
 
-    private:
         resolved_type resolve_gid_locked(std::unique_lock<mutex_type>& l,
             naming::gid_type const& gid, error_code& ec);
 
+    private:
         resolved_type resolve_gid_locked_non_local(
             std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
             error_code& ec);

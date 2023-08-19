@@ -30,8 +30,7 @@ add_hpx_library(
           "hpx/binary_filter/snappy_serialization_filter.hpp"
           "hpx/binary_filter/snappy_serialization_filter_registration.hpp"
   PREPEND_HEADER_ROOT INSTALL_HEADERS
-  FOLDER "Core/Plugins/Compression"
-  DEPENDENCIES ${SNAPPY_LIBRARY} ${HPX_WITH_UNITY_BUILD_OPTION}
+  FOLDER "Core/Plugins/Compression" ${HPX_WITH_UNITY_BUILD_OPTION}
 )
 
 target_include_directories(
@@ -39,7 +38,9 @@ target_include_directories(
 )
 target_link_directories(compression_snappy PRIVATE ${SNAPPY_LIBRARY_DIR})
 
-target_link_libraries(compression_snappy PUBLIC Boost::iostreams)
+target_link_libraries(
+  compression_snappy PUBLIC Boost::iostreams ${SNAPPY_LIBRARY}
+)
 
 add_hpx_pseudo_dependencies(
   components.parcel_plugins.binary_filter.snappy compression_snappy

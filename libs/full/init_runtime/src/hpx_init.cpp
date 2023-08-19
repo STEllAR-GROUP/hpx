@@ -67,6 +67,7 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/naming.hpp>
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/parcelports/init_all_parcelports.hpp>
 #include <hpx/parcelset/parcelhandler.hpp>
 #include <hpx/parcelset_base/locality_interface.hpp>
 #endif
@@ -125,6 +126,10 @@ namespace hpx::detail {
         apex::version();
 #endif
 #endif
+#if defined(HPX_HAVE_NETWORKING)
+        // force linking parcelports
+        hpx::parcelset::init_all_parcelports();
+#endif
         util::set_hpx_prefix(hpx_prefix);
 #if defined(__FreeBSD__)
         freebsd_environ = env;
@@ -163,6 +168,10 @@ namespace hpx::detail {
         // application
         apex::version();
 #endif
+#endif
+#if defined(HPX_HAVE_NETWORKING)
+        // force linking parcelports
+        hpx::parcelset::init_all_parcelports();
 #endif
         util::set_hpx_prefix(hpx_prefix);
 #if defined(__FreeBSD__)

@@ -216,6 +216,8 @@ function(hpx_setup_target target)
     hpx_debug("setup_target.${target} UNITY_BUILD: OFF")
   endif()
 
+  set_target_properties(${target} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
   get_target_property(target_EXCLUDE_FROM_ALL ${target} EXCLUDE_FROM_ALL)
 
   if(target_EXPORT AND NOT target_EXCLUDE_FROM_ALL)

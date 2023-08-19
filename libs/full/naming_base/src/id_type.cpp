@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,9 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     namespace naming::detail {
 
+        void (*gid_managed_deleter)(id_type_impl const* p) noexcept = nullptr;
+        void (*gid_unmanaged_deleter)(id_type_impl const* p) noexcept = nullptr;
+
         util::internal_allocator<id_type_impl> id_type_impl::alloc_;
 
         id_type_impl::deleter_type id_type_impl::get_deleter(
@@ -26,18 +29,18 @@ namespace hpx {
             switch (t)
             {
             case hpx::id_type::management_type::unmanaged:
-                return &detail::gid_unmanaged_deleter;
+                return gid_unmanaged_deleter;
 
             case hpx::id_type::management_type::managed:
                 [[fallthrough]];
             case hpx::id_type::management_type::managed_move_credit:
-                return &detail::gid_managed_deleter;
+                return gid_managed_deleter;
 
             default:
                 HPX_ASSERT(false);    // invalid management type
-                return &detail::gid_unmanaged_deleter;
+                break;
             }
-            return nullptr;
+            return gid_unmanaged_deleter;
         }
 
         // support functions for hpx::intrusive_ptr
@@ -62,9 +65,10 @@ namespace hpx {
         return *this;
     }
 
-    id_type id_type::operator++(int)    // post-increment
+    id_type id_type::operator++(int) const
+    // post-increment
     {
-        return id_type((*gid_)++, management_type::unmanaged);
+        return {(*gid_)++, management_type::unmanaged};
     }
 
     // comparison is required as well
@@ -138,10 +142,10 @@ namespace hpx::traits {
     hpx::id_type get_remote_result<hpx::id_type, naming::gid_type>::call(
         naming::gid_type const& rhs)
     {
-        bool has_credits = naming::detail::has_credits(rhs);
-        return hpx::id_type(rhs,
+        bool const has_credits = naming::detail::has_credits(rhs);
+        return {rhs,
             has_credits ? hpx::id_type::management_type::managed :
-                          hpx::id_type::management_type::unmanaged);
+                          hpx::id_type::management_type::unmanaged};
     }
 
     // we need to specialize this template to allow for automatic conversion of
@@ -154,7 +158,7 @@ namespace hpx::traits {
         result.reserve(rhs.size());
         for (naming::gid_type const& r : rhs)
         {
-            bool has_credits = naming::detail::has_credits(r);
+            bool const has_credits = naming::detail::has_credits(r);
             result.emplace_back(r,
                 has_credits ? hpx::id_type::management_type::managed :
                               hpx::id_type::management_type::unmanaged);
