@@ -544,6 +544,26 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_FETCH_SIMD_SORT
+  BOOL
+  "Use FetchContent to fetch Eve. By default an installed Eve will be used. (default: On)"
+  ON
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+hpx_option(
+  HPX_WITH_SIMD_SORT_TAG STRING "Eve repository tag or branch" "v2.0"
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
+if(HPX_WITH_FETCH_SIMD_SORT)
+  include(HPX_SetupSimdSort)
+else()
+  find_package(SimdSort)
+endif()
+
 # ##############################################################################
 # HPX CUDA configuration
 # ##############################################################################
