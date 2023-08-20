@@ -26,7 +26,7 @@ elseif(NOT TARGET Json::json)
     )
   else()
     hpx_info(
-      "HPX_WITH_FETCH_JSON=${HPX_WITH_FETCH_JSON}, JSON will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_Json_TAG=${HPX_WITH_Json_TAG})"
+      "HPX_WITH_FETCH_JSON=${HPX_WITH_FETCH_JSON}, JSON will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_JSON_TAG=${HPX_WITH_JSON_TAG})"
     )
   endif()
 
@@ -45,7 +45,7 @@ elseif(NOT TARGET Json::json)
     json SYSTEM INTERFACE $<BUILD_INTERFACE:${Json_ROOT}/include>
                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
-  target_compile_definitions(json INTERFACE Json_HAS_CPP_17)
+  target_compile_definitions(json INTERFACE JSON_HAS_CPP_17)
 
   install(
     TARGETS json
