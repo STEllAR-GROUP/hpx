@@ -32,7 +32,7 @@ void dummy_task(std::size_t n)
 {
     // no other work can take place on this thread whilst it sleeps
     bool sleep = true;
-    auto start = std::chrono::steady_clock::now();
+    auto const start = std::chrono::steady_clock::now();
     do
     {
         std::this_thread::sleep_for(std::chrono::microseconds(n) / 25);
@@ -45,7 +45,7 @@ void dummy_task(std::size_t n)
 
 inline std::size_t st_rand()
 {
-    return std::size_t(std::rand());
+    return static_cast<std::size_t>(std::rand());
 }
 
 int hpx_main(variables_map& vm)
@@ -86,25 +86,31 @@ int hpx_main(variables_map& vm)
     // randomly create normal priority tasks
     // and then a set of HP tasks in periodic bursts
     // Use task plotting tools to validate that scheduling is correct
-    const int np_loop = vm["nnp"].as<int>();
-    const int hp_loop = vm["nhp"].as<int>();
-    const int np_m = vm["mnp"].as<int>();
-    const int hp_m = vm["mhp"].as<int>();
-    const int cycles = vm["cycles"].as<int>();
+    int const np_loop = vm["nnp"].as<int>();
+    int const hp_loop = vm["nhp"].as<int>();
+    int const np_m = vm["mnp"].as<int>();
+    int const hp_m = vm["mhp"].as<int>();
+    int const cycles = vm["cycles"].as<int>();
 
-    const int np_total = np_loop * cycles;
-    //
+    int const np_total = np_loop * cycles;
+
     struct dec_counter
     {
         explicit dec_counter(std::atomic<int>& counter)
           : counter_(counter)
         {
         }
+
+        dec_counter(dec_counter const&) = delete;
+        dec_counter(dec_counter&&) = delete;
+        dec_counter& operator=(dec_counter const&) = delete;
+        dec_counter& operator=(dec_counter&&) = delete;
+
         ~dec_counter()
         {
             --counter_;
         }
-        //
+
         std::atomic<int>& counter_;
     };
 
@@ -113,52 +119,63 @@ int hpx_main(variables_map& vm)
     std::atomic<int> hp_task_count(0);
     std::atomic<int> hp_launch_count(0);
     std::atomic<int> launch_count(0);
-    //
+
     std::atomic<int> count_down((np_loop + hp_loop) * cycles);
     std::atomic<int> counter(0);
     auto f3 = hpx::async(NP_executor,
         hpx::annotated_function(
-            [&]() {
+            [&]() -> hpx::future<void> {
                 ++launch_count;
+
+                std::vector<hpx::future<void>> v;
+                v.reserve(np_total);
                 for (int i = 0; i < np_total; ++i)
                 {
                     // normal priority
-                    auto f3 = hpx::async(NP_executor,
+                    auto f = hpx::async(NP_executor,
                         hpx::annotated_function(
                             [&, np_m]() {
-                                np_task_count++;
+                                ++np_task_count;
                                 dec_counter dec(count_down);
-                                dummy_task(std::size_t(np_m));
+                                dummy_task(static_cast<std::size_t>(np_m));
                             },
                             "NP task"));
 
                     // continuation runs as a sync task
-                    f3.then(hpx::launch::sync, [&](hpx::future<void>&&) {
-                        // on every Nth task, spawn new HP tasks, otherwise quit
-                        if ((++counter) % np_loop != 0)
-                            return;
+                    v.push_back(f.then(hpx::launch::sync,
+                        [&](hpx::future<void>&&) -> hpx::future<void> {
+                            // on every Nth task, spawn new HP tasks, otherwise quit
+                            if ((++counter) % np_loop != 0)
+                                return hpx::make_ready_future();
 
-                        // Launch HP tasks using an HP task to do it
-                        hpx::async(HP_executor,
-                            hpx::annotated_function(
-                                [&]() {
-                                    ++hp_launch_count;
-                                    for (int j = 0; j < hp_loop; ++j)
-                                    {
-                                        hpx::async(HP_executor,
-                                            hpx::annotated_function(
-                                                [&]() {
-                                                    ++hp_task_count;
-                                                    dec_counter dec(count_down);
-                                                    dummy_task(
-                                                        std::size_t(hp_m));
-                                                },
-                                                "HP task"));
-                                    }
-                                },
-                                "Launch HP"));
-                    });
+                            // Launch HP tasks using an HP task to do it
+                            return hpx::async(HP_executor,
+                                hpx::annotated_function(
+                                    [&]() -> hpx::future<void> {
+                                        ++hp_launch_count;
+
+                                        std::vector<hpx::future<void>> v1;
+                                        v1.reserve(hp_loop);
+                                        for (int j = 0; j < hp_loop; ++j)
+                                        {
+                                            v1.push_back(hpx::async(HP_executor,
+                                                hpx::annotated_function(
+                                                    [&]() {
+                                                        ++hp_task_count;
+                                                        dec_counter dec(
+                                                            count_down);
+                                                        dummy_task(static_cast<
+                                                            std::size_t>(hp_m));
+                                                    },
+                                                    "HP task")));
+                                        }
+                                        return hpx::when_all(std::move(v1));
+                                    },
+                                    "Launch HP"));
+                        }));
                 }
+
+                return hpx::when_all(std::move(v));
             },
             "Launch"));
 
@@ -167,6 +184,8 @@ int hpx_main(variables_map& vm)
     {
         hpx::this_thread::yield();
     } while (count_down > 0);
+
+    f3.get();
 
     std::cout << "Tasks NP  : " << np_task_count << "\n"
               << "Tasks HP  : " << hp_task_count << "\n"
