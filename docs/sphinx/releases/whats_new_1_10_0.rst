@@ -1,4 +1,4 @@
-﻿..
+..
     Copyright (C) 2007-2023 Hartmut Kaiser
 
     SPDX-License-Identifier: BSL-1.0
@@ -17,9 +17,11 @@ General changes
 Breaking changes
 ================
 
-- The CMake configuration keys ``SOMELIB_ROOT`` (e.g., ``BOOST_ROOT``) has been
+- The |cmake| configuration keys ``SOMELIB_ROOT`` (e.g., ``BOOST_ROOT``) have been
   renamed to ``Somelib_ROOT`` (e.g., ``Boost_ROOT``) to avoid warnings when using
-  newer versions of CMake. Please update your scripts accordingly.
+  newer versions of |cmake|. Please update your scripts accordingly. For now, the
+  old variable names are re-assigned to the new names and unset in the |cmake|
+  cache.
 
 Closed issues
 =============

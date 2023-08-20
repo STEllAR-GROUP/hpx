@@ -39,7 +39,7 @@ set(command_line_handling_local_sources
 
 if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
   include(HPX_SetupJSON)
-  set(command_line_handling_local_dependencies JSON::json)
+  set(command_line_handling_local_dependencies Json::json)
 
   set(command_line_handling_local_headers
       ${command_line_handling_local_headers}
