@@ -135,7 +135,7 @@ namespace hpx::execution::experimental {
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // Return the matching non-unsequences execution policy
+    // Return the matching non-unsequenced execution policy
     inline constexpr struct to_non_unseq_t final
       : hpx::functional::detail::tag_fallback<to_non_unseq_t>
     {

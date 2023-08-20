@@ -43,10 +43,10 @@ namespace hpx::resiliency::experimental {
         using future_type =
             hpx::traits::executor_future_t<BaseExecutor, Result>;
 
-        template <typename V, typename F>
+        template <typename BaseExecutor_, typename V, typename F>
         explicit replicate_executor(
-            BaseExecutor& exec, std::size_t n, V&& v, F&& f)
-          : exec_(exec)
+            BaseExecutor_&& exec, std::size_t n, V&& v, F&& f)
+          : exec_(HPX_FORWARD(BaseExecutor_, exec))
           , replicate_count_(n)
           , voter_(HPX_FORWARD(V, v))
           , validator_(HPX_FORWARD(F, f))
@@ -157,12 +157,67 @@ namespace hpx::resiliency::experimental {
         }
         /// \endcond
 
+    public:
+        BaseExecutor const& get_executor() const
+        {
+            return exec_;
+        }
+        std::size_t get_replicate_count() const
+        {
+            return replicate_count_;
+        }
+        Vote const& get_voter() const
+        {
+            return voter_;
+        }
+        Validate const& get_validator() const
+        {
+            return validator_;
+        }
+
     private:
-        BaseExecutor& exec_;
+        BaseExecutor exec_;
         std::size_t replicate_count_;
         Vote voter_;
         Validate validator_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // support all properties exposed by the wrapped executor
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,
+        typename Vote, typename Validate, typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(Tag tag,
+        replicate_executor<BaseExecutor, Vote, Validate> const& exec,
+        Property&& prop)
+        -> decltype(replicate_executor<BaseExecutor, Vote, Validate>(
+            std::declval<Tag>()(
+                std::declval<BaseExecutor>(), std::declval<Property>()),
+            std::declval<std::size_t>(), std::declval<Vote>(),
+            std::declval<Validate>()))
+    {
+        return replicate_executor<BaseExecutor, Vote, Validate>(
+            tag(exec.get_executor(), HPX_FORWARD(Property, prop)),
+            exec.get_replicate_count(), exec.get_voter(), exec.get_validator());
+    }
+
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,
+        typename Vote, typename Validate,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, replicate_executor<BaseExecutor, Vote, Validate> const& exec)
+        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
+    {
+        return tag(exec.get_executor());
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Voter, typename Validate>

@@ -99,18 +99,29 @@ namespace hpx::execution::experimental {
             return pool_;
         }
 
-        friend constexpr thread_pool_policy_scheduler tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::parallel::execution::with_processing_units_count_t,
-            thread_pool_policy_scheduler const& scheduler,
-            std::size_t num_cores) noexcept
+            Executor_ const& scheduler, std::size_t num_cores) noexcept
         {
             auto scheduler_with_num_cores = scheduler;
             scheduler_with_num_cores.num_cores_ = num_cores;
             return scheduler_with_num_cores;
         }
 
+        // clang-format off
+        template <typename Parameters,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_executor_parameters_v<Parameters>
+            )>
+        // clang-format on
         friend constexpr std::size_t tag_invoke(
-            hpx::parallel::execution::processing_units_count_t,
+            hpx::parallel::execution::processing_units_count_t, Parameters&&,
             thread_pool_policy_scheduler const& scheduler,
             hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
             std::size_t = 0)
@@ -118,10 +129,15 @@ namespace hpx::execution::experimental {
             return scheduler.get_num_cores();
         }
 
-        friend constexpr thread_pool_policy_scheduler tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_first_core_t,
-            thread_pool_policy_scheduler const& exec,
-            std::size_t first_core) noexcept
+            Executor_ const& exec, std::size_t first_core) noexcept
         {
             auto exec_with_first_core = exec;
             exec_with_first_core.first_core_ = first_core;
@@ -137,20 +153,29 @@ namespace hpx::execution::experimental {
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
         // support with_annotation property
-        friend constexpr thread_pool_policy_scheduler tag_invoke(
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
+            )>
+        // clang-format on
+        friend constexpr auto tag_invoke(
             hpx::execution::experimental::with_annotation_t,
-            thread_pool_policy_scheduler const& scheduler,
-            char const* annotation)
+            Executor_ const& scheduler, char const* annotation)
         {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ = annotation;
             return sched_with_annotation;
         }
 
-        friend thread_pool_policy_scheduler tag_invoke(
-            hpx::execution::experimental::with_annotation_t,
-            thread_pool_policy_scheduler const& scheduler,
-            std::string annotation)
+        // clang-format off
+        template <typename Executor_,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_convertible_v<Executor_, thread_pool_policy_scheduler>
+            )>
+        // clang-format on
+        friend auto tag_invoke(hpx::execution::experimental::with_annotation_t,
+            Executor_ const& scheduler, std::string annotation)
         {
             auto sched_with_annotation = scheduler;
             sched_with_annotation.annotation_ =

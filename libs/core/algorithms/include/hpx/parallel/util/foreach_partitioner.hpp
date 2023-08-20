@@ -36,7 +36,7 @@ namespace hpx::parallel::util::detail {
 
     template <typename Result, typename ExPolicy, typename FwdIter, typename F>
     auto foreach_partition(
-        ExPolicy&& policy, FwdIter first, std::size_t count, F&& f)
+        ExPolicy policy, FwdIter first, std::size_t count, F&& f)
     {
         // estimate a chunk size based on number of cores used
         using parameters_type =
@@ -53,7 +53,7 @@ namespace hpx::parallel::util::detail {
                 "has_variable_chunk_size and invokes_testing_function");
 
             auto&& shape = detail::get_bulk_iteration_shape_idx_variable(
-                HPX_FORWARD(ExPolicy, policy), first, count);
+                policy, first, count);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -61,8 +61,8 @@ namespace hpx::parallel::util::detail {
         }
         else if constexpr (!invokes_testing_function)
         {
-            auto&& shape = detail::get_bulk_iteration_shape_idx(
-                HPX_FORWARD(ExPolicy, policy), first, count);
+            auto&& shape =
+                detail::get_bulk_iteration_shape_idx(policy, first, count);
 
             return execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},
@@ -72,7 +72,7 @@ namespace hpx::parallel::util::detail {
         {
             std::vector<hpx::future<Result>> inititems;
             auto&& shape = detail::get_bulk_iteration_shape_idx(
-                HPX_FORWARD(ExPolicy, policy), inititems, f, first, count);
+                policy, inititems, f, first, count);
 
             auto&& workitems = execution::bulk_async_execute(policy.executor(),
                 partitioner_iteration<Result, F>{HPX_FORWARD(F, f)},

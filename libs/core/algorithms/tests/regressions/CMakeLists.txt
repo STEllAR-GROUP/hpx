@@ -12,6 +12,7 @@ set(tests
     for_loop_5735
     for_loop_with_auto_chunk_size
     minimal_findend
+    num_cores
     reduce_3641
     scan_different_inits
     scan_non_commutative

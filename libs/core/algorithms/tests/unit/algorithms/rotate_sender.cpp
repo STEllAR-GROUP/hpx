@@ -46,7 +46,7 @@ void test_rotate_direct(Policy l, ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-    std::size_t mid_pos = std::rand() % c.size();    //-V104
+    std::size_t const mid_pos = std::rand() % c.size();    //-V104
     base_iterator mid = std::begin(c);
     std::advance(mid, mid_pos);
 
@@ -88,7 +88,7 @@ void test_rotate(Policy l, ExPolicy&& policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-    std::size_t mid_pos = std::rand() % c.size();    //-V104
+    std::size_t const mid_pos = std::rand() % c.size();    //-V104
     base_iterator mid = std::begin(c);
     std::advance(mid, mid_pos);
 
@@ -127,7 +127,7 @@ void test_rotate_async_direct(Policy l, ExPolicy&& p, IteratorTag)
     std::iota(std::begin(c), std::end(c), std::rand());
     std::copy(std::begin(c), std::end(c), std::back_inserter(d1));
 
-    std::size_t mid_pos = std::rand() % c.size();    //-V104
+    std::size_t const mid_pos = std::rand() % c.size();    //-V104
 
     base_iterator mid = std::begin(c);
     std::advance(mid, mid_pos);
@@ -191,7 +191,7 @@ void rotate_test()
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
-    unsigned int seed = (unsigned int) std::time(nullptr);
+    unsigned int seed = static_cast<unsigned int>(std::time(nullptr));
     if (vm.count("seed"))
         seed = vm["seed"].as<unsigned int>();
 

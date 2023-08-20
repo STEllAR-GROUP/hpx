@@ -66,6 +66,38 @@ namespace executor_example {
         }
     };
 
+    // support all properties exposed by the wrapped executor
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    auto tag_invoke(Tag tag,
+        disable_thread_stealing_executor<BaseExecutor> const& exec,
+        Property&& prop)
+        -> decltype(disable_thread_stealing_executor<BaseExecutor>(
+            std::declval<Tag>()(
+                std::declval<BaseExecutor>(), std::declval<Property>())))
+    // clang-format on
+    {
+        return disable_thread_stealing_executor<BaseExecutor>(
+            tag(static_cast<BaseExecutor const&>(exec),
+                HPX_FORWARD(Property, prop)));
+    }
+
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, disable_thread_stealing_executor<BaseExecutor> const& exec)
+        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
+    {
+        return tag(static_cast<BaseExecutor const&>(exec));
+    }
+
     template <typename BaseExecutor>
     auto make_disable_thread_stealing_executor(BaseExecutor&& exec)
     {

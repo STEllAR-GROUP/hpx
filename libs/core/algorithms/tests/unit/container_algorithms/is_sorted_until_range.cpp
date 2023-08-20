@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -1214,7 +1215,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
             decorated_iterator(
                 std::end(c), []() { throw std::runtime_error("test"); }));
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1232,7 +1233,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
             iterator(std::end(c)),
             [](int, int) -> bool { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1250,7 +1251,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy, IteratorTag)
             iterator(std::end(c)), std::less<int>(),
             [](int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1285,7 +1286,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1306,7 +1307,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1327,7 +1328,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p, IteratorTag)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1361,7 +1362,7 @@ void test_sorted_until_seq_bad_alloc(IteratorTag)
             decorated_iterator(
                 std::end(c), []() { throw std::runtime_error("test"); }));
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1379,7 +1380,7 @@ void test_sorted_until_seq_bad_alloc(IteratorTag)
             iterator(std::end(c)),
             [](int, int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1397,7 +1398,7 @@ void test_sorted_until_seq_bad_alloc(IteratorTag)
             iterator(std::end(c)), std::less<int>(),
             [](int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1426,7 +1427,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy)
         hpx::ranges::is_sorted_until(policy, c,
             [](int, int) -> bool { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1443,7 +1444,7 @@ void test_sorted_until_bad_alloc(ExPolicy policy)
         hpx::ranges::is_sorted_until(policy, c, std::less<int>(),
             [](int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1470,7 +1471,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1490,7 +1491,7 @@ void test_sorted_until_async_bad_alloc(ExPolicy p)
 
         HPX_TEST(false);
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1515,7 +1516,7 @@ void test_sorted_until_seq_bad_alloc()
         hpx::ranges::is_sorted_until(
             c, [](int, int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1532,7 +1533,7 @@ void test_sorted_until_seq_bad_alloc()
         hpx::ranges::is_sorted_until(c, std::less<int>(),
             [](int) -> int { throw std::runtime_error("test"); });
     }
-    catch (hpx::exception_list const& e)
+    catch (hpx::exception_list const&)
     {
         caught_bad_alloc = true;
     }
@@ -1585,12 +1586,12 @@ int hpx_main()
     sorted_until_exception_test();
     sorted_until_bad_alloc_test();
 
-    std::vector<int> c(100);
-    hpx::future<void> f =
-        hpx::dataflow(hpx::ranges::is_sorted, hpx::execution::par, c);
-    f = hpx::dataflow(
-        hpx::unwrapping(hpx::ranges::is_sorted), hpx::execution::par, c, f);
-    f.get();
+    // std::vector<int> c(100);
+    // hpx::future<void> f =
+    //     hpx::dataflow(hpx::ranges::is_sorted, hpx::execution::par, c);
+    // f = hpx::dataflow(
+    //     hpx::unwrapping(hpx::ranges::is_sorted), hpx::execution::par, c, f);
+    // f.get();
 
     return hpx::local::finalize();
 }

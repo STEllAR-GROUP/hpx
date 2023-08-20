@@ -43,9 +43,9 @@ namespace hpx::resiliency::experimental {
         using future_type =
             hpx::traits::executor_future_t<BaseExecutor, Result>;
 
-        template <typename F>
-        explicit replay_executor(BaseExecutor& exec, std::size_t n, F&& f)
-          : exec_(exec)
+        template <typename BaseExecutor_, typename F>
+        explicit replay_executor(BaseExecutor_&& exec, std::size_t n, F&& f)
+          : exec_(HPX_FORWARD(BaseExecutor_, exec))
           , replay_count_(n)
           , validator_(HPX_FORWARD(F, f))
         {
@@ -154,11 +154,59 @@ namespace hpx::resiliency::experimental {
         }
         /// \endcond
 
+    public:
+        BaseExecutor const& get_executor() const
+        {
+            return exec_;
+        }
+        std::size_t get_replay_count() const
+        {
+            return replay_count_;
+        }
+        Validate const& get_validator() const
+        {
+            return validator_;
+        }
+
     private:
-        BaseExecutor& exec_;
+        BaseExecutor exec_;
         std::size_t replay_count_;
         Validate validator_;
     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // support all properties exposed by the wrapped executor
+    // clang-format off
+    template <typename Tag, typename BaseExecutor,
+        typename Validate, typename Property,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(Tag tag,
+        replay_executor<BaseExecutor, Validate> const& exec, Property&& prop)
+        -> decltype(replay_executor<BaseExecutor, Validate>(
+            std::declval<Tag>()(
+                std::declval<BaseExecutor>(), std::declval<Property>()),
+            std::declval<std::size_t>(), std::declval<Validate>()))
+    {
+        return replay_executor<BaseExecutor, Validate>(
+            tag(exec.get_executor(), HPX_FORWARD(Property, prop)),
+            exec.get_replay_count(), exec.get_validator());
+    }
+
+    // clang-format off
+    template <typename Tag, typename BaseExecutor, typename Validate,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_scheduling_property_v<Tag>
+        )>
+    // clang-format on
+    auto tag_invoke(
+        Tag tag, replay_executor<BaseExecutor, Validate> const& exec)
+        -> decltype(std::declval<Tag>()(std::declval<BaseExecutor>()))
+    {
+        return tag(exec.get_executor());
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename BaseExecutor, typename Validate>
