@@ -65,17 +65,17 @@ if(HPX_WITH_EXAMPLES_QTHREADS)
   )
 
   set(qthreads_homogeneous_timed_task_spawn_FLAGS
-      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARIES}
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${Qthreads_LIBRARIES}
       hpx_core
   )
 
   set(qthreads_heterogeneous_timed_task_spawn_FLAGS
-      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${QTHREADS_LIBRARIES}
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${Qthreads_LIBRARIES}
       hpx_core
   )
 
   set(qthreads_heterogeneous_timed_task_spawn_INCLUDE_DIRECTORIES
-      ${QTHREADS_INCLUDE_DIR}
+      ${Qthreads_INCLUDE_DIR}
   )
 endif()
 
@@ -83,11 +83,11 @@ if(HPX_WITH_EXAMPLES_TBB)
   list(APPEND benchmarks tbb_homogeneous_timed_task_spawn)
 
   set(tbb_homogeneous_timed_task_spawn_FLAGS
-      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${TBB_LIBRARIES}
+      NOLIBS DEPENDENCIES ${boost_library_dependencies} ${Tbb_LIBRARIES}
       hpx_core
   )
 
-  set(tbb_homogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIR})
+  set(tbb_homogeneous_timed_task_spawn_INCLUDE_DIRECTORIES ${Tbb_INCLUDE_DIR})
 endif()
 
 if(HPX_WITH_DISTRIBUTED_RUNTIME)

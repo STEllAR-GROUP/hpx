@@ -14,8 +14,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 find_package(Hwloc)
-if(NOT HWLOC_FOUND)
+if(NOT Hwloc_FOUND)
   hpx_error(
-    "Hwloc could not be found, please specify HWLOC_ROOT to point to the correct location"
+    "Hwloc could not be found, please specify Hwloc_ROOT to point to the correct location"
   )
 endif()

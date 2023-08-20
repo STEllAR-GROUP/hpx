@@ -32,7 +32,7 @@ endif()
 set(hpx_external_SOURCES)
 if("${HPX_PLATFORM_UC}" STREQUAL "ANDROID")
   list(APPEND hpx_external_SOURCES ${hpx_external_objects_SOURCES}
-       "${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c"
+       "${Android_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c"
   )
 endif()
 

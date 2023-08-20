@@ -127,11 +127,20 @@ if(HPX_WITH_TESTS)
   include(CTest)
 
   # find Python interpreter (needed to run tests)
-  find_package(PythonInterp)
-  if(NOT PYTHONINTERP_FOUND)
-    hpx_warn(
-      "A python interpreter could not be found. The test suite can not be run automatically."
-    )
+  if(POLICY CMP0148)
+    find_package(Python COMPONENTS Interpreter)
+    if(NOT Python_FOUND)
+      hpx_warn(
+        "A python interpreter could not be found. The test suite can not be run automatically."
+      )
+    endif()
+  else()
+    find_package(PythonInterp)
+    if(NOT PYTHONINTERP_FOUND)
+      hpx_warn(
+        "A python interpreter could not be found. The test suite can not be run automatically."
+      )
+    endif()
   endif()
 
   # add actual tests, first iterate through all modules

@@ -5,6 +5,16 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
+
+  # compatibility with older CMake versions
+  if(SVE_ROOT AND NOT Sve_ROOT)
+    set(Sve_ROOT
+        ${SVE_ROOT}
+        CACHE PATH "SVE base directory"
+    )
+    unset(SVE_ROOT CACHE)
+  endif()
+
   if(HPX_WITH_FETCH_SVE)
     if(FETCHCONTENT_SOURCE_DIR_SVE)
       hpx_info(
@@ -12,7 +22,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       )
     else()
       hpx_info(
-        "HPX_WITH_FETCH_SVE=${HPX_WITH_FETCH_SVE}, SVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SVE_TAG=${HPX_WITH_SVE_TAG})"
+        "HPX_WITH_FETCH_SVE=${HPX_WITH_FETCH_SVE}, SVE will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_Sve_TAG=${HPX_WITH_Sve_TAG})"
       )
     endif()
 
@@ -22,7 +32,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
       )
     endif()
 
-    set(SVE_LENGTH "${HPX_WITH_SVE_LENGTH}")
+    set(Sve_LENGTH "${HPX_WITH_SVE_LENGTH}")
 
     include(FetchContent)
     fetchcontent_declare(
@@ -33,7 +43,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
 
     fetchcontent_makeavailable(sve)
 
-    set(SVE_ROOT ${sve_SOURCE_DIR})
+    set(Sve_ROOT ${sve_SOURCE_DIR})
 
     install(
       TARGETS sve
@@ -42,7 +52,7 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
     )
 
     install(
-      DIRECTORY ${SVE_ROOT}/include/
+      DIRECTORY ${Sve_ROOT}/include/
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
       COMPONENT core
       FILES_MATCHING
@@ -65,10 +75,10 @@ if(("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE") AND NOT TARGET SVE::sve)
     )
 
   else()
-    if(SVE_ROOT)
-      find_package(SVE REQUIRED PATHS ${SVE_ROOT})
+    if(Sve_ROOT)
+      find_package(SVE REQUIRED PATHS ${Sve_ROOT})
     else()
-      hpx_error("SVE_ROOT not set")
+      hpx_error("Sve_ROOT not set")
     endif()
   endif()
 endif()

@@ -58,22 +58,31 @@ if(NOT TARGET hpx_dependencies_boost)
 
   list(REMOVE_DUPLICATES __boost_libraries)
 
+  # compatibility with older CMake versions
+  if(BOOST_ROOT AND NOT Boost_ROOT)
+    set(Boost_ROOT
+        ${BOOST_ROOT}
+        CACHE PATH "Boost base directory"
+    )
+    unset(BOOST_ROOT CACHE)
+  endif()
+
   find_package(
-    Boost ${Boost_MINIMUM_VERSION} MODULE REQUIRED
+    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED
     COMPONENTS ${__boost_libraries}
   )
 
   if(NOT Boost_FOUND)
     hpx_error(
-      "Could not find Boost. Please set BOOST_ROOT to point to your Boost installation."
+      "Could not find Boost. Please set Boost_ROOT to point to your Boost installation."
     )
   endif()
 
   # We are assuming that there is only one Boost Root
-  if(NOT BOOST_ROOT AND "$ENV{BOOST_ROOT}")
-    set(BOOST_ROOT $ENV{BOOST_ROOT})
-  elseif(NOT BOOST_ROOT)
-    string(REPLACE "/include" "" BOOST_ROOT "${Boost_INCLUDE_DIRS}")
+  if(NOT Boost_ROOT AND "$ENV{BOOST_ROOT}")
+    set(Boost_ROOT $ENV{BOOST_ROOT})
+  elseif(NOT Boost_ROOT)
+    string(REPLACE "/include" "" Boost_ROOT "${Boost_INCLUDE_DIRS}")
   endif()
 
   add_library(hpx_dependencies_boost INTERFACE IMPORTED)

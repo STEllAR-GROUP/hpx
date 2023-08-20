@@ -221,14 +221,14 @@ foreach(output_format ${HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS})
   # the moment not worth the effort.
   if(${output_format} STREQUAL "latexpdf")
     set(SPHINX_DOCS_BUILD_COMMAND
-        ${SPHINX_EXECUTABLE} -M ${output_format}
+        ${Sphinx_EXECUTABLE} -M ${output_format}
         "${CMAKE_CURRENT_BINARY_DIR}/sphinx" "${SPHINX_DOCS_OUTPUT_DIR}" || (
                                                                             exit
                                                                             0)
     )
   else()
     set(SPHINX_DOCS_BUILD_COMMAND
-        ${SPHINX_EXECUTABLE} -b ${output_format} -n -d
+        ${Sphinx_EXECUTABLE} -b ${output_format} -n -d
         "${CMAKE_CURRENT_BINARY_DIR}/doctree"
         "${CMAKE_CURRENT_BINARY_DIR}/sphinx" "${SPHINX_DOCS_OUTPUT_DIR}"
     )

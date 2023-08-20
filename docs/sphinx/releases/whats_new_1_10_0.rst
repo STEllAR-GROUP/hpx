@@ -17,6 +17,10 @@ General changes
 Breaking changes
 ================
 
+- The CMake configuration keys ``SOMELIB_ROOT`` (e.g., ``BOOST_ROOT``) has been
+  renamed to ``Somelib_ROOT`` (e.g., ``Boost_ROOT``) to avoid warnings when using
+  newer versions of CMake. Please update your scripts accordingly.
+
 Closed issues
 =============
 

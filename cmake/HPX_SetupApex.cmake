@@ -15,20 +15,43 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
+  # compatibility with older CMake versions
+  if(APEX_ROOT AND NOT Apex_ROOT)
+    set(Apex_ROOT
+        ${APEX_ROOT}
+        CACHE PATH "Apex base directory"
+    )
+    unset(APEX_ROOT CACHE)
+  endif()
+  if(MSR_ROOT AND NOT Msr_ROOT)
+    set(Msr_ROOT
+        ${MSR_ROOT}
+        CACHE PATH "MSR base directory"
+    )
+    unset(MSR_ROOT CACHE)
+  endif()
+  if(OTF2_ROOT AND NOT Otf2_ROOT)
+    set(Otf2_ROOT
+        ${OTF2_ROOT}
+        CACHE PATH "OTF2 base directory"
+    )
+    unset(OTF2_ROOT CACHE)
+  endif()
+
   if(NOT HPX_FIND_PACKAGE)
-    if(NOT "${APEX_ROOT}" AND "$ENV{APEX_ROOT}")
-      set(APEX_ROOT "$ENV{APEX_ROOT}")
+    if(NOT "${Apex_ROOT}" AND "$ENV{APEX_ROOT}")
+      set(Apex_ROOT "$ENV{APEX_ROOT}")
     endif()
 
     # We want to track parent dependencies
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
-    if(APEX_ROOT)
+    if(Apex_ROOT)
       # Use given (external) APEX
-      set(HPX_APEX_ROOT ${APEX_ROOT})
+      set(HPX_APEX_ROOT ${Apex_ROOT})
 
     else()
-      # If APEX_ROOT not specified, local clone into hpx source dir
+      # If Apex_ROOT not specified, local clone into hpx source dir
       include(FetchContent)
       fetchcontent_declare(
         apex
@@ -50,15 +73,15 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       if(NOT apex_POPULATED)
         hpx_error("APEX could not be populated with HPX_WITH_APEX=On")
       endif()
-      set(APEX_ROOT ${apex_SOURCE_DIR})
+      set(Apex_ROOT ${apex_SOURCE_DIR})
 
-      hpx_info("APEX_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
+      hpx_info("Apex_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
     endif()
 
-    list(APPEND CMAKE_MODULE_PATH "${APEX_ROOT}/cmake/Modules")
-    add_subdirectory(${APEX_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
-    if(AMPLIFIER_FOUND)
-      hpx_error("AMPLIFIER_FOUND has been set. Please disable the use of the \
+    list(APPEND CMAKE_MODULE_PATH "${Apex_ROOT}/cmake/Modules")
+    add_subdirectory(${Apex_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
+    if(Amplifier_FOUND)
+      hpx_error("Amplifier_FOUND has been set. Please disable the use of the \
         Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX"
       )
     endif()
@@ -86,14 +109,14 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
   # handle optional ITTNotify library (private dependency, skip when called in
   # find_package(HPX))
   if(HPX_WITH_ITTNOTIFY AND NOT HPX_FIND_PACKAGE)
-    add_subdirectory(${APEX_ROOT}/src/ITTNotify)
-    if(NOT ITTNOTIFY_FOUND)
+    add_subdirectory(${Apex_ROOT}/src/ITTNotify)
+    if(NOT Ittnotify_FOUND)
       hpx_error("ITTNotify could not be found and HPX_WITH_ITTNOTIFY=On")
     endif()
 
     add_library(ITTNotify::ittnotify INTERFACE IMPORTED)
     target_include_directories(
-      ITTNotify::ittnotify SYSTEM INTERFACE ${ITTNOTIFY_SOURCE_DIR}
+      ITTNotify::ittnotify SYSTEM INTERFACE ${Ittnotify_SOURCE_DIR}
     )
     target_link_libraries(APEX::apex INTERFACE ITTNotify::ittnotify)
     hpx_add_config_define(HPX_HAVE_ITTNOTIFY 1)

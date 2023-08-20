@@ -23,7 +23,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/HPXMacros.cmake")
 if(HPX_WITH_FETCH_ASIO)
   include("${CMAKE_CURRENT_LIST_DIR}/HPXAsioTarget.cmake")
 else()
-  set(HPX_ASIO_ROOT "@ASIO_ROOT@")
+  set(HPX_ASIO_ROOT "@Asio_ROOT@")
   include(HPX_SetupAsio)
 endif()
 
@@ -34,7 +34,7 @@ if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
   if(HPX_WITH_FETCH_JSON)
     include("${CMAKE_CURRENT_LIST_DIR}/HPXJSONTarget.cmake")
   else()
-    set(HPX_JSON_ROOT "@JSON_ROOT@")
+    set(HPX_JSON_ROOT "@Json_ROOT@")
     include(HPX_SetupJSON)
   endif()
 endif()
@@ -46,7 +46,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
     find_dependency(@LCI_FABRIC@)
     include("${CMAKE_CURRENT_LIST_DIR}/HPXLCITarget.cmake")
   else()
-    set(LCI_ROOT "@LCI_ROOT@")
+    set(Lci_ROOT "@Lci_ROOT@")
     include(HPX_SetupLCI)
     hpx_setup_lci()
   endif()
@@ -58,7 +58,7 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "EVE")
   if(HPX_WITH_FETCH_EVE)
     include("${CMAKE_CURRENT_LIST_DIR}/HPXEveTarget.cmake")
   else()
-    set(EVE_ROOT "@EVE_ROOT@")
+    set(Eve_ROOT "@Eve_ROOT@")
     include(HPX_SetupEve)
   endif()
 endif()
@@ -67,7 +67,7 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   if(HPX_WITH_FETCH_SVE)
     include("${CMAKE_CURRENT_LIST_DIR}/HPXSVETarget.cmake")
   else()
-    set(SVE_ROOT "@SVE_ROOT@")
+    set(Sve_ROOT "@Sve_ROOT@")
     include(HPX_SetupSVE)
   endif()
 endif()
@@ -118,31 +118,31 @@ set(HPX_CXX_COMPILER_VERSION
 
 # Propagate Amplifier settings, if needed
 if(HPX_WITH_ITTNOTIFY)
-  set(AMPLIFIER_INCLUDE_DIR "@AMPLIFIER_INCLUDE_DIR@")
-  set(AMPLIFIER_LIBRARY "@AMPLIFIER_LIBRARY@")
-  set(AMPLIFIER_ROOT "@AMPLIFIER_ROOT@")
+  set(Amplifier_INCLUDE_DIR "@Amplifier_INCLUDE_DIR@")
+  set(Amplifier_LIBRARY "@Amplifier_LIBRARY@")
+  set(Amplifier_ROOT "@Amplifier_ROOT@")
 endif()
 
 # Allocator
-set(HPX_JEMALLOC_ROOT "@JEMALLOC_ROOT@")
-set(HPX_TCMALLOC_ROOT "@TCMALLOC_ROOT@")
-set(HPX_TBBMALLOC_ROOT "@TBBMALLOC_ROOT@")
+set(HPX_JEMALLOC_ROOT "@Jemalloc_ROOT@")
+set(HPX_TCMALLOC_ROOT "@Tcmalloc_ROOT@")
+set(HPX_TBBMALLOC_ROOT "@Tbbmalloc_ROOT@")
 # Special handle for mimalloc cause we can't specify HPX_MIMALLOC_ROOT as a HINT
 # to find_package
-set(HPX_MIMALLOC_ROOT "@MIMALLOC_ROOT@")
-if(NOT MIMALLOC_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
-  set(MIMALLOC_ROOT ${HPX_MIMALLOC_ROOT})
+set(HPX_MIMALLOC_ROOT "@Mimalloc_ROOT@")
+if(NOT Mimalloc_ROOT AND NOT "$ENV{MIMALLOC_ROOT}")
+  set(Mimalloc_ROOT ${HPX_MIMALLOC_ROOT})
 endif()
 include(HPX_SetupAllocator)
 
 include(HPX_SetupThreads)
 
 # Boost Separate boost targets to be unarily linked to some modules
-set(HPX_BOOST_ROOT "@BOOST_ROOT@")
-# By default BOOST_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+set(HPX_BOOST_ROOT "@Boost_ROOT@")
+# By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
 # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if(NOT BOOST_ROOT AND NOT "$ENV{BOOST_ROOT}")
-  set(BOOST_ROOT ${HPX_BOOST_ROOT})
+if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+  set(Boost_ROOT ${HPX_BOOST_ROOT})
 endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
@@ -152,11 +152,11 @@ include(HPX_SetupBoostIostreams)
 include(HPX_SetupHIP)
 
 # Hwloc
-set(HPX_HWLOC_ROOT "@HWLOC_ROOT@")
+set(HPX_HWLOC_ROOT "@Hwloc_ROOT@")
 include(HPX_SetupHwloc)
 
 # Papi
-set(HPX_PAPI_ROOT "@PAPI_ROOT@")
+set(HPX_PAPI_ROOT "@Papi_ROOT@")
 include(HPX_SetupPapi)
 
 # CUDA
@@ -169,11 +169,11 @@ endif()
 
 # APEX
 set(APEX_WITH_MSR "@APEX_WITH_MSR@")
-set(MSR_ROOT "@MSR_ROOT@")
+set(Msr_ROOT "@Msr_ROOT@")
 set(APEX_WITH_ACTIVEHARMONY "@APEX_WITH_ACTIVEHARMONY@")
-set(ACTIVEHARMONY_ROOT "@ACTIVEHARMONY_ROOT@")
+set(Activeharmony_ROOT "@Activeharmony_ROOT@")
 set(APEX_WITH_OTF2 "@APEX_WITH_OTF2@")
-set(OTF2_ROOT "@OTF2_ROOT@")
+set(Otf2_ROOT "@Otf2_ROOT@")
 include(HPX_SetupApex)
 # ##############################################################################
 

@@ -14,10 +14,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_PAPI)
-  find_package(PAPI)
-  if(NOT PAPI_FOUND)
+  find_package(Papi)
+  if(NOT Papi_FOUND)
     hpx_error("PAPI could not be found and HPX_WITH_PAPI=On, please specify \
-    PAPI_ROOT to point to the root of your PAPI installation"
+    Papi_ROOT to point to the root of your PAPI installation"
     )
   endif()
 endif()
