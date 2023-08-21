@@ -194,7 +194,7 @@ struct stepper
     hpx::future<space> do_work(std::size_t subdomains,
         std::size_t subdomain_width, std::size_t iterations, std::size_t sti,
         std::uint64_t nd, std::uint64_t n_value, double error,
-        hpx::sliding_semaphore& sem)
+        std::shared_ptr<hpx::sliding_semaphore> sem)
     {
         using hpx::unwrapping;
         using hpx::resiliency::experimental::dataflow_replicate;
@@ -230,15 +230,15 @@ struct stepper
             // trigger the semaphore once computation has reached this point
             if ((t % nd) == 0)
             {
-                next[0].then([&sem, t](partition&&) {
+                next[0].then([sem, t](partition&&) {
                     // inform semaphore about new lower limit
-                    sem.signal(t);
+                    sem->signal(t);
                 });
             }
 
             // suspend if the tree has become too deep, the continuation above
             // will resume this thread once the computation has caught up
-            sem.wait(t);
+            sem->wait(t);
         }
 
         // Return the solution at time-step 'iterations'.
@@ -274,7 +274,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     {
         // limit depth of dependency tree
-        hpx::sliding_semaphore sem(nd);
+        auto sem = std::make_shared<hpx::sliding_semaphore>(nd);
 
         hpx::future<stepper::space> result = step.do_work(subdomains,
             subdomain_width, iterations, sti, nd, n_value, error, sem);
