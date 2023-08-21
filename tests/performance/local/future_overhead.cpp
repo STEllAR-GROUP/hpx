@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -257,16 +258,16 @@ void measure_function_futures_sliding_semaphore(
     // start the clock
     high_resolution_timer walltime;
     const int sem_count = 5000;
-    hpx::sliding_semaphore sem(sem_count);
+    auto sem = std::make_shared<hpx::sliding_semaphore>(sem_count);
     for (std::uint64_t i = 0; i < count; ++i)
     {
-        hpx::async(exec, [i, &sem]() {
+        hpx::async(exec, [i, sem]() {
             null_function();
-            sem.signal(i);
+            sem->signal(i);
         });
-        sem.wait(i);
+        sem->wait(i);
     }
-    sem.wait(count + sem_count - 1);
+    sem->wait(count + sem_count - 1);
 
     // stop the clock
     const double duration = walltime.elapsed();
