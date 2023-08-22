@@ -373,8 +373,8 @@ namespace hpx::parallel::util {
                 InIter last = std::next(first, num);
 
                 return in_out_result<InIter, OutIter>{last,
-                    hpx::get<1>(
-                    ::hpx::parallel::util::loop_with_manual_cleanup_n(
+                    hpx::get<
+                        1>(::hpx::parallel::util::loop_with_manual_cleanup_n(
                         HPX_FORWARD(ExPolicy, policy), t, num,
                         [](zip_iterator current) -> void {
                             auto& [current_first, current_dest] =
@@ -415,17 +415,18 @@ namespace hpx::parallel::util {
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
                     hpx::get<1>(
-                        ::hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
-                        t, num,
-                        [](zip_iterator it) -> void {
-                            auto iters = it.get_iterator_tuple();
+                        ::hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(t,
+                            num,
+                            [](zip_iterator it) -> void {
+                                auto iters = it.get_iterator_tuple();
 
-                            InIter current_first = hpx::get<0>(iters);
-                            OutIter current_dest = hpx::get<1>(iters);
+                                InIter current_first = hpx::get<0>(iters);
+                                OutIter current_dest = hpx::get<1>(iters);
 
-                            hpx::relocate_at(std::addressof(*current_first),
-                                std::addressof(*current_dest));
-                        }).get_iterator_tuple())};
+                                hpx::relocate_at(std::addressof(*current_first),
+                                    std::addressof(*current_dest));
+                            })
+                            .get_iterator_tuple())};
             }
         };
 
