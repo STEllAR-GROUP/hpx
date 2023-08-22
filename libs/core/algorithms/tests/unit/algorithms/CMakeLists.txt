@@ -145,6 +145,7 @@ set(tests
     uninitialized_fill
     uninitialized_filln
     uninitialized_move
+    uninitialized_relocate
     uninitialized_relocaten
     uninitialized_moven
     uninitialized_value_construct

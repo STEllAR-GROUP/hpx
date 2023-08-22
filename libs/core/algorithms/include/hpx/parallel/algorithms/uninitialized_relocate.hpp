@@ -9,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/algorithms/traits/pointer_category.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution/algorithms/detail/is_negative.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -272,4 +273,77 @@ namespace hpx {
                         static_cast<std::size_t>(count), dest));
         }
     } uninitialized_relocate_n{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::uninitialized_relocate
+    inline constexpr struct uninitialized_relocate_t final
+      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_t>
+    {
+        // clang-format off
+        template <typename InIter1, typename InIter2, typename FwdIter,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_input_iterator_v<InIter1> &&
+                hpx::traits::is_input_iterator_v<InIter2> &&
+                hpx::traits::is_forward_iterator_v<FwdIter>
+            )>
+        friend FwdIter tag_fallback_invoke(hpx::uninitialized_relocate_t,
+            InIter1 first, InIter2 last, FwdIter dest) noexcept(
+            hpx::traits::pointer_relocate_category<InIter1,
+            FwdIter>::is_noexcept_relocatable_v
+        )
+        // clang-format on
+        {
+            static_assert(hpx::traits::pointer_relocate_category<InIter1,
+                              FwdIter>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::detail::is_negative(std::distance(first, last)))
+            {
+                return dest;
+            }
+
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate<
+                    parallel::util::in_out_result<InIter1, FwdIter>>()
+                    .call(hpx::execution::seq, first, last, dest));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename InIter1, typename InIter2, typename FwdIter,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_input_iterator_v<InIter1> &&
+                hpx::traits::is_input_iterator_v<InIter2> &&
+                hpx::traits::is_forward_iterator_v<FwdIter>
+            )>
+        friend typename parallel::util::detail::algorithm_result<ExPolicy,
+            FwdIter>::type
+        tag_fallback_invoke(hpx::uninitialized_relocate_t, ExPolicy&& policy,
+            InIter1 first, InIter2 last, FwdIter dest) noexcept(
+            hpx::traits::pointer_relocate_category<InIter1,
+            FwdIter>::is_noexcept_relocatable_v)
+        // clang-format on
+        {
+            static_assert(hpx::traits::pointer_relocate_category<InIter1,
+                              FwdIter>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+
+            auto count = std::distance(first, last);
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::detail::is_negative(count))
+            {
+                return parallel::util::detail::algorithm_result<ExPolicy,
+                    FwdIter>::get(HPX_MOVE(dest));
+            }
+
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate_n<
+                    parallel::util::in_out_result<InIter1, FwdIter>>()
+                    .call(HPX_FORWARD(ExPolicy, policy), first, count, dest));
+        }
+    } uninitialized_relocate{};
 }    // namespace hpx
