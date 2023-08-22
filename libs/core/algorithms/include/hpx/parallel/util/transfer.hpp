@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <cstring>    // for std::memmove
 #include <iterator>
+#include <memory>    // for std::addressof
 #include <type_traits>
 #include <utility>
 
@@ -371,30 +372,28 @@ namespace hpx::parallel::util {
                 InIter last = std::next(first, num);
 
                 return in_out_result<InIter, OutIter>{last,
-                    hpx::get < 1(loop_with_manual_cleanup_n(
-                                   HPX_FORWARD(ExPolicy, policy), t, num,
-                                   [](zip_iterator current) -> void {
-                                       auto& [current_first, current_dest] =
-                                           current.get_iterator_tuple();
+                    hpx::get<1>(loop_with_manual_cleanup_n(
+                        HPX_FORWARD(ExPolicy, policy), t, num,
+                        [](zip_iterator current) -> void {
+                            auto& [current_first, current_dest] =
+                                current.get_iterator_tuple();
 
-                                       hpx::relocate_at(
-                                           std::addressof(*current_first),
-                                           std::addressof(*current_dest));
-                                   },
-                                   [first, last, dest](
-                                       zip_iterator iter_at_fail) -> void {
-                                       auto& [current_first, current_dest] =
-                                           iter_at_fail.get_iterator_tuple();
+                            hpx::relocate_at(std::addressof(*current_first),
+                                std::addressof(*current_dest));
+                        },
+                        [first, last, dest](zip_iterator iter_at_fail) -> void {
+                            auto& [current_first, current_dest] =
+                                iter_at_fail.get_iterator_tuple();
 
-                                       // destroy all objects constructed so far
-                                       std::destroy(dest, current_dest);
-                                       // destroy all the objects not relocated yet
-                                       std::destroy(current_first + 1, last);
+                            // destroy all objects constructed so far
+                            std::destroy(dest, current_dest);
+                            // destroy all the objects not relocated yet
+                            std::destroy(current_first + 1, last);
 
-                                       // This is done to minimize the number of
-                                       // objects in an invalid state in case of
-                                       // an exception.
-                                   }).get_iterator_tuple())};
+                            // This is done to minimize the number of
+                            // objects in an invalid state in case of
+                            // an exception.
+                        }).get_iterator_tuple())};
             }
         };
 
