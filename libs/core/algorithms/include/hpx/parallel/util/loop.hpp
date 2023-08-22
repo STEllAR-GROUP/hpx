@@ -9,13 +9,14 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/execution_policy.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/type_support/identity.hpp>
+#include <hpx/iterator_support/zip_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>

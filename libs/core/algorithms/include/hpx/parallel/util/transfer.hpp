@@ -394,8 +394,6 @@ namespace hpx::parallel::util {
                                        // This is done to minimize the number of
                                        // objects in an invalid state in case of
                                        // an exception.
-
-                                       throw;
                                    }).get_iterator_tuple())};
             }
         };
