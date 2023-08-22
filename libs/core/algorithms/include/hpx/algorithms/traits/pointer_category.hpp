@@ -144,8 +144,7 @@ namespace hpx::traits {
             using type = general_pointer_tag;
         };
 
-        template <typename Source, typename Dest,
-            bool Contiguous = iterators_are_contiguous_v<Source, Dest>>
+        template <typename Source, typename Dest>
         struct pointer_relocate_category
         {
             using type_src = iter_value_t<Source>;
@@ -165,16 +164,14 @@ namespace hpx::traits {
                 std::is_nothrow_constructible_v<type_src,
                     std::add_rvalue_reference_t<type_dst>>;
 
+            // Used externally to determine if a relocation is noexcept
+            constexpr static bool is_noexcept_relocatable_v =
+                can_move_construct_nothrow && is_buffer_memcpyable;
+
             using type = std::conditional_t<is_buffer_memcpyable,
                 trivially_relocatable_pointer_tag,
-                std::conditional_t<is_buffer_memcpyable,
+                std::conditional_t<can_move_construct_nothrow,
                     nothrow_relocatable_pointer_tag, general_pointer_tag>>;
-        };
-
-        template <typename Source, typename Dest>
-        struct pointer_relocate_category<Source, Dest, false>
-        {
-            using type = general_pointer_tag;
         };
     }    // namespace detail
 
