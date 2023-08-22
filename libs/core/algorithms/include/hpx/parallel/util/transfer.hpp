@@ -14,6 +14,7 @@
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/relocate_at.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -410,22 +411,21 @@ namespace hpx::parallel::util {
             {
                 using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
 
-                zip_iterator t = hpx::util::make_zip_iterator(first, dest);
+                zip_iterator t = hpx::util::zip_iterator(first, dest);
 
                 return in_out_result<InIter, OutIter>{std::next(first, num),
-                    ::hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
-                        HPX_FORWARD(ExPolicy, policy), t, num,
+                    hpx::get<1>(
+                        ::hpx::parallel::util::loop_n<std::decay_t<ExPolicy>>(
+                        t, num,
                         [](zip_iterator it) -> void {
-                            using hpx::get;
-
                             auto iters = it.get_iterator_tuple();
 
-                            InIter current_first = get<0>(iters);
-                            OutIter current_dest = get<1>(iters);
+                            InIter current_first = hpx::get<0>(iters);
+                            OutIter current_dest = hpx::get<1>(iters);
 
                             hpx::relocate_at(std::addressof(*current_first),
                                 std::addressof(*current_dest));
-                        })};
+                        }).get_iterator_tuple())};
             }
         };
 
