@@ -15,7 +15,6 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
-#include <hpx/iterator_support/zip_iterator.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
