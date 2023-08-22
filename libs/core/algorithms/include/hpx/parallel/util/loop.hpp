@@ -857,7 +857,6 @@ namespace hpx::parallel::util {
             static FwdIter unseq_call(
                 ExPolicy, FwdIter it, std::size_t num, F&& f, Cleanup&& cleanup)
             {
-                FwdIter base = it;
                 try
                 {
                     std::size_t count(num & std::size_t(-4));    // -V112
