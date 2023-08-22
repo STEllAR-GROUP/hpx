@@ -45,7 +45,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
 
         // clang-format off
-        template <typename ExPolicy, typename InIter, typename FwdIter, 
+        template <typename ExPolicy, typename InIter, typename FwdIter,
         HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_input_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter>

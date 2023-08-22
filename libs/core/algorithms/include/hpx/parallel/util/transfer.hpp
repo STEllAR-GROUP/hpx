@@ -406,7 +406,7 @@ namespace hpx::parallel::util {
         {
             template <typename ExPolicy, typename InIter, typename OutIter>
             HPX_FORCEINLINE static in_out_result<InIter, OutIter> call(
-                ExPolicy&& policy, InIter first, std::size_t num,
+                ExPolicy&&, InIter first, std::size_t num,
                 OutIter dest) noexcept
             {
                 using zip_iterator = hpx::util::zip_iterator<InIter, OutIter>;
