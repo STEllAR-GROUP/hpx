@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/executors/execution_policy.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/functional/detail/invoke.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
@@ -795,7 +795,6 @@ namespace hpx::parallel::util {
             static FwdIter call(ExPolicy&&, FwdIter it, std::size_t num, F&& f,
                 Cleanup&& cleanup)
             {
-                FwdIter base = it;
                 try
                 {
                     std::size_t count(num & std::size_t(-4));    // -V112
