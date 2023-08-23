@@ -8,18 +8,23 @@
 
 #include <cassert>
 
+#include <memory>    // for std::shared_ptr, std::unique_ptr
 #include <mutex>
 
 // Integral types are relocatable
 static_assert(hpx::is_relocatable_v<int>);
 static_assert(hpx::is_relocatable_v<int const>);
+
+// Pointer types are relocatable
 static_assert(hpx::is_relocatable_v<int*>);
 static_assert(hpx::is_relocatable_v<int (*)()>);
+static_assert(hpx::is_relocatable_v<int (*)[]>);
+static_assert(hpx::is_relocatable_v<int (*)[4]>);
 
 // Array types are not move-constructible and thus not relocatable
 static_assert(!hpx::is_relocatable_v<int[]>);
-static_assert(!hpx::is_relocatable_v<int const[]>);
 static_assert(!hpx::is_relocatable_v<int[4]>);
+static_assert(!hpx::is_relocatable_v<int const[]>);
 static_assert(!hpx::is_relocatable_v<int const[4]>);
 
 // Function types are not move-constructible and thus not relocatable
@@ -56,13 +61,52 @@ struct not_copy_constructible
 
 static_assert(hpx::is_relocatable_v<not_copy_constructible>);
 
-// reference types are relocatable
-static_assert(hpx::is_relocatable_v<int&>);
-static_assert(hpx::is_relocatable_v<int&&>);
-static_assert(hpx::is_relocatable_v<int (&)()>);
-static_assert(hpx::is_relocatable_v<std::mutex&>);
-static_assert(hpx::is_relocatable_v<not_move_constructible&>);
-static_assert(hpx::is_relocatable_v<not_copy_constructible&>);
-static_assert(hpx::is_relocatable_v<not_destructible&>);
+// reference types are not relocatable
+static_assert(!hpx::is_relocatable_v<int&>);
+static_assert(!hpx::is_relocatable_v<int&&>);
+static_assert(!hpx::is_relocatable_v<int (&)()>);
+static_assert(!hpx::is_relocatable_v<std::mutex&>);
+static_assert(!hpx::is_relocatable_v<not_move_constructible&>);
+static_assert(!hpx::is_relocatable_v<not_copy_constructible&>);
+static_assert(!hpx::is_relocatable_v<not_destructible&>);
+
+/*
+    Tests for is_relocatable_from
+*/
+
+// clang-format off
+
+// Reference types are not relocatable
+static_assert(!hpx::is_relocatable_from_v<
+    int (&)[], int (&)[4]>);
+
+// Array types are not move constructible
+static_assert(!hpx::is_relocatable_from_v<
+    int[4], int[4]>);
+
+// This is a simple pointer
+static_assert(hpx::is_relocatable_from_v<
+    int (*)[4], int (*)[4]>);
+
+// Can move from const shared_ptr
+static_assert(hpx::is_relocatable_from_v<
+    std::shared_ptr<int>, const std::shared_ptr<int>>);
+
+// Can't move away from a const unique_ptr
+static_assert(!hpx::is_relocatable_from_v<
+    std::unique_ptr<int>, const std::unique_ptr<int>>);
+
+// Can move away from a non-const unique_ptr
+static_assert(hpx::is_relocatable_from_v<
+    std::unique_ptr<int>, std::unique_ptr<int>>);
+
+// Can move away from a non-const unique_ptr, the dest's constness does not matter
+static_assert(hpx::is_relocatable_from_v<
+    const std::unique_ptr<int>, std::unique_ptr<int>>);
+
+// Can't move away from a const unique_ptr, the dest's constness does not matter
+static_assert(!hpx::is_relocatable_from_v<
+    const std::unique_ptr<int>, const std::unique_ptr<int>>);
+// clang-format on
 
 int main(int, char*[]) {}

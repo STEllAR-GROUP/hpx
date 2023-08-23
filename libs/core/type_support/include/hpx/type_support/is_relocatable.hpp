@@ -11,7 +11,9 @@
 namespace hpx {
 
     template <typename T>
-    struct is_relocatable : std::is_move_constructible<T>
+    struct is_relocatable
+      : std::bool_constant<std::is_move_constructible_v<T> &&
+            std::is_object_v<T>>
     {
     };
 
@@ -20,7 +22,7 @@ namespace hpx {
     struct is_relocatable_from
       : std::bool_constant<
             std::is_constructible_v<std::remove_cv_t<ToTp>, FromTp> &&
-            std::is_same_v<std::decay_t<ToTp>, std::decay_t<FromTp>>>
+            std::is_same_v<std::remove_cv_t<ToTp>, std::remove_cv_t<FromTp>>>
     {
     };
 
