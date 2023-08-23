@@ -77,17 +77,13 @@ namespace hpx::experimental {
 
             if (n_objects != 0)
             {
-                void* first_void = const_cast<void*>(
-                    static_cast<const void*>(std::addressof(*first)));
-                void* last_void = const_cast<void*>(
-                    static_cast<const void*>(std::addressof(*last)));
+                std::byte const* first_byte =
+                    reinterpret_cast<std::byte const*>(std::addressof(*first));
+                std::byte const* last_byte =
+                    reinterpret_cast<std::byte const*>(std::addressof(*last));
 
-                void* dst_void = const_cast<void*>(
-                    static_cast<const void*>(std::addressof(*dst)));
-
-                std::byte* first_byte =
-                    reinterpret_cast<std::byte*>(first_void);
-                std::byte* last_byte = reinterpret_cast<std::byte*>(last_void);
+                std::byte* dst_byte = const_cast<std::byte*>(
+                    reinterpret_cast<std::byte const*>(std::addressof(*dst)));
 
                 auto n_bytes = std::distance(first_byte, last_byte);
 
@@ -95,7 +91,7 @@ namespace hpx::experimental {
                 // That the new buffer actually contains objects
                 // within their lifetime. But this is not possible
                 // with current language features.
-                std::memmove(dst_void, first_void, n_bytes);
+                std::memmove(dst_byte, first_byte, n_bytes);
 
                 dst += n_objects;
             }
@@ -142,7 +138,8 @@ namespace hpx::experimental {
                 catch (...)
                 {
                     // destroy all objects other that the one
-                    // that caused the exception
+                    // that caused the exception 
+                    // (relocate_at already destroyed that one)
 
                     // destroy all objects constructed so far
                     std::destroy(original_dst, dst);
