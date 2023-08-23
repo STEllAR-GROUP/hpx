@@ -165,6 +165,7 @@ int hpx_main()
         }
 
         std::destroy(ptr2, ptr2 + N);
+        HPX_TEST(trivially_relocatable_struct::dtor_count == N);
 
         std::free(mem1);
         std::free(mem2);
