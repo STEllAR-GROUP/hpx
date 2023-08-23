@@ -150,17 +150,18 @@ static_assert(hpx::is_trivially_relocatable_v<
     explicitly_trivially_relocatable_1 const volatile[10]>);
 
 // References and temporaries are not trivially relocatable
-static_assert(
-    !hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1&>);
-static_assert(
-    !hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1&&>);
+// clang-format off
 static_assert(!hpx::is_trivially_relocatable_v<
-              explicitly_trivially_relocatable_1 (&)[10]>);
-static_assert(
-    !hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1 (
-        &&)[10]>);
+    explicitly_trivially_relocatable_1&>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1&&>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 (&)[10]>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 (&&)[10]>);
 static_assert(!hpx::is_trivially_relocatable_v<
               explicitly_trivially_relocatable_1 const volatile&>);
+// clang-format on
 
 // Trivial relocatability is not inherited
 struct derived_from_explicitly_trivially_relocatable
