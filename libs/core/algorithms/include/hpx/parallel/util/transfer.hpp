@@ -377,9 +377,10 @@ namespace hpx::parallel::util {
                         ::hpx::parallel::util::loop_with_manual_cleanup_n(
                             HPX_FORWARD(ExPolicy, policy), t, num,
                             [](zip_iterator current) -> void {
-
-                                InIter& current_first = hpx::get<0>(current.get_iterator_tuple());
-                                OutIter& current_dest = hpx::get<1>(current.get_iterator_tuple());
+                                InIter& current_first =
+                                    hpx::get<0>(current.get_iterator_tuple());
+                                OutIter& current_dest =
+                                    hpx::get<1>(current.get_iterator_tuple());
 
                                 hpx::relocate_at(std::addressof(*current_first),
                                     std::addressof(*current_dest));
@@ -390,7 +391,7 @@ namespace hpx::parallel::util {
 
                                 // destroy all objects constructed so far
                                 // the object that caused the exception is
-                                // destroyed by relocate_at 
+                                // destroyed by relocate_at
                                 std::destroy(dest, current_dest);
                                 // destroy all the objects not relocated yet
                                 std::destroy(current_first + 1, last);
