@@ -8,7 +8,6 @@
 
 #include <hpx/init.hpp>
 #include <hpx/type_support/uninitialized_relocate.hpp>
-#include <vector>
 
 int main(int argc, char* argv[])
 {
