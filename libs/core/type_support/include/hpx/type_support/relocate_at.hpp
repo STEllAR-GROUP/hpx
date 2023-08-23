@@ -19,12 +19,12 @@
 #endif
 
 namespace hpx::detail {
-#if __cplusplus <= 201703L
-    // pre c++17 std::destroy_at can be used only on non-array types
+#if __cplusplus < 202002L
+    // until c++20 std::destroy_at can be used only on non-array types
     template <typename T,
         HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T> && !std::is_array_v<T>)>
 #else
-    // c++17 std::destroy_at can be used on array types, destructing each element
+    // since c++20 std::destroy_at can be used on array types, destructing each element
     template <typename T, HPX_CONCEPT_REQUIRES_(std::is_destructible_v<T>)>
 #endif
     struct destroy_guard
@@ -79,12 +79,9 @@ namespace hpx::experimental {
         template <typename T,
             std::enable_if_t<!relocate_using_memmove<T>, int> = 0>
         T* relocate_at_helper(T* src, T* dst) noexcept(
-            // has non-throwing move constructor
             std::is_nothrow_move_constructible_v<T>)
         {
-            using hpx::detail::destroy_guard;
-
-            destroy_guard g(src);
+            hpx::detail::destroy_guard g(src);
             return hpx::construct_at(dst, HPX_MOVE(*src));
         };
 
@@ -92,9 +89,7 @@ namespace hpx::experimental {
         T relocate_helper(T* src) noexcept(
             std::is_nothrow_move_constructible_v<T>)
         {
-            using hpx::detail::destroy_guard;
-
-            destroy_guard g(src);
+            hpx::detail::destroy_guard g(src);
             return HPX_MOVE(*src);
         }
 
@@ -138,7 +133,7 @@ namespace hpx::experimental {
     }
 
     template <typename T>
-    T relocate(T* src) noexcept(std::is_nothrow_move_constructible_v<T>)
+    T relocate(T* src) noexcept(noexcept(detail::relocate_helper(src)))
     {
         static_assert(
             hpx::is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
