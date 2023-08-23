@@ -71,7 +71,6 @@ namespace hpx {
     {
     };
 
-
     template <typename T>
     struct is_trivially_relocatable<T[]> : is_trivially_relocatable<T>
     {
@@ -88,8 +87,7 @@ namespace hpx {
     };
 
     template <typename T, int N>
-    struct is_trivially_relocatable<T volatile[N]>
-      : is_trivially_relocatable<T>
+    struct is_trivially_relocatable<T volatile[N]> : is_trivially_relocatable<T>
     {
     };
 

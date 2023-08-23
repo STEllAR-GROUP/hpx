@@ -138,7 +138,7 @@ namespace hpx::experimental {
                 catch (...)
                 {
                     // destroy all objects other that the one
-                    // that caused the exception 
+                    // that caused the exception
                     // (relocate_at already destroyed that one)
 
                     // destroy all objects constructed so far
