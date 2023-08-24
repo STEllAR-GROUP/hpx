@@ -23,8 +23,8 @@ find_path(
   Jemalloc_INCLUDE_DIR jemalloc/jemalloc.h
   HINTS ${Jemalloc_ROOT}
         ENV
-        Jemalloc_ROOT
-        ${HPX_Jemalloc_ROOT}
+        JEMALLOC_ROOT
+        ${HPX_JEMALLOC_ROOT}
         ${PC_Jemalloc_MINIMAL_INCLUDEDIR}
         ${PC_Jemalloc_MINIMAL_INCLUDE_DIRS}
         ${PC_Jemalloc_INCLUDEDIR}
@@ -39,8 +39,8 @@ if(MSVC)
     Jemalloc_ADDITIONAL_INCLUDE_DIR msvc_compat/strings.h
     HINTS ${Jemalloc_ROOT}
           ENV
-          Jemalloc_ROOT
-          ${HPX_Jemalloc_ROOT}
+          JEMALLOC_ROOT
+          ${HPX_JEMALLOC_ROOT}
           ${PC_Jemalloc_MINIMAL_INCLUDEDIR}
           ${PC_Jemalloc_MINIMAL_INCLUDE_DIRS}
           ${PC_Jemalloc_INCLUDEDIR}
@@ -65,8 +65,8 @@ find_library(
   NAMES jemalloc libjemalloc
   HINTS ${Jemalloc_ROOT}
         ENV
-        Jemalloc_ROOT
-        ${HPX_Jemalloc_ROOT}
+        JEMALLOC_ROOT
+        ${HPX_JEMALLOC_ROOT}
         ${PC_Jemalloc_MINIMAL_LIBDIR}
         ${PC_Jemalloc_MINIMAL_LIBRARY_DIRS}
         ${PC_Jemalloc_LIBDIR}

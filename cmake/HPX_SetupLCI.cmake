@@ -38,14 +38,14 @@ macro(hpx_setup_lci)
         )
       else()
         hpx_info(
-          "HPX_WITH_FETCH_LCI=${HPX_WITH_FETCH_LCI}, LCI will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_Lci_TAG=${HPX_WITH_Lci_TAG})"
+          "HPX_WITH_FETCH_LCI=${HPX_WITH_FETCH_LCI}, LCI will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_LCI_TAG=${HPX_WITH_LCI_TAG})"
         )
       endif()
       include(FetchContent)
       fetchcontent_declare(
         lci
         GIT_REPOSITORY https://github.com/uiuc-hpc/LC.git
-        GIT_TAG ${HPX_WITH_Lci_TAG}
+        GIT_TAG ${HPX_WITH_LCI_TAG}
       )
 
       fetchcontent_getproperties(lci)
