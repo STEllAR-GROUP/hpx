@@ -248,11 +248,11 @@ namespace hpx {
     ///           iterator to the element in the destination range, one past
     ///           the last element relocated.
     ///
-    template <typename ExPolicy, typename FwdIter1, typename Size,
-        typename FwdIter2>
-    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
+    template <typename ExPolicy, typename InIter, typename Size,
+        typename FwdIter>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_relocate_n(
-        ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
+        ExPolicy&& policy, InIter first, Size count, FwdIter dest);
 }    // namespace hpx
 
 #else    // DOXYGEN
@@ -294,7 +294,7 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
 
         // clang-format off
-        template <typename ExPolicy, typename InIter, typename FwdIter, 
+        template <typename ExPolicy, typename InIter, typename FwdIter,
         typename Size, HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_input_iterator_v<InIter> &&
                 hpx::traits::is_forward_iterator_v<FwdIter> &&
