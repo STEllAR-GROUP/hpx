@@ -1181,39 +1181,39 @@ the gathered data in the root process.
     #include <vector>
 
     int main(int argc, char *argv[]) {
-    MPI_Init(&argc, &argv);
+        MPI_Init(&argc, &argv);
 
-    int num_localities, this_locality;
-    MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+        int num_localities, this_locality;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
 
-    std::vector<int> local_data; // Data to be gathered
+        std::vector<int> local_data; // Data to be gathered
 
-    if (this_locality == 0) {
-        local_data.resize(num_localities); // Resize the vector on the root process
-    }
-
-    // Each process calculates its local data value
-    int my_data = 42 + this_locality;
-
-    for (std::uint32_t i = 0; i != 10; ++i) {
-
-        // Gather data from all processes to the root process (process 0)
-        MPI_Gather(&my_data, 1, MPI_INT, local_data.data(), 1, MPI_INT, 0,
-                MPI_COMM_WORLD);
-
-        // Only the root process (process 0) will print the gathered data
         if (this_locality == 0) {
-        std::cout << "Gathered data on the root: ";
-        for (int i = 0; i < num_localities; ++i) {
-            std::cout << local_data[i] << " ";
+            local_data.resize(num_localities); // Resize the vector on the root process
         }
-        std::cout << std::endl;
-        }
-    }
 
-    MPI_Finalize();
-    return 0;
+        // Each process calculates its local data value
+        int my_data = 42 + this_locality;
+
+        for (std::uint32_t i = 0; i != 10; ++i) {
+
+            // Gather data from all processes to the root process (process 0)
+            MPI_Gather(&my_data, 1, MPI_INT, local_data.data(), 1, MPI_INT, 0,
+                    MPI_COMM_WORLD);
+
+            // Only the root process (process 0) will print the gathered data
+            if (this_locality == 0) {
+            std::cout << "Gathered data on the root: ";
+            for (int i = 0; i < num_localities; ++i) {
+                std::cout << local_data[i] << " ";
+            }
+            std::cout << std::endl;
+            }
+        }
+
+        MPI_Finalize();
+        return 0;
     }
 
 
@@ -1320,35 +1320,35 @@ the gathered data in the root process.
     #include <vector>
 
     int main(int argc, char *argv[]) {
-    MPI_Init(&argc, &argv);
+        MPI_Init(&argc, &argv);
 
-    int num_localities, this_locality;
-    MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
-    MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+        int num_localities, this_locality;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
 
-    int num_localities = num_localities;
-    std::vector<int> data(num_localities);
+        int num_localities = num_localities;
+        std::vector<int> data(num_localities);
 
-    if (this_locality == 0) {
-        // Fill the data vector on the root locality (locality 0)
-        for (int i = 0; i < num_localities; ++i) {
-        data[i] = 42 + i;
+        if (this_locality == 0) {
+            // Fill the data vector on the root locality (locality 0)
+            for (int i = 0; i < num_localities; ++i) {
+            data[i] = 42 + i;
+            }
         }
-    }
 
-    int local_data; // Variable to store the received data
+        int local_data; // Variable to store the received data
 
-    // Scatter data from the root locality to all other localities
-    MPI_Scatter(&data[0], 1, MPI_INT, &local_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+        // Scatter data from the root locality to all other localities
+        MPI_Scatter(&data[0], 1, MPI_INT, &local_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    // Now, each locality has its own local_data
+        // Now, each locality has its own local_data
 
-    // Print the local_data on each locality
-    std::cout << "Locality " << this_locality << " received " << local_data
-                << std::endl;
+        // Print the local_data on each locality
+        std::cout << "Locality " << this_locality << " received " << local_data
+                    << std::endl;
 
-    MPI_Finalize();
-    return 0;
+        MPI_Finalize();
+        return 0;
     }
 
 |hpx| equivalent:
@@ -1442,3 +1442,100 @@ the data from the root locality. In more detail:
    MPI_Comm_rank              `hpx::get_locality_id()`
    MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
    =========================  =============================================
+
+MPI_Allgather
+-------------
+
+The following code gathers data from all processes and sends the data to all
+processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes (equivalent to HPX localities).
+        int num_localities = size;
+
+        // Get the MPI process rank (equivalent to HPX locality ID).
+        int here = rank;
+
+        std::uint32_t value = here;
+
+        std::vector<std::uint32_t> r(num_localities);
+
+        // Perform an all-gather operation to gather values from all processes.
+        MPI_Allgather(&value, 1, MPI_UINT32_T, r.data(), 1, MPI_UINT32_T,
+                        MPI_COMM_WORLD);
+
+        // Print the result.
+        std::cout << "Locality " << here << " has values:";
+        for (size_t j = 0; j < r.size(); ++j) {
+            std::cout << " " << r[j];
+        }
+        std::cout << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    // test functionality based on immediate local result value
+    auto all_gather_direct_client =
+        create_communicator(all_gather_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::vector<std::uint32_t>> overall_result =
+        all_gather(all_gather_direct_client, value);
+
+    std::vector<std::uint32_t> r = overall_result.get();
+
+    std::cout << "Locality " << here << " has values:";
+    for (std::size_t j = 0; j != r.size(); ++j)
+    {
+        std::cout << " " << j;
+    }
+    std::cout << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has values: 0 1
+    Locality 1 has values: 0 1
+
+|hpx| uses the function `all_gather` to implement the functionality of `MPI_Allgather`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_gather_direct_client`.
+
+- The values that the localities exchange with each other are equal to each locality's ID.
+
+- The gather operation is performed using `all_gather`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the vector called `r`.
