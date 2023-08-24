@@ -1464,10 +1464,10 @@ processes.
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-        // Get the number of MPI processes (equivalent to HPX localities).
+        // Get the number of MPI processes
         int num_localities = size;
 
-        // Get the MPI process rank (equivalent to HPX locality ID).
+        // Get the MPI process rank
         int here = rank;
 
         std::uint32_t value = here;
@@ -1582,8 +1582,6 @@ The following code combines values from all processes and distributes the result
         return 0;
     }
 
-
-
 |hpx| equivalent:
 
 .. code-block:: c++
@@ -1627,3 +1625,108 @@ detail:
   needed.
 
 - The `get()` function waits until the result is available and then stores it in the variable `res`.
+
+MPI_Alltoall
+-------------
+
+The following code cGathers data from and scatters data to all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <algorithm>
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes
+        int num_localities = size;
+
+        // Get the MPI process rank
+        int this_locality = rank;
+
+        // Create a communicator for all-to-all operation.
+        MPI_Comm all_to_all_direct_client;
+        MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &all_to_all_direct_client);
+
+        std::vector<std::uint32_t> values(num_localities);
+        std::fill(values.begin(), values.end(), this_locality);
+
+        // Create vectors to store received values.
+        std::vector<std::uint32_t> r(num_localities);
+
+        // Perform an all-to-all operation to exchange values with other localities.
+        MPI_Alltoall(values.data(), 1, MPI_UINT32_T, r.data(), 1, MPI_UINT32_T,
+                    all_to_all_direct_client);
+
+        // Print the results.
+        std::cout << "Locality " << this_locality << " has values:";
+        for (std::size_t j = 0; j != r.size(); ++j) {
+            std::cout << " " << r[j];
+        }
+        std::cout << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto all_to_all_direct_client =
+        create_communicator(all_to_all_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    std::vector<std::uint32_t> values(num_localities);
+    std::fill(values.begin(), values.end(), this_locality);
+
+    hpx::future<std::vector<std::uint32_t>> overall_result =
+        all_to_all(all_to_all_direct_client, std::move(values));
+
+    std::vector<std::uint32_t> r = overall_result.get();
+    std::cout << "Locality " << this_locality << " has values:";
+
+    for (std::size_t j = 0; j != r.size(); ++j)
+    {
+        std::cout << " " << r[j];
+    }
+    std::cout << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has values: 0 1
+    Locality 1 has values: 0 1
+
+|hpx| uses the function `all_to_all` to implement the functionality of `MPI_Alltoall`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_to_all_direct_client`.
+
+- The value each locality sends is equal to its ID.
+
+- The all-to-all operation is performed using `all_to_all`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the variable `r`.
+
