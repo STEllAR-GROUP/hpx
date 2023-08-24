@@ -131,6 +131,12 @@ namespace hpx::traits {
 
     namespace communication {
         struct all_gather_tag;
+
+        template <>
+        constexpr char const* communicator_name<all_gather_tag>() noexcept
+        {
+            return "all_gather";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////

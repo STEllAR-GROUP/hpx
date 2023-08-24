@@ -136,7 +136,14 @@ namespace hpx { namespace collectives {
 namespace hpx::traits {
 
     namespace communication {
+
         struct all_reduce_tag;
+
+        template <>
+        constexpr char const* communicator_name<all_reduce_tag>() noexcept
+        {
+            return "all_reduce";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
