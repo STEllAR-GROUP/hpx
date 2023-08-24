@@ -235,6 +235,12 @@ namespace hpx::traits {
     namespace communication {
 
         struct reduce_tag;
+
+        template <>
+        constexpr char const* communicator_name<reduce_tag>() noexcept
+        {
+            return "reduce";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////

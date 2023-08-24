@@ -130,7 +130,14 @@ namespace hpx { namespace collectives {
 namespace hpx::traits {
 
     namespace communication {
+
         struct all_to_all_tag;
+
+        template <>
+        constexpr char const* communicator_name<all_to_all_tag>() noexcept
+        {
+            return "all_to_all";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
