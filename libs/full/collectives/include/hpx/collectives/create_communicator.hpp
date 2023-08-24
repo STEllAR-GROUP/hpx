@@ -102,18 +102,15 @@ namespace hpx::collectives::detail {
     };
 }    // namespace hpx::collectives::detail
 
-namespace hpx::util {
-
-    // This is explicitly instantiated to ensure that the id is stable across
-    // shared libraries.
-    template <>
-    struct extra_data_helper<collectives::detail::communicator_data>
-    {
-        HPX_EXPORT static extra_data_id_type id() noexcept;
-        static constexpr void reset(
-            collectives::detail::communicator_data*) noexcept {};
-    };
-}    // namespace hpx::util
+// This is explicitly instantiated to ensure that the id is stable across
+// shared libraries.
+template <>
+struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
+{
+    HPX_EXPORT static extra_data_id_type id() noexcept;
+    static constexpr void reset(
+        collectives::detail::communicator_data*) noexcept {};
+};    // namespace hpx::util
 
 namespace hpx::collectives {
 

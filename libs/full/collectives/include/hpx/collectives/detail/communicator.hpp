@@ -16,6 +16,7 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
+#include <hpx/modules/logging.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -31,6 +32,16 @@ namespace hpx::traits {
     // This type can be specialized for a particular collective operation
     template <typename Communicator, typename Operation>
     struct communication_operation;
+
+    namespace communication {
+
+        // Retrieve name of the current communicator
+        template <typename Operation>
+        constexpr char const* communicator_name() noexcept
+        {
+            return "<unknown>";
+        }
+    }    // namespace communication
 }    // namespace hpx::traits
 
 namespace hpx::collectives::detail {
@@ -55,6 +66,11 @@ namespace hpx::collectives::detail {
             using collective_operation =
                 traits::communication_operation<communicator_server, Operation>;
 
+            LHPX_(info, " [COL] ")
+                .format("get({}): which({}), generation({})",
+                    traits::communication::communicator_name<Operation>(),
+                    which, generation);
+
             return collective_operation::template get<Result>(
                 *this, which, generation, HPX_MOVE(args)...);
         }
@@ -74,6 +90,11 @@ namespace hpx::collectives::detail {
         {
             using collective_operation =
                 traits::communication_operation<communicator_server, Operation>;
+
+            LHPX_(info, " [COL] ")
+                .format("set({}): which({}), generation({})",
+                    traits::communication::communicator_name<Operation>(),
+                    which, generation);
 
             return collective_operation::template set<Result>(
                 *this, which, generation, HPX_MOVE(args)...);
