@@ -1538,3 +1538,92 @@ detail:
   needed.
 
 - The `get()` function waits until the result is available and then stores it in the vector called `r`.
+
+
+MPI_Allreduce
+-------------
+
+The following code combines values from all processes and distributes the result back to all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes
+        int num_localities = size;
+
+        // Get the MPI process rank
+        int here = rank;
+
+        // Create a communicator for the all reduce operation.
+        MPI_Comm all_reduce_direct_client;
+        MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &all_reduce_direct_client);
+
+        // Perform the all reduce operation to calculate the sum of 'here' values.
+        std::uint32_t value = here;
+        std::uint32_t res = 0;
+        MPI_Allreduce(&value, &res, 1, MPI_UINT32_T, MPI_SUM,
+                        all_reduce_direct_client);
+
+        std::cout << "Locality " << rank << " has value: " << res << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const here = hpx::get_locality_id();
+
+    auto const all_reduce_direct_client =
+        create_communicator(all_reduce_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result =
+        all_reduce(all_reduce_direct_client, value, std::plus<std::uint32_t>{});
+
+    std::uint32_t res = overall_result.get();
+    std::cout << "Locality " << here << " has value: " << res << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value: 1
+    Locality 1 has value: 1
+
+|hpx| uses the function `all_reduce` to implement the functionality of `MPI_Allreduce`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_reduce_direct_client`.
+
+- The value of each locality is equal to its ID.
+
+- The reduce operation is performed using `all_reduce`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the variable `res`.
