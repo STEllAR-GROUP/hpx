@@ -5,6 +5,253 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/uninitialized_relocate.hpp
+#if defined(DOXYGEN)
+namespace hpx {
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the move-construction of an element, all elements left
+    /// in the input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam InIter1     The type of the source iterator first (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam InIter2     The type of the source iterator last (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
+    ///
+    /// \returns  The \a uninitialized_relocate algorithm returns \a FwdIter.
+    ///           The \a uninitialized_relocate algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element relocated.
+    ///
+    template <typename InIter1, typename InIter2, typename FwdIter>
+    FwdIter uninitialized_relocate(InIter1 first, InIter2 last, FwdIter dest);
+
+    /// Relocates the elements in the range defined by [first, first + count), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the move-construction of an element, all elements left
+    /// in the input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter1     The type of the source iterator first (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam InIter2     The type of the source iterator last (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    //// The assignments in the parallel \a uninitialized_relocate_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_relocate algorithm returns a
+    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a uninitialized_relocate algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element relocated.
+    ///
+    template <typename ExPolicy, typename InIter1, typename InIter2, typename FwdIter>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
+    uninitialized_relocate(
+        ExPolicy&& policy, InIter1 first, InIter2 last, FwdIter dest);
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the move-construction of an element, all elements left
+    /// in the input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, first+count):
+    ///             `count*sizeof(T)` bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, first+count):
+    ///             `count` memory copies of sizeof(T) bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             `count` move assignments and destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam InIter      The type of the source iterator first (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to relocate.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.                   
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate_n algorithm 
+    /// invoked without an execution policy object will execute in sequential 
+    /// order in the calling thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_n algorithm returns \a FwdIter.
+    ///           The \a uninitialized_relocate_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element relocated.
+    ///
+    template <typename InIter, typename Size, typename FwdIter>
+    FwdIter uninitialized_relocate_n(InIter first, Size count, FwdIter dest);
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area beginning at \a dest. If an exception is
+    /// thrown during the move-construction of an element, all elements left
+    /// in the input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, first+count):
+    ///             `count*sizeof(T)` bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, first+count):
+    ///             `count` memory copies of sizeof(T) bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             `count` move assignments and destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam InIter      The type of the source iterator first (deduced).
+    ///                     This iterator type must meet the requirements of an
+    ///                     input iterator.
+    /// \tparam Size        The type of the argument specifying the number of
+    ///                     elements to relocate.
+    /// \tparam FwdIter     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     forward iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param count        Refers to the number of elements starting at
+    ///                     \a first the algorithm will be applied to.                   
+    /// \param dest         Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a sequenced_policy execute in sequential order in the
+    /// calling thread.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate_n algorithm
+    /// invoked with an execution policy object of type
+    /// \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_n algorithm returns a
+    ///           \a hpx::future<FwdIter> if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a FwdIter otherwise.
+    ///           The \a uninitialized_relocate_n algorithm returns the output
+    ///           iterator to the element in the destination range, one past
+    ///           the last element relocated.
+    ///
+    template <typename ExPolicy, typename FwdIter1, typename Size,
+        typename FwdIter2>
+    hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
+    uninitialized_relocate_n(
+        ExPolicy&& policy, FwdIter1 first, Size count, FwdIter2 dest);
+}    // namespace hpx
+
+#else    // DOXYGEN
 
 #pragma once
 
@@ -45,16 +292,17 @@ namespace hpx::parallel {
         ///////////////////////////////////////////////////////////////////////
 
         // clang-format off
-        template <typename ExPolicy, typename InIter, typename FwdIter,
-        HPX_CONCEPT_REQUIRES_(
+        template <typename ExPolicy, typename InIter, typename FwdIter, 
+        typename Size, HPX_CONCEPT_REQUIRES_(
                 hpx::traits::is_input_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                std::is_integral_v<Size>
             )>
         // clang-format on
         typename util::detail::algorithm_result<ExPolicy,
             util::in_out_result<InIter, FwdIter>>::type
         parallel_uninitialized_relocate_n(
-            ExPolicy&& policy, InIter first, std::size_t count, FwdIter dest)
+            ExPolicy&& policy, InIter first, Size count, FwdIter dest)
         {
             if (count == 0)
             {
@@ -236,10 +484,6 @@ namespace hpx {
             FwdIter>::is_noexcept_relocatable_v)
         // clang-format on
         {
-            static_assert(hpx::traits::is_input_iterator_v<InIter>,
-                "Required at least input iterator.");
-            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
-                "Requires at least forward iterator.");
             static_assert(hpx::traits::pointer_relocate_category<InIter,
                               FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
@@ -367,3 +611,4 @@ namespace hpx {
         }
     } uninitialized_relocate{};
 }    // namespace hpx
+#endif    // DOXYGEN
