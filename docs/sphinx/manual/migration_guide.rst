@@ -1639,6 +1639,12 @@ MPI_Alltoall
 -------------
 
 The following code gathers data from and scatters data to all processes.
+=======
+MPI_Alltoall
+-------------
+
+The following code cGathers data from and scatters data to all processes.
+>>>>>>> ac67290f86 (Add MPI_Alltoall doc)
 
 |mpi| code:
 
@@ -1739,6 +1745,7 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the variable `r`.
 
+<<<<<<< HEAD
 .. _MPI_Barrier:
 
 MPI_Barrier
