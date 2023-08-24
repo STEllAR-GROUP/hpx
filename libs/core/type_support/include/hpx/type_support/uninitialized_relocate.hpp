@@ -44,7 +44,8 @@ namespace hpx::experimental {
             constexpr static bool is_buffer_memcpyable =
                 hpx::is_trivially_relocatable_v<in_type> &&
                 //  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ The important check
-                std::is_same_v<std::decay_t<in_type>, std::decay_t<out_type>> &&
+                std::is_same_v<std::remove_cv_t<in_type>,
+                    std::remove_cv_t<out_type>> &&
                 //  can only relocate between same types
                 !std::is_volatile_v<in_type> && !std::is_volatile_v<out_type> &&
                 //  volatile types are not memcpyable
@@ -103,14 +104,17 @@ namespace hpx::experimental {
             std::enable_if_t<
                 choose_uninitialized_relocate_helper<InIter, FwdIter>::value ==
                     relocate_strategy::for_loop_nothrow,
+                // Either the buffer is not contiguous or the types are no-throw
+                // move constructible but not trivially relocatable
                 int> = 0>
         FwdIter uninitialized_relocate_helper(
             InIter first, InIter last, FwdIter dst) noexcept
         {
             for (; first != last; ++first, ++dst)
             {
-                // the move + destroy version will be used
-                hpx::experimental::relocate_at(
+                // if the type is trivially relocatable this will be a memcpy
+                // otherwise it will be a move + destroy
+                relocate_at_helper(
                     std::addressof(*first), std::addressof(*dst));
             }
 
@@ -132,7 +136,7 @@ namespace hpx::experimental {
                 try
                 {
                     // the move + destroy version will be used
-                    hpx::experimental::relocate_at(
+                    relocate_at_helper(
                         std::addressof(*first), std::addressof(*dst));
                 }
                 catch (...)
