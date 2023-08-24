@@ -386,11 +386,10 @@ namespace hpx::parallel::util {
                                     std::addressof(*current_dest));
                             },
                             [last, dest](zip_iterator iter_at_fail) -> void {
-                                InIter current_first =
-                                    hpx::get<0>(iter_at_fail.get_iterator_tuple());
-                                OutIter current_dest =
-                                    hpx::get<1>(iter_at_fail.get_iterator_tuple());
-
+                                InIter current_first = hpx::get<0>(
+                                    iter_at_fail.get_iterator_tuple());
+                                OutIter current_dest = hpx::get<1>(
+                                    iter_at_fail.get_iterator_tuple());
 
                                 // destroy all objects constructed so far
                                 // the object that caused the exception is
