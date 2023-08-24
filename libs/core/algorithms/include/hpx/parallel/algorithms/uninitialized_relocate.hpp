@@ -5,6 +5,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/uninitialized_relocate.hpp
+
+#pragma once
+
 #if defined(DOXYGEN)
 namespace hpx {
 
@@ -126,7 +129,8 @@ namespace hpx {
     ///           iterator to the element in the destination range, one past
     ///           the last element relocated.
     ///
-    template <typename ExPolicy, typename InIter1, typename InIter2, typename FwdIter>
+    template <typename ExPolicy, typename InIter1, typename InIter2,
+        typename FwdIter>
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_relocate(
         ExPolicy&& policy, InIter1 first, InIter2 last, FwdIter dest);
@@ -165,11 +169,11 @@ namespace hpx {
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.                   
+    ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
-    /// The assignments in the parallel \a uninitialized_relocate_n algorithm 
-    /// invoked without an execution policy object will execute in sequential 
+    /// The assignments in the parallel \a uninitialized_relocate_n algorithm
+    /// invoked without an execution policy object will execute in sequential
     /// order in the calling thread.
     ///
     /// \returns  The \a uninitialized_relocate_n algorithm returns \a FwdIter.
@@ -220,7 +224,7 @@ namespace hpx {
     /// \param first        Refers to the beginning of the sequence of elements
     ///                     the algorithm will be applied to.
     /// \param count        Refers to the number of elements starting at
-    ///                     \a first the algorithm will be applied to.                   
+    ///                     \a first the algorithm will be applied to.
     /// \param dest         Refers to the beginning of the destination range.
     ///
     /// The assignments in the parallel \a uninitialized_relocate_n algorithm
@@ -252,8 +256,6 @@ namespace hpx {
 }    // namespace hpx
 
 #else    // DOXYGEN
-
-#pragma once
 
 #include <hpx/config.hpp>
 #include <hpx/algorithms/traits/pointer_category.hpp>
