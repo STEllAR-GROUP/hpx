@@ -16,10 +16,10 @@ find_path(
         ENV
         JEMALLOC_ROOT
         ${HPX_JEMALLOC_ROOT}
-        ${PC_JEMALLOC_MINIMAL_INCLUDEDIR}
-        ${PC_JEMALLOC_MINIMAL_INCLUDE_DIRS}
-        ${PC_JEMALLOC_INCLUDEDIR}
-        ${PC_JEMALLOC_INCLUDE_DIRS}
+        ${PC_Jemalloc_MINIMAL_INCLUDEDIR}
+        ${PC_Jemalloc_MINIMAL_INCLUDE_DIRS}
+        ${PC_Jemalloc_INCLUDEDIR}
+        ${PC_Jemalloc_INCLUDE_DIRS}
   PATH_SUFFIXES include
 )
 
@@ -32,10 +32,10 @@ if(MSVC)
           ENV
           JEMALLOC_ROOT
           ${HPX_JEMALLOC_ROOT}
-          ${PC_JEMALLOC_MINIMAL_INCLUDEDIR}
-          ${PC_JEMALLOC_MINIMAL_INCLUDE_DIRS}
-          ${PC_JEMALLOC_INCLUDEDIR}
-          ${PC_JEMALLOC_INCLUDE_DIRS}
+          ${PC_Jemalloc_MINIMAL_INCLUDEDIR}
+          ${PC_Jemalloc_MINIMAL_INCLUDE_DIRS}
+          ${PC_Jemalloc_INCLUDEDIR}
+          ${PC_Jemalloc_INCLUDE_DIRS}
     PATH_SUFFIXES include
   )
 endif()
@@ -58,10 +58,10 @@ find_library(
         ENV
         JEMALLOC_ROOT
         ${HPX_JEMALLOC_ROOT}
-        ${PC_JEMALLOC_MINIMAL_LIBDIR}
-        ${PC_JEMALLOC_MINIMAL_LIBRARY_DIRS}
-        ${PC_JEMALLOC_LIBDIR}
-        ${PC_JEMALLOC_LIBRARY_DIRS}
+        ${PC_Jemalloc_MINIMAL_LIBDIR}
+        ${PC_Jemalloc_MINIMAL_LIBRARY_DIRS}
+        ${PC_Jemalloc_LIBDIR}
+        ${PC_Jemalloc_LIBRARY_DIRS}
   PATH_SUFFIXES lib lib64
 )
 
