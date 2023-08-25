@@ -37,6 +37,7 @@
 #include <type_traits>
 
 namespace hpx::parcelset::policies::lci {
+
     parcelset::locality parcelport::here()
     {
         return parcelset::locality(locality(util::lci_environment::enabled() ?
@@ -151,44 +152,45 @@ namespace hpx::parcelset::policies::lci {
     bool parcelport::do_background_work(
         std::size_t num_thread, parcelport_background_mode mode)
     {
-        static thread_local int do_lci_progress = -1;
-        if (do_lci_progress == -1)
+        static thread_local bool devices_to_progress_initialized = false;
+        static thread_local std::vector<device_t*> devices_to_progress;
+        if (!devices_to_progress_initialized)
         {
-            do_lci_progress = 0;
+            devices_to_progress_initialized = true;
             if (config_t::progress_type == config_t::progress_type_t::rp &&
                 hpx::threads::get_self_id() != hpx::threads::invalid_thread_id)
             {
                 if (hpx::this_thread::get_pool() ==
                     &hpx::resource::get_thread_pool("lci-progress-pool"))
-                    do_lci_progress = 1;
+                {
+                    std::size_t prg_thread_id =
+                        hpx::get_local_worker_thread_num();
+                    double rate = (double) config_t::ndevices /
+                        config_t::progress_thread_num;
+                    for (int i = prg_thread_id * rate;
+                         i < (prg_thread_id + 1) * rate; ++i)
+                    {
+                        devices_to_progress.push_back(&devices[i]);
+                    }
+                }
             }
         }
 
         bool has_work = false;
-        // magic number
-        const int max_idle_loop_count = 1000;
-        if (do_lci_progress == 1)
+        if (!devices_to_progress.empty())
         {
+            // magic number
+            const int max_idle_loop_count = 1000;
             int idle_loop_count = 0;
             while (idle_loop_count < max_idle_loop_count)
             {
-                while (util::lci_environment::do_progress(device))
+                for (auto device_p : devices_to_progress)
                 {
-                    has_work = true;
-                    idle_loop_count = 0;
-                }
-                ++idle_loop_count;
-            }
-        }
-        else if (do_lci_progress == 2)
-        {
-            int idle_loop_count = 0;
-            while (idle_loop_count < max_idle_loop_count)
-            {
-                while (util::lci_environment::do_progress(device))
-                {
-                    has_work = true;
-                    idle_loop_count = 0;
+                    if (util::lci_environment::do_progress(device_p->device))
+                    {
+                        has_work = true;
+                        idle_loop_count = 0;
+                    }
                 }
                 ++idle_loop_count;
             }
@@ -213,7 +215,7 @@ namespace hpx::parcelset::policies::lci {
             if (config_t::progress_type == config_t::progress_type_t::worker ||
                 config_t::progress_type ==
                     config_t::progress_type_t::pthread_worker)
-                do_progress();
+                do_progress_local();
             if (config_t::enable_lci_backlog_queue)
                 // try to send pending messages
                 has_work = backlog_queue::background_work(
@@ -226,7 +228,7 @@ namespace hpx::parcelset::policies::lci {
             if (config_t::progress_type == config_t::progress_type_t::worker ||
                 config_t::progress_type ==
                     config_t::progress_type_t::pthread_worker)
-                do_progress();
+                do_progress_local();
         }
         return has_work;
     }
@@ -258,7 +260,7 @@ namespace hpx::parcelset::policies::lci {
             if (config_t::progress_type == config_t::progress_type_t::worker ||
                 config_t::progress_type ==
                     config_t::progress_type_t::pthread_worker)
-                while (do_progress())
+                while (do_progress_local())
                     continue;
             if (has_work)
             {
@@ -275,11 +277,12 @@ namespace hpx::parcelset::policies::lci {
     }
 
     std::atomic<bool> parcelport::prg_thread_flag = false;
-    void parcelport::progress_thread_fn(LCI_device_t device)
+    void parcelport::progress_thread_fn(const std::vector<device_t>& devices)
     {
         while (prg_thread_flag)
         {
-            util::lci_environment::do_progress(device);
+            for (auto& device : devices)
+                util::lci_environment::do_progress(device.device);
         }
     }
 
@@ -300,8 +303,6 @@ namespace hpx::parcelset::policies::lci {
     void parcelport::setup(util::runtime_configuration const& rtcfg)
     {
         HPX_UNUSED(rtcfg);
-        // Create device
-        device = LCI_UR_DEVICE;
 
         // Create completion objects
         if (config_t::protocol == config_t::protocol_t::sendrecv &&
@@ -341,36 +342,51 @@ namespace hpx::parcelset::policies::lci {
             throw std::runtime_error("Unknown completion type!");
         }
 
-        // Create endpoints
-        LCI_plist_t plist_;
-        LCI_plist_create(&plist_);
-        LCI_plist_set_comp_type(
-            plist_, LCI_PORT_COMMAND, config_t::completion_type);
-        LCI_plist_set_comp_type(
-            plist_, LCI_PORT_MESSAGE, config_t::completion_type);
-        LCI_endpoint_init(&endpoint_followup, device, plist_);
-        LCI_plist_set_default_comp(
-            plist_, recv_new_completion_manager->get_completion_object());
-        if (config_t::protocol == config_t::protocol_t::sendrecv &&
-            config_t::completion_type == LCI_COMPLETION_SYNC)
-            LCI_plist_set_comp_type(
-                plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
-        else
+        // Create device
+        devices.resize(config_t::ndevices);
+        for (int i = 0; i < config_t::ndevices; ++i)
         {
+            auto& device = devices[i];
+            // Create the LCI device
+            if (i == 0)
+            {
+                device.device = LCI_UR_DEVICE;
+            }
+            else
+            {
+                LCI_device_init(&device.device);
+            }
+            // Create the LCI endpoint
+            LCI_plist_t plist_;
+            LCI_plist_create(&plist_);
             LCI_plist_set_comp_type(
-                plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+                plist_, LCI_PORT_COMMAND, config_t::completion_type);
+            LCI_plist_set_comp_type(
+                plist_, LCI_PORT_MESSAGE, config_t::completion_type);
+            LCI_endpoint_init(&device.endpoint_followup, device.device, plist_);
+            LCI_plist_set_default_comp(
+                plist_, recv_new_completion_manager->get_completion_object());
+            if (config_t::protocol == config_t::protocol_t::sendrecv &&
+                config_t::completion_type == LCI_COMPLETION_SYNC)
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
+            else
+            {
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+            }
+            if (config_t::protocol == config_t::protocol_t::sendrecv)
+                LCI_plist_set_match_type(plist_, LCI_MATCH_TAG);
+            LCI_endpoint_init(&device.endpoint_new, device.device, plist_);
+            LCI_plist_free(&plist_);
         }
-        if (config_t::protocol == config_t::protocol_t::sendrecv)
-            LCI_plist_set_match_type(plist_, LCI_MATCH_TAG);
-        LCI_endpoint_init(&endpoint_new, device, plist_);
-        LCI_plist_free(&plist_);
 
         // Create progress threads
         HPX_ASSERT(prg_thread_flag == false);
         HPX_ASSERT(prg_thread_p == nullptr);
         prg_thread_flag = true;
         prg_thread_p =
-            std::make_unique<std::thread>(progress_thread_fn, device);
+            std::make_unique<std::thread>(progress_thread_fn, devices);
 
         // Create the sender and receiver
         switch (config_t::protocol)
@@ -392,9 +408,16 @@ namespace hpx::parcelset::policies::lci {
     void parcelport::cleanup()
     {
         join_prg_thread_if_running();
-        // free ep, rcq
-        LCI_endpoint_free(&endpoint_followup);
-        LCI_endpoint_free(&endpoint_new);
+        // Free devices
+        for (auto& device : devices)
+        {
+            LCI_endpoint_free(&device.endpoint_followup);
+            LCI_endpoint_free(&device.endpoint_new);
+            if (device.device != LCI_UR_DEVICE)
+            {
+                LCI_device_free(&device.device);
+            }
+        }
     }
 
     void parcelport::join_prg_thread_if_running()
@@ -410,11 +433,46 @@ namespace hpx::parcelset::policies::lci {
         }
     }
 
-    bool parcelport::do_progress()
+    bool parcelport::do_progress_local()
     {
         bool ret = false;
-        ret = util::lci_environment::do_progress(device) || ret;
+        auto device = get_tls_device();
+        ret = util::lci_environment::do_progress(device.device) || ret;
         return ret;
+    }
+
+    parcelport::device_t& parcelport::get_tls_device()
+    {
+        static thread_local std::size_t tls_device_idx = -1;
+
+        if (hpx::threads::get_self_id() == hpx::threads::invalid_thread_id)
+        {
+            util::lci_environment::log(
+                util::lci_environment::log_level_t::debug, "device",
+                "Rank %d unusual phase\n", LCI_RANK);
+            return devices[0];
+        }
+        if (tls_device_idx == std::size_t(-1))
+        {
+            // initialize TLS device
+            // hpx::threads::topology& topo = hpx::threads::create_topology();
+            auto& rp = hpx::resource::get_partitioner();
+
+            std::size_t num_thread =
+                hpx::get_worker_thread_num();    // current worker
+            std::size_t total_thread_num = rp.get_num_threads();
+            HPX_ASSERT(num_thread < total_thread_num);
+            std::size_t nthreads_per_device =
+                (total_thread_num + config_t::ndevices - 1) /
+                config_t::ndevices;
+
+            tls_device_idx = num_thread / nthreads_per_device;
+            util::lci_environment::log(
+                util::lci_environment::log_level_t::debug, "device",
+                "Rank %d thread %lu/%lu gets device %lu\n", LCI_RANK,
+                num_thread, total_thread_num, tls_device_idx);
+        }
+        return devices[tls_device_idx];
     }
 }    // namespace hpx::parcelset::policies::lci
 

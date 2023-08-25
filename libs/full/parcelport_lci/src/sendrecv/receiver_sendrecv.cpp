@@ -21,9 +21,10 @@
 
 namespace hpx::parcelset::policies::lci {
     receiver_sendrecv::connection_ptr receiver_sendrecv::create_connection(
-        int dest, parcelset::parcelport* pp)
+        int dest, parcelset::parcelport* pp, std::size_t device_idx)
     {
-        return std::make_shared<receiver_connection_sendrecv>(dest, pp);
+        return std::make_shared<receiver_connection_sendrecv>(
+            dest, pp, device_idx);
     }
 
     bool receiver_sendrecv::background_work() noexcept
@@ -49,12 +50,15 @@ namespace hpx::parcelset::policies::lci {
         if (request.request.flag == LCI_OK)
         {
             auto useful_bg_start = LCT_now();
+            std::size_t device_idx = 0;
             if (config_t::protocol == config_t::protocol_t::sendrecv)
             {
+                device_idx = (std::size_t) request.request.user_context;
+                auto& device = pp_->devices[device_idx];
                 LCI_comp_t completion =
                     pp_->recv_new_completion_manager->alloc_completion();
-                LCI_recvmn(
-                    pp_->endpoint_new, LCI_RANK_ANY, 0, completion, nullptr);
+                LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0, completion,
+                    (void*) device_idx);
                 pp_->recv_new_completion_manager->enqueue_completion(
                     completion);
             }
@@ -64,7 +68,7 @@ namespace hpx::parcelset::policies::lci {
                 LCI_RANK, request.request.tag,
                 request.request.data.mbuffer.length);
             connection_ptr connection =
-                create_connection(request.request.rank, pp_);
+                create_connection(request.request.rank, pp_, device_idx);
             connection->load((char*) request.request.data.mbuffer.address);
             receiver_connection_sendrecv::return_t ret = connection->receive();
             if (ret.isDone)

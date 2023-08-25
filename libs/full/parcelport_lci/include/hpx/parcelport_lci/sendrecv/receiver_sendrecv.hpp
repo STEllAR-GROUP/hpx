@@ -42,21 +42,26 @@ namespace hpx::parcelset::policies::lci {
         {
             if (config_t::protocol == config_t::protocol_t::sendrecv)
             {
-                for (int i = 0; i < config_t::prepost_recv_num; ++i)
+                for (std::size_t i = 0; i < pp_->devices.size(); ++i)
                 {
-                    LCI_comp_t completion =
-                        pp_->recv_new_completion_manager->alloc_completion();
-                    LCI_recvmn(pp_->endpoint_new, LCI_RANK_ANY, 0, completion,
-                        nullptr);
-                    pp_->recv_new_completion_manager->enqueue_completion(
-                        completion);
+                    auto& device = pp->devices[i];
+                    for (int j = 0; j < config_t::prepost_recv_num; ++j)
+                    {
+                        LCI_comp_t completion = pp_->recv_new_completion_manager
+                                                    ->alloc_completion();
+                        LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0,
+                            completion, (void*) i);
+                        pp_->recv_new_completion_manager->enqueue_completion(
+                            completion);
+                    }
                 }
             }
         }
 
         ~receiver_sendrecv() {}
 
-        connection_ptr create_connection(int dest, parcelset::parcelport* pp);
+        connection_ptr create_connection(
+            int dest, parcelset::parcelport* pp, std::size_t device_idx);
 
         bool background_work() noexcept;
 

@@ -10,6 +10,7 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
+#include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelset/parcelport_connection.hpp>
 
 #include <cstddef>
@@ -52,6 +53,7 @@ namespace hpx::parcelset::policies::lci {
           : dst_rank(dst)
           , pp_((lci::parcelport*) pp)
           , there_(parcelset::locality(locality(dst_rank)))
+          , device_p(&pp_->get_tls_device())
         {
         }
 
@@ -84,6 +86,7 @@ namespace hpx::parcelset::policies::lci {
         postprocess_handler_type postprocess_handler_;
         parcelport* pp_;
         parcelset::locality there_;
+        parcelport::device_t* device_p;
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         parcelset::data_point data_point_;
 #endif

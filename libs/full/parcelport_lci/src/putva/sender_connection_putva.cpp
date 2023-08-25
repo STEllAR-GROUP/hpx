@@ -62,7 +62,7 @@ namespace hpx::parcelset::policies::lci {
         int num_zero_copy_chunks = static_cast<int>(buffer_.num_chunks_.first);
         if (is_eager)
         {
-            while (LCI_mbuffer_alloc(pp_->device, &mbuffer) != LCI_OK)
+            while (LCI_mbuffer_alloc(device_p->device, &mbuffer) != LCI_OK)
                 continue;
             HPX_ASSERT(mbuffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(buffer_, (char*) mbuffer.address, mbuffer.length);
@@ -99,8 +99,9 @@ namespace hpx::parcelset::policies::lci {
                 iovec.lbuffers[i].length = buffer_.data_.size();
                 if (config_t::reg_mem)
                 {
-                    LCI_memory_register(pp_->device, iovec.lbuffers[i].address,
-                        iovec.lbuffers[i].length, &iovec.lbuffers[i].segment);
+                    LCI_memory_register(device_p->device,
+                        iovec.lbuffers[i].address, iovec.lbuffers[i].length,
+                        &iovec.lbuffers[i].segment);
                 }
                 else
                 {
@@ -122,7 +123,7 @@ namespace hpx::parcelset::policies::lci {
                     iovec.lbuffers[i].length = tchunks_length;
                     if (config_t::reg_mem)
                     {
-                        LCI_memory_register(pp_->device,
+                        LCI_memory_register(device_p->device,
                             iovec.lbuffers[i].address, iovec.lbuffers[i].length,
                             &iovec.lbuffers[i].segment);
                     }
@@ -145,7 +146,7 @@ namespace hpx::parcelset::policies::lci {
                         iovec.lbuffers[i].length = c.size_;
                         if (config_t::reg_mem)
                         {
-                            LCI_memory_register(pp_->device,
+                            LCI_memory_register(device_p->device,
                                 iovec.lbuffers[i].address,
                                 iovec.lbuffers[i].length,
                                 &iovec.lbuffers[i].segment);
@@ -199,7 +200,7 @@ namespace hpx::parcelset::policies::lci {
         int ret;
         if (is_eager)
         {
-            ret = LCI_putmna(pp_->endpoint_new, mbuffer, dst_rank, 0,
+            ret = LCI_putmna(device_p->endpoint_new, mbuffer, dst_rank, 0,
                 LCI_DEFAULT_COMP_REMOTE);
             if (ret == LCI_OK)
             {
@@ -218,8 +219,8 @@ namespace hpx::parcelset::policies::lci {
             // We will get this pointer back via the send completion queue
             // after this send completes.
             state.store(connection_state::locked, std::memory_order_relaxed);
-            ret = LCI_putva(pp_->endpoint_new, iovec, completion, dst_rank, 0,
-                LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
+            ret = LCI_putva(device_p->endpoint_new, iovec, completion, dst_rank,
+                0, LCI_DEFAULT_COMP_REMOTE, sharedPtr_p);
             // After this point, if ret == OK, this object can be shared by
             // two threads (the sending thread and the thread polling the
             // completion queue). Care must be taken to avoid data race.

@@ -76,7 +76,7 @@ namespace hpx::parcelset::policies::lci {
                             config_t::progress_type_t::worker ||
                         config_t::progress_type ==
                             config_t::progress_type_t::pthread_worker)
-                        while (pp_->do_progress())
+                        while (pp_->do_progress_local())
                             continue;
                 }
             } while (ret.status == return_status_t::retry);

@@ -26,6 +26,7 @@ namespace hpx::parcelset::policies::lci {
     int config_t::progress_thread_num;
     int config_t::prepost_recv_num;
     bool config_t::reg_mem;
+    int config_t::ndevices;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
     {
@@ -101,6 +102,7 @@ namespace hpx::parcelset::policies::lci {
         prepost_recv_num =
             util::get_entry_as(rtcfg, "hpx.parcel.lci.prepost_recv_num", 1);
         reg_mem = util::get_entry_as(rtcfg, "hpx.parcel.lci.reg_mem", 1);
+        ndevices = util::get_entry_as(rtcfg, "hpx.parcel.lci.ndevices", 1);
 
         if (!enable_send_immediate && enable_lci_backlog_queue)
         {

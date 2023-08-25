@@ -124,9 +124,16 @@ namespace hpx::parcelset {
             std::atomic<bool> is_sending_early_parcel = false;
 
             // LCI objects
-            LCI_device_t device;
-            LCI_endpoint_t endpoint_new;
-            LCI_endpoint_t endpoint_followup;
+            struct device_t
+            {
+                // These are all pointers to the real data structure allocated
+                // by LCI. They would not be modified once initialized.
+                // So we should not have false sharing here.
+                LCI_device_t device;
+                LCI_endpoint_t endpoint_new;
+                LCI_endpoint_t endpoint_followup;
+            };
+            std::vector<device_t> devices;
 
             // Parcelport objects
             static std::atomic<bool> prg_thread_flag;
@@ -137,10 +144,12 @@ namespace hpx::parcelset {
             std::shared_ptr<completion_manager_base>
                 recv_followup_completion_manager;
 
-            bool do_progress();
+            bool do_progress_local();
+            device_t& get_tls_device();
 
         private:
-            static void progress_thread_fn(LCI_device_t device);
+            static void progress_thread_fn(
+                const std::vector<device_t>& devices);
 
             void setup(util::runtime_configuration const& rtcfg);
             void cleanup();
@@ -251,7 +260,8 @@ namespace hpx::traits {
                 "comp_type = queue\n"
                 "progress_type = rp\n"
                 "prepost_recv_num = 1\n"
-                "reg_mem = 1\n";
+                "reg_mem = 1\n"
+                "ndevices = 1\n";
         }
     };
 }    // namespace hpx::traits

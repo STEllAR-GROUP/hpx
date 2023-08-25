@@ -44,7 +44,7 @@ namespace hpx::parcelset::policies::lci {
         postprocess_handler_ = HPX_MOVE(parcel_postprocess);
 
         // build header
-        while (LCI_mbuffer_alloc(pp_->device, &header_buffer) != LCI_OK)
+        while (LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
             continue;
         HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
         header_ = header(
@@ -142,13 +142,14 @@ namespace hpx::parcelset::policies::lci {
         LCI_error_t ret;
         if (config_t::protocol == config_t::protocol_t::putsendrecv)
         {
-            ret = LCI_putmna(pp_->endpoint_new, header_buffer, dst_rank, 0,
+            ret = LCI_putmna(device_p->endpoint_new, header_buffer, dst_rank, 0,
                 LCI_DEFAULT_COMP_REMOTE);
         }
         else
         {
             HPX_ASSERT(config_t::protocol == config_t::protocol_t::sendrecv);
-            ret = LCI_sendmn(pp_->endpoint_new, header_buffer, dst_rank, 0);
+            ret =
+                LCI_sendmn(device_p->endpoint_new, header_buffer, dst_rank, 0);
         }
         if (ret == LCI_OK)
         {
@@ -178,7 +179,7 @@ namespace hpx::parcelset::policies::lci {
             buffer.address = address;
             buffer.length = length;
             LCI_error_t ret =
-                LCI_sendm(pp_->endpoint_followup, buffer, dst_rank, tag);
+                LCI_sendm(device_p->endpoint_followup, buffer, dst_rank, tag);
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
@@ -199,7 +200,7 @@ namespace hpx::parcelset::policies::lci {
             if (config_t::reg_mem && segment_to_use == LCI_SEGMENT_ALL)
             {
                 LCI_memory_register(
-                    pp_->device, address, length, &segment_to_use);
+                    device_p->device, address, length, &segment_to_use);
             }
             if (completion == nullptr)
             {
@@ -209,7 +210,7 @@ namespace hpx::parcelset::policies::lci {
             buffer.segment = segment_to_use;
             buffer.address = address;
             buffer.length = length;
-            LCI_error_t ret = LCI_sendl(pp_->endpoint_followup, buffer,
+            LCI_error_t ret = LCI_sendl(device_p->endpoint_followup, buffer,
                 dst_rank, tag, completion, sharedPtr_p);
             if (ret == LCI_OK)
             {

@@ -47,6 +47,8 @@ namespace hpx::parcelset::policies::lci {
         static int prepost_recv_num;
         // Whether to register the buffer in HPX (or rely on LCI to register it)
         static bool reg_mem;
+        // How many devices to use
+        static int ndevices;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };

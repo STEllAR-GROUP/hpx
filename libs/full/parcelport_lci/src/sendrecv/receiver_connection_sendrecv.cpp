@@ -24,9 +24,10 @@
 
 namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::receiver_connection_sendrecv(
-        int dst, parcelset::parcelport* pp)
+        int dst, parcelset::parcelport* pp, std::size_t device_idx)
       : dst_rank(dst)
       , pp_((lci::parcelport*) pp)
+      , device_p(&pp_->devices[device_idx])
     {
     }
 
@@ -141,7 +142,7 @@ namespace hpx::parcelset::policies::lci {
             LCI_mbuffer_t mbuffer;
             mbuffer.address = address;
             mbuffer.length = length;
-            LCI_error_t ret = LCI_recvm(pp_->endpoint_followup, mbuffer,
+            LCI_error_t ret = LCI_recvm(device_p->endpoint_followup, mbuffer,
                 dst_rank, tag, completion, sharedPtr_p);
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
@@ -158,14 +159,14 @@ namespace hpx::parcelset::policies::lci {
             lbuffer.length = length;
             if (config_t::reg_mem)
             {
-                LCI_memory_register(pp_->device, lbuffer.address,
+                LCI_memory_register(device_p->device, lbuffer.address,
                     lbuffer.length, &lbuffer.segment);
             }
             else
             {
                 lbuffer.segment = LCI_SEGMENT_ALL;
             }
-            LCI_error_t ret = LCI_recvl(pp_->endpoint_followup, lbuffer,
+            LCI_error_t ret = LCI_recvl(device_p->endpoint_followup, lbuffer,
                 dst_rank, tag, completion, sharedPtr_p);
             HPX_ASSERT(ret == LCI_OK);
             HPX_UNUSED(ret);
