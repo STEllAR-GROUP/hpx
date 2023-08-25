@@ -476,8 +476,8 @@ namespace hpx {
         template <typename InIter, typename Size,
             typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )>
         friend FwdIter tag_fallback_invoke(hpx::uninitialized_relocate_n_t,
@@ -486,6 +486,12 @@ namespace hpx {
             FwdIter>::is_noexcept_relocatable_v)
         // clang-format on
         {
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+                "The 'first' argument must meet the requirements "
+                "of an input iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "The 'dest' argument must meet the requirements of a forward "
+                "iterator.");
             static_assert(hpx::traits::pointer_relocate_category<InIter,
                               FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
@@ -509,7 +515,8 @@ namespace hpx {
             typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_forward_iterator_v<FwdIter> &&
+                hpx::traits::is_iterator_v<InIter> &&
+                hpx::traits::is_iterator_v<FwdIter> &&
                 std::is_integral_v<Size>
             )>
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -519,7 +526,13 @@ namespace hpx {
             hpx::traits::pointer_relocate_category<InIter,
                 FwdIter>::is_noexcept_relocatable_v)
         // clang-format on
-        {
+        {   
+            static_assert(hpx::traits::is_input_iterator_v<InIter>,
+                "The 'first' argument must meet the requirements "
+                "of an input iterator.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "The 'dest' argument must meet the requirements of a forward "
+                "iterator.");
             static_assert(hpx::traits::pointer_relocate_category<InIter,
                               FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
@@ -548,9 +561,9 @@ namespace hpx {
         // clang-format off
         template <typename InIter1, typename InIter2, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_input_iterator_v<InIter1> &&
-                hpx::traits::is_input_iterator_v<InIter2> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<InIter1> &&
+                hpx::traits::is_iterator_v<InIter2> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         friend FwdIter tag_fallback_invoke(hpx::uninitialized_relocate_t,
             InIter1 first, InIter2 last, FwdIter dest) noexcept(
@@ -559,6 +572,13 @@ namespace hpx {
         )
         // clang-format on
         {
+            static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
+                    hpx::traits::is_input_iterator_v<InIter2>,
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of input iterators.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "The 'dest' argument must meet the requirements of a forward "
+                "iterator.");
             static_assert(hpx::traits::pointer_relocate_category<InIter1,
                               FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
@@ -580,9 +600,9 @@ namespace hpx {
         template <typename ExPolicy, typename InIter1, typename InIter2, typename FwdIter,
             HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_input_iterator_v<InIter1> &&
-                hpx::traits::is_input_iterator_v<InIter2> &&
-                hpx::traits::is_forward_iterator_v<FwdIter>
+                hpx::traits::is_iterator_v<InIter1> &&
+                hpx::traits::is_iterator_v<InIter2> &&
+                hpx::traits::is_iterator_v<FwdIter>
             )>
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
@@ -592,6 +612,13 @@ namespace hpx {
             FwdIter>::is_noexcept_relocatable_v)
         // clang-format on
         {
+            static_assert(hpx::traits::is_input_iterator_v<InIter1> &&
+                    hpx::traits::is_input_iterator_v<InIter2>,
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of input iterators.");
+            static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
+                "The 'dest' argument must meet the requirements of a forward "
+                "iterator.");
             static_assert(hpx::traits::pointer_relocate_category<InIter1,
                               FwdIter>::valid_relocation,
                 "Relocating from this source type to this destination type is "
