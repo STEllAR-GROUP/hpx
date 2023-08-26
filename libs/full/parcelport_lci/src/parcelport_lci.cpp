@@ -348,6 +348,7 @@ namespace hpx::parcelset::policies::lci {
         {
             auto& device = devices[i];
             // Create the LCI device
+            device.idx = i;
             if (i == 0)
             {
                 device.device = LCI_UR_DEVICE;

@@ -21,10 +21,10 @@
 
 namespace hpx::parcelset::policies::lci {
     receiver_sendrecv::connection_ptr receiver_sendrecv::create_connection(
-        int dest, parcelset::parcelport* pp, std::size_t device_idx)
+        int dest, parcelset::parcelport* pp)
     {
         return std::make_shared<receiver_connection_sendrecv>(
-            dest, pp, device_idx);
+            dest, pp);
     }
 
     bool receiver_sendrecv::background_work() noexcept
@@ -68,7 +68,7 @@ namespace hpx::parcelset::policies::lci {
                 LCI_RANK, request.request.tag,
                 request.request.data.mbuffer.length);
             connection_ptr connection =
-                create_connection(request.request.rank, pp_, device_idx);
+                create_connection(request.request.rank, pp_);
             connection->load((char*) request.request.data.mbuffer.address);
             receiver_connection_sendrecv::return_t ret = connection->receive();
             if (ret.isDone)

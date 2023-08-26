@@ -33,7 +33,7 @@ namespace hpx::parcelset::policies::lci {
 
     public:
         receiver_connection_sendrecv(
-            int dst, parcelset::parcelport* pp, std::size_t device_idx);
+            int dst, parcelset::parcelport* pp);
         ~receiver_connection_sendrecv() {}
         void load(char* header_buffer);
         return_t receive();

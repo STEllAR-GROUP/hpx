@@ -129,6 +129,7 @@ namespace hpx::parcelset {
                 // These are all pointers to the real data structure allocated
                 // by LCI. They would not be modified once initialized.
                 // So we should not have false sharing here.
+                int idx;
                 LCI_device_t device;
                 LCI_endpoint_t endpoint_new;
                 LCI_endpoint_t endpoint_followup;

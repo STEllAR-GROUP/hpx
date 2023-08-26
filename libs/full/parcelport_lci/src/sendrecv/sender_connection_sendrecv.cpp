@@ -83,6 +83,7 @@ namespace hpx::parcelset::policies::lci {
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "tag",
                 "Rank %d Wrap around!\n", LCI_RANK);
+        header_.set_device_idx(device_p->idx);
         header_.set_tag(tag);
         send_chunks_idx = 0;
         completion = nullptr;
@@ -184,8 +185,8 @@ namespace hpx::parcelset::policies::lci {
             {
                 util::lci_environment::log(
                     util::lci_environment::log_level_t::debug, "send",
-                    "sendm (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
-                    original_tag, tag, length);
+                    "sendm (%d, %d, %d) device %d tag %d size %d\n", LCI_RANK, dst_rank,
+                    original_tag, device_p->idx, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
                 return {return_status_t::done, nullptr};
             }
@@ -216,8 +217,8 @@ namespace hpx::parcelset::policies::lci {
             {
                 util::lci_environment::log(
                     util::lci_environment::log_level_t::debug, "send",
-                    "sendl (%d, %d, %d) tag %d size %d\n", LCI_RANK, dst_rank,
-                    original_tag, tag, length);
+                    "sendl (%d, %d, %d) device %d, tag %d size %d\n", LCI_RANK, dst_rank,
+                    original_tag, device_p->idx, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
                 if (segment_used != LCI_SEGMENT_ALL)
                 {

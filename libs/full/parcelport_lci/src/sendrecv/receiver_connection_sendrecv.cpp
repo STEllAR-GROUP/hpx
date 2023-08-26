@@ -24,10 +24,9 @@
 
 namespace hpx::parcelset::policies::lci {
     receiver_connection_sendrecv::receiver_connection_sendrecv(
-        int dst, parcelset::parcelport* pp, std::size_t device_idx)
+        int dst, parcelset::parcelport* pp)
       : dst_rank(dst)
       , pp_((lci::parcelport*) pp)
-      , device_p(&pp_->devices[device_idx])
     {
     }
 
@@ -42,6 +41,7 @@ namespace hpx::parcelset::policies::lci {
             static_cast<std::size_t>(header_.numbytes());
         timer_.restart();
 #endif
+        device_p = &pp_->devices[header_.get_device_idx()];
         tag = header_.get_tag();
         // decode data
         buffer.data_.allocate(header_.numbytes_nonzero_copy());
@@ -148,8 +148,8 @@ namespace hpx::parcelset::policies::lci {
             HPX_UNUSED(ret);
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "recv",
-                "recvm (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
-                original_tag, tag, length);
+                "recvm (%d, %d, %d) device %d tag %d size %d\n", dst_rank, LCI_RANK,
+                original_tag, device_p->idx, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
         }
         else
@@ -172,8 +172,8 @@ namespace hpx::parcelset::policies::lci {
             HPX_UNUSED(ret);
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "recv",
-                "recvl (%d, %d, %d) tag %d size %d\n", dst_rank, LCI_RANK,
-                original_tag, tag, length);
+                "recvl (%d, %d, %d) device %d tag %d size %d\n", dst_rank, LCI_RANK,
+                original_tag, device_p->idx, tag, length);
             tag = (tag + 1) % LCI_MAX_TAG;
             if (segment_used != LCI_SEGMENT_ALL)
             {

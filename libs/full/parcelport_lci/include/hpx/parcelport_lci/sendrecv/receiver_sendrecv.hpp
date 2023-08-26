@@ -61,7 +61,7 @@ namespace hpx::parcelset::policies::lci {
         ~receiver_sendrecv() {}
 
         connection_ptr create_connection(
-            int dest, parcelset::parcelport* pp, std::size_t device_idx);
+            int dest, parcelset::parcelport* pp);
 
         bool background_work() noexcept;
 

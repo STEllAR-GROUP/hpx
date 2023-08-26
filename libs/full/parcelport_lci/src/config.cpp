@@ -117,6 +117,13 @@ namespace hpx::parcelset::policies::lci {
             progress_type = progress_type_t::pthread;
             fprintf(stderr, "WARNING: set progress_type to pthread!\n");
         }
+#ifndef LCI_ENABLE_MULTITHREAD_PROGRESS
+        if (progress_type == progress_type_t::worker
+            || progress_thread_num > ndevices) {
+            fprintf(stderr, "WARNING: Thread-safe LCI_progress is needed "
+                            "but not enabled during compilation!\n");
+        }
+#endif
     }
 }    // namespace hpx::parcelset::policies::lci
 #endif
