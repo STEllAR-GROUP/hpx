@@ -12,7 +12,7 @@ Migration guide
 ===============
 
 The Migration Guide serves as a valuable resource for developers seeking to transition their
-parallel computing applications from different APIs (i.e. |openmp|, |tbb|) to |hpx|. |hpx|, an
+parallel computing applications from different APIs (i.e. |openmp|, |tbb|, |mpi|) to |hpx|. |hpx|, an
 advanced C++ library, offers a versatile and high-performance platform for parallel and distributed
 computing, providing a wide range of features and capabilities. This guide aims to assist developers
 in understanding the key differences between different APIs and |hpx|, and it provides step-by-step
@@ -1045,3 +1045,689 @@ task_group
 |hpx| drew inspiration from |tbb| to introduce the :cpp:func:`hpx::experimental::task_group`
 feature. Therefore, utilizing :cpp:func:`hpx::experimental::task_group` provides an
 equivalent functionality to `tbb::task_group`.
+
+|mpi|
+=====
+
+|mpi| is a standardized communication protocol and library that allows multiple processes or
+nodes in a parallel computing system to exchange data and coordinate their execution.
+
+MPI_Send & MPI_Recv
+-------------------
+
+Let's assume we have the following simple message passing code where each process sends a
+message to the next process in a circular manner. The exchanged message is modified and printed
+to the console.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstddef>
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    constexpr int times = 2;
+
+    int main(int argc, char *argv[]) {
+    MPI_Init(&argc, &argv);
+
+    int num_localities;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+    int this_locality;
+    MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+
+    int next_locality = (this_locality + 1) % num_localities;
+    std::vector<int> msg_vec = {0, 1};
+
+    int cnt = 0;
+    int msg = msg_vec[this_locality];
+
+    int recv_msg;
+    MPI_Request request_send, request_recv;
+    MPI_Status status;
+
+    while (cnt < times) {
+        cnt += 1;
+
+        MPI_Isend(&msg, 1, MPI_INT, next_locality, cnt, MPI_COMM_WORLD,
+                &request_send);
+        MPI_Irecv(&recv_msg, 1, MPI_INT, next_locality, cnt, MPI_COMM_WORLD,
+                &request_recv);
+
+        MPI_Wait(&request_send, &status);
+        MPI_Wait(&request_recv, &status);
+
+        std::cout << "Time: " << cnt << ", Locality " << this_locality
+                << " received msg: " << recv_msg << "\n";
+
+        recv_msg += 10;
+        msg = recv_msg;
+    }
+
+    MPI_Finalize();
+    return 0;
+    }
+
+|hpx| equivalent:
+
+.. literalinclude:: ../../libs/full/collectives/examples/channel_communicator.cpp
+   :start-after: //[doc
+   :end-before: //doc]
+
+To perform message passing between different processes in |hpx| we can use a channel communicator.
+To understand this example, let's focus on the `hpx_main()` function:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+- `create_channel_communicator` function is used to create a channel to serve the communication.
+  This function takes several arguments, including the launch policy (`hpx::launch::sync`), the
+  name of the communicator (`channel_communicator_name`), the number of localities, and the ID
+  of the current locality.
+- The communication follows a ring pattern, where each process (or locality) sends a message to
+  its neighbor in a circular manner. This means that the messages circulate around the localities,
+  ensuring that the communication wraps around when reaching the end of the locality sequence.
+  To achieve this, the `next_locality` variable is calculated as the ID of the next locality in
+  the ring.
+- The initial values for the communication are set (`msg_vec`, `cnt`, `msg`).
+- The `set()` function is called to send the message to the next locality in the ring. The message
+  is sent asynchronously and is associated with a tag (`cnt`).
+- The `get()` function is called to receive a message from the next locality. It is also associated
+  with the same tag as the `set()` operation.
+- The `setf.get()` call blocks until the message sending operation is complete.
+- A continuation is set up using the function `then()` to handle the received message.
+  Inside the continuation:
+
+  - The received message value (`rec_msg`) is retrieved using `f.get()`.
+
+  - The received message is printed to the console and then modified by adding 10.
+
+  - The `set()` and `get()` operations are repeated to send and receive the modified message to
+    the next locality.
+
+  - The `setf.get()` call blocks until the new message sending operation is complete.
+- The `done_msg.get()` call blocks until the continuation is complete for the current loop iteration.
+
+Having said that, we conclude to the following table:
+
+.. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  ==============================================================
+   |openmpi| function         |hpx| equivalent
+   =========================  ==============================================================
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Isend                  `hpx::collectives::set()`
+   MPI_Irecv                  `hpx::collectives::get()`
+   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
+   =========================  ==============================================================
+
+MPI_Gather
+----------
+
+The following code gathers data from all processes to the root process and verifies
+the gathered data in the root process.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <numeric>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities, this_locality;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+
+        std::vector<int> local_data; // Data to be gathered
+
+        if (this_locality == 0) {
+            local_data.resize(num_localities); // Resize the vector on the root process
+        }
+
+        // Each process calculates its local data value
+        int my_data = 42 + this_locality;
+
+        for (std::uint32_t i = 0; i != 10; ++i) {
+
+            // Gather data from all processes to the root process (process 0)
+            MPI_Gather(&my_data, 1, MPI_INT, local_data.data(), 1, MPI_INT, 0,
+                    MPI_COMM_WORLD);
+
+            // Only the root process (process 0) will print the gathered data
+            if (this_locality == 0) {
+            std::cout << "Gathered data on the root: ";
+            for (int i = 0; i < num_localities; ++i) {
+                std::cout << local_data[i] << " ";
+            }
+            std::cout << std::endl;
+            }
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    // test functionality based on immediate local result value
+    auto gather_direct_client = create_communicator(gather_direct_basename,
+        num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            hpx::future<std::vector<std::uint32_t>> overall_result =
+                gather_here(gather_direct_client, std::uint32_t(42));
+
+            std::vector<std::uint32_t> sol = overall_result.get();
+            std::cout << "Gathered data on the root:";
+
+            for (std::size_t j = 0; j != sol.size(); ++j)
+            {
+                HPX_TEST(j + 42 == sol[j]);
+                std::cout << " " << sol[j];
+            }
+            std::cout << std::endl;
+        }
+        else
+        {
+            hpx::future<void> overall_result =
+                gather_there(gather_direct_client, this_locality + 42);
+            overall_result.get();
+        }
+
+    }
+
+This code will print 10 times the following message:
+
+.. code-block:: c++
+
+    Gathered data on the root: 42 43
+
+|hpx| uses two functions to implement the functionality of `MPI_Gather`: `hpx::gather_here` and
+`hpx::gather_there`. `hpx::gather_here` is gathering data from all localities to the locality
+with ID 0 (root locality). `hpx::gather_there` allows non-root localities to participate in the
+gather operation by sending data to the root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `gather_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - the `hpx::gather_here` function is used to perform the gather operation. It collects data from all
+    other localities into the `overall_result` future object. The function arguments provide the necessary
+    information, such as the base name for the gather operation (`gather_direct_basename`), the value
+    to be gathered (`value`), the number of localities (`num_localities`), the current locality ID
+    (`this_locality`), and the generation number (related to the gather operation).
+
+  - The `get()` member function of the `overall_result` future is used to retrieve the gathered data.
+
+  - The next `for` loop is used to verify the correctness of the gathered data (`sol`). `HPX_TEST`
+    is a macro provided by the |hpx| testing utilities to perform similar testing with the Standard
+    C++ macro `assert`.
+
+- If the current locality is not the root:
+
+  - The `hpx::gather_there` function is used to participate in the gather operation initiated by
+    the root locality. It sends the data (in this case, the value `this_locality + 42`) to the root
+    locality, indicating that it should be included in the gathering.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the gather operation
+    to complete for this locality.
+
+
+.. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  =====================================================================
+   |openmpi| function         |hpx| equivalent
+   =========================  =====================================================================
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
+   =========================  =====================================================================
+
+MPI_Scatter
+-----------
+
+The following code gathers data from all processes to the root process and verifies
+the gathered data in the root process.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities, this_locality;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_locality);
+
+        int num_localities = num_localities;
+        std::vector<int> data(num_localities);
+
+        if (this_locality == 0) {
+            // Fill the data vector on the root locality (locality 0)
+            for (int i = 0; i < num_localities; ++i) {
+            data[i] = 42 + i;
+            }
+        }
+
+        int local_data; // Variable to store the received data
+
+        // Scatter data from the root locality to all other localities
+        MPI_Scatter(&data[0], 1, MPI_INT, &local_data, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+        // Now, each locality has its own local_data
+
+        // Print the local_data on each locality
+        std::cout << "Locality " << this_locality << " received " << local_data
+                    << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    HPX_TEST_LTE(std::uint32_t(2), num_localities);
+
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto scatter_direct_client =
+        hpx::collectives::create_communicator(scatter_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 10; ++i)
+    {
+        if (this_locality == 0)
+        {
+            std::vector<std::uint32_t> data(num_localities);
+            std::iota(data.begin(), data.end(), 42 + i);
+
+            hpx::future<std::uint32_t> result =
+                scatter_to(scatter_direct_client, std::move(data));
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                scatter_from<std::uint32_t>(scatter_direct_client);
+
+            HPX_TEST_EQ(i + 42 + this_locality, result.get());
+
+            std::cout << "Locality " << this_locality << " received "
+                      << i + 42 + this_locality << std::endl;
+        }
+    }
+
+For num_localities = 2 and since we run for 10 iterations this code will print
+the following message:
+
+.. code-block:: c++
+
+    Locality 1 received 43
+    Locality 1 received 44
+    Locality 1 received 45
+    Locality 1 received 46
+    Locality 1 received 47
+    Locality 1 received 48
+    Locality 1 received 49
+    Locality 1 received 50
+    Locality 1 received 51
+    Locality 1 received 52
+
+|hpx| uses two functions to implement the functionality of `MPI_Scatter`: `hpx::scatter_to` and
+`hpx::scatter_from`. `hpx::scatter_to` is distributing the data from the locality with ID 0
+(root locality) to all other localities. `hpx::scatter_from` allows non-root localities to receive
+the data from the root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `scatter_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - The data vector is filled with values ranging from `42 + i` to `42 + i + num_localities - 1`.
+
+  - The `hpx::scatter_to` function is used to perform the scatter operation using the communicator
+    `scatter_direct_client`. This scatters the data vector to other localities and
+    returns a future representing the result.
+
+  - `HPX_TEST_EQ` is a macro provided by the |hpx| testing utilities to test the distributed values.
+
+- If the current locality is not the root:
+
+  - The `hpx::scatter_from` function is used to collect the data by the root locality.
+
+  - `HPX_TEST_EQ` is a macro provided by the |hpx| testing utilities to test the collected values.
+
+
+.. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  =============================================
+   |openmpi| function         |hpx| equivalent
+   =========================  =============================================
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
+   =========================  =============================================
+
+MPI_Allgather
+-------------
+
+The following code gathers data from all processes and sends the data to all
+processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes
+        int num_localities = size;
+
+        // Get the MPI process rank
+        int here = rank;
+
+        std::uint32_t value = here;
+
+        std::vector<std::uint32_t> r(num_localities);
+
+        // Perform an all-gather operation to gather values from all processes.
+        MPI_Allgather(&value, 1, MPI_UINT32_T, r.data(), 1, MPI_UINT32_T,
+                        MPI_COMM_WORLD);
+
+        // Print the result.
+        std::cout << "Locality " << here << " has values:";
+        for (size_t j = 0; j < r.size(); ++j) {
+            std::cout << " " << r[j];
+        }
+        std::cout << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    // test functionality based on immediate local result value
+    auto all_gather_direct_client =
+        create_communicator(all_gather_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::vector<std::uint32_t>> overall_result =
+        all_gather(all_gather_direct_client, value);
+
+    std::vector<std::uint32_t> r = overall_result.get();
+
+    std::cout << "Locality " << here << " has values:";
+    for (std::size_t j = 0; j != r.size(); ++j)
+    {
+        std::cout << " " << j;
+    }
+    std::cout << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has values: 0 1
+    Locality 1 has values: 0 1
+
+|hpx| uses the function `all_gather` to implement the functionality of `MPI_Allgather`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_gather_direct_client`.
+
+- The values that the localities exchange with each other are equal to each locality's ID.
+
+- The gather operation is performed using `all_gather`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the vector called `r`.
+
+
+MPI_Allreduce
+-------------
+
+The following code combines values from all processes and distributes the result back to all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes
+        int num_localities = size;
+
+        // Get the MPI process rank
+        int here = rank;
+
+        // Create a communicator for the all reduce operation.
+        MPI_Comm all_reduce_direct_client;
+        MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &all_reduce_direct_client);
+
+        // Perform the all reduce operation to calculate the sum of 'here' values.
+        std::uint32_t value = here;
+        std::uint32_t res = 0;
+        MPI_Allreduce(&value, &res, 1, MPI_UINT32_T, MPI_SUM,
+                        all_reduce_direct_client);
+
+        std::cout << "Locality " << rank << " has value: " << res << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t const num_localities =
+        hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t const here = hpx::get_locality_id();
+
+    auto const all_reduce_direct_client =
+        create_communicator(all_reduce_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result =
+        all_reduce(all_reduce_direct_client, value, std::plus<std::uint32_t>{});
+
+    std::uint32_t res = overall_result.get();
+    std::cout << "Locality " << here << " has value: " << res << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value: 1
+    Locality 1 has value: 1
+
+|hpx| uses the function `all_reduce` to implement the functionality of `MPI_Allreduce`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_reduce_direct_client`.
+
+- The value of each locality is equal to its ID.
+
+- The reduce operation is performed using `all_reduce`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the variable `res`.
+
+MPI_Alltoall
+-------------
+
+The following code cGathers data from and scatters data to all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <algorithm>
+    #include <cstdint>
+    #include <iostream>
+    #include <mpi.h>
+    #include <vector>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        // Get the number of MPI processes
+        int num_localities = size;
+
+        // Get the MPI process rank
+        int this_locality = rank;
+
+        // Create a communicator for all-to-all operation.
+        MPI_Comm all_to_all_direct_client;
+        MPI_Comm_split(MPI_COMM_WORLD, 0, rank, &all_to_all_direct_client);
+
+        std::vector<std::uint32_t> values(num_localities);
+        std::fill(values.begin(), values.end(), this_locality);
+
+        // Create vectors to store received values.
+        std::vector<std::uint32_t> r(num_localities);
+
+        // Perform an all-to-all operation to exchange values with other localities.
+        MPI_Alltoall(values.data(), 1, MPI_UINT32_T, r.data(), 1, MPI_UINT32_T,
+                    all_to_all_direct_client);
+
+        // Print the results.
+        std::cout << "Locality " << this_locality << " has values:";
+        for (std::size_t j = 0; j != r.size(); ++j) {
+            std::cout << " " << r[j];
+        }
+        std::cout << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto all_to_all_direct_client =
+        create_communicator(all_to_all_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    std::vector<std::uint32_t> values(num_localities);
+    std::fill(values.begin(), values.end(), this_locality);
+
+    hpx::future<std::vector<std::uint32_t>> overall_result =
+        all_to_all(all_to_all_direct_client, std::move(values));
+
+    std::vector<std::uint32_t> r = overall_result.get();
+    std::cout << "Locality " << this_locality << " has values:";
+
+    for (std::size_t j = 0; j != r.size(); ++j)
+    {
+        std::cout << " " << r[j];
+    }
+    std::cout << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has values: 0 1
+    Locality 1 has values: 0 1
+
+|hpx| uses the function `all_to_all` to implement the functionality of `MPI_Alltoall`. In more
+detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `hpx::collectives::create_communicator()` is used to create a communicator called
+  `all_to_all_direct_client`.
+
+- The value each locality sends is equal to its ID.
+
+- The all-to-all operation is performed using `all_to_all`. The result is stored in an `hpx::future`
+  object called `overall_result`, which represents a future result that can be retrieved later when
+  needed.
+
+- The `get()` function waits until the result is available and then stores it in the variable `r`.
+

@@ -5,6 +5,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+///////////////////////////////////////////////////////////////////////////////
+//[doc
 #include <hpx/config.hpp>
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -20,14 +22,12 @@
 
 using namespace hpx::collectives;
 
-///////////////////////////////////////////////////////////////////////////////
 constexpr char const* channel_communicator_name =
     "/example/channel_communicator/";
 
 // the number of times
 constexpr int times = 2;
 
-////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
     std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
@@ -89,3 +89,4 @@ int main(int argc, char* argv[])
     return 0;
 #endif
 }
+//doc]
