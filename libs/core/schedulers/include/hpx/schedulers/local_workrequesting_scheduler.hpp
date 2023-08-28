@@ -1675,7 +1675,9 @@ namespace hpx::threads::policies {
 
             // check if work was available
             if (0 != added)
+            {
                 return result;
+            }
 
             if (num_thread == num_queues_ - 1)
             {
@@ -1683,25 +1685,28 @@ namespace hpx::threads::policies {
                     result;
             }
 
-            // check if we have been disabled
-            if (!running)
-                return true;
-
-            // return if no stealing is requested (or not possible)
-            if (num_queues_ == 1 || !allow_stealing)
-                return result;
+            // check if we have been disabled or if no stealing is requested (or
+            // not possible)
+            if (!running || num_queues_ == 1)
+            {
+                return !running;
+            }
 
             // attempt to steal more work
-            send_steal_request(d);
-            HPX_ASSERT(d.requested_ != 0);
-
-            // now try to handle steal requests again if we have not received a
-            // task from some other core yet
-            if (!try_receiving_tasks(d, added, next_thrd))
+            if (allow_stealing)
             {
-                // decline or forward all pending steal requests
-                decline_or_forward_all_steal_requests(d);
+                send_steal_request(d);
+                HPX_ASSERT(d.requested_ != 0);
             }
+
+            if (try_receiving_tasks(d, added, next_thrd))
+            {
+                return false;
+            }
+
+            // if we did not receive any new task, decline or forward all
+            // pending steal requests
+            decline_or_forward_all_steal_requests(d);
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
