@@ -2215,8 +2215,8 @@ hpx_include(SetOutputPaths)
 
 # ##############################################################################
 # Fixing git tag, if necessary
-hpx_info("HPX_WITH_GIT_TAG: " ${HPX_WITH_GIT_TAG})
-hpx_info("HPX_WITH_GIT_BRANCH: " ${HPX_WITH_GIT_BRANCH})
+hpx_debug("HPX_WITH_GIT_TAG: " ${HPX_WITH_GIT_TAG})
+hpx_debug("HPX_WITH_GIT_BRANCH: " ${HPX_WITH_GIT_BRANCH})
 
 if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
                                                       STREQUAL "x")
