@@ -57,9 +57,8 @@ string(REGEX REPLACE " " ";" HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS
 )
 
 # If a branch name has been set, we copy files to a corresponding directory
-message("HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
 if(HPX_WITH_GIT_BRANCH)
-  message("Updating branch directory")
+  message("Updating branch directory, " "HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
   set(DOCS_BRANCH_DEST
       "${HPX_BINARY_DIR}/docs/gh-pages/branches/${HPX_WITH_GIT_BRANCH}"
   )
@@ -92,9 +91,8 @@ if(HPX_WITH_GIT_BRANCH)
 endif()
 
 # If a tag name has been set, we copy files to a corresponding directory
-message("HPX_WITH_GIT_TAG=\"${HPX_WITH_GIT_TAG}\"")
 if(HPX_WITH_GIT_TAG)
-  message("Updating tag directory")
+  message("Updating tag directory, " "HPX_WITH_GIT_TAG=\"${HPX_WITH_GIT_TAG}\"")
   set(DOCS_TAG_DEST "${HPX_BINARY_DIR}/docs/gh-pages/tags/${HPX_WITH_GIT_TAG}")
   file(REMOVE_RECURSE "${DOCS_TAG_DEST}")
   if("html" IN_LIST HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS)
