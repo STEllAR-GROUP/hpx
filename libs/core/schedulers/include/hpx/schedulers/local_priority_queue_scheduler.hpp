@@ -78,7 +78,7 @@ namespace hpx::threads::policies {
                 detail::affinity_data const& affinity_data,
                 std::size_t num_high_priority_queues = static_cast<std::size_t>(
                     -1),
-                thread_queue_init_parameters thread_queue_init =
+                thread_queue_init_parameters const& thread_queue_init =
                     thread_queue_init_parameters{},
                 char const* description =
                     "local_priority_queue_scheduler") noexcept
@@ -111,7 +111,7 @@ namespace hpx::threads::policies {
         };
         using init_parameter_type = init_parameter;
 
-        local_priority_queue_scheduler(init_parameter_type const& init,
+        explicit local_priority_queue_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
           : scheduler_base(
                 init.num_queues_, init.description_, init.thread_queue_init_)
@@ -801,7 +801,7 @@ namespace hpx::threads::policies {
 
             num_thread = select_active_pu(num_thread, allow_fallback);
 
-            [[maybe_unused]] auto* thrdptr = get_thread_id_data(thrd);
+            [[maybe_unused]] auto const* thrdptr = get_thread_id_data(thrd);
             switch (priority)
             {
             case thread_priority::high_recursive:
@@ -1007,7 +1007,7 @@ namespace hpx::threads::policies {
         std::int64_t get_thread_count(
             thread_schedule_state state = thread_schedule_state::unknown,
             thread_priority priority = thread_priority::default_,
-            std::size_t num_thread = std::size_t(-1),
+            std::size_t num_thread = static_cast<std::size_t>(-1),
             bool /* reset */ = false) const override
         {
             // Return thread count of one specific queue.

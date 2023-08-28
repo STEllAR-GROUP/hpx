@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -25,7 +25,9 @@
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
 #include <hpx/modules/util.hpp>
+#if defined(HPX_HAVE_MAX_CPU_COUNT)
 #include <hpx/preprocessor/stringize.hpp>
+#endif
 #include <hpx/util/from_string.hpp>
 #include <hpx/version.hpp>
 
@@ -33,9 +35,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <iterator>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -106,18 +106,23 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        std::size_t handle_num_localities(util::manage_config& cfgmap,
-            hpx::program_options::variables_map& vm,
-            util::batch_environment& env, bool using_nodelist,
+        std::size_t handle_num_localities(util::manage_config const& cfgmap,
+            hpx::program_options::variables_map const& vm,
+            util::batch_environment const& env, bool using_nodelist,
             std::size_t num_localities, bool initial)
         {
-            std::size_t batch_localities = env.retrieve_number_of_localities();
-            if (num_localities == 1 && batch_localities != std::size_t(-1))
+            std::size_t const batch_localities =
+                env.retrieve_number_of_localities();
+            if (num_localities == 1 &&
+                batch_localities != static_cast<std::size_t>(-1))
             {
-                std::size_t cfg_num_localities = cfgmap.get_value<std::size_t>(
-                    "hpx.localities", batch_localities);
-                if (cfg_num_localities > 1)
+                if (auto const cfg_num_localities =
+                        cfgmap.get_value<std::size_t>(
+                            "hpx.localities", batch_localities);
+                    cfg_num_localities > 1)
+                {
                     num_localities = cfg_num_localities;
+                }
             }
 
             if (!initial && env.found_batch_environment() && using_nodelist &&
@@ -129,7 +134,8 @@ namespace hpx::util {
 
             if (vm.count("hpx:localities"))
             {
-                std::size_t localities = vm["hpx:localities"].as<std::size_t>();
+                std::size_t const localities =
+                    vm["hpx:localities"].as<std::size_t>();
 
                 if (localities == 0)
                 {
@@ -161,9 +167,9 @@ namespace hpx::util {
 
         ///////////////////////////////////////////////////////////////////////
         std::size_t get_number_of_default_cores(
-            util::batch_environment& env, bool use_process_mask)
+            util::batch_environment const& env, bool use_process_mask)
         {
-            std::size_t num_cores =
+            std::size_t const num_cores =
                 hpx::local::detail::get_number_of_default_cores(
                     use_process_mask);
             if (use_process_mask)
@@ -172,13 +178,13 @@ namespace hpx::util {
             }
 
             std::size_t batch_threads = env.retrieve_number_of_threads();
-            if (batch_threads == std::size_t(-1))
+            if (batch_threads == static_cast<std::size_t>(-1))
             {
                 return num_cores;
             }
 
             // assuming we assign the first N cores ...
-            threads::topology& top = threads::create_topology();
+            threads::topology const& top = threads::create_topology();
             std::size_t core = 0;
             for (/**/; core < num_cores; ++core)
             {
@@ -190,11 +196,11 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        std::size_t handle_num_threads(util::manage_config& cfgmap,
+        std::size_t handle_num_threads(util::manage_config const& cfgmap,
             util::runtime_configuration const& rtcfg,
-            hpx::program_options::variables_map& vm,
-            util::batch_environment& env, bool using_nodelist, bool initial,
-            bool use_process_mask)
+            hpx::program_options::variables_map const& vm,
+            util::batch_environment const& env, bool using_nodelist,
+            bool initial, bool use_process_mask)
         {
             // If using the process mask we override "cores" and "all" options
             // but keep explicit numeric values.
@@ -205,16 +211,15 @@ namespace hpx::util {
                 detail::get_number_of_default_cores(env, use_process_mask);
             std::size_t const batch_threads = env.retrieve_number_of_threads();
 
-            std::string threads_str =
-                cfgmap.get_value<std::string>("hpx.os_threads",
-                    rtcfg.get_entry(
-                        "hpx.os_threads", std::to_string(init_threads)));
+            auto threads_str = cfgmap.get_value<std::string>("hpx.os_threads",
+                rtcfg.get_entry(
+                    "hpx.os_threads", std::to_string(init_threads)));
 
-            std::size_t threads = 0;
+            std::size_t threads;
             if ("cores" == threads_str)
             {
                 threads = init_cores;
-                if (batch_threads != std::size_t(-1))
+                if (batch_threads != static_cast<std::size_t>(-1))
                 {
                     threads = batch_threads;
                 }
@@ -222,12 +227,12 @@ namespace hpx::util {
             else if ("all" == threads_str)
             {
                 threads = init_threads;
-                if (batch_threads != std::size_t(-1))
+                if (batch_threads != static_cast<std::size_t>(-1))
                 {
                     threads = batch_threads;
                 }
             }
-            else if (batch_threads != std::size_t(-1))
+            else if (batch_threads != static_cast<std::size_t>(-1))
             {
                 threads = batch_threads;
             }
@@ -243,7 +248,7 @@ namespace hpx::util {
                 if ("all" == threads_str)
                 {
                     threads = init_threads;
-                    if (batch_threads != std::size_t(-1))
+                    if (batch_threads != static_cast<std::size_t>(-1))
                     {
                         threads = batch_threads;
                     }
@@ -251,7 +256,7 @@ namespace hpx::util {
                 else if ("cores" == threads_str)
                 {
                     threads = init_cores;
-                    if (batch_threads != std::size_t(-1))
+                    if (batch_threads != static_cast<std::size_t>(-1))
                     {
                         threads = batch_threads;
                     }
@@ -281,7 +286,7 @@ namespace hpx::util {
             }
 
             // make sure minimal requested number of threads is observed
-            std::size_t min_os_threads = cfgmap.get_value<std::size_t>(
+            auto min_os_threads = cfgmap.get_value<std::size_t>(
                 "hpx.force_min_os_threads", threads);
 
             if (min_os_threads == 0)
@@ -318,7 +323,7 @@ namespace hpx::util {
         ///////////////////////////////////////////////////////////////////////
 #if !defined(HPX_HAVE_NETWORKING)
         void check_networking_option(
-            hpx::program_options::variables_map& vm, char const* option)
+            hpx::program_options::variables_map const& vm, char const* option)
         {
             if (vm.count(option) != 0)
             {
@@ -331,7 +336,7 @@ namespace hpx::util {
 #endif
 
         void check_networking_options(
-            [[maybe_unused]] hpx::program_options::variables_map& vm)
+            [[maybe_unused]] hpx::program_options::variables_map const& vm)
         {
 #if !defined(HPX_HAVE_NETWORKING)
             check_networking_option(vm, "hpx:agas");
@@ -355,7 +360,7 @@ namespace hpx::util {
         std::vector<std::string> ini_config,
         hpx::function<int(hpx::program_options::variables_map& vm)> hpx_main_f)
       : base_type(HPX_MOVE(rtcfg), HPX_MOVE(ini_config), HPX_MOVE(hpx_main_f))
-      , node_(std::size_t(-1))
+      , node_(static_cast<std::size_t>(-1))
       , num_localities_(1)
     {
     }
@@ -371,7 +376,8 @@ namespace hpx::util {
         // disabled
         detail::check_networking_options(vm);
 
-        bool debug_clp = node != std::size_t(-1) && vm.count("hpx:debug-clp");
+        bool debug_clp =
+            node != static_cast<std::size_t>(-1) && vm.count("hpx:debug-clp");
 
         // create host name mapping
         util::map_hostnames mapnames(debug_clp);
@@ -384,12 +390,11 @@ namespace hpx::util {
 
         // The AGAS host name and port number are pre-initialized from
         //the command line
-        std::string agas_host = cfgmap.get_value<std::string>(
+        auto agas_host = cfgmap.get_value<std::string>(
             "hpx.agas.address", rtcfg_.get_entry("hpx.agas.address", ""));
-        std::uint16_t agas_port =
-            cfgmap.get_value<std::uint16_t>("hpx.agas.port",
-                hpx::util::from_string<std::uint16_t>(
-                    rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)));
+        auto agas_port = cfgmap.get_value<std::uint16_t>("hpx.agas.port",
+            hpx::util::from_string<std::uint16_t>(
+                rtcfg_.get_entry("hpx.agas.port", HPX_INITIAL_IP_PORT)));
 
         if (vm.count("hpx:agas"))
         {
@@ -416,8 +421,8 @@ namespace hpx::util {
                     vm["hpx:iftransform"].as<std::string>()));
             }
 
-            typedef util::map_hostnames::transform_function_type
-                transform_function_type;
+            using transform_function_type =
+                util::map_hostnames::transform_function_type;
             mapnames.use_transform(transform_function_type(iftransform));
         }
 
@@ -435,6 +440,7 @@ namespace hpx::util {
                     "one of the --hpx:nodefile and --hpx:nodes options at the "
                     "same time.");
             }
+
             std::string node_file = vm["hpx:nodefile"].as<std::string>();
             ini_config.emplace_back("hpx.nodefile!=" + node_file);
             std::ifstream ifs(node_file.c_str());
@@ -537,7 +543,7 @@ namespace hpx::util {
             "hpx.parcel.port", initial_hpx_port);
 
         run_agas_server = vm.count("hpx:run-agas-server") != 0;
-        if (node == std::size_t(-1))
+        if (node == static_cast<std::size_t>(-1))
             node = env.retrieve_node_number();
 #else
         num_localities_ = 1;
@@ -622,7 +628,8 @@ namespace hpx::util {
                 }
 #endif
             }
-            else if (node != std::size_t(-1) || vm.count("hpx:node"))
+            else if (node != static_cast<std::size_t>(-1) ||
+                vm.count("hpx:node"))
             {
                 // command line overwrites the environment
                 if (vm.count("hpx:node"))
@@ -767,7 +774,8 @@ namespace hpx::util {
 #endif
             }
 
-            // write HPX and AGAS network parameters to the proper ini-file entries
+            // write HPX and AGAS network parameters to the proper ini-file
+            // entries
             ini_config.emplace_back("hpx.parcel.address=" + hpx_host);
             ini_config.emplace_back(
                 "hpx.parcel.port=" + std::to_string(hpx_port));
@@ -949,7 +957,8 @@ namespace hpx::util {
             error_mode |= util::commandline_error_mode::ignore_aliases;
             hpx::program_options::variables_map prevm;
             if (!util::parse_commandline(rtcfg_, desc_cmdline, argv[0], args,
-                    prevm, std::size_t(-1), error_mode, rtcfg_.mode_))
+                    prevm, static_cast<std::size_t>(-1), error_mode,
+                    rtcfg_.mode_))
             {
                 return -1;
             }
@@ -997,7 +1006,7 @@ namespace hpx::util {
         // be considered now.
 
         // minimally assume one locality and this is the console
-        if (node_ == std::size_t(-1))
+        if (node_ == static_cast<std::size_t>(-1))
             node_ = 0;
 
         for (std::shared_ptr<plugins::plugin_registry_base>& reg :

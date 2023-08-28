@@ -6,7 +6,6 @@
 
 #include <hpx/command_line_handling/parse_command_line.hpp>
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
-#include <hpx/datastructures/any.hpp>
 #include <hpx/ini/ini.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
@@ -14,9 +13,8 @@
 
 #include <cctype>
 #include <cstddef>
-#include <fstream>
+#include <exception>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -47,18 +45,19 @@ namespace hpx::util {
 
             // any --hpx: option without a second ':' is handled elsewhere as
             // well
-            std::string::size_type p = s.find_first_of(':', hpx_prefix_len);
+            std::string::size_type const p =
+                s.find_first_of(':', hpx_prefix_len);
             if (p == std::string::npos)
                 return false;
 
             if (hpx::util::from_string<std::size_t>(
                     s.substr(hpx_prefix_len, p - hpx_prefix_len),
-                    std::size_t(-1)) == node)
+                    static_cast<std::size_t>(-1)) == node)
             {
                 using hpx::local::detail::trim_whitespace;
 
                 // this option is for the current locality only
-                std::string::size_type p1 = s.find_first_of('=', p);
+                std::string::size_type const p1 = s.find_first_of('=', p);
                 if (p1 != std::string::npos)
                 {
                     // the option has a value
@@ -127,9 +126,9 @@ namespace hpx::util {
                 using hpx::program_options::store;
                 using hpx::program_options::command_line_style::unix_style;
 
-                util::commandline_error_mode mode =
+                util::commandline_error_mode const mode =
                     error_mode & util::commandline_error_mode::ignore_aliases;
-                util::commandline_error_mode notmode =
+                util::commandline_error_mode const notmode =
                     error_mode & ~util::commandline_error_mode::ignore_aliases;
 
                 store(hpx::local::detail::get_commandline_parser(
@@ -160,22 +159,21 @@ namespace hpx::util {
                 return;
 
             filesystem::path dir(filesystem::initial_path());
-            filesystem::path app(appname);
+            filesystem::path const app(appname);
             appname = filesystem::basename(app.filename());
 
             // walk up the hierarchy, trying to find a file <appname>.cfg
             while (!dir.empty())
             {
                 filesystem::path filename = dir / (appname + ".cfg");
-                util::commandline_error_mode mode = error_mode &
+                util::commandline_error_mode const mode = error_mode &
                     ~util::commandline_error_mode::report_missing_config_file;
                 std::vector<std::string> options =
                     hpx::local::detail::read_config_file_options(
                         filename.string(), mode);
 
-                bool result = handle_config_file_options(
-                    options, desc_cfgfile, vm, ini, node, mode);
-                if (result)
+                if (handle_config_file_options(
+                        options, desc_cfgfile, vm, ini, node, mode))
                 {
                     break;    // break on the first options file found
                 }
@@ -204,7 +202,7 @@ namespace hpx::util {
             using hpx::program_options::options_description;
             if (vm.count("hpx:options-file"))
             {
-                std::vector<std::string> const& cfg_files =
+                auto const& cfg_files =
                     vm["hpx:options-file"].as<std::vector<std::string>>();
 
                 for (std::string const& cfg_file : cfg_files)
@@ -454,7 +452,7 @@ namespace hpx::util {
             all_options[options_type::desc_cfgfile].add(
                 all_options[options_type::counter_options]);
 #endif
-            bool result = hpx::local::detail::parse_commandline(rtcfg,
+            bool const result = hpx::local::detail::parse_commandline(rtcfg,
                 all_options, app_options, args, vm, error_mode, visible,
                 unregistered_options);
 
@@ -491,8 +489,8 @@ namespace hpx::util {
 
         std::string extract_arg0(std::string const& cmdline)
         {
-            std::string::size_type p = cmdline.find_first_of(" \t");
-            if (p != std::string::npos)
+            if (std::string::size_type const p = cmdline.find_first_of(" \t");
+                p != std::string::npos)
             {
                 return cmdline.substr(0, p);
             }

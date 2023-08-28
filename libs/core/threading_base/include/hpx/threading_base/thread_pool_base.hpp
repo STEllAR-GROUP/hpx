@@ -12,6 +12,7 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/callback_notifier.hpp>
+#include <hpx/threading_base/detail/get_default_pool.hpp>
 #include <hpx/threading_base/network_background_callback.hpp>
 #include <hpx/threading_base/scheduler_mode.hpp>
 #include <hpx/threading_base/scheduler_state.hpp>
@@ -107,7 +108,7 @@ namespace hpx::threads {
     // note: this data structure has to be protected from races from the outside
 
     /// \brief The base class used to manage a pool of OS threads.
-    class HPX_CORE_EXPORT thread_pool_base
+    class thread_pool_base
     {
     public:
         /// \cond NOINTERNAL

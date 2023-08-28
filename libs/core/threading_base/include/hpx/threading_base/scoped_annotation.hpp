@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
