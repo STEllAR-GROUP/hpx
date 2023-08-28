@@ -218,7 +218,15 @@ struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
     {
     }
 
-    ~future_data() noexcept override;
+    // The constructor for the base template is defaulted. Some compilers
+    // generate duplicate symbols for this is the destructor definition is not
+    // visible to it. We hide the implementation in tidy() instead.
+    ~future_data() noexcept override
+    {
+        tidy();
+    }
+
+    void tidy() const noexcept;
 
     [[nodiscard]] std::string const& get_registered_name() const noexcept;
     void set_registered_name(std::string name);

@@ -47,11 +47,11 @@ int hpx_main()
         std::uint64_t b_lva = b.get_lva();
 
         // Resolve a_gid.
-        address addr = hpx::agas::resolve(a_id).get();
+        address addr = hpx::agas::resolve(hpx::launch::sync, a_id);
 
         ///////////////////////////////////////////////////////////////////////
         HPX_TEST_EQ(addr.address_, reinterpret_cast<void*>(a.get_lva()));
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+        HPX_SANITY_EQ(hpx::agas::resolve(hpx::launch::sync, a_id).address_,
             reinterpret_cast<void*>(a.get_lva()));
 
         ///////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ int hpx_main()
 
         ///////////////////////////////////////////////////////////////////////
         HPX_TEST_EQ(b_lva, a.get_lva());
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+        HPX_SANITY_EQ(hpx::agas::resolve(hpx::launch::sync, a_id).address_,
             reinterpret_cast<void*>(a.get_lva()));
 
         ///////////////////////////////////////////////////////////////////////
@@ -81,8 +81,9 @@ int hpx_main()
         hpx::agas::update_cache_entry(a_gid, addr);
 
         ///////////////////////////////////////////////////////////////////////
-        HPX_TEST_EQ(hpx::agas::resolve(a_id).get().address_, a_lva);
-        HPX_SANITY_EQ(hpx::agas::resolve(a_id).get().address_,
+        HPX_TEST_EQ(
+            hpx::agas::resolve(hpx::launch::sync, a_id).address_, a_lva);
+        HPX_SANITY_EQ(hpx::agas::resolve(hpx::launch::sync, a_id).address_,
             reinterpret_cast<void*>(a.get_lva()));
     }
 

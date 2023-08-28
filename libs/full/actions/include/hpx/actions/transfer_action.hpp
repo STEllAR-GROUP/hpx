@@ -223,16 +223,14 @@ namespace hpx::actions {
         {
             // If this is a direct action and deferred schedule was requested,
             // that is we are not the last parcel, return immediately
-            if (base_type::direct_execution::value)
+            if constexpr (base_type::direct_execution::value)
             {
                 return;
             }
-            else
-            {
-                // If this is not a direct action, we can safely set
-                // deferred_schedule to false
-                deferred_schedule = false;
-            }
+
+            // If this is not a direct action, we can safely set
+            // deferred_schedule to false
+            deferred_schedule = false;
         }
 
         schedule_thread(HPX_MOVE(target), lva, comptype, num_thread);

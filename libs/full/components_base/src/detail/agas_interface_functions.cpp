@@ -9,6 +9,7 @@
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/modules/coroutines.hpp>
+#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/futures.hpp>
@@ -109,7 +110,7 @@ namespace hpx::agas::detail {
     bool (*is_local_lva_encoded_address)(naming::gid_type const& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<naming::address> (*resolve_async)(
+    hpx::future_or_value<naming::address> (*resolve_async)(
         hpx::id_type const& id) = nullptr;
 
     naming::address (*resolve)(
@@ -177,17 +178,15 @@ namespace hpx::agas::detail {
         error_code& ec) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<std::int64_t> (*incref_async)(naming::gid_type const& gid,
-        std::int64_t credits, hpx::id_type const& keep_alive) = nullptr;
-
-    std::int64_t (*incref)(naming::gid_type const& gid, std::int64_t credits,
-        hpx::id_type const& keep_alive, error_code& ec) = nullptr;
+    hpx::future_or_value<std::int64_t> (*incref_async)(
+        naming::gid_type const& gid, std::int64_t credits,
+        hpx::id_type const& keep_alive) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
     std::int64_t (*replenish_credits)(naming::gid_type& gid) = nullptr;
 
     ///////////////////////////////////////////////////////////////////////////
-    hpx::future<hpx::id_type> (*get_colocation_id_async)(
+    hpx::future_or_value<id_type> (*get_colocation_id_async)(
         hpx::id_type const& id) = nullptr;
 
     hpx::id_type (*get_colocation_id)(

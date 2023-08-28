@@ -10,6 +10,7 @@
 #include <hpx/async_colocated/get_colocation_id.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/id_type.hpp>
 
 namespace hpx {
@@ -20,8 +21,13 @@ namespace hpx {
         return agas::get_colocation_id(launch::sync, id, ec);
     }
 
-    future<hpx::id_type> get_colocation_id(hpx::id_type const& id)
+    hpx::future<id_type> get_colocation_id(hpx::id_type const& id)
     {
-        return agas::get_colocation_id(id);
+        auto result = agas::get_colocation_id(id);
+        if (result.has_value())
+        {
+            return hpx::make_ready_future(HPX_MOVE(result).get_value());
+        }
+        return HPX_MOVE(result).get_future();
     }
 }    // namespace hpx
