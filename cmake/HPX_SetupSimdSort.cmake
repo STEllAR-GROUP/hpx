@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Srinivas Yadav
+# Copyright (c) 2023 Hari Hara Naveen S
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +7,14 @@
 if(HPX_WITH_FETCH_SIMD_SORT)
   if(FETCHCONTENT_SOURCE_DIR_SIMD_SORT)
     hpx_info(
-      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_EVE=${FETCHCONTENT_SOURCE_DIR_EVE})"
+      "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_SIMD_SORT=${FETCHCONTENT_SOURCE_DIR_SIMD_SORT})"
     )
   else()
     hpx_info(
       "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SIMD_SORT_TAG=${HPX_WITH_SIMD_SORT_TAG})"
     )
   endif()
+
   include(FetchContent)
   fetchcontent_declare(
     simdsort
@@ -29,7 +30,7 @@ if(HPX_WITH_FETCH_SIMD_SORT)
 
   add_library(simdsort INTERFACE)
   target_include_directories(
-    simdsort SYSTEM INTERFACE $<BUILD_INTERFACE:${SIMD_SORT_ROOT}/include/>
+    simdsort SYSTEM INTERFACE $<BUILD_INTERFACE:${SIMD_SORT_ROOT}/src/>
                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
@@ -40,12 +41,12 @@ if(HPX_WITH_FETCH_SIMD_SORT)
   )
 
   install(
-    DIRECTORY ${SIMD_SORT_ROOT}/include/
+    DIRECTORY ${SIMD_SORT_ROOT}/src/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT core
     FILES_MATCHING
     PATTERN "*.hpp"
-    PATTERN "*.ipp"
+    PATTERN "*.h"
   )
 
   export(
