@@ -227,7 +227,7 @@ namespace hpx { namespace components { namespace server {
     void runtime_support::dijkstra_make_black()
     {
         // Rule 1: A machine sending a message makes itself black.
-        std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
+//        std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
         dijkstra_color_ = true;
     }
 
