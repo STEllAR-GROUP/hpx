@@ -151,8 +151,8 @@ Past and current funding and support for HPX is listed `here
      :target: https://doi.org/10.5281/zenodo.598202
      :alt: Latest software release of HPX
 
-.. |codacy| image:: https://api.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
-     :target: https://www.codacy.com/gh/STEllAR-GROUP/hpx
+.. |codacy| .. image:: https://app.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
+     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
      :alt: HPX Code Quality Assessment
 
 .. |coveralls| image:: https://coveralls.io/repos/github/STEllAR-GROUP/hpx/badge.svg
