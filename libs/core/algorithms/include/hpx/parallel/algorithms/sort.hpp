@@ -173,6 +173,7 @@ namespace hpx {
 #include <exception>
 #include <iterator>
 #include <list>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
