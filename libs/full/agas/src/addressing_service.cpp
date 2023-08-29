@@ -269,48 +269,49 @@ namespace hpx::agas {
     parcelset::endpoints_type const& addressing_service::resolve_locality(
         naming::gid_type const& gid, error_code& ec)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+//        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
         auto it = resolved_localities_.find(gid);
         if (it == resolved_localities_.end() || it->second.empty())
         {
-            // The locality hasn't been requested to be resolved yet. Do it now.
-            parcelset::endpoints_type endpoints;
-            {
-                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                endpoints = locality_ns_->resolve_locality(gid);
-                if (endpoints.empty())
-                {
-                    std::string const str = hpx::util::format(
-                        "couldn't resolve the given target locality ({})", gid);
-
-                    l.unlock();
-
-                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "addressing_service::resolve_locality", str);
-                    return resolved_localities_[naming::invalid_gid];
-                }
-            }
-
-            // Search again ... might have been added by a different thread already
-            it = resolved_localities_.find(gid);
-            if (it == resolved_localities_.end())
-            {
-                if (HPX_UNLIKELY(!util::insert_checked(
-                        resolved_localities_.emplace(gid, endpoints), it)))
-                {
-                    l.unlock();
-
-                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
-                        "addressing_service::resolve_locality",
-                        "resolved locality insertion failed "
-                        "due to a locking error or memory corruption");
-                    return resolved_localities_[naming::invalid_gid];
-                }
-            }
-            else if (it->second.empty() && !endpoints.empty())
-            {
-                resolved_localities_[gid] = HPX_MOVE(endpoints);
-            }
+            throw std::runtime_error("Unexpected code.");
+//            // The locality hasn't been requested to be resolved yet. Do it now.
+//            parcelset::endpoints_type endpoints;
+//            {
+//                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
+//                endpoints = locality_ns_->resolve_locality(gid);
+//                if (endpoints.empty())
+//                {
+//                    std::string const str = hpx::util::format(
+//                        "couldn't resolve the given target locality ({})", gid);
+//
+//                    l.unlock();
+//
+//                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+//                        "addressing_service::resolve_locality", str);
+//                    return resolved_localities_[naming::invalid_gid];
+//                }
+//            }
+//
+//            // Search again ... might have been added by a different thread already
+//            it = resolved_localities_.find(gid);
+//            if (it == resolved_localities_.end())
+//            {
+//                if (HPX_UNLIKELY(!util::insert_checked(
+//                        resolved_localities_.emplace(gid, endpoints), it)))
+//                {
+//                    l.unlock();
+//
+//                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
+//                        "addressing_service::resolve_locality",
+//                        "resolved locality insertion failed "
+//                        "due to a locking error or memory corruption");
+//                    return resolved_localities_[naming::invalid_gid];
+//                }
+//            }
+//            else if (it->second.empty() && !endpoints.empty())
+//            {
+//                resolved_localities_[gid] = HPX_MOVE(endpoints);
+//            }
         }
         return it->second;
     }
