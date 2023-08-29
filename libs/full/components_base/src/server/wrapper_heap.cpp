@@ -150,22 +150,30 @@ namespace hpx::components::detail {
             count * parameters_.element_size,
             HPX_WRAPPER_HEAP_INITIALIZED_MEMORY);
 
-        std::unique_lock l(mtx_);
-
-        if (!ensure_pool(count))
+        if (nullptr == pool_)
+        {
             return false;
+        }
+
+        std::size_t const num_bytes = count * parameters_.element_size;
+        std::size_t const total_num_bytes =
+            parameters_.capacity * parameters_.element_size;
+
+        if (first_free_ + num_bytes > pool_ + total_num_bytes)
+        {
+            return false;
+        }
 
 #if defined(HPX_DEBUG)
         alloc_count_ += count;
 #endif
 
-        void* p = first_free_;
-        HPX_ASSERT(p != nullptr);
+        char* p = first_free_.fetch_add(count * parameters_.element_size, std::memory_order_relaxed);
 
-        first_free_ = first_free_ + count * parameters_.element_size;
-
-        HPX_ASSERT(free_size_ >= count);
-        free_size_ -= count;
+        if (p + num_bytes > pool_ + total_num_bytes)
+        {
+            return false;
+        }
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         // init memory blocks
@@ -182,10 +190,6 @@ namespace hpx::components::detail {
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         HPX_ASSERT(did_alloc(p));
-#endif
-        std::unique_lock l(mtx_);
-
-#if HPX_DEBUG_WRAPPER_HEAP != 0
         char* p1 = p;
         std::size_t const total_num_bytes =
             parameters_.capacity * parameters_.element_size;
@@ -206,10 +210,11 @@ namespace hpx::components::detail {
 #if defined(HPX_DEBUG)
         free_count_ += count;
 #endif
-        free_size_ += count;
+        size_t current_free_size = free_size_.fetch_add(count, std::memory_order_relaxed) + count;
 
         // release the pool if this one was the last allocated item
-        test_release(l);
+        if (current_free_size == parameters_.capacity)
+            free_pool();
     }
 
     bool wrapper_heap::did_alloc(void* p) const
@@ -234,6 +239,7 @@ namespace hpx::components::detail {
 
         HPX_ASSERT(did_alloc(p));
 
+        if (!base_gid_)
         {
             std::unique_lock l(mtx_);
             if (!base_gid_)
@@ -249,8 +255,8 @@ namespace hpx::components::detail {
                     base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
             }
         }
-
         naming::gid_type result = base_gid_;
+
         result.set_lsb(p);
 
         // We have to assume this credit was split as otherwise the gid returned
@@ -268,54 +274,29 @@ namespace hpx::components::detail {
         base_gid_ = g;
     }
 
-    bool wrapper_heap::test_release(std::unique_lock<mutex_type>& lk)
+    bool wrapper_heap::free_pool()
     {
-        if (pool_ == nullptr)
-        {
-            return false;
-        }
-
-        std::size_t const total_num_bytes =
-            parameters_.capacity * parameters_.element_size;
-
-        if (first_free_ < pool_ + total_num_bytes ||
-            free_size_ < parameters_.capacity)
-        {
-            return false;
-        }
-
-        HPX_ASSERT(free_size_ == parameters_.capacity);
-        HPX_ASSERT(first_free_ == pool_ + total_num_bytes);
+        HPX_ASSERT(pool_);
+        HPX_ASSERT(first_free_ == pool_ +
+                parameters_.capacity * parameters_.element_size);
 
         // unbind in AGAS service
         if (base_gid_)
         {
-            naming::gid_type base_gid = base_gid_;
-            base_gid_ = naming::invalid_gid;
-
-            unlock_guard ull(lk);
-            agas::unbind_range_local(base_gid, parameters_.capacity);
+            naming::gid_type base_gid = naming::invalid_gid;
+            {
+                std::unique_lock l(mtx_);
+                if (base_gid_)
+                {
+                    base_gid = base_gid_;
+                    base_gid_ = naming::invalid_gid;
+                }
+            }
+            if (base_gid)
+                agas::unbind_range_local(base_gid, parameters_.capacity);
         }
 
         tidy();
-        return true;
-    }
-
-    bool wrapper_heap::ensure_pool(std::size_t count)
-    {
-        if (nullptr == pool_)
-        {
-            return false;
-        }
-
-        std::size_t const num_bytes = count * parameters_.element_size;
-        std::size_t const total_num_bytes =
-            parameters_.capacity * parameters_.element_size;
-
-        if (first_free_ + num_bytes > pool_ + total_num_bytes)
-        {
-            return false;
-        }
         return true;
     }
 
@@ -337,7 +318,7 @@ namespace hpx::components::detail {
             pool_ :
             pool_ + parameters_.element_alignment;
 
-        free_size_ = parameters_.capacity;
+//        free_size_ = parameters_.capacity;
 
         LOSH_(info).format("wrapper_heap ({}): init_pool ({}) size: {}.",
             !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
