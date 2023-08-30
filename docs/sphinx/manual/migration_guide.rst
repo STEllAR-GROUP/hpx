@@ -1248,9 +1248,9 @@ This code will print 10 times the following message:
 
     Gathered data on the root: 42 43
 
-|hpx| uses two functions to implement the functionality of `MPI_Gather`: `hpx::gather_here` and
-`hpx::gather_there`. `hpx::gather_here` is gathering data from all localities to the locality
-with ID 0 (root locality). `hpx::gather_there` allows non-root localities to participate in the
+|hpx| uses two functions to implement the functionality of `MPI_Gather`: `gather_here` and
+`gather_there`. `gather_here` is gathering data from all localities to the locality
+with ID 0 (root locality). `gather_there` allows non-root localities to participate in the
 gather operation by sending data to the root locality. In more detail:
 
 - `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
@@ -1261,7 +1261,7 @@ gather operation by sending data to the root locality. In more detail:
 
 - If the current locality is the root (its ID is equal to 0):
 
-  - the `hpx::gather_here` function is used to perform the gather operation. It collects data from all
+  - The `gather_here` function is used to perform the gather operation. It collects data from all
     other localities into the `overall_result` future object. The function arguments provide the necessary
     information, such as the base name for the gather operation (`gather_direct_basename`), the value
     to be gathered (`value`), the number of localities (`num_localities`), the current locality ID
@@ -1275,7 +1275,7 @@ gather operation by sending data to the root locality. In more detail:
 
 - If the current locality is not the root:
 
-  - The `hpx::gather_there` function is used to participate in the gather operation initiated by
+  - The `gather_there` function is used to participate in the gather operation initiated by
     the root locality. It sends the data (in this case, the value `this_locality + 42`) to the root
     locality, indicating that it should be included in the gathering.
 
@@ -2055,26 +2055,126 @@ For num_localities = 2 this code will print the following message:
 
 - The `get()` member function of the `overall_result` future is used to wait for the result.
 
+MPI_Reduce
+----------
+
+The following code performs a global reduce operation across all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_processes;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+
+        int this_rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_rank);
+
+        int value = this_rank;
+
+        int result = 0;
+
+        // Perform the reduction operation
+        MPI_Reduce(&value, &result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+        // Print the result for the root process (process 0)
+        if (this_rank == 0) {
+            std::cout << "Locality " << this_rank << " has value " << result
+                    << std::endl;
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto reduce_direct_client = create_communicator(reduce_direct_basename,
+        num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    std::uint32_t value = hpx::get_locality_id();
+
+    if (this_locality == 0)
+    {
+        hpx::future<std::uint32_t> overall_result = reduce_here(
+            reduce_direct_client, value, std::plus<std::uint32_t>{});
+
+        uint32_t r = overall_result.get();
+
+        std::cout << "Locality " << this_locality << " has value " << r
+                  << std::endl;
+    }
+    else
+    {
+        hpx::future<void> overall_result =
+            reduce_there(reduce_direct_client, std::move(value));
+        overall_result.get();
+    }
+
+This code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value 1
+
+|hpx| uses two functions to implement the functionality of `MPI_Reduce`: `reduce_here` and
+`reduce_there`. `reduce_here` is gathering data from all localities to the locality
+with ID 0 (root locality) and then performs the defined reduction operation. `reduce_there`
+allows non-root localities to participate in the reduction operation by sending data to the
+root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `reduce_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - The `reduce_here` function initiates a reduction operation with addition (`std::plus`) as the
+    reduction operator. The result is stored in `overall_result`.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the result.
+
+- If the current locality is not the root:
+
+  - The `reduce_there` initiates a remote reduction operation.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the remote
+    reduction operation to complete. This is done to ensure synchronization among localities.
+
 List of |mpi|-|hpx| functions
 -----------------------------
 
    .. table:: |hpx| equivalent functions of |mpi|
 
-   =========================  ==================================================================================================
+   =========================  =============================================================================================
    |openmpi| function         |hpx| equivalent
-   =========================  ==================================================================================================
+   =========================  =============================================================================================
    MPI_Allgather              `hpx::collectives::all_gather`
    MPI_Allreduce              `hpx::collectives::all_reduce`
    MPI_Alltoall               `hpx::collectives::all_to_all`
    MPI_Barrier                `hpx::distributed::barrier`
-   MPI_Bcast                  `hpx::collectives::broadcast_to()` and `hpx::collectives::broadcast_from()` both used with `get()`
+   MPI_Bcast                  `hpx::collectives::broadcast_to()` and `hpx::collectives::broadcast_from()` used with `get()`
    MPI_Comm_size              `hpx::get_num_localities`
    MPI_Comm_rank              `hpx::get_locality_id()`
    MPI_Exscan                 `hpx::collectives::exclusive_scan()` used with `get()`
-   MPI_Gather                 `hpx::collectives::gather_here()` and `hpx::collectives::gather_there()` both used with `get()`
-   MPI_Scan                   `hpx::collectives::inclusive_scan()` used with `get()`
+   MPI_Gather                 `hpx::collectives::gather_here()` and `hpx::collectives::gather_there()` used with `get()`
    MPI_Irecv                  `hpx::collectives::get()`
    MPI_Isend                  `hpx::collectives::set()`
+   MPI_Reduce                 `hpx::collectives::reduce_here` and `hpx::collectives::reduce_there` used with `get()`
+   MPI_Scan                   `hpx::collectives::inclusive_scan()` used with `get()`
    MPI_Scatter                `hpx::collectives::scatter_to()` and `hpx::collectives::scatter_from()`
    MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  ==================================================================================================
+   =========================  =============================================================================================
