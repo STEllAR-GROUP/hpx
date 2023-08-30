@@ -1892,7 +1892,8 @@ the root locality. In more detail:
 MPI_Exscan
 ----------
 
-The following code broadcasts data from one process to all other processes.
+The following code computes the exclusive scan (partial reductions) of data on a
+collection of processes.
 
 |mpi| code:
 
@@ -1968,11 +1969,91 @@ For num_localities = 2 this code will print the following message:
   `exclusive_scan_client`.
 
 - The `exclusive_scan` function is used to perform the exclusive scan operation
-  using the communicator `exclusive_scan_client`. This sends the data to other localities and
-  returns a future representing the result.
+  using the communicator `exclusive_scan_client`. `std::plus<std::uint32_t>{}`
+  specifies the binary associative operator to use for the scan. In this case,
+  it's addition for summing values.
 
 - The `get()` member function of the `overall_result` future is used to wait for the result.
 
+
+MPI_Scan
+--------
+
+The following code Computes the inclusive scan (partial reductions) of data on a collection
+of processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <numeric>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        // Calculate the value for this locality (here)
+        int value = here;
+
+        std::vector<int> result(num_localities);
+
+        MPI_Scan(&value, &result[0], 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        std::cout << "Locality " << here << " has value " << result[0] << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto inclusive_scan_client = create_communicator(inclusive_scan_basename,
+        num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result = inclusive_scan(
+        inclusive_scan_client, value, std::plus<std::uint32_t>{});
+
+    uint32_t r = overall_result.get();
+
+    std::cout << "Locality " << here << " has value " << r << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value 0
+    Locality 1 has value 1
+
+|hpx| uses the function `inclusive_scan` to implement `MPI_Scan`. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `inclusive_scan_client`.
+
+- The `inclusive_scan` function is used to perform the exclusive scan operation
+  using the communicator `inclusive_scan_client`. `std::plus<std::uint32_t>{}`
+  specifies the binary associative operator to use for the scan. In this case,
+  it's addition for summing values.
+
+- The `get()` member function of the `overall_result` future is used to wait for the result.
 
 List of |mpi|-|hpx| functions
 -----------------------------
@@ -1991,6 +2072,7 @@ List of |mpi|-|hpx| functions
    MPI_Comm_rank              `hpx::get_locality_id()`
    MPI_Exscan                 `hpx::collectives::exclusive_scan()` used with `get()`
    MPI_Gather                 `hpx::collectives::gather_here()` and `hpx::collectives::gather_there()` both used with `get()`
+   MPI_Scan                   `hpx::collectives::inclusive_scan()` used with `get()`
    MPI_Irecv                  `hpx::collectives::get()`
    MPI_Isend                  `hpx::collectives::set()`
    MPI_Scatter                `hpx::collectives::scatter_to()` and `hpx::collectives::scatter_from()`
