@@ -1777,19 +1777,130 @@ detail:
   Each thread waits until all other threads also reach this point before any of them can proceed
   further.
 
+MPI_Bcast
+---------
+
+The following code broadcasts data from one process to all other processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        int value;
+
+        for (int i = 0; i < 5; ++i) {
+            if (here == 0) {
+                value = i + 42;
+            }
+
+            // Broadcast the value from process 0 to all other processes
+            MPI_Bcast(&value, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+            if (here != 0) {
+                std::cout << "Locality " << here << " received " << value << std::endl;
+            }
+
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto broadcast_direct_client =
+        create_communicator(broadcast_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 5; ++i)
+    {
+        if (here == 0)
+        {
+            hpx::future<std::uint32_t> result =
+                broadcast_to(broadcast_direct_client, i + 42);
+
+            result.get();
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::collectives::broadcast_from<std::uint32_t>(
+                    broadcast_direct_client);
+
+            uint32_t r = result.get();
+
+            std::cout << "Locality " << here << " received " << r << std::endl;
+        }
+    }
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 1 received 42
+    Locality 1 received 43
+    Locality 1 received 44
+    Locality 1 received 45
+    Locality 1 received 46
+
+|hpx| uses two functions to implement the functionality of `MPI_Bcast`: `hpx::broadcast_to` and
+`hpx::broadcast_from`. `hpx::broadcast_to` is broadcasting the data from the root locality to all
+other localities. `hpx::broadcast_from` allows non-root localities to collect the data sent by
+the root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `broadcast_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - The `hpx::broadcast_to` function is used to perform the broadcast operation using the communicator
+    `broadcast_direct_client`. This sends the data to other localities and
+    returns a future representing the result.
+
+  - The `get()` member function of the `result` future is used to wait for and retrieve the result.
+
+- If the current locality is not the root:
+
+  - The `hpx::scatter_from` function is used to collect the data by the root locality.
+
+  - The `get()` member function of the `result` future is used to wait for the result.
 
 List of |mpi|-|hpx| functions
 -----------------------------
 
    .. table:: |hpx| equivalent functions of |mpi|
 
-   =========================  =====================================================================
+   =========================  =======================================================================
    |openmpi| function         |hpx| equivalent
-   =========================  =====================================================================
+   =========================  =======================================================================
    MPI_Allgather              `hpx::distributed::all_gather`
    MPI_Allreduce              `hpx::distributed::all_reduce`
    MPI_Alltoall               `hpx::distributed::all_to_all`
    MPI_Barrier                `hpx::distributed::barrier`
+   MPI_Bcast                  `hpx::broadcast_to()` and `hpx::broadcast_from()` both used with `get()`
    MPI_Comm_size              `hpx::get_num_localities`
    MPI_Comm_rank              `hpx::get_locality_id()`
    MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
@@ -1797,4 +1908,4 @@ List of |mpi|-|hpx| functions
    MPI_Isend                  `hpx::collectives::set()`
    MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
    MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  =====================================================================
+   =========================  =======================================================================
