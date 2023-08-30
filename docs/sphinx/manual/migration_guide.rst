@@ -1863,9 +1863,9 @@ For num_localities = 2 this code will print the following message:
     Locality 1 received 45
     Locality 1 received 46
 
-|hpx| uses two functions to implement the functionality of `MPI_Bcast`: `hpx::broadcast_to` and
-`hpx::broadcast_from`. `hpx::broadcast_to` is broadcasting the data from the root locality to all
-other localities. `hpx::broadcast_from` allows non-root localities to collect the data sent by
+|hpx| uses two functions to implement the functionality of `MPI_Bcast`: `broadcast_to` and
+`broadcast_from`. `broadcast_to` is broadcasting the data from the root locality to all
+other localities. `broadcast_from` allows non-root localities to collect the data sent by
 the root locality. In more detail:
 
 - `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
@@ -1876,7 +1876,7 @@ the root locality. In more detail:
 
 - If the current locality is the root (its ID is equal to 0):
 
-  - The `hpx::broadcast_to` function is used to perform the broadcast operation using the communicator
+  - The `broadcast_to` function is used to perform the broadcast operation using the communicator
     `broadcast_direct_client`. This sends the data to other localities and
     returns a future representing the result.
 
@@ -1884,28 +1884,114 @@ the root locality. In more detail:
 
 - If the current locality is not the root:
 
-  - The `hpx::scatter_from` function is used to collect the data by the root locality.
+  - The `broadcast_from` function is used to collect the data by the root locality.
 
   - The `get()` member function of the `result` future is used to wait for the result.
+
+MPI_Exscan
+----------
+
+The following code broadcasts data from one process to all other processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <numeric>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        // Calculate the value for this locality (here)
+        int value = here;
+
+        // Perform an exclusive scan
+        std::vector<int> result(num_localities);
+        MPI_Exscan(&value, &result[0], 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        if (here != 0) {
+            int r = result[here - 1]; // Result is in the previous rank's slot
+
+            std::cout << "Locality " << here << " has value " << r << std::endl;
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto exclusive_scan_client = create_communicator(exclusive_scan_basename,
+        num_sites_arg(num_localities), this_site_arg(here));
+
+    // test functionality based on immediate local result value
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result = exclusive_scan(
+        exclusive_scan_client, value, std::plus<std::uint32_t>{});
+
+    uint32_t r = overall_result.get();
+
+    if (here != 0)
+    {
+        std::cout << "Locality " << here << " has value " << r << std::endl;
+    }
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 1 has value 0
+
+|hpx| uses the function `exclusive_scan` to implement `MPI_Exscan`. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `exclusive_scan_client`.
+
+- The `exclusive_scan` function is used to perform the exclusive scan operation
+  using the communicator `exclusive_scan_client`. This sends the data to other localities and
+  returns a future representing the result.
+
+- The `get()` member function of the `overall_result` future is used to wait for the result.
+
 
 List of |mpi|-|hpx| functions
 -----------------------------
 
    .. table:: |hpx| equivalent functions of |mpi|
 
-   =========================  =======================================================================
+   =========================  ==================================================================================================
    |openmpi| function         |hpx| equivalent
-   =========================  =======================================================================
-   MPI_Allgather              `hpx::distributed::all_gather`
-   MPI_Allreduce              `hpx::distributed::all_reduce`
-   MPI_Alltoall               `hpx::distributed::all_to_all`
+   =========================  ==================================================================================================
+   MPI_Allgather              `hpx::collectives::all_gather`
+   MPI_Allreduce              `hpx::collectives::all_reduce`
+   MPI_Alltoall               `hpx::collectives::all_to_all`
    MPI_Barrier                `hpx::distributed::barrier`
-   MPI_Bcast                  `hpx::broadcast_to()` and `hpx::broadcast_from()` both used with `get()`
+   MPI_Bcast                  `hpx::collectives::broadcast_to()` and `hpx::collectives::broadcast_from()` both used with `get()`
    MPI_Comm_size              `hpx::get_num_localities`
    MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
+   MPI_Exscan                 `hpx::collectives::exclusive_scan()` used with `get()`
+   MPI_Gather                 `hpx::collectives::gather_here()` and `hpx::collectives::gather_there()` both used with `get()`
    MPI_Irecv                  `hpx::collectives::get()`
    MPI_Isend                  `hpx::collectives::set()`
-   MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
+   MPI_Scatter                `hpx::collectives::scatter_to()` and `hpx::collectives::scatter_from()`
    MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  =======================================================================
+   =========================  ==================================================================================================
