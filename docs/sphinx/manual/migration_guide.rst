@@ -1153,18 +1153,6 @@ To understand this example, let's focus on the `hpx_main()` function:
 
 Having said that, we conclude to the following table:
 
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  ==============================================================
-   |openmpi| function         |hpx| equivalent
-   =========================  ==============================================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Isend                  `hpx::collectives::set()`
-   MPI_Irecv                  `hpx::collectives::get()`
-   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  ==============================================================
-
 MPI_Gather
 ----------
 
@@ -1294,17 +1282,6 @@ gather operation by sending data to the root locality. In more detail:
   - The `get()` member function of the `overall_result` future is used to wait for the gather operation
     to complete for this locality.
 
-
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  =====================================================================
-   |openmpi| function         |hpx| equivalent
-   =========================  =====================================================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
-   =========================  =====================================================================
-
 MPI_Scatter
 -----------
 
@@ -1431,17 +1408,6 @@ the data from the root locality. In more detail:
   - The `hpx::scatter_from` function is used to collect the data by the root locality.
 
   - `HPX_TEST_EQ` is a macro provided by the |hpx| testing utilities to test the collected values.
-
-
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  =============================================
-   |openmpi| function         |hpx| equivalent
-   =========================  =============================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
-   =========================  =============================================
 
 MPI_Allgather
 -------------
@@ -1630,7 +1596,7 @@ detail:
 MPI_Alltoall
 -------------
 
-The following code cGathers data from and scatters data to all processes.
+The following code gathers data from and scatters data to all processes.
 
 |mpi| code:
 
@@ -1731,3 +1697,105 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the variable `r`.
 
+MPI_Barrier
+-----------
+
+The following code shows how barrier is used to synchronize multiple processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdlib>
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        std::size_t iterations = 5;
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        for (std::size_t i = 0; i != iterations; ++i) {
+            MPI_Barrier(MPI_COMM_WORLD);
+            if (rank == 0) {
+            std::cout << "Iteration " << i << " completed." << std::endl;
+            }
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::size_t iterations = 5;
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    char const* const barrier_test_name = "/test/barrier/multiple";
+
+    hpx::distributed::barrier b(barrier_test_name);
+    for (std::size_t i = 0; i != iterations; ++i)
+    {
+        b.wait();
+        if (this_locality == 0)
+        {
+            std::cout << "Iteration " << i << " completed." << std::endl;
+        }
+    }
+
+This code will print the following message:
+
+.. code-block:: c++
+
+    Iteration 0 completed.
+    Iteration 1 completed.
+    Iteration 2 completed.
+    Iteration 3 completed.
+    Iteration 4 completed.
+
+|hpx| uses the function `barrier` to implement the functionality of `MPI_Barrier`. In more
+detail:
+
+- After defining the number of iterations, we use
+  `hpx::get_locality_id()` to get the ID of the current locality.
+
+- `char const* const barrier_test_name = "/test/barrier/multiple"`: This line defines a constant
+  character array as the name of the barrier. This name is used to identify the barrier across
+  different localities. All participating threads that use this name will synchronize
+  at this barrier.
+
+- Using `hpx::distributed::barrier b(barrier_test_name)`, we create an instance of the distributed
+  barrier with the previously defined name. This barrier will be used to synchronize the execution
+  of threads across different localities.
+
+- Running for all the desired iterations, we use `b.wait()` to synchronize the threads.
+  Each thread waits until all other threads also reach this point before any of them can proceed
+  further.
+
+
+List of |mpi|-|hpx| functions
+-----------------------------
+
+   .. table:: |hpx| equivalent functions of |mpi|
+
+   =========================  =====================================================================
+   |openmpi| function         |hpx| equivalent
+   =========================  =====================================================================
+   MPI_Allgather              `hpx::distributed::all_gather`
+   MPI_Allreduce              `hpx::distributed::all_reduce`
+   MPI_Alltoall               `hpx::distributed::all_to_all`
+   MPI_Barrier                `hpx::distributed::barrier`
+   MPI_Comm_size              `hpx::get_num_localities`
+   MPI_Comm_rank              `hpx::get_locality_id()`
+   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
+   MPI_Irecv                  `hpx::collectives::get()`
+   MPI_Isend                  `hpx::collectives::set()`
+   MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
+   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
+   =========================  =====================================================================
