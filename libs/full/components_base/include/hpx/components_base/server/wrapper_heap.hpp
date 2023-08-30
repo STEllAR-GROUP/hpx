@@ -111,15 +111,13 @@ namespace hpx::components::detail {
 
     protected:
         char* pool_;
-        std::atomic<char*> first_free_;
         heap_parameters const parameters_;
+        std::atomic<char*> first_free_;
         std::atomic<std::size_t> free_size_;
-
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
-        naming::gid_type base_gid_;
-
         mutable mutex_type mtx_;
+        naming::gid_type base_gid_;
 
     public:
         std::string const class_name_;

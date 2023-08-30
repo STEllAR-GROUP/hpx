@@ -69,8 +69,8 @@ namespace hpx::components::detail {
     wrapper_heap::wrapper_heap(char const* class_name,
         [[maybe_unused]] std::size_t count, heap_parameters parameters)
       : pool_(nullptr)
-      , first_free_(nullptr)
       , parameters_(parameters)
+      , first_free_(nullptr)
       , free_size_(0)
       , base_gid_(naming::invalid_gid)
       , class_name_(class_name)
@@ -92,8 +92,8 @@ namespace hpx::components::detail {
 
     wrapper_heap::wrapper_heap()
       : pool_(nullptr)
-      , first_free_(nullptr)
       , parameters_({0, 0, 0})
+      , first_free_(nullptr)
       , free_size_(0)
       , base_gid_(naming::invalid_gid)
 #if defined(HPX_DEBUG)
@@ -357,7 +357,8 @@ namespace hpx::components::detail {
             std::size_t const total_num_bytes =
                 parameters_.capacity * parameters_.element_size;
             allocator_type::free(pool_, total_num_bytes);
-            pool_ = first_free_ = nullptr;
+            pool_ = nullptr;
+//            pool_ = first_free_ = nullptr;
             free_size_ = 0;
         }
     }
