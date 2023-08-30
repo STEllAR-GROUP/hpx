@@ -68,6 +68,11 @@ function(add_hpx_test category name)
     )
   endif()
 
+  # add additional command line arguments to all test executions
+  if(NOT x${HPX_WITH_TESTS_COMMAND_LINE} STREQUAL x"")
+    set(args ${args} "${HPX_WITH_TESTS_COMMAND_LINE}")
+  endif()
+
   if(${HPX_WITH_PARALLEL_TESTS_BIND_NONE}
      AND NOT run_serial
      AND NOT "${name}_RUNWRAPPER"

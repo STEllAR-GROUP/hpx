@@ -464,6 +464,7 @@ namespace hpx::threads::detail {
             {
                 ++idle_loop_count;
 
+                next_thrd = nullptr;
                 if (scheduler.wait_or_add_new(num_thread, running,
                         idle_loop_count, enable_stealing_staged, added,
                         &next_thrd))

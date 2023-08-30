@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <stack>
 #include <string>
@@ -575,7 +576,7 @@ stepper_server::space stepper_server::do_work(
     }
 
     // limit depth of dependency tree
-    hpx::sliding_semaphore sem(nd);
+    auto sem = std::make_shared<hpx::sliding_semaphore>(nd);
 
     for (std::size_t t = 0; t != nt; ++t)
     {
@@ -626,15 +627,15 @@ stepper_server::space stepper_server::do_work(
         // trigger the semaphore once computation has reached this point
         if ((t % nd) == 0)
         {
-            next[0].then([&sem, t](partition&&) {
+            next[0].then([sem, t](partition&&) {
                 // inform semaphore about new lower limit
-                sem.signal(t);
+                sem->signal(t);
             });
         }
 
         // suspend if the tree has become too deep, the continuation above
         // will resume this thread once the computation has caught up
-        sem.wait(t);
+        sem->wait(t);
     }
 
     return U_[nt % 2];

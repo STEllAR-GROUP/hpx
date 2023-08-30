@@ -75,7 +75,9 @@ int main(int argc, char** argv)
         "abp-priority-fifo",
         "abp-priority-lifo",
 #endif
-        "shared-priority"
+        "shared-priority",
+        "local-workrequesting-fifo",
+        "local-workrequesting-lifo"
     };
     // clang-format on
     for (auto const& scheduler : schedulers)

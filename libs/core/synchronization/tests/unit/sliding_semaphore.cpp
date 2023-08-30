@@ -13,6 +13,7 @@
 #include <atomic>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -23,9 +24,9 @@ int const initial_count = 42;
 int const num_tasks = 139;
 std::atomic<int> completed_tasks(0);
 
-void worker(hpx::sliding_semaphore& sem)
+void worker(std::shared_ptr<hpx::sliding_semaphore> sem)
 {
-    sem.signal(++count);    // signal main thread
+    sem->signal(++count);    // signal main thread
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -34,14 +35,14 @@ int hpx_main()
     std::vector<hpx::future<void>> futures;
     futures.reserve(num_tasks);
 
-    hpx::sliding_semaphore sem(initial_count);
+    auto sem = std::make_shared<hpx::sliding_semaphore>(initial_count);
 
     for (std::size_t i = 0; i != num_tasks; ++i)
     {
         futures.emplace_back(hpx::async(&worker, std::ref(sem)));
     }
 
-    sem.wait(initial_count + num_tasks);
+    sem->wait(initial_count + num_tasks);
 
     HPX_TEST_EQ(count, num_tasks);
 
