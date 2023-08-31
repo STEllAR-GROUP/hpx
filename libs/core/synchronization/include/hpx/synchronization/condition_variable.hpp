@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -143,6 +143,11 @@ namespace hpx {
         ///
         ~condition_variable() = default;
 
+        condition_variable(condition_variable const&) = delete;
+        condition_variable(condition_variable&&) = delete;
+        condition_variable& operator=(condition_variable const&) = delete;
+        condition_variable& operator=(condition_variable&&) = delete;
+
         ///
         /// \brief If any threads are waiting on \a *this, calling \a notify_one
         /// unblocks one of the waiting threads.
@@ -207,9 +212,9 @@ namespace hpx {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            auto data = data_;    // keep data alive
+            auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking ignore_lock;
+            util::ignore_all_while_checking const ignore_lock;
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
@@ -314,9 +319,9 @@ namespace hpx {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            auto data = data_;    // keep data alive
+            auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking ignore_lock;
+            util::ignore_all_while_checking const ignore_lock;
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
@@ -570,6 +575,12 @@ namespace hpx {
         ///
         ~condition_variable_any() = default;
 
+        condition_variable_any(condition_variable_any const&) = delete;
+        condition_variable_any(condition_variable_any&&) = delete;
+        condition_variable_any& operator=(
+            condition_variable_any const&) = delete;
+        condition_variable_any& operator=(condition_variable_any&&) = delete;
+
         ///
         /// \brief If any threads are waiting on \a *this, calling \a notify_one
         /// unblocks one of the waiting threads.
@@ -661,7 +672,7 @@ namespace hpx {
         ///
         /// \note If these functions fail to meet the postconditions (lock is
         ///       locked by the calling thread), std::terminate is called. For
-        ///       example, this could happen if relocking the mutex throws an
+        ///       example, this could happen if re-locking the mutex throws an
         ///       exception.
         ///
         ///       The effects of `notify_one()/notify_all()` and each of the
@@ -689,9 +700,9 @@ namespace hpx {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            auto data = data_;    // keep data alive
+            auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking ignore_lock;
+            util::ignore_all_while_checking const ignore_lock;
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
@@ -726,7 +737,7 @@ namespace hpx {
         ///
         /// \note If these functions fail to meet the postconditions (lock is
         ///       locked by the calling thread), std::terminate is called. For
-        ///       example, this could happen if relocking the mutex throws an
+        ///       example, this could happen if re-locking the mutex throws an
         ///       exception.
         ///
         ///       The effects of `notify_one()/notify_all()` and each of the
@@ -806,9 +817,9 @@ namespace hpx {
         {
             HPX_ASSERT_OWNS_LOCK(lock);
 
-            auto data = data_;    // keep data alive
+            auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking ignore_lock;
+            util::ignore_all_while_checking const ignore_lock;
             HPX_UNUSED(ignore_lock);
 
             std::unique_lock<mutex_type> l(data->mtx_);
@@ -1058,7 +1069,7 @@ namespace hpx {
 
             while (!pred())
             {
-                util::ignore_all_while_checking ignore_lock;
+                util::ignore_all_while_checking const ignore_lock;
                 HPX_UNUSED(ignore_lock);
 
                 std::unique_lock<mutex_type> l(data->mtx_);
@@ -1153,7 +1164,7 @@ namespace hpx {
             {
                 bool should_stop;
                 {
-                    util::ignore_all_while_checking ignore_lock;
+                    util::ignore_all_while_checking const ignore_lock;
                     HPX_UNUSED(ignore_lock);
 
                     std::unique_lock<mutex_type> l(data->mtx_);

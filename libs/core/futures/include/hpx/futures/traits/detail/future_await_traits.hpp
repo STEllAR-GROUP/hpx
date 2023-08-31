@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,8 +45,8 @@ namespace hpx::lcos::detail {
             return is_ready_;
         }
 
-        constexpr void await_suspend(coroutine_handle<>) const noexcept {}
-        constexpr void await_resume() const noexcept {}
+        static constexpr void await_suspend(coroutine_handle<>) noexcept {}
+        static constexpr void await_resume() noexcept {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ namespace hpx::lcos::detail {
                 HPX_MOVE(shared_state));
         }
 
-        constexpr suspend_never initial_suspend() const noexcept
+        static constexpr suspend_never initial_suspend() noexcept
         {
             return suspend_never{};
         }

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -77,7 +77,7 @@ namespace hpx {
     ///        \namedrequirement{CopyAssignable},
     ///        or \namedrequirement{MoveAssignable}.
     ///
-    /// \note \a couting_semaphore's \a try_acquire() can spuriously fail.
+    /// \note \a counting_semaphore's \a try_acquire() can spuriously fail.
     ///
     /// \tparam LeastMaxValue \a counting_semaphore allows more than one
     ///                        concurrent access to the same resource, for

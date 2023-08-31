@@ -1,4 +1,4 @@
-//  Copyright (c) 2012-2022 Hartmut Kaiser
+//  Copyright (c) 2012-2023 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  adapted from:
@@ -60,14 +60,14 @@ namespace hpx {
                 unlock();
             }
 
-            void lock() noexcept(
-                noexcept(std::declval<hpx::spinlock&>().lock()))
+            void lock() const
+                noexcept(noexcept(std::declval<hpx::spinlock&>().lock()))
             {
                 sp_.lock();
             }
 
-            void unlock() noexcept(
-                noexcept(std::declval<hpx::spinlock&>().unlock()))
+            void unlock() const
+                noexcept(noexcept(std::declval<hpx::spinlock&>().unlock()))
             {
                 sp_.unlock();
             }

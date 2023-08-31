@@ -52,12 +52,16 @@ namespace hpx::lcos::local::detail {
         {
         }
 
+        reset_queue_entry(reset_queue_entry const&) = delete;
+        reset_queue_entry(reset_queue_entry&&) = delete;
+        reset_queue_entry& operator=(reset_queue_entry const&) = delete;
+        reset_queue_entry& operator=(reset_queue_entry&&) = delete;
+
         ~reset_queue_entry()
         {
             if (e_.ctx_)
             {
-                condition_variable::queue_type* q =
-                    static_cast<condition_variable::queue_type*>(e_.q_);
+                auto* q = static_cast<condition_variable::queue_type*>(e_.q_);
                 q->erase(&e_);    // remove entry from queue
             }
         }
@@ -117,7 +121,7 @@ namespace hpx::lcos::local::detail {
 
         if (!queue_.empty())
         {
-            auto ctx = queue_.front()->ctx_;
+            auto const ctx = queue_.front()->ctx_;
 
             // remove item from queue before error handling
             queue_.front()->ctx_.reset();
@@ -133,7 +137,7 @@ namespace hpx::lcos::local::detail {
                 return false;
             }
 
-            bool not_empty = !queue_.empty();
+            bool const not_empty = !queue_.empty();
             lock.unlock();
 
             ctx.resume();
@@ -192,7 +196,7 @@ namespace hpx::lcos::local::detail {
                     return;
                 }
 
-                util::ignore_while_checking il(&lock);
+                util::ignore_while_checking const il(&lock);
                 HPX_UNUSED(il);
 
                 ctx.resume();
@@ -222,7 +226,7 @@ namespace hpx::lcos::local::detail {
         HPX_ASSERT_OWNS_LOCK(lock);
 
         // enqueue the request and block this thread
-        auto this_ctx = hpx::execution_base::this_thread::agent();
+        auto const this_ctx = hpx::execution_base::this_thread::agent();
         queue_entry f(this_ctx, &queue_);
         queue_.push_back(f);
 

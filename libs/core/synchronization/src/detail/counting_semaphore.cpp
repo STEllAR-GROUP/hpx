@@ -63,7 +63,7 @@ namespace hpx::lcos::local::detail {
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
-        if (!(value_ < count))
+        if (value_ >= count)
         {
             // enter wait_locked only if there are sufficient credits available
             wait(l, count);
@@ -108,7 +108,7 @@ namespace hpx::lcos::local::detail {
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
-        std::ptrdiff_t count = static_cast<std::ptrdiff_t>(cond_.size(l));
+        auto const count = static_cast<std::ptrdiff_t>(cond_.size(l));
         signal(HPX_MOVE(l), count);
         return count;
     }

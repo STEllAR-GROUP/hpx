@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -169,12 +169,12 @@ namespace hpx::lcos::detail {
         {
             if (ar.is_preprocessing())
             {
-                hpx::traits::detail::shared_state_ptr_for_t<Future> state =
+                auto shared_state =
                     hpx::traits::future_access<Future>::get_shared_state(f);
 
-                state->execute_deferred();
+                shared_state->execute_deferred();
 
-                preprocess_future(ar, *state);
+                preprocess_future(ar, *shared_state);
             }
             else
             {
@@ -221,12 +221,12 @@ namespace hpx::lcos::detail {
         {
             if (ar.is_preprocessing())
             {
-                hpx::traits::detail::shared_state_ptr_for_t<Future> state =
+                auto shared_state =
                     hpx::traits::future_access<Future>::get_shared_state(f);
 
-                state->execute_deferred();
+                shared_state->execute_deferred();
 
-                preprocess_future(ar, *state);
+                preprocess_future(ar, *shared_state);
             }
             else
             {
@@ -323,9 +323,12 @@ namespace hpx::lcos::detail {
     template <>
     struct future_value<void> : future_data_result<void>
     {
-        HPX_FORCEINLINE static void get(hpx::util::unused_type) noexcept {}
+        HPX_FORCEINLINE static constexpr void get(
+            hpx::util::unused_type) noexcept
+        {
+        }
 
-        static void get_default() noexcept {}
+        static constexpr void get_default() noexcept {}
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -477,6 +480,7 @@ namespace hpx::lcos::detail {
 
     public:
         future_base() noexcept = default;
+        ~future_base() = default;
 
         explicit future_base(hpx::intrusive_ptr<shared_state_type> const& p)
           : shared_state_(p)
@@ -746,6 +750,11 @@ namespace hpx {
             {
             }
 
+            invalidate(invalidate const&) = delete;
+            invalidate(invalidate&&) = delete;
+            invalidate& operator=(invalidate const&) = delete;
+            invalidate& operator=(invalidate&&) = delete;
+
             ~invalidate()
             {
                 f_.shared_state_.reset();
@@ -791,6 +800,8 @@ namespace hpx {
         //     constructor invocation.
         //   - other.valid() == false.
         future(future&& other) noexcept = default;
+
+        future(future const& other) noexcept = delete;
 
         // Effects: constructs a future object by moving the instance referred
         //          to by rhs and unwrapping the inner future.
@@ -848,6 +859,8 @@ namespace hpx {
         //   - other.valid() == false.
         future& operator=(future&& other) noexcept = default;
 
+        future& operator=(future const& other) noexcept = delete;
+
         // Returns: shared_future<R>(HPX_MOVE(*this)).
         // Postcondition: valid() == false.
         shared_future<R> share() noexcept
@@ -877,9 +890,8 @@ namespace hpx {
             invalidate on_exit(*this);
 
             using result_type = typename shared_state_type::result_type;
-            result_type* result =
-                lcos::detail::future_get_result<result_type>::call(
-                    this->shared_state_);
+            auto* result = lcos::detail::future_get_result<result_type>::call(
+                this->shared_state_);
 
             // no error has been reported, return the result
             return lcos::detail::future_value<R>::get(HPX_MOVE(*result));
@@ -1500,8 +1512,7 @@ namespace hpx {
         {
             return hpx::make_exceptional_future<T>(std::current_exception());
         }
-
-        return future<T>();
+        return {};
     }
 
     ///////////////////////////////////////////////////////////////////////////

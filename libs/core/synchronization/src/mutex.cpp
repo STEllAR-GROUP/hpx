@@ -48,7 +48,7 @@ namespace hpx {
         HPX_ITT_SYNC_PREPARE(this);
         std::unique_lock<mutex_type> l(mtx_);
 
-        threads::thread_id_type self_id = threads::get_self_id();
+        threads::thread_id_type const self_id = threads::get_self_id();
         if (owner_id_ == self_id)
         {
             HPX_ITT_SYNC_CANCEL(this);
@@ -86,7 +86,7 @@ namespace hpx {
             return false;
         }
 
-        threads::thread_id_type self_id = threads::get_self_id();
+        threads::thread_id_type const self_id = threads::get_self_id();
         util::register_lock(this);
         HPX_ITT_SYNC_ACQUIRED(this);
         owner_id_ = self_id;
@@ -102,7 +102,7 @@ namespace hpx {
         util::unregister_lock(this);
         std::unique_lock<mutex_type> l(mtx_);
 
-        threads::thread_id_type self_id = threads::get_self_id();
+        threads::thread_id_type const self_id = threads::get_self_id();
         if (HPX_UNLIKELY(owner_id_ != self_id))
         {
             l.unlock();
@@ -148,7 +148,7 @@ namespace hpx {
         HPX_ITT_SYNC_PREPARE(this);
         std::unique_lock<mutex_type> l(mtx_);
 
-        threads::thread_id_type self_id = threads::get_self_id();
+        threads::thread_id_type const self_id = threads::get_self_id();
         if (owner_id_ != threads::invalid_thread_id)
         {
             threads::thread_restart_state const reason =
