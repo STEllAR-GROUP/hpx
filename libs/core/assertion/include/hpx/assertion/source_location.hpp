@@ -90,7 +90,7 @@ namespace hpx::assertion {
 }
 
 #if defined(HPX_HAVE_CXX20_SOURCE_LOCATION)
-#define HPX_CURRENT_SOURCE_LOCATION() ::hpx::source_location::current()
+#define HPX_CURRENT_SOURCE_LOCATION() std::source_location::current()
 #else
 #define HPX_CURRENT_SOURCE_LOCATION()                                          \
     ::hpx::source_location                                                     \
