@@ -51,16 +51,21 @@ namespace hpx::components::detail {
 
         naming::gid_type get_gid(void* p)
         {
-            std::unique_lock guard(this->mtx_);
+            //        mtx_.lock();
+            pthread_rwlock_rdlock(&rwlock);
+            auto heap_list = heap_list_;
+            pthread_rwlock_unlock(&rwlock);
+            //        mtx_.unlock();
+//            std::unique_lock guard(this->mtx_);
 
             using iterator = typename base_type::const_iterator;
 
-            iterator end = this->heap_list_.end();
-            for (iterator it = this->heap_list_.begin(); it != end; ++it)
+            iterator end = heap_list.end();
+            for (iterator it = heap_list.begin(); it != end; ++it)
             {
                 if ((*it)->did_alloc(p))
                 {
-                    unlock_guard ul(guard);
+//                    unlock_guard ul(guard);
                     return (*it)->get_gid(p, type_);
                 }
             }

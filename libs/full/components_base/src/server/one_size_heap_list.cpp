@@ -55,9 +55,11 @@ namespace hpx { namespace util {
 
         void* p = nullptr;
 
-        mtx_.lock();
+//        mtx_.lock();
+        pthread_rwlock_rdlock(&rwlock);
         auto heap_list = heap_list_;
-        mtx_.unlock();
+        pthread_rwlock_unlock(&rwlock);
+//        mtx_.unlock();
 
         if (!heap_list.empty())
         {
@@ -98,9 +100,11 @@ namespace hpx { namespace util {
         result = heap->alloc((void**) &p, count);
 
         // Add the heap into the list
-        mtx_.lock();
+//        mtx_.lock();
+        pthread_rwlock_wrlock(&rwlock);
         heap_list_.push_front(heap);
-        mtx_.unlock();
+        pthread_rwlock_unlock(&rwlock);
+//        mtx_.unlock();
 
         if (HPX_UNLIKELY(!result || nullptr == p))
         {
@@ -147,9 +151,11 @@ namespace hpx { namespace util {
         if (reschedule(p, count))
             return;
 
-        mtx_.lock();
+//        mtx_.lock();
+        pthread_rwlock_rdlock(&rwlock);
         auto heap_list = heap_list_;
-        mtx_.unlock();
+        pthread_rwlock_unlock(&rwlock);
+//        mtx_.unlock();
         // Find the heap which allocated this pointer.
         for (auto& heap : heap_list)
         {
@@ -170,9 +176,11 @@ namespace hpx { namespace util {
 
     bool one_size_heap_list::did_alloc(void* p) const
     {
-        mtx_.lock();
+//        mtx_.lock();
+        pthread_rwlock_rdlock(&rwlock);
         auto heap_list = heap_list_;
-        mtx_.unlock();
+        pthread_rwlock_unlock(&rwlock);
+//        mtx_.unlock();
         for (typename list_type::value_type const& heap : heap_list)
         {
             if (heap->did_alloc(p))
