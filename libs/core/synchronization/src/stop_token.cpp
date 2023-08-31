@@ -16,7 +16,7 @@
 #include <cstdint>
 #include <mutex>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     void intrusive_ptr_add_ref(stop_state* p) noexcept
@@ -27,7 +27,7 @@ namespace hpx { namespace detail {
 
     void intrusive_ptr_release(stop_state* p) noexcept
     {
-        std::uint64_t old_state = p->state_.fetch_sub(
+        std::uint64_t const old_state = p->state_.fetch_sub(
             stop_state::token_ref_increment, std::memory_order_acq_rel);
 
         if ((old_state & stop_state::token_ref_mask) ==
@@ -51,7 +51,7 @@ namespace hpx { namespace detail {
     }
 
     // returns true if the callback was successfully removed
-    bool stop_callback_base::remove_this_callback() noexcept
+    bool stop_callback_base::remove_this_callback() const noexcept
     {
         if (prev_ != nullptr)
         {
@@ -179,7 +179,7 @@ namespace hpx { namespace detail {
 
     bool stop_state::add_callback(stop_callback_base* cb) noexcept
     {
-        scoped_lock_if_not_stopped l(*this, cb);
+        scoped_lock_if_not_stopped const l(*this, cb);
         if (!l)
             return false;
 
@@ -189,7 +189,7 @@ namespace hpx { namespace detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void stop_state::remove_callback(stop_callback_base* cb) noexcept
+    void stop_state::remove_callback(stop_callback_base const* cb) noexcept
     {
         {
             std::lock_guard<stop_state> l(*this);
@@ -228,7 +228,7 @@ namespace hpx { namespace detail {
     ///////////////////////////////////////////////////////////////////////////
     struct scoped_lock_and_request_stop
     {
-        scoped_lock_and_request_stop(stop_state& state) noexcept
+        explicit scoped_lock_and_request_stop(stop_state& state) noexcept
           : state_(state)
           , has_lock_(state_.lock_and_request_stop())
         {
@@ -239,16 +239,25 @@ namespace hpx { namespace detail {
                 state_.unlock();
         }
 
+        scoped_lock_and_request_stop(
+            scoped_lock_and_request_stop const&) = delete;
+        scoped_lock_and_request_stop(scoped_lock_and_request_stop&&) = delete;
+        scoped_lock_and_request_stop& operator=(
+            scoped_lock_and_request_stop const&) = delete;
+        scoped_lock_and_request_stop& operator=(
+            scoped_lock_and_request_stop&&) = delete;
+
         explicit operator bool() const noexcept
         {
             return has_lock_;
         }
 
-        void unlock() noexcept
+        void unlock() const noexcept
         {
             state_.unlock();
         }
 
+    private:
         stop_state& state_;
         bool has_lock_;
     };
@@ -256,7 +265,7 @@ namespace hpx { namespace detail {
     bool stop_state::request_stop() noexcept
     {
         // Set the 'stop_requested' signal and acquired the lock.
-        scoped_lock_and_request_stop l(*this);
+        scoped_lock_and_request_stop const l(*this);
         if (!l)
             return false;    // stop has already been requested.
 
@@ -298,4 +307,4 @@ namespace hpx { namespace detail {
 
         return true;
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -172,7 +172,6 @@ namespace hpx {
                     HPX_THROW_EXCEPTION(hpx::error::no_state,
                         "detail::promise_base<R>::set_value",
                         "this promise has no valid shared state");
-                    return;
                 }
 
                 if (shared_state_->is_ready())
@@ -180,7 +179,6 @@ namespace hpx {
                     HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                         "detail::promise_base<R>::set_value",
                         "result has already been stored for this promise");
-                    return;
                 }
 
                 shared_state_->set_value(HPX_FORWARD(Ts, ts)...);
@@ -194,7 +192,6 @@ namespace hpx {
                     HPX_THROW_EXCEPTION(hpx::error::no_state,
                         "detail::promise_base<R>::set_exception",
                         "this promise has no valid shared state");
-                    return;
                 }
 
                 if (shared_state_->is_ready())
@@ -202,7 +199,6 @@ namespace hpx {
                     HPX_THROW_EXCEPTION(hpx::error::promise_already_satisfied,
                         "detail::promise_base<R>::set_exception",
                         "result has already been stored for this promise");
-                    return;
                 }
 
                 shared_state_->set_exception(HPX_FORWARD(T, value));
@@ -277,6 +273,8 @@ namespace hpx {
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept = default;
 
+        promise(promise const& other) = delete;
+
         // Effects: Abandons any shared state
         ~promise() = default;
 
@@ -284,6 +282,8 @@ namespace hpx {
         //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
+
+        promise& operator=(promise const& other) = delete;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -411,6 +411,8 @@ namespace hpx {
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept = default;
 
+        promise(promise const& other) = delete;
+
         // Effects: Abandons any shared state
         ~promise() = default;
 
@@ -418,6 +420,8 @@ namespace hpx {
         //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
+
+        promise& operator=(promise const& other) = delete;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -503,6 +507,8 @@ namespace hpx {
         // Postcondition: other has no shared state.
         promise(promise&& other) noexcept = default;
 
+        promise(promise const& other) noexcept = delete;
+
         // Effects: Abandons any shared state
         ~promise() = default;
 
@@ -510,6 +516,8 @@ namespace hpx {
         //          promise(HPX_MOVE(other)).swap(*this).
         // Returns: *this.
         promise& operator=(promise&& other) noexcept = default;
+
+        promise& operator=(promise const& other) noexcept = delete;
 
         // Effects: Exchanges the shared state of *this and other.
         // Postcondition: *this has the shared state (if any) that other had
@@ -572,12 +580,6 @@ namespace hpx {
         //   - no_state if *this has no shared state.
         using base_type::set_exception;
     };
-
-    template <typename R>
-    void swap(promise<R>& x, promise<R>& y) noexcept
-    {
-        x.swap(y);
-    }
 }    // namespace hpx
 
 namespace hpx::lcos::local {
@@ -595,4 +597,10 @@ namespace std {
     struct uses_allocator<hpx::promise<R>, Allocator> : std::true_type
     {
     };
+
+    template <typename R>
+    void swap(hpx::promise<R>& x, hpx::promise<R>& y) noexcept
+    {
+        x.swap(y);
+    }
 }    // namespace std

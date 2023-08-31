@@ -70,7 +70,14 @@ namespace hpx {
             virtual void execute() noexcept = 0;
 
             void add_this_callback(stop_callback_base*& callbacks) noexcept;
-            bool remove_this_callback() noexcept;
+            bool remove_this_callback() const noexcept;
+
+            stop_callback_base() = default;
+
+            stop_callback_base(stop_callback_base const&) = delete;
+            stop_callback_base(stop_callback_base&&) = delete;
+            stop_callback_base& operator=(stop_callback_base const&) = delete;
+            stop_callback_base& operator=(stop_callback_base&&) = delete;
 
         protected:
             virtual ~stop_callback_base() = default;
@@ -103,6 +110,11 @@ namespace hpx {
               : state_(token_ref_increment)
             {
             }
+
+            stop_state(stop_state const&) = delete;
+            stop_state(stop_state&&) = delete;
+            stop_state& operator=(stop_state const&) = delete;
+            stop_state& operator=(stop_state&&) = delete;
 
             ~stop_state()
             {
@@ -138,7 +150,7 @@ namespace hpx {
 
             HPX_CORE_EXPORT bool add_callback(stop_callback_base* cb) noexcept;
             HPX_CORE_EXPORT void remove_callback(
-                stop_callback_base* cb) noexcept;
+                stop_callback_base const* cb) noexcept;
 
         private:
             [[nodiscard]] static bool is_locked(std::uint64_t state) noexcept
@@ -246,17 +258,10 @@ namespace hpx {
         //      state]
         constexpr stop_token() noexcept = default;
 
-        stop_token(stop_token const& rhs) noexcept
-          : state_(rhs.state_)
-        {
-        }
+        stop_token(stop_token const& rhs) = default;
         stop_token(stop_token&&) noexcept = default;
 
-        stop_token& operator=(stop_token const& rhs) noexcept
-        {
-            state_ = rhs.state_;
-            return *this;
-        }
+        stop_token& operator=(stop_token const& rhs) = default;
         stop_token& operator=(stop_token&&) noexcept = default;
 
         // Effects: Releases ownership of the stop state, if any.
@@ -366,7 +371,7 @@ namespace hpx {
     public:
         // 32.3.4.1 constructors, copy, and assignment
 
-        // Effects: Initialises *this to have ownership of a new stop state.
+        // Effects: Initializes *this to have ownership of a new stop state.
         //
         // Postconditions: stop_possible() is true and stop_requested() is false.
         //
@@ -422,7 +427,7 @@ namespace hpx {
         {
             if (!stop_possible())
             {
-                return stop_token();
+                return {};
             }
             return stop_token(state_);
         }
@@ -458,7 +463,7 @@ namespace hpx {
         //
         // Returns: true if this call made a stop request; otherwise false
         /// makes a stop request for the associated stop-state, if any
-        bool request_stop() noexcept
+        bool request_stop() const noexcept
         {
             return !!state_ && state_->request_stop();
         }
@@ -537,13 +542,13 @@ namespace hpx {
         }
 
         // Effects: Unregisters the callback from the owned stop state, if any.
-        //      The destructor does not block waiting for the execution of anrhs
-        //      callback registered by an associated stop_callback. If the
-        //      callback is concurrently executing on anrhs thread, then the
-        //      return from the invocation of callback strongly happens before
-        //      (6.9.2.1) callback is destroyed. If callback is executing on the
-        //      current thread, then the destructor does not block (3.6) waiting
-        //      for the return from the invocation of callback. Releases
+        //      The destructor does not block waiting for the execution of
+        //      another callback registered by an associated stop_callback. If
+        //      the callback is concurrently executing on another thread, then
+        //      the return from the invocation of callback strongly happens
+        //      before (6.9.2.1) callback is destroyed. If callback is executing
+        //      on the current thread, then the destructor does not block (3.6)
+        //      waiting for the return from the invocation of callback. Releases
         //      ownership of the stop state, if any.
         ~stop_callback()
         {
@@ -623,7 +628,7 @@ namespace hpx {
 }    // namespace hpx
 
 ////////////////////////////////////////////////////////////////////////////////
-// Extensions to <stop_token> as preposed by P2300
+// Extensions to <stop_token> as proposed by P2300
 namespace hpx::p2300_stop_token {
 
     // [stoptoken.inplace], class in_place_stop_token
@@ -793,6 +798,8 @@ namespace hpx::p2300_stop_token {
           : source_(nullptr)
         {
         }
+
+        ~in_place_stop_token() = default;
 
         in_place_stop_token(in_place_stop_token const& rhs) noexcept = default;
 

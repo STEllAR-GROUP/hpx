@@ -118,8 +118,7 @@ namespace hpx {
             {
                 HPX_ITT_SYNC_PREPARE(this);
 
-                bool r = acquire_lock();    //-V707
-                if (r)
+                if (acquire_lock())
                 {
                     HPX_ITT_SYNC_ACQUIRED(this);
                     util::register_lock(this);

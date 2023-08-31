@@ -656,7 +656,9 @@ namespace hpx::lcos::detail {
                 std::destroy_at(exception_ptr);
                 break;
             }
-            default:
+            case empty:
+                [[fallthrough]];
+            case ready:
                 break;
             }
 
@@ -1020,10 +1022,17 @@ namespace hpx::lcos::detail {
             {
                 target.set_thread_id(threads::get_self_id());
             }
+
             ~reset_id()
             {
                 target_.set_thread_id(threads::invalid_thread_id);
             }
+
+            reset_id(reset_id const&) = delete;
+            reset_id(reset_id&&) = delete;
+            reset_id& operator=(reset_id const&) = delete;
+            reset_id& operator=(reset_id&&) = delete;
+
             cancelable_task_base& target_;
         };
 
@@ -1046,7 +1055,6 @@ namespace hpx::lcos::detail {
             hpx::intrusive_ptr<cancelable_task_base> this_(
                 this);    // keep alive
 
-            std::unique_lock<mutex_type> l(mtx_);
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     if (!this->started_test_and_set())

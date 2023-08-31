@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -40,7 +40,7 @@ namespace hpx {
 
         public:
             // clang-format off
-            recursive_mutex_impl(char const* desc = "recursive_mutex_impl")
+            explicit recursive_mutex_impl(char const* desc = "recursive_mutex_impl")
                 noexcept(noexcept(
                     std::is_nothrow_constructible_v<Mutex, char const*>))
               : recursion_count(0)
@@ -57,7 +57,7 @@ namespace hpx {
             /// \throws Never throws.
             bool try_lock()
             {
-                auto ctx = hpx::execution_base::this_thread::agent();
+                auto const ctx = hpx::execution_base::this_thread::agent();
                 HPX_ASSERT(ctx);
 
                 return try_recursive_lock(ctx) || try_basic_lock(ctx);
@@ -73,7 +73,7 @@ namespace hpx {
             ///         HPX-thread.
             void lock()
             {
-                auto ctx = hpx::execution_base::this_thread::agent();
+                auto const ctx = hpx::execution_base::this_thread::agent();
                 HPX_ASSERT(ctx);
 
                 if (!try_recursive_lock(ctx))

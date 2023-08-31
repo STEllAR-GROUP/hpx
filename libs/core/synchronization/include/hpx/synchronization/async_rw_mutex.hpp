@@ -205,11 +205,11 @@ namespace hpx::experimental {
             async_rw_mutex_access_type::readwrite>
         {
         private:
-            static_assert(!std::is_void<ReadWriteT>::value,
+            static_assert(!std::is_void_v<ReadWriteT>,
                 "Cannot mix void and non-void type in "
                 "async_rw_mutex_access_wrapper wrapper (ReadWriteT is void, "
                 "ReadT is non-void)");
-            static_assert(!std::is_void<ReadT>::value,
+            static_assert(!std::is_void_v<ReadT>,
                 "Cannot mix void and non-void type in "
                 "async_rw_mutex_access_wrapper wrapper (ReadT is void, "
                 "ReadWriteT is non-void)");
@@ -540,10 +540,10 @@ namespace hpx::experimental {
     class async_rw_mutex
     {
     private:
-        static_assert(!std::is_void<ReadWriteT>::value,
+        static_assert(!std::is_void_v<ReadWriteT>,
             "Cannot mix void and non-void type in async_rw_mutex (ReadWriteT "
             "is void, ReadT is non-void)");
-        static_assert(!std::is_void<ReadT>::value,
+        static_assert(!std::is_void_v<ReadT>,
             "Cannot mix void and non-void type in async_rw_mutex (ReadT is "
             "void, ReadWriteT is non-void)");
 
@@ -567,7 +567,7 @@ namespace hpx::experimental {
         async_rw_mutex() = delete;
         template <typename U,
             typename = std::enable_if_t<
-                !std::is_same<std::decay_t<U>, async_rw_mutex>::value>>
+                !std::is_same_v<std::decay_t<U>, async_rw_mutex>>>
         explicit async_rw_mutex(U&& u, allocator_type const& alloc = {})
           : value(HPX_FORWARD(U, u))
           , alloc(alloc)

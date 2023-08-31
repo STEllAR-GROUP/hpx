@@ -34,8 +34,6 @@ namespace hpx::lcos::local {
     barrier::barrier(std::size_t expected)
       : number_of_threads_(expected)
       , total_(barrier_flag)
-      , mtx_()
-      , cond_()
     {
     }
 

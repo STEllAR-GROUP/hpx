@@ -1,6 +1,6 @@
 //  (C) Copyright 2006-2008 Anthony Williams
 //  (C) Copyright      2011 Bryce Lelbach
-//  (C) Copyright 2022 Hartmut Kaiser
+//  (C) Copyright 2022-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -49,9 +49,6 @@ namespace hpx {
         public:
             shared_mutex()
               : state{0u, false, false, false}
-              , shared_cond()
-              , exclusive_cond()
-              , upgrade_cond()
             {
             }
 
@@ -85,9 +82,7 @@ namespace hpx {
             {
                 std::unique_lock<mutex_type> lk(state_change);
 
-                bool const last_reader = !--state.shared_count;
-
-                if (last_reader)
+                if (/*bool const last_reader = */ !--state.shared_count)
                 {
                     if (state.upgrade)
                     {
@@ -160,23 +155,21 @@ namespace hpx {
 
                 if (state.exclusive || state.exclusive_waiting_blocked ||
                     state.upgrade)
-                    return false;
-
-                else
                 {
-                    ++state.shared_count;
-                    state.upgrade = true;
-                    return true;
+                    return false;
                 }
+
+                ++state.shared_count;
+                state.upgrade = true;
+                return true;
             }
 
             void unlock_upgrade()
             {
                 std::unique_lock<mutex_type> lk(state_change);
                 state.upgrade = false;
-                bool const last_reader = !--state.shared_count;
 
-                if (last_reader)
+                if (/*bool const last_reader = */ !--state.shared_count)
                 {
                     state.exclusive_waiting_blocked = false;
                     release_waiters();

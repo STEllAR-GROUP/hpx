@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,7 @@ namespace hpx::lcos::local {
 
         bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t numitems =
+            std::size_t const numitems =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
 
             if (numitems < size_)
@@ -217,7 +217,7 @@ namespace hpx::lcos::local {
 
         bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t numitems =
+            std::size_t const numitems =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
 
             if (numitems < size_)

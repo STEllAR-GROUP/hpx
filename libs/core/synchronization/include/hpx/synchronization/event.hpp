@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2011-2012 Bryce Adelstein-Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,14 +30,12 @@ namespace hpx::lcos::local {
     public:
         /// \brief Construct a new event semaphore
         event() noexcept
-          : mtx_()
-          , cond_()
-          , event_(false)
+          : event_(false)
         {
         }
 
         /// \brief Check if the event has occurred.
-        bool occurred() noexcept
+        bool occurred() const noexcept
         {
             return event_.load(std::memory_order_acquire);
         }
