@@ -46,11 +46,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     # We want to track parent dependencies
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
-    if(Apex_ROOT)
-      # Use given (external) APEX
-      set(HPX_APEX_ROOT ${Apex_ROOT})
-
-    else()
+    if (HPX_WITH_FETCH_APEX)
       # If Apex_ROOT not specified, local clone into hpx source dir
       include(FetchContent)
       fetchcontent_declare(
@@ -76,10 +72,10 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
       set(Apex_ROOT ${apex_SOURCE_DIR})
 
       hpx_info("Apex_ROOT is not set. Cloning APEX into ${apex_SOURCE_DIR}.")
+      list(APPEND CMAKE_MODULE_PATH "${Apex_ROOT}/cmake/Modules")
+      add_subdirectory(${Apex_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
     endif()
 
-    list(APPEND CMAKE_MODULE_PATH "${Apex_ROOT}/cmake/Modules")
-    add_subdirectory(${Apex_ROOT}/src/apex ${CMAKE_BINARY_DIR}/apex/src/apex)
     if(Amplifier_FOUND)
       hpx_error("Amplifier_FOUND has been set. Please disable the use of the \
         Intel Amplifier (WITH_AMPLIFIER=Off) in order to use APEX"
@@ -87,12 +83,21 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     endif()
   endif()
 
-  add_library(APEX::apex INTERFACE IMPORTED)
-  if(HPX_FIND_PACKAGE)
-    target_link_libraries(APEX::apex INTERFACE HPX::apex)
+  if(HPX_WITH_FETCH_APEX)
+    add_library(APEX::apex INTERFACE IMPORTED)
+    if(HPX_FIND_PACKAGE)
+      target_link_libraries(APEX::apex INTERFACE HPX::apex)
+    else()
+      target_link_libraries(APEX::apex INTERFACE apex)
+    endif()
   else()
-    target_link_libraries(APEX::apex INTERFACE apex)
+    if(Apex_ROOT)
+      find_package(APEX REQUIRED PATHS ${Apex_ROOT})
+    else()
+      hpx_error("Apex_ROOT not set.")
+    endif()
   endif()
+
   if((UNIX AND NOT APPLE) OR MINGW)
     target_link_options(APEX::apex INTERFACE "-Wl,-no-as-needed")
   endif()
