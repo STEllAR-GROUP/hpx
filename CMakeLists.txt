@@ -937,6 +937,15 @@ hpx_option(
   CATEGORY "Profiling"
 )
 
+hpx_option(
+  HPX_WITH_FETCH_APEX
+  BOOL
+  "Use FetchContent to fetch APEX. By default an installed APEX will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 if(HPX_WITH_APEX)
   hpx_add_config_define(HPX_HAVE_APEX) # tell HPX that we use APEX
   hpx_option(
