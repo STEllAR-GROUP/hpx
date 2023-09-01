@@ -88,6 +88,15 @@ namespace hpx::components::detail {
         {
             throw std::bad_alloc();
         }
+        // use the pool's base address as the first gid, this will also
+        // allow for the ids to be locally resolvable
+        base_gid_ = naming::replace_locality_id(
+            naming::replace_component_type(
+                naming::gid_type(pool_), 0),
+            agas::get_locality_id());
+
+        naming::detail::set_credit_for_gid(
+            base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
     }
 
     wrapper_heap::wrapper_heap()
@@ -239,24 +248,27 @@ namespace hpx::components::detail {
 
         HPX_ASSERT(did_alloc(p));
 
-        if (!base_gid_)
-        {
-            std::unique_lock l(mtx_);
-            if (!base_gid_)
-            {
-                // use the pool's base address as the first gid, this will also
-                // allow for the ids to be locally resolvable
-                base_gid_ = naming::replace_locality_id(
-                    naming::replace_component_type(
-                        naming::gid_type(pool_), type),
-                    agas::get_locality_id());
-
-                naming::detail::set_credit_for_gid(
-                    base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
-            }
-        }
+//        if (!base_gid_)
+//        {
+//            std::unique_lock l(mtx_);
+//            if (!base_gid_)
+//            {
+//                // use the pool's base address as the first gid, this will also
+//                // allow for the ids to be locally resolvable
+//                base_gid_ = naming::replace_locality_id(
+//                    naming::replace_component_type(
+//                        naming::gid_type(pool_), type),
+//                    agas::get_locality_id());
+//
+//                naming::detail::set_credit_for_gid(
+//                    base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+//            }
+//        }
         naming::gid_type result = base_gid_;
-
+        if (type) {
+            result = naming::replace_component_type(
+                result, type);
+        }
         result.set_lsb(p);
 
         // We have to assume this credit was split as otherwise the gid returned
@@ -285,7 +297,7 @@ namespace hpx::components::detail {
         {
             naming::gid_type base_gid = naming::invalid_gid;
             {
-                std::unique_lock l(mtx_);
+//                std::unique_lock l(mtx_);
                 if (base_gid_)
                 {
                     base_gid = base_gid_;
