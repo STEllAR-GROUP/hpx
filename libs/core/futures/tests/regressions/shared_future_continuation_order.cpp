@@ -21,15 +21,17 @@ int hpx_main()
     hpx::promise<int> p;
     hpx::shared_future<int> f1 = p.get_future();
 
-    hpx::future<int> f2 = f1.then([](hpx::shared_future<int>&& f) {
-        HPX_TEST_EQ(f.get(), 42);
-        return ++invocation_count;
-    });
+    hpx::future<int> f2 =
+        f1.then(hpx::launch::sync, [](hpx::shared_future<int>&& f) {
+            HPX_TEST_EQ(f.get(), 42);
+            return ++invocation_count;
+        });
 
-    hpx::future<int> f3 = f1.then([](hpx::shared_future<int>&& f) {
-        HPX_TEST_EQ(f.get(), 42);
-        return ++invocation_count;
-    });
+    hpx::future<int> f3 =
+        f1.then(hpx::launch::sync, [](hpx::shared_future<int>&& f) {
+            HPX_TEST_EQ(f.get(), 42);
+            return ++invocation_count;
+        });
 
     p.set_value(42);
 
