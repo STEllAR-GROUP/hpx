@@ -57,26 +57,35 @@
 #include <thread>
 #include <utility>
 
-namespace hpx{ namespace detail {
-    void log_all_runtime_threads()
+#if defined(HPX_HAVE_LOGGING)
+namespace hpx { namespace detail {
+    void try_log_runtime_threads()
     {
-        auto rt = hpx::get_runtime_ptr();
-        if (rt)
+        // This may be used in non-valid runtime states, let it fail silently
+        try
         {
+            auto rt = hpx::get_runtime_ptr();
+            if (rt == nullptr)
+                return;
+
             rt->get_thread_manager().enumerate_threads(
                 [](hpx::threads::thread_id_type id) -> bool {
                     hpx::threads::thread_data* td = get_thread_id_data(id);
                     auto sched = td->get_scheduler_base();
-                    LTM_(debug).format(
-                        "Logging all runtime threads: pool({}), scheduler({}),"
-                        "thread({}), description({}), state({})",
+                    LTM_(debug).format("Logging all runtime threads: pool({}), "
+                                       "scheduler({}),"
+                                       "thread({}), description({}), state({})",
                         sched->get_parent_pool(), sched, id,
                         td->get_description(), td->get_state().state());
                     return true;
                 });
         }
+        catch (...)
+        {
+        }
     }
 }};    // namespace hpx::detail
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
@@ -114,7 +123,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_LOGGING)
             LRT_(debug).format("Terminating due to system signal({})", reason);
-            hpx::detail::log_all_runtime_threads();
+            hpx::detail::try_log_runtime_threads();
 #endif
 
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
@@ -192,7 +201,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_LOGGING)
             LRT_(debug).format("Terminating due to system signal({})", signum);
-            hpx::detail::log_all_runtime_threads();
+            hpx::detail::try_log_runtime_threads();
 #endif
 
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
