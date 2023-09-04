@@ -247,6 +247,22 @@ namespace hpx { namespace util {
 #endif
     }
 
+    int64_t lci_environment::pcounter_now()
+    {
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        return static_cast<int64_t>(LCT_now());
+#endif
+        return 0;
+    }
+
+    int64_t lci_environment::pcounter_since([[maybe_unused]] int64_t then)
+    {
+#ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER
+        return static_cast<int64_t>(LCT_now()) - then;
+#endif
+        return 0;
+    }
+
     void lci_environment::pcounter_add([[maybe_unused]] LCT_pcounter_handle_t handle, [[maybe_unused]] int64_t val)
     {
 #ifdef HPX_HAVE_PARCELPORT_LCI_PCOUNTER

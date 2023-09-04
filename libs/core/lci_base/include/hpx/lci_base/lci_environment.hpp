@@ -82,6 +82,8 @@ namespace hpx { namespace util {
             HPX_LCI_PCOUNTER_TIMER_FOR_EACH(HPX_LCI_PCOUNTER_HANDLE_DECL)
 
             static LCT_pcounter_ctx_t pcounter_ctx;
+            static int64_t pcounter_now();
+            static int64_t pcounter_since(int64_t then);
             static void pcounter_add(LCT_pcounter_handle_t handle, int64_t val);
             static void pcounter_start(LCT_pcounter_handle_t handle);
             static void pcounter_end(LCT_pcounter_handle_t handle);

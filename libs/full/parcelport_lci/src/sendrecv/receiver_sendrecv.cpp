@@ -41,15 +41,15 @@ namespace hpx::parcelset::policies::lci {
     {
         bool did_some_work = false;
 
-        auto poll_comp_start = LCT_now();
+        auto poll_comp_start = util::lci_environment::pcounter_now();
         request_wrapper_t request;
         request.request = pp_->recv_new_completion_manager->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
-            static_cast<int64_t>(LCT_now() - poll_comp_start));
+            util::lci_environment::pcounter_since(poll_comp_start));
 
         if (request.request.flag == LCI_OK)
         {
-            auto useful_bg_start = LCT_now();
+            auto useful_bg_start = util::lci_environment::pcounter_now();
             std::size_t device_idx = 0;
             if (config_t::protocol == config_t::protocol_t::sendrecv)
             {
@@ -82,7 +82,7 @@ namespace hpx::parcelset::policies::lci {
             }
             util::lci_environment::pcounter_add(
                 util::lci_environment::useful_bg_work,
-                static_cast<int64_t>(LCT_now() - useful_bg_start));
+                util::lci_environment::pcounter_since(useful_bg_start));
             did_some_work = true;
         }
         return did_some_work;
@@ -93,14 +93,14 @@ namespace hpx::parcelset::policies::lci {
         bool did_some_work = false;
         // We don't use a request_wrapper here because all the receive buffers
         // should be managed by the connections
-        auto poll_comp_start = LCT_now();
+        auto poll_comp_start = util::lci_environment::pcounter_now();
         LCI_request_t request = pp_->recv_followup_completion_manager->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
-            static_cast<int64_t>(LCT_now() - poll_comp_start));
+            util::lci_environment::pcounter_since(poll_comp_start));
 
         if (request.flag == LCI_OK)
         {
-            auto useful_bg_start = LCT_now();
+            auto useful_bg_start = util::lci_environment::pcounter_now();
             HPX_ASSERT(request.user_context);
             auto* sharedPtr_p = (connection_ptr*) request.user_context;
             size_t length;
@@ -126,7 +126,7 @@ namespace hpx::parcelset::policies::lci {
             }
             util::lci_environment::pcounter_add(
                 util::lci_environment::useful_bg_work,
-                static_cast<int64_t>(LCT_now() - useful_bg_start));
+                util::lci_environment::pcounter_since(useful_bg_start));
             did_some_work = true;
         }
         return did_some_work;

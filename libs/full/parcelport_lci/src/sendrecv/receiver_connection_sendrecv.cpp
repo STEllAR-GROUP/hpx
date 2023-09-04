@@ -32,7 +32,7 @@ namespace hpx::parcelset::policies::lci {
 
     void receiver_connection_sendrecv::load(char* header_buffer)
     {
-        conn_start_time = LCT_now();
+        conn_start_time = util::lci_environment::pcounter_now();
         util::lci_environment::pcounter_add(util::lci_environment::recv_conn_start, 1);
         header header_ = header(header_buffer);
         header_.assert_valid();
@@ -367,8 +367,8 @@ namespace hpx::parcelset::policies::lci {
 #endif
         util::lci_environment::pcounter_add(
             util::lci_environment::recv_conn_timer,
-            static_cast<int64_t>(LCT_now() - conn_start_time));
-        auto handle_parcels_start_time = LCT_now();
+            util::lci_environment::pcounter_since(conn_start_time));
+        auto handle_parcels_start_time = util::lci_environment::pcounter_now();
         if (parcels_.empty())
         {
             // decode and handle received data
@@ -386,7 +386,7 @@ namespace hpx::parcelset::policies::lci {
         }
         util::lci_environment::pcounter_add(
             util::lci_environment::handle_parcels,
-            static_cast<int64_t>(LCT_now() - handle_parcels_start_time));
+            util::lci_environment::pcounter_since(handle_parcels_start_time));
         buffer.data_.free();
         parcels_.clear();
     }

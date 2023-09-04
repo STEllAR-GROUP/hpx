@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::lci {
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
         timer_.restart();
 #endif
-        conn_start_time = LCT_now();
+        conn_start_time = util::lci_environment::pcounter_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -373,7 +373,7 @@ namespace hpx::parcelset::policies::lci {
         buffer_.clear();
         util::lci_environment::pcounter_add(
             util::lci_environment::send_conn_timer,
-            static_cast<int64_t>(LCT_now() - conn_start_time));
+            util::lci_environment::pcounter_since(conn_start_time));
 
         if (postprocess_handler_)
         {

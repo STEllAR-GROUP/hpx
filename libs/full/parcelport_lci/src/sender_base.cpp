@@ -31,14 +31,14 @@ namespace hpx::parcelset::policies::lci {
     {
         bool did_some_work = false;
         // try to accept a new connection
-        auto poll_comp_start = LCT_now();
+        auto poll_comp_start = util::lci_environment::pcounter_now();
         LCI_request_t request = pp_->send_completion_manager->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
-            static_cast<int64_t>(LCT_now() - poll_comp_start));
+            util::lci_environment::pcounter_since(poll_comp_start));
 
         if (request.flag == LCI_OK)
         {
-            auto useful_bg_start = LCT_now();
+            auto useful_bg_start = util::lci_environment::pcounter_now();
             did_some_work = true;
             auto* sharedPtr_p = (connection_ptr*) request.user_context;
             sender_connection_base::return_t ret = (*sharedPtr_p)->send();
@@ -55,7 +55,7 @@ namespace hpx::parcelset::policies::lci {
             }
             util::lci_environment::pcounter_add(
                 util::lci_environment::useful_bg_work,
-                static_cast<int64_t>(LCT_now() - useful_bg_start));
+                util::lci_environment::pcounter_since(useful_bg_start));
         }
 
         return did_some_work;

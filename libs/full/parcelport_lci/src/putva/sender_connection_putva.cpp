@@ -49,7 +49,7 @@ namespace hpx::parcelset::policies::lci {
         data_point_ = buffer_.data_point_;
         data_point_.time_ = hpx::chrono::high_resolution_clock::now();
 #endif
-        conn_start_time = LCT_now();
+        conn_start_time = util::lci_environment::pcounter_now();
         HPX_ASSERT(!handler_);
         HPX_ASSERT(!postprocess_handler_);
         HPX_ASSERT(!buffer_.data_.empty());
@@ -272,7 +272,7 @@ namespace hpx::parcelset::policies::lci {
 #endif
         util::lci_environment::pcounter_add(
             util::lci_environment::send_conn_timer,
-            static_cast<int64_t>(LCT_now() - conn_start_time));
+            util::lci_environment::pcounter_since(conn_start_time));
 
         if (postprocess_handler_)
         {
