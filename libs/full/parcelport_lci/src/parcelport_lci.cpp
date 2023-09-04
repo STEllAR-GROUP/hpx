@@ -308,7 +308,7 @@ namespace hpx::parcelset::policies::lci {
         if (config_t::protocol == config_t::protocol_t::sendrecv &&
             config_t::completion_type == LCI_COMPLETION_SYNC)
         {
-            if (config_t::prepost_recv_num == 1)
+            if (config_t::prepost_recv_num == 1 && config_t::ndevices == 1)
             {
                 recv_new_completion_manager =
                     std::make_shared<completion_manager_sync_single>();
