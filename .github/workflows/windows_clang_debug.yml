@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: jwlawson/actions-setup-cmake@v1.14
       with:
         cmake-version: '3.22.x'
