@@ -125,6 +125,44 @@ static_assert(
 static_assert(
     hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_2>);
 
+// c-v-ref-array qualified versions of explicitly declared trivially relocatable
+// types are trivially relocatable
+
+static_assert(
+    hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1 const>);
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 volatile>);
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 const volatile>);
+static_assert(
+    hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1[]>);
+static_assert(
+    hpx::is_trivially_relocatable_v<explicitly_trivially_relocatable_1[10]>);
+
+// Chain of c-v-array qualifiers are supported
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1[10][10]>);
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 const[10]>);
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 volatile[10]>);
+static_assert(hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 const volatile[10]>);
+
+// References and temporaries are not trivially relocatable
+// clang-format off
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1&>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1&&>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 (&)[10]>);
+static_assert(!hpx::is_trivially_relocatable_v<
+    explicitly_trivially_relocatable_1 (&&)[10]>);
+static_assert(!hpx::is_trivially_relocatable_v<
+              explicitly_trivially_relocatable_1 const volatile&>);
+// clang-format on
+
 // Trivial relocatability is not inherited
 struct derived_from_explicitly_trivially_relocatable
   : explicitly_trivially_relocatable_1
@@ -240,5 +278,10 @@ static_assert(hpx::is_trivially_relocatable_v<double*>,
     "double* should be Trivially Relocatable");
 static_assert(hpx::is_trivially_relocatable_v<char*>,
     "char* should be Trivially Relocatable");
+
+// Void and function types are not trivially relocatable
+static_assert(!hpx::is_trivially_relocatable_v<void>);
+static_assert(!hpx::is_trivially_relocatable_v<int()>);
+static_assert(!hpx::is_trivially_relocatable_v<int (&)()>);
 
 int main(int, char*[]) {}
