@@ -145,7 +145,7 @@ namespace hpx::traits {
         {
             using type = std::conditional_t<
                 std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
-                    is_relocatable_v<iter_value_t<Source>>,
+                    hpx::experimental::is_relocatable_v<iter_value_t<Source>>,
                 relocatable_pointer_tag, general_pointer_tag>;
         };
 

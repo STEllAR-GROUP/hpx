@@ -39,10 +39,10 @@ namespace hpx::experimental {
             using out_type = typename std::iterator_traits<FwdIter>::value_type;
 
             constexpr static bool valid_relocation =
-                hpx::is_relocatable_from_v<out_type, in_type>;
+                is_relocatable_from_v<out_type, in_type>;
 
             constexpr static bool is_buffer_memcpyable =
-                hpx::is_trivially_relocatable_v<in_type> &&
+                is_trivially_relocatable_v<in_type> &&
                 //  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ The important check
                 std::is_same_v<std::remove_cv_t<in_type>,
                     std::remove_cv_t<out_type>> &&
