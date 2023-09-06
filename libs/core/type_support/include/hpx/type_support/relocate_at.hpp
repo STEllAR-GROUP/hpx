@@ -61,7 +61,7 @@ namespace hpx::experimental {
 
         template <typename T>
         constexpr bool relocate_using_memmove =
-            hpx::is_trivially_relocatable_v<T> && !std::is_volatile_v<T>;
+            is_trivially_relocatable_v<T> && !std::is_volatile_v<T>;
 
         template <typename T,
             std::enable_if_t<relocate_using_memmove<T>, int> = 0>
@@ -126,7 +126,7 @@ namespace hpx::experimental {
         // noexcept if the memmove path is taken or if the move path is noexcept
         noexcept(detail::relocate_at_helper(src, dst)))
     {
-        static_assert(hpx::is_relocatable_v<T>,
+        static_assert(is_relocatable_v<T>,
             "new (dst) T(std::move(*src)) must be well-formed");
 
         return detail::relocate_at_helper(src, dst);
@@ -136,7 +136,7 @@ namespace hpx::experimental {
     T relocate(T* src) noexcept(noexcept(detail::relocate_helper(src)))
     {
         static_assert(
-            hpx::is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
+            is_relocatable_v<T>, "T(std::move(*src)) must be well-formed");
 
         return detail::relocate_helper(src);
     }
