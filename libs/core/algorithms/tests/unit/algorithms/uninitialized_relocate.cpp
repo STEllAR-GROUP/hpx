@@ -7,49 +7,51 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/uninitialized_relocate.hpp>
+#include <hpx/executors/execution_policy.hpp>
+#include <atomic>
 
-#define N 50
+#define N 5000
 #define K 10
 
 struct trivially_relocatable_struct
 {
-    static int count;
-    static int move_count;
-    static int dtor_count;
+    static std::atomic<int> count;
+    static std::atomic<int> move_count;
+    static std::atomic<int> dtor_count;
     int data;
 
     explicit trivially_relocatable_struct(int data)
       : data(data)
     {
-        count++;
+        count.fetch_add(1);
     }
     trivially_relocatable_struct(trivially_relocatable_struct&& other)
       : data(other.data)
     {
-        move_count++;
+        move_count.fetch_add(1);
         count++;
     }
     ~trivially_relocatable_struct()
     {
-        dtor_count++;
+        dtor_count.fetch_add(1);
         count--;
     }
 
     // making sure the address is never directly accessed
     friend void operator&(trivially_relocatable_struct) = delete;
 };
-int trivially_relocatable_struct::count = 0;
-int trivially_relocatable_struct::move_count = 0;
-int trivially_relocatable_struct::dtor_count = 0;
+std::atomic<int> trivially_relocatable_struct::count = 0;
+std::atomic<int> trivially_relocatable_struct::move_count = 0;
+std::atomic<int> trivially_relocatable_struct::dtor_count = 0;
 
 HPX_DECLARE_TRIVIALLY_RELOCATABLE(trivially_relocatable_struct);
 static_assert(hpx::is_trivially_relocatable_v<trivially_relocatable_struct>);
 
 struct non_trivially_relocatable_struct
 {
-    static int count;
-    static int move_count;
-    static int dtor_count;
+    static std::atomic<int> count;
+    static std::atomic<int> move_count;
+    static std::atomic<int> dtor_count;
     int data;
 
     explicit non_trivially_relocatable_struct(int data)
@@ -62,30 +64,30 @@ struct non_trivially_relocatable_struct
         non_trivially_relocatable_struct&& other) noexcept
       : data(other.data)
     {
-        move_count++;
+        move_count.fetch_add(1);
         count++;
     }
     ~non_trivially_relocatable_struct()
     {
-        dtor_count++;
+        dtor_count.fetch_add(1);
         count--;
     }
 
     // making sure the address is never directly accessed
     friend void operator&(non_trivially_relocatable_struct) = delete;
 };
-int non_trivially_relocatable_struct::count = 0;
-int non_trivially_relocatable_struct::move_count = 0;
-int non_trivially_relocatable_struct::dtor_count = 0;
+std::atomic<int> non_trivially_relocatable_struct::count = 0;
+std::atomic<int> non_trivially_relocatable_struct::move_count = 0;
+std::atomic<int> non_trivially_relocatable_struct::dtor_count = 0;
 
 static_assert(
     !hpx::is_trivially_relocatable_v<non_trivially_relocatable_struct>);
 
 struct non_trivially_relocatable_struct_throwing
 {
-    static int count;
-    static int move_count;
-    static int dtor_count;
+    static std::atomic<int> count;
+    static std::atomic<int> move_count;
+    static std::atomic<int> dtor_count;
 
     int data;
 
@@ -99,17 +101,17 @@ struct non_trivially_relocatable_struct_throwing
         non_trivially_relocatable_struct_throwing&& other)
       : data(other.data)
     {
-        if (move_count == K)
+        if (move_count.load() == K)
         {
             throw 42;
         }
-        move_count++;
+        move_count.fetch_add(1);
 
         count++;
     }
     ~non_trivially_relocatable_struct_throwing()
     {
-        dtor_count++;
+        dtor_count.fetch_add(1);
         count--;
     }
 
@@ -117,12 +119,14 @@ struct non_trivially_relocatable_struct_throwing
     friend void operator&(non_trivially_relocatable_struct_throwing) = delete;
 };
 
-int non_trivially_relocatable_struct_throwing::count = 0;
-int non_trivially_relocatable_struct_throwing::move_count = 0;
-int non_trivially_relocatable_struct_throwing::dtor_count = 0;
+std::atomic<int> non_trivially_relocatable_struct_throwing::count = 0;
+std::atomic<int> non_trivially_relocatable_struct_throwing::move_count = 0;
+std::atomic<int> non_trivially_relocatable_struct_throwing::dtor_count = 0;
 
 static_assert(!hpx::is_trivially_relocatable_v<
               non_trivially_relocatable_struct_throwing>);
+
+char msg[256];
 
 int hpx_main()
 {
@@ -137,9 +141,9 @@ int hpx_main()
         trivially_relocatable_struct* ptr2 =
             static_cast<trivially_relocatable_struct*>(mem2);
 
-        HPX_TEST(trivially_relocatable_struct::count == 0);
-        HPX_TEST(trivially_relocatable_struct::move_count == 0);
-        HPX_TEST(trivially_relocatable_struct::dtor_count == 0);
+        HPX_TEST(trivially_relocatable_struct::count.load() == 0);
+        HPX_TEST(trivially_relocatable_struct::move_count.load() == 0);
+        HPX_TEST(trivially_relocatable_struct::dtor_count.load() == 0);
 
         for (int i = 0; i < N; i++)
         {
@@ -147,24 +151,30 @@ int hpx_main()
         }
 
         // N objects constructed
-        HPX_TEST(trivially_relocatable_struct::count == N);
+        HPX_TEST(trivially_relocatable_struct::count.load() == N);
 
         // relocate them to ptr2
-        hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        hpx::uninitialized_relocate(hpx::execution::par, ptr1, ptr1 + N, ptr2);
+
+        sprintf(msg,
+            "count: %d, move_count: %d, dtor_count: %d",
+            trivially_relocatable_struct::count.load(),
+            trivially_relocatable_struct::move_count.load(),
+            trivially_relocatable_struct::dtor_count.load());
 
         // All creations - destructions balance out
-        HPX_TEST(trivially_relocatable_struct::count == N);
+        HPX_TEST_MSG(trivially_relocatable_struct::count.load() == N, msg);
 
         // No move constructor or destructor should be called
-        HPX_TEST(trivially_relocatable_struct::move_count == 0);
-        HPX_TEST(trivially_relocatable_struct::dtor_count == 0);
+        HPX_TEST_MSG(trivially_relocatable_struct::move_count.load() == 0, msg);
+        HPX_TEST_MSG(trivially_relocatable_struct::dtor_count.load() == 0, msg);
 
         for (int i = 0; i < N; i++)
         {
             HPX_TEST(ptr2[i].data == 1234);
         }
 
-        std::destroy(ptr2, ptr2 + N);
+        std::destroy_n(ptr2, N);
 
         std::free(mem1);
         std::free(mem2);
@@ -180,9 +190,9 @@ int hpx_main()
         non_trivially_relocatable_struct* ptr2 =
             static_cast<non_trivially_relocatable_struct*>(mem2);
 
-        HPX_TEST(non_trivially_relocatable_struct::count == 0);
-        HPX_TEST(non_trivially_relocatable_struct::move_count == 0);
-        HPX_TEST(non_trivially_relocatable_struct::dtor_count == 0);
+        HPX_TEST(non_trivially_relocatable_struct::count.load() == 0);
+        HPX_TEST(non_trivially_relocatable_struct::move_count.load() == 0);
+        HPX_TEST(non_trivially_relocatable_struct::dtor_count.load() == 0);
 
         for (int i = 0; i < N; i++)
         {
@@ -190,24 +200,31 @@ int hpx_main()
         }
 
         // N objects constructed
-        HPX_TEST(non_trivially_relocatable_struct::count == N);
+        HPX_TEST(non_trivially_relocatable_struct::count.load() == N);
 
         // relocate them to ptr2
-        hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        hpx::uninitialized_relocate(hpx::execution::par, ptr1, ptr1 + N, ptr2);
+
+        sprintf(msg,
+            "count: %d, move_count: %d, dtor_count: %d",
+            non_trivially_relocatable_struct::count.load(),
+            non_trivially_relocatable_struct::move_count.load(),
+            non_trivially_relocatable_struct::dtor_count.load());
+
 
         // All creations - destructions balance out
-        HPX_TEST(non_trivially_relocatable_struct::count == N);
+        HPX_TEST_MSG(non_trivially_relocatable_struct::count.load() == N, msg);
 
-        // Every object was moved from and then destroyed
-        HPX_TEST(non_trivially_relocatable_struct::move_count == N);
-        HPX_TEST(non_trivially_relocatable_struct::dtor_count == N);
+                // Every object was moved from and then destroyed
+        HPX_TEST_MSG(non_trivially_relocatable_struct::move_count.load() == N, msg);
+        HPX_TEST_MSG(non_trivially_relocatable_struct::dtor_count.load() == N, msg);
 
         for (int i = 0; i < N; i++)
         {
             HPX_TEST(ptr2[i].data == 1234);
         }
 
-        std::destroy(ptr2, ptr2 + N);
+        std::destroy_n(ptr2, N);
 
         std::free(mem1);
         std::free(mem2);
@@ -225,9 +242,9 @@ int hpx_main()
         non_trivially_relocatable_struct_throwing* ptr2 =
             static_cast<non_trivially_relocatable_struct_throwing*>(mem2);
 
-        HPX_TEST(non_trivially_relocatable_struct_throwing::count == 0);
-        HPX_TEST(non_trivially_relocatable_struct_throwing::move_count == 0);
-        HPX_TEST(non_trivially_relocatable_struct_throwing::dtor_count == 0);
+        HPX_TEST(non_trivially_relocatable_struct_throwing::count.load() == 0);
+        HPX_TEST(non_trivially_relocatable_struct_throwing::move_count.load() == 0);
+        HPX_TEST(non_trivially_relocatable_struct_throwing::dtor_count.load() == 0);
 
         for (int i = 0; i < N; i++)
         {
@@ -235,27 +252,34 @@ int hpx_main()
         }
 
         // N objects constructed
-        HPX_TEST(non_trivially_relocatable_struct_throwing::count == N);
+        HPX_TEST(non_trivially_relocatable_struct_throwing::count.load() == N);
 
         // relocate them to ptr2
         try
         {
-            hpx::uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+            hpx::uninitialized_relocate(hpx::execution::par, ptr1, ptr1 + N, ptr2);
             HPX_UNREACHABLE;    // should have thrown
         }
         catch (...)
         {
         }
 
+        sprintf(msg,
+            "count: %d, move_count: %d, dtor_count: %d",
+            non_trivially_relocatable_struct_throwing::count.load(),
+            non_trivially_relocatable_struct_throwing::move_count.load(),
+            non_trivially_relocatable_struct_throwing::dtor_count.load());
+
+
         // K move constructors were called
-        HPX_TEST(non_trivially_relocatable_struct_throwing::move_count == K);
+        HPX_TEST_MSG(non_trivially_relocatable_struct_throwing::move_count.load() == K, msg);
 
         // K - 1 destructors were called to balance out the move constructors
         // (- 1 because the last move constructor throws)
         // and then N + 1 destructors were called: K on the old range and
         // N - (K - 1) = N - K + 1 on the new range
-        HPX_TEST(
-            non_trivially_relocatable_struct_throwing::dtor_count == N + K);
+        HPX_TEST_MSG(
+            non_trivially_relocatable_struct_throwing::dtor_count.load() == N + K, msg);
 
         // It stops at K, so K-1 move-destruct pairs have been executed
         // after this N - (K - 1) destructs will be done on the old range

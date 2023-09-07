@@ -338,7 +338,7 @@ namespace hpx::parallel {
                                     part_size, part_dest)));
                     },
                     // finalize, called once if no error occurred
-                    [dest, first, count](auto&& data) mutable
+                    [first, dest, count](auto&& data) mutable
                     -> util::in_out_result<InIter, FwdIter> {
                         // make sure iterators embedded in function object that is
                         // attached to futures are invalidated
@@ -346,8 +346,7 @@ namespace hpx::parallel {
 
                         std::advance(first, count);
                         std::advance(dest, count);
-                        return util::in_out_result<InIter, FwdIter>{
-                            first, dest};
+                        return {first, dest};
                     },
                     // cleanup function, called for each partition which
                     // didn't fail, but only if at least one failed
@@ -526,7 +525,7 @@ namespace hpx {
             hpx::traits::pointer_relocate_category<InIter,
                 FwdIter>::is_noexcept_relocatable_v)
         // clang-format on
-        {   
+        {
             static_assert(hpx::traits::is_input_iterator_v<InIter>,
                 "The 'first' argument must meet the requirements "
                 "of an input iterator.");
