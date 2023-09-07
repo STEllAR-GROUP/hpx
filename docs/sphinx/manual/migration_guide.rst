@@ -42,6 +42,8 @@ Some general steps that can be used to migrate code to |hpx| code are the follow
 
    Compile the converted code with the |hpx| library and run it using the appropriate HPX runtime environment.
 
+.. _openmp:
+
 |openmp|
 ========
 
@@ -656,6 +658,8 @@ directive in |openmp|. This synchronization is achieved using :cpp:func:`hpx::wa
     If the `nowait` clause is used in the `sections` directive, then you can just remove
     the :cpp:func:`hpx::wait_all` function while keeping the rest of the code as it is.
 
+.. _tbb:
+
 |tbb|
 =====
 
@@ -966,7 +970,7 @@ parallel_scan
         [](const int& left, const int& right) { return left + right; });
 
 :cpp:func:`hpx::inclusive_scan` with `hpx::execution::par` as execution policy
- can be used to perform a prefix scan in parallel. The management of intermediate
+can be used to perform a prefix scan in parallel. The management of intermediate
 results is seamlessly handled internally by |hpx|, eliminating the need
 for explicit consideration. `input.begin()` and `input.end()` refer to the beginning
 and end of the sequence of elements the algorithm will be applied to respectively.
@@ -1046,11 +1050,40 @@ task_group
 feature. Therefore, utilizing :cpp:func:`hpx::experimental::task_group` provides an
 equivalent functionality to `tbb::task_group`.
 
+.. _mpi:
+
 |mpi|
 =====
 
 |mpi| is a standardized communication protocol and library that allows multiple processes or
 nodes in a parallel computing system to exchange data and coordinate their execution.
+
+List of |mpi|-|hpx| functions
+-----------------------------
+
+   .. table:: |hpx| equivalent functions of |mpi|
+
+   ========================================  ===================================================================================================================
+   |mpi| function                            |hpx| equivalent
+   ========================================  ===================================================================================================================
+   :ref:`MPI_Allgather`                      :cpp:class:`hpx::collectives::all_gather`
+   :ref:`MPI_Allreduce`                      :cpp:class:`hpx::collectives::all_reduce`
+   :ref:`MPI_Alltoall`                       :cpp:class:`hpx::collectives::all_to_all`
+   :ref:`MPI_Barrier`                        :cpp:class:`hpx::distributed::barrier`
+   :ref:`MPI_Bcast`                          :cpp:class:`hpx::collectives::broadcast_to()` and :cpp:class:`hpx::collectives::broadcast_from()` used with :code:`get()`
+   :ref:`MPI_Comm_size <MPI_Send_MPI_Recv>`  :cpp:class:`hpx::get_num_localities`
+   :ref:`MPI_Comm_rank <MPI_Send_MPI_Recv>`  :cpp:class:`hpx::get_locality_id()`
+   :ref:`MPI_Exscan`                         :cpp:class:`hpx::collectives::exclusive_scan()` used with :code:`get()`
+   :ref:`MPI_Gather`                         :cpp:class:`hpx::collectives::gather_here()` and :cpp:class:`hpx::collectives::gather_there()` used with :code:`get()`
+   :ref:`MPI_Irecv <MPI_Send_MPI_Recv>`      :cpp:class:`hpx::collectives::get()`
+   :ref:`MPI_Isend <MPI_Send_MPI_Recv>`      :cpp:class:`hpx::collectives::set()`
+   :ref:`MPI_Reduce`                         :cpp:class:`hpx::collectives::reduce_here` and :cpp:class:`hpx::collectives::reduce_there` used with :code:`get()`
+   :ref:`MPI_Scan`                           :cpp:class:`hpx::collectives::inclusive_scan()` used with :code:`get()`
+   :ref:`MPI_Scatter`                        :cpp:class:`hpx::collectives::scatter_to()` and :cpp:class:`hpx::collectives::scatter_from()`
+   :ref:`MPI_Wait <MPI_Send_MPI_Recv>`       :cpp:class:`hpx::collectives::get()` used with a future i.e. :code:`setf.get()`
+   ========================================  ===================================================================================================================
+
+.. _MPI_Send_MPI_Recv:
 
 MPI_Send & MPI_Recv
 -------------------
@@ -1152,6 +1185,8 @@ To understand this example, let's focus on the `hpx_main()` function:
 - The `done_msg.get()` call blocks until the continuation is complete for the current loop iteration.
 
 Having said that, we conclude to the following table:
+
+.. _MPI_Gather:
 
 MPI_Gather
 ----------
@@ -1282,6 +1317,8 @@ gather operation by sending data to the root locality. In more detail:
   - The `get()` member function of the `overall_result` future is used to wait for the gather operation
     to complete for this locality.
 
+.. _MPI_Scatter:
+
 MPI_Scatter
 -----------
 
@@ -1409,6 +1446,8 @@ the data from the root locality. In more detail:
 
   - `HPX_TEST_EQ` is a macro provided by the |hpx| testing utilities to test the collected values.
 
+.. _MPI_Allgather:
+
 MPI_Allgather
 -------------
 
@@ -1506,6 +1545,7 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the vector called `r`.
 
+.. _MPI_Allreduce:
 
 MPI_Allreduce
 -------------
@@ -1592,6 +1632,8 @@ detail:
   needed.
 
 - The `get()` function waits until the result is available and then stores it in the variable `res`.
+
+.. _MPI_Alltoall:
 
 MPI_Alltoall
 -------------
@@ -1697,6 +1739,8 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the variable `r`.
 
+.. _MPI_Barrier:
+
 MPI_Barrier
 -----------
 
@@ -1777,6 +1821,8 @@ detail:
 - Running for all the desired iterations, we use `b.wait()` to synchronize the threads.
   Each thread waits until all other threads also reach this point before any of them can proceed
   further.
+
+.. _MPI_Bcast:
 
 MPI_Bcast
 ---------
@@ -1889,6 +1935,8 @@ the root locality. In more detail:
 
   - The `get()` member function of the `result` future is used to wait for the result.
 
+.. _MPI_Exscan:
+
 MPI_Exscan
 ----------
 
@@ -1975,6 +2023,7 @@ For num_localities = 2 this code will print the following message:
 
 - The `get()` member function of the `overall_result` future is used to wait for the result.
 
+.. _MPI_Scan:
 
 MPI_Scan
 --------
@@ -2054,6 +2103,8 @@ For num_localities = 2 this code will print the following message:
   it's addition for summing values.
 
 - The `get()` member function of the `overall_result` future is used to wait for the result.
+
+.. _MPI_Reduce:
 
 MPI_Reduce
 ----------
@@ -2153,28 +2204,3 @@ root locality. In more detail:
 
   - The `get()` member function of the `overall_result` future is used to wait for the remote
     reduction operation to complete. This is done to ensure synchronization among localities.
-
-List of |mpi|-|hpx| functions
------------------------------
-
-   .. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  =============================================================================================
-   |openmpi| function         |hpx| equivalent
-   =========================  =============================================================================================
-   MPI_Allgather              `hpx::collectives::all_gather`
-   MPI_Allreduce              `hpx::collectives::all_reduce`
-   MPI_Alltoall               `hpx::collectives::all_to_all`
-   MPI_Barrier                `hpx::distributed::barrier`
-   MPI_Bcast                  `hpx::collectives::broadcast_to()` and `hpx::collectives::broadcast_from()` used with `get()`
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Exscan                 `hpx::collectives::exclusive_scan()` used with `get()`
-   MPI_Gather                 `hpx::collectives::gather_here()` and `hpx::collectives::gather_there()` used with `get()`
-   MPI_Irecv                  `hpx::collectives::get()`
-   MPI_Isend                  `hpx::collectives::set()`
-   MPI_Reduce                 `hpx::collectives::reduce_here` and `hpx::collectives::reduce_there` used with `get()`
-   MPI_Scan                   `hpx::collectives::inclusive_scan()` used with `get()`
-   MPI_Scatter                `hpx::collectives::scatter_to()` and `hpx::collectives::scatter_from()`
-   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  =============================================================================================
