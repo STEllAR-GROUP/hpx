@@ -70,9 +70,9 @@ namespace hpx::experimental::util {
             // clang-format off
             using implementation_tag = std::conditional_t<
                 is_buffer_memcpyable,
-                    buffer_memcpy_tag, 
+                    buffer_memcpy_tag,
                     std::conditional_t<is_noexcept_relocatable_v,
-                        for_loop_nothrow_tag, 
+                        for_loop_nothrow_tag,
                         for_loop_try_catch_tag
                     >
                 >;
