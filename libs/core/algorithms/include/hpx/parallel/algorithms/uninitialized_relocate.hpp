@@ -313,15 +313,14 @@ namespace hpx::parallel {
                     get(util::in_out_result<InIter, FwdIter>{first, dest});
             }
 
-            using zip_iterator = hpx::util::zip_iterator<InIter, FwdIter>;
+            using zip_iter = ::hpx::util::zip_iterator<InIter, FwdIter>;
             using partition_result_type = std::pair<FwdIter, FwdIter>;
 
             return util::partitioner_with_cleanup<ExPolicy,
                 util::in_out_result<InIter, FwdIter>, partition_result_type>::
                 call(
-                    HPX_FORWARD(ExPolicy, policy), zip_iterator(first, dest),
-                    count,
-                    [policy](zip_iterator t, std::size_t part_size) mutable
+                    HPX_FORWARD(ExPolicy, policy), zip_iter(first, dest), count,
+                    [](zip_iter t, std::size_t part_size) mutable
                     -> partition_result_type {
                         using hpx::get;
 
@@ -378,10 +377,9 @@ namespace hpx::parallel {
                     hpx::traits::is_forward_iterator_v<FwdIter>
                 )>
             // clang-format on
-            static util::in_out_result<InIter, FwdIter> sequential(
-                ExPolicy&& policy, InIter first, std::size_t count,
-                FwdIter dest) noexcept(hpx::experimental::util::detail::
-                    relocation_traits<InIter,
+            static util::in_out_result<InIter, FwdIter> sequential(ExPolicy&&,
+                InIter first, std::size_t count, FwdIter dest) noexcept(hpx::
+                    experimental::util::detail::relocation_traits<InIter,
                         FwdIter>::is_noexcept_relocatable_v)
             {
                 return util::in_out_result<InIter, FwdIter>{first,
@@ -435,7 +433,7 @@ namespace hpx::parallel {
                 )>
             //  clang-format on
             static util::in_out_result<InIter1, FwdIter> sequential(
-                ExPolicy&& policy, InIter1 first, InIter2 last,
+                ExPolicy&&, InIter1 first, InIter2 last,
                 FwdIter dest) noexcept(hpx::experimental::util::detail::relocation_traits<
                     InIter1, FwdIter>::is_noexcept_relocatable_v)
             {
@@ -490,9 +488,8 @@ namespace hpx::experimental {
                 std::is_integral_v<Size>
             )>
         // clang-format on
-        friend FwdIter tag_fallback_invoke(
-            hpx::experimental::uninitialized_relocate_n_t, InIter first,
-            Size count,
+        friend FwdIter tag_fallback_invoke(uninitialized_relocate_n_t,
+            InIter first, Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -532,8 +529,8 @@ namespace hpx::experimental {
         // clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             FwdIter>::type
-        tag_fallback_invoke(hpx::experimental::uninitialized_relocate_n_t,
-            ExPolicy&& policy, InIter first, Size count,
+        tag_fallback_invoke(uninitialized_relocate_n_t, ExPolicy&& policy,
+            InIter first, Size count,
             FwdIter dest) noexcept(util::detail::relocation_traits<InIter,
             FwdIter>::is_noexcept_relocatable_v)
         {
@@ -605,7 +602,7 @@ namespace hpx::experimental {
         }
 
         // clang-format off
-        template <typename ExPolicy, typename InIter1, typename InIter2, 
+        template <typename ExPolicy, typename InIter1, typename InIter2,
             typename FwdIter, HPX_CONCEPT_REQUIRES_(
                 hpx::is_execution_policy_v<ExPolicy> &&
                 hpx::traits::is_iterator_v<InIter1> &&
