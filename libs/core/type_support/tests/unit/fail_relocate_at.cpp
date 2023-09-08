@@ -9,6 +9,8 @@
 #include <hpx/init.hpp>
 #include <hpx/type_support/relocate_at.hpp>
 
+using hpx::experimental::relocate_at;
+
 int main(int argc, char* argv[])
 {
     int a[10];
@@ -17,5 +19,5 @@ int main(int argc, char* argv[])
     int(*p)[10] = &a;
     int(*q)[10] = &b;
 
-    hpx::experimental::relocate_at(p, q);
+    relocate_at(p, q);
 }
