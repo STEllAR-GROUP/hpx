@@ -6,13 +6,13 @@
 
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/type_support/uninitialized_relocate.hpp>
+#include <hpx/type_support/uninitialized_relocate_n_primitive.hpp>
 
 #define N 50
 #define K 10
 
 using hpx::experimental::is_trivially_relocatable_v;
-using hpx::experimental::uninitialized_relocate;
+using hpx::experimental::uninitialized_relocate_n_primitive;
 
 struct trivially_relocatable_struct
 {
@@ -152,7 +152,7 @@ int hpx_main()
         HPX_TEST(trivially_relocatable_struct::count == N);
 
         // relocate them to ptr2
-        uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        uninitialized_relocate_n_primitive(ptr1, ptr1 + N, ptr2);
 
         // All creations - destructions balance out
         HPX_TEST(trivially_relocatable_struct::count == N);
@@ -196,7 +196,7 @@ int hpx_main()
         HPX_TEST(non_trivially_relocatable_struct::count == N);
 
         // relocate them to ptr2
-        uninitialized_relocate(ptr1, ptr1 + N, ptr2);
+        uninitialized_relocate_n_primitive(ptr1, ptr1 + N, ptr2);
 
         // All creations - destructions balance out
         HPX_TEST(non_trivially_relocatable_struct::count == N);
@@ -243,8 +243,8 @@ int hpx_main()
         // relocate them to ptr2
         try
         {
-            uninitialized_relocate(ptr1, ptr1 + N, ptr2);
-            HPX_TEST(false);    // should never reach this
+            uninitialized_relocate_n_primitive(ptr1, ptr1 + N, ptr2);
+            HPX_UNREACHABLE;    // should error out
         }
         catch (int forty_two)
         {
