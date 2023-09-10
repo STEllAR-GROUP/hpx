@@ -40,7 +40,8 @@ namespace hpx::parcelset::policies::lci {
         }
         else if (ret.status == return_status_t::wait)
         {
-            pp_->send_completion_manager->enqueue_completion(ret.completion);
+            device_p->completion_manager_p->send
+                ->enqueue_completion(ret.completion);
         }
         util::lci_environment::pcounter_add(
             util::lci_environment::async_write_timer,

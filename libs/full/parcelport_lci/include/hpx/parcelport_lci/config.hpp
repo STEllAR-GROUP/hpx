@@ -49,6 +49,8 @@ namespace hpx::parcelset::policies::lci {
         static bool reg_mem;
         // How many devices to use
         static int ndevices;
+        // How many completion managers to use
+        static int ncomps;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };

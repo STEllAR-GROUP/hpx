@@ -32,7 +32,8 @@ namespace hpx::parcelset::policies::lci {
         bool did_some_work = false;
         // try to accept a new connection
         auto poll_comp_start = util::lci_environment::pcounter_now();
-        LCI_request_t request = pp_->send_completion_manager->poll();
+        auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
+        LCI_request_t request = completion_manager_p->send->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
@@ -50,7 +51,7 @@ namespace hpx::parcelset::policies::lci {
             else if (ret.status ==
                 sender_connection_base::return_status_t::wait)
             {
-                pp_->send_completion_manager->enqueue_completion(
+                completion_manager_p->send->enqueue_completion(
                     ret.completion);
             }
             util::lci_environment::pcounter_add(

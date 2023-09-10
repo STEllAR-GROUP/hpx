@@ -136,7 +136,7 @@ namespace hpx::parcelset::policies::lci {
         void* address, int length)
     {
         LCI_comp_t completion =
-            pp_->recv_followup_completion_manager->alloc_completion();
+            device_p->completion_manager_p->recv_followup->alloc_completion();
         if (length <= LCI_MEDIUM_SIZE)
         {
             LCI_mbuffer_t mbuffer;

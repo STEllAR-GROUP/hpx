@@ -40,8 +40,10 @@ namespace hpx::parcelset::policies::lci {
             bool did_some_work = false;
 
             auto poll_comp_start = util::lci_environment::pcounter_now();
+            auto completion_manager_p =
+                pp_->get_tls_device().completion_manager_p;
             request_wrapper_t request;
-            request.request = pp_->recv_new_completion_manager->poll();
+            request.request = completion_manager_p->recv_new->poll();
             util::lci_environment::pcounter_add(
                 util::lci_environment::poll_comp,
                 util::lci_environment::pcounter_since(poll_comp_start));

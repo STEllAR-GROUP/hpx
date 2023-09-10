@@ -212,7 +212,7 @@ namespace hpx::parcelset::policies::lci {
         {
             void* buffer_to_free = iovec.piggy_back.address;
             LCI_comp_t completion =
-                pp_->send_completion_manager->alloc_completion();
+                device_p->completion_manager_p->send->alloc_completion();
             // In order to keep the send_connection object from being
             // deallocated. We have to allocate a shared_ptr in the heap
             // and pass a pointer to shared_ptr to LCI.

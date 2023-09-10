@@ -205,7 +205,8 @@ namespace hpx::parcelset::policies::lci {
             }
             if (completion == nullptr)
             {
-                completion = pp_->send_completion_manager->alloc_completion();
+                completion =
+                    device_p->completion_manager_p->send->alloc_completion();
             }
             LCI_lbuffer_t buffer;
             buffer.segment = segment_to_use;

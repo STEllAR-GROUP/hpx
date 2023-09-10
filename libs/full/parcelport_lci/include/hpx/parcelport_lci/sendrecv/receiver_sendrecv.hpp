@@ -47,12 +47,13 @@ namespace hpx::parcelset::policies::lci {
                     auto& device = pp->devices[i];
                     for (int j = 0; j < config_t::prepost_recv_num; ++j)
                     {
-                        LCI_comp_t completion = pp_->recv_new_completion_manager
+                        LCI_comp_t completion = device.completion_manager_p
+                                                    ->recv_new
                                                     ->alloc_completion();
                         LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0,
                             completion, (void*) i);
-                        pp_->recv_new_completion_manager->enqueue_completion(
-                            completion);
+                        device.completion_manager_p->recv_new
+                            ->enqueue_completion(completion);
                     }
                 }
             }

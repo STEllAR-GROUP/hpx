@@ -42,8 +42,9 @@ namespace hpx::parcelset::policies::lci {
         bool did_some_work = false;
 
         auto poll_comp_start = util::lci_environment::pcounter_now();
+        auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
         request_wrapper_t request;
-        request.request = pp_->recv_new_completion_manager->poll();
+        request.request = completion_manager_p->recv_new->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
@@ -56,11 +57,10 @@ namespace hpx::parcelset::policies::lci {
                 device_idx = (std::size_t) request.request.user_context;
                 auto& device = pp_->devices[device_idx];
                 LCI_comp_t completion =
-                    pp_->recv_new_completion_manager->alloc_completion();
+                    completion_manager_p->recv_new->alloc_completion();
                 LCI_recvmn(device.endpoint_new, LCI_RANK_ANY, 0, completion,
                     (void*) device_idx);
-                pp_->recv_new_completion_manager->enqueue_completion(
-                    completion);
+                completion_manager_p->recv_new->enqueue_completion(completion);
             }
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "recv",
@@ -77,7 +77,7 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                pp_->recv_followup_completion_manager->enqueue_completion(
+                completion_manager_p->recv_followup->enqueue_completion(
                     ret.completion);
             }
             util::lci_environment::pcounter_add(
@@ -94,7 +94,8 @@ namespace hpx::parcelset::policies::lci {
         // We don't use a request_wrapper here because all the receive buffers
         // should be managed by the connections
         auto poll_comp_start = util::lci_environment::pcounter_now();
-        LCI_request_t request = pp_->recv_followup_completion_manager->poll();
+        auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
+        LCI_request_t request = completion_manager_p->recv_followup->poll();
         util::lci_environment::pcounter_add(util::lci_environment::poll_comp,
             util::lci_environment::pcounter_since(poll_comp_start));
 
@@ -121,7 +122,7 @@ namespace hpx::parcelset::policies::lci {
             }
             else
             {
-                pp_->recv_followup_completion_manager->enqueue_completion(
+                completion_manager_p->recv_followup->enqueue_completion(
                     ret.completion);
             }
             util::lci_environment::pcounter_add(
