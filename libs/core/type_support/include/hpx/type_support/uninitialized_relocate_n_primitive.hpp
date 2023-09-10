@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/type_support/is_contiguous_iterator.hpp>
 #include <hpx/type_support/is_relocatable.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
 #include <hpx/type_support/relocate_at.hpp>
@@ -165,6 +166,7 @@ namespace hpx::experimental::util {
     FwdIter uninitialized_relocate_n_primitive(InIter first, Size n,
         FwdIter dst, iterators_are_contiguous_t) noexcept(
             detail::relocation_traits<InIter, FwdIter>::is_noexcept_relocatable_v)
+    // clang-format on
     {
         static_assert(
             detail::relocation_traits<InIter, FwdIter>::valid_relocation,
@@ -176,7 +178,6 @@ namespace hpx::experimental::util {
         return detail::uninitialized_relocate_n_primitive_helper(
             first, n, dst, implementation_tag{});
     }
-    // clang-format on
 
     template <typename InIter, typename Size, typename FwdIter>
     FwdIter uninitialized_relocate_n_primitive(InIter first, Size n,
@@ -184,8 +185,8 @@ namespace hpx::experimental::util {
         FwdIter>::is_noexcept_relocatable_v)
     {
         using iterators_are_contiguous_default_t =
-            std::bool_constant<std::is_pointer_v<InIter> &&
-                std::is_pointer_v<FwdIter>>;
+            std::bool_constant<hpx::traits::is_contiguous_iterator_v<InIter> &&
+                hpx::traits::is_contiguous_iterator_v<FwdIter>>;
 
         return uninitialized_relocate_n_primitive(
             first, n, dst, iterators_are_contiguous_default_t{});
