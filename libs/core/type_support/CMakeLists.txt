@@ -18,6 +18,7 @@ set(type_support_headers
     hpx/type_support/identity.hpp
     hpx/type_support/is_relocatable.hpp
     hpx/type_support/is_trivially_relocatable.hpp
+    hpx/type_support/is_contiguous_iterator.hpp
     hpx/type_support/lazy_conditional.hpp
     hpx/type_support/lazy_enable_if.hpp
     hpx/type_support/pack.hpp
