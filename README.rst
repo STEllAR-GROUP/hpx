@@ -5,7 +5,7 @@
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-|circleci_status| |codacy| |coveralls| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
+|circleci_status| |codacy_quality| |codacy_coverage| |OpenSSF| |CFF| |JOSS| |zenodo_doi|
 
 Documentation: `latest
 <https://hpx-docs.stellar-group.org/latest/html/index.html>`_,
@@ -98,8 +98,8 @@ continuous integration service additionally tracks the current build status for
 the master branch: |circleci_status|.
 
 We use `Codacy <https://www.codacy.com/>`_ to assess the code quality of this
-project: |codacy|. For our coverage analysis we rely on
-`Coveralls <https://coveralls.io/>`_ to present the results: |coveralls|.
+project: |codacy_quality|. For our coverage analysis, we also rely on
+Codacy to present the results: |codacy_coverage|.
 
 If you can't find what you are looking for in the documentation or you suspect
 you've found a bug in HPX we very much encourage and appreciate any issue
@@ -151,12 +151,12 @@ Past and current funding and support for HPX is listed `here
      :target: https://doi.org/10.5281/zenodo.598202
      :alt: Latest software release of HPX
 
-.. |codacy| image:: https://app.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
+.. |codacy_quality| image:: https://app.codacy.com/project/badge/Grade/0b8cd5a874914edaba67ce3bb711e688
      :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
      :alt: HPX Code Quality Assessment
 
-.. |coveralls| image:: https://coveralls.io/repos/github/STEllAR-GROUP/hpx/badge.svg
-     :target: https://coveralls.io/github/STEllAR-GROUP/hpx
+.. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/0b8cd5a874914edaba67ce3bb711e688    
+     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
      :alt: HPX coverage report
 
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
