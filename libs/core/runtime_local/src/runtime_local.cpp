@@ -57,6 +57,36 @@
 #include <thread>
 #include <utility>
 
+#if defined(HPX_HAVE_LOGGING)
+namespace hpx { namespace detail {
+    void try_log_runtime_threads()
+    {
+        // This may be used in non-valid runtime states, let it fail silently
+        try
+        {
+            auto rt = hpx::get_runtime_ptr();
+            if (rt == nullptr)
+                return;
+
+            rt->get_thread_manager().enumerate_threads(
+                [](hpx::threads::thread_id_type id) -> bool {
+                    hpx::threads::thread_data* td = get_thread_id_data(id);
+                    auto sched = td->get_scheduler_base();
+                    LTM_(debug).format("Logging all runtime threads: pool({}), "
+                                       "scheduler({}),"
+                                       "thread({}), description({}), state({})",
+                        sched->get_parent_pool(), sched, id,
+                        td->get_description(), td->get_state().state());
+                    return true;
+                });
+        }
+        catch (...)
+        {
+        }
+    }
+}};    // namespace hpx::detail
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // Make sure the system gets properly shut down while handling Ctrl-C and other
 // system signals
@@ -89,6 +119,11 @@ namespace hpx {
                 std::cerr << "{stack-trace}: " << hpx::util::trace(trace_depth)
                           << "\n";
             }
+#endif
+
+#if defined(HPX_HAVE_LOGGING)
+            LRT_(debug).format("Terminating due to system signal({})", reason);
+            hpx::detail::try_log_runtime_threads();
 #endif
 
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
@@ -162,6 +197,11 @@ namespace hpx {
                 std::cerr << "{stack-trace}: " << hpx::util::trace(trace_depth)
                           << "\n";
             }
+#endif
+
+#if defined(HPX_HAVE_LOGGING)
+            LRT_(debug).format("Terminating due to system signal({})", signum);
+            hpx::detail::try_log_runtime_threads();
 #endif
 
             std::cerr << "{what}: " << (reason ? reason : "Unknown reason")
