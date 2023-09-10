@@ -213,7 +213,14 @@ namespace hpx::traits {
     ///////////////////////////////////////////////////////////////////////////
     // support for broadcast
     namespace communication {
+
         struct broadcast_tag;
+
+        template <>
+        constexpr char const* communicator_name<broadcast_tag>() noexcept
+        {
+            return "broadcast";
+        }
     }    // namespace communication
 
     template <typename Communicator>

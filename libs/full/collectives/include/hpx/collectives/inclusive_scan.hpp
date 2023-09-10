@@ -138,6 +138,12 @@ namespace hpx::traits {
     namespace communication {
 
         struct inclusive_scan_tag;
+
+        template <>
+        constexpr char const* communicator_name<inclusive_scan_tag>() noexcept
+        {
+            return "inclusive_scan";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
