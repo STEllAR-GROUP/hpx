@@ -30,7 +30,6 @@ for details.
   [`#hpx`](https://cpplang.slack.com/messages/C68QLPZB3) channel is another
   place where people usually offer support.
 
-
 ### Mailing Lists/Groups
 
 * [hpx-users group](mailto:hpx-users@stellar-group.org), see
