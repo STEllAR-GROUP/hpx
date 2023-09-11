@@ -21,13 +21,11 @@ Please send us an [email](info@stellar-group.org) describing the issue. See our
 [security policy](https://github.com/STEllAR-GROUP/hpx/blob/master/.github/SECURITY.md)
 for details.
 
-### Real-time Chat
+### Chat
 
-* #ste||ar on [Libera.Chat](https://libera.chat/): this is the best option
+* #ste||ar on [Discord](https://discord.gg/Tn9QuzVjvy): this is the best option
   to get in contact with us as most of the developers are available on this
-  channel. Check out the [channel archives](http://irclog.cct.lsu.edu/ste~b~~b~ar)
-  for past conversations. The channel can also be accessed through
-  [Matrix](https://matrix.to/#/#ste||ar:libera.chat).
+  channel.
 * Slack ([registration](https://cpplang.now.sh/)): The
   [`#hpx`](https://cpplang.slack.com/messages/C68QLPZB3) channel is another
   place where people usually offer support.
