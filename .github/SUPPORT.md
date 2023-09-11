@@ -26,6 +26,9 @@ for details.
 * #ste||ar on [Discord](https://discord.gg/Tn9QuzVjvy): this is the best option
   to get in contact with us as most of the developers are available on this
   channel.
+* Slack ([registration](https://cpplang.now.sh/)): The
+  [`#hpx`](https://cpplang.slack.com/messages/C68QLPZB3) channel is another
+  place where people usually offer support.
 
 
 ### Mailing Lists/Groups
