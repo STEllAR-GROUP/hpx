@@ -4,9 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#pragma once
+
+// #include <avx512-16bit-qsort.hpp>
+// #include <avx512-32bit-qsort.hpp>
+#include <avx512-64bit-qsort.hpp>
+
 #include <type_traits>
 
-#pragma once
 
 namespace hpx::parallel::util {
     // TODO : add support for _Float16

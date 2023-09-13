@@ -42,7 +42,6 @@ set(algorithms_headers
     hpx/parallel/algorithms/detail/sample_sort.hpp
     hpx/parallel/algorithms/detail/search.hpp
     hpx/parallel/algorithms/detail/set_operation.hpp
-    hpx/parallel/algorithms/detail/simd_sort.hpp
     hpx/parallel/algorithms/detail/spin_sort.hpp
     hpx/parallel/algorithms/detail/transfer.hpp
     hpx/parallel/algorithms/detail/upper_lower_bound.hpp
