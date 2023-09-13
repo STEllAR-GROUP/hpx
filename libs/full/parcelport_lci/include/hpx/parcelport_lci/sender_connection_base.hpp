@@ -53,7 +53,7 @@ namespace hpx::parcelset::policies::lci {
           : dst_rank(dst)
           , pp_((lci::parcelport*) pp)
           , there_(parcelset::locality(locality(dst_rank)))
-          , device_p(&pp_->get_tls_device())
+          , device_p(nullptr)
         {
         }
 

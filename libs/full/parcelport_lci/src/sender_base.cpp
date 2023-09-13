@@ -30,7 +30,6 @@ namespace hpx::parcelset::policies::lci {
     bool sender_base::background_work(size_t /* num_thread */) noexcept
     {
         bool did_some_work = false;
-        // try to accept a new connection
         auto poll_comp_start = util::lci_environment::pcounter_now();
         auto completion_manager_p = pp_->get_tls_device().completion_manager_p;
         LCI_request_t request = completion_manager_p->send->poll();

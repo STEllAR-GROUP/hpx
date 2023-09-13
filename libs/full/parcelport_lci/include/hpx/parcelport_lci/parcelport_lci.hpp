@@ -120,8 +120,6 @@ namespace hpx::parcelset {
             // whether the parcelport has been initialized
             // (starting to execute the background works)
             std::atomic<bool> is_initialized = false;
-            // whether the parcelport is sending early parcels
-            std::atomic<bool> is_sending_early_parcel = false;
 
             // LCI objects
             struct completion_manager_t;

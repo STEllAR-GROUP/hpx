@@ -31,6 +31,7 @@ namespace hpx::parcelset::policies::lci {
         sender_connection_base::postprocess_handler_type&& parcel_postprocess)
     {
         LCT_time_t async_write_start_time = util::lci_environment::pcounter_now();
+        device_p = &pp_->get_tls_device();
         load(HPX_FORWARD(handler_type, handler),
             HPX_FORWARD(postprocess_handler_type, parcel_postprocess));
         return_t ret = send();
@@ -54,7 +55,7 @@ namespace hpx::parcelset::policies::lci {
         return_t ret;
         const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
-            HPX_UNLIKELY(pp_->is_sending_early_parcel))
+            HPX_UNLIKELY(!pp_->is_initialized))
         {
             // If we are sending early parcels, we should not expect the
             // thread make progress on the backlog queue

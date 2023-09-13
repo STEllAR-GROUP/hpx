@@ -144,9 +144,7 @@ namespace hpx::parcelset::policies::lci {
     void parcelport::send_early_parcel(
         hpx::parcelset::locality const& dest, parcel p)
     {
-        is_sending_early_parcel = true;
         base_type::send_early_parcel(dest, HPX_MOVE(p));
-        is_sending_early_parcel = false;
     }
 
     bool parcelport::do_background_work(
@@ -454,12 +452,14 @@ namespace hpx::parcelset::policies::lci {
     {
         static thread_local std::size_t tls_device_idx = -1;
 
-        if (hpx::threads::get_self_id() == hpx::threads::invalid_thread_id)
+        if (HPX_UNLIKELY(!is_initialized ||
+                hpx::threads::get_self_id() == hpx::threads::invalid_thread_id))
         {
+            static thread_local std::size_t tls_rr_device_idx = 0;
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "device",
                 "Rank %d unusual phase\n", LCI_RANK);
-            return devices[0];
+            return devices[tls_rr_device_idx++ % devices.size()];
         }
         if (tls_device_idx == std::size_t(-1))
         {
