@@ -281,7 +281,9 @@ namespace hpx::parcelset::policies::lci {
         while (prg_thread_flag)
         {
             for (auto& device : devices)
+            {
                 util::lci_environment::do_progress(device.device);
+            }
         }
     }
 
@@ -455,11 +457,11 @@ namespace hpx::parcelset::policies::lci {
         if (HPX_UNLIKELY(!is_initialized ||
                 hpx::threads::get_self_id() == hpx::threads::invalid_thread_id))
         {
-            static thread_local std::size_t tls_rr_device_idx = 0;
+            static thread_local unsigned int tls_rand_seed = rand();
             util::lci_environment::log(
                 util::lci_environment::log_level_t::debug, "device",
                 "Rank %d unusual phase\n", LCI_RANK);
-            return devices[tls_rr_device_idx++ % devices.size()];
+            return devices[rand_r(&tls_rand_seed) % devices.size()];
         }
         if (tls_device_idx == std::size_t(-1))
         {
