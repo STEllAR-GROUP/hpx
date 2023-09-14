@@ -31,9 +31,9 @@ if(NOT TARGET SimdSort::simdsort)
     VERSION_VAR SIMD_SORT_VERSION_STRING
   )
 
-  add_library(SimdSort::simdsort PRIVATE IMPORTED)
+  add_library(SimdSort::simdsort INTERFACE IMPORTED)
   target_include_directories(
-    SimdSort::simdsort SYSTEM PRIVATE ${SIMD_SORT_INCLUDE_DIR}
+    SimdSort::simdsort SYSTEM INTERFACE ${SIMD_SORT_INCLUDE_DIR}
   )
 
   mark_as_advanced(

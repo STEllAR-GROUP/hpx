@@ -559,15 +559,18 @@ hpx_option(
   ADVANCED
 )
 
-hpx_check_for_32bit_simd_sort(DEFINITIONS HPX_HAVE_AVX512F)
+hpx_check_for_avx512f(DEFINITIONS HPX_HAVE_AVX512F)
 
 if(NOT (HPX_WITH_AVX512F))
   set(HPX_WITH_SIMD_SORT Off)
 endif()
 
+
 if(HPX_WITH_SIMD_SORT)
-  hpx_add_config_define(HPX_HAVE_SIMD_SORT)
   include(HPX_SetupSimdSort)
+  hpx_add_config_define(HPX_HAVE_SIMD_SORT)
+  add_compile_options(-mavx512f)
+  MESSAGE("HPX_WITH_SIMD_SORT : ${HPX_WITH_SIMD_SORT}")
 endif()
 
 # ##############################################################################

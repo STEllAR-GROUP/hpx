@@ -41,8 +41,6 @@ namespace hpx::parallel::util {
     constexpr bool is_simd_sortable_v = is_simd_sortable<T>::value;
 }    // namespace hpx::parallel::util
 
-// #if (HPX_WITH_SIMD_SORT)
-
 namespace hpx::parallel::util {
     template <typename T>
     void simd_quicksort(T* arr, int64_t arrsize)
