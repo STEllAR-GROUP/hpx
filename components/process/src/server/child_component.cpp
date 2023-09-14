@@ -34,7 +34,7 @@ namespace hpx { namespace components { namespace process { namespace server
     {
         int (*f)(process::util::child const&) =
             &process::util::wait_for_exit<process::util::child>;
-        return hpx::threads::run_as_os_thread(f, std::ref(child_)).get();
+        return hpx::run_as_os_thread(f, std::ref(child_)).get();
     }
 }}}}
 

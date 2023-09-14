@@ -270,12 +270,12 @@ void thread_func()
 
     // Create an HPX thread (returning an int) and wait for it to run to
     // completion.
-    int result = hpx::threads::run_as_hpx_thread(&hpx_thread_func2, 42);
+    int result = hpx::run_as_hpx_thread(&hpx_thread_func2, 42);
 
     // Create an HPX thread (returning void) and wait for it to run to
     // completion.
     if (result == 42)
-        hpx::threads::run_as_hpx_thread(&hpx_thread_func1);
+        hpx::run_as_hpx_thread(&hpx_thread_func1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ int main()
 
     // The main thread was automatically registered with the HPX runtime,
     // no explicit registration for this thread is necessary.
-    hpx::threads::run_as_hpx_thread(&hpx_thread_func1);
+    hpx::run_as_hpx_thread(&hpx_thread_func1);
 
     // wait for the (kernel) thread to run to completion
     t.join();
