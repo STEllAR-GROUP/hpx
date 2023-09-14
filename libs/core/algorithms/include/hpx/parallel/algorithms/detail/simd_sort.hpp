@@ -6,12 +6,11 @@
 
 #pragma once
 
-// #include <avx512-16bit-qsort.hpp>
-// #include <avx512-32bit-qsort.hpp>
+#ifdef HPX_HAVE_SIMD_SORT
+#include <avx512-32bit-qsort.hpp>
 #include <avx512-64bit-qsort.hpp>
 
 #include <type_traits>
-
 
 namespace hpx::parallel::util {
     // TODO : add support for _Float16
@@ -42,7 +41,7 @@ namespace hpx::parallel::util {
     constexpr bool is_simd_sortable_v = is_simd_sortable<T>::value;
 }    // namespace hpx::parallel::util
 
-#if (HPX_WITH_SIMD_SORT)
+// #if (HPX_WITH_SIMD_SORT)
 
 namespace hpx::parallel::util {
     template <typename T>
