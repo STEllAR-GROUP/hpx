@@ -26,7 +26,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         // This is the overload for running functions which return a value.
@@ -148,4 +149,17 @@ namespace hpx { namespace threads {
         return detail::run_as_hpx_thread(
             result_is_void(), f, HPX_FORWARD(Ts, vs)...);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx
+
+namespace hpx::threads {
+
+    template <typename F, typename... Ts>
+    HPX_DEPRECATED_V(1, 10,
+        "hpx::threads::run_as_hpx_thread is deprecated, use "
+        "hpx::run_as_hpx_thread instead")
+    decltype(auto) run_as_hpx_thread(F const& f, Ts&&... ts)
+    {
+        return hpx::run_as_hpx_thread(
+            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+}    // namespace hpx::threads
