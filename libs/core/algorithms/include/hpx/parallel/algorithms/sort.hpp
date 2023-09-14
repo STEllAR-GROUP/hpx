@@ -470,11 +470,9 @@ namespace hpx {
 #ifdef HPX_HAVE_SIMD_SORT
     template <typename RandomIt, typename Comp = hpx::parallel::detail::less,
         HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_random_access_iterator_v<RandomIt>&&
-                hpx::is_invocable_v<Comp, hpx::traits::iter_value_t<RandomIt>,
-                    hpx::traits::iter_value_t<RandomIt>>)>
+            hpx::traits::is_random_access_iterator_v<RandomIt>)>
     void tag_invoke(hpx::sort_t, hpx::execution::unsequenced_policy,
-        RandomIt first, RandomIt last, Comp comp = Comp())
+        RandomIt first, RandomIt last, Comp)
     {
         return hpx::parallel::util::simd_quicksort(
             std::addressof(*first), std::distance(first, last));
