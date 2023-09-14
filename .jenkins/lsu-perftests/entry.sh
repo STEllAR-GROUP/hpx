@@ -34,6 +34,7 @@ sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
 set +e
 sbatch \
     --verbose --verbose --verbose --verbose \
+    --exclusive \
     --job-name="${job_name}" \
     --nodes="1" \
     --partition="${configuration_slurm_partition}" \

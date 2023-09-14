@@ -46,6 +46,7 @@ fi
 set +e
 sbatch \
     --verbose --verbose --verbose --verbose \
+    --exclusive \
     --job-name="${job_name}" \
     --nodes="1" \
     --partition="${configuration_slurm_partition}" \
