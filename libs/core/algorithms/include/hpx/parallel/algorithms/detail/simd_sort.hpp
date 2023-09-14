@@ -9,6 +9,7 @@
 #ifdef HPX_HAVE_SIMD_SORT
 #include <avx512-32bit-qsort.hpp>
 #include <avx512-64bit-qsort.hpp>
+#endif
 
 #include <type_traits>
 
@@ -41,6 +42,7 @@ namespace hpx::parallel::util {
     constexpr bool is_simd_sortable_v = is_simd_sortable<T>::value;
 }    // namespace hpx::parallel::util
 
+#ifdef HPX_HAVE_SIMD_SORT
 namespace hpx::parallel::util {
     template <typename T>
     void simd_quicksort(T* arr, int64_t arrsize)
