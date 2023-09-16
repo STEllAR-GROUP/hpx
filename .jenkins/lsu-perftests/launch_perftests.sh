@@ -24,17 +24,6 @@ hpx_test_options=(
     --vector_size=518176 --hpx:threads=4 --iterations=200 \
     --warmup_iterations=20")
 
-
-    #     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
-    # --hpx:threads=4 --vector_size=10000 --work_delay=1 \
-    # --chunk_size=0 --test_count=5000"
-    # "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
-    # --hpx:queuing=local-priority --hpx:threads=4 --test-all \
-    # --repetitions=100 --futures=500000"
-    # "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
-    # --vector_size=1048576 --hpx:threads=4 --iterations=5000 \
-    # --warmup_iterations=500")
-
 # Build binaries for performance tests
 ${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
     --source-dir ${src_dir} --build-dir ${build_dir} -e $envfile \
