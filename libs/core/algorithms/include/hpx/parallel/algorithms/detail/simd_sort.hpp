@@ -51,4 +51,12 @@ namespace hpx::parallel::util {
         return avx512_qsort(arr, arrsize);
     }
 }    // namespace hpx::parallel::util
+#else
+namespace hpx::parallel::util {
+    template <typename T>
+    void simd_quicksort(T* arr, int64_t arrsize)
+    {
+        static_assert(false);
+    }
+}    // namespace hpx::parallel::util
 #endif

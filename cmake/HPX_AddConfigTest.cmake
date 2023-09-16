@@ -719,6 +719,6 @@ function(hpx_check_for_avx512f)
   add_hpx_config_test(
     HPX_WITH_AVX512F
     SOURCE cmake/tests/avx512f.cpp
-    FILE ${ARGN} CXXFLAGS -mavx512f 
+    FILE ${ARGN} CXXFLAGS -mavx512f
   )
 endfunction()
