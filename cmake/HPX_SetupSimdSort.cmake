@@ -4,15 +4,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(FETCHCONTENT_SOURCE_DIR_SIMD_SORT)
-  hpx_info(
-    "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be used through CMake's FetchContent and installed alongside HPX (FETCHCONTENT_SOURCE_DIR_SIMD_SORT=${FETCHCONTENT_SOURCE_DIR_SIMD_SORT})"
-  )
-else()
-  hpx_info(
-    "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SIMD_SORT_TAG=${HPX_WITH_SIMD_SORT_TAG})"
-  )
-endif()
+hpx_info(
+  "HPX_WITH_FETCH_SIMD_SORT=${HPX_WITH_FETCH_SIMD_SORT}, x86-simd-sort will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_SIMD_SORT_TAG=${HPX_WITH_SIMD_SORT_TAG})"
+)
 
 include(FetchContent)
 fetchcontent_declare(
