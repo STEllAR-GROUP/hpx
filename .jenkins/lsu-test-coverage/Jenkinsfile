@@ -20,42 +20,27 @@ pipeline {
             )
         )
     }
-    environment {
-        CODACY_TOKEN = credentials('CODACY_TOKEN_HPX')
 
-    }
     stages {
-        stage('checkout') {
-            steps {
-                dir('hpx') {
-                    sh '''
-                    #!/bin/bash -l
-                    rm -rf *
-                    '''
-                    checkout scm
-                    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-                }
-            }
-        }
         stage('test-coverage') {
             environment{
+                CODACY_TOKEN = credentials('CODACY_TOKEN_HPX')
                 configuration_name = "test-coverage"
             }
             steps {
-                dir('hpx') {
-                    sh '''
-                    #!/bin/bash -l
-                    .jenkins/lsu-test-coverage/entry.sh
-                    '''
-                }
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                sh '''
+                #!/bin/bash -l
+                .jenkins/lsu-test-coverage/entry.sh
+                '''
             }
         }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: 'hpx/jenkins-hpx-*', fingerprint: true
-            archiveArtifacts artifacts: 'hpx/grcov-log.txt', fingerprint: true
+            archiveArtifacts artifacts: 'jenkins-hpx-*', fingerprint: true
+            archiveArtifacts artifacts: 'grcov-log.txt', fingerprint: true
         }
     }
 }

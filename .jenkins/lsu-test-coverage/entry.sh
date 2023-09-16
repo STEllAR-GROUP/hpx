@@ -11,9 +11,6 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# Clean up old artifacts
-rm -f ./jenkins-hpx* ./grcov-log.txt
-
 source .jenkins/lsu-test-coverage/slurm-constraint-${configuration_name}.sh
 
 if [[ -z "${CHANGE_ID:-}" ]]; then
