@@ -47,7 +47,7 @@ ctest_status=$?
 ./grcov . -s ${src_dir} -o lcov.info -t lcov --log "grcov-log.txt" --ignore-not-existing --ignore "/*"
 
 # Upload to Codacy
-bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r lcov.info --language CPP -t ${CODACY_TOKEN} --commit-uuid ${ghprbActualCommit}
+bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r lcov.info --language CPP -t ${CODACY_TOKEN} --commit-uuid ${GIT_COMMIT}
 
 echo "${ctest_status}" > "jenkins-hpx-${configuration_name}-ctest-status.txt"
 exit $ctest_status
