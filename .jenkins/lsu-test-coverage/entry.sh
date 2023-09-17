@@ -11,17 +11,14 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# Clean up old artifacts
-rm -f ./jenkins-hpx* ./grcov-log.txt
-
 source .jenkins/lsu-test-coverage/slurm-constraint-${configuration_name}.sh
 
-if [[ -z "${ghprbPullId:-}" ]]; then
+if [[ -z "${CHANGE_ID:-}" ]]; then
     # Set name of branch if not building a pull request
     export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
     job_name="jenkins-hpx-${git_local_branch}-${configuration_name}"
 else
-    job_name="jenkins-hpx-${ghprbPullId}-${configuration_name}"
+    job_name="jenkins-hpx-${CHANGE_ID}-${configuration_name}"
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests

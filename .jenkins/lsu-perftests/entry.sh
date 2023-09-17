@@ -10,9 +10,6 @@
 # Make undefined variables errors, print each command
 set -eux
 
-# Clean up old artifacts
-rm -f ./jenkins-hpx* ./*-Testing
-
 source .jenkins/lsu-perftests/slurm-constraint-${configuration_name}.sh
 
 if [[ -z "${ghprbPullId:-}" ]]; then
