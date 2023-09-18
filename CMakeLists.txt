@@ -1178,8 +1178,14 @@ if(HPX_WITH_NETWORKING)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_OPENSHMEM)
     hpx_option(
       HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT STRING
-      "Define which conduit to use for the gasnet parcelport" "sos"
+      "Define which conduit to use for the OpenSHMEM parcelport" "sos"
       STRINGS "sos;ucx"
+    )
+
+    hpx_add_config_define(HPX_WITH_FETCH_OPENSHMEM)
+    hpx_option(
+      HPX_WITH_FETCH_OPENSHMEM BOOL
+      "Download an OpenSHMEM if one is not available" OFF
     )
   endif()
 

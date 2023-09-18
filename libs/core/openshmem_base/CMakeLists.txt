@@ -27,7 +27,7 @@ add_hpx_module(
   GLOBAL_HEADER_GEN ON
   SOURCES ${openshmem_base_sources}
   HEADERS ${openshmem_base_headers}
-  DEPENDENCIES PkgConfig::OPENSHMEM ${openshmem_additional_dependencies}
+  DEPENDENCIES PkgConfig::OPENSHMEM
   MODULE_DEPENDENCIES hpx_logging hpx_runtime_configuration hpx_string_util
                       hpx_threading_base hpx_util
   CMAKE_SUBDIRS examples tests

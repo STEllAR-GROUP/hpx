@@ -13,21 +13,125 @@ macro(hpx_setup_openshmem)
 
     find_gasnet()
 
-    hpx_info(
-      "OpenSHMEM needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`"
-    )
-
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       pkg_search_module(
-        OPENSHMEM REQUIRED IMPORTED_TARGET GLOBAL
+        OPENSHMEM IMPORTED_TARGET GLOBAL
         osss-ucx
       )
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
       pkg_search_module(
-        OPENSHMEM REQUIRED IMPORTED_TARGET GLOBAL
+        OPENSHMEM IMPORTED_TARGET GLOBAL
         sandia-openshmem
       )
     endif()
+  else()
+
+    find_program(MAKE_EXECUTABLE NAMES gmake make mingw32-make REQUIRED)
+
+    include(FindOpenSHMEM_PMI)
+
+    set(PMI_AUTOCONF_OPTS)
+    if(NOT PMI_LIBRARY OR NOT PMI_FOUND)
+      set(PMI_AUTOCONF_OPTS --enable-pmi-simple)
+    else()
+      set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR} --with-pmi-libdir=${PMI_LIBRARY}")
+    endif()
+
+    include(FetchContent)
+
+    if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
+
+      pkg_search_module(
+        UCX IMPORTED_TARGET GLOBAL
+        ucx
+      )
+
+      if(NOT PkgConfig::OPENSHMEM)
+        FetchContent_Declare(ucx
+          DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+          URL https://github.com/openucx/ucx/archive/refs/tags/v1.14.1.tar.gz
+        )
+
+        fetchcontent_getproperties(ucx)
+        if(NOT ucx )
+          FetchContent_Populate(ucx)
+        endif()
+
+	set(UCX_DIR "${ucx_SOURCE_DIR}")
+	set(UCX_BUILD_OUTPUT "${UCX_DIR}/build.log")
+	set(UCX_ERROR_FILE "${UCX_DIR}/error.log")
+
+	message(STATUS "Building UCX and installing into ${CMAKE_INSTALL_PREFIX}")
+        execute_process(
+          COMMAND bash -c "./autogen.sh && ./configure --prefix=${CMAKE_INSTALL_PREFIX} ${PMI_AUTOCONF_OPTS} && make && make install"
+	  WORKING_DIRECTORY ${UCX_DIR}
+	  RESULT_VARIABLE UCX_BUILD_STATUS
+	  OUTPUT_FILE ${UCX_BUILD_OUTPUT}
+	  ERROR_FILE ${UCX_ERROR_FILE}
+        )
+
+        if(UCX_BUILD_STATUS)
+          message(FATAL_ERROR "UCX build result = ${UCX_BUILD_STATUS} - see ${UCX_BUILD_OUTPUT} for more details")
+        endif()
+      endif()
+
+      FetchContent_Declare(openshmem_src
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+	URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
+      )
+      FetchContent_MakeAvailable(openshmem_src)
+      set(PMI_AUTOCONF_OPTS "")
+      message(STATUS "Building OSSS-UCX (OpenSHMEM on UCX) and installing into ${CMAKE_INSTALL_PREFIX}")
+    elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
+      FetchContent_Declare(openshmem_src
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        URL https://github.com/Sandia-OpenSHMEM/SOS/archive/refs/tags/v1.5.2.tar.gz
+      )
+      FetchContent_MakeAvailable(openshmem_src)
+      message(STATUS "Building  and installing Sandia OpenSHMEM into ${CMAKE_INSTALL_PREFIX}")
+    else()
+      message(FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT is not set to `ucx` or `sos`")
+    endif()
+
+    fetchcontent_getproperties(openshmem_src)
+    if(NOT openshmem_src_POPULATED)
+      FetchContent_Populate(openshmem_src)
+    endif()
+
+    set(OPENSHMEM_SRC_DIR "${openshmem_src_SOURCE_DIR}")
+    set(OPENSHMEM_SRC_BUILD_OUTPUT "${OPENSHMEM_SRC_DIR}/build.log")
+    set(OPENSHMEM_SRC_ERROR_FILE "${OPENSHMEM_SRC_DIR}/error.log")
+
+    message(STATUS "${CMAKE_INSTALL_PREFIX} ${PMI_AUTOCONF_OPTS}")
+    execute_process(
+      COMMAND bash -c "./autogen.sh && ./configure --prefix=${CMAKE_INSTALL_PREFIX} --enable-shared ${PMI_AUTOCONF_OPTS} && make && make install"
+      WORKING_DIRECTORY ${OPENSHMEM_SRC_DIR}
+      RESULT_VARIABLE OPENSHMEM_SRC_BUILD_STATUS
+      OUTPUT_FILE ${OPENSHMEM_SRC_BUILD_OUTPUT}
+      ERROR_FILE ${OPENSHMEM_SRC_ERROR_FILE}
+    )
+
+    if(OPENSHMEM_SRC_BUILD_STATUS)
+      message(FATAL_ERROR "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details")
+    endif()
+
+    if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
+      pkg_search_module(
+        OPENSHMEM IMPORTED_TARGET GLOBAL
+        osss-ucx
+      )
+    elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
+      pkg_search_module(
+        OPENSHMEM IMPORTED_TARGET GLOBAL
+        sandia-openshmem
+      )
+    endif()
+
+    if(NOT TARGET PkgConfig::OPENSHMEM)
+      message(FATAL_ERROR "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}")
+    endif()
+
+  endif()
 
     if(OPENSHMEM_CFLAGS)
       set(IS_PARAM "0")
