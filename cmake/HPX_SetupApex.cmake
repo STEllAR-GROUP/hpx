@@ -46,7 +46,7 @@ if(HPX_WITH_APEX AND NOT TARGET APEX::apex)
     # We want to track parent dependencies
     hpx_add_config_define(HPX_HAVE_THREAD_PARENT_REFERENCE)
 
-    if (HPX_WITH_FETCH_APEX)
+    if(HPX_WITH_FETCH_APEX)
       # If Apex_ROOT not specified, local clone into hpx source dir
       include(FetchContent)
       fetchcontent_declare(
