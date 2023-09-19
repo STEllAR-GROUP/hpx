@@ -16,9 +16,79 @@ macro(hpx_setup_gasnet)
       "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`"
     )
     pkg_search_module(
-      GASNET REQUIRED IMPORTED_TARGET GLOBAL
+      GASNET IMPORTED_TARGET GLOBAL
       gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
     )
+
+    if((NOT GASNET_FOUND) AND HPX_WITH_FETCH_GASNET)
+
+      if(NOT CMAKE_C_COMPILER)
+        message(FATAL_ERROR "HPX_WITH_FETCH_GASNET requires `-DCMAKE_C_COMPILER` to be set; CMAKE_C_COMPILER is currently unset.}")
+      endif()
+      if(NOT CMAKE_CXX_COMPILER)
+        message(FATAL_ERROR "HPX_WITH_FETCH_GASNET requires `-DCMAKE_CXX_COMPILER` to be set; CMAKE_CXX_COMPILER is currently unset.}")
+      endif()
+      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi" AND NOT OFI_DIR)
+        message(FATAL_ERROR "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ofi AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}")
+      endif()
+      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx" AND NOT UCX_DIR)
+        message(FATAL_ERROR "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}")
+      endif()
+
+      include(FetchContent)
+      FetchContent_Declare(gasnet
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        URL https://gasnet.lbl.gov/EX/GASNet-2023.3.0.tar.gz
+      )
+
+      fetchcontent_getproperties(gasnet)
+      if(NOT gasnet)
+        FetchContent_Populate(gasnet)
+      endif()
+
+      message(STATUS "Building GASNET and installing into ${CMAKE_INSTALL_PREFIX}")
+      
+      set(GASNET_DIR "${gasnet_SOURCE_DIR}")
+      set(GASNET_BUILD_OUTPUT "${GASNET_DIR}/build.log")
+      set(GASNET_ERROR_FILE "${GASNET_DIR}/error.log")
+
+      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "udp" OR "${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "smp")
+        execute_process(
+	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+	  WORKING_DIRECTORY ${GASNET_DIR}
+	  RESULT_VARIABLE GASNET_BUILD_STATUS
+	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+	  ERROR_FILE ${GASNET_ERROR_FILE}
+        )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi")
+        execute_process(
+	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+	  WORKING_DIRECTORY ${GASNET_DIR}
+	  RESULT_VARIABLE GASNET_BUILD_STATUS
+	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+	  ERROR_FILE ${GASNET_ERROR_FILE}
+        )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx")
+        execute_process(
+  	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+	  WORKING_DIRECTORY ${GASNET_DIR}
+	  RESULT_VARIABLE GASNET_BUILD_STATUS
+	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+	  ERROR_FILE ${GASNET_ERROR_FILE}
+        )
+      endif()
+	        
+      if(GASNET_BUILD_STATUS)
+        message(FATAL_ERROR "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details")
+      endif()
+
+      pkg_search_module(
+        GASNET REQUIRED IMPORTED_TARGET GLOBAL
+        gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
+      )
+    elseif((NOT GASNET_FOUND) AND (NOT HPX_WITH_FETCH_GASNET))
+      message(FATAL_ERROR "GASNet not found and HPX_WITH_FETCH_GASNET not set!")
+    endif()
 
     if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
       set(GASNET_MPI_FOUND TRUE)
