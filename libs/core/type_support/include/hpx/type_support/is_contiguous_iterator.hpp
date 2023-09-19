@@ -1,4 +1,5 @@
 //  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,49 +25,86 @@ namespace hpx::traits {
         using iter_value_type_t =
             typename std::iterator_traits<Iter>::value_type;
 
-        template <typename T, typename Enable = void>
-        struct is_known_contiguous_iterator : std::false_type
+        template <typename T>
+        inline constexpr bool has_valid_array_v =
+            std::is_copy_assignable_v<T> && !std::is_function_v<T>;
+
+        template <typename Iter, typename Enable = void>
+        struct is_std_array_iterator : std::false_type
         {
         };
 
         template <typename Iter>
-        struct is_known_contiguous_iterator<Iter,
-            std::enable_if_t<!std::is_array_v<Iter>>>
-          : std::bool_constant<
-                std::is_same_v<    // for std::vector
-                    typename std::vector<iter_value_type_t<Iter>>::iterator,
-                    Iter> ||
-                std::is_same_v<typename std::vector<
-                                   iter_value_type_t<Iter>>::const_iterator,
-                    Iter> ||    // for std::array
+        struct is_std_array_iterator<Iter,
+            std::enable_if_t<has_valid_array_v<iter_value_type_t<Iter>>>>
+          : std::bool_constant<(
                 std::is_same_v<
                     typename std::array<iter_value_type_t<Iter>, 1>::iterator,
                     Iter> ||
                 std::is_same_v<typename std::array<iter_value_type_t<Iter>,
                                    1>::const_iterator,
-                    Iter> ||    // for std::string
-                std::is_same_v<typename std::string::iterator, Iter> ||
-                std::is_same_v<typename std::string::const_iterator, Iter>>
+                    Iter>)>
+        {
+        };
+
+        template <typename T>
+        inline constexpr bool has_valid_vector_v =
+            std::is_copy_assignable_v<T> && !std::is_function_v<T>;
+
+        template <typename T, typename Enable = void>
+        struct is_std_vector_iterator : std::false_type
+        {
+        };
+
+        template <typename Iter>
+        struct is_std_vector_iterator<Iter,
+            std::enable_if_t<has_valid_vector_v<iter_value_type_t<Iter>>>>
+          : std::bool_constant<
+                std::is_same_v<
+                    typename std::vector<iter_value_type_t<Iter>>::iterator,
+                    Iter> ||
+                std::is_same_v<typename std::vector<
+                                   iter_value_type_t<Iter>>::const_iterator,
+                    Iter>>
+        {
+        };
+
+        template <typename T>
+        inline constexpr bool has_valid_basic_string_v =
+            std::is_copy_assignable_v<T> && !std::is_function_v<T> &&
+            std::is_trivial_v<T>;
+
+        template <typename T, typename Enable = void>
+        struct is_std_basic_string_iterator : std::false_type
+        {
+        };
+
+        template <typename Iter>
+        struct is_std_basic_string_iterator<Iter,
+            std::enable_if_t<has_valid_basic_string_v<iter_value_type_t<Iter>>>>
+          : std::bool_constant<
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::iterator,
+                    Iter> ||
+                std::is_same_v<typename std::basic_string<
+                                   iter_value_type_t<Iter>>::const_iterator,
+                    Iter>>
+        {
+        };
+
+        template <typename Iter>
+        struct is_known_contiguous_iterator
+          : std::bool_constant<is_std_array_iterator<Iter>::value ||
+                is_std_vector_iterator<Iter>::value ||
+                is_std_basic_string_iterator<Iter>::value>
         {
         };
     }    // namespace detail
 
-    template <typename Iter,
-        bool not_known_contiguous_iterator =
-    // When _GLIBCXX_DEBUG is defined vectors are contiguous, but the iterators
-    // are not plain pointers.
-#if defined(_GLIBCXX_DEBUG)
-            false
-#else
-            detail::is_known_contiguous_iterator<Iter>::value
-#endif
-        >
-    struct is_contiguous_iterator : std::is_pointer<Iter>::type
-    {
-    };
-
     template <typename Iter>
-    struct is_contiguous_iterator<Iter, true> : std::true_type
+    struct is_contiguous_iterator
+      : std::bool_constant<std::is_pointer_v<Iter> ||
+            detail::is_known_contiguous_iterator<Iter>::value>
     {
     };
 
