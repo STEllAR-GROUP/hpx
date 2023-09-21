@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Marcin Copik
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -65,6 +65,12 @@ namespace hpx::parallel::execution {
     };
 
     template <typename Parameters>
+    struct extract_has_variable_chunk_size<::std::reference_wrapper<Parameters>>
+      : extract_has_variable_chunk_size<Parameters>
+    {
+    };
+
+    template <typename Parameters>
     inline constexpr bool extract_has_variable_chunk_size_v =
         extract_has_variable_chunk_size<Parameters>::value;
 
@@ -87,6 +93,13 @@ namespace hpx::parallel::execution {
     {
     };
 #endif
+
+    template <typename Parameters>
+    struct extract_invokes_testing_function<
+        ::std::reference_wrapper<Parameters>>
+      : extract_invokes_testing_function<Parameters>
+    {
+    };
 
     template <typename Parameters>
     inline constexpr bool extract_invokes_testing_function_v =
