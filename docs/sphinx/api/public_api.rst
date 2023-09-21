@@ -23,7 +23,7 @@ sub-namespaces will eventually be removed.
 ``hpx/algorithm.hpp``
 =====================
 
-The header :hpx-header:`libs/full/include,hpx/algorithm.hpp` corresponds to the
+The header :hpx-header:`libs/full/include,include/hpx/algorithm.hpp` corresponds to the
 C++ standard library header :cppreference-header:`algorithm`. See :ref:`parallel_algorithms` for
 more information about the parallel algorithms.
 
@@ -253,7 +253,7 @@ Macros
 ``hpx/barrier.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include,hpx/barrier.hpp` corresponds to the
+The header :hpx-header:`libs/full/include,include/hpx/barrier.hpp` corresponds to the
 C++ standard library header :cppreference-header:`barrier` and contains a distributed barrier implementation. This
 functionality is also exposed through the ``hpx::distributed`` namespace. The name in
 ``hpx::distributed`` should be preferred.
@@ -282,7 +282,7 @@ Classes
 ``hpx/channel.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include,hpx/channel.hpp` contains a local and a
+The header :hpx-header:`libs/full/include,include/hpx/channel.hpp` contains a local and a
 distributed channel implementation. This  functionality is also exposed through the ``hpx::distributed``
 namespace. The name in ``hpx::distributed`` should be preferred.
 
@@ -493,7 +493,7 @@ Functions
 ``hpx/future.hpp``
 ==================
 
-The header :hpx-header:`libs/full/include,hpx/future.hpp` corresponds to the
+The header :hpx-header:`libs/full/include,include/hpx/future.hpp` corresponds to the
 C++ standard library header :cppreference-header:`future`. See :ref:`extend_futures` for more
 information about extensions to futures compared to the C++ standard library.
 
@@ -610,7 +610,7 @@ Functions
 ``hpx/latch.hpp``
 =================
 
-The header :hpx-header:`libs/full/include,hpx/latch.hpp` corresponds to the C++
+The header :hpx-header:`libs/full/include,include/hpx/latch.hpp` corresponds to the C++
 standard library header :cppreference-header:`latch`. It contains a local and a distributed latch
 implementation. This functionality is also exposed through the ``hpx::distributed`` namespace.
 The name in ``hpx::distributed`` should be preferred.
@@ -789,7 +789,7 @@ Classes
 ``hpx/runtime.hpp``
 ===================
 
-The header :hpx-header:`libs/full/include,hpx/runtime.hpp` contains functions for accessing
+The header :hpx-header:`libs/full/include,include/hpx/runtime.hpp` contains functions for accessing
 local and distributed runtime information.
 
 Typedefs
