@@ -42,6 +42,8 @@ Some general steps that can be used to migrate code to |hpx| code are the follow
 
    Compile the converted code with the |hpx| library and run it using the appropriate HPX runtime environment.
 
+.. _openmp:
+
 |openmp|
 ========
 
@@ -656,6 +658,8 @@ directive in |openmp|. This synchronization is achieved using :cpp:func:`hpx::wa
     If the `nowait` clause is used in the `sections` directive, then you can just remove
     the :cpp:func:`hpx::wait_all` function while keeping the rest of the code as it is.
 
+.. _tbb:
+
 |tbb|
 =====
 
@@ -966,7 +970,7 @@ parallel_scan
         [](const int& left, const int& right) { return left + right; });
 
 :cpp:func:`hpx::inclusive_scan` with `hpx::execution::par` as execution policy
- can be used to perform a prefix scan in parallel. The management of intermediate
+can be used to perform a prefix scan in parallel. The management of intermediate
 results is seamlessly handled internally by |hpx|, eliminating the need
 for explicit consideration. `input.begin()` and `input.end()` refer to the beginning
 and end of the sequence of elements the algorithm will be applied to respectively.
@@ -1046,11 +1050,40 @@ task_group
 feature. Therefore, utilizing :cpp:func:`hpx::experimental::task_group` provides an
 equivalent functionality to `tbb::task_group`.
 
+.. _mpi:
+
 |mpi|
 =====
 
 |mpi| is a standardized communication protocol and library that allows multiple processes or
 nodes in a parallel computing system to exchange data and coordinate their execution.
+
+List of |mpi|-|hpx| functions
+-----------------------------
+
+   .. table:: |hpx| equivalent functions of |mpi|
+
+   ========================================  ===================================================================================================================
+   |mpi| function                            |hpx| equivalent
+   ========================================  ===================================================================================================================
+   :ref:`MPI_Allgather`                      :cpp:class:`hpx::collectives::all_gather`
+   :ref:`MPI_Allreduce`                      :cpp:class:`hpx::collectives::all_reduce`
+   :ref:`MPI_Alltoall`                       :cpp:class:`hpx::collectives::all_to_all`
+   :ref:`MPI_Barrier`                        :cpp:class:`hpx::distributed::barrier`
+   :ref:`MPI_Bcast`                          :cpp:class:`hpx::collectives::broadcast_to()` and :cpp:class:`hpx::collectives::broadcast_from()` used with :code:`get()`
+   :ref:`MPI_Comm_size <MPI_Send_MPI_Recv>`  :cpp:class:`hpx::get_num_localities`
+   :ref:`MPI_Comm_rank <MPI_Send_MPI_Recv>`  :cpp:class:`hpx::get_locality_id()`
+   :ref:`MPI_Exscan`                         :cpp:class:`hpx::collectives::exclusive_scan()` used with :code:`get()`
+   :ref:`MPI_Gather`                         :cpp:class:`hpx::collectives::gather_here()` and :cpp:class:`hpx::collectives::gather_there()` used with :code:`get()`
+   :ref:`MPI_Irecv <MPI_Send_MPI_Recv>`      :cpp:class:`hpx::collectives::get()`
+   :ref:`MPI_Isend <MPI_Send_MPI_Recv>`      :cpp:class:`hpx::collectives::set()`
+   :ref:`MPI_Reduce`                         :cpp:class:`hpx::collectives::reduce_here` and :cpp:class:`hpx::collectives::reduce_there` used with :code:`get()`
+   :ref:`MPI_Scan`                           :cpp:class:`hpx::collectives::inclusive_scan()` used with :code:`get()`
+   :ref:`MPI_Scatter`                        :cpp:class:`hpx::collectives::scatter_to()` and :cpp:class:`hpx::collectives::scatter_from()`
+   :ref:`MPI_Wait <MPI_Send_MPI_Recv>`       :cpp:class:`hpx::collectives::get()` used with a future i.e. :code:`setf.get()`
+   ========================================  ===================================================================================================================
+
+.. _MPI_Send_MPI_Recv:
 
 MPI_Send & MPI_Recv
 -------------------
@@ -1153,17 +1186,7 @@ To understand this example, let's focus on the `hpx_main()` function:
 
 Having said that, we conclude to the following table:
 
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  ==============================================================
-   |openmpi| function         |hpx| equivalent
-   =========================  ==============================================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Isend                  `hpx::collectives::set()`
-   MPI_Irecv                  `hpx::collectives::get()`
-   MPI_Wait                   `hpx::collectives::get()` used with a future i.e. `setf.get()`
-   =========================  ==============================================================
+.. _MPI_Gather:
 
 MPI_Gather
 ----------
@@ -1260,9 +1283,9 @@ This code will print 10 times the following message:
 
     Gathered data on the root: 42 43
 
-|hpx| uses two functions to implement the functionality of `MPI_Gather`: `hpx::gather_here` and
-`hpx::gather_there`. `hpx::gather_here` is gathering data from all localities to the locality
-with ID 0 (root locality). `hpx::gather_there` allows non-root localities to participate in the
+|hpx| uses two functions to implement the functionality of `MPI_Gather`: `gather_here` and
+`gather_there`. `gather_here` is gathering data from all localities to the locality
+with ID 0 (root locality). `gather_there` allows non-root localities to participate in the
 gather operation by sending data to the root locality. In more detail:
 
 - `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
@@ -1273,7 +1296,7 @@ gather operation by sending data to the root locality. In more detail:
 
 - If the current locality is the root (its ID is equal to 0):
 
-  - the `hpx::gather_here` function is used to perform the gather operation. It collects data from all
+  - The `gather_here` function is used to perform the gather operation. It collects data from all
     other localities into the `overall_result` future object. The function arguments provide the necessary
     information, such as the base name for the gather operation (`gather_direct_basename`), the value
     to be gathered (`value`), the number of localities (`num_localities`), the current locality ID
@@ -1287,23 +1310,14 @@ gather operation by sending data to the root locality. In more detail:
 
 - If the current locality is not the root:
 
-  - The `hpx::gather_there` function is used to participate in the gather operation initiated by
+  - The `gather_there` function is used to participate in the gather operation initiated by
     the root locality. It sends the data (in this case, the value `this_locality + 42`) to the root
     locality, indicating that it should be included in the gathering.
 
   - The `get()` member function of the `overall_result` future is used to wait for the gather operation
     to complete for this locality.
 
-
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  =====================================================================
-   |openmpi| function         |hpx| equivalent
-   =========================  =====================================================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Gather                 `hpx::gather_here()` and `hpx::gather_there()` both used with `get()`
-   =========================  =====================================================================
+.. _MPI_Scatter:
 
 MPI_Scatter
 -----------
@@ -1432,16 +1446,7 @@ the data from the root locality. In more detail:
 
   - `HPX_TEST_EQ` is a macro provided by the |hpx| testing utilities to test the collected values.
 
-
-.. table:: |hpx| equivalent functions of |mpi|
-
-   =========================  =============================================
-   |openmpi| function         |hpx| equivalent
-   =========================  =============================================
-   MPI_Comm_size              `hpx::get_num_localities`
-   MPI_Comm_rank              `hpx::get_locality_id()`
-   MPI_Scatter                `hpx::scatter_to()` and `hpx::scatter_from()`
-   =========================  =============================================
+.. _MPI_Allgather:
 
 MPI_Allgather
 -------------
@@ -1540,6 +1545,7 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the vector called `r`.
 
+.. _MPI_Allreduce:
 
 MPI_Allreduce
 -------------
@@ -1627,10 +1633,12 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the variable `res`.
 
+.. _MPI_Alltoall:
+
 MPI_Alltoall
 -------------
 
-The following code cGathers data from and scatters data to all processes.
+The following code gathers data from and scatters data to all processes.
 
 |mpi| code:
 
@@ -1731,3 +1739,468 @@ detail:
 
 - The `get()` function waits until the result is available and then stores it in the variable `r`.
 
+.. _MPI_Barrier:
+
+MPI_Barrier
+-----------
+
+The following code shows how barrier is used to synchronize multiple processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <cstdlib>
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char **argv) {
+        MPI_Init(&argc, &argv);
+
+        std::size_t iterations = 5;
+
+        int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+        for (std::size_t i = 0; i != iterations; ++i) {
+            MPI_Barrier(MPI_COMM_WORLD);
+            if (rank == 0) {
+            std::cout << "Iteration " << i << " completed." << std::endl;
+            }
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::size_t iterations = 5;
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    char const* const barrier_test_name = "/test/barrier/multiple";
+
+    hpx::distributed::barrier b(barrier_test_name);
+    for (std::size_t i = 0; i != iterations; ++i)
+    {
+        b.wait();
+        if (this_locality == 0)
+        {
+            std::cout << "Iteration " << i << " completed." << std::endl;
+        }
+    }
+
+This code will print the following message:
+
+.. code-block:: c++
+
+    Iteration 0 completed.
+    Iteration 1 completed.
+    Iteration 2 completed.
+    Iteration 3 completed.
+    Iteration 4 completed.
+
+|hpx| uses the function `barrier` to implement the functionality of `MPI_Barrier`. In more
+detail:
+
+- After defining the number of iterations, we use
+  `hpx::get_locality_id()` to get the ID of the current locality.
+
+- `char const* const barrier_test_name = "/test/barrier/multiple"`: This line defines a constant
+  character array as the name of the barrier. This name is used to identify the barrier across
+  different localities. All participating threads that use this name will synchronize
+  at this barrier.
+
+- Using `hpx::distributed::barrier b(barrier_test_name)`, we create an instance of the distributed
+  barrier with the previously defined name. This barrier will be used to synchronize the execution
+  of threads across different localities.
+
+- Running for all the desired iterations, we use `b.wait()` to synchronize the threads.
+  Each thread waits until all other threads also reach this point before any of them can proceed
+  further.
+
+.. _MPI_Bcast:
+
+MPI_Bcast
+---------
+
+The following code broadcasts data from one process to all other processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        int value;
+
+        for (int i = 0; i < 5; ++i) {
+            if (here == 0) {
+                value = i + 42;
+            }
+
+            // Broadcast the value from process 0 to all other processes
+            MPI_Bcast(&value, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+            if (here != 0) {
+                std::cout << "Locality " << here << " received " << value << std::endl;
+            }
+
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto broadcast_direct_client =
+        create_communicator(broadcast_direct_basename,
+            num_sites_arg(num_localities), this_site_arg(here));
+
+    // test functionality based on immediate local result value
+    for (std::uint32_t i = 0; i != 5; ++i)
+    {
+        if (here == 0)
+        {
+            hpx::future<std::uint32_t> result =
+                broadcast_to(broadcast_direct_client, i + 42);
+
+            result.get();
+        }
+        else
+        {
+            hpx::future<std::uint32_t> result =
+                hpx::collectives::broadcast_from<std::uint32_t>(
+                    broadcast_direct_client);
+
+            uint32_t r = result.get();
+
+            std::cout << "Locality " << here << " received " << r << std::endl;
+        }
+    }
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 1 received 42
+    Locality 1 received 43
+    Locality 1 received 44
+    Locality 1 received 45
+    Locality 1 received 46
+
+|hpx| uses two functions to implement the functionality of `MPI_Bcast`: `broadcast_to` and
+`broadcast_from`. `broadcast_to` is broadcasting the data from the root locality to all
+other localities. `broadcast_from` allows non-root localities to collect the data sent by
+the root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `broadcast_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - The `broadcast_to` function is used to perform the broadcast operation using the communicator
+    `broadcast_direct_client`. This sends the data to other localities and
+    returns a future representing the result.
+
+  - The `get()` member function of the `result` future is used to wait for and retrieve the result.
+
+- If the current locality is not the root:
+
+  - The `broadcast_from` function is used to collect the data by the root locality.
+
+  - The `get()` member function of the `result` future is used to wait for the result.
+
+.. _MPI_Exscan:
+
+MPI_Exscan
+----------
+
+The following code computes the exclusive scan (partial reductions) of data on a
+collection of processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <numeric>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        // Calculate the value for this locality (here)
+        int value = here;
+
+        // Perform an exclusive scan
+        std::vector<int> result(num_localities);
+        MPI_Exscan(&value, &result[0], 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        if (here != 0) {
+            int r = result[here - 1]; // Result is in the previous rank's slot
+
+            std::cout << "Locality " << here << " has value " << r << std::endl;
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto exclusive_scan_client = create_communicator(exclusive_scan_basename,
+        num_sites_arg(num_localities), this_site_arg(here));
+
+    // test functionality based on immediate local result value
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result = exclusive_scan(
+        exclusive_scan_client, value, std::plus<std::uint32_t>{});
+
+    uint32_t r = overall_result.get();
+
+    if (here != 0)
+    {
+        std::cout << "Locality " << here << " has value " << r << std::endl;
+    }
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 1 has value 0
+
+|hpx| uses the function `exclusive_scan` to implement `MPI_Exscan`. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `exclusive_scan_client`.
+
+- The `exclusive_scan` function is used to perform the exclusive scan operation
+  using the communicator `exclusive_scan_client`. `std::plus<std::uint32_t>{}`
+  specifies the binary associative operator to use for the scan. In this case,
+  it's addition for summing values.
+
+- The `get()` member function of the `overall_result` future is used to wait for the result.
+
+.. _MPI_Scan:
+
+MPI_Scan
+--------
+
+The following code Computes the inclusive scan (partial reductions) of data on a collection
+of processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+    #include <numeric>
+    #include <vector>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_localities;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_localities);
+
+        int here;
+        MPI_Comm_rank(MPI_COMM_WORLD, &here);
+
+        // Calculate the value for this locality (here)
+        int value = here;
+
+        std::vector<int> result(num_localities);
+
+        MPI_Scan(&value, &result[0], 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
+        std::cout << "Locality " << here << " has value " << result[0] << std::endl;
+
+        MPI_Finalize();
+        return 0;
+    }
+
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t here = hpx::get_locality_id();
+
+    auto inclusive_scan_client = create_communicator(inclusive_scan_basename,
+        num_sites_arg(num_localities), this_site_arg(here));
+
+    std::uint32_t value = here;
+
+    hpx::future<std::uint32_t> overall_result = inclusive_scan(
+        inclusive_scan_client, value, std::plus<std::uint32_t>{});
+
+    uint32_t r = overall_result.get();
+
+    std::cout << "Locality " << here << " has value " << r << std::endl;
+
+For num_localities = 2 this code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value 0
+    Locality 1 has value 1
+
+|hpx| uses the function `inclusive_scan` to implement `MPI_Scan`. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `inclusive_scan_client`.
+
+- The `inclusive_scan` function is used to perform the exclusive scan operation
+  using the communicator `inclusive_scan_client`. `std::plus<std::uint32_t>{}`
+  specifies the binary associative operator to use for the scan. In this case,
+  it's addition for summing values.
+
+- The `get()` member function of the `overall_result` future is used to wait for the result.
+
+.. _MPI_Reduce:
+
+MPI_Reduce
+----------
+
+The following code performs a global reduce operation across all processes.
+
+|mpi| code:
+
+.. code-block:: c++
+
+    #include <iostream>
+    #include <mpi.h>
+
+    int main(int argc, char *argv[]) {
+        MPI_Init(&argc, &argv);
+
+        int num_processes;
+        MPI_Comm_size(MPI_COMM_WORLD, &num_processes);
+
+        int this_rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &this_rank);
+
+        int value = this_rank;
+
+        int result = 0;
+
+        // Perform the reduction operation
+        MPI_Reduce(&value, &result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+        // Print the result for the root process (process 0)
+        if (this_rank == 0) {
+            std::cout << "Locality " << this_rank << " has value " << result
+                    << std::endl;
+        }
+
+        MPI_Finalize();
+        return 0;
+    }
+
+|hpx| equivalent:
+
+.. code-block:: c++
+
+    std::uint32_t num_localities = hpx::get_num_localities(hpx::launch::sync);
+    std::uint32_t this_locality = hpx::get_locality_id();
+
+    auto reduce_direct_client = create_communicator(reduce_direct_basename,
+        num_sites_arg(num_localities), this_site_arg(this_locality));
+
+    std::uint32_t value = hpx::get_locality_id();
+
+    if (this_locality == 0)
+    {
+        hpx::future<std::uint32_t> overall_result = reduce_here(
+            reduce_direct_client, value, std::plus<std::uint32_t>{});
+
+        uint32_t r = overall_result.get();
+
+        std::cout << "Locality " << this_locality << " has value " << r
+                  << std::endl;
+    }
+    else
+    {
+        hpx::future<void> overall_result =
+            reduce_there(reduce_direct_client, std::move(value));
+        overall_result.get();
+    }
+
+This code will print the following message:
+
+.. code-block:: c++
+
+    Locality 0 has value 1
+
+|hpx| uses two functions to implement the functionality of `MPI_Reduce`: `reduce_here` and
+`reduce_there`. `reduce_here` is gathering data from all localities to the locality
+with ID 0 (root locality) and then performs the defined reduction operation. `reduce_there`
+allows non-root localities to participate in the reduction operation by sending data to the
+root locality. In more detail:
+
+- `hpx::get_num_localities(hpx::launch::sync)` retrieves the number of localities, while
+  `hpx::get_locality_id()` returns the ID of the current locality.
+
+- The function `create_communicator()` is used to create a communicator called
+  `reduce_direct_client`.
+
+- If the current locality is the root (its ID is equal to 0):
+
+  - The `reduce_here` function initiates a reduction operation with addition (`std::plus`) as the
+    reduction operator. The result is stored in `overall_result`.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the result.
+
+- If the current locality is not the root:
+
+  - The `reduce_there` initiates a remote reduction operation.
+
+  - The `get()` member function of the `overall_result` future is used to wait for the remote
+    reduction operation to complete. This is done to ensure synchronization among localities.

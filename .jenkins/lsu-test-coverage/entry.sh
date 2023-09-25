@@ -2,6 +2,7 @@
 
 # Copyright (c) 2020 ETH Zurich
 # Copyright (c) 2022 Hartmut Kaiser
+# Copyright (c) 2023 Panos Syskakis
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,14 +11,14 @@
 # Make undefined variables errors, print each command
 set -eux
 
-source .jenkins/lsu-perftests/slurm-constraint-${configuration_name}.sh
+source .jenkins/lsu-test-coverage/slurm-constraint-${configuration_name}.sh
 
-if [[ -z "${ghprbPullId:-}" ]]; then
+if [[ -z "${CHANGE_ID:-}" ]]; then
     # Set name of branch if not building a pull request
     export git_local_branch=$(echo ${GIT_BRANCH} | cut -f2 -d'/')
     job_name="jenkins-hpx-${git_local_branch}-${configuration_name}"
 else
-    job_name="jenkins-hpx-${ghprbPullId}-${configuration_name}"
+    job_name="jenkins-hpx-${CHANGE_ID}-${configuration_name}"
 
     # Cancel currently running builds on the same branch, but only for pull
     # requests
@@ -27,6 +28,17 @@ fi
 # delay things for a random amount of time
 sleep $[(RANDOM % 10) + 1].$[(RANDOM % 10)]s
 
+# Fetch grcov
+wget https://github.com/mozilla/grcov/releases/download/v0.8.2/grcov-linux-x86_64.tar.bz2 -O grcov.tar.bz2 \
+&& echo "32e40a984cb7ed3a60760e26071618370f10fdce2186916e7321f1dd01a6d0fd grcov.tar.bz2" | sha256sum --check --status \
+&& tar -jxf grcov.tar.bz2 \
+&& rm grcov.tar.bz2
+
+if [ ! -e "grcov" ]; then
+    echo "Error: Failed to fetch grcov."
+    exit 1
+fi
+
 # Start the actual build
 set +e
 sbatch \
@@ -34,11 +46,11 @@ sbatch \
     --job-name="${job_name}" \
     --nodes="1" \
     --partition="${configuration_slurm_partition}" \
-    --nodelist="${configuration_slurm_nodelist}" \
-    --time="03:00:00" \
+    --time="05:00:00" \
     --output="jenkins-hpx-${configuration_name}.out" \
     --error="jenkins-hpx-${configuration_name}.err" \
-    --wait .jenkins/lsu-perftests/batch.sh
+    --wait .jenkins/lsu-test-coverage/batch.sh
+
 
 # Print slurm logs
 echo "= stdout =================================================="
@@ -49,12 +61,6 @@ cat jenkins-hpx-${configuration_name}.err
 
 # Get build status
 status_file="jenkins-hpx-${configuration_name}-ctest-status.txt"
-
-# Comment on the PR if any failures
-if [[ $(cat ${status_file}) != 0 ]]; then
-    ./.jenkins/lsu-perftests/comment_github.sh
-fi
-
 
 set -e
 exit $(cat ${status_file})

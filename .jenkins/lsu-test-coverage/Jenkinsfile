@@ -20,17 +20,18 @@ pipeline {
             )
         )
     }
+
     stages {
-        stage('perftests') {
+        stage('test-coverage') {
             environment{
-                GITHUB_TOKEN = credentials('STELLARBOT_GITHUB_TOKEN')
-                configuration_name = "perftests"
+                CODACY_TOKEN = credentials('CODACY_TOKEN_HPX')
+                configuration_name = "test-coverage"
             }
             steps {
                 echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
                 sh '''
                 #!/bin/bash -l
-                .jenkins/lsu-perftests/entry.sh
+                .jenkins/lsu-test-coverage/entry.sh
                 '''
             }
         }
@@ -39,8 +40,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'jenkins-hpx-*', fingerprint: true
-            archiveArtifacts artifacts: '*-Testing/**', fingerprint: true
-            archiveArtifacts artifacts: '*-reports/**', fingerprint: true
+            archiveArtifacts artifacts: 'grcov-log.txt', fingerprint: true
         }
     }
 }

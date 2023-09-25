@@ -148,7 +148,14 @@ namespace hpx { namespace collectives {
 namespace hpx::traits {
 
     namespace communication {
+
         struct exclusive_scan_tag;
+
+        template <>
+        constexpr char const* communicator_name<exclusive_scan_tag>() noexcept
+        {
+            return "exclusive_scan";
+        }
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////

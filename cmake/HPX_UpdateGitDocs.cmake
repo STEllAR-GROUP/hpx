@@ -58,7 +58,9 @@ string(REGEX REPLACE " " ";" HPX_WITH_DOCUMENTATION_OUTPUT_FORMATS
 
 # If a branch name has been set, we copy files to a corresponding directory
 if(HPX_WITH_GIT_BRANCH)
-  message("Updating branch directory, " "HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\"")
+  message("Updating branch directory, "
+          "HPX_WITH_GIT_BRANCH=\"${HPX_WITH_GIT_BRANCH}\""
+  )
   set(DOCS_BRANCH_DEST
       "${HPX_BINARY_DIR}/docs/gh-pages/branches/${HPX_WITH_GIT_BRANCH}"
   )
