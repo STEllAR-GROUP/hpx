@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     bool exception_caught = false;
     try
     {
-        hpx::threads::run_as_hpx_thread(&hpx_thread_func);
+        hpx::run_as_hpx_thread(&hpx_thread_func);
         HPX_TEST(false);    // this should not be executed
     }
     catch (...)

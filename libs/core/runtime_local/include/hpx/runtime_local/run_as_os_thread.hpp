@@ -16,17 +16,30 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace threads {
+namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Ts>
-    hpx::future<typename util::invoke_result<F, Ts...>::type> run_as_os_thread(
+    hpx::future<util::invoke_result_t<F, Ts...>> run_as_os_thread(
         F&& f, Ts&&... vs)
     {
-        HPX_ASSERT(get_self_ptr() != nullptr);
+        HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         parallel::execution::io_pool_executor executor;
         auto result = parallel::execution::async_execute(
             executor, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
         return result;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx
+
+namespace hpx::threads {
+
+    template <typename F, typename... Ts>
+    HPX_DEPRECATED_V(1, 10,
+        "hpx::threads::run_as_os_thread is deprecated, use "
+        "hpx::run_as_os_thread instead")
+    decltype(auto) run_as_os_thread(F const& f, Ts&&... ts)
+    {
+        return hpx::run_as_os_thread(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
+    }
+}    // namespace hpx::threads
