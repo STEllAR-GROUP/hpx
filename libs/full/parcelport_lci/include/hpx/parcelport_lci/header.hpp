@@ -50,6 +50,37 @@ namespace hpx::parcelset::policies::lci {
         };
 
         template <typename buffer_type, typename ChunkType>
+        static size_t get_header_size(
+            parcel_buffer<buffer_type, ChunkType> const& buffer,
+            size_t max_header_size) noexcept
+        {
+            HPX_ASSERT(max_header_size >= pos_piggy_back_address);
+
+            size_t current_header_size = pos_piggy_back_address;
+            if (buffer.data_.size() <= (max_header_size - current_header_size))
+            {
+                current_header_size += buffer.data_.size();
+            }
+            int num_zero_copy_chunks = buffer.num_chunks_.first;
+            [[maybe_unused]] int num_non_zero_copy_chunks =
+                buffer.num_chunks_.second;
+            if (num_zero_copy_chunks != 0)
+            {
+                HPX_ASSERT(buffer.transmission_chunks_.size() ==
+                    size_t(num_zero_copy_chunks + num_non_zero_copy_chunks));
+                int tchunk_size =
+                    static_cast<int>(buffer.transmission_chunks_.size() *
+                        sizeof(typename parcel_buffer<buffer_type,
+                            ChunkType>::transmission_chunk_type));
+                if (tchunk_size <= int(max_header_size - current_header_size))
+                {
+                    current_header_size += tchunk_size;
+                }
+            }
+            return current_header_size;
+        }
+
+        template <typename buffer_type, typename ChunkType>
         header(parcel_buffer<buffer_type, ChunkType> const& buffer,
             char* header_buffer, size_t max_header_size) noexcept
         {

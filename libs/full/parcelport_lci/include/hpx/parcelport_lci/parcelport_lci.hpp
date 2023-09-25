@@ -266,7 +266,8 @@ namespace hpx::traits {
                 "prepost_recv_num = 1\n"
                 "reg_mem = 1\n"
                 "ndevices = 1\n"
-                "ncomps = 1\n";
+                "ncomps = 1\n"
+                "enable_in_buffer_assembly = 1\n";
         }
     };
 }    // namespace hpx::traits

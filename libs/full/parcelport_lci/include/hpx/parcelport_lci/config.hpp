@@ -51,6 +51,8 @@ namespace hpx::parcelset::policies::lci {
         static int ndevices;
         // How many completion managers to use
         static int ncomps;
+        // Whether to enable in-buffer assembly for the header messages.
+        static bool enable_in_buffer_assembly;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };
