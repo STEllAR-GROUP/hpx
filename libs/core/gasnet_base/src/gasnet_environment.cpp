@@ -610,8 +610,12 @@ namespace hpx::util {
         if (enabled() && has_called_init())
         {
             gasnet_exit(1);
-            delete gasnet_environment::segments;
-            delete gasnet_environment::segment_mutex;
+            if(gasnet_environment::segments != nullptr) {
+               delete gasnet_environment::segments;
+            }
+            if(gasnet_environment::segments != segment_mutex) {
+               delete gasnet_environment::segment_mutex;
+            }
         }
     }
 
