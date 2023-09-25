@@ -28,6 +28,7 @@ namespace hpx::parcelset::policies::lci {
     bool config_t::reg_mem;
     int config_t::ndevices;
     int config_t::ncomps;
+    bool config_t::enable_in_buffer_assembly;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
     {
@@ -105,6 +106,8 @@ namespace hpx::parcelset::policies::lci {
         reg_mem = util::get_entry_as(rtcfg, "hpx.parcel.lci.reg_mem", 1);
         ndevices = util::get_entry_as(rtcfg, "hpx.parcel.lci.ndevices", 1);
         ncomps = util::get_entry_as(rtcfg, "hpx.parcel.lci.ncomps", 1);
+        enable_in_buffer_assembly = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.enable_in_buffer_assembly", 1);
 
         if (!enable_send_immediate && enable_lci_backlog_queue)
         {

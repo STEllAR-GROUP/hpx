@@ -111,6 +111,12 @@ int hpx_main(hpx::program_options::variables_map& b_arg)
         return 0;
     }
 
+    if (window == 0)
+    {
+        std::cout << "window is 0!" << std::endl;
+        return 0;
+    }
+
     std::vector<hpx::id_type> localities = hpx::find_remote_localities();
 
     hpx::id_type to;

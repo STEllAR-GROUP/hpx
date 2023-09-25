@@ -264,8 +264,9 @@ namespace hpx::traits {
                 "progress_type = rp\n"
                 "prepost_recv_num = 1\n"
                 "reg_mem = 1\n"
-                "ndevices = 2\n"
-                "ncomps = 1\n";
+                "ndevices = 1\n"
+                "ncomps = 1\n"
+                "enable_in_buffer_assembly = 1\n";
         }
     };
 }    // namespace hpx::traits
