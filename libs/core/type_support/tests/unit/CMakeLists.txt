@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-set(tests relocate relocate_at uninitialized_relocate)
+set(tests relocate relocate_at uninitialized_relocate_n_primitive)
 
 if(HPX_WITH_CXX20_COROUTINES)
   set(tests ${tests} generator)
@@ -32,7 +32,9 @@ endforeach()
 
 if(HPX_WITH_COMPILE_ONLY_TESTS)
   # add compile time tests
-  set(compile_tests is_relocatable is_trivially_relocatable)
+  set(compile_tests is_relocatable is_trivially_relocatable
+                    is_contiguous_iterator
+  )
 
   if(HPX_WITH_FAIL_COMPILE_TESTS)
     set(fail_compile_tests fail_relocate_at fail_uninitialized_relocate)

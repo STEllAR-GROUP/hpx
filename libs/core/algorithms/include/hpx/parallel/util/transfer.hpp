@@ -15,6 +15,7 @@
 #include <hpx/parallel/algorithms/detail/distance.hpp>
 #include <hpx/parallel/util/loop.hpp>
 #include <hpx/parallel/util/result_types.hpp>
+#include <hpx/type_support/is_contiguous_iterator.hpp>
 
 #include <algorithm>
 #include <cstddef>

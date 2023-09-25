@@ -97,6 +97,7 @@ set(algorithms_headers
     hpx/parallel/algorithms/uninitialized_default_construct.hpp
     hpx/parallel/algorithms/uninitialized_fill.hpp
     hpx/parallel/algorithms/uninitialized_move.hpp
+    hpx/parallel/algorithms/uninitialized_relocate.hpp
     hpx/parallel/algorithms/uninitialized_value_construct.hpp
     hpx/parallel/algorithms/unique.hpp
     hpx/parallel/container_algorithms/adjacent_difference.hpp

@@ -15,7 +15,12 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/construct_at.hpp>
+
+#include <hpx/type_support/is_trivially_relocatable.hpp>
 #include <hpx/type_support/relocate_at.hpp>
+
+using hpx::experimental::is_trivially_relocatable_v;
+using hpx::experimental::relocate;
 
 struct non_trivially_relocatable_struct
 {
@@ -42,6 +47,8 @@ struct non_trivially_relocatable_struct
 };
 int non_trivially_relocatable_struct::count = 0;
 
+static_assert(!is_trivially_relocatable_v<non_trivially_relocatable_struct>);
+
 int hpx_main()
 {
     void* mem1 = std::malloc(sizeof(non_trivially_relocatable_struct));
@@ -56,7 +63,7 @@ int hpx_main()
     // a single object was constructed
     HPX_TEST(non_trivially_relocatable_struct::count == 1);
 
-    non_trivially_relocatable_struct obj2 = hpx::experimental::relocate(ptr1);
+    non_trivially_relocatable_struct obj2 = relocate(ptr1);
 
     // count = 1 + 1 (from the move construction) - 1 (from the destruction)
     HPX_TEST(non_trivially_relocatable_struct::count == 1);
