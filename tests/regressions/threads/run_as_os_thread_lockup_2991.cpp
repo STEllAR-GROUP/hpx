@@ -29,7 +29,7 @@ int hpx_main()
 
         std::cout << std::this_thread::get_id()
                   << ": about to run on io thread\n";
-        hpx::threads::run_as_os_thread(locker);
+        hpx::run_as_os_thread(locker);
         //sleep(2);
     }
     std::cout << std::this_thread::get_id() << ": exiting\n";

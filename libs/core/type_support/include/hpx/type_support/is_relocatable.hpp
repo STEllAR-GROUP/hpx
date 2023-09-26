@@ -8,21 +8,12 @@
 
 #include <type_traits>
 
-namespace hpx {
+namespace hpx::experimental {
 
     template <typename T>
     struct is_relocatable
       : std::bool_constant<std::is_move_constructible_v<T> &&
             std::is_object_v<T>>
-    {
-    };
-
-    // ToTp(FromTp&&) must be well-formed
-    template <typename ToTp, typename FromTp>
-    struct is_relocatable_from
-      : std::bool_constant<
-            std::is_constructible_v<std::remove_cv_t<ToTp>, FromTp> &&
-            std::is_same_v<std::remove_cv_t<ToTp>, std::remove_cv_t<FromTp>>>
     {
     };
 
@@ -41,4 +32,4 @@ namespace hpx {
     template <typename ToTp, typename FromTp>
     inline constexpr bool is_relocatable_from_v =
         is_relocatable_from<ToTp, FromTp>::value;
-}    // namespace hpx
+}    // namespace hpx::experimental

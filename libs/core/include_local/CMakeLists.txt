@@ -44,7 +44,7 @@ if(NOT HPX_WITH_DISTRIBUTED_RUNTIME)
   )
 endif()
 
-# The headers in hpx/local/ were deprecated in HPX V1.10.0
+# The headers in hpx/local/ were deprecated in HPX V1.9.1
 # cmake-format: off
 set(include_local_compat_headers
     hpx/local/algorithm.hpp => hpx/algorithm.hpp

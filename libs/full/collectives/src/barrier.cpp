@@ -139,7 +139,7 @@ namespace hpx { namespace distributed {
                 // make sure this runs as an HPX thread
                 if (hpx::threads::get_self_ptr() == nullptr)
                 {
-                    hpx::threads::run_as_hpx_thread(&barrier::release, this);
+                    hpx::run_as_hpx_thread(&barrier::release, this);
                 }
 
                 hpx::future<void> f;

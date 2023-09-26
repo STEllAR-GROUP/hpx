@@ -7,7 +7,12 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/construct_at.hpp>
+
+#include <hpx/type_support/is_trivially_relocatable.hpp>
 #include <hpx/type_support/relocate_at.hpp>
+
+using hpx::experimental::is_trivially_relocatable_v;
+using hpx::experimental::relocate_at;
 
 struct non_trivially_relocatable_struct
 {
@@ -34,8 +39,7 @@ struct non_trivially_relocatable_struct
 };
 int non_trivially_relocatable_struct::count = 0;
 
-static_assert(
-    !hpx::is_trivially_relocatable_v<non_trivially_relocatable_struct>);
+static_assert(!is_trivially_relocatable_v<non_trivially_relocatable_struct>);
 
 struct trivially_relocatable_struct
 {
@@ -62,7 +66,8 @@ struct trivially_relocatable_struct
 int trivially_relocatable_struct::count = 0;
 
 HPX_DECLARE_TRIVIALLY_RELOCATABLE(trivially_relocatable_struct);
-static_assert(hpx::is_trivially_relocatable_v<trivially_relocatable_struct>);
+
+static_assert(is_trivially_relocatable_v<trivially_relocatable_struct>);
 
 int hpx_main()
 {
@@ -83,7 +88,7 @@ int hpx_main()
         // a single object was constructed
         HPX_TEST(non_trivially_relocatable_struct::count == 1);
 
-        hpx::experimental::relocate_at(ptr1, ptr2);
+        relocate_at(ptr1, ptr2);
 
         // count = 1 + 1 (from the move construction) - 1 (from the destruction)
         HPX_TEST(non_trivially_relocatable_struct::count == 1);
@@ -111,7 +116,7 @@ int hpx_main()
         // a single object was constructed
         HPX_TEST(trivially_relocatable_struct::count == 1);
 
-        hpx::experimental::relocate_at(ptr1, ptr2);
+        relocate_at(ptr1, ptr2);
 
         // count = 1 + 0 (relocation on trivially relocatable
         // objects does not trigger move constructors
