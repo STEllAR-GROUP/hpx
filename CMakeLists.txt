@@ -1142,6 +1142,14 @@ if(HPX_WITH_NETWORKING)
     CATEGORY "Build Targets"
     ADVANCED
   )
+  hpx_option(
+    HPX_WITH_FETCH_NANOBENCH
+    BOOL
+    "Use FetchContent to fetch Nanobench. (default: OFF)"
+    OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
 
   hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON

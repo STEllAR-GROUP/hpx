@@ -20,21 +20,6 @@ set(testing_compat_headers
 # Default location is $HPX_ROOT/libs/testing/src
 set(testing_sources testing.cpp performance.cpp)
 
-# specify C++ standard
-set(CMAKE_CXX_STANDARD 17)
-
-# include FetchContent module
-include(FetchContent)
-
-# fetch nanobench
-FetchContent_Declare(
-    nanobench
-    GIT_REPOSITORY https://github.com/martinus/nanobench.git
-    GIT_TAG v4.3.11
-    GIT_SHALLOW TRUE
-)
-
-FetchContent_MakeAvailable(nanobench)
 
 include(HPX_AddModule)
 add_hpx_module(
