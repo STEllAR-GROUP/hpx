@@ -35,7 +35,7 @@ if(NOT TARGET Hwloc::hwloc)
 
   find_library(
     Hwloc_LIBRARY
-    NAMES libhwloc.so hwloc
+    NAMES libhwloc.so libhwloc.lib hwloc
     HINTS ${Hwloc_ROOT}
           ENV
           HWLOC_ROOT
