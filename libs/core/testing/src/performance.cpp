@@ -4,6 +4,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#define ANKERL_NANOBENCH_IMPLEMENT
 #include <hpx/testing/performance.hpp>
 
 #include <chrono>
@@ -15,78 +16,42 @@
 #include <type_traits>
 #include <vector>
 
+#include <nanobench.h>
+
+#define NANOBENCH_EPOCHS 24
+#define NANOBENCH_WARMUP 40
+
 namespace hpx::util {
 
     namespace detail {
 
-        // Json output for performance reports
-        class json_perf_times
+        char const* nanobench_hpx_template() noexcept
         {
-            using key_t = std::tuple<std::string, std::string>;
-            using value_t = std::vector<double>;
-            using map_t = std::map<key_t, value_t>;
-
-            map_t m_map;
-
-            HPX_CORE_EXPORT friend std::ostream& operator<<(
-                std::ostream& strm, json_perf_times const& obj);
-
-        public:
-            HPX_CORE_EXPORT void add(std::string const& name,
-                std::string const& executor, double time);
-        };
-
-        json_perf_times& times()
-        {
-            static json_perf_times res;
-            return res;
+            return R"DELIM({
+    "outputs": [
+{{#result}}        {
+            "name": "{{name}}",
+            "executor": "{{context(executor)}}",
+            "series": [
+                {{#measurement}}{{elapsed}}{{^-last}},
+                {{/-last}}{{/measurement}}
+            ]
+        }{{^-last}},{{/-last}}
+{{/result}}    ]
+})DELIM";
         }
 
-        void add_time(std::string const& test_name, std::string const& executor,
-            double time)
+        ankerl::nanobench::Bench& bench()
         {
-            times().add(test_name, executor, time);
+            static ankerl::nanobench::Bench b;
+            static ankerl::nanobench::Config cfg;
+
+            cfg.mWarmup = NANOBENCH_WARMUP;
+            cfg.mNumEpochs = NANOBENCH_EPOCHS;
+
+            return b.config(cfg);
         }
 
-        std::ostream& operator<<(std::ostream& strm, json_perf_times const& obj)
-        {
-            strm << "{\n";
-            strm << "  \"outputs\" : [";
-            int outputs = 0;
-            for (auto&& item : obj.m_map)
-            {
-                if (outputs)
-                    strm << ",";
-                strm << "\n    {\n";
-                strm << R"(      "name" : ")" << std::get<0>(item.first)
-                     << "\",\n";
-                strm << R"(      "executor" : ")" << std::get<1>(item.first)
-                     << "\",\n";
-                strm << R"(      "series" : [)";
-                int series = 0;
-                for (auto const val : item.second)
-                {
-                    if (series)
-                        strm << ", ";
-                    strm << val;
-                    ++series;
-                }
-                strm << "]\n";
-                strm << "    }";
-                ++outputs;
-            }
-            if (outputs)
-                strm << "\n  ";
-            strm << "]\n";
-            strm << "}\n";
-            return strm;
-        }
-
-        void json_perf_times::add(
-            std::string const& name, std::string const& executor, double time)
-        {
-            m_map[key_t(name, executor)].push_back(time);
-        }
     }    // namespace detail
 
     void perftests_report(std::string const& name, std::string const& exec,
@@ -95,25 +60,20 @@ namespace hpx::util {
         if (steps == 0)
             return;
 
-        // First iteration to cache the data
-        test();
-        using timer = std::chrono::high_resolution_clock;
-        for (size_t i = 0; i != steps; ++i)
-        {
-            // For now we don't flush the cache
-            //flush_cache();
-            timer::time_point start = timer::now();
-            test();
-            // default is in seconds
-            auto time =
-                std::chrono::duration_cast<std::chrono::duration<double>>(
-                    timer::now() - start);
-            detail::add_time(name, exec, time.count());
-        }
+        std::size_t const steps_per_epoch = steps / NANOBENCH_EPOCHS + 1;
+
+        detail::bench()
+            .name(name)
+            .context("executor", exec)
+            .minEpochIterations(steps_per_epoch)
+            .run(test);
     }
 
-    void perftests_print_times()
+    void perftests_print_times(std::ostream& strm, char const* templ)
     {
-        std::cout << detail::times();
+        if (!templ)
+            templ = detail::nanobench_hpx_template();
+
+        detail::bench().render(templ, strm);
     }
 }    // namespace hpx::util

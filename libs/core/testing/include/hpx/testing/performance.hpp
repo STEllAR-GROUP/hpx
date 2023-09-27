@@ -10,6 +10,7 @@
 #include <hpx/functional/function.hpp>
 
 #include <cstddef>
+#include <iostream>
 #include <string>
 
 namespace hpx::util {
@@ -18,5 +19,8 @@ namespace hpx::util {
         std::string const& exec, std::size_t const steps,
         hpx::function<void()>&& test);
 
-    HPX_CORE_EXPORT void perftests_print_times();
+    // templ is a mustache-style template for the output
+    // used by the nanobench reporter
+    HPX_CORE_EXPORT void perftests_print_times(
+        std::ostream& strm = std::cout, char const* templ = nullptr);
 }    // namespace hpx::util
