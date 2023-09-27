@@ -26,7 +26,7 @@ This program will perform a matrix multiplication in parallel. The output will l
 
    Resultant Matrix is :
    124 93
-   111 127
+   130 82
 
 Setup
 =====
@@ -73,7 +73,7 @@ This should print:
 
    Resultant Matrix is :
    124 93
-   111 127
+   130 82
 
 Notice that the numbers may be different because of the random initialization of the matrices.
 
