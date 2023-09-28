@@ -7,7 +7,9 @@
 // This test should fail to compile
 
 #include <hpx/init.hpp>
-#include <hpx/type_support/uninitialized_relocate.hpp>
+#include <hpx/type_support/uninitialized_relocate_n_primitive.hpp>
+
+using hpx::experimental::util::uninitialized_relocate_n_primitive;
 
 int main(int argc, char* argv[])
 {
@@ -17,5 +19,5 @@ int main(int argc, char* argv[])
     int(*p)[10] = &a;
     int(*q)[10] = &b;
 
-    hpx::experimental::uninitialized_relocate(p, p + 1, q);
+    uninitialized_relocate_n_primitive(p, 1, q);
 }

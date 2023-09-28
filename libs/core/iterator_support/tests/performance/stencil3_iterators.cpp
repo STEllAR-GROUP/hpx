@@ -154,12 +154,12 @@ namespace hpx::experimental {
                 left_transformer;
             typedef next_transformer<IterEnd, IterValueEnd> right_transformer;
 
-            typedef util::transform_iterator<Iterator, left_transformer>
+            typedef ::hpx::util::transform_iterator<Iterator, left_transformer>
                 left_iterator;
-            typedef util::transform_iterator<Iterator, right_transformer>
+            typedef ::hpx::util::transform_iterator<Iterator, right_transformer>
                 right_iterator;
 
-            typedef util::detail::zip_iterator_base<
+            typedef ::hpx::util::detail::zip_iterator_base<
                 hpx::tuple<left_iterator, Iterator, right_iterator>,
                 stencil3_iterator_full<Iterator, IterBegin, IterValueBegin,
                     IterEnd, IterValueEnd>>
@@ -172,15 +172,16 @@ namespace hpx::experimental {
                 auto prev = make_previous_transformer(begin, begin_val);
                 auto next = make_next_transformer(end, end_val);
 
-                return type(hpx::make_tuple(util::transform_iterator(it, prev),
-                    it, util::transform_iterator(it, next)));
+                return type(
+                    hpx::make_tuple(::hpx::util::transform_iterator(it, prev),
+                        it, ::hpx::util::transform_iterator(it, next)));
             }
 
             static type create(Iterator const& it)
             {
                 return type(hpx::make_tuple(
-                    util::transform_iterator(it, left_transformer()), it,
-                    util::transform_iterator(it, right_transformer())));
+                    ::hpx::util::transform_iterator(it, left_transformer()), it,
+                    ::hpx::util::transform_iterator(it, right_transformer())));
             }
         };
     }    // namespace detail
@@ -284,12 +285,12 @@ std::uint64_t bench_stencil3_iterator_full()
 namespace hpx::experimental {
     template <typename Iterator>
     class stencil3_iterator_v1
-      : public util::detail::zip_iterator_base<
+      : public ::hpx::util::detail::zip_iterator_base<
             hpx::tuple<Iterator, Iterator, Iterator>,
             stencil3_iterator_v1<Iterator>>
     {
     private:
-        typedef util::detail::zip_iterator_base<
+        typedef ::hpx::util::detail::zip_iterator_base<
             hpx::tuple<Iterator, Iterator, Iterator>,
             stencil3_iterator_v1<Iterator>>
             base_type;
@@ -385,10 +386,11 @@ namespace hpx::experimental {
     template <typename Iterator,
         typename Transformer = detail::stencil_transformer_v2>
     class stencil3_iterator_v2
-      : public hpx::util::transform_iterator<Iterator, Transformer>
+      : public ::hpx::util::transform_iterator<Iterator, Transformer>
     {
     private:
-        typedef hpx::util::transform_iterator<Iterator, Transformer> base_type;
+        typedef ::hpx::util::transform_iterator<Iterator, Transformer>
+            base_type;
 
     public:
         stencil3_iterator_v2() {}

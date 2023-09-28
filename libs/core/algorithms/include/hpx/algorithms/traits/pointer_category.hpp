@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/type_support/is_contiguous_iterator.hpp>
 #include <hpx/type_support/is_relocatable.hpp>
 
 #include <type_traits>
@@ -145,7 +146,7 @@ namespace hpx::traits {
         {
             using type = std::conditional_t<
                 std::is_same_v<iter_value_t<Source>, iter_value_t<Dest>> &&
-                    is_relocatable_v<iter_value_t<Source>>,
+                    hpx::experimental::is_relocatable_v<iter_value_t<Source>>,
                 relocatable_pointer_tag, general_pointer_tag>;
         };
 
