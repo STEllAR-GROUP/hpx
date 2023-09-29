@@ -174,6 +174,7 @@ set(APEX_WITH_ACTIVEHARMONY "@APEX_WITH_ACTIVEHARMONY@")
 set(Activeharmony_ROOT "@Activeharmony_ROOT@")
 set(APEX_WITH_OTF2 "@APEX_WITH_OTF2@")
 set(Otf2_ROOT "@Otf2_ROOT@")
+set(Apex_ROOT "@Apex_ROOT@")
 include(HPX_SetupApex)
 # ##############################################################################
 
