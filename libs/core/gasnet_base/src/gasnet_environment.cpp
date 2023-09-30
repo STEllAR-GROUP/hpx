@@ -215,6 +215,7 @@ static inline void wait_done_obj(done_t* done, bool do_yield)
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
+
     namespace detail {
 
         bool detect_gasnet_environment(
