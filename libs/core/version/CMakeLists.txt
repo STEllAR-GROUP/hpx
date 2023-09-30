@@ -21,8 +21,9 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   set(additional_dependencies ${additional_dependencies} LCI::LCI)
 endif()
 if(HPX_WITH_NETWORKING
-    AND HPX_WITH_PARCELPORT_GASNET
-    AND HPX_WITH_PARCELPORT_GASNET_CONDUIT)
+   AND HPX_WITH_PARCELPORT_GASNET
+   AND HPX_WITH_PARCELPORT_GASNET_CONDUIT
+)
   include(HPX_SetupGasnet)
   hpx_setup_gasnet()
   set(additional_dependencies ${additional_dependencies} PkgConfig::GASNET)

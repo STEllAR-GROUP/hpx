@@ -1157,7 +1157,10 @@ if(HPX_WITH_NETWORKING)
     CATEGORY "Parcelport"
   )
   hpx_option(
-    HPX_WITH_FETCH_GASNET BOOL "Use FetchContent to fetch GASNET. By default an installed GASNET will be used. (default: OFF)." OFF
+    HPX_WITH_FETCH_GASNET
+    BOOL
+    "Use FetchContent to fetch GASNET. By default an installed GASNET will be used. (default: OFF)."
+    OFF
     CATEGORY "Build Targets"
     ADVANCED
   )
