@@ -614,7 +614,7 @@ namespace hpx::util {
             if(gasnet_environment::segments != nullptr) {
                delete gasnet_environment::segments;
             }
-            if(gasnet_environment::segments != segment_mutex) {
+            if(gasnet_environment::segment_mutex != nullptr) {
                delete gasnet_environment::segment_mutex;
             }
         }

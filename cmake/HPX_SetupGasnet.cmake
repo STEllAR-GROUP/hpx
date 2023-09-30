@@ -12,14 +12,12 @@ macro(hpx_setup_gasnet)
 
     find_package(PkgConfig REQUIRED QUIET COMPONENTS)
 
-    hpx_info(
-      "GASNet needs to be compiled with the following environment variables set during autoconf: `CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure ...`"
-    )
     pkg_search_module(
       GASNET IMPORTED_TARGET GLOBAL
       gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
     )
 
+message(STATUS "GASNET? ${GASNET_FOUND} ${HPX_WITH_FETCH_GASNET}")
     if((NOT GASNET_FOUND) AND HPX_WITH_FETCH_GASNET)
 
       if(NOT CMAKE_C_COMPILER)
@@ -35,6 +33,7 @@ macro(hpx_setup_gasnet)
         message(FATAL_ERROR "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}")
       endif()
 
+      message(STATUS "Fetching GASNET")
       include(FetchContent)
       FetchContent_Declare(gasnet
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE

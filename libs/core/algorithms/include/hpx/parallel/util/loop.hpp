@@ -93,49 +93,6 @@ namespace hpx::parallel::util {
             HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
                 ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
             {
-                return call(
-                    hpx::execution::seq, it, end, tok, HPX_FORWARD(F, f));
-            }
-
-            template <typename ExPolicy, typename Begin, typename End,
-                typename F,
-                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::unseq
-                    hpx::is_unsequenced_execution_policy_v<ExPolicy> &&
-                    !hpx::is_parallel_execution_policy_v<ExPolicy>)>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy, Begin it, End end, F&& f)
-            {
-                // clang-format off
-                HPX_IVDEP HPX_UNROLL HPX_VECTORIZE 
-                for (/**/; it != end; ++it)
-                {
-                    HPX_INVOKE(f, it);
-                }
-                // clang-format on
-
-                return it;
-            }
-
-            template <typename ExPolicy, typename Begin, typename End,
-                typename F,
-                HPX_CONCEPT_REQUIRES_(    // forces hpx::execution::seq
-                    hpx::is_sequenced_execution_policy_v<ExPolicy>)>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static constexpr Begin call(
-                ExPolicy&&, Begin it, End end, F&& f)
-            {
-                for (/**/; it != end; ++it)
-                {
-                    HPX_INVOKE(f, it);
-                }
-
-                return it;
-            }
-
-            template <typename ExPolicy, typename Begin, typename End,
-                typename CancelToken, typename F>
-            HPX_HOST_DEVICE HPX_FORCEINLINE static Begin call(
-                ExPolicy&& policy, Begin it, End end, CancelToken& tok, F&& f)
-            {
                 // check at the start of a partition only
                 if (tok.was_cancelled())
                     return it;
