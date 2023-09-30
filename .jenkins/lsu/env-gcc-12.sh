@@ -11,7 +11,6 @@ module load boost/1.80.0-${build_type,,}
 module load hwloc
 module load openmpi
 module load pwrapi/1.1.1
-module load gasnet/2023.3.0
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
