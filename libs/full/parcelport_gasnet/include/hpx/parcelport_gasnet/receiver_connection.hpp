@@ -106,7 +106,7 @@ namespace hpx::parcelset::policies::gasnet {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
                     hpx::util::gasnet_environment::scoped_lock l;
-		    unsigned long elem[2] = { 0, 0 };
+                    unsigned long elem[2] = {0, 0};
                     std::memcpy(elem,
                         hpx::util::gasnet_environment::segments[self_].addr,
                         static_cast<int>(buffer_.transmission_chunks_.size() *
