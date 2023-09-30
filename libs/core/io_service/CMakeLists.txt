@@ -7,13 +7,13 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(io_service_headers
-    hpx/io_service/io_service_pool.hpp hpx/io_service/io_service_pool.hpp
+    hpx/io_service/io_service_pool.hpp hpx/io_service/io_service_pool_fwd.hpp
     hpx/io_service/io_service_thread_pool.hpp
 )
 
 # cmake-format: off
 set(io_service_compat_headers
-    hpx/util/io_service_pool.hpp => hpx/modules/io_service.hpp
+    hpx/util/io_service_pool_fwd.hpp => hpx/modules/io_service.hpp
 )
 # cmake-format: on
 
