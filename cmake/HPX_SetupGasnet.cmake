@@ -13,70 +13,97 @@ macro(hpx_setup_gasnet)
     find_package(PkgConfig REQUIRED QUIET COMPONENTS)
 
     pkg_search_module(
-      GASNET IMPORTED_TARGET GLOBAL gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
+      GASNET IMPORTED_TARGET GLOBAL
+      gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
     )
 
     if((NOT GASNET_FOUND) AND HPX_WITH_FETCH_GASNET)
 
       if(NOT CMAKE_C_COMPILER)
-        message(FATAL_ERROR "HPX_WITH_FETCH_GASNET requires `-DCMAKE_C_COMPILER` to be set; CMAKE_C_COMPILER is currently unset.}")
+        message(
+          FATAL_ERROR
+            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_C_COMPILER` to be set; CMAKE_C_COMPILER is currently unset.}"
+        )
       endif()
       if(NOT CMAKE_CXX_COMPILER)
-        message(FATAL_ERROR "HPX_WITH_FETCH_GASNET requires `-DCMAKE_CXX_COMPILER` to be set; CMAKE_CXX_COMPILER is currently unset.}")
+        message(
+          FATAL_ERROR
+            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_CXX_COMPILER` to be set; CMAKE_CXX_COMPILER is currently unset.}"
+        )
       endif()
       if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi" AND NOT OFI_DIR)
-        message(FATAL_ERROR "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ofi AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}")
+        message(
+          FATAL_ERROR
+            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ofi AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}"
+        )
       endif()
       if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx" AND NOT UCX_DIR)
-        message(FATAL_ERROR "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}")
+        message(
+          FATAL_ERROR
+            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}"
+        )
       endif()
 
       message(STATUS "Fetching GASNET")
       include(FetchContent)
-      FetchContent_Declare(gasnet
+      fetchcontent_declare(
+        gasnet
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         URL https://gasnet.lbl.gov/EX/GASNet-2023.3.0.tar.gz
       )
 
       fetchcontent_getproperties(gasnet)
       if(NOT gasnet)
-        FetchContent_Populate(gasnet)
+        fetchcontent_populate(gasnet)
       endif()
 
-      message(STATUS "Building GASNET and installing into ${CMAKE_INSTALL_PREFIX}")
-      
+      message(
+        STATUS "Building GASNET and installing into ${CMAKE_INSTALL_PREFIX}"
+      )
+
       set(GASNET_DIR "${gasnet_SOURCE_DIR}")
       set(GASNET_BUILD_OUTPUT "${GASNET_DIR}/build.log")
       set(GASNET_ERROR_FILE "${GASNET_DIR}/error.log")
 
-      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "udp" OR "${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "smp")
+      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "udp"
+         OR "${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "smp"
+      )
         execute_process(
-	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
-	  WORKING_DIRECTORY ${GASNET_DIR}
-	  RESULT_VARIABLE GASNET_BUILD_STATUS
-	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
-	  ERROR_FILE ${GASNET_ERROR_FILE}
+          COMMAND
+            bash -c
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+          WORKING_DIRECTORY ${GASNET_DIR}
+          RESULT_VARIABLE GASNET_BUILD_STATUS
+          OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+          ERROR_FILE ${GASNET_ERROR_FILE}
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi")
         execute_process(
-	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
-	  WORKING_DIRECTORY ${GASNET_DIR}
-	  RESULT_VARIABLE GASNET_BUILD_STATUS
-	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
-	  ERROR_FILE ${GASNET_ERROR_FILE}
+          COMMAND
+            bash -c
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+          WORKING_DIRECTORY ${GASNET_DIR}
+          RESULT_VARIABLE GASNET_BUILD_STATUS
+          OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+          ERROR_FILE ${GASNET_ERROR_FILE}
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx")
         execute_process(
-  	  COMMAND bash -c "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
-	  WORKING_DIRECTORY ${GASNET_DIR}
-	  RESULT_VARIABLE GASNET_BUILD_STATUS
-	  OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
-	  ERROR_FILE ${GASNET_ERROR_FILE}
+          COMMAND
+            bash -c
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+          WORKING_DIRECTORY ${GASNET_DIR}
+          RESULT_VARIABLE GASNET_BUILD_STATUS
+          OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+          ERROR_FILE ${GASNET_ERROR_FILE}
         )
       endif()
-	        
+
       if(GASNET_BUILD_STATUS)
-        message(FATAL_ERROR "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details")
+        message(
+          FATAL_ERROR
+            "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
+        )
       endif()
 
       pkg_search_module(
@@ -253,10 +280,10 @@ macro(hpx_setup_gasnet)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS "${NEWLINK}")
           endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
+          else()
             set(NEWLINK "SHELL: ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
@@ -278,9 +305,7 @@ macro(hpx_setup_gasnet)
               endif()
             endforeach()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
+          string(FIND "SHELL:" "${NEWLINK}" IDX)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS "${NEWLINK}")
           endif()
@@ -376,10 +401,10 @@ macro(hpx_setup_gasnet)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS_OTHER "${NEWLINK}")
           endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
+          else()
             set(NEWLINK "SHELL: ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
@@ -401,9 +426,7 @@ macro(hpx_setup_gasnet)
               endif()
             endforeach()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
+          string(FIND "SHELL:" "${NEWLINK}" IDX)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS "${NEWLINK}")
           endif()
@@ -573,10 +596,10 @@ macro(hpx_setup_gasnet)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_STATIC_LDFLAGS "${NEWLINK}")
           endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
+          else()
             set(NEWLINK "SHELL: ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
@@ -598,9 +621,7 @@ macro(hpx_setup_gasnet)
               endif()
             endforeach()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
+          string(FIND "SHELL:" "${NEWLINK}" IDX)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS "${NEWLINK}")
           endif()
@@ -697,10 +718,10 @@ macro(hpx_setup_gasnet)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_STATIC_LDFLAGS_OTHER "${NEWLINK}")
           endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
+          else()
             set(NEWLINK "SHELL: ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
@@ -722,9 +743,7 @@ macro(hpx_setup_gasnet)
               endif()
             endforeach()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
+          string(FIND "SHELL:" "${NEWLINK}" IDX)
           if("${IDX}" EQUAL "-1")
             list(APPEND GASNET_LDFLAGS "${NEWLINK}")
           endif()
@@ -739,7 +758,8 @@ macro(hpx_setup_gasnet)
       PkgConfig::GASNET PROPERTIES INTERFACE_LINK_OPTIONS "${GASNET_LDFLAGS}"
     )
     set_target_properties(
-      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES "${GASNET_LIBRARY_DIRS}"
+      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                   "${GASNET_LIBRARY_DIRS}"
     )
 
   endif()
