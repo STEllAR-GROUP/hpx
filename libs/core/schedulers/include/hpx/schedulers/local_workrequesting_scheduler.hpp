@@ -221,11 +221,6 @@ namespace hpx::threads::policies {
             scheduler_data& operator=(scheduler_data const&) = delete;
             scheduler_data& operator=(scheduler_data&&) = delete;
 
-            scheduler_data(scheduler_data const&) = delete;
-            scheduler_data(scheduler_data&&) = delete;
-            scheduler_data& operator=(scheduler_data const&) = delete;
-            scheduler_data& operator=(scheduler_data&&) = delete;
-
             ~scheduler_data()
             {
                 delete queue_;
