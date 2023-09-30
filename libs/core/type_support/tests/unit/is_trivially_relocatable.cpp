@@ -278,9 +278,4 @@ static_assert(!is_trivially_relocatable_v<void>);
 static_assert(!is_trivially_relocatable_v<int()>);
 static_assert(!is_trivially_relocatable_v<int (&)()>);
 
-// Void and function types are not trivially relocatable
-static_assert(!hpx::is_trivially_relocatable_v<void>);
-static_assert(!hpx::is_trivially_relocatable_v<int()>);
-static_assert(!hpx::is_trivially_relocatable_v<int (&)()>);
-
 int main(int, char*[]) {}
