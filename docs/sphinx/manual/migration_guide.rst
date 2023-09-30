@@ -1639,11 +1639,6 @@ MPI_Alltoall
 -------------
 
 The following code gathers data from and scatters data to all processes.
-=======
-MPI_Alltoall
--------------
-
-The following code gathers data from and scatters data to all processes.
 
 |mpi| code:
 

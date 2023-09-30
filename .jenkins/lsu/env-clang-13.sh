@@ -25,6 +25,8 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
+configure_extra_options+=" -DHPX_WITH_FETCH_GASNET=ON"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET_CONDUIT=mpi"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo"
 
