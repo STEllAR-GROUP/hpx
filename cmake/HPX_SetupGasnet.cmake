@@ -22,26 +22,59 @@ macro(hpx_setup_gasnet)
       if(NOT CMAKE_C_COMPILER)
         message(
           FATAL_ERROR
-            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_C_COMPILER` to be set; CMAKE_C_COMPILER is currently unset.}"
+            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_C_COMPILER` to be set; CMAKE_C_COMPILER is currently unset."
         )
       endif()
       if(NOT CMAKE_CXX_COMPILER)
         message(
           FATAL_ERROR
-            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_CXX_COMPILER` to be set; CMAKE_CXX_COMPILER is currently unset.}"
+            "HPX_WITH_FETCH_GASNET requires `-DCMAKE_CXX_COMPILER` to be set; CMAKE_CXX_COMPILER is currently unset."
         )
       endif()
       if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi" AND NOT OFI_DIR)
         message(
           FATAL_ERROR
-            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ofi AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}"
+            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ofi AND HPX_WITH_FETCH_GASNET requires `-DOFI_DIR` to be set; OFI_DIR is currently unset."
         )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ofi")
+        pkg_search_module(
+          OFI
+          REQUIRED
+          IMPORTED_TARGET
+          GLOBAL
+          libfabric
+          libfabric-1.5
+          libfabric-1.7
+          libfabric-1.15
+        )
+        if(NOT OFI_FOUND)
+          message(
+            FATAL_ERROR
+              "libfabric 1.5, 1.7, or 1.15 was not found. Your `$PKG_CONFIG_PATH` or `-DOFI_DIR` may need to be updated"
+          )
+        endif()
       endif()
       if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx" AND NOT UCX_DIR)
         message(
           FATAL_ERROR
-            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset.}"
+            "HPX_WITH_PARCELPORT_GASNET_CONDUIT=ucx AND HPX_WITH_FETCH_GASNET requires `-DUCX_DIR` to be set; UCX_DIR is currently unset."
         )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "ucx")
+        pkg_search_module(
+          UCX
+          REQUIRED
+          IMPORTED_TARGET
+          GLOBAL
+          ucx
+          ucx-1.14.0
+          ucx-1.15.0
+        )
+        if(NOT UCX_FOUND)
+          message(
+            FATAL_ERROR
+              "UCX 1.14.0, or 1.15.0 was not found. Your `$PKG_CONFIG_PATH` or `-DUCX_DIR` may need to be updated"
+          )
+        endif()
       endif()
 
       message(STATUS "Fetching GASNET")
