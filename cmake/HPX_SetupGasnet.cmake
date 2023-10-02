@@ -11,6 +11,7 @@ macro(hpx_setup_gasnet)
   if(NOT TARGET PkgConfig::GASNET)
 
     find_package(PkgConfig REQUIRED QUIET COMPONENTS)
+    set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH TRUE)
 
     pkg_search_module(
       GASNET IMPORTED_TARGET GLOBAL
@@ -78,6 +79,10 @@ macro(hpx_setup_gasnet)
       endif()
 
       message(STATUS "Fetching GASNET")
+
+      set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+      set(ENV{PKG_CONFIG_PATH} "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+
       include(FetchContent)
       fetchcontent_declare(
         gasnet
