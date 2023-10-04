@@ -103,13 +103,21 @@ macro(hpx_setup_gasnet)
       set(GASNET_BUILD_OUTPUT "${GASNET_DIR}/build.log")
       set(GASNET_ERROR_FILE "${GASNET_DIR}/error.log")
 
-      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "udp"
-         OR "${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "smp"
-      )
+      if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "udp")
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-udp && make && make install"
+          WORKING_DIRECTORY ${GASNET_DIR}
+          RESULT_VARIABLE GASNET_BUILD_STATUS
+          OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+          ERROR_FILE ${GASNET_ERROR_FILE}
+        )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "smp")
+        execute_process(
+          COMMAND
+            bash -c
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-smp && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -143,8 +151,6 @@ macro(hpx_setup_gasnet)
             "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
         )
       else()
-        message(STATUS "INSTALLING GASNET to\t${CMAKE_INSTALL_PREFIX}")
-
         find_file(
           GASNET_PKGCONFIG_FILE_FOUND
           gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
@@ -153,7 +159,7 @@ macro(hpx_setup_gasnet)
         )
 
         if(NOT GASNET_PKGCONFIG_FILE_FOUND)
-          message(FATAL "ERROR INSTALLING GASNET")
+          message(FATAL_ERROR "ERROR INSTALLING GASNET")
         endif()
 
         file(
@@ -162,7 +168,7 @@ macro(hpx_setup_gasnet)
           GASNET_PKGCONFIG_FILE_CONTENT
         )
         if(NOT GASNET_PKGCONFIG_FILE_CONTENT)
-          message(FATAL "ERROR INSTALLING GASNET")
+          message(FATAL_ERROR "ERROR INSTALLING GASNET")
         endif()
 
         string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
@@ -176,10 +182,37 @@ macro(hpx_setup_gasnet)
           ${GASNET_PKGCONFIG_FILE_CONTENT}
         )
 
-        file(INSTALL ${GASNET_DIR}/install
-             DESTINATION ${CMAKE_INSTALL_PREFIX}/..
-        )
+        file(GLOB_RECURSE GASNET_FILES ${GASNET_DIR}/install/*)
 
+        if(NOT GASNET_FILES)
+          message(STATUS "ERROR INSTALLING GASNET")
+        endif()
+
+        foreach(GASNET_FILE ${GASNET_FILES})
+          set(GASNET_FILE_CACHED "${GASNET_FILE}")
+          string(REGEX
+                    MATCH "(^\/.*\/)"
+                    GASNET_FILE_PATH ${GASNET_FILE})
+
+          string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
+                         GASNET_FILE 
+                         ${GASNET_FILE})
+
+          string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
+             GASNET_FILE_PATH
+             ${GASNET_FILE_PATH})
+
+          file(MAKE_DIRECTORY ${GASNET_FILE_PATH})
+
+          string(LENGTH ${GASNET_FILE_PATH} GASNET_FILE_PATH_SIZE)
+          MATH(EXPR GASNET_FILE_PATH_SIZE "${GASNET_FILE_PATH_SIZE}-1")
+
+          string(SUBSTRING ${GASNET_FILE_PATH} 0 ${GASNET_FILE_PATH_SIZE} GASNET_FILE_PATH) 
+
+          file(COPY ${GASNET_FILE_CACHED}
+               DESTINATION ${GASNET_FILE_PATH}
+          )
+        endforeach()
       endif()
 
       pkg_search_module(
