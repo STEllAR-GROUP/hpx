@@ -159,7 +159,7 @@ macro(hpx_setup_gasnet)
         )
 
         if(NOT GASNET_PKGCONFIG_FILE_FOUND)
-          message(FATAL_ERROR "ERROR INSTALLING GASNET")
+          message(FATAL_ERROR "PKG-CONFIG ERROR (${GASNET_PKGCONFIG_FILE_FOUND}); CANNOT FIND COMPILED GASNET: ${GASNET_DIR}/install/lib/pkgconfig")
         endif()
 
         file(
@@ -209,7 +209,7 @@ macro(hpx_setup_gasnet)
                            GASNET_FILE_PATH
           )
 
-          file(COPY ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
+          file(INSTALL ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
         endforeach()
       endif()
 
