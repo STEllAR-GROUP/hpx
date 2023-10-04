@@ -109,7 +109,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -119,7 +119,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -129,7 +129,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-FPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${CMAKE_INSTALL_PREFIX} --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -142,6 +142,44 @@ macro(hpx_setup_gasnet)
           FATAL_ERROR
             "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
         )
+      else()
+        message(STATUS "INSTALLING GASNET to\t${CMAKE_INSTALL_PREFIX}")
+
+        find_file(
+          GASNET_PKGCONFIG_FILE_FOUND
+          gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
+          HINTS ${GASNET_DIR}/install/lib/pkgconfig
+          PATHS ${GASNET_DIR}/install/lib/pkgconfig
+        )
+
+        if(NOT GASNET_PKGCONFIG_FILE_FOUND)
+          message(FATAL "ERROR INSTALLING GASNET")
+        endif()
+
+        file(
+          READ
+          ${GASNET_DIR}/install/lib/pkgconfig/gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
+          GASNET_PKGCONFIG_FILE_CONTENT
+        )
+        if(NOT GASNET_PKGCONFIG_FILE_CONTENT)
+          message(FATAL "ERROR INSTALLING GASNET")
+        endif()
+
+        string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
+                       GASNET_PKGCONFIG_FILE_CONTENT
+                       ${GASNET_PKGCONFIG_FILE_CONTENT}
+        )
+
+        file(
+          WRITE
+          ${GASNET_DIR}/install/lib/pkgconfig/gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
+          ${GASNET_PKGCONFIG_FILE_CONTENT}
+        )
+
+        file(INSTALL ${GASNET_DIR}/install
+             DESTINATION ${CMAKE_INSTALL_PREFIX}/..
+        )
+
       endif()
 
       pkg_search_module(
