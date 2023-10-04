@@ -190,28 +190,26 @@ macro(hpx_setup_gasnet)
 
         foreach(GASNET_FILE ${GASNET_FILES})
           set(GASNET_FILE_CACHED "${GASNET_FILE}")
-          string(REGEX
-                    MATCH "(^\/.*\/)"
-                    GASNET_FILE_PATH ${GASNET_FILE})
+          string(REGEX MATCH "(^\/.*\/)" GASNET_FILE_PATH ${GASNET_FILE})
 
           string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
-                         GASNET_FILE 
-                         ${GASNET_FILE})
+                         GASNET_FILE ${GASNET_FILE}
+          )
 
           string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
-             GASNET_FILE_PATH
-             ${GASNET_FILE_PATH})
+                         GASNET_FILE_PATH ${GASNET_FILE_PATH}
+          )
 
           file(MAKE_DIRECTORY ${GASNET_FILE_PATH})
 
           string(LENGTH ${GASNET_FILE_PATH} GASNET_FILE_PATH_SIZE)
-          MATH(EXPR GASNET_FILE_PATH_SIZE "${GASNET_FILE_PATH_SIZE}-1")
+          math(EXPR GASNET_FILE_PATH_SIZE "${GASNET_FILE_PATH_SIZE}-1")
 
-          string(SUBSTRING ${GASNET_FILE_PATH} 0 ${GASNET_FILE_PATH_SIZE} GASNET_FILE_PATH) 
-
-          file(COPY ${GASNET_FILE_CACHED}
-               DESTINATION ${GASNET_FILE_PATH}
+          string(SUBSTRING ${GASNET_FILE_PATH} 0 ${GASNET_FILE_PATH_SIZE}
+                           GASNET_FILE_PATH
           )
+
+          file(COPY ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
         endforeach()
       endif()
 
