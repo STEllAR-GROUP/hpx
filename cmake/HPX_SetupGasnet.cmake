@@ -151,6 +151,9 @@ macro(hpx_setup_gasnet)
             "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
         )
       else()
+        set(CMAKE_PREFIX_PATH "${GASNET_DIR}/install/lib/pkgconfig")
+        set(ENV{PKG_CONFIG_PATH} "${GASNET_DIR}/install/lib/pkgconfig")
+
         find_file(
           GASNET_PKGCONFIG_FILE_FOUND
           gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
@@ -212,6 +215,9 @@ macro(hpx_setup_gasnet)
           file(INSTALL ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
         endforeach()
       endif()
+
+      set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+      set(ENV{PKG_CONFIG_PATH} "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
 
       pkg_search_module(
         GASNET REQUIRED IMPORTED_TARGET GLOBAL
