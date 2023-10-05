@@ -151,18 +151,15 @@ macro(hpx_setup_gasnet)
             "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
         )
       else()
-        set(CMAKE_PREFIX_PATH "${GASNET_DIR}/install/lib/pkgconfig")
-        set(ENV{PKG_CONFIG_PATH} "${GASNET_DIR}/install/lib/pkgconfig")
 
         find_file(
           GASNET_PKGCONFIG_FILE_FOUND
           gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
-          HINTS ${GASNET_DIR}/install/lib/pkgconfig
-          PATHS ${GASNET_DIR}/install/lib/pkgconfig
+          ${GASNET_DIR}/install/lib/pkgconfig
         )
 
         if(NOT GASNET_PKGCONFIG_FILE_FOUND)
-          message(FATAL_ERROR "PKG-CONFIG ERROR (${GASNET_PKGCONFIG_FILE_FOUND}); CANNOT FIND COMPILED GASNET: ${GASNET_DIR}/install/lib/pkgconfig")
+          message(FATAL_ERROR "PKG-CONFIG ERROR (${GASNET_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED GASNET: ${GASNET_DIR}/install/lib/pkgconfig")
         endif()
 
         file(
@@ -170,6 +167,7 @@ macro(hpx_setup_gasnet)
           ${GASNET_DIR}/install/lib/pkgconfig/gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
           GASNET_PKGCONFIG_FILE_CONTENT
         )
+
         if(NOT GASNET_PKGCONFIG_FILE_CONTENT)
           message(FATAL_ERROR "ERROR INSTALLING GASNET")
         endif()
@@ -212,7 +210,7 @@ macro(hpx_setup_gasnet)
                            GASNET_FILE_PATH
           )
 
-          file(INSTALL ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
+          file(COPY ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
         endforeach()
       endif()
 
