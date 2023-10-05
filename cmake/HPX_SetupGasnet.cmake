@@ -152,14 +152,16 @@ macro(hpx_setup_gasnet)
         )
       else()
 
-        find_file(
-          GASNET_PKGCONFIG_FILE_FOUND
-          gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
-          ${GASNET_DIR}/install/lib/pkgconfig
+        find_file(GASNET_PKGCONFIG_FILE_FOUND
+                  gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
+                  ${GASNET_DIR}/install/lib/pkgconfig
         )
 
         if(NOT GASNET_PKGCONFIG_FILE_FOUND)
-          message(FATAL_ERROR "PKG-CONFIG ERROR (${GASNET_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED GASNET: ${GASNET_DIR}/install/lib/pkgconfig")
+          message(
+            FATAL_ERROR
+              "PKG-CONFIG ERROR (${GASNET_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED GASNET: ${GASNET_DIR}/install/lib/pkgconfig"
+          )
         endif()
 
         file(
