@@ -16,6 +16,39 @@ to harness the full potential of distributed computing. Here, you'll find a comp
 list of header files, classes and functions for various distributed computing features
 provided by |hpx|.
 
+.. _public_distr_api_header_barrier:
+
+``hpx/barrier.hpp``
+===================
+
+The header :hpx-header:`libs/full/include/include,hpx/barrier.hpp` includes
+a distributed barrier implementation. For information regarding the C++ standard
+library header :cppreference-header:`barrier`, see :ref:`public_api`.
+
+Classes
+-------
+
+.. table:: Distributed implementation of classes of header ``hpx/barrier.hpp``
+
+   +----------------------------------------+
+   | Class                                  |
+   +========================================+
+   | :cpp:class:`hpx::distributed::barrier` |
+   +----------------------------------------+
+
+Functions
+---------
+
+.. table:: `hpx` functions of header ``hpx/barrier.hpp``
+
+   +-------------------------------------------+
+   | Function                                  |
+   +===========================================+
+   | :cpp:func:`hpx::distributed::wait`        |
+   +-------------------------------------------+
+   | :cpp:func:`hpx::distributed::synchronize` |
+   +-------------------------------------------+
+
 .. _public_distr_api_header_collectives:
 
 ``hpx/collectives.hpp``
@@ -30,11 +63,27 @@ Classes
 .. table:: `hpx` classes of header ``hpx/collectives.hpp``
 
    +-----------------------------------------------------+
-   | Function                                            |
+   | Class                                            |
    +=====================================================+
-   | :cpp:class:`hpx::collectives::barrier`              |
+   | :cpp:struct:`hpx::collectives::num_sites_arg`       |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::this_site_arg`       |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::that_site_arg`       |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::generation_arg`      |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::root_site_arg`       |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::tag_arg`             |
+   +-----------------------------------------------------+
+   | :cpp:struct:`hpx::collectives::arity_arg`           |
+   +-----------------------------------------------------+
+   | :cpp:class:`hpx::collectives::communicator`         |
    +-----------------------------------------------------+
    | :cpp:class:`hpx::collectives::channel_communicator` |
+   +-----------------------------------------------------+
+   | :cpp:class:`hpx::collectives::communicator`         |
    +-----------------------------------------------------+
 
 Functions
@@ -67,6 +116,12 @@ Functions
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::create_local_communicator`   |
    +-----------------------------------------------------------+
+   | :cpp:func:`hpx::collectives::set_info`                    |
+   +-----------------------------------------------------------+
+   | :cpp:func:`hpx::collectives::get_info`                    |
+   +-----------------------------------------------------------+
+   | :cpp:func:`hpx::collectives::is_root`                     |
+   +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::exclusive_scan`              |
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::gather_here`                 |
@@ -84,3 +139,43 @@ Functions
    | :cpp:func:`hpx::collectives::scatter_to`                  |
    +-----------------------------------------------------------+
 
+.. _public_distr_api_header_latch:
+
+``hpx/latch.hpp``
+=================
+
+The header :hpx-header:`libs/full/include/include,hpx/latch.hpp` includes
+a distributed latch implementation. For information regarding the C++ standard
+library header :cppreference-header:`latch`, see :ref:`public_api`.
+
+Classes
+-------
+
+.. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
+
+   +--------------------------------------+
+   | Class                                |
+   +======================================+
+   | :cpp:class:`hpx::distributed::latch` |
+   +--------------------------------------+
+
+Functions
+---------
+
+.. table:: `hpx` functions of header ``hpx/latch.hpp``
+
+   +---------------------------------------------------+
+   | Function                                          |
+   +===================================================+
+   | :cpp:func:`hpx::distributed::count_down_and_wait` |
+   +---------------------------------------------------+
+   | :cpp:func:`hpx::distributed::arrive_and_wait`     |
+   +---------------------------------------------------+
+   | :cpp:func:`hpx::distributed::count_down`          |
+   +---------------------------------------------------+
+   | :cpp:func:`hpx::distributed::is_ready`            |
+   +---------------------------------------------------+
+   | :cpp:func:`hpx::distributed::try_wait`            |
+   +---------------------------------------------------+
+   | :cpp:func:`hpx::distributed::wait`                |
+   +---------------------------------------------------+
