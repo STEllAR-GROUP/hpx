@@ -83,6 +83,8 @@ Classes
    +-----------------------------------------------------+
    | :cpp:class:`hpx::collectives::channel_communicator` |
    +-----------------------------------------------------+
+   | :cpp:class:`hpx::collectives::communicator`         |
+   +-----------------------------------------------------+
 
 Functions
 ---------
@@ -177,15 +179,3 @@ Functions
    +---------------------------------------------------+
    | :cpp:func:`hpx::distributed::wait`                |
    +---------------------------------------------------+
-=======
-.. table:: `hpx` functions of header ``hpx/collectives/all_to_all.hpp``
-
-   +------------------------------------------+
-   | Function                                 |
-   +==========================================+
-   | :cpp:func:`hpx::collectives::all_to_all` |
-   +------------------------------------------+
-
-.. _public_distr_api_header_argument_types:
-
-``hpx/collectives/argument_types.hpp``
