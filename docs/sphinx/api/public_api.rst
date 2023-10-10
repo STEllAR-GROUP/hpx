@@ -524,7 +524,7 @@ Classes
    :cpp:class:`hpx::promise`, but will eventually refer to
    :cpp:class:`hpx::promise` after a deprecation period.
 
-.. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
+.. table:: Distributed implementation of classes of header ``hpx/future.hpp``
 
    +---------------------------------------+
    | Class                                 |
