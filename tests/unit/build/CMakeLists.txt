@@ -42,6 +42,9 @@ function(
     set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
                                  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
     )
+    set(ADDITIONAL_CMAKE_OPTIONS ${ADDITIONAL_CMAKE_OPTIONS}
+                                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    )
   else()
     set(ADDITIONAL_CMAKE_OPTIONS
         ${ADDITIONAL_CMAKE_OPTIONS}
@@ -86,7 +89,7 @@ function(create_pkgconfig_test name hpx_dir)
       "${CMAKE_COMMAND}" -E chdir "${build_dir}" make -f
       "${PROJECT_SOURCE_DIR}/examples/hello_world_component/Makefile"
       SRC_DIR=${PROJECT_SOURCE_DIR}/examples/hello_world_component
-      HPX_DIR=${hpx_dir} CXX=${CMAKE_CXX_COMPILER}
+      HPX_DIR=${hpx_dir} CXX=${CMAKE_CXX_COMPILER} CC=${CMAKE_C_COMPILER}
       CXX_FLAGS=${CMAKE_CXX_FLAGS_SAFE} PKG_CONFIG=${PKG_CONFIG_EXECUTABLE}
       BUILD_TYPE=$<CONFIGURATION>
     VERBATIM
