@@ -143,6 +143,30 @@ macro(hpx_setup_gasnet)
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
           ERROR_FILE ${GASNET_ERROR_FILE}
         )
+      elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+        if(NOT MPI_FOUND)
+          message(
+            FATAL_ERROR
+            "GASNet MPI Conduit selected; MPI not found!"
+          )
+        endif()
+
+        if(NOT TARGET Mpi::mpi)
+          message(
+            FATAL_ERROR
+            "GASNet MPI Conduit selected; MPI not found!"
+          )
+        endif()
+
+        execute_process(
+          COMMAND
+            bash -c
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${MPI_C_COMPILER} --with-mpi-cflags=${MPI_C_COMPILER_FLAGS} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+          WORKING_DIRECTORY ${GASNET_DIR}
+          RESULT_VARIABLE GASNET_BUILD_STATUS
+          OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+          ERROR_FILE ${GASNET_ERROR_FILE}
+        )
       endif()
 
       if(GASNET_BUILD_STATUS)
@@ -164,60 +188,68 @@ macro(hpx_setup_gasnet)
           )
         endif()
 
-        file(
-          READ
-          ${GASNET_DIR}/install/lib/pkgconfig/gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
-          GASNET_PKGCONFIG_FILE_CONTENT
-        )
+        install(CODE "set(GASNET_CONDUIT \"${HPX_WITH_PARCELPORT_GASNET_CONDUIT}\")")
+        install(CODE "set(GASNET_PATH \"${GASNET_DIR}\")")
 
-        if(NOT GASNET_PKGCONFIG_FILE_CONTENT)
-          message(FATAL_ERROR "ERROR INSTALLING GASNET")
-        endif()
-
-        string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
-                       GASNET_PKGCONFIG_FILE_CONTENT
-                       ${GASNET_PKGCONFIG_FILE_CONTENT}
-        )
-
-        file(
-          WRITE
-          ${GASNET_DIR}/install/lib/pkgconfig/gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
-          ${GASNET_PKGCONFIG_FILE_CONTENT}
-        )
-
-        file(GLOB_RECURSE GASNET_FILES ${GASNET_DIR}/install/*)
-
-        if(NOT GASNET_FILES)
-          message(STATUS "ERROR INSTALLING GASNET")
-        endif()
-
-        foreach(GASNET_FILE ${GASNET_FILES})
-          set(GASNET_FILE_CACHED "${GASNET_FILE}")
-          string(REGEX MATCH "(^\/.*\/)" GASNET_FILE_PATH ${GASNET_FILE})
-
-          string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
-                         GASNET_FILE ${GASNET_FILE}
+        install(CODE [[
+          file(
+            READ
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet-${GASNET_CONDUIT}-par.pc
+            GASNET_PKGCONFIG_FILE_CONTENT
           )
 
-          string(REPLACE "${GASNET_DIR}/install" "${CMAKE_INSTALL_PREFIX}"
-                         GASNET_FILE_PATH ${GASNET_FILE_PATH}
+          if(NOT GASNET_PKGCONFIG_FILE_CONTENT)
+            message(FATAL_ERROR "ERROR INSTALLING GASNET")
+          endif()
+
+          string(REPLACE "${GASNET_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                         GASNET_PKGCONFIG_FILE_CONTENT
+                         ${GASNET_PKGCONFIG_FILE_CONTENT}
           )
 
-          file(MAKE_DIRECTORY ${GASNET_FILE_PATH})
-
-          string(LENGTH ${GASNET_FILE_PATH} GASNET_FILE_PATH_SIZE)
-          math(EXPR GASNET_FILE_PATH_SIZE "${GASNET_FILE_PATH_SIZE}-1")
-
-          string(SUBSTRING ${GASNET_FILE_PATH} 0 ${GASNET_FILE_PATH_SIZE}
-                           GASNET_FILE_PATH
+          file(
+            WRITE
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet-${GASNET_CONDUIT}-par.pc
+            ${GASNET_PKGCONFIG_FILE_CONTENT}
           )
 
-          file(COPY ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
-        endforeach()
+          file(GLOB_RECURSE GASNET_FILES ${GASNET_PATH}/install/*)
+
+          if(NOT GASNET_FILES)
+            message(STATUS "ERROR INSTALLING GASNET")
+          endif()
+
+          foreach(GASNET_FILE ${GASNET_FILES})
+            set(GASNET_FILE_CACHED "${GASNET_FILE}")
+
+            string(REGEX MATCH "(^\/.*\/)" GASNET_FILE_PATH ${GASNET_FILE})
+
+            string(REPLACE "${GASNET_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                           GASNET_FILE ${GASNET_FILE}
+            )
+
+            string(REPLACE "${GASNET_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                           GASNET_FILE_PATH ${GASNET_FILE_PATH}
+            )
+        
+            file(MAKE_DIRECTORY ${GASNET_FILE_PATH})
+        
+            string(LENGTH ${GASNET_FILE_PATH} GASNET_FILE_PATH_SIZE)
+            math(EXPR GASNET_FILE_PATH_SIZE "${GASNET_FILE_PATH_SIZE}-1")
+        
+            string(SUBSTRING ${GASNET_FILE_PATH} 0 ${GASNET_FILE_PATH_SIZE}
+                             GASNET_FILE_PATH
+            )
+        
+            file(COPY ${GASNET_FILE_CACHED} DESTINATION ${GASNET_FILE_PATH})
+          endforeach()
+        ]])
+
+        #install(FILES ${GASNET_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX})
       endif()
 
-      set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
-      set(ENV{PKG_CONFIG_PATH} "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+      set(CMAKE_PREFIX_PATH "${GASNET_DIR}/install/lib/pkgconfig")
+      set(ENV{PKG_CONFIG_PATH} "${GASNET_DIR}/install/lib/pkgconfig")
 
       pkg_search_module(
         GASNET REQUIRED IMPORTED_TARGET GLOBAL
@@ -864,16 +896,33 @@ macro(hpx_setup_gasnet)
       endif()
     endif()
 
-    set_target_properties(
-      PkgConfig::GASNET PROPERTIES INTERFACE_COMPILE_OPTIONS "${GASNET_CFLAGS}"
-    )
-    set_target_properties(
-      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_OPTIONS "${GASNET_LDFLAGS}"
-    )
-    set_target_properties(
-      PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                   "${GASNET_LIBRARY_DIRS}"
-    )
+    if(GASNET_DIR)
+      list(TRANSFORM GASNET_CFLAGS REPLACE "${GASNET_DIR}/install" "$<BUILD_INTERFACE:${GASNET_DIR}/install>")
+      list(TRANSFORM GASNET_LDFLAGS REPLACE "${GASNET_DIR}/install" "$<BUILD_INTERFACE:${GASNET_DIR}/install>")
+      list(TRANSFORM GASNET_LIBRARY_DIRS REPLACE "${GASNET_DIR}/install" "$<BUILD_INTERFACE:${GASNET_DIR}/install>")
+
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_COMPILE_OPTIONS "${GASNET_CFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_LINK_OPTIONS "${GASNET_LDFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                     "${GASNET_LIBRARY_DIRS}"
+      )
+    else()
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_COMPILE_OPTIONS "${GASNET_CFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_LINK_OPTIONS "${GASNET_LDFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::GASNET PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                     "${GASNET_LIBRARY_DIRS}"
+      )
+    endif()
 
   endif()
 
