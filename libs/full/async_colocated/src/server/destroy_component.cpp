@@ -33,7 +33,7 @@ namespace hpx::components::server {
             agas::is_local_address_cached(gid, addr))
         {
             // Check if component was migrated, we are not interested in pinning
-            // the object as it is supposed to be destroyed anyways that is, no
+            // the object as it is supposed to be destroyed anyway - that is, no
             // one else has a handle to it anymore
 
             // The object is local, we can destroy it locally...
@@ -44,7 +44,8 @@ namespace hpx::components::server {
                 if (naming::refers_to_virtual_memory(gid))
                 {
                     // simply delete the memory
-                    delete[] hpx::bit_cast<std::uint8_t*>(gid.get_lsb());
+                    delete[] hpx::bit_cast<std::uint8_t*>(
+                        static_cast<std::size_t>(gid.get_lsb()));
                     return;
                 }
 
