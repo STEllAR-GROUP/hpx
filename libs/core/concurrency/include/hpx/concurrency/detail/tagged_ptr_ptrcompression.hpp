@@ -55,7 +55,7 @@ namespace hpx::lockfree::detail {
 
         static constexpr T* extract_ptr(compressed_ptr_t i) noexcept
         {
-            return hpx::bit_cast<T*>(i & ptr_mask);
+            return hpx::bit_cast<T*>(static_cast<std::size_t>(i & ptr_mask));
         }
 
         static constexpr tag_t extract_tag(compressed_ptr_t i) noexcept
