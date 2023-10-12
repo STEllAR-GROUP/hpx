@@ -156,7 +156,7 @@ distributed applications similarly to how you would write applications for a
 single node (see :ref:`why_hpx` and
 :ref:`writing_distributed_hpx_applications`).
 
-If you are already familiar with ``async`` and ``future``\ s from the C++ standard
+If you are already familiar with ``async`` and ``future`` from the C++ standard
 library, the same functionality is available in |hpx|.
 
 The following terminology is essential when talking about task-based C++
