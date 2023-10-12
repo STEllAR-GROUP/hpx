@@ -14,13 +14,13 @@
 #include <cstring>
 #include <type_traits>
 
-#if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
+#if defined(__cpp_lib_trivially_relocatable)
 #include <memory>
 #endif
 
 namespace hpx::experimental::util {
 
-#if defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
+#if defined(__cpp_lib_trivially_relocatable)
     using std::uninitialized_relocate;
 #else
 
@@ -80,6 +80,9 @@ namespace hpx::experimental::util {
             // clang-format on
         };
 
+        //////////////////////////////
+        // uninitialized_relocate_n //
+        //////////////////////////////
         template <typename InIter, typename Size, typename FwdIter>
         FwdIter uninitialized_relocate_n_primitive_helper(
             InIter first, Size n, FwdIter dst, buffer_memcpy_tag) noexcept
@@ -158,8 +161,142 @@ namespace hpx::experimental::util {
             return dst;
         }
 
+        ////////////////////////////
+        // uninitialized_relocate //
+        ////////////////////////////
+        template <typename InIter, typename Sent, typename FwdIter>
+        FwdIter uninitialized_relocate_primitive_helper(
+            InIter first, Sent last, FwdIter dst, buffer_memcpy_tag) noexcept
+        {
+            return uninitialized_relocate_n_primitive_helper(
+                first, std::distance(first, last), dst, buffer_memcpy_tag{});
+        }
+
+        template <typename InIter, typename Sent, typename FwdIter>
+        // Either the buffer is not contiguous or the types are no-throw
+        // move constructible but not trivially relocatable
+        FwdIter uninitialized_relocate_primitive_helper(
+            InIter first, Sent last, FwdIter dst, for_loop_nothrow_tag) noexcept
+        {
+            for (; first != last; ++first, ++dst)
+            {
+                // if the type is trivially relocatable this will be a memcpy
+                // otherwise it will be a move + destroy
+                hpx::experimental::detail::relocate_at_helper(
+                    std::addressof(*first), std::addressof(*dst));
+            }
+
+            return dst;
+        }
+
+        template <typename InIter, typename Sent, typename FwdIter>
+        FwdIter uninitialized_relocate_primitive_helper(
+            InIter first, Sent last, FwdIter dst, for_loop_try_catch_tag)
+        {
+            FwdIter original_dst = dst;
+
+            for (; first != last; ++first, ++dst)
+            {
+                try
+                {
+                    // the move + destroy version will be used
+                    hpx::experimental::detail::relocate_at_helper(
+                        std::addressof(*first), std::addressof(*dst));
+                }
+                catch (...)
+                {
+                    // destroy all objects other that the one
+                    // that caused the exception
+                    // (relocate_at already destroyed that one)
+
+                    // destroy all objects constructed so far
+                    std::destroy(original_dst, dst);
+                    // destroy all the objects not relocated yet
+                    std::destroy(++first, last);
+
+                    throw;
+                }
+            }
+
+            return dst;
+        }
+
+        /////////////////////////////////////
+        // uninitialized_relocate_backward //
+        /////////////////////////////////////
+        template <typename BiIter1, typename BiIter2>
+        BiIter2 uninitialized_relocate_backward_primitive_helper(BiIter1 first,
+            BiIter1 last, BiIter2 dst_last, buffer_memcpy_tag) noexcept
+        {
+            // Here we know the iterators are contiguous
+            // So calculating the distance and the previous
+            // iterator is O(1)
+            auto n_objects = std::distance(first, last);
+            BiIter2 dst_first = std::prev(dst_last, n_objects);
+
+            return uninitialized_relocate_n_primitive_helper(
+                first, n_objects, dst_first, buffer_memcpy_tag{});
+        }
+
+        template <typename BiIter1, typename BiIter2>
+        // Either the buffer is not contiguous or the types are no-throw
+        // move constructible but not trivially relocatable
+        // dst_last is one past the last element of the destination
+        BiIter2 uninitialized_relocate_backward_primitive_helper(BiIter1 first,
+            BiIter1 last, BiIter2 dst_last, for_loop_nothrow_tag) noexcept
+        {
+            while (first != last)
+            {
+                // if the type is trivially relocatable this will be a memcpy
+                // otherwise it will be a move + destroy
+                std::advance(last, -1);
+                std::advance(dst_last, -1);
+                hpx::experimental::detail::relocate_at_helper(
+                    std::addressof(*last), std::addressof(*dst_last));
+            }
+
+            return dst_last;
+        }
+
+        template <typename InIter, typename Sent, typename FwdIter>
+        FwdIter uninitialized_relocate_backward_primitive_helper(
+            InIter first, Sent last, FwdIter dst_last, for_loop_try_catch_tag)
+        {
+            FwdIter original_dst_last = dst_last;
+
+            while (first != last)
+            {
+                try
+                {
+                    std::advance(last, -1);
+                    std::advance(dst_last, -1);
+                    // the move + destroy version will be used
+                    hpx::experimental::detail::relocate_at_helper(
+                        std::addressof(*last), std::addressof(*dst_last));
+                }
+                catch (...)
+                {
+                    // destroy all objects other that the one
+                    // that caused the exception
+                    // (relocate_at already destroyed that one)
+
+                    // destroy all objects constructed so far
+                    std::destroy(++dst_last, original_dst_last);
+                    // destroy all the objects not relocated yet
+                    std::destroy(first, last);
+
+                    throw;
+                }
+            }
+
+            return dst_last;
+        }
+
     }    // namespace detail
 
+    //////////////////////////////
+    // uninitialized_relocate_n //
+    //////////////////////////////
     template <typename InIter, typename FwdIter, typename Size,
         typename iterators_are_contiguous_t>
     // clang-format off
@@ -192,6 +329,79 @@ namespace hpx::experimental::util {
             first, n, dst, iterators_are_contiguous_default_t{});
     }
 
-#endif    // defined(HPX_HAVE_P1144_STD_RELOCATE_AT)
+    ////////////////////////////
+    // uninitialized_relocate //
+    ////////////////////////////
+    template <typename InIter, typename Sent, typename FwdIter,
+        typename iterators_are_contiguous_t>
+    // clang-format off
+    FwdIter uninitialized_relocate_primitive(InIter first, Sent last,
+        FwdIter dst, iterators_are_contiguous_t) noexcept(
+            detail::relocation_traits<InIter, FwdIter>::is_noexcept_relocatable_v)
+    // clang-format on
+    {
+        // TODO CHECK SENT
+        static_assert(
+            detail::relocation_traits<InIter, FwdIter>::valid_relocation,
+            "uninitialized_move(first, last, dst) must be well-formed");
+
+        using implementation_tag = typename detail::relocation_traits<InIter,
+            FwdIter, iterators_are_contiguous_t::value>::implementation_tag;
+
+        return detail::uninitialized_relocate_primitive_helper(
+            first, last, dst, implementation_tag{});
+    }
+
+    template <typename InIter, typename Sent, typename FwdIter>
+    FwdIter uninitialized_relocate_primitive(InIter first, Sent last,
+        FwdIter dst) noexcept(detail::relocation_traits<InIter,
+        FwdIter>::is_noexcept_relocatable_v)
+    {
+        using iterators_are_contiguous_default_t =
+            std::bool_constant<hpx::traits::is_contiguous_iterator_v<InIter> &&
+                hpx::traits::is_contiguous_iterator_v<FwdIter>>;
+
+        return uninitialized_relocate_primitive(
+            first, last, dst, iterators_are_contiguous_default_t{});
+    }
+
+    /////////////////////////////////////
+    // uninitialized_relocate_backward //
+    /////////////////////////////////////
+    template <typename BiIter1, typename BiIter2,
+        typename iterators_are_contiguous_t>
+    // clang-format off
+    BiIter2 uninitialized_relocate_backward_primitive(BiIter1 first, BiIter1 last,
+        BiIter2 dst_last, iterators_are_contiguous_t) noexcept(
+            detail::relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
+    // clang-format on
+    {
+        // TODO CHECK SENT
+        static_assert(
+            detail::relocation_traits<BiIter1, BiIter2>::valid_relocation,
+            "uninitialized_move(first, last, dst) must be well-formed");
+
+        using implementation_tag = typename detail::relocation_traits<BiIter1,
+            BiIter2, iterators_are_contiguous_t::value>::implementation_tag;
+
+        return detail::uninitialized_relocate_backward_primitive_helper(
+            first, last, dst_last, implementation_tag{});
+    }
+
+    template <typename BiIter1, typename BiIter2>
+    BiIter2 uninitialized_relocate_backward_primitive(BiIter1 first,
+        BiIter1 last,
+        BiIter2 dst_last) noexcept(detail::relocation_traits<BiIter1,
+        BiIter2>::is_noexcept_relocatable_v)
+    {
+        using iterators_are_contiguous_default_t =
+            std::bool_constant<hpx::traits::is_contiguous_iterator_v<BiIter1> &&
+                hpx::traits::is_contiguous_iterator_v<BiIter2>>;
+
+        return uninitialized_relocate_backward_primitive(
+            first, last, dst_last, iterators_are_contiguous_default_t{});
+    }
+
+#endif    // defined(__cpp_lib_trivially_relocatable)
 
 }    // namespace hpx::experimental::util
