@@ -437,11 +437,9 @@ namespace hpx::parallel {
                 FwdIter dest) noexcept(hpx::experimental::util::detail::relocation_traits<
                     InIter1, FwdIter>::is_noexcept_relocatable_v)
             {
-                auto count = std::distance(first, last);
-
                 return util::in_out_result<InIter1, FwdIter>{first,
-                    hpx::experimental::util::uninitialized_relocate_n_primitive(
-                        first, count, dest)};
+                    hpx::experimental::util::uninitialized_relocate_primitive(
+                        first, last, dest)};
             }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -465,6 +463,64 @@ namespace hpx::parallel {
 
                 return parallel_uninitialized_relocate_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
+            }
+        };
+        /// \endcond
+
+        /////////////////////////////////////////////////////////////////////////////
+        // uninitialized_relocate_backward
+        /// \cond NOINTERNAL
+        template <typename IterPair>
+        struct uninitialized_relocate_backward
+          : public algorithm<uninitialized_relocate_backward<IterPair>,
+                IterPair>
+        {
+            constexpr uninitialized_relocate_backward() noexcept
+              : algorithm<uninitialized_relocate_backward, IterPair>(
+                    "uninitialized_relocate_backward")
+            {
+            }
+
+            // non vectorized overload
+            template <typename ExPolicy, typename BiIter1, typename BiIter2,
+                // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_sequenced_execution_policy_v<ExPolicy>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                )>
+            //  clang-format on
+            static util::in_out_result<BiIter1, BiIter2> sequential(
+                ExPolicy&&, BiIter1 first, BiIter1 last,
+                BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
+                relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
+            {
+                return util::in_out_result<BiIter1, BiIter2>{first,
+                    hpx::experimental::util::uninitialized_relocate_backward_primitive(
+                        first, last, dest_last)};
+            }
+
+            template <typename ExPolicy, typename BiIter1, typename BiIter2,
+            // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_execution_policy_v<ExPolicy>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                )>
+            // clang-format on
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<BiIter1, BiIter2>>
+            parallel(ExPolicy&& policy, BiIter1 first, BiIter1 last,
+                BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
+                    relocation_traits<BiIter1,
+                        BiIter2>::is_noexcept_relocatable_v)
+            {
+                auto count = std::distance(first, last);
+
+                auto dest_first = std::prev(dest_last, count);
+
+                return parallel_uninitialized_relocate_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest_first);
             }
         };
         /// \endcond
@@ -644,5 +700,87 @@ namespace hpx::experimental {
                     .call(HPX_FORWARD(ExPolicy, policy), first, count, dest));
         }
     } uninitialized_relocate{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::uninitialized_relocate_backward
+    inline constexpr struct uninitialized_relocate_backward_t final
+      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
+    {
+        // clang-format off
+        template <typename BiIter1, typename BiIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<BiIter1> &&
+                hpx::traits::is_iterator_v<BiIter2>
+            )>
+        // clang-format on
+        friend BiIter2 tag_fallback_invoke(uninitialized_relocate_backward_t,
+            BiIter1 first, BiIter1 last,
+            BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
+            BiIter2>::is_noexcept_relocatable_v)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of input iterators.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
+                "The 'dest_last' argument must meet the requirements of a "
+                "forward iterator.");
+            static_assert(util::detail::relocation_traits<BiIter1,
+                              BiIter2>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+            // if count is representing a negative value, we do nothing
+            if (first == last)
+            {
+                return dest_last;
+            }
+
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate_backward<
+                    parallel::util::in_out_result<BiIter1, BiIter2>>()
+                    .call(hpx::execution::seq, first, last, dest_last));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename BiIter1, typename BiIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<BiIter1> &&
+                hpx::traits::is_iterator_v<BiIter2>
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            BiIter2>::type
+        tag_fallback_invoke(uninitialized_relocate_backward_t,
+            ExPolicy&& policy, BiIter1 first, BiIter1 last,
+            BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
+            BiIter2>::is_noexcept_relocatable_v)
+        {
+            static_assert(hpx::traits::is_input_iterator_v<BiIter1>,
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of bidirectional iterators.");
+            static_assert(hpx::traits::is_forward_iterator_v<BiIter2>,
+                "The 'dest' argument must meet the requirements of a "
+                "bidirectional iterator.");
+            static_assert(util::detail::relocation_traits<BiIter1,
+                              BiIter2>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+
+            auto count = std::distance(first, last);
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::detail::is_negative(count))
+            {
+                return parallel::util::detail::algorithm_result<ExPolicy,
+                    BiIter2>::get(HPX_MOVE(dest_last));
+            }
+
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate_backward<
+                    parallel::util::in_out_result<BiIter1, BiIter2>>()
+                    .call(
+                        HPX_FORWARD(ExPolicy, policy), first, last, dest_last));
+        }
+    } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental
 #endif    // DOXYGEN
