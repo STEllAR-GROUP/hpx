@@ -115,8 +115,8 @@ typedef struct
     volatile int flag;
 } done_t;
 
-static void AM_signal(
-    gasnet_token_t token, gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
+static void AM_signal([[maybe_unused]] gasnet_token_t token,
+    gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
     done_t* done = reinterpret_cast<done_t*>(get_ptr_from_args(a0, a1));
     uint_least32_t prev;
@@ -125,7 +125,8 @@ static void AM_signal(
         done->flag = 1;
 }
 
-static void AM_signal_long(gasnet_token_t token, void* buf, size_t nbytes,
+static void AM_signal_long([[maybe_unused]] gasnet_token_t token,
+    [[maybe_unused]] void* buf, [[maybe_unused]] size_t nbytes,
     gasnet_handlerarg_t a0, gasnet_handlerarg_t a1)
 {
     done_t* done = reinterpret_cast<done_t*>(get_ptr_from_args(a0, a1));
@@ -290,7 +291,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     int gasnet_environment::init(int* argc, char*** argv, const int minimal,
-        const int required, int& provided)
+        [[maybe_unused]] const int required, int& provided)
     {
         if (!has_called_init_)
         {
@@ -346,8 +347,6 @@ namespace hpx::util {
         gasnet_environment::segment_mutex = new hpx::mutex[size()];
 
         GASNET_Safe(gasnet_getSegmentInfo(segments, size()));
-
-        int retval;
 
         gasnet_barrier_notify(0, GASNET_BARRIERFLAG_ANONYMOUS);
         gasnet_barrier_wait(0, GASNET_BARRIERFLAG_ANONYMOUS);
