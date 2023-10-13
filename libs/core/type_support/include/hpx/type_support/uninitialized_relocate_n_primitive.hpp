@@ -22,11 +22,8 @@
 
 namespace hpx::experimental::util {
 
-#if defined(__cpp_lib_trivially_relocatable)
-    using std::uninitialized_relocate;
-#else
+    namespace detail {    // Utility metafunctions
 
-    namespace detail {
         struct buffer_memcpy_tag
         {
         };
@@ -81,7 +78,96 @@ namespace hpx::experimental::util {
                 >;
             // clang-format on
         };
+    }    // namespace detail
 
+#if defined(HPX_HAVE_P1144_RELOCATE_AT)
+    //////////////////////////////
+    // uninitialized_relocate_n //
+    //////////////////////////////
+    template <typename InIter, typename FwdIter, typename Size,
+        typename Dummy>    // Dummy is used retain the same signature
+                           // as the implementation before P1144
+    // clang-format off
+    std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive(InIter first, Size n,
+        FwdIter dst, Dummy) noexcept(
+            detail::relocation_traits<InIter, FwdIter>::is_noexcept_relocatable_v)
+    // clang-format on
+    {
+        static_assert(
+            detail::relocation_traits<InIter, FwdIter>::valid_relocation,
+            "uninitialized_move(first, last, dst) must be well-formed");
+
+        return std::uninitialized_relocate_n(first, n, dst);
+    }
+
+    template <typename InIter, typename Size, typename FwdIter>
+    std::tuple<InIter, FwdIter> uninitialized_relocate_n_primitive(InIter first,
+        Size n, FwdIter dst) noexcept(detail::relocation_traits<InIter,
+        FwdIter>::is_noexcept_relocatable_v)
+    {
+        return uninitialized_relocate_n_primitive(first, n, dst, bool{});
+    }
+
+    ////////////////////////////
+    // uninitialized_relocate //
+    ////////////////////////////
+    template <typename InIter, typename Sent, typename FwdIter,
+        typename Dummy>    // Dummy is used retain the same signature
+                           // as the implementation before P1144
+    // clang-format off
+    std::tuple<InIter, FwdIter> uninitialized_relocate_primitive(InIter first, Sent last,
+        FwdIter dst, Dummy) noexcept(
+            detail::relocation_traits<InIter, FwdIter>::is_noexcept_relocatable_v)
+    // clang-format on
+    {
+        // TODO CHECK SENT
+        static_assert(
+            detail::relocation_traits<InIter, FwdIter>::valid_relocation,
+            "uninitialized_move(first, last, dst) must be well-formed");
+
+        return std::uninitialized_relocate(first, last, dst);
+    }
+
+    template <typename InIter, typename Sent, typename FwdIter>
+    std::tuple<InIter, FwdIter> uninitialized_relocate_primitive(InIter first,
+        Sent last, FwdIter dst) noexcept(detail::relocation_traits<InIter,
+        FwdIter>::is_noexcept_relocatable_v)
+    {
+        return uninitialized_relocate_primitive(first, last, dst, bool{});
+    }
+
+    /////////////////////////////////////
+    // uninitialized_relocate_backward //
+    /////////////////////////////////////
+    template <typename BiIter1, typename BiIter2,
+        typename Dummy>    // Dummy is used retain the same signature
+                           // as the implementation before P1144
+    // clang-format off
+    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(BiIter1 first, BiIter1 last,
+        BiIter2 dst_last, Dummy) noexcept(
+            detail::relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
+    // clang-format on
+    {
+        // TODO CHECK SENT
+        static_assert(
+            detail::relocation_traits<BiIter1, BiIter2>::valid_relocation,
+            "uninitialized_move(first, last, dst) must be well-formed");
+
+        return std::uninitialized_relocate_backward(first, last, dst_last);
+    }
+
+    template <typename BiIter1, typename BiIter2>
+    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
+        BiIter1 first, BiIter1 last,
+        BiIter2 dst_last) noexcept(detail::relocation_traits<BiIter1,
+        BiIter2>::is_noexcept_relocatable_v)
+    {
+        return uninitialized_relocate_backward_primitive(
+            first, last, dst_last, bool{});
+    }
+#else
+
+    namespace detail {
         //////////////////////////////
         // uninitialized_relocate_n //
         //////////////////////////////
