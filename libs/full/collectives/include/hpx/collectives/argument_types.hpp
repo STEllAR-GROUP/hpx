@@ -50,11 +50,29 @@ namespace hpx::collectives {
         struct arity_tag;
     }    // namespace detail
 
+    /// The number of participating sites (default: all localities)
     using num_sites_arg = detail::argument_type<detail::num_sites_tag>;
+
+    /// The local end of the communication channel
     using this_site_arg = detail::argument_type<detail::this_site_tag>;
+
+    /// The opposite end of the communication channel
     using that_site_arg = detail::argument_type<detail::that_site_tag>;
+
+    /// The generational counter identifying the sequence number of the
+    /// operation performed on the given base name. It needs to be supplied
+    /// only if the operation on the given base name has to be performed
+    /// more than once. It must be a positive number greater than zero.
     using generation_arg = detail::argument_type<detail::generation_tag>;
+
+    /// The site that is responsible for creating the support object
+    /// of the operation. It defaults to '0' (zero).
     using root_site_arg = detail::argument_type<detail::root_site_tag, 0>;
+
+    /// The tag identifying the concrete operation
     using tag_arg = detail::argument_type<detail::tag_tag, 0>;
+
+    /// The number of children each of the communication nodes is connected
+    /// to (default: picked based on num_sites).
     using arity_arg = detail::argument_type<detail::arity_tag>;
 }    // namespace hpx::collectives
