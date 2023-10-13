@@ -26,7 +26,7 @@ namespace hpx::lockfree {
 
         uint128_type() = default;
 
-        constexpr uint128_type(std::uint64_t l, std::uint64_t r) noexcept
+        constexpr uint128_type(std::size_t l, std::size_t r) noexcept
           : left(l)
           , right(r)
         {
@@ -52,11 +52,30 @@ namespace hpx::lockfree {
         }
     };
 
+    namespace detail {
+
+        template <std::size_t Size>
+        struct ptr_mask;    // intentionally left unimplemented
+
+        template <>
+        struct ptr_mask<4>
+        {
+            static constexpr std::uint32_t value = 0xffffffff;
+        };
+
+        template <>
+        struct ptr_mask<8>
+        {
+            static constexpr std::uint64_t value = 0xffffffffffff;
+        };
+    }    // namespace detail
+
     template <typename Left, typename Right>
     struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
         using compressed_ptr_pair_t = uint128_type;
-        using compressed_ptr_t = std::uint64_t;
+        // compressed_ptr_t must be of the same size as a pointer
+        using compressed_ptr_t = std::size_t;
         using tag_t = std::uint16_t;
 
         struct HPX_LOCKFREE_DCAS_ALIGNMENT cast_unit
@@ -82,18 +101,21 @@ namespace hpx::lockfree {
 
         static constexpr std::size_t left_tag_index = 3;
         static constexpr std::size_t right_tag_index = 7;
-        static constexpr compressed_ptr_t ptr_mask = 0xffffffffffff;
+        static constexpr compressed_ptr_t ptr_mask =
+            detail::ptr_mask<sizeof(compressed_ptr_t)>::value;
 
         static constexpr Left* extract_left_ptr(
             compressed_ptr_pair_t i) noexcept
         {
-            return hpx::bit_cast<Left*>(i.left & ptr_mask);
+            return hpx::bit_cast<Left*>(
+                static_cast<compressed_ptr_t>(i.left & ptr_mask));
         }
 
         static constexpr Right* extract_right_ptr(
             compressed_ptr_pair_t i) noexcept
         {
-            return hpx::bit_cast<Right*>(i.right & ptr_mask);
+            return hpx::bit_cast<Right*>(
+                static_cast<compressed_ptr_t>(i.right & ptr_mask));
         }
 
         static constexpr tag_t extract_left_tag(
