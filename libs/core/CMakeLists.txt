@@ -51,6 +51,7 @@ set(_hpx_core_modules
     itt_notify
     lci_base
     lcos_local
+    likwid
     lock_registration
     logging
     memory

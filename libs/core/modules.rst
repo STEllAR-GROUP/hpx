@@ -50,6 +50,7 @@ Core modules
    /libs/core/itt_notify/docs/index.rst
    /libs/core/lci_base/docs/index.rst
    /libs/core/lcos_local/docs/index.rst
+   /libs/core/likwid/docs/index.rst
    /libs/core/lock_registration/docs/index.rst
    /libs/core/logging/docs/index.rst
    /libs/core/memory/docs/index.rst
