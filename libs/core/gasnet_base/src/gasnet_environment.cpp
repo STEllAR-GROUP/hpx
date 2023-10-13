@@ -170,7 +170,8 @@ static void AM_copy_payload(gasnet_token_t token, void* buf, size_t nbytes,
     GASNET_Safe(gasnet_AMReplyShort2(token, SIGNAL, ack0, ack1));
 }
 
-static gasnet_handlerentry_t ftable[] = {{SIGNAL, (void (*)()) & AM_signal},
+[[maybe_unused]] static gasnet_handlerentry_t ftable[] = {
+    {SIGNAL, (void (*)()) & AM_signal},
     {SIGNAL_LONG, (void (*)()) & AM_signal_long},
     {DO_REPLY_PUT, (void (*)()) & AM_reply_put},
     {DO_COPY_PAYLOAD, (void (*)()) & AM_copy_payload}};
