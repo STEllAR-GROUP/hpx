@@ -91,8 +91,14 @@ function(add_hpx_test category name)
     set(Python_EXECUTABLE ${PYTHON_EXECUTABLE})
   endif()
 
+  set(ENV_VAR "")
+  if(HPX_WITH_PARCELPORT_GASNET)
+     set(ENV_VAR "GASNET_PSHM_NODES=2")
+  endif()
+
   # cmake-format: off
   set(cmd
+      ${ENV_VAR}
       "${Python_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
       ${CMAKE_CROSSCOMPILING_EMULATOR}
