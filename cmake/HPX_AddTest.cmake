@@ -93,7 +93,7 @@ function(add_hpx_test category name)
 
   set(ENV_VAR "")
   if(HPX_WITH_PARCELPORT_GASNET)
-     set(ENV_VAR "GASNET_PSHM_NODES=2")
+    set(ENV_VAR "GASNET_PSHM_NODES=2")
   endif()
 
   # cmake-format: off
