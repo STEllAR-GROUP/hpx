@@ -329,11 +329,13 @@ namespace hpx::parallel {
                         InIter part_source = get<0>(iters);
                         FwdIter part_dest = get<1>(iters);
 
-                        // returns (dest begin, dest end)
-                        return std::make_pair(part_dest,
+                        auto [part_source_advanced, part_dest_advanced] =
                             hpx::experimental::util::
                                 uninitialized_relocate_n_primitive(
-                                    part_source, part_size, part_dest));
+                                    part_source, part_size, part_dest);
+
+                        // returns (dest begin, dest end)
+                        return std::make_pair(part_dest, part_dest_advanced);
                     },
                     // finalize, called once if no error occurred
                     [first, dest, count](auto&& data) mutable
@@ -382,9 +384,12 @@ namespace hpx::parallel {
                     experimental::util::detail::relocation_traits<InIter,
                         FwdIter>::is_noexcept_relocatable_v)
             {
-                return util::in_out_result<InIter, FwdIter>{first,
+                auto [first_advanced, dest_advanced] =
                     hpx::experimental::util::uninitialized_relocate_n_primitive(
-                        first, count, dest)};
+                        first, count, dest);
+
+                return util::in_out_result<InIter, FwdIter>{
+                    first_advanced, dest_advanced};
             }
 
             // clang-format off
@@ -437,9 +442,11 @@ namespace hpx::parallel {
                 FwdIter dest) noexcept(hpx::experimental::util::detail::relocation_traits<
                     InIter1, FwdIter>::is_noexcept_relocatable_v)
             {
-                return util::in_out_result<InIter1, FwdIter>{first,
+                auto [first_advanced, dest_advanced] =
                     hpx::experimental::util::uninitialized_relocate_primitive(
-                        first, last, dest)};
+                        first, last, dest);
+
+                return util::in_out_result<InIter1, FwdIter>{first_advanced, dest_advanced};
             }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -485,8 +492,8 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename BiIter1, typename BiIter2,
                 // clang-format off
                 HPX_CONCEPT_REQUIRES_(
-                    hpx::is_sequenced_execution_policy_v<ExPolicy>&&
-                    hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
+                    hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
                     hpx::traits::is_bidirectional_iterator_v<BiIter2>
                 )>
             //  clang-format on
@@ -495,9 +502,12 @@ namespace hpx::parallel {
                 BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
                 relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
             {
-                return util::in_out_result<BiIter1, BiIter2>{first,
-                    hpx::experimental::util::uninitialized_relocate_backward_primitive(
-                        first, last, dest_last)};
+                auto [last_advanced, dest_last_advanced] = 
+                hpx::experimental::util::uninitialized_relocate_backward_primitive(
+                        first, last, dest_last);
+
+                return util::in_out_result<BiIter1, BiIter2>{last_advanced, dest_last_advanced
+                    };
             }
 
             template <typename ExPolicy, typename BiIter1, typename BiIter2,
