@@ -140,7 +140,8 @@ static void AM_signal_long([[maybe_unused]] gasnet_token_t token,
 // arg->dst (which is local to the caller of this AM).
 // nbytes is < gasnet_AMMaxLongReply here (see chpl_comm_get).
 //
-static void AM_reply_put(gasnet_token_t token, void* buf, size_t nbytes)
+static void AM_reply_put(
+    gasnet_token_t token, void* buf, [[maybe_unused]] size_t nbytes)
 {
     xfer_info_t* x = static_cast<xfer_info_t*>(buf);
 
