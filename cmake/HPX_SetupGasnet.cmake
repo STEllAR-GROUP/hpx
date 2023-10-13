@@ -152,6 +152,12 @@ macro(hpx_setup_gasnet)
           message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
         endif()
 
+        if(NOT ${MPI_C_COMPILER})
+          set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
+        else()
+          message(FATAL_ERROR "GASNet MPI Conduit selected; $MPI_CC not found!")
+        endif()
+
         execute_process(
           COMMAND
             bash -c
