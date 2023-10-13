@@ -152,8 +152,12 @@ macro(hpx_setup_gasnet)
           message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
         endif()
 
-        if(NOT ${MPI_C_COMPILER})
+        if(${MPI_C_COMPILER})
           set(CMAKE_C_COMPILER ${MPI_C_COMPILER})
+        elseif(${MPI_CC})
+          set(CMAKE_C_COMPILER ${MPI_CC})
+        elseif(ENV{MPI_CC})
+          set(CMAKE_C_COMPILER ENV{MPI_CC})
         else()
           message(FATAL_ERROR "GASNet MPI Conduit selected; $MPI_CC not found!")
         endif()
@@ -161,7 +165,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${MPI_C_COMPILER} --with-mpi-cflags=${MPI_C_COMPILER_FLAGS} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
