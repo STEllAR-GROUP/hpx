@@ -103,11 +103,10 @@ struct non_trivially_relocatable_struct_throwing
         non_trivially_relocatable_struct_throwing&& other)
       : data(other.data)
     {
-        if (move_count.load() == K)
+        if (move_count.fetch_add(1) == K)
         {
             throw 42;
         }
-        move_count.fetch_add(1);
 
         count++;
     }
