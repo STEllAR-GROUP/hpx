@@ -271,23 +271,9 @@ int hpx_main()
             non_trivially_relocatable_struct_throwing::move_count.load(),
             non_trivially_relocatable_struct_throwing::dtor_count.load());
 
-        // K move constructors were called
+        // After catching, all objects must be destroyed
         HPX_TEST_MSG(
-            non_trivially_relocatable_struct_throwing::move_count.load() == K,
-            msg);
-
-        // K - 1 destructors were called to balance out the move constructors
-        // (- 1 because the last move constructor throws)
-        // and then N + 1 destructors were called: K on the old range and
-        // N - (K - 1) = N - K + 1 on the new range
-        HPX_TEST_MSG(
-            non_trivially_relocatable_struct_throwing::dtor_count.load() ==
-                N + K,
-            msg);
-
-        // It stops at K, so K-1 move-destruct pairs have been executed
-        // after this N - (K - 1) destructs will be done on the old range
-        // and K - 1 on the new range. giving 2*N total destructs
+            non_trivially_relocatable_struct_throwing::count == 0, msg);
 
         std::free(mem1);
         std::free(mem2);
