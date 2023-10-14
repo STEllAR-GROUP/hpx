@@ -538,7 +538,6 @@ care of synchronization:
 
     future_outer.get();    // Wait for the outer task to complete
 
-
 Task yield
 ^^^^^^^^^^
 
@@ -1234,6 +1233,7 @@ the gathered data in the root process.
             std::cout << std::endl;
             }
         }
+        std::cout << std::endl;
 
         MPI_Finalize();
         return 0;

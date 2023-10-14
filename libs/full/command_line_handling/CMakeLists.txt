@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,6 +33,14 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   include(HPX_SetupLCI)
   hpx_setup_lci()
   set(additional_dependencies ${additional_dependencies} LCI::LCI)
+endif()
+if(HPX_WITH_PARCELPORT_GASNET)
+  include(HPX_SetupGasnet)
+  hpx_setup_gasnet()
+  if("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
+    set(additional_dependencies ${additional_dependencies} Mpi::mpi)
+  endif()
+  set(additional_dependencies ${additional_dependencies} PkgConfig::GASNET)
 endif()
 
 include(HPX_AddModule)

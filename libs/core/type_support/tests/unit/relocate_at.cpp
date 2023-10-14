@@ -66,6 +66,7 @@ struct trivially_relocatable_struct
 int trivially_relocatable_struct::count = 0;
 
 HPX_DECLARE_TRIVIALLY_RELOCATABLE(trivially_relocatable_struct);
+
 static_assert(is_trivially_relocatable_v<trivially_relocatable_struct>);
 
 int hpx_main()

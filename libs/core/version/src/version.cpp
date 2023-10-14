@@ -46,6 +46,11 @@
 #include <lci.h>
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+#include <gasnet.h>
+#endif
+
 #include <hwloc.h>
 
 #include <algorithm>
@@ -127,6 +132,19 @@ namespace hpx {
     {
         std::ostringstream strm;
         strm << "the one and only LCI";
+        return strm.str();
+    }
+#endif
+
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+    std::string gasnet_version()
+    {
+        std::ostringstream strm;
+        strm << "GASNET_VERSION:" << GASNET_RELEASE_VERSION_MAJOR << ':'
+             << GASNET_RELEASE_VERSION_MINOR << ':'
+             << GASNET_RELEASE_VERSION_PATCH << '-'
+             << "GASNET_CONDUIT:" << GASNET_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
@@ -294,6 +312,10 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
                                                 "  LCI: {}\n"
 #endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+                                                "  GASNET: {}\n"
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)
                                                 "  MPI: {}\n"
@@ -309,6 +331,10 @@ namespace hpx {
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
             lci_version(),
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+            gasnet_version(),
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)) ||      \
     defined(HPX_HAVE_MODULE_MPI_BASE)

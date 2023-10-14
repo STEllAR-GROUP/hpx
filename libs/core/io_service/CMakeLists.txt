@@ -13,7 +13,7 @@ set(io_service_headers
 
 # cmake-format: off
 set(io_service_compat_headers
-    hpx/util/io_service_pool.hpp => hpx/modules/io_service.hpp
+    hpx/util/io_service_pool_fwd.hpp => hpx/modules/io_service.hpp
 )
 # cmake-format: on
 

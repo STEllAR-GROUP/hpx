@@ -108,6 +108,10 @@ namespace hpx::performance_counters {
             return counter_status::invalid_data;
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         result = "/";
         result += path.objectname_;
 
@@ -164,6 +168,9 @@ namespace hpx::performance_counters {
             result += "@";
             result += path.parameters_;
         }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -182,7 +189,14 @@ namespace hpx::performance_counters {
             return counter_status::invalid_data;
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         result = "/";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         result += path.objectname_;
 
         if (!path.countername_.empty())
@@ -209,7 +223,14 @@ namespace hpx::performance_counters {
             return counter_status::invalid_data;
         }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
         result = "/";
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         result += path.objectname_;
 
         if (!path.countername_.empty())
@@ -247,6 +268,10 @@ namespace hpx::performance_counters {
         }
         else
         {
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wrestrict"
+#endif
             result = "/";
             result += path.parentinstancename_;
             if (path.parentinstanceindex_ == -1)
@@ -290,6 +315,9 @@ namespace hpx::performance_counters {
                     result += "#" + std::to_string(path.subinstanceindex_);
                 }
             }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
         }
 
         if (&ec != &throws)

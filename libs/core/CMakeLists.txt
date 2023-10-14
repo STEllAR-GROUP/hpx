@@ -41,6 +41,7 @@ set(_hpx_core_modules
     format
     functional
     futures
+    gasnet_base
     hardware
     hashing
     include_local

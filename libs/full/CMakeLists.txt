@@ -31,6 +31,7 @@ set(_hpx_full_modules
     lcos_distributed
     naming
     naming_base
+    parcelport_gasnet
     parcelport_lci
     parcelport_libfabric
     parcelport_mpi

@@ -21,6 +21,9 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_GASNET_BASE)
+#include <hpx/modules/gasnet_base.hpp>
+#endif
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/topology.hpp>
@@ -994,6 +997,18 @@ namespace hpx::util {
             num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
+        }
+#endif
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
+    defined(HPX_HAVE_MODULE_GASNET_BASE)
+        // better to put GASNET init after MPI init, since GASNET will also
+        // initialize MPI if MPI is not already initialized.
+        if (util::gasnet_environment::check_gasnet_environment(rtcfg_))
+        {
+            util::gasnet_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::gasnet_environment::size());
+            node_ = static_cast<std::size_t>(util::gasnet_environment::rank());
         }
 #endif
 

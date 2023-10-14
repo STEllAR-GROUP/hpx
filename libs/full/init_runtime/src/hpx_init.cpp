@@ -99,7 +99,7 @@
 namespace hpx_startup {
     std::vector<std::string> (*user_main_config_function)(
         std::vector<std::string> const&) = nullptr;
-}
+}    // namespace hpx_startup
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::detail {
