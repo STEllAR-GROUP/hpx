@@ -15,6 +15,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/bit_cast.hpp>
 
+#include <cstddef>
 #include <cstdint>
 
 HPX_PLAIN_ACTION_ID(hpx::components::server::destroy_component,

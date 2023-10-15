@@ -12,6 +12,7 @@
 #include <hpx/config.hpp>
 #include <hpx/type_support/bit_cast.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 
