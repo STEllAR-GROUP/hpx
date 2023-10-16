@@ -159,11 +159,15 @@ macro(hpx_setup_gasnet)
         elseif(${MPI_CC})
           set(MPI_CC ${CMAKE_C_COMPILER})
           set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        elseif(ENV{MPI_CC})
+        elseif($ENV{MPI_CC})
           set(MPI_CC ${CMAKE_C_COMPILER})
           set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
         else()
           message(FATAL_ERROR "GASNet MPI Conduit selected; $MPI_CC not found!")
+        endif()
+
+        if(NOT "$CMAKE_C_COMPILER" STREQUAL "${MPI_CC}")
+          message(FATAL_ERROR "GASNet MPI: $MPI_CC != $CMAKE_C_COMPILER!")
         endif()
 
         execute_process(
