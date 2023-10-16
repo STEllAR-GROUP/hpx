@@ -120,27 +120,39 @@ namespace hpx::parcelset {
             // whether the parcelport has been initialized
             // (starting to execute the background works)
             std::atomic<bool> is_initialized = false;
-            // whether the parcelport is sending early parcels
-            std::atomic<bool> is_sending_early_parcel = false;
 
             // LCI objects
-            LCI_device_t device;
-            LCI_endpoint_t endpoint_new;
-            LCI_endpoint_t endpoint_followup;
+            struct completion_manager_t;
+            struct device_t
+            {
+                // These are all pointers to the real data structure allocated
+                // by LCI. They would not be modified once initialized.
+                // So we should not have false sharing here.
+                int idx;
+                LCI_device_t device;
+                LCI_endpoint_t endpoint_new;
+                LCI_endpoint_t endpoint_followup;
+                completion_manager_t* completion_manager_p;
+            };
+            std::vector<device_t> devices;
 
             // Parcelport objects
             static std::atomic<bool> prg_thread_flag;
             std::unique_ptr<std::thread> prg_thread_p;
-            std::shared_ptr<completion_manager_base> send_completion_manager;
-            std::shared_ptr<completion_manager_base>
-                recv_new_completion_manager;
-            std::shared_ptr<completion_manager_base>
-                recv_followup_completion_manager;
+            struct completion_manager_t
+            {
+                std::shared_ptr<completion_manager_base> send;
+                std::shared_ptr<completion_manager_base> recv_new;
+                std::shared_ptr<completion_manager_base> recv_followup;
+            };
+            std::vector<completion_manager_t> completion_managers;
 
-            bool do_progress();
+            bool do_progress_local();
+            device_t& get_tls_device();
 
         private:
-            static void progress_thread_fn(LCI_device_t device);
+            static void progress_thread_fn(
+                const std::vector<device_t>& devices);
 
             void setup(util::runtime_configuration const& rtcfg);
             void cleanup();
@@ -250,7 +262,10 @@ namespace hpx::traits {
                 "protocol = putsendrecv\n"
                 "comp_type = queue\n"
                 "progress_type = rp\n"
-                "prepost_recv_num = 1\n";
+                "prepost_recv_num = 1\n"
+                "reg_mem = 1\n"
+                "ndevices = 2\n"
+                "ncomps = 1\n";
         }
     };
 }    // namespace hpx::traits

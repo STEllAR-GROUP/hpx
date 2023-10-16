@@ -28,23 +28,25 @@ namespace hpx::parcelset::policies::lci {
         {
             // siguature for assert_valid
             pos_signature = 0,
+            // device idx
+            pos_device_idx = 1 * sizeof(value_type),
             // tag
-            pos_tag = 1 * sizeof(value_type),
+            pos_tag = 2 * sizeof(value_type),
             // non-zero-copy chunk size
-            pos_numbytes_nonzero_copy = 2 * sizeof(value_type),
+            pos_numbytes_nonzero_copy = 3 * sizeof(value_type),
             // transmission chunk size
-            pos_numbytes_tchunk = 3 * sizeof(value_type),
+            pos_numbytes_tchunk = 4 * sizeof(value_type),
             // how many bytes in total (including zero-copy and non-zero-copy chunks)
-            pos_numbytes = 4 * sizeof(value_type),
+            pos_numbytes = 5 * sizeof(value_type),
             // zero-copy chunk number
-            pos_numchunks_zero_copy = 5 * sizeof(value_type),
+            pos_numchunks_zero_copy = 6 * sizeof(value_type),
             // non-zero-copy chunk number
-            pos_numchunks_nonzero_copy = 6 * sizeof(value_type),
+            pos_numchunks_nonzero_copy = 7 * sizeof(value_type),
             // whether piggyback data
-            pos_piggy_back_flag_data = 7 * sizeof(value_type),
+            pos_piggy_back_flag_data = 8 * sizeof(value_type),
             // whether piggyback transmission chunk
-            pos_piggy_back_flag_tchunk = 7 * sizeof(value_type) + 1,
-            pos_piggy_back_address = 7 * sizeof(value_type) + 2
+            pos_piggy_back_flag_tchunk = 8 * sizeof(value_type) + 1,
+            pos_piggy_back_address = 8 * sizeof(value_type) + 2
         };
 
         template <typename buffer_type, typename ChunkType>
@@ -131,6 +133,16 @@ namespace hpx::parcelset::policies::lci {
         value_type signature() const noexcept
         {
             return get<pos_signature>();
+        }
+
+        void set_device_idx(int device_idx) noexcept
+        {
+            set<pos_device_idx>(static_cast<value_type>(device_idx));
+        }
+
+        value_type get_device_idx() const noexcept
+        {
+            return get<pos_device_idx>();
         }
 
         void set_tag(LCI_tag_t tag) noexcept
