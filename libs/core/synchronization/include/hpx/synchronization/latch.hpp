@@ -25,13 +25,16 @@
 namespace hpx {
 
     /// Latches are a thread coordination mechanism that allow one or more
-    /// threads to block until an operation is completed. An individual latch
-    /// is a singleuse object; once the operation has been completed, the latch
+    /// threads to block until an operation is completed. An individual latch is
+    /// a single-use object; once the operation has been completed, the latch
     /// cannot be reused.
     class latch
     {
     public:
-        HPX_NON_COPYABLE(latch);
+        latch(latch const&) = delete;
+        latch(latch&&) = delete;
+        latch& operator=(latch const&) = delete;
+        latch& operator=(latch&&) = delete;
 
     protected:
         using mutex_type = hpx::spinlock;
@@ -44,9 +47,7 @@ namespace hpx {
         /// Postconditions: counter_ == count.
         ///
         explicit latch(std::ptrdiff_t count)
-          : mtx_()
-          , cond_()
-          , counter_(count)
+          : counter_(count)
           , notified_(count == 0)
         {
         }
@@ -90,7 +91,7 @@ namespace hpx {
         {
             HPX_ASSERT(update >= 0);
 
-            std::ptrdiff_t new_count = (counter_ -= update);
+            std::ptrdiff_t const new_count = (counter_ -= update);
             HPX_ASSERT(new_count >= 0);
 
             // 26111: Caller failing to release lock 'this->mtx_.data_'
@@ -168,7 +169,7 @@ namespace hpx {
 
             std::unique_lock l(mtx_.data_);
 
-            std::ptrdiff_t old_count =
+            std::ptrdiff_t const old_count =
                 counter_.fetch_sub(update, std::memory_order_relaxed);
             HPX_ASSERT_LOCKED(l, old_count >= update);
 
@@ -295,7 +296,7 @@ namespace hpx::lcos::local {
             return hpx::latch::try_wait();
         }
 
-        void abort_all()
+        void abort_all() const
         {
             // 26115: Failing to release lock 'this->mtx_.data_'
 #if defined(HPX_MSVC)
@@ -321,7 +322,7 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT(n >= 0);
 
-            std::ptrdiff_t old_count =
+            std::ptrdiff_t const old_count =
                 counter_.fetch_add(n, std::memory_order_acq_rel);
 
             HPX_ASSERT(old_count > 0);
@@ -337,7 +338,7 @@ namespace hpx::lcos::local {
         {
             HPX_ASSERT(n >= 0);
 
-            std::ptrdiff_t old_count =
+            std::ptrdiff_t const old_count =
                 counter_.exchange(n, std::memory_order_acq_rel);
 
             HPX_ASSERT(old_count == 0);
@@ -364,7 +365,7 @@ namespace hpx::lcos::local {
             {
                 notified_ = false;
 
-                std::ptrdiff_t old_count =
+                std::ptrdiff_t const old_count =
                     counter_.fetch_add(n + count, std::memory_order_relaxed);
 
                 HPX_ASSERT(old_count == 0);
@@ -373,7 +374,7 @@ namespace hpx::lcos::local {
                 return true;
             }
 
-            std::ptrdiff_t old_count =
+            std::ptrdiff_t const old_count =
                 counter_.fetch_add(n, std::memory_order_relaxed);
 
             HPX_ASSERT(old_count > 0);

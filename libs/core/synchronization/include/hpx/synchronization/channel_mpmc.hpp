@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2022 Hartmut Kaiser
+//  Copyright (c) 2019-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,7 @@ namespace hpx::lcos::local {
 
         constexpr bool is_full(std::size_t tail) const noexcept
         {
-            std::size_t numitems = size_ + tail - head_.data_;
+            std::size_t const numitems = size_ + tail - head_.data_;
             if (numitems < size_)
             {
                 return numitems == size_ - 1;

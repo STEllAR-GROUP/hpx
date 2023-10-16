@@ -161,7 +161,7 @@ namespace hpx {
         ///                 expected is 0 this object can only be destroyed.-
         ///                 end note]
         ///
-        /// \throws:        Any exception thrown by CompletionFunction's move
+        /// Throws:         Any exception thrown by CompletionFunction's move
         ///                 constructor.
         constexpr explicit barrier(
             std::ptrdiff_t expected, OnCompletion completion = OnCompletion())
@@ -216,7 +216,7 @@ namespace hpx {
         ///
         /// \returns:       The constructed arrival_token object.
         ///
-        /// \throws:        system_error when an exception is required
+        /// \throws system_error: when an exception is required
         ///                 ([thread.req.exception]).
         ///
         /// Error conditions: Any of the error conditions allowed for mutex
@@ -241,7 +241,7 @@ namespace hpx {
         ///                 point for a previous phase, the call returns
         ///                 immediately. - end note ]
         ///
-        /// \throws:        system_error when an exception is required
+        /// \throws system_error: when an exception is required
         ///                 ([thread.req.exception]).
         /// Error conditions: Any of the error conditions allowed for mutex
         ///                 types ([thread.mutex.requirements.mutex]).
@@ -278,7 +278,7 @@ namespace hpx {
         ///                 the start of the phase completion step for the
         ///                 current phase.
         ///
-        /// \throws:        system_error when an exception is required
+        /// \throws system_error: when an exception is required
         ///                 ([thread.req.exception]).Error conditions:
         ///                 Any of the error conditions allowed for mutex
         ///                 types ([thread.mutex.requirements.mutex]).

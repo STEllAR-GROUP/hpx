@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,14 +17,14 @@ namespace hpx {
     /// inconsistencies.
     struct no_mutex
     {
-        constexpr void lock() noexcept {}
+        static constexpr void lock() noexcept {}
 
-        constexpr bool try_lock() noexcept
+        static constexpr bool try_lock() noexcept
         {
             return true;
         }
 
-        constexpr void unlock() noexcept {}
+        static constexpr void unlock() noexcept {}
     };
 }    // namespace hpx
 

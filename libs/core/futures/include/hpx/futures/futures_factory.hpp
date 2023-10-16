@@ -78,7 +78,7 @@ namespace hpx::lcos::local {
             task_object& operator=(task_object const&) = delete;
             task_object& operator=(task_object&&) = delete;
 
-            ~task_object() = default;
+            ~task_object() override = default;
 
             void do_run() noexcept override
             {
@@ -230,7 +230,7 @@ namespace hpx::lcos::local {
                 task_object_allocator const&) = delete;
             task_object_allocator& operator=(task_object_allocator&&) = delete;
 
-            ~task_object_allocator() = default;
+            ~task_object_allocator() override = default;
 
         private:
             void destroy() noexcept override
@@ -570,8 +570,6 @@ namespace hpx::lcos::local {
                     base_allocator>::template rebind_alloc<shared_state>;
                 using traits = std::allocator_traits<other_allocator>;
 
-                using init_no_addref = typename shared_state::init_no_addref;
-
                 using unique_ptr = std::unique_ptr<shared_state,
                     util::allocator_deleter<other_allocator>>;
 
@@ -672,8 +670,6 @@ namespace hpx::lcos::local {
                 using other_allocator = typename std::allocator_traits<
                     base_allocator>::template rebind_alloc<shared_state>;
                 using traits = std::allocator_traits<other_allocator>;
-
-                using init_no_addref = typename shared_state::init_no_addref;
 
                 using unique_ptr = std::unique_ptr<shared_state,
                     util::allocator_deleter<other_allocator>>;
@@ -817,7 +813,6 @@ namespace hpx::lcos::local {
                 HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::operator()",
                     "futures_factory invalid (has it been moved?)");
-                return;
             }
             task_->run();
         }
@@ -840,7 +835,6 @@ namespace hpx::lcos::local {
                 HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::post()",
                     "futures_factory invalid (has it been moved?)");
-                return threads::invalid_thread_id;
             }
             return task_->post(pool, annotation, HPX_MOVE(policy), ec);
         }
@@ -882,7 +876,6 @@ namespace hpx::lcos::local {
                 HPX_THROW_EXCEPTION(hpx::error::task_moved,
                     "futures_factory<Result()>::set_exception",
                     "futures_factory invalid (has it been moved?)");
-                return;
             }
             task_->set_exception(e);
         }

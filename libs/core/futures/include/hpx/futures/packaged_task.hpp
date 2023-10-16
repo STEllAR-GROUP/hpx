@@ -83,7 +83,6 @@ namespace hpx {
                 HPX_THROW_EXCEPTION(hpx::error::no_state,
                     "packaged_task<Signature>::operator()",
                     "this packaged_task has no valid shared state");
-                return;
             }
 
             // synchronous execution of the embedded function (object)
@@ -164,7 +163,8 @@ namespace std {    //-V1061
     };
 
     template <typename Sig>
-    void swap(hpx::packaged_task<Sig>& lhs, hpx::packaged_task<Sig>& rhs)
+    void swap(
+        hpx::packaged_task<Sig>& lhs, hpx::packaged_task<Sig>& rhs) noexcept
     {
         lhs.swap(rhs);
     }

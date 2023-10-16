@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +21,7 @@ namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Future, typename F>
         struct continuation_not_callable
         {
@@ -37,7 +38,7 @@ namespace hpx::traits {
         template <typename Future, typename F, typename Enable = void>
         struct future_then_result
         {
-            typedef typename continuation_not_callable<Future, F>::type type;
+            using type = typename continuation_not_callable<Future, F>::type;
         };
 
         template <typename Future, typename F>

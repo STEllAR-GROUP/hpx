@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +22,6 @@ namespace hpx::lcos::local::detail {
         std::int64_t max_difference, std::int64_t lower_limit) noexcept
       : max_difference_(max_difference)
       , lower_limit_(lower_limit)
-      , cond_()
     {
     }
 
@@ -53,7 +52,7 @@ namespace hpx::lcos::local::detail {
     {
         HPX_ASSERT_OWNS_LOCK(l);
 
-        if (!(upper_limit - max_difference_ > lower_limit_))
+        if (upper_limit - max_difference_ <= lower_limit_)
         {
             // enter wait_locked only if necessary
             wait(l, upper_limit);

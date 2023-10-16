@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2016 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -31,8 +31,7 @@ namespace hpx::traits {
     }
 
     template <typename T, typename Enable = void>
-    struct acquire_future
-      : detail::acquire_future_impl<typename std::decay<T>::type>
+    struct acquire_future : detail::acquire_future_impl<std::decay_t<T>>
     {
     };
 
