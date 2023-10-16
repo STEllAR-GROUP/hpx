@@ -107,7 +107,8 @@ namespace hpx { namespace util {
         std::string name() const;
 
     protected:
-        mutable mutex_type mtx_;
+//        mutable mutex_type mtx_;
+        mutable pthread_rwlock_t rwlock;
         list_type heap_list_;
 
     private:

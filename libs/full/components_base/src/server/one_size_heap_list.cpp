@@ -47,27 +47,21 @@ namespace hpx { namespace util {
 
     void* one_size_heap_list::alloc(std::size_t count)
     {
-        std::unique_lock guard(mtx_);
-
         if (HPX_UNLIKELY(0 == count))
         {
-            guard.unlock();
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::alloc",
                 "cannot allocate 0 objects");
         }
 
         void* p = nullptr;
 
+        pthread_rwlock_rdlock(&rwlock);
+
         if (!heap_list_.empty())
         {
             for (auto& heap : heap_list_)
             {
-                bool allocated = false;
-
-                {
-                    hpx::unlock_guard ul(guard);
-                    allocated = heap->alloc(&p, count);
-                }
+                bool allocated = heap->alloc(&p, count);
 
                 if (allocated)
                 {
@@ -77,6 +71,7 @@ namespace hpx { namespace util {
                     if (alloc_count_ - free_count_ > max_alloc_count_)
                         max_alloc_count_ = alloc_count_ - free_count_;
 #endif
+                    pthread_rwlock_unlock(&rwlock);
                     return p;
                 }
 
@@ -90,29 +85,28 @@ namespace hpx { namespace util {
 #endif
             }
         }
+        pthread_rwlock_unlock(&rwlock);
 
         // Create new heap.
-#if defined(HPX_DEBUG)
-        heap_list_.push_front(
-            create_heap_(class_name_.c_str(), heap_count_ + 1, parameters_));
-#else
-        heap_list_.push_front(
-            create_heap_(class_name_.c_str(), 0, parameters_));
-#endif
-
-        auto const itnew = heap_list_.begin();
-        list_type::value_type const heap = *itnew;
         bool result = false;
+        std::shared_ptr<util::wrapper_heap_base> heap;
+#if defined(HPX_DEBUG)
+        heap = create_heap_(class_name_.c_str(), heap_count_ + 1, parameters_);
+#else
+        heap = create_heap_(class_name_.c_str(), 0, parameters_);
+#endif
+        result = heap->alloc((void**) &p, count);
 
-        {
-            hpx::unlock_guard ul(guard);
-            result = heap->alloc((void**) &p, count);
-        }
+        // Add the heap into the list
+//        mtx_.lock();
+        pthread_rwlock_wrlock(&rwlock);
+        heap_list_.push_front(heap);
+        pthread_rwlock_unlock(&rwlock);
+//        mtx_.unlock();
 
         if (HPX_UNLIKELY(!result || nullptr == p))
         {
             // out of memory
-            guard.unlock();
             HPX_THROW_EXCEPTION(hpx::error::out_of_memory, name() + "::alloc",
                 "new heap failed to allocate {1} objects", count);
         }
@@ -155,32 +149,24 @@ namespace hpx { namespace util {
         if (reschedule(p, count))
             return;
 
-        std::unique_lock ul(mtx_);
-
+//        mtx_.lock();
+        pthread_rwlock_rdlock(&rwlock);
+//        mtx_.unlock();
         // Find the heap which allocated this pointer.
         for (auto& heap : heap_list_)
         {
-            bool did_allocate = false;
-
-            {
-                hpx::unlock_guard ull(ul);
-                did_allocate = heap->did_alloc(p);
-                if (did_allocate)
-                {
-                    heap->free(p, count);
-                }
-            }
-
+            bool did_allocate = heap->did_alloc(p);
             if (did_allocate)
             {
+                heap->free(p, count);
 #if defined(HPX_DEBUG)
                 free_count_ += count;
 #endif
+                pthread_rwlock_unlock(&rwlock);
                 return;
             }
         }
-
-        ul.unlock();
+        pthread_rwlock_unlock(&rwlock);
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::free",
             "pointer {1} was not allocated by this {2}", p, name());
@@ -188,15 +174,16 @@ namespace hpx { namespace util {
 
     bool one_size_heap_list::did_alloc(void* p) const
     {
-        std::unique_lock ul(mtx_);
+        pthread_rwlock_rdlock(&rwlock);
         for (typename list_type::value_type const& heap : heap_list_)
         {
-            hpx::unlock_guard ull(ul);
             if (heap->did_alloc(p))
             {
+                pthread_rwlock_unlock(&rwlock);
                 return true;
             }
         }
+        pthread_rwlock_unlock(&rwlock);
         return false;
     }
 

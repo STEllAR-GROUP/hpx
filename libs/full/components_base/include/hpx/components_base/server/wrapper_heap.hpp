@@ -104,23 +104,20 @@ namespace hpx::components::detail {
         void set_gid(naming::gid_type const& g);
 
     protected:
-        bool test_release(std::unique_lock<mutex_type>& lk);
-        bool ensure_pool(std::size_t count);
+        bool free_pool();
 
         bool init_pool();
         void tidy();
 
     protected:
         char* pool_;
-        char* first_free_;
         heap_parameters const parameters_;
-        std::size_t free_size_;
-
+        alignas(64) std::atomic<char*> first_free_;
+        alignas(64) std::atomic<std::size_t> free_size_;
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
+        alignas(64) mutable mutex_type mtx_;
         naming::gid_type base_gid_;
-
-        mutable mutex_type mtx_;
 
     public:
         std::string const class_name_;
