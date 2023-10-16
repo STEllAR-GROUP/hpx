@@ -200,7 +200,7 @@ int hpx_main(variables_map& vm)
 }
 
 #if defined(JACOBI_SMP_NO_HPX)
-#define HPX_APPLICATION_STRING "jacobi_omp_[static,dynamic]"
+#define HPX_APPLICATION_STRING "jacobi_omp_nonuniform_[static,dynamic]"
 #endif
 
 int main(int argc, char** argv)
