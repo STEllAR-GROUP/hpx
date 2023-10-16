@@ -70,13 +70,13 @@ public:
     partition_data() = default;
 
     explicit partition_data(std::size_t size)
-      : data_(std::allocator<double>().allocate(size), size, buffer_type::take)
+      : data_(new double[size], size, buffer_type::take)
       , size_(size)
     {
     }
 
     partition_data(std::size_t size, double initial_value)
-      : data_(std::allocator<double>().allocate(size), size, buffer_type::take)
+      : data_(new double[size], size, buffer_type::take)
       , size_(size)
     {
         double const base_value = static_cast<double>(initial_value * size);
@@ -85,8 +85,7 @@ public:
     }
 
     partition_data(partition_data const& old_part)
-      : data_(std::allocator<double>().allocate(old_part.size()),
-            old_part.size(), buffer_type::take)
+      : data_(new double[old_part.size()], old_part.size(), buffer_type::take)
       , size_(old_part.size())
     {
         for (std::size_t i = 0; i < old_part.size(); i++)
