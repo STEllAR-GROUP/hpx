@@ -4,12 +4,19 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file communication_setup.hpp
+
 #pragma once
 
 #if defined(DOXYGEN)
 
-// clang-format off
+/// Top level HPX namespace
 namespace hpx::collectives {
+    // clang-format off
+
+    /// A handle identifying the communication channel to use for a particular
+    /// collective operation
+    struct communicator;
 
     /// The function \a create_communication_set sets up a (distributed)
     /// tree-like communication structure that can be used with any of the
@@ -38,8 +45,8 @@ namespace hpx::collectives {
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
         arity_arg arity = arity_arg());
-}
-// clang-format on
+    // clang-format on
+}    // namespace hpx::collectives
 
 #else    // DOXYGEN
 
