@@ -63,7 +63,7 @@ Classes
 .. table:: `hpx` classes of header ``hpx/collectives.hpp``
 
    +-----------------------------------------------------+
-   | Class                                            |
+   | Class                                               |
    +=====================================================+
    | :cpp:struct:`hpx::collectives::num_sites_arg`       |
    +-----------------------------------------------------+
@@ -79,11 +79,9 @@ Classes
    +-----------------------------------------------------+
    | :cpp:struct:`hpx::collectives::arity_arg`           |
    +-----------------------------------------------------+
-   | :cpp:class:`hpx::collectives::communicator`         |
+   | :cpp:struct:`hpx::collectives::communicator`        |
    +-----------------------------------------------------+
    | :cpp:class:`hpx::collectives::channel_communicator` |
-   +-----------------------------------------------------+
-   | :cpp:class:`hpx::collectives::communicator`         |
    +-----------------------------------------------------+
 
 Functions
@@ -116,11 +114,11 @@ Functions
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::create_local_communicator`   |
    +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::set_info`                    |
+   | :cpp:func:`hpx::collectives::communicator::set_info`      |
    +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::get_info`                    |
+   | :cpp:func:`hpx::collectives::communicator::get_info`      |
    +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::is_root`                     |
+   | :cpp:func:`hpx::collectives::communicator::is_root`       |
    +-----------------------------------------------------------+
    | :cpp:func:`hpx::collectives::exclusive_scan`              |
    +-----------------------------------------------------------+
