@@ -9,8 +9,10 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/uninitialized_relocate.hpp>
 
+#include <atomic>
 #include <random>
 #include <set>
+#include <utility>
 
 constexpr int N = 500;    // number of objects to construct
 constexpr int M = 200;    // number of objects to relocate
@@ -207,7 +209,7 @@ std::pair<T*, T*> setup()
 }
 
 template <typename Ex>
-void test(Ex&& ex)
+void test()
 {
     {    // Non-overlapping trivially relocatable
         auto [ptr1, ptr2] = setup<trivially_relocatable_struct>();
@@ -510,8 +512,8 @@ void test_overlapping()
 
 int hpx_main()
 {
-    test<>(hpx::execution::seq);
-    test<>(hpx::execution::par);
+    test<hpx::execution::sequenced_policy>();
+    test<hpx::execution::parallel_policy>();
 
     test_overlapping();
 

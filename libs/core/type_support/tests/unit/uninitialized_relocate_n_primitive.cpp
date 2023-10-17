@@ -7,7 +7,7 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
-#include <hpx/type_support/uninitialized_relocation_primitive.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #define N 50
 #define K 10

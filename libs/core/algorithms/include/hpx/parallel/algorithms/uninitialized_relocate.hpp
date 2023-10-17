@@ -446,7 +446,7 @@ namespace hpx::parallel {
                     hpx::experimental::util::uninitialized_relocate_primitive(
                         first, last, dest);
 
-                return util::in_out_result<InIter1, FwdIter>{first_advanced, 
+                return util::in_out_result<InIter1, FwdIter>{first_advanced,
                                 dest_advanced};
             }
 
@@ -507,7 +507,7 @@ namespace hpx::parallel {
                 hpx::experimental::util::uninitialized_relocate_backward_primitive(
                         first, last, dest_last);
 
-                return util::in_out_result<BiIter1, BiIter2>{last_advanced, 
+                return util::in_out_result<BiIter1, BiIter2>{last_advanced,
                             dest_last_advanced};
             }
 
@@ -731,10 +731,10 @@ namespace hpx::experimental {
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
                 "The 'first' and 'last' arguments must meet the requirements "
-                "of input iterators.");
+                "of bidirectional iterators.");
             static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
                 "The 'dest_last' argument must meet the requirements of a "
-                "forward iterator.");
+                "bidirectional iterator.");
             static_assert(util::detail::relocation_traits<BiIter1,
                               BiIter2>::valid_relocation,
                 "Relocating from this source type to this destination type is "
@@ -766,10 +766,10 @@ namespace hpx::experimental {
             BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
             BiIter2>::is_noexcept_relocatable_v)
         {
-            static_assert(hpx::traits::is_input_iterator_v<BiIter1>,
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1>,
                 "The 'first' and 'last' arguments must meet the requirements "
                 "of bidirectional iterators.");
-            static_assert(hpx::traits::is_forward_iterator_v<BiIter2>,
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
                 "The 'dest' argument must meet the requirements of a "
                 "bidirectional iterator.");
             static_assert(util::detail::relocation_traits<BiIter1,
