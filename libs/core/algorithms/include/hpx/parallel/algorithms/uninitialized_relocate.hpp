@@ -274,7 +274,7 @@ namespace hpx {
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/construct_at.hpp>
-#include <hpx/type_support/uninitialized_relocate_n_primitive.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -446,7 +446,8 @@ namespace hpx::parallel {
                     hpx::experimental::util::uninitialized_relocate_primitive(
                         first, last, dest);
 
-                return util::in_out_result<InIter1, FwdIter>{first_advanced, dest_advanced};
+                return util::in_out_result<InIter1, FwdIter>{first_advanced, 
+                                dest_advanced};
             }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -502,12 +503,12 @@ namespace hpx::parallel {
                 BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
                 relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
             {
-                auto [last_advanced, dest_last_advanced] = 
+                auto [last_advanced, dest_last_advanced] =
                 hpx::experimental::util::uninitialized_relocate_backward_primitive(
                         first, last, dest_last);
 
-                return util::in_out_result<BiIter1, BiIter2>{last_advanced, dest_last_advanced
-                    };
+                return util::in_out_result<BiIter1, BiIter2>{last_advanced, 
+                            dest_last_advanced};
             }
 
             template <typename ExPolicy, typename BiIter1, typename BiIter2,

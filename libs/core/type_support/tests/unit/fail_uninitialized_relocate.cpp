@@ -7,7 +7,7 @@
 // This test should fail to compile
 
 #include <hpx/init.hpp>
-#include <hpx/type_support/uninitialized_relocate_n_primitive.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 using hpx::experimental::util::uninitialized_relocate_n_primitive;
 

@@ -143,8 +143,8 @@ namespace hpx::experimental::util {
         typename Dummy>    // Dummy is used retain the same signature
                            // as the implementation before P1144
     // clang-format off
-    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(BiIter1 first, BiIter1 last,
-        BiIter2 dst_last, Dummy) noexcept(
+    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
+        BiIter1 first, BiIter1 last,BiIter2 dst_last, Dummy) noexcept(
             detail::relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
     // clang-format on
     {
@@ -461,11 +461,10 @@ namespace hpx::experimental::util {
     /////////////////////////////////////
     template <typename BiIter1, typename BiIter2,
         typename iterators_are_contiguous_t>
-    // clang-format off
-    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(BiIter1 first, BiIter1 last,
-        BiIter2 dst_last, iterators_are_contiguous_t) noexcept(
-            detail::relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
-    // clang-format on
+    std::tuple<BiIter1, BiIter2> uninitialized_relocate_backward_primitive(
+        BiIter1 first, BiIter1 last, BiIter2 dst_last,
+        iterators_are_contiguous_t) noexcept(detail::relocation_traits<BiIter1,
+        BiIter2>::is_noexcept_relocatable_v)
     {
         // TODO CHECK SENT
         static_assert(
