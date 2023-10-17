@@ -120,8 +120,6 @@ namespace hpx { namespace collectives {
 namespace hpx { namespace collectives {
 
     // forward declarations
-    /// a handle identifying the communication channel to use for get/set
-    /// operations
     class channel_communicator;
 
     template <typename T>

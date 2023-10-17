@@ -140,9 +140,6 @@ struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
 
 namespace hpx::collectives {
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// a handle identifying the communication channel to use for a particular
-    /// collective operation
     struct communicator
       : hpx::components::client_base<communicator, detail::communicator_server,
             detail::communicator_data>
