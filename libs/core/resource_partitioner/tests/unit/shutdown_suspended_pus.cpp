@@ -27,14 +27,15 @@ std::size_t const max_threads = (std::min)(
 
 int hpx_main()
 {
+    std::size_t const num_os_threads = hpx::get_os_thread_count();
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(std::size_t(max_threads), num_threads);
+    HPX_TEST_EQ(std::size_t(num_os_threads), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(max_threads));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(), std::size_t(num_os_threads));
 
     // Remove all but one pu
     for (std::size_t thread_num = 0; thread_num < num_threads - 1; ++thread_num)

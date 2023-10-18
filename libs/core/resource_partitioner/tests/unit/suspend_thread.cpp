@@ -28,15 +28,16 @@ std::size_t const max_threads = (std::min)(static_cast<std::size_t>(4),
 
 int hpx_main()
 {
+    std::size_t const num_os_threads = hpx::get_os_thread_count();
     std::size_t const num_threads = hpx::resource::get_num_threads("default");
 
-    HPX_TEST_EQ(static_cast<std::size_t>(max_threads), num_threads);
+    HPX_TEST_EQ(static_cast<std::size_t>(num_os_threads), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("default");
 
-    HPX_TEST_EQ(
-        tp.get_active_os_thread_count(), static_cast<std::size_t>(max_threads));
+    HPX_TEST_EQ(tp.get_active_os_thread_count(),
+        static_cast<std::size_t>(num_os_threads));
 
     {
         // Check number of used resources
@@ -124,7 +125,7 @@ int hpx_main()
 
             // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            for (std::size_t i = 0; i < num_threads - 1; ++i)
             {
                 fs.push_back(
                     hpx::threads::suspend_processing_unit(tp, thread_num));
@@ -136,7 +137,7 @@ int hpx_main()
 
             // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            for (std::size_t i = 0; i < num_threads - 1; ++i)
             {
                 fs.push_back(
                     hpx::threads::resume_processing_unit(tp, thread_num));
