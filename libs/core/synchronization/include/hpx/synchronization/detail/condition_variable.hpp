@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -55,17 +55,31 @@ namespace hpx::lcos::local::detail {
 
         // Return false if no more threads are waiting (returns true if queue is
         // non-empty).
-        HPX_CORE_EXPORT bool notify_one(std::unique_lock<mutex_type> lock,
-            threads::thread_priority priority, error_code& ec = throws);
+        HPX_CORE_EXPORT bool notify_one(std::unique_lock<mutex_type>& lock,
+            threads::thread_priority priority, bool unlock,
+            error_code& ec = throws);
 
         HPX_CORE_EXPORT void notify_all(std::unique_lock<mutex_type> lock,
             threads::thread_priority priority, error_code& ec = throws);
+
+        bool notify_one(std::unique_lock<mutex_type> lock,
+            threads::thread_priority priority, error_code& ec = throws)
+        {
+            return notify_one(lock, priority, true, ec);
+        }
 
         bool notify_one(
             std::unique_lock<mutex_type> lock, error_code& ec = throws)
         {
             return notify_one(
-                HPX_MOVE(lock), threads::thread_priority::default_, ec);
+                lock, threads::thread_priority::default_, true, ec);
+        }
+
+        bool notify_one_no_unlock(
+            std::unique_lock<mutex_type>& lock, error_code& ec = throws)
+        {
+            return notify_one(
+                lock, threads::thread_priority::default_, false, ec);
         }
 
         void notify_all(

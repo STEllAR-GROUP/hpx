@@ -11,226 +11,570 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/synchronization/condition_variable.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
+#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/synchronization/detail/condition_variable.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 
+#include <atomic>
+#include <cstdint>
 #include <mutex>
 
-namespace hpx {
+namespace hpx::detail {
 
-    namespace detail {
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Mutex>
+    struct shared_mutex_data
+    {
+        using mutex_type = Mutex;
 
-        template <typename Mutex = hpx::mutex>
-        class shared_mutex
+        HPX_HOST_DEVICE_CONSTEXPR shared_mutex_data() noexcept
+          : count_(1)
         {
-        private:
-            using mutex_type = Mutex;
+        }
 
-            struct state_data
+        struct state_data
+        {
+            std::uint32_t shared_count;
+            std::uint8_t tag;    // ABA protection
+            bool exclusive;
+            bool upgrade;
+            bool exclusive_waiting_blocked;
+        };
+
+        struct shared_state
+        {
+            union
             {
-                unsigned shared_count;
-                bool exclusive;
-                bool upgrade;
-                bool exclusive_waiting_blocked;
+                std::uint64_t value = 0;
+                state_data data;
             };
 
-            state_data state;
-            mutex_type state_change;
-            hpx::condition_variable shared_cond;
-            hpx::condition_variable exclusive_cond;
-            hpx::condition_variable upgrade_cond;
+            shared_state() = default;
+        };
 
-            void release_waiters()
+        util::cache_aligned_data_derived<std::atomic<shared_state>> state;
+
+        using condition_variable = lcos::local::detail::condition_variable;
+
+        util::cache_aligned_data_derived<mutex_type> state_change;
+        util::cache_aligned_data_derived<condition_variable> shared_cond;
+        util::cache_aligned_data_derived<condition_variable> exclusive_cond;
+        util::cache_aligned_data_derived<condition_variable> upgrade_cond;
+
+        void release_waiters(std::unique_lock<mutex_type>& lk)
+        {
+            exclusive_cond.notify_one_no_unlock(lk);
+            shared_cond.notify_all(HPX_MOVE(lk));
+        }
+
+        bool set_state(shared_state& s1, shared_state& s) noexcept
+        {
+            ++s.data.tag;
+            return s1.value == state.load(std::memory_order_relaxed).value &&
+                state.compare_exchange_strong(s1, s, std::memory_order_release);
+        }
+
+        bool set_state(shared_state& s1, shared_state& s,
+            std::unique_lock<mutex_type>& lk) noexcept
+        {
+            if (s1.value != state.load(std::memory_order_relaxed).value)
+                return false;
+
+            ++s.data.tag;
+
+            lk = std::unique_lock<mutex_type>(state_change);
+            if (state.compare_exchange_strong(s1, s, std::memory_order_release))
+                return true;
+
+            lk.unlock();
+            return false;
+        }
+
+        void lock_shared()
+        {
+            while (true)
             {
-                exclusive_cond.notify_one();
-                shared_cond.notify_all();
-            }
-
-        public:
-            shared_mutex()
-              : state{0u, false, false, false}
-            {
-            }
-
-            void lock_shared()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                while (state.exclusive || state.exclusive_waiting_blocked)
+                auto s = state.load(std::memory_order_acquire);
+                while (s.data.exclusive || s.data.exclusive_waiting_blocked)
                 {
-                    shared_cond.wait(lk);
-                }
-
-                ++state.shared_count;
-            }
-
-            bool try_lock_shared()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                if (state.exclusive || state.exclusive_waiting_blocked)
-                    return false;
-
-                else
-                {
-                    ++state.shared_count;
-                    return true;
-                }
-            }
-
-            void unlock_shared()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                if (/*bool const last_reader = */ !--state.shared_count)
-                {
-                    if (state.upgrade)
                     {
-                        state.upgrade = false;
-                        state.exclusive = true;
+                        std::unique_lock<mutex_type> lk(state_change);
+                        shared_cond.wait(lk);
+                    }
 
-                        upgrade_cond.notify_one();
+                    s = state.load(std::memory_order_acquire);
+                }
+
+                auto s1 = s;
+
+                ++s.data.shared_count;
+                if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+        }
+
+        bool try_lock_shared()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                if (s.data.exclusive || s.data.exclusive_waiting_blocked)
+                {
+                    return false;
+                }
+
+                auto s1 = s;
+
+                ++s.data.shared_count;
+                if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+            return true;
+        }
+
+        void unlock_shared()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                if (--s.data.shared_count == 0)
+                {
+                    if (s.data.upgrade)
+                    {
+                        s.data.upgrade = false;
+                        s.data.exclusive = true;
+
+                        std::unique_lock<mutex_type> lk;
+                        if (set_state(s1, s, lk))
+                        {
+                            HPX_ASSERT_OWNS_LOCK(lk);
+                            upgrade_cond.notify_one_no_unlock(lk);
+                            release_waiters(lk);
+                            break;
+                        }
                     }
                     else
                     {
-                        state.exclusive_waiting_blocked = false;
+                        s.data.exclusive_waiting_blocked = false;
+
+                        std::unique_lock<mutex_type> lk;
+                        if (set_state(s1, s, lk))
+                        {
+                            HPX_ASSERT_OWNS_LOCK(lk);
+                            release_waiters(lk);
+                            break;
+                        }
+                    }
+                }
+                else if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+        }
+
+        void lock()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                while (s.data.shared_count != 0 || s.data.exclusive)
+                {
+                    auto s1 = s;
+
+                    s.data.exclusive_waiting_blocked = true;
+                    std::unique_lock<mutex_type> lk;
+                    if (set_state(s1, s, lk))
+                    {
+                        HPX_ASSERT_OWNS_LOCK(lk);
+                        exclusive_cond.wait(lk);
                     }
 
-                    release_waiters();
+                    s = state.load(std::memory_order_acquire);
                 }
-            }
 
-            void lock()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
+                auto s1 = s;
 
-                while (state.shared_count || state.exclusive)
+                s.data.exclusive = true;
+                if (set_state(s1, s))
                 {
-                    state.exclusive_waiting_blocked = true;
-                    exclusive_cond.wait(lk);
-                }
-
-                state.exclusive = true;
-            }
-
-            bool try_lock()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                if (state.shared_count || state.exclusive)
-                    return false;
-
-                else
-                {
-                    state.exclusive = true;
-                    return true;
+                    break;
                 }
             }
+        }
 
-            void unlock()
+        bool try_lock()
+        {
+            while (true)
             {
-                std::unique_lock<mutex_type> lk(state_change);
-                state.exclusive = false;
-                state.exclusive_waiting_blocked = false;
-                release_waiters();
-            }
-
-            void lock_upgrade()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                while (state.exclusive || state.exclusive_waiting_blocked ||
-                    state.upgrade)
-                {
-                    shared_cond.wait(lk);
-                }
-
-                ++state.shared_count;
-                state.upgrade = true;
-            }
-
-            bool try_lock_upgrade()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-
-                if (state.exclusive || state.exclusive_waiting_blocked ||
-                    state.upgrade)
+                auto s = state.load(std::memory_order_acquire);
+                if (s.data.shared_count || s.data.exclusive)
                 {
                     return false;
                 }
 
-                ++state.shared_count;
-                state.upgrade = true;
-                return true;
-            }
+                auto s1 = s;
 
-            void unlock_upgrade()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-                state.upgrade = false;
-
-                if (/*bool const last_reader = */ !--state.shared_count)
+                s.data.exclusive = true;
+                if (set_state(s1, s))
                 {
-                    state.exclusive_waiting_blocked = false;
-                    release_waiters();
+                    break;
                 }
             }
+            return true;
+        }
 
-            void unlock_upgrade_and_lock()
+        void unlock()
+        {
+            while (true)
             {
-                std::unique_lock<mutex_type> lk(state_change);
-                --state.shared_count;
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
 
-                while (state.shared_count)
+                s.data.exclusive = false;
+                s.data.exclusive_waiting_blocked = false;
+
+                std::unique_lock<mutex_type> lk;
+                if (set_state(s1, s, lk))
                 {
-                    upgrade_cond.wait(lk);
+                    HPX_ASSERT_OWNS_LOCK(lk);
+                    release_waiters(lk);
+                    break;
+                }
+            }
+        }
+
+        void lock_upgrade()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                while (s.data.exclusive || s.data.exclusive_waiting_blocked ||
+                    s.data.upgrade)
+                {
+                    {
+                        std::unique_lock<mutex_type> lk(state_change);
+                        shared_cond.wait(lk);
+                    }
+
+                    s = state.load(std::memory_order_acquire);
                 }
 
-                state.upgrade = false;
-                state.exclusive = true;
-            }
+                auto s1 = s;
 
-            void unlock_and_lock_upgrade()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-                state.exclusive = false;
-                state.upgrade = true;
-                ++state.shared_count;
-                state.exclusive_waiting_blocked = false;
-                release_waiters();
-            }
-
-            void unlock_and_lock_shared()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-                state.exclusive = false;
-                ++state.shared_count;
-                state.exclusive_waiting_blocked = false;
-                release_waiters();
-            }
-
-            bool try_unlock_shared_and_lock()
-            {
-                std::unique_lock<mutex_type> lk(state_change);
-                if (!state.exclusive && !state.exclusive_waiting_blocked &&
-                    !state.upgrade && state.shared_count == 1)
+                ++s.data.shared_count = true;
+                s.data.upgrade = true;
+                if (set_state(s1, s))
                 {
-                    state.shared_count = 0;
-                    state.exclusive = true;
-                    return true;
+                    break;
                 }
-                return false;
             }
+        }
 
-            void unlock_upgrade_and_lock_shared()
+        bool try_lock_upgrade()
+        {
+            while (true)
             {
-                std::unique_lock<mutex_type> lk(state_change);
-                state.upgrade = false;
-                state.exclusive_waiting_blocked = false;
-                release_waiters();
+                auto s = state.load(std::memory_order_acquire);
+                if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
+                    s.data.upgrade)
+                {
+                    return false;
+                }
+
+                auto s1 = s;
+
+                ++s.data.shared_count;
+                s.data.upgrade = true;
+                if (set_state(s1, s))
+                {
+                    break;
+                }
             }
-        };
-    }    // namespace detail
+            return true;
+        }
+
+        void unlock_upgrade()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                bool release = false;
+                s.data.upgrade = false;
+                if (--s.data.shared_count == 0)
+                {
+                    s.data.exclusive_waiting_blocked = false;
+                    release = true;
+                }
+
+                if (release)
+                {
+                    std::unique_lock<mutex_type> lk;
+                    if (set_state(s1, s, lk))
+                    {
+                        HPX_ASSERT_OWNS_LOCK(lk);
+                        release_waiters(lk);
+                        break;
+                    }
+                }
+                else if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+        }
+
+        void unlock_upgrade_and_lock()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                --s.data.shared_count;
+                if (!set_state(s1, s))
+                {
+                    continue;
+                }
+
+                s = state.load(std::memory_order_acquire);
+                while (s.data.shared_count != 0)
+                {
+                    {
+                        std::unique_lock<mutex_type> lk(state_change);
+                        upgrade_cond.wait(lk);
+                    }
+                    s = state.load(std::memory_order_acquire);
+                }
+
+                s1 = s;
+
+                s.data.upgrade = false;
+                s.data.exclusive = true;
+                if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+        }
+
+        void unlock_and_lock_upgrade()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                s.data.exclusive = false;
+                s.data.exclusive_waiting_blocked = false;
+                s.data.upgrade = true;
+                ++s.data.shared_count;
+
+                std::unique_lock<mutex_type> lk;
+                if (set_state(s1, s, lk))
+                {
+                    HPX_ASSERT_OWNS_LOCK(lk);
+                    release_waiters(lk);
+                    break;
+                }
+            }
+        }
+
+        void unlock_and_lock_shared()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                s.data.exclusive = false;
+                s.data.exclusive_waiting_blocked = false;
+                ++s.data.shared_count;
+
+                std::unique_lock<mutex_type> lk;
+                if (set_state(s1, s, lk))
+                {
+                    HPX_ASSERT_OWNS_LOCK(lk);
+                    release_waiters(lk);
+                    break;
+                }
+            }
+        }
+
+        bool try_unlock_shared_and_lock()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                if (s.data.exclusive || s.data.exclusive_waiting_blocked ||
+                    s.data.upgrade || s.data.shared_count == 1)
+                {
+                    return false;
+                }
+
+                auto s1 = s;
+
+                s.data.shared_count = 0;
+                s.data.exclusive = true;
+                if (set_state(s1, s))
+                {
+                    break;
+                }
+            }
+            return true;
+        }
+
+        void unlock_upgrade_and_lock_shared()
+        {
+            while (true)
+            {
+                auto s = state.load(std::memory_order_acquire);
+                auto s1 = s;
+
+                s.data.exclusive_waiting_blocked = false;
+                s.data.upgrade = false;
+
+                std::unique_lock<mutex_type> lk;
+                if (set_state(s1, s, lk))
+                {
+                    HPX_ASSERT_OWNS_LOCK(lk);
+                    release_waiters(lk);
+                    break;
+                }
+            }
+        }
+
+    private:
+        friend void intrusive_ptr_add_ref(shared_mutex_data* p) noexcept
+        {
+            ++p->count_;
+        }
+
+        friend void intrusive_ptr_release(shared_mutex_data* p) noexcept
+        {
+            if (0 == --p->count_)
+            {
+                delete p;
+            }
+        }
+
+        hpx::util::atomic_count count_;
+    };
+
+    template <typename Mutex = hpx::spinlock>
+    class shared_mutex
+    {
+    private:
+        using mutex_type = Mutex;
+
+        using data_type = hpx::intrusive_ptr<shared_mutex_data<Mutex>>;
+        hpx::util::cache_aligned_data_derived<data_type> data_;
+
+        using shared_state = typename shared_mutex_data<Mutex>::shared_state;
+
+    public:
+        shared_mutex()
+          : data_(new shared_mutex_data<Mutex>, false)
+        {
+        }
+
+        void lock_shared()
+        {
+            auto data = data_;
+            data->lock_shared();
+        }
+
+        bool try_lock_shared()
+        {
+            auto data = data_;
+            return data->try_lock_shared();
+        }
+
+        void unlock_shared()
+        {
+            auto data = data_;
+            data->unlock_shared();
+        }
+
+        void lock()
+        {
+            auto data = data_;
+            data->lock();
+        }
+
+        bool try_lock()
+        {
+            auto data = data_;
+            return data->try_lock();
+        }
+
+        void unlock()
+        {
+            auto data = data_;
+            data->unlock();
+        }
+
+        void lock_upgrade()
+        {
+            auto data = data_;
+            data->lock_upgrade();
+        }
+
+        bool try_lock_upgrade()
+        {
+            auto data = data_;
+            return data->try_lock_upgrade();
+        }
+
+        void unlock_upgrade()
+        {
+            auto data = data_;
+            data->unlock_upgrade();
+        }
+
+        void unlock_upgrade_and_lock()
+        {
+            auto data = data_;
+            data->unlock_upgrade_and_lock();
+        }
+
+        void unlock_and_lock_upgrade()
+        {
+            auto data = data_;
+            data->unlock_and_lock_upgrade();
+        }
+
+        void unlock_and_lock_shared()
+        {
+            auto data = data_;
+            data->unlock_and_lock_shared();
+        }
+
+        bool try_unlock_shared_and_lock()
+        {
+            auto data = data_;
+            return data->try_unlock_shared_and_lock();
+        }
+
+        void unlock_upgrade_and_lock_shared()
+        {
+            auto data = data_;
+            data->unlock_upgrade_and_lock_shared();
+        }
+    };
+}    // namespace hpx::detail
+
+namespace hpx {
 
     /// The \a shared_mutex class is a synchronization primitive that can be
     /// used to protect shared data from being simultaneously accessed by

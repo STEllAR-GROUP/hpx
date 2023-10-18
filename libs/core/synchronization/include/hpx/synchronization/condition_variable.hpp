@@ -22,7 +22,6 @@
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <mutex>
 #include <utility>
@@ -158,7 +157,7 @@ namespace hpx {
         ///
         /// \returns \a notify_one returns \a void.
         ///
-        void notify_one(error_code& ec = throws)
+        void notify_one(error_code& ec = throws) const
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
             data_->cond_.notify_one(HPX_MOVE(l), ec);
@@ -173,7 +172,7 @@ namespace hpx {
         ///
         /// \returns \a notify_all returns \a void.
         ///
-        void notify_all(error_code& ec = throws)
+        void notify_all(error_code& ec = throws) const
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
             data_->cond_.notify_all(HPX_MOVE(l), ec);
@@ -214,8 +213,7 @@ namespace hpx {
 
             auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking const ignore_lock;
-            HPX_UNUSED(ignore_lock);
+            [[maybe_unused]] util::ignore_all_while_checking const ignore_lock;
 
             std::unique_lock<mutex_type> l(data->mtx_);
             unlock_guard<std::unique_lock<Mutex>> unlock(lock);
@@ -321,8 +319,7 @@ namespace hpx {
 
             auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking const ignore_lock;
-            HPX_UNUSED(ignore_lock);
+            [[maybe_unused]] util::ignore_all_while_checking const ignore_lock;
 
             std::unique_lock<mutex_type> l(data->mtx_);
             unlock_guard<std::unique_lock<Mutex>> unlock(lock);
@@ -620,7 +617,7 @@ namespace hpx {
         ///
         /// \returns \a notify_one returns \a void.
         ///
-        void notify_one(error_code& ec = throws)
+        void notify_one(error_code& ec = throws) const
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
             data_->cond_.notify_one(HPX_MOVE(l), ec);
@@ -651,7 +648,7 @@ namespace hpx {
         ///
         /// \returns \a notify_all returns \a void.
         ///
-        void notify_all(error_code& ec = throws)
+        void notify_all(error_code& ec = throws) const
         {
             std::unique_lock<mutex_type> l(data_->mtx_);
             data_->cond_.notify_all(HPX_MOVE(l), ec);
@@ -702,8 +699,7 @@ namespace hpx {
 
             auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking const ignore_lock;
-            HPX_UNUSED(ignore_lock);
+            [[maybe_unused]] util::ignore_all_while_checking const ignore_lock;
 
             std::unique_lock<mutex_type> l(data->mtx_);
             unlock_guard<Lock> unlock(lock);
@@ -819,8 +815,7 @@ namespace hpx {
 
             auto const data = data_;    // keep data alive
 
-            util::ignore_all_while_checking const ignore_lock;
-            HPX_UNUSED(ignore_lock);
+            [[maybe_unused]] util::ignore_all_while_checking const ignore_lock;
 
             std::unique_lock<mutex_type> l(data->mtx_);
             unlock_guard<Lock> unlock(lock);
@@ -1069,14 +1064,14 @@ namespace hpx {
 
             while (!pred())
             {
-                util::ignore_all_while_checking const ignore_lock;
-                HPX_UNUSED(ignore_lock);
+                [[maybe_unused]] util::ignore_all_while_checking const
+                    ignore_lock;
 
                 std::unique_lock<mutex_type> l(data->mtx_);
                 if (stoken.stop_requested())
                 {
                     // pred() has already evaluated to false since we last
-                    // a acquired lock
+                    // an acquired lock
                     return false;
                 }
 
@@ -1164,8 +1159,8 @@ namespace hpx {
             {
                 bool should_stop;
                 {
-                    util::ignore_all_while_checking const ignore_lock;
-                    HPX_UNUSED(ignore_lock);
+                    [[maybe_unused]] util::ignore_all_while_checking const
+                        ignore_lock;
 
                     std::unique_lock<mutex_type> l(data->mtx_);
                     if (stoken.stop_requested())

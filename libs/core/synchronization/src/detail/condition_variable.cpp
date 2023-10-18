@@ -108,8 +108,8 @@ namespace hpx::lcos::local::detail {
 
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
-    bool condition_variable::notify_one(std::unique_lock<mutex_type> lock,
-        threads::thread_priority /* priority */, error_code& ec)
+    bool condition_variable::notify_one(std::unique_lock<mutex_type>& lock,
+        threads::thread_priority priority, bool unlock, error_code& ec)
     {
         // Caller failing to hold lock 'lock' before calling function
 #if defined(HPX_MSVC)
@@ -138,7 +138,8 @@ namespace hpx::lcos::local::detail {
             }
 
             bool const not_empty = !queue_.empty();
-            lock.unlock();
+            if (unlock)
+                lock.unlock();
 
             ctx.resume();
 
@@ -147,6 +148,9 @@ namespace hpx::lcos::local::detail {
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        if (unlock)
+            lock.unlock();
 
         return false;
 
