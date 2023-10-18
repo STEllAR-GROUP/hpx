@@ -35,21 +35,21 @@ void dummy_task(std::size_t n, std::string const& text)
 
 int hpx_main()
 {
-    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads());
-    HPX_TEST_EQ(
-        std::size_t(max_threads), hpx::resource::get_num_thread_pools());
+    std::size_t const num_os_threads = hpx::get_os_thread_count();
+    HPX_TEST_EQ(num_os_threads, hpx::resource::get_num_threads());
+    HPX_TEST_EQ(num_os_threads, hpx::resource::get_num_thread_pools());
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("pool-0"));
     HPX_TEST(hpx::resource::pool_exists("default"));
     HPX_TEST(hpx::resource::pool_exists("pool-0"));
     HPX_TEST(!hpx::resource::pool_exists("nonexistent"));
-    for (std::size_t pool_index = 0; pool_index < max_threads; ++pool_index)
+    for (std::size_t pool_index = 0; pool_index < num_os_threads; ++pool_index)
     {
         HPX_TEST(hpx::resource::pool_exists(pool_index));
     }
-    HPX_TEST(!hpx::resource::pool_exists(max_threads));
+    HPX_TEST(!hpx::resource::pool_exists(num_os_threads));
 
-    for (std::size_t i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < num_os_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         HPX_TEST_EQ(pool_name, hpx::resource::get_pool_name(i));
@@ -83,7 +83,7 @@ int hpx_main()
     std::vector<hpx::execution::parallel_executor> execs;
     std::vector<hpx::execution::parallel_executor> execs_hp;
     //
-    for (std::size_t i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < num_os_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         execs.push_back(hpx::execution::parallel_executor(
@@ -94,7 +94,7 @@ int hpx_main()
             hpx::threads::thread_priority::high));
     }
 
-    for (std::size_t i = 0; i < max_threads; ++i)
+    for (std::size_t i = 0; i < num_os_threads; ++i)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         lotsa_futures.push_back(
@@ -122,8 +122,10 @@ void init_resource_partitioner_handler(
     // before adding pools - set the default pool name to "pool-0"
     rp.set_default_pool_name("pool-0");
 
+    size_t const num_threads = rp.get_number_requested_threads();
+
     // create N pools
-    for (std::size_t i = 0; i < max_threads; i++)
+    for (std::size_t i = 0; i < num_threads; i++)
     {
         std::string pool_name = "pool-" + std::to_string(i);
         rp.create_thread_pool(
@@ -131,21 +133,21 @@ void init_resource_partitioner_handler(
     }
 
     // add one PU to each pool
-    std::size_t thread_count = 0;
+    std::size_t threads_added = 0;
     for (hpx::resource::numa_domain const& d : rp.numa_domains())
     {
         for (hpx::resource::core const& c : d.cores())
         {
             for (hpx::resource::pu const& p : c.pus())
             {
-                if (thread_count < max_threads)
+                if (threads_added < num_threads)
                 {
                     std::string pool_name =
-                        "pool-" + std::to_string(thread_count);
-                    std::cout << "Added pu " << thread_count << " to "
+                        "pool-" + std::to_string(threads_added);
+                    std::cout << "Added pu " << threads_added << " to "
                               << pool_name << "\n";
                     rp.add_resource(p, pool_name);
-                    thread_count++;
+                    threads_added++;
                 }
             }
         }
