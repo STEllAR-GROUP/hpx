@@ -14,21 +14,19 @@ macro(hpx_setup_openshmem)
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       set(OPENSHMEM_PC "ucx")
 
-      pkg_search_module(
-        UCX IMPORTED_TARGET GLOBAL
-        ucx
-      )
+      pkg_search_module(UCX IMPORTED_TARGET GLOBAL ucx)
 
       if(NOT UCX_FOUND)
-        message(FATAL "HPX_WITH_PARCELPORT_OPENSHMEM=ucx selected but UCX is unavailable")
+        message(
+          FATAL
+          "HPX_WITH_PARCELPORT_OPENSHMEM=ucx selected but UCX is unavailable"
+        )
       endif()
 
-      pkg_search_module(
-        OPENSHMEM IMPORTED_TARGET GLOBAL
-        osss-ucx
-      )
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL osss-ucx)
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
-      set(OPENSHMEM_PC "sandia-openshmem"")
+      set(OPENSHMEM_PC
+          "sandia-openshmem"")
 
       pkg_search_module(
         OPENSHMEM IMPORTED_TARGET GLOBAL
@@ -47,37 +45,59 @@ macro(hpx_setup_openshmem)
     if(NOT PMI_LIBRARY OR NOT PMI_FOUND)
       set(PMI_AUTOCONF_OPTS --enable-pmi-simple)
     else()
-      set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR} --with-pmi-libdir=${PMI_LIBRARY}")
+      set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR}
+          --with-pmi-libdir=${PMI_LIBRARY}")
     endif()
 
     include(FetchContent)
 
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
 
-      message(STATUS "Fetching OSSS-UCX-OpenSHMEM")
+      message(STATUS "Fetching
+          OSSS-UCX-OpenSHMEM")
 
       fetchcontent_declare(
-        openshmem 
+        openshmem
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     	URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
       )
 
-      message(STATUS "Building OSSS-UCX (OpenSHMEM on UCX) and installing into ${CMAKE_INSTALL_PREFIX}")
+      message(STATUS "Building
+          OSSS-UCX
+          (OpenSHMEM on UCX)
+          and
+          installing
+          into
+          ${CMAKE_INSTALL_PREFIX}")
 
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
 
-      message(STATUS "Fetching Sandia-OpenSHMEM")
+      message(STATUS "Fetching
+          Sandia-OpenSHMEM")
 
       fetchcontent_declare(
-        openshmem 
+        openshmem
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         URL https://github.com/Sandia-OpenSHMEM/SOS/archive/refs/tags/v1.5.2.tar.gz
       )
 
-      message(STATUS "Building  and installing Sandia OpenSHMEM into ${CMAKE_INSTALL_PREFIX}")
+      message(STATUS "Building
+          and
+          installing
+          Sandia
+          OpenSHMEM
+          into
+          ${CMAKE_INSTALL_PREFIX}")
 
     else()
-        message(FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM is not set to `ucx` or `sos`")
+        message(FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM
+          is
+          not
+          set
+          to
+          `ucx`
+          or
+          `sos`")
     endif()
 
     fetchcontent_getproperties(openshmem)
@@ -95,7 +115,19 @@ macro(hpx_setup_openshmem)
     execute_process(
       COMMAND
         bash -c
-        "CC=${CMAKE_C_COMPILER} ./autogen.sh && CC=${CMAKE_C_COMPILER} ./configure --prefix=${OPENSHMEM_DIR}/install --enable-shared ${PMI_AUTOCONF_OPTS} && make && make install"
+        "CC=${CMAKE_C_COMPILER}
+          ./autogen.sh
+          &&
+          CC=${CMAKE_C_COMPILER}
+          ./configure
+          --prefix=${OPENSHMEM_DIR}/install
+          --enable-shared
+          ${PMI_AUTOCONF_OPTS}
+          &&
+          make
+          &&
+          make
+          install"
       WORKING_DIRECTORY ${OPENSHMEM_DIR}
       RESULT_VARIABLE OPENSHMEM_BUILD_STATUS
       OUTPUT_FILE ${OPENSHMEM_BUILD_OUTPUT}
@@ -103,7 +135,17 @@ macro(hpx_setup_openshmem)
     )
 
     if(OPENSHMEM_BUILD_STATUS)
-      message(FATAL_ERROR "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details")
+      message(FATAL_ERROR "OpenSHMEM
+          build
+          result
+          =
+          ${OPENSHMEM_SRC_BUILD_STATUS}
+          -
+          see
+          ${OPENSHMEM_SRC_BUILD_OUTPUT}
+          for
+          more
+          details")
     else()
 
       find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND
@@ -114,11 +156,21 @@ macro(hpx_setup_openshmem)
       if(NOT OPENSHMEM_PKGCONFIG_FILE_FOUND)
         message(
           FATAL_ERROR
-            "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEMT_DIR}/install/lib/pkgconfig"
+            "PKG-CONFIG
+          ERROR
+          (${OPENSHMEM_PKGCONFIG_FILE_FOUND})
+          ->
+          CANNOT
+          FIND
+          COMPILED
+          OpenSHMEM:
+          ${OPENSHMEMT_DIR}/install/lib/pkgconfig"
         )
       endif()
 
-      install(CODE "set(OPENSHMEM_PATH \"${OPENSHMEM_DIR}\")")
+      install(CODE "set
+          (OPENSHMEM_PATH \"${OPENSHMEM_DIR}\")
+          ")
 
       install(
         CODE [[
@@ -129,7 +181,9 @@ macro(hpx_setup_openshmem)
         )
 
         if(NOT OPENSHMEM_PKGCONFIG_FILE_CONTENT)
-          message(FATAL_ERROR "ERROR INSTALLING OPENSHMEM")
+          message(FATAL_ERROR "ERROR
+          INSTALLING
+          OPENSHMEM")
         endif()
 
         string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
@@ -146,13 +200,17 @@ macro(hpx_setup_openshmem)
         file(GLOB_RECURSE OPENSHMEM_FILES ${OPENSHMEM_PATH}/install/*)
 
         if(NOT OPENSHMEM_FILES)
-          message(STATUS "ERROR INSTALLING OPENSHMEM")
+          message(STATUS "ERROR
+          INSTALLING
+          OPENSHMEM")
         endif()
 
         foreach(OPENSHMEM_FILE ${OPENSHMEM_FILES})
           set(OPENSHMEM_FILE_CACHED "${OPENSHMEM_FILE}")
 
-          string(REGEX MATCH "(^\/.*\/)" OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE})
+          string(REGEX MATCH "
+          (^ \/.*\/)
+          " OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE})
 
           string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
             OPENSHMEM_FILE ${OPENSHMEM_FILE}
@@ -195,7 +253,15 @@ macro(hpx_setup_openshmem)
     endif()
 
     if(NOT OPENSHMEM_FOUND)
-      message(FATAL_ERROR "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}")
+      message(FATAL_ERROR "OpenSHMEM
+          downloaded,
+          compiled,
+          but
+          cannot
+          be
+          found
+          in
+          ${CMAKE_INSTALL_PREFIX}")
     endif()
 
   endif()
@@ -220,7 +286,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         endif()
@@ -256,7 +323,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         endif()
@@ -303,7 +371,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -338,10 +407,12 @@ macro(hpx_setup_openshmem)
         set(IDX 0)
 
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          set(NEWLINK "SHELL:-Wl,--whole-archive
+          ")
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -358,8 +429,10 @@ macro(hpx_setup_openshmem)
               endif()
             endforeach()
           endforeach()
-          string(APPEND NEWLINK " -Wl,--no-whole-archive")
-          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+          string(APPEND NEWLINK "
+          -Wl,--no-whole-archive")
+          string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive"
                       "${NEWLINK}" IDX
           )
           if("${IDX}" EQUAL "-1")
@@ -369,11 +442,13 @@ macro(hpx_setup_openshmem)
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
 	  else()
-            set(NEWLINK "SHELL: ")
+            set(NEWLINK "SHELL:
+          ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -417,7 +492,7 @@ macro(hpx_setup_openshmem)
         string(FIND "${X}" "-lsma" IDX)
         string(FIND "${X}" "-L" DIRIDX)
 	string(FIND "${X}" "-Wl" SKIP)
-	
+
 	if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
@@ -431,7 +506,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -465,10 +541,12 @@ macro(hpx_setup_openshmem)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          set(NEWLINK "SHELL:-Wl,--whole-archive
+          ")
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -485,9 +563,11 @@ macro(hpx_setup_openshmem)
               endif()
             endforeach()
           endforeach()
-          string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(APPEND NEWLINK "
+          -Wl,--no-whole-archive")
 
-          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+          string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive"
                       "${NEWLINK}" IDX
           )
           if("${IDX}" EQUAL "-1")
@@ -497,11 +577,13 @@ macro(hpx_setup_openshmem)
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
 	  else()
-            set(NEWLINK "SHELL: ")
+            set(NEWLINK "SHELL:
+          ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -549,7 +631,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         endif()
@@ -585,7 +668,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         endif()
@@ -618,7 +702,7 @@ macro(hpx_setup_openshmem)
         string(FIND "${X}" "-lsma" IDX)
         string(FIND "${X}" "-L" DIRIDX)
 	string(FIND "${X}" "-Wl" SKIP)
-	
+
 	if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
@@ -632,7 +716,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -666,10 +751,12 @@ macro(hpx_setup_openshmem)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          set(NEWLINK "SHELL:-Wl,--whole-archive
+          ")
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -687,9 +774,11 @@ macro(hpx_setup_openshmem)
               endif()
             endforeach()
           endforeach()
-          string(APPEND NEWLINK " -Wl,--no-whole-archive")
+          string(APPEND NEWLINK "
+          -Wl,--no-whole-archive")
 
-          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+          string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive"
                       "${NEWLINK}" IDX
           )
           if("${IDX}" EQUAL "-1")
@@ -699,11 +788,13 @@ macro(hpx_setup_openshmem)
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
 	  else()
-            set(NEWLINK "SHELL: ")
+            set(NEWLINK "SHELL:
+          ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -747,7 +838,7 @@ macro(hpx_setup_openshmem)
         string(FIND "${X}" "-lsma" IDX)
         string(FIND "${X}" "-L" DIRIDX)
 	string(FIND "${X}" "-Wl" SKIP)
-	
+
 	if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
@@ -761,7 +852,8 @@ macro(hpx_setup_openshmem)
           list(APPEND FLAG_LIST "${X}")
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM} ${X}")
+          list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}")
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -795,10 +887,12 @@ macro(hpx_setup_openshmem)
       if(NOT "${IDX}" EQUAL "0")
         set(IDX 0)
         if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive ")
+          set(NEWLINK "SHELL:-Wl,--whole-archive
+          ")
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -810,15 +904,18 @@ macro(hpx_setup_openshmem)
 
               list(LENGTH FOUND_LIB IDX)
 
-              message(STATUS "${FOUND_LIB} ${X}")
+              message(STATUS "${FOUND_LIB}
+          ${X}")
               if(NOT "${IDX}" EQUAL "0")
                 string(APPEND NEWLINK "${FOUND_LIB}")
                 set(FOUND_LIB "")
               endif()
             endforeach()
           endforeach()
-          string(APPEND NEWLINK " -Wl,--no-whole-archive")
-          string(FIND "SHELL:-Wl,--whole-archive  -Wl,--no-whole-archive"
+          string(APPEND NEWLINK "
+          -Wl,--no-whole-archive")
+          string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive"
                       "${NEWLINK}" IDX
           )
           if("${IDX}" EQUAL "-1")
@@ -828,11 +925,13 @@ macro(hpx_setup_openshmem)
           if(APPLE)
             set(NEWLINK "SHELL:-Wl,-force_load,")
 	  else()
-            set(NEWLINK "SHELL: ")
+            set(NEWLINK "SHELL:
+          ")
           endif()
           foreach(X IN ITEMS ${LIB_LIST})
             set(DIRSTR "")
-            string(REPLACE ";" " " DIRSTR "${DIR_LIST}")
+            string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}")
             foreach(Y IN ITEMS ${DIR_LIST})
               find_library(
                 FOUND_LIB
@@ -894,7 +993,8 @@ macro(hpx_setup_openshmem)
       )
       set_target_properties(
         PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                     "${OPENSHMEM_LIBRARY_DIRS}"
+                                     "${OPENSHMEM_LIBRARY_DIRS}
+          "
       )
     endif()
 
