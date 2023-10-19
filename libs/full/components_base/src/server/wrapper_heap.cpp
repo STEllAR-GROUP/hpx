@@ -67,7 +67,7 @@ namespace hpx::components::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     wrapper_heap::wrapper_heap(char const* class_name,
-        [[maybe_unused]] std::size_t count, heap_parameters parameters)
+        [[maybe_unused]] std::size_t count, heap_parameters const& parameters)
       : pool_(nullptr)
       , parameters_(parameters)
       , first_free_(nullptr)
@@ -88,15 +88,15 @@ namespace hpx::components::detail {
         {
             throw std::bad_alloc();
         }
+
         // use the pool's base address as the first gid, this will also
         // allow for the ids to be locally resolvable
         base_gid_ = naming::replace_locality_id(
-            naming::replace_component_type(
-                naming::gid_type(pool_), 0),
+            naming::replace_component_type(naming::gid_type(pool_), 0),
             agas::get_locality_id());
 
         naming::detail::set_credit_for_gid(
-            base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
+            base_gid_, static_cast<std::int64_t>(HPX_GLOBALCREDIT_INITIAL));
     }
 
     wrapper_heap::wrapper_heap()
@@ -177,7 +177,9 @@ namespace hpx::components::detail {
         alloc_count_ += count;
 #endif
 
-        char* p = first_free_.fetch_add(count * parameters_.element_size, std::memory_order_relaxed);
+        char* p = first_free_.fetch_add(
+            static_cast<std::ptrdiff_t>(count * parameters_.element_size),
+            std::memory_order_relaxed);
 
         if (p + num_bytes > pool_ + total_num_bytes)
         {
@@ -219,7 +221,8 @@ namespace hpx::components::detail {
 #if defined(HPX_DEBUG)
         free_count_ += count;
 #endif
-        size_t current_free_size = free_size_.fetch_add(count, std::memory_order_relaxed) + count;
+        size_t const current_free_size =
+            free_size_.fetch_add(count, std::memory_order_relaxed) + count;
 
         // release the pool if this one was the last allocated item
         if (current_free_size == parameters_.capacity)
@@ -247,27 +250,12 @@ namespace hpx::components::detail {
         [[maybe_unused]] util::itt::heap_internal_access hia;
 
         HPX_ASSERT(did_alloc(p));
+        HPX_ASSERT(base_gid_);
 
-//        if (!base_gid_)
-//        {
-//            std::unique_lock l(mtx_);
-//            if (!base_gid_)
-//            {
-//                // use the pool's base address as the first gid, this will also
-//                // allow for the ids to be locally resolvable
-//                base_gid_ = naming::replace_locality_id(
-//                    naming::replace_component_type(
-//                        naming::gid_type(pool_), type),
-//                    agas::get_locality_id());
-//
-//                naming::detail::set_credit_for_gid(
-//                    base_gid_, std::int64_t(HPX_GLOBALCREDIT_INITIAL));
-//            }
-//        }
         naming::gid_type result = base_gid_;
-        if (type) {
-            result = naming::replace_component_type(
-                result, type);
+        if (type)
+        {
+            result = naming::replace_component_type(result, type);
         }
         result.set_lsb(p);
 
@@ -289,15 +277,15 @@ namespace hpx::components::detail {
     bool wrapper_heap::free_pool()
     {
         HPX_ASSERT(pool_);
-        HPX_ASSERT(first_free_ == pool_ +
-                parameters_.capacity * parameters_.element_size);
+        HPX_ASSERT(first_free_ ==
+            pool_ + parameters_.capacity * parameters_.element_size);
 
         // unbind in AGAS service
         if (base_gid_)
         {
             naming::gid_type base_gid = naming::invalid_gid;
             {
-//                std::unique_lock l(mtx_);
+                std::unique_lock l(mtx_);
                 if (base_gid_)
                 {
                     base_gid = base_gid_;
@@ -324,13 +312,19 @@ namespace hpx::components::detail {
             return false;
         }
 
-        first_free_ = (reinterpret_cast<std::size_t>(pool_) %
-                              parameters_.element_alignment ==
-                          0) ?
-            pool_ :
-            pool_ + parameters_.element_alignment;
+        if (reinterpret_cast<std::size_t>(pool_) %
+                parameters_.element_alignment ==
+            0)
+        {
+            first_free_.store(pool_, std::memory_order_relaxed);
+        }
+        else
+        {
+            first_free_.store(pool_ + parameters_.element_alignment,
+                std::memory_order_relaxed);
+        }
 
-//        free_size_ = parameters_.capacity;
+        free_size_.store(parameters_.capacity, std::memory_order_release);
 
         LOSH_(info).format("wrapper_heap ({}): init_pool ({}) size: {}.",
             !class_name_.empty() ? class_name_.c_str() : "<Unknown>",
@@ -370,8 +364,9 @@ namespace hpx::components::detail {
                 parameters_.capacity * parameters_.element_size;
             allocator_type::free(pool_, total_num_bytes);
             pool_ = nullptr;
-//            pool_ = first_free_ = nullptr;
-            free_size_ = 0;
+
+            first_free_.store(nullptr, std::memory_order_relaxed);
+            free_size_.store(0, std::memory_order_release);
         }
     }
 }    // namespace hpx::components::detail

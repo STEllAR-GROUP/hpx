@@ -9,8 +9,11 @@
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/naming_base/id_type.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
+#include <mutex>
+#include <shared_mutex>
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,7 +28,7 @@ namespace hpx::components::detail {
         using value_type = typename Heap::value_type;
 
         using storage_type = std::aligned_storage_t<sizeof(value_type),
-            std::alignment_of<value_type>::value>;
+            std::alignment_of_v<value_type>>;
 
         enum
         {
@@ -44,27 +47,23 @@ namespace hpx::components::detail {
                     get_component_type<typename value_type::wrapped_type>()),
                 base_type::heap_parameters{
                     heap_capacity, heap_element_alignment, heap_element_size},
-                (Heap*) nullptr)
+                static_cast<Heap*>(nullptr))
           , type_(get_component_type<typename value_type::wrapped_type>())
         {
         }
 
         naming::gid_type get_gid(void* p)
         {
-            pthread_rwlock_rdlock(&rwlock);
+            std::shared_lock<hpx::shared_mutex> sl(rwlock_);
 
-            using iterator = typename base_type::const_iterator;
-
-            iterator end = heap_list_.end();
-            for (iterator it = heap_list_.begin(); it != end; ++it)
+            auto const end = heap_list_.end();
+            for (auto it = heap_list_.begin(); it != end; ++it)
             {
                 if ((*it)->did_alloc(p))
                 {
-                    pthread_rwlock_unlock(&rwlock);
                     return (*it)->get_gid(p, type_);
                 }
             }
-            pthread_rwlock_unlock(&rwlock);
             return naming::invalid_gid;
         }
 

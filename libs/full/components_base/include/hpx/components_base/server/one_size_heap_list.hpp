@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2017 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
@@ -30,7 +31,7 @@ namespace hpx { namespace util {
         using iterator = typename list_type::iterator;
         using const_iterator = typename list_type::const_iterator;
 
-        using mutex_type = hpx::spinlock;
+        using mutex_type = hpx::shared_mutex;
 
         using heap_parameters = wrapper_heap_base::heap_parameters;
 
@@ -107,8 +108,7 @@ namespace hpx { namespace util {
         std::string name() const;
 
     protected:
-//        mutable mutex_type mtx_;
-        mutable pthread_rwlock_t rwlock;
+        mutable mutex_type rwlock_;
         list_type heap_list_;
 
     private:

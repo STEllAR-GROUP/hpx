@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/register_thread.hpp>
@@ -24,6 +25,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 
 namespace hpx { namespace util {
@@ -55,37 +57,35 @@ namespace hpx { namespace util {
 
         void* p = nullptr;
 
-        pthread_rwlock_rdlock(&rwlock);
-
-        if (!heap_list_.empty())
         {
-            for (auto& heap : heap_list_)
+            std::shared_lock<hpx::shared_mutex> sl(rwlock_);
+
+            if (!heap_list_.empty())
             {
-                bool allocated = heap->alloc(&p, count);
-
-                if (allocated)
+                for (auto& heap : heap_list_)
                 {
+                    if (heap->alloc(&p, count))
+                    {
 #if defined(HPX_DEBUG)
-                    // Allocation succeeded, update statistics.
-                    alloc_count_ += count;
-                    if (alloc_count_ - free_count_ > max_alloc_count_)
-                        max_alloc_count_ = alloc_count_ - free_count_;
+                        // Allocation succeeded, update statistics.
+                        alloc_count_ += count;
+                        if (alloc_count_ - free_count_ > max_alloc_count_)
+                            max_alloc_count_ = alloc_count_ - free_count_;
 #endif
-                    pthread_rwlock_unlock(&rwlock);
-                    return p;
-                }
+                        return p;
+                    }
 
 #if defined(HPX_DEBUG)
-                LOSH_(info).format(
-                    "{1}::alloc: failed to allocate from heap[{2}] "
-                    "(heap[{2}] has allocated {3} objects and has "
-                    "space for {4} more objects)",
-                    name(), heap->heap_count(), heap->size(),
-                    heap->free_size());
+                    LOSH_(info).format(
+                        "{1}::alloc: failed to allocate from heap[{2}] "
+                        "(heap[{2}] has allocated {3} objects and has "
+                        "space for {4} more objects)",
+                        name(), heap->heap_count(), heap->size(),
+                        heap->free_size());
 #endif
+                }
             }
         }
-        pthread_rwlock_unlock(&rwlock);
 
         // Create new heap.
         bool result = false;
@@ -98,11 +98,10 @@ namespace hpx { namespace util {
         result = heap->alloc((void**) &p, count);
 
         // Add the heap into the list
-//        mtx_.lock();
-        pthread_rwlock_wrlock(&rwlock);
-        heap_list_.push_front(heap);
-        pthread_rwlock_unlock(&rwlock);
-//        mtx_.unlock();
+        {
+            std::unique_lock<hpx::shared_mutex> ul(rwlock_);
+            heap_list_.push_front(heap);
+        }
 
         if (HPX_UNLIKELY(!result || nullptr == p))
         {
@@ -149,24 +148,22 @@ namespace hpx { namespace util {
         if (reschedule(p, count))
             return;
 
-//        mtx_.lock();
-        pthread_rwlock_rdlock(&rwlock);
-//        mtx_.unlock();
-        // Find the heap which allocated this pointer.
-        for (auto& heap : heap_list_)
         {
-            bool did_allocate = heap->did_alloc(p);
-            if (did_allocate)
+            std::shared_lock<hpx::shared_mutex> sl(rwlock_);
+
+            // Find the heap which allocated this pointer.
+            for (auto const& heap : heap_list_)
             {
-                heap->free(p, count);
+                if (heap->did_alloc(p))
+                {
+                    heap->free(p, count);
 #if defined(HPX_DEBUG)
-                free_count_ += count;
+                    free_count_ += count;
 #endif
-                pthread_rwlock_unlock(&rwlock);
-                return;
+                    return;
+                }
             }
         }
-        pthread_rwlock_unlock(&rwlock);
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::free",
             "pointer {1} was not allocated by this {2}", p, name());
@@ -174,16 +171,14 @@ namespace hpx { namespace util {
 
     bool one_size_heap_list::did_alloc(void* p) const
     {
-        pthread_rwlock_rdlock(&rwlock);
-        for (typename list_type::value_type const& heap : heap_list_)
+        std::shared_lock<hpx::shared_mutex> sl(rwlock_);
+        for (auto const& heap : heap_list_)
         {
             if (heap->did_alloc(p))
             {
-                pthread_rwlock_unlock(&rwlock);
                 return true;
             }
         }
-        pthread_rwlock_unlock(&rwlock);
         return false;
     }
 
@@ -191,7 +186,7 @@ namespace hpx { namespace util {
     {
         if (class_name_.empty())
         {
-            return std::string("one_size_heap_list(unknown)");
+            return {"one_size_heap_list(unknown)"};
         }
         return std::string("one_size_heap_list(") + class_name_ + ")";
     }
