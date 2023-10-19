@@ -5,13 +5,10 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 include(HPX_Message)
-include(FindGasnet)
 
 macro(hpx_setup_openshmem)
 
   if(NOT TARGET PkgConfig::OPENSHMEM)
-
-    find_gasnet()
 
     set(OPENSHMEM_PC "")
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
