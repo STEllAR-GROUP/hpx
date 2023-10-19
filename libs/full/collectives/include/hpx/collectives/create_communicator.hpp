@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,30 @@
 #if defined(DOXYGEN)
 // clang-format off
 namespace hpx { namespace collectives {
+
+    /// A communicator instance represents the list of sites that participate in
+    /// a particular collective operation.
+    struct communicator
+    {
+        /// Store the number of used sites and the index of the current site for
+        /// this communicator instance.
+        ///
+        /// \param  num_sites   The number of participating sites (default: all
+        ///                     localities).
+        /// \param this_site    The sequence number of this site (usually
+        ///                     the locality id).
+        void set_info(
+            num_sites_arg num_sites, this_site_arg this_site) noexcept;
+
+        /// Retrieve the number of used sites and the index of the current site
+        /// for this communicator instance.
+        [[nodiscard] std::pair<num_sites_arg, this_site_arg>
+        get_info() const noexcept;
+
+        /// Return whether this communicator instance represents the root site
+        /// of the communication operation.
+        [[nodiscard]] bool is_root() const;
+    };
 
     /// Create a new communicator object usable with any collective operation
     ///
@@ -88,7 +112,6 @@ namespace hpx { namespace collectives {
 #include <hpx/components/client_base.hpp>
 #include <hpx/type_support/extra_data.hpp>
 
-#include <cstddef>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,8 +120,8 @@ namespace hpx::collectives::detail {
     // Data stored in the shared state of the communicator client type below
     struct communicator_data
     {
-        std::size_t num_sites_ = static_cast<std::size_t>(-1);
-        std::size_t this_site_ = static_cast<std::size_t>(-1);
+        num_sites_arg num_sites_;
+        this_site_arg this_site_;
     };
 }    // namespace hpx::collectives::detail
 
@@ -109,7 +132,9 @@ struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
 {
     HPX_EXPORT static extra_data_id_type id() noexcept;
     static constexpr void reset(
-        collectives::detail::communicator_data*) noexcept {};
+        collectives::detail::communicator_data*) noexcept
+    {
+    }
 };    // namespace hpx::util
 
 namespace hpx::collectives {
@@ -149,9 +174,10 @@ namespace hpx::collectives {
         }
 
         HPX_EXPORT void set_info(
-            std::size_t num_sites, std::size_t this_site) noexcept;
-        [[nodiscard]] HPX_EXPORT std::pair<std::size_t, std::size_t> get_info()
-            const noexcept;
+            num_sites_arg num_sites, this_site_arg this_site) noexcept;
+
+        [[nodiscard]] HPX_EXPORT std::pair<num_sites_arg, this_site_arg>
+        get_info() const noexcept;
 
         [[nodiscard]] bool is_root() const
         {
