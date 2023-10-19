@@ -380,6 +380,10 @@ if(HPX_WITH_PARCELPORT_GASNET AND GASNET_LIBRARY_DIRS)
   target_link_directories(hpx_core PUBLIC ${GASNET_LIBRARY_DIRS})
 endif()
 
+if(HPX_WITH_PARCELPORT_OPENSHMEM AND OPENSHMEM_LIBRARY_DIRS)
+  target_link_directories(hpx_core PUBLIC ${OPENSHMEM_LIBRARY_DIRS})
+endif()
+
 if(HPX_WITH_MODULES_AS_STATIC_LIBRARIES OR HPX_WITH_STATIC_LINKING)
   target_link_libraries(hpx_core PUBLIC hpx_public_flags)
   target_link_libraries(hpx_core PUBLIC hpx_base_libraries)

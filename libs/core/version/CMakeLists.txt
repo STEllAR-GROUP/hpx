@@ -27,6 +27,14 @@ if(HPX_WITH_NETWORKING
   hpx_setup_openshmem()
   set(additional_dependencies ${additional_dependencies} PkgConfig::OPENSHMEM)
 endif()
+if(HPX_WITH_NETWORKING
+   AND HPX_WITH_PARCELPORT_OPENSHMEM
+   AND HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT
+)
+  include(HPX_SetupOpenSHMEM)
+  hpx_setup_openshmem()
+  set(additional_dependencies ${additional_dependencies} PkgConfig::OPENSHMEM)
+endif()
 
 include(HPX_AddModule)
 add_hpx_module(

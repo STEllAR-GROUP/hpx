@@ -16,7 +16,7 @@ hpx_setup_openshmem()
 
 # Default location is $HPX_ROOT/libs/openshmem_base/include
 set(openshmem_base_headers hpx/openshmem_base/openshmem.hpp
-                        hpx/openshmem_base/openshmem_environment.hpp
+                           hpx/openshmem_base/openshmem_environment.hpp
 )
 
 set(openshmem_base_sources openshmem_environment.cpp)

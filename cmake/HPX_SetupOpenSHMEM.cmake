@@ -13,18 +13,34 @@ macro(hpx_setup_openshmem)
 
     find_gasnet()
 
+    set(OPENSHMEM_PC "")
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
+      set(OPENSHMEM_PC "ucx")
+
+      pkg_search_module(
+        UCX IMPORTED_TARGET GLOBAL
+        ucx
+      )
+
+      if(NOT UCX_FOUND)
+        message(FATAL "HPX_WITH_PARCELPORT_OPENSHMEM=ucx selected but UCX is unavailable")
+      endif()
+
       pkg_search_module(
         OPENSHMEM IMPORTED_TARGET GLOBAL
         osss-ucx
       )
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
+      set(OPENSHMEM_PC "sandia-openshmem"")
+
       pkg_search_module(
         OPENSHMEM IMPORTED_TARGET GLOBAL
         sandia-openshmem
       )
     endif()
-  else()
+  endif()
+
+  if(NOT OPENSHMEM_FOUND)
 
     find_program(MAKE_EXECUTABLE NAMES gmake make mingw32-make REQUIRED)
 
@@ -41,79 +57,133 @@ macro(hpx_setup_openshmem)
 
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
 
-      pkg_search_module(
-        UCX IMPORTED_TARGET GLOBAL
-        ucx
-      )
+      message(STATUS "Fetching OSSS-UCX-OpenSHMEM")
 
-      if(NOT PkgConfig::OPENSHMEM)
-        FetchContent_Declare(ucx
-          DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-          URL https://github.com/openucx/ucx/archive/refs/tags/v1.14.1.tar.gz
-        )
-
-        fetchcontent_getproperties(ucx)
-        if(NOT ucx )
-          FetchContent_Populate(ucx)
-        endif()
-
-	set(UCX_DIR "${ucx_SOURCE_DIR}")
-	set(UCX_BUILD_OUTPUT "${UCX_DIR}/build.log")
-	set(UCX_ERROR_FILE "${UCX_DIR}/error.log")
-
-	message(STATUS "Building UCX and installing into ${CMAKE_INSTALL_PREFIX}")
-        execute_process(
-          COMMAND bash -c "./autogen.sh && ./configure --prefix=${CMAKE_INSTALL_PREFIX} ${PMI_AUTOCONF_OPTS} && make && make install"
-	  WORKING_DIRECTORY ${UCX_DIR}
-	  RESULT_VARIABLE UCX_BUILD_STATUS
-	  OUTPUT_FILE ${UCX_BUILD_OUTPUT}
-	  ERROR_FILE ${UCX_ERROR_FILE}
-        )
-
-        if(UCX_BUILD_STATUS)
-          message(FATAL_ERROR "UCX build result = ${UCX_BUILD_STATUS} - see ${UCX_BUILD_OUTPUT} for more details")
-        endif()
-      endif()
-
-      FetchContent_Declare(openshmem_src
+      fetchcontent_declare(
+        openshmem 
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-	URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
+    	URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
       )
-      FetchContent_MakeAvailable(openshmem_src)
-      set(PMI_AUTOCONF_OPTS "")
+
       message(STATUS "Building OSSS-UCX (OpenSHMEM on UCX) and installing into ${CMAKE_INSTALL_PREFIX}")
+
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
-      FetchContent_Declare(openshmem_src
+
+      message(STATUS "Fetching Sandia-OpenSHMEM")
+
+      fetchcontent_declare(
+        openshmem 
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         URL https://github.com/Sandia-OpenSHMEM/SOS/archive/refs/tags/v1.5.2.tar.gz
       )
-      FetchContent_MakeAvailable(openshmem_src)
+
       message(STATUS "Building  and installing Sandia OpenSHMEM into ${CMAKE_INSTALL_PREFIX}")
+
     else()
-      message(FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT is not set to `ucx` or `sos`")
+        message(FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM is not set to `ucx` or `sos`")
     endif()
 
-    fetchcontent_getproperties(openshmem_src)
-    if(NOT openshmem_src_POPULATED)
-      FetchContent_Populate(openshmem_src)
+    fetchcontent_getproperties(openshmem)
+    if(NOT openshmem)
+      fetchcontent_populate(openshmem)
     endif()
 
-    set(OPENSHMEM_SRC_DIR "${openshmem_src_SOURCE_DIR}")
-    set(OPENSHMEM_SRC_BUILD_OUTPUT "${OPENSHMEM_SRC_DIR}/build.log")
-    set(OPENSHMEM_SRC_ERROR_FILE "${OPENSHMEM_SRC_DIR}/error.log")
+    set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+    set(ENV{PKG_CONFIG_PATH} "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
 
-    message(STATUS "${CMAKE_INSTALL_PREFIX} ${PMI_AUTOCONF_OPTS}")
+    set(OPENSHMEM_DIR "${openshmem_SOURCE_DIR}")
+    set(OPENSHMEM_BUILD_OUTPUT "${OPENSHMEM_DIR}/build.log")
+    set(OPENSHMEM_ERROR_FILE "${OPENSHMEM_DIR}/error.log")
+
     execute_process(
-      COMMAND bash -c "./autogen.sh && ./configure --prefix=${CMAKE_INSTALL_PREFIX} --enable-shared ${PMI_AUTOCONF_OPTS} && make && make install"
-      WORKING_DIRECTORY ${OPENSHMEM_SRC_DIR}
-      RESULT_VARIABLE OPENSHMEM_SRC_BUILD_STATUS
-      OUTPUT_FILE ${OPENSHMEM_SRC_BUILD_OUTPUT}
-      ERROR_FILE ${OPENSHMEM_SRC_ERROR_FILE}
+      COMMAND
+        bash -c
+        "CC=${CMAKE_C_COMPILER} ./autogen.sh && CC=${CMAKE_C_COMPILER} ./configure --prefix=${OPENSHMEM_DIR}/install --enable-shared ${PMI_AUTOCONF_OPTS} && make && make install"
+      WORKING_DIRECTORY ${OPENSHMEM_DIR}
+      RESULT_VARIABLE OPENSHMEM_BUILD_STATUS
+      OUTPUT_FILE ${OPENSHMEM_BUILD_OUTPUT}
+      ERROR_FILE ${OPENSHMEM_ERROR_FILE}
     )
 
-    if(OPENSHMEM_SRC_BUILD_STATUS)
+    if(OPENSHMEM_BUILD_STATUS)
       message(FATAL_ERROR "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details")
+    else()
+
+      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND
+        ${OPENSHMEM_PC}
+        ${OPENSHMEM_DIR}/install/lib/pkgconfig
+      )
+
+      if(NOT OPENSHMEM_PKGCONFIG_FILE_FOUND)
+        message(
+          FATAL_ERROR
+            "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEMT_DIR}/install/lib/pkgconfig"
+        )
+      endif()
+
+      install(CODE "set(OPENSHMEM_PATH \"${OPENSHMEM_DIR}\")")
+
+      install(
+        CODE [[
+        file(
+          READ
+          ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PC}
+          OPENSHMEM_PKGCONFIG_FILE_CONTENT
+        )
+
+        if(NOT OPENSHMEM_PKGCONFIG_FILE_CONTENT)
+          message(FATAL_ERROR "ERROR INSTALLING OPENSHMEM")
+        endif()
+
+        string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+          OPENSHMEM_PKGCONFIG_FILE_CONTENT
+          ${OPENSHMEM_PKGCONFIG_FILE_CONTENT}
+        )
+
+        file(
+          WRITE
+          ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PC}
+          ${OPENSHMEM_PKGCONFIG_FILE_CONTENT}
+        )
+
+        file(GLOB_RECURSE OPENSHMEM_FILES ${OPENSHMEM_PATH}/install/*)
+
+        if(NOT OPENSHMEM_FILES)
+          message(STATUS "ERROR INSTALLING OPENSHMEM")
+        endif()
+
+        foreach(OPENSHMEM_FILE ${OPENSHMEM_FILES})
+          set(OPENSHMEM_FILE_CACHED "${OPENSHMEM_FILE}")
+
+          string(REGEX MATCH "(^\/.*\/)" OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE})
+
+          string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+            OPENSHMEM_FILE ${OPENSHMEM_FILE}
+          )
+
+          string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+            OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE_PATH}
+          )
+
+          file(MAKE_DIRECTORY ${OPENSHMEM_FILE_PATH})
+
+          string(LENGTH ${OPENSHMEM_FILE_PATH} OPENSHMEM_FILE_PATH_SIZE)
+          math(EXPR OPENSHMEM_FILE_PATH_SIZE "${OPENSHMEM_FILE_PATH_SIZE}-1")
+
+          string(SUBSTRING ${OPENSHMEM_FILE_PATH} 0 ${OPENSHMEM_FILE_PATH_SIZE}
+            OPENSHMEM_FILE_PATH
+          )
+
+          file(COPY ${OPENSHMEM_FILE_CACHED} DESTINATION ${OPENSHMEM_FILE_PATH})
+        endforeach()
+      ]]
+      )
+
+      # install(FILES ${OPENSHMEM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX})
     endif()
+
+    set(CMAKE_PREFIX_PATH "${OPENSHMEM_DIR}/install/lib/pkgconfig")
+    set(ENV{PKG_CONFIG_PATH} "${OPENSHMEM_DIR}/install/lib/pkgconfig")
 
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       pkg_search_module(
@@ -127,7 +197,7 @@ macro(hpx_setup_openshmem)
       )
     endif()
 
-    if(NOT TARGET PkgConfig::OPENSHMEM)
+    if(NOT OPENSHMEM_FOUND)
       message(FATAL_ERROR "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}")
     endif()
 
@@ -792,16 +862,44 @@ macro(hpx_setup_openshmem)
       endif()
     endif()
 
-    set_target_properties(
-      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS "${OPENSHMEM_CFLAGS}"
-    )
-    set_target_properties(
-      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS "${OPENSHMEM_LDFLAGS}"
-    )
-    set_target_properties(
-      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                   "${OPENSHMEM_LIBRARY_DIRS}"
-    )
+    if(OPENSHMEM_DIR)
+      list(TRANSFORM OPENSHMEM_CFLAGS
+           REPLACE "${OPENSHMEM_DIR}/install"
+                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+      )
+      list(TRANSFORM OPENSHMEM_LDFLAGS
+           REPLACE "${OPENSHMEM_DIR}/install"
+                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+      )
+      list(TRANSFORM OPENSHMEM_LIBRARY_DIRS
+           REPLACE "${OPENSHMEM_DIR}/install"
+                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+      )
+
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
+                                     "${OPENSHMEM_CFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
+                                     "${OPENSHMEM_LDFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                     "${OPENSHMEM_LIBRARY_DIRS}"
+      )
+    else()
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS "${OPENSHMEM_CFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS "${OPENSHMEM_LDFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                     "${OPENSHMEM_LIBRARY_DIRS}"
+      )
+    endif()
 
   endif()
 endmacro()
