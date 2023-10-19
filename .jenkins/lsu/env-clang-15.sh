@@ -7,7 +7,7 @@
 module purge
 module load cmake
 module load llvm/15
-module load boost/1.82.0-${build_type,,}
+module load boost/1.81.0-${build_type,,}
 module load hwloc
 module load openmpi
 module load pwrapi/1.1.1
