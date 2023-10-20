@@ -23,7 +23,7 @@ extern "C" {
 #include <shmem.h>
 
 #ifdef __cplusplus
-} // extern "C"
+}    // extern "C"
 #endif
 
 #if defined(__clang__)

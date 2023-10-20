@@ -50,7 +50,8 @@
 #include <shmem.h>
 
 #define OPENSHMEM_CONDUIT_NAME_STR_HELPER(x) #x
-#define OPENSHMEM_CONDUIT_NAME_STR OPENSHMEM_CONDUIT_NAME_STR_HELPER(HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT)
+#define OPENSHMEM_CONDUIT_NAME_STR                                             \
+    OPENSHMEM_CONDUIT_NAME_STR_HELPER(HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT)
 #endif
 
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
@@ -58,7 +59,8 @@
 #include <gasnet.h>
 #endif
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
 #include <shmem.h>
 
@@ -149,7 +151,8 @@ namespace hpx {
         return strm.str();
     }
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
     std::string openshmem_version()
     {
@@ -160,8 +163,7 @@ namespace hpx {
         shmem_info_get_name(vendor_cstr);
 
         std::ostringstream strm;
-        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':'
-             << major << ':'
+        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':' << major << ':'
              << minor << '-'
              << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
@@ -181,7 +183,8 @@ namespace hpx {
     }
 #endif
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
     std::string openshmem_version()
     {
@@ -192,8 +195,7 @@ namespace hpx {
         shmem_info_get_name(vendor_cstr);
 
         std::ostringstream strm;
-        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':'
-             << major << ':'
+        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':' << major << ':'
              << minor << '-'
              << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
@@ -363,11 +365,13 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
                                                 "  LCI: {}\n"
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
                                                 "  OPENSHMEM: {}\n"
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
                                                 "  OPENSHMEM: {}\n"
 #endif
@@ -390,7 +394,8 @@ namespace hpx {
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
             openshmem_version(),
 #endif
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||   \
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
     defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
             openshmem_version(),
 #endif
