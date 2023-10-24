@@ -232,15 +232,9 @@ macro(hpx_setup_openshmem)
     endif()
 
     if(NOT OPENSHMEM_FOUND)
-      message(FATAL_ERROR "OpenSHMEM
-          downloaded,
-          compiled,
-          but
-          cannot
-          be
-          found
-          in
-          ${CMAKE_INSTALL_PREFIX}")
+      message(
+        FATAL_ERROR "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}"
+      )
     endif()
 
   endif()
