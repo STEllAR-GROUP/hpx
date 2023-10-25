@@ -25,13 +25,9 @@ macro(hpx_setup_openshmem)
 
       pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL osss-ucx)
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
-      set(OPENSHMEM_PC
-          "sandia-openshmem")
+      set(OPENSHMEM_PC "sandia-openshmem")
 
-      pkg_search_module(
-        OPENSHMEM IMPORTED_TARGET GLOBAL
-        sandia-openshmem
-      )
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL sandia-openshmem)
     endif()
   endif()
 
@@ -58,35 +54,30 @@ macro(hpx_setup_openshmem)
       set(PMI_AUTOCONF_OPTS "--enable-pmi-simple")
     else()
       set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR}
-          --with-pmi-libdir=${PMI_LIBRARY}")
+          --with-pmi-libdir=${PMI_LIBRARY}"
+      )
     endif()
 
     include(FetchContent)
 
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
 
-      message(
-         STATUS
-            "Fetching OSSS-UCX-OpenSHMEM"
-      )
+      message(STATUS "Fetching OSSS-UCX-OpenSHMEM")
 
       fetchcontent_declare(
         openshmem
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    	URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
+        URL https://github.com/openshmem-org/osss-ucx/archive/refs/tags/v1.0.2.tar.gz
       )
 
       message(
-         STATUS
-            "Building OSSS-UCX (OpenSHMEM on UCX) and installing into ${CMAKE_INSTALL_PREFIX}"
+        STATUS
+          "Building OSSS-UCX (OpenSHMEM on UCX) and installing into ${CMAKE_INSTALL_PREFIX}"
       )
 
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
 
-      message(
-         STATUS
-            "Fetching Sandia-OpenSHMEM"
-      )
+      message(STATUS "Fetching Sandia-OpenSHMEM")
 
       fetchcontent_declare(
         openshmem
@@ -95,15 +86,14 @@ macro(hpx_setup_openshmem)
       )
 
       message(
-         STATUS
-            "Building and installing Sandia OpenSHMEM into ${CMAKE_INSTALL_PREFIX}"
+        STATUS
+          "Building and installing Sandia OpenSHMEM into ${CMAKE_INSTALL_PREFIX}"
       )
 
     else()
-        message(
-           FATAL_ERROR
-              "HPX_WITH_PARCELPORT_OPENSHMEM is not set to `ucx` or `sos`"
-        )
+      message(
+        FATAL_ERROR "HPX_WITH_PARCELPORT_OPENSHMEM is not set to `ucx` or `sos`"
+      )
     endif()
 
     fetchcontent_getproperties(openshmem)
@@ -130,20 +120,19 @@ macro(hpx_setup_openshmem)
 
     if(OPENSHMEM_BUILD_STATUS)
       message(
-         FATAL_ERROR
-            "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details"
+        FATAL_ERROR
+          "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details"
       )
     else()
 
-      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND
-        ${OPENSHMEM_PC}
-        ${OPENSHMEM_DIR}/install/lib/pkgconfig
+      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND ${OPENSHMEM_PC}
+                ${OPENSHMEM_DIR}/install/lib/pkgconfig
       )
 
       if(NOT OPENSHMEM_PKGCONFIG_FILE_FOUND)
         message(
-           FATAL_ERROR
-              "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEM_DIR}/install/lib/pkgconfig"
+          FATAL_ERROR
+            "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEM_DIR}/install/lib/pkgconfig"
         )
       endif()
 
@@ -220,118 +209,115 @@ macro(hpx_setup_openshmem)
     set(ENV{PKG_CONFIG_PATH} "${OPENSHMEM_DIR}/install/lib/pkgconfig")
 
     if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
-      pkg_search_module(
-        OPENSHMEM IMPORTED_TARGET GLOBAL
-        osss-ucx
-      )
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL osss-ucx)
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
-      pkg_search_module(
-        OPENSHMEM IMPORTED_TARGET GLOBAL
-        sandia-openshmem
-      )
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL sandia-openshmem)
     endif()
 
     if(NOT OPENSHMEM_FOUND)
       message(
-        FATAL_ERROR "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}"
+        FATAL_ERROR
+          "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}"
       )
     endif()
 
   endif()
 
-    if(OPENSHMEM_CFLAGS)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(IDX 0)
-      set(FLAG_LIST "")
+  if(OPENSHMEM_CFLAGS)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(IDX 0)
+    set(FLAG_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_CFLAGS})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        if(NOT "${PARAM_FOUND}" EQUAL "-1")
-          set(IS_PARAM "1")
-          set(NEWPARAM "SHELL:${X}")
-        endif()
-        if("${PARAM_FOUND}" EQUAL "-1"
-           AND "${IS_PARAM}" EQUAL "0"
-           OR "${IS_PARAM}" EQUAL "-1"
+    foreach(X IN ITEMS ${OPENSHMEM_CFLAGS})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      if(NOT "${PARAM_FOUND}" EQUAL "-1")
+        set(IS_PARAM "1")
+        set(NEWPARAM "SHELL:${X}")
+      endif()
+      if("${PARAM_FOUND}" EQUAL "-1"
+         AND "${IS_PARAM}" EQUAL "0"
+         OR "${IS_PARAM}" EQUAL "-1"
+      )
+        list(APPEND FLAG_LIST "${X}")
+        set(IS_PARAM "0")
+      elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
+        list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}"
         )
-          list(APPEND FLAG_LIST "${X}")
-          set(IS_PARAM "0")
-        elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
-          set(NEWPARAM "")
-          set(IS_PARAM "0")
-        endif()
-      endforeach()
+        set(NEWPARAM "")
+        set(IS_PARAM "0")
+      endif()
+    endforeach()
 
-      list(LENGTH OPENSHMEM_CFLAGS IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_CFLAGS NEWPARAM)
-      endforeach()
+    list(LENGTH OPENSHMEM_CFLAGS IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_CFLAGS NEWPARAM)
+    endforeach()
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_CFLAGS "${X}")
-      endforeach()
-    endif()
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_CFLAGS "${X}")
+    endforeach()
+  endif()
 
-    if(OPENSHMEM_CFLAGS_OTHER)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(IDX 0)
-      set(FLAG_LIST "")
+  if(OPENSHMEM_CFLAGS_OTHER)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(IDX 0)
+    set(FLAG_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_CFLAGS_OTHER})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        if(NOT "${PARAM_FOUND}" EQUAL "-1")
-          set(IS_PARAM "1")
-          set(NEWPARAM "SHELL:${X}")
-        endif()
-        if("${PARAM_FOUND}" EQUAL "-1"
-           AND "${IS_PARAM}" EQUAL "0"
-           OR "${IS_PARAM}" EQUAL "-1"
+    foreach(X IN ITEMS ${OPENSHMEM_CFLAGS_OTHER})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      if(NOT "${PARAM_FOUND}" EQUAL "-1")
+        set(IS_PARAM "1")
+        set(NEWPARAM "SHELL:${X}")
+      endif()
+      if("${PARAM_FOUND}" EQUAL "-1"
+         AND "${IS_PARAM}" EQUAL "0"
+         OR "${IS_PARAM}" EQUAL "-1"
+      )
+        list(APPEND FLAG_LIST "${X}")
+        set(IS_PARAM "0")
+      elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
+        list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}"
         )
-          list(APPEND FLAG_LIST "${X}")
-          set(IS_PARAM "0")
-        elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
-          set(NEWPARAM "")
-          set(IS_PARAM "0")
-        endif()
-      endforeach()
+        set(NEWPARAM "")
+        set(IS_PARAM "0")
+      endif()
+    endforeach()
 
-      list(LENGTH OPENSHMEM_CFLAGS_OTHER IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_CFLAGS_OTHER NEWPARAM)
-      endforeach()
+    list(LENGTH OPENSHMEM_CFLAGS_OTHER IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_CFLAGS_OTHER NEWPARAM)
+    endforeach()
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_CFLAGS_OTHER "${X}")
-      endforeach()
-    endif()
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_CFLAGS_OTHER "${X}")
+    endforeach()
+  endif()
 
-    if(OPENSHMEM_LDFLAGS)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(IDX 0)
-      set(DIRIDX 0)
-      set(SKIP 0)
-      set(FLAG_LIST "")
-      set(DIR_LIST "")
-      set(LIB_LIST "")
+  if(OPENSHMEM_LDFLAGS)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(IDX 0)
+    set(DIRIDX 0)
+    set(SKIP 0)
+    set(FLAG_LIST "")
+    set(DIR_LIST "")
+    set(LIB_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        string(FIND "${X}" "-lsma" IDX)
-        string(FIND "${X}" "-l" LIDX)
-        string(FIND "${X}" "-L" DIRIDX)
-	string(FIND "${X}" "-Wl" SKIP)
+    foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      string(FIND "${X}" "-lsma" IDX)
+      string(FIND "${X}" "-l" LIDX)
+      string(FIND "${X}" "-L" DIRIDX)
+      string(FIND "${X}" "-Wl" SKIP)
 
-	if("${SKIP}" EQUAL "-1")
+      if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
           set(NEWPARAM "SHELL:${X}")
@@ -345,7 +331,8 @@ macro(hpx_setup_openshmem)
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
           list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
+          ${X}"
+          )
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -361,112 +348,114 @@ macro(hpx_setup_openshmem)
           string(REPLACE "-L" "" TMPSTR "${X}")
           list(APPEND DIR_LIST "${TMPSTR}")
         endif()
-	endif()
-      endforeach()
+      endif()
+    endforeach()
 
+    set(IDX 0)
+    list(LENGTH OPENSHMEM_LDFLAGS IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_LDFLAGS NEWPARAM)
+    endforeach()
+
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_LDFLAGS "${X}")
+    endforeach()
+
+    set(IDX 0)
+    list(LENGTH LIB_LIST IDX)
+    if(NOT "${IDX}" EQUAL "0")
       set(IDX 0)
-      list(LENGTH OPENSHMEM_LDFLAGS IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_LDFLAGS NEWPARAM)
-      endforeach()
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_LDFLAGS "${X}")
-      endforeach()
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(NEWLINK "SHELL:-Wl,--whole-archive
+          "
+        )
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-      set(IDX 0)
-      list(LENGTH LIB_LIST IDX)
-      if(NOT "${IDX}" EQUAL "0")
-        set(IDX 0)
-
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive
-          ")
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
-
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(APPEND NEWLINK "
-          -Wl,--no-whole-archive")
-          string(FIND "SHELL:-Wl,--whole-archive
+        endforeach()
+        string(APPEND NEWLINK "
           -Wl,--no-whole-archive"
-                      "${NEWLINK}" IDX
+        )
+        string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive" "${NEWLINK}" IDX
+        )
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
+        endif()
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(APPLE)
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+        else()
+          set(NEWLINK "SHELL:
+          "
           )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
-          endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-          if(APPLE)
-            set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
-            set(NEWLINK "SHELL:
-          ")
-          endif()
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
+        endif()
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
-          endif()
+        endforeach()
+        string(FIND "SHELL:" "${NEWLINK}" IDX)
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
         endif()
       endif()
     endif()
+  endif()
 
-    if(OPENSHMEM_LDFLAGS_OTHER)
-      unset(FOUND_LIB)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(SKIP 0)
-      set(IDX 0)
-      set(DIRIDX 0)
-      set(FLAG_LIST "")
-      set(DIR_LIST "")
-      set(LIB_LIST "")
+  if(OPENSHMEM_LDFLAGS_OTHER)
+    unset(FOUND_LIB)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(SKIP 0)
+    set(IDX 0)
+    set(DIRIDX 0)
+    set(FLAG_LIST "")
+    set(DIR_LIST "")
+    set(LIB_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS_OTHER})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        string(FIND "${X}" "-lsma" IDX)
-        string(FIND "${X}" "-L" DIRIDX)
-	string(FIND "${X}" "-Wl" SKIP)
+    foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS_OTHER})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      string(FIND "${X}" "-lsma" IDX)
+      string(FIND "${X}" "-L" DIRIDX)
+      string(FIND "${X}" "-Wl" SKIP)
 
-	if("${SKIP}" EQUAL "-1")
+      if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
           set(NEWPARAM "SHELL:${X}")
@@ -480,7 +469,8 @@ macro(hpx_setup_openshmem)
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
           list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
+          ${X}"
+          )
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -496,187 +486,191 @@ macro(hpx_setup_openshmem)
           string(REPLACE "-L" "" TMPSTR "${X}")
           list(APPEND DIR_LIST "${TMPSTR}")
         endif()
-        endif()
-      endforeach()
+      endif()
+    endforeach()
 
+    set(IDX 0)
+    list(LENGTH OPENSHMEM_LDFLAGS_OTHER IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_LDFLAGS_OTHER NEWPARAM)
+    endforeach()
+
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_LDFLAGS_OTHER "${X}")
+    endforeach()
+
+    set(IDX 0)
+    list(LENGTH LIB_LIST IDX)
+    if(NOT "${IDX}" EQUAL "0")
       set(IDX 0)
-      list(LENGTH OPENSHMEM_LDFLAGS_OTHER IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_LDFLAGS_OTHER NEWPARAM)
-      endforeach()
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(NEWLINK "SHELL:-Wl,--whole-archive
+          "
+        )
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_LDFLAGS_OTHER "${X}")
-      endforeach()
-
-      set(IDX 0)
-      list(LENGTH LIB_LIST IDX)
-      if(NOT "${IDX}" EQUAL "0")
-        set(IDX 0)
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive
-          ")
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
-
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(APPEND NEWLINK "
-          -Wl,--no-whole-archive")
-
-          string(FIND "SHELL:-Wl,--whole-archive
+        endforeach()
+        string(APPEND NEWLINK "
           -Wl,--no-whole-archive"
-                      "${NEWLINK}" IDX
-          )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS_OTHER "${NEWLINK}")
-          endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-          if(APPLE)
-            set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
-            set(NEWLINK "SHELL:
-          ")
-          endif()
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
+        )
 
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
-          endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
+        string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive" "${NEWLINK}" IDX
+        )
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS_OTHER "${NEWLINK}")
+        endif()
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(APPLE)
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+        else()
+          set(NEWLINK "SHELL:
+          "
           )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
-          endif()
+        endif()
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
+
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
+          endforeach()
+        endforeach()
+        string(FIND "SHELL:" "${NEWLINK}" IDX)
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
         endif()
       endif()
-
     endif()
 
-    if(OPENSHMEM_STATIC_CFLAGS)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(IDX 0)
-      set(FLAG_LIST "")
+  endif()
 
-      foreach(X IN ITEMS ${OPENSHMEM_STATIC_CFLAGS})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        if(NOT "${PARAM_FOUND}" EQUAL "-1")
-          set(IS_PARAM "1")
-          set(NEWPARAM "SHELL:${X}")
-        endif()
-        if("${PARAM_FOUND}" EQUAL "-1"
-           AND "${IS_PARAM}" EQUAL "0"
-           OR "${IS_PARAM}" EQUAL "-1"
+  if(OPENSHMEM_STATIC_CFLAGS)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(IDX 0)
+    set(FLAG_LIST "")
+
+    foreach(X IN ITEMS ${OPENSHMEM_STATIC_CFLAGS})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      if(NOT "${PARAM_FOUND}" EQUAL "-1")
+        set(IS_PARAM "1")
+        set(NEWPARAM "SHELL:${X}")
+      endif()
+      if("${PARAM_FOUND}" EQUAL "-1"
+         AND "${IS_PARAM}" EQUAL "0"
+         OR "${IS_PARAM}" EQUAL "-1"
+      )
+        list(APPEND FLAG_LIST "${X}")
+        set(IS_PARAM "0")
+      elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
+        list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}"
         )
-          list(APPEND FLAG_LIST "${X}")
-          set(IS_PARAM "0")
-        elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
-          set(NEWPARAM "")
-          set(IS_PARAM "0")
-        endif()
-      endforeach()
+        set(NEWPARAM "")
+        set(IS_PARAM "0")
+      endif()
+    endforeach()
 
-      list(LENGTH OPENSHMEM_STATIC_CFLAGS IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_STATIC_CFLAGS NEWPARAM)
-      endforeach()
+    list(LENGTH OPENSHMEM_STATIC_CFLAGS IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_STATIC_CFLAGS NEWPARAM)
+    endforeach()
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_STATIC_CFLAGS "${X}")
-      endforeach()
-    endif()
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_STATIC_CFLAGS "${X}")
+    endforeach()
+  endif()
 
-    if(OPENSHMEM_STATIC_CFLAGS_OTHER)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(IDX 0)
-      set(FLAG_LIST "")
+  if(OPENSHMEM_STATIC_CFLAGS_OTHER)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(IDX 0)
+    set(FLAG_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_STATIC_CFLAGS_OTHER})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        if(NOT "${PARAM_FOUND}" EQUAL "-1")
-          set(IS_PARAM "1")
-          set(NEWPARAM "SHELL:${X}")
-        endif()
-        if("${PARAM_FOUND}" EQUAL "-1"
-           AND "${IS_PARAM}" EQUAL "0"
-           OR "${IS_PARAM}" EQUAL "-1"
+    foreach(X IN ITEMS ${OPENSHMEM_STATIC_CFLAGS_OTHER})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      if(NOT "${PARAM_FOUND}" EQUAL "-1")
+        set(IS_PARAM "1")
+        set(NEWPARAM "SHELL:${X}")
+      endif()
+      if("${PARAM_FOUND}" EQUAL "-1"
+         AND "${IS_PARAM}" EQUAL "0"
+         OR "${IS_PARAM}" EQUAL "-1"
+      )
+        list(APPEND FLAG_LIST "${X}")
+        set(IS_PARAM "0")
+      elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
+        list(APPEND FLAG_LIST "${NEWPARAM}
+          ${X}"
         )
-          list(APPEND FLAG_LIST "${X}")
-          set(IS_PARAM "0")
-        elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
-          list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
-          set(NEWPARAM "")
-          set(IS_PARAM "0")
-        endif()
-      endforeach()
+        set(NEWPARAM "")
+        set(IS_PARAM "0")
+      endif()
+    endforeach()
 
-      list(LENGTH OPENSHMEM_STATIC_CFLAGS_OTHER IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_STATIC_CFLAGS_OTHER NEWPARAM)
-      endforeach()
+    list(LENGTH OPENSHMEM_STATIC_CFLAGS_OTHER IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_STATIC_CFLAGS_OTHER NEWPARAM)
+    endforeach()
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_STATIC_CFLAGS_OTHER "${X}")
-      endforeach()
-    endif()
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_STATIC_CFLAGS_OTHER "${X}")
+    endforeach()
+  endif()
 
-    if(OPENSHMEM_STATIC_LDFLAGS)
-      unset(FOUND_LIB)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(SKIP 0)
-      set(IDX 0)
-      set(DIRIDX 0)
-      set(FLAG_LIST "")
-      set(DIR_LIST "")
-      set(LIB_LIST "")
+  if(OPENSHMEM_STATIC_LDFLAGS)
+    unset(FOUND_LIB)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(SKIP 0)
+    set(IDX 0)
+    set(DIRIDX 0)
+    set(FLAG_LIST "")
+    set(DIR_LIST "")
+    set(LIB_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_STATIC_LDFLAGS})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        string(FIND "${X}" "-lsma" IDX)
-        string(FIND "${X}" "-L" DIRIDX)
-	string(FIND "${X}" "-Wl" SKIP)
+    foreach(X IN ITEMS ${OPENSHMEM_STATIC_LDFLAGS})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      string(FIND "${X}" "-lsma" IDX)
+      string(FIND "${X}" "-L" DIRIDX)
+      string(FIND "${X}" "-Wl" SKIP)
 
-	if("${SKIP}" EQUAL "-1")
+      if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
           set(NEWPARAM "SHELL:${X}")
@@ -690,7 +684,8 @@ macro(hpx_setup_openshmem)
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
           list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
+          ${X}"
+          )
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -706,113 +701,115 @@ macro(hpx_setup_openshmem)
           string(REPLACE "-L" "" TMPSTR "${X}")
           list(APPEND DIR_LIST "${TMPSTR}")
         endif()
-        endif()
-      endforeach()
+      endif()
+    endforeach()
 
+    set(IDX 0)
+    list(LENGTH OPENSHMEM_STATIC_LDFLAGS IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_STATIC_LDFLAGS NEWPARAM)
+    endforeach()
+
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_STATIC_LDFLAGS "${X}")
+    endforeach()
+
+    set(IDX 0)
+    list(LENGTH LIB_LIST IDX)
+    if(NOT "${IDX}" EQUAL "0")
       set(IDX 0)
-      list(LENGTH OPENSHMEM_STATIC_LDFLAGS IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_STATIC_LDFLAGS NEWPARAM)
-      endforeach()
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(NEWLINK "SHELL:-Wl,--whole-archive
+          "
+        )
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_STATIC_LDFLAGS "${X}")
-      endforeach()
+            list(LENGTH FOUND_LIB IDX)
 
-      set(IDX 0)
-      list(LENGTH LIB_LIST IDX)
-      if(NOT "${IDX}" EQUAL "0")
-        set(IDX 0)
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive
-          ")
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
-
-              list(LENGTH FOUND_LIB IDX)
-
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(APPEND NEWLINK "
-          -Wl,--no-whole-archive")
-
-          string(FIND "SHELL:-Wl,--whole-archive
+        endforeach()
+        string(APPEND NEWLINK "
           -Wl,--no-whole-archive"
-                      "${NEWLINK}" IDX
-          )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_STATIC_LDFLAGS "${NEWLINK}")
-          endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-          if(APPLE)
-            set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
-            set(NEWLINK "SHELL:
-          ")
-          endif()
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
+        )
 
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
-          endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
+        string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive" "${NEWLINK}" IDX
+        )
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_STATIC_LDFLAGS "${NEWLINK}")
+        endif()
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(APPLE)
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+        else()
+          set(NEWLINK "SHELL:
+          "
           )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
-          endif()
+        endif()
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
+
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
+          endforeach()
+        endforeach()
+        string(FIND "SHELL:" "${NEWLINK}" IDX)
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
         endif()
       endif()
     endif()
+  endif()
 
-    if(OPENSHMEM_STATIC_LDFLAGS_OTHER)
-      unset(FOUND_LIB)
-      set(IS_PARAM "0")
-      set(PARAM_FOUND "0")
-      set(NEWPARAM "")
-      set(SKIP 0)
-      set(IDX 0)
-      set(DIRIDX 0)
-      set(FLAG_LIST "")
-      set(DIR_LIST "")
-      set(LIB_LIST "")
+  if(OPENSHMEM_STATIC_LDFLAGS_OTHER)
+    unset(FOUND_LIB)
+    set(IS_PARAM "0")
+    set(PARAM_FOUND "0")
+    set(NEWPARAM "")
+    set(SKIP 0)
+    set(IDX 0)
+    set(DIRIDX 0)
+    set(FLAG_LIST "")
+    set(DIR_LIST "")
+    set(LIB_LIST "")
 
-      foreach(X IN ITEMS ${OPENSHMEM_STATIC_LDFLAGS_OTHER})
-        string(FIND "${X}" "--param" PARAM_FOUND)
-        string(FIND "${X}" "-lsma" IDX)
-        string(FIND "${X}" "-L" DIRIDX)
-	string(FIND "${X}" "-Wl" SKIP)
+    foreach(X IN ITEMS ${OPENSHMEM_STATIC_LDFLAGS_OTHER})
+      string(FIND "${X}" "--param" PARAM_FOUND)
+      string(FIND "${X}" "-lsma" IDX)
+      string(FIND "${X}" "-L" DIRIDX)
+      string(FIND "${X}" "-Wl" SKIP)
 
-	if("${SKIP}" EQUAL "-1")
+      if("${SKIP}" EQUAL "-1")
         if(NOT "${PARAM_FOUND}" EQUAL "-1")
           set(IS_PARAM "1")
           set(NEWPARAM "SHELL:${X}")
@@ -826,7 +823,8 @@ macro(hpx_setup_openshmem)
           set(IS_PARAM "0")
         elseif("${PARAM_FOUND}" EQUAL "-1" AND "${IS_PARAM}" EQUAL "1")
           list(APPEND FLAG_LIST "${NEWPARAM}
-          ${X}")
+          ${X}"
+          )
           set(NEWPARAM "")
           set(IS_PARAM "0")
         elseif(NOT "${IDX}" EQUAL "-1" AND NOT "${LIDX}" EQUAL "-1")
@@ -842,131 +840,137 @@ macro(hpx_setup_openshmem)
           string(REPLACE "-L" "" TMPSTR "${X}")
           list(APPEND DIR_LIST "${TMPSTR}")
         endif()
-        endif()
-      endforeach()
+      endif()
+    endforeach()
 
+    set(IDX 0)
+    list(LENGTH OPENSHMEM_STATIC_LDFLAGS_OTHER IDX)
+    foreach(X RANGE ${IDX})
+      list(POP_FRONT OPENSHMEM_STATIC_LDFLAGS_OTHER NEWPARAM)
+    endforeach()
+
+    foreach(X IN ITEMS ${FLAG_LIST})
+      list(APPEND OPENSHMEM_STATIC_LDFLAGS_OTHER "${X}")
+    endforeach()
+
+    set(IDX 0)
+    list(LENGTH LIB_LIST IDX)
+    if(NOT "${IDX}" EQUAL "0")
       set(IDX 0)
-      list(LENGTH OPENSHMEM_STATIC_LDFLAGS_OTHER IDX)
-      foreach(X RANGE ${IDX})
-        list(POP_FRONT OPENSHMEM_STATIC_LDFLAGS_OTHER NEWPARAM)
-      endforeach()
+      if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(NEWLINK "SHELL:-Wl,--whole-archive
+          "
+        )
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-      foreach(X IN ITEMS ${FLAG_LIST})
-        list(APPEND OPENSHMEM_STATIC_LDFLAGS_OTHER "${X}")
-      endforeach()
+            list(LENGTH FOUND_LIB IDX)
 
-      set(IDX 0)
-      list(LENGTH LIB_LIST IDX)
-      if(NOT "${IDX}" EQUAL "0")
-        set(IDX 0)
-        if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-          set(NEWLINK "SHELL:-Wl,--whole-archive
-          ")
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
-
-              list(LENGTH FOUND_LIB IDX)
-
-              message(STATUS "${FOUND_LIB}
-          ${X}")
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            message(STATUS "${FOUND_LIB}
+          ${X}"
+            )
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(APPEND NEWLINK "
-          -Wl,--no-whole-archive")
-          string(FIND "SHELL:-Wl,--whole-archive
+        endforeach()
+        string(APPEND NEWLINK "
           -Wl,--no-whole-archive"
-                      "${NEWLINK}" IDX
+        )
+        string(FIND "SHELL:-Wl,--whole-archive
+          -Wl,--no-whole-archive" "${NEWLINK}" IDX
+        )
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_STATIC_LDFLAGS_OTHER "${NEWLINK}")
+        endif()
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        if(APPLE)
+          set(NEWLINK "SHELL:-Wl,-force_load,")
+        else()
+          set(NEWLINK "SHELL:
+          "
           )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_STATIC_LDFLAGS_OTHER "${NEWLINK}")
-          endif()
-        elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-          if(APPLE)
-            set(NEWLINK "SHELL:-Wl,-force_load,")
-	  else()
-            set(NEWLINK "SHELL:
-          ")
-          endif()
-          foreach(X IN ITEMS ${LIB_LIST})
-            set(DIRSTR "")
-            string(REPLACE ";" "
-          " DIRSTR "${DIR_LIST}")
-            foreach(Y IN ITEMS ${DIR_LIST})
-              find_library(
-                FOUND_LIB
-                NAMES ${X} "lib${X}" "lib${X}.a"
-                PATHS ${Y}
-                HINTS ${Y} NO_CACHE
-                NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
-              )
+        endif()
+        foreach(X IN ITEMS ${LIB_LIST})
+          set(DIRSTR "")
+          string(REPLACE ";" "
+          " DIRSTR "${DIR_LIST}"
+          )
+          foreach(Y IN ITEMS ${DIR_LIST})
+            find_library(
+              FOUND_LIB
+              NAMES ${X} "lib${X}" "lib${X}.a"
+              PATHS ${Y}
+              HINTS ${Y} NO_CACHE
+              NO_CMAKE_FIND_ROOT_PATH NO_DEFAULT_PATH
+            )
 
-              list(LENGTH FOUND_LIB IDX)
-              if(NOT "${IDX}" EQUAL "0")
-                string(APPEND NEWLINK "${FOUND_LIB}")
-                set(FOUND_LIB "")
-              endif()
-            endforeach()
+            list(LENGTH FOUND_LIB IDX)
+            if(NOT "${IDX}" EQUAL "0")
+              string(APPEND NEWLINK "${FOUND_LIB}")
+              set(FOUND_LIB "")
+            endif()
           endforeach()
-          string(FIND "SHELL:"
-                      "${NEWLINK}" IDX
-          )
-          if("${IDX}" EQUAL "-1")
-            list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
-          endif()
+        endforeach()
+        string(FIND "SHELL:" "${NEWLINK}" IDX)
+        if("${IDX}" EQUAL "-1")
+          list(APPEND OPENSHMEM_LDFLAGS "${NEWLINK}")
         endif()
       endif()
     endif()
+  endif()
 
-    if(OPENSHMEM_DIR)
-      list(TRANSFORM OPENSHMEM_CFLAGS
-           REPLACE "${OPENSHMEM_DIR}/install"
-                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
-      )
-      list(TRANSFORM OPENSHMEM_LDFLAGS
-           REPLACE "${OPENSHMEM_DIR}/install"
-                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
-      )
-      list(TRANSFORM OPENSHMEM_LIBRARY_DIRS
-           REPLACE "${OPENSHMEM_DIR}/install"
-                   "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
-      )
+  if(OPENSHMEM_DIR)
+    list(TRANSFORM OPENSHMEM_CFLAGS
+         REPLACE "${OPENSHMEM_DIR}/install"
+                 "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+    )
+    list(TRANSFORM OPENSHMEM_LDFLAGS
+         REPLACE "${OPENSHMEM_DIR}/install"
+                 "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+    )
+    list(TRANSFORM OPENSHMEM_LIBRARY_DIRS
+         REPLACE "${OPENSHMEM_DIR}/install"
+                 "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
+    )
 
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
-                                     "${OPENSHMEM_CFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
-                                     "${OPENSHMEM_LDFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                     "${OPENSHMEM_LIBRARY_DIRS}"
-      )
-    else()
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS "${OPENSHMEM_CFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS "${OPENSHMEM_LDFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES "${OPENSHMEM_LIBRARY_DIRS}"
-      )
-    endif()
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
+                                      "${OPENSHMEM_CFLAGS}"
+    )
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
+                                      "${OPENSHMEM_LDFLAGS}"
+    )
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                      "${OPENSHMEM_LIBRARY_DIRS}"
+    )
+  else()
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
+                                      "${OPENSHMEM_CFLAGS}"
+    )
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
+                                      "${OPENSHMEM_LDFLAGS}"
+    )
+    set_target_properties(
+      PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                      "${OPENSHMEM_LIBRARY_DIRS}"
+    )
+  endif()
 
 endmacro()
