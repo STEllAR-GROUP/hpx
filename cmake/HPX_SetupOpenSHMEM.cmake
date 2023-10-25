@@ -900,7 +900,6 @@ macro(hpx_setup_openshmem)
             )
 
             list(LENGTH FOUND_LIB IDX)
-
             if(NOT "${IDX}" EQUAL "0")
               string(APPEND NEWLINK "${FOUND_LIB}")
               set(FOUND_LIB "")
