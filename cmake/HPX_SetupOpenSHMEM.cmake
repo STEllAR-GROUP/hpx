@@ -53,9 +53,9 @@ macro(hpx_setup_openshmem)
 
     include(FindOpenShmemPmi)
 
-    set(PMI_AUTOCONF_OPTS)
+    set(PMI_AUTOCONF_OPTS "")
     if(NOT PMI_LIBRARY OR NOT PMI_FOUND)
-      set(PMI_AUTOCONF_OPTS --enable-pmi-simple)
+      set(PMI_AUTOCONF_OPTS "--enable-pmi-simple")
     else()
       set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR}
           --with-pmi-libdir=${PMI_LIBRARY}")
@@ -143,7 +143,7 @@ macro(hpx_setup_openshmem)
       if(NOT OPENSHMEM_PKGCONFIG_FILE_FOUND)
         message(
            FATAL_ERROR
-              "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEMT_DIR}/install/lib/pkgconfig"
+              "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEM_DIR}/install/lib/pkgconfig"
         )
       endif()
 
