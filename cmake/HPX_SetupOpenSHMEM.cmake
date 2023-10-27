@@ -124,8 +124,7 @@ macro(hpx_setup_openshmem)
       )
     else()
 
-      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND
-	        ${OPENSHMEM_PC}.pc
+      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND ${OPENSHMEM_PC}.pc
                 ${OPENSHMEM_DIR}/install/lib/pkgconfig
       )
 
@@ -194,10 +193,7 @@ macro(hpx_setup_openshmem)
     set(CMAKE_PREFIX_PATH "${OPENSHMEM_DIR}/install/lib/pkgconfig")
     set(ENV{PKG_CONFIG_PATH} "${OPENSHMEM_DIR}/install/lib/pkgconfig")
 
-    pkg_search_module(
-      OPENSHMEM REQUIRED IMPORTED_TARGET GLOBAL
-      ${OPENSHMEM_PC}
-    )
+    pkg_search_module(OPENSHMEM REQUIRED IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
 
     if(NOT OPENSHMEM_FOUND)
       message(
@@ -206,7 +202,9 @@ macro(hpx_setup_openshmem)
       )
     endif()
   elseif((NOT OPENSHMEM_FOUND) AND (NOT HPX_WITH_FETCH_OPENSHMEM))
-    message(FATAL_ERROR "OpenSHMEM not found and HPX_WITH_FETCH_OPENSHMEM not set!")
+    message(
+      FATAL_ERROR "OpenSHMEM not found and HPX_WITH_FETCH_OPENSHMEM not set!"
+    )
   endif()
 
   if(OPENSHMEM_CFLAGS)
