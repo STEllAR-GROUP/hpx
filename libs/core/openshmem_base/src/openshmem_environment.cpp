@@ -253,6 +253,7 @@ namespace hpx::util {
         else
         {
             const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
+
             shmem_uint8_put_signal(raddr, addr, size,
                 reinterpret_cast<std::uint64_t*>(sigaddr), 1, SHMEM_SIGNAL_SET,
                 node);

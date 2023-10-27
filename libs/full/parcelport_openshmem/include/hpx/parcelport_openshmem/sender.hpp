@@ -37,8 +37,7 @@ namespace hpx::parcelset::policies::openshmem {
         // different versions of clang-format disagree
         // clang-format off
         sender() noexcept
-          : next_free_tag_request_(-1)
-          , next_free_tag_(-1)
+          : next_free_tag_(-1)
         {
         }
         // clang-format on
@@ -156,7 +155,6 @@ namespace hpx::parcelset::policies::openshmem {
         connection_list connections_;
 
         hpx::spinlock next_free_tag_mtx_;
-        int next_free_tag_request_;
         int next_free_tag_;
     };
 }    // namespace hpx::parcelset::policies::openshmem
