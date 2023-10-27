@@ -53,8 +53,12 @@ macro(hpx_setup_openshmem)
     if(NOT PMI_LIBRARY OR NOT PMI_FOUND)
       set(PMI_AUTOCONF_OPTS "--enable-pmi-simple")
     else()
-      set(PMI_AUTOCONF_OPTS "--with-pmi=${PMI_INCLUDE_DIR}
-          --with-pmi-libdir=${PMI_LIBRARY}"
+      string(REGEX MATCH "(^\/[^\/]+)" PMI_INCLUDE_DIR_ROOT_PATH
+                   ${PMI_INCLUDE_DIR}
+      )
+      string(REGEX MATCH "(^\/[^\/]+)" PMI_LIBRARY_ROOT_PATH ${PMI_LIBRARY})
+      set(PMI_AUTOCONF_OPTS
+          "--with-pmi=${PMI_INCLUDE_DIR_ROOT_PATH} --with-pmi-libdir=${PMI_LIBRARY_ROOT_PATH}"
       )
     endif()
 
