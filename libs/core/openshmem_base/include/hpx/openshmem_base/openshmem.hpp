@@ -17,15 +17,7 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <shmem.h>
-
-#ifdef __cplusplus
-}    // extern "C"
-#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
