@@ -2257,6 +2257,10 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
   include(HPX_SetupGasnet)
   hpx_setup_gasnet()
 endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_OPENSHMEM)
+  include(HPX_SetupOpenSHMEM)
+  hpx_setup_openshmem()
+endif()
 
 # Setup packages and subprojects
 include(HPX_SetupSYCL)
