@@ -118,9 +118,11 @@ macro(hpx_setup_openshmem)
     )
 
     if(OPENSHMEM_BUILD_STATUS)
+      file(READ ${OPENSHMEM_BUILD_OUTPUT} OPENSHMEM_BUILD_OUTPUT_CONTENT)
+
       message(
         FATAL_ERROR
-          "OpenSHMEM build result = ${OPENSHMEM_SRC_BUILD_STATUS} - see ${OPENSHMEM_SRC_BUILD_OUTPUT} for more details"
+          "OpenSHMEM build result = ${OPENSHMEM_BUILD_STATUS} - see ${OPENSHMEM_BUILD_OUTPUT} for more details\nOpenSHMEM build command\t:./autogen.sh && CC=${CMAKE_C_COMPILER} ./configure --prefix=${OPENSHMEM_DIR}/install --enable-shared --disable-fortran ${PMI_AUTOCONF_OPTS} && make && make install\n${OPENSHMEM_BUILD_OUTPUT_CONTENT}"
       )
     else()
 
