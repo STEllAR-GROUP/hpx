@@ -101,17 +101,16 @@ macro(hpx_setup_openshmem)
       fetchcontent_populate(openshmem)
     endif()
 
-    set(CMAKE_PREFIX_PATH "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
-    set(ENV{PKG_CONFIG_PATH} "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
-
     set(OPENSHMEM_DIR "${openshmem_SOURCE_DIR}")
     set(OPENSHMEM_BUILD_OUTPUT "${OPENSHMEM_DIR}/build.log")
     set(OPENSHMEM_ERROR_FILE "${OPENSHMEM_DIR}/error.log")
 
+    set(ENV{PKG_CONFIG_PATH} "${OPENSHMEM_DIR}/install/lib/pkgconfig")
+
     execute_process(
       COMMAND
         bash -c
-        "./autogen.sh && CC=${CMAKE_C_COMPILER} ./configure --prefix=${OPENSHMEM_DIR}/install --enable-shared ${PMI_AUTOCONF_OPTS} && make && make install"
+        "./autogen.sh && CC=${CMAKE_C_COMPILER} ./configure --prefix=${OPENSHMEM_DIR}/install --enable-shared --disable-fortran ${PMI_AUTOCONF_OPTS} && make && make install"
       WORKING_DIRECTORY ${OPENSHMEM_DIR}
       RESULT_VARIABLE OPENSHMEM_BUILD_STATUS
       OUTPUT_FILE ${OPENSHMEM_BUILD_OUTPUT}
@@ -125,94 +124,80 @@ macro(hpx_setup_openshmem)
       )
     else()
 
-      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND ${OPENSHMEM_PC}
+      find_file(OPENSHMEM_PKGCONFIG_FILE_FOUND
+	        ${OPENSHMEM_PC}.pc
                 ${OPENSHMEM_DIR}/install/lib/pkgconfig
       )
 
       if(NOT OPENSHMEM_PKGCONFIG_FILE_FOUND)
         message(
           FATAL_ERROR
-            "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEM_DIR}/install/lib/pkgconfig"
+            "PKG-CONFIG ERROR (${OPENSHMEM_PKGCONFIG_FILE_FOUND}; ${OPENSHMEM_PC}) -> CANNOT FIND COMPILED OpenSHMEM: ${OPENSHMEM_DIR}/install/lib/pkgconfig"
         )
       endif()
 
+      install(CODE "set(OPENSHMEM_PKGCONF \"${OPENSHMEM_PC}\")")
       install(CODE "set(OPENSHMEM_PATH \"${OPENSHMEM_DIR}\")")
 
       install(
         CODE [[
-        file(
-          READ
-          ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PC}
-          OPENSHMEM_PKGCONFIG_FILE_CONTENT
-        )
+          file(READ
+            ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PKGCONF}.pc
+	    OPENSHMEM_PKGCONFIG_FILE_CONTENT)
 
-        if(NOT OPENSHMEM_PKGCONFIG_FILE_CONTENT)
-          message(
-             FATAL_ERROR
-                "ERROR INSTALLING OPENSHMEM"
-          )
-        endif()
+          if(NOT OPENSHMEM_PKGCONFIG_FILE_CONTENT)
+            message(FATAL_ERROR "ERROR INSTALLING OPENSHMEM")
+          endif()
 
-        string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
-          OPENSHMEM_PKGCONFIG_FILE_CONTENT
-          ${OPENSHMEM_PKGCONFIG_FILE_CONTENT}
-        )
+	  string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                         OPENSHMEM_PKGCONFIG_FILE_CONTENT
+                         ${OPENSHMEM_PKGCONFIG_FILE_CONTENT})
 
-        file(
-          WRITE
-          ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PC}
-          ${OPENSHMEM_PKGCONFIG_FILE_CONTENT}
-        )
-
-        file(GLOB_RECURSE OPENSHMEM_FILES ${OPENSHMEM_PATH}/install/*)
-
-        if(NOT OPENSHMEM_FILES)
-          message(
-             STATUS
-                "ERROR INSTALLING OPENSHMEM"
-          )
-        endif()
-
-        foreach(OPENSHMEM_FILE ${OPENSHMEM_FILES})
-          set(OPENSHMEM_FILE_CACHED "${OPENSHMEM_FILE}")
-
-          string(REGEX MATCH "
-          (^ \/.*\/)
-          " OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE})
-
-          string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
-            OPENSHMEM_FILE ${OPENSHMEM_FILE}
+          file(WRITE
+            ${OPENSHMEM_PATH}/install/lib/pkgconfig/${OPENSHMEM_PKGCONF}.pc
+            ${OPENSHMEM_PKGCONFIG_FILE_CONTENT}
           )
 
-          string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
-            OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE_PATH}
-          )
+          file(GLOB_RECURSE OPENSHMEM_FILES ${OPENSHMEM_PATH}/install/*)
 
-          file(MAKE_DIRECTORY ${OPENSHMEM_FILE_PATH})
+	  if(NOT OPENSHMEM_FILES)
+           message(STATUS "ERROR INSTALLING OPENSHMEM")
+          endif()
 
-          string(LENGTH ${OPENSHMEM_FILE_PATH} OPENSHMEM_FILE_PATH_SIZE)
-          math(EXPR OPENSHMEM_FILE_PATH_SIZE "${OPENSHMEM_FILE_PATH_SIZE}-1")
+          foreach(OPENSHMEM_FILE ${OPENSHMEM_FILES})
+            set(OPENSHMEM_FILE_CACHED "${OPENSHMEM_FILE}")
 
-          string(SUBSTRING ${OPENSHMEM_FILE_PATH} 0 ${OPENSHMEM_FILE_PATH_SIZE}
-            OPENSHMEM_FILE_PATH
-          )
+            string(REGEX MATCH "(^\/.*\/)" OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE})
 
-          file(COPY ${OPENSHMEM_FILE_CACHED} DESTINATION ${OPENSHMEM_FILE_PATH})
-        endforeach()
-      ]]
+            string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                           OPENSHMEM_FILE ${OPENSHMEM_FILE}
+            )
+
+            string(REPLACE "${OPENSHMEM_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                           OPENSHMEM_FILE_PATH ${OPENSHMEM_FILE_PATH}
+            )
+
+            file(MAKE_DIRECTORY ${OPENSHMEM_FILE_PATH})
+
+            string(LENGTH ${OPENSHMEM_FILE_PATH} OPENSHMEM_FILE_PATH_SIZE)
+            math(EXPR OPENSHMEM_FILE_PATH_SIZE "${OPENSHMEM_FILE_PATH_SIZE}-1")
+
+            string(SUBSTRING ${OPENSHMEM_FILE_PATH} 0 ${OPENSHMEM_FILE_PATH_SIZE}
+                             OPENSHMEM_FILE_PATH)
+
+            file(COPY ${OPENSHMEM_FILE_CACHED} DESTINATION ${OPENSHMEM_FILE_PATH})
+          endforeach()
+        ]]
       )
-
-      # install(FILES ${OPENSHMEM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX})
     endif()
 
     set(CMAKE_PREFIX_PATH "${OPENSHMEM_DIR}/install/lib/pkgconfig")
     set(ENV{PKG_CONFIG_PATH} "${OPENSHMEM_DIR}/install/lib/pkgconfig")
 
-    if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
-      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL osss-ucx)
-    elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
-      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL sandia-openshmem)
-    endif()
+    pkg_search_module(
+      OPENSHMEM REQUIRED IMPORTED_TARGET GLOBAL
+      ${OPENSHMEM_PC}
+    )
 
     if(NOT OPENSHMEM_FOUND)
       message(
@@ -220,7 +205,8 @@ macro(hpx_setup_openshmem)
           "OpenSHMEM downloaded, compiled, but cannot be found in ${CMAKE_INSTALL_PREFIX}"
       )
     endif()
-
+  elseif((NOT OPENSHMEM_FOUND) AND (NOT HPX_WITH_FETCH_OPENSHMEM))
+    message(FATAL_ERROR "OpenSHMEM not found and HPX_WITH_FETCH_OPENSHMEM not set!")
   endif()
 
   if(OPENSHMEM_CFLAGS)
