@@ -7,7 +7,7 @@
 
 #pragma once
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
+#if defined(HPX_HAVE_PARCELPORT_OPENSHMEM)
 
 #if defined(__clang__)
 #pragma clang diagnostic push
