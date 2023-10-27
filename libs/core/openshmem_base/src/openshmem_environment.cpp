@@ -16,8 +16,6 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/util.hpp>
 
-#include <shmem.h>
-
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
