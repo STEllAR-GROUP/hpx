@@ -104,7 +104,7 @@ namespace hpx::parcelset {
             }
 
             static std::size_t background_threads(
-                util::runtime_configuration const& ini)
+                [[maybe_unused]] util::runtime_configuration const& ini)
             {
                 /*
                 return hpx::util::get_entry_as<std::size_t>(ini,
