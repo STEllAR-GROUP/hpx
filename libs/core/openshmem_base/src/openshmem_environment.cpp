@@ -18,6 +18,11 @@
 
 #ifndef SHMEM_H
 #include <shmem.h>
+
+#ifndef SHMEM_SIGNAL_SET
+#define SHMEM_SIGNAL_SET        0
+#endif
+
 #endif
 
 #include <atomic>
