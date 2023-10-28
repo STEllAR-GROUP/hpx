@@ -110,7 +110,8 @@ namespace hpx::util {
     unsigned int openshmem_environment::xmt = 0;
 
     ///////////////////////////////////////////////////////////////////////////
-    int openshmem_environment::init([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv, [[maybe_unused]] int& provided)
+    int openshmem_environment::init([[maybe_unused]] int* argc,
+        [[maybe_unused]] char*** argv, [[maybe_unused]] int& provided)
     {
         if (!has_called_init_)
         {
@@ -170,8 +171,9 @@ namespace hpx::util {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void openshmem_environment::init(
-        [[maybe_unused]] int* argc, [[maybe_unused]] char*** argv, [[maybe_unused]] util::runtime_configuration& rtcfg)
+    void openshmem_environment::init([[maybe_unused]] int* argc,
+        [[maybe_unused]] char*** argv,
+        [[maybe_unused]] util::runtime_configuration& rtcfg)
     {
         if (enabled_)
             return;    // don't call twice
