@@ -10,7 +10,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/openshmem_base/openshmem.hpp>
 #include <hpx/modules/openshmem_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
