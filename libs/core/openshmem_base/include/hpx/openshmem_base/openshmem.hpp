@@ -7,7 +7,7 @@
 
 #pragma once
 
-#if defined(HPX_HAVE_PARCELPORT_OPENSHMEM)
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -17,7 +17,9 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
+#ifndef SHMEM_H
 #include <shmem.h>
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
