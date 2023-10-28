@@ -10,22 +10,25 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/logging.hpp>
+#include <hpx/openshmem_base/openshmem.hpp>
 #include <hpx/modules/openshmem_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/util.hpp>
 
+/*
 #ifndef SHMEM_H
 #define SHMEM_H
+*/
 #include <mpp/shmem.h>
-
+/*
 #ifndef SHMEM_SIGNAL_SET
 #define SHMEM_SIGNAL_SET 0
 #endif
 
 #endif
-
+*/
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
