@@ -6,9 +6,9 @@
 
 module purge
 module load cmake
-module load gcc/12
+module load gcc/13
 module load cuda/12
-module load boost/1.81.0-${build_type,,}
+module load boost/1.83.0-${build_type,,}
 module load hwloc
 
 export CXX_STD="17"
