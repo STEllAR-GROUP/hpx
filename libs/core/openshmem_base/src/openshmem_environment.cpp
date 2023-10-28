@@ -62,7 +62,7 @@ namespace hpx::util {
     }    // namespace detail
 
     bool openshmem_environment::check_openshmem_environment(
-        util::runtime_configuration const& cfg)
+        [[maybe_unused]] util::runtime_configuration const& cfg)
     {
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
         // We disable the OPENSHMEM parcelport if any of these hold:
@@ -110,7 +110,7 @@ namespace hpx::util {
     unsigned int openshmem_environment::xmt = 0;
 
     ///////////////////////////////////////////////////////////////////////////
-    int openshmem_environment::init(int* argc, char*** argv, int& provided)
+    int openshmem_environment::init([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv, [[maybe_unused]] int& provided)
     {
         if (!has_called_init_)
         {
@@ -171,7 +171,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     void openshmem_environment::init(
-        int* argc, char*** argv, util::runtime_configuration& rtcfg)
+        [[maybe_unused]] int* argc, [[maybe_unused]] char*** argv, [[maybe_unused]] util::runtime_configuration& rtcfg)
     {
         if (enabled_)
             return;    // don't call twice
