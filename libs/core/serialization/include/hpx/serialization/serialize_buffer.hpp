@@ -20,11 +20,55 @@
 #include <boost/shared_array.hpp>
 #endif
 
-#include <algorithm>
 #include <cstddef>
 #include <memory>
 
 namespace hpx::serialization {
+
+    namespace detail {
+
+        template <typename Allocator>
+        struct array_allocator
+        {
+            auto* operator()(Allocator alloc, std::size_t size) const
+            {
+                auto* p = alloc.allocate(size);
+                std::uninitialized_default_construct(p, p + size);
+                return p;
+            }
+        };
+
+        template <typename T>
+        struct array_allocator<std::allocator<T>>
+        {
+            T* operator()(std::allocator<T>, std::size_t size) const
+            {
+                return new T[size];
+            }
+        };
+
+        template <typename Deallocator>
+        struct array_deleter
+        {
+            template <typename T>
+            void operator()(
+                T* p, Deallocator dealloc, std::size_t size) const noexcept
+            {
+                std::destroy(p, p + size);
+                dealloc.deallocate(p, size);
+            }
+        };
+
+        template <typename T>
+        struct array_deleter<std::allocator<T>>
+        {
+            void operator()(
+                T const* p, std::allocator<T>, std::size_t) const noexcept
+            {
+                delete[] p;
+            }
+        };
+    }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Allocator>
@@ -41,20 +85,28 @@ namespace hpx::serialization {
         static constexpr void no_deleter(T*) noexcept {}
 
         template <typename Deallocator>
-        static void deleter(
-            T* p, Deallocator dealloc, std::size_t size) noexcept
+        struct deleter
         {
-            dealloc.deallocate(p, size);
-        }
+            void operator()(
+                T* p, Deallocator dealloc, std::size_t size) const noexcept
+            {
+                std::destroy_at(p);
+                dealloc.deallocate(p, size);
+            }
+        };
 
     public:
         enum init_mode
         {
-            copy = 0,         // constructor copies data
-            reference = 1,    // constructor does not copy data and does not
-                              // manage the lifetime of it
-            take = 2          // constructor does not copy data but does take
-                              // ownership and manages the lifetime of it
+            copy = 0,          // constructor copies data
+            reference = 1,     // constructor does not copy data and does not
+                               // manage the lifetime of it
+            take = 2,          // constructor does not copy data but takes
+                               // ownership of array pointer and manages the
+                               // lifetime of it
+            take_single = 3    // constructor does not copy data but takes
+                               // ownership of pointer to non-array and manages
+                               // the lifetime of it
         };
 
         using value_type = T;
@@ -72,9 +124,10 @@ namespace hpx::serialization {
           , size_(size)
           , alloc_(alloc)
         {
-            data_.reset(alloc_.allocate(size),
-                [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+            auto* p = detail::array_allocator<allocator_type>()(alloc_, size);
+            data_.reset(
+                p, [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                    serialize_buffer::deleter<allocator_type>()(p, alloc, size);
                 });
         }
 
@@ -88,25 +141,33 @@ namespace hpx::serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size),
+                auto* p =
+                    detail::array_allocator<allocator_type>()(alloc_, size);
+                data_.reset(p,
                     [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                        serialize_buffer::deleter<allocator_type>(
-                            p, alloc, size);
+                        detail::array_deleter<allocator_type>()(p, alloc, size);
                     });
-                if (size != 0)
-                    std::copy(data, data + size, data_.get());
+                std::uninitialized_copy(data, data + size, p);
             }
             else if (mode == reference)
             {
                 data_ = buffer_type(data, &serialize_buffer::no_deleter);
             }
-            else
+            else if (mode == take_single)
             {
                 // take ownership
                 data_ = buffer_type(data,
                     [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                        serialize_buffer::deleter<allocator_type>(
+                        serialize_buffer::deleter<allocator_type>()(
                             p, alloc, size);
+                    });
+            }
+            else if (mode == take)
+            {
+                // take ownership
+                data_ = buffer_type(data,
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                        detail::array_deleter<allocator_type>()(p, alloc, size);
                     });
             }
         }
@@ -120,49 +181,60 @@ namespace hpx::serialization {
         {
             // if 2 allocators are specified we assume mode 'take'
             data_ = buffer_type(data, [this, dealloc](T* p) noexcept {
-                serialize_buffer::deleter<Deallocator>(p, dealloc, size_);
+                detail::array_deleter<Deallocator>()(p, dealloc, size_);
             });
         }
 
         template <typename Deleter>
         serialize_buffer(T* data, std::size_t size, init_mode mode,
-            Deleter const& deleter,
-            allocator_type const& alloc = allocator_type())
+            Deleter&& deleter, allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
           , alloc_(alloc)
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), deleter);
-                if (size != 0)
-                    std::copy(data, data + size, data_.get());
+                auto* p =
+                    detail::array_allocator<allocator_type>()(alloc_, size);
+                data_ = buffer_type(p,
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                        detail::array_deleter<allocator_type>()(p, alloc, size);
+                    });
+                std::uninitialized_copy(data, data + size, p);
             }
             else
             {
                 // reference or take ownership, behavior is defined by deleter
-                data_ = buffer_type(data, deleter);
+                data_ = buffer_type(data,
+                    [deleter = HPX_FORWARD(Deleter, deleter)](
+                        T* p) noexcept { deleter(p); });
             }
         }
 
         template <typename Deleter>
         serialize_buffer(T const* data, std::size_t size,
             init_mode mode,    //-V659
-            Deleter const& deleter,
-            allocator_type const& alloc = allocator_type())
+            Deleter&& deleter, allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
           , alloc_(alloc)
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size), deleter);
-                if (size != 0)
-                    std::copy(data, data + size, data_.get());
+                auto* p =
+                    detail::array_allocator<allocator_type>()(alloc_, size);
+                data_ = buffer_type(p,
+                    [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                        detail::array_deleter<allocator_type>()(p, alloc, size);
+                    });
+                std::uninitialized_copy(data, data + size, p);
             }
             else if (mode == reference)
             {
-                data_ = buffer_type(const_cast<T*>(data), deleter);
+                // reference behavior is defined by deleter
+                data_ = buffer_type(const_cast<T*>(data),
+                    [deleter = HPX_FORWARD(Deleter, deleter)](
+                        T* p) noexcept { deleter(p); });
             }
             else
             {
@@ -193,26 +265,28 @@ namespace hpx::serialization {
           , alloc_(alloc)
         {
             // create from const data implies 'copy' mode
-            data_.reset(alloc_.allocate(size),
-                [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+            auto* p = detail::array_allocator<allocator_type>()(alloc_, size);
+            data_ = buffer_type(
+                p, [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                    detail::array_deleter<allocator_type>()(p, alloc, size);
                 });
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
+            std::uninitialized_copy(data, data + size, p);
         }
 
         template <typename Deleter>
-        serialize_buffer(T const* data, std::size_t size,
-            Deleter const& deleter,
+        serialize_buffer(T const* data, std::size_t size, Deleter&&,
             allocator_type const& alloc = allocator_type())
           : data_()
           , size_(size)
           , alloc_(alloc)
         {
             // create from const data implies 'copy' mode
-            data_.reset(alloc_.allocate(size), deleter);
-            if (size != 0)
-                std::copy(data, data + size, data_.get());
+            auto* p = detail::array_allocator<allocator_type>()(alloc_, size);
+            data_ = buffer_type(
+                p, [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                    detail::array_deleter<allocator_type>()(p, alloc, size);
+                });
+            std::uninitialized_copy(data, data + size, p);
         }
 
         serialize_buffer(T const* data, std::size_t size, init_mode mode,
@@ -223,13 +297,13 @@ namespace hpx::serialization {
         {
             if (mode == copy)
             {
-                data_.reset(alloc_.allocate(size),
+                auto* p =
+                    detail::array_allocator<allocator_type>()(alloc_, size);
+                data_ = buffer_type(p,
                     [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                        serialize_buffer::deleter<allocator_type>(
-                            p, alloc, size);
+                        detail::array_deleter<allocator_type>()(p, alloc, size);
                     });
-                if (size != 0)
-                    std::copy(data, data + size, data_.get());
+                std::uninitialized_copy(data, data + size, p);
             }
             else if (mode == reference)
             {
@@ -316,9 +390,10 @@ namespace hpx::serialization {
         {
             ar >> size_ >> alloc_;    // -V128
 
-            data_.reset(alloc_.allocate(size_),
-                [alloc = this->alloc_, size = this->size_](T* p) {
-                    serialize_buffer::deleter<allocator_type>(p, alloc, size);
+            data_ = buffer_type(
+                detail::array_allocator<allocator_type>()(alloc_, size_),
+                [alloc = this->alloc_, size = this->size_](T* p) noexcept {
+                    detail::array_deleter<allocator_type>()(p, alloc, size);
                 });
 
             if (size_ != 0)
