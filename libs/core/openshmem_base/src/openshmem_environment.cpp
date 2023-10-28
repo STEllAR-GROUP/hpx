@@ -17,18 +17,9 @@
 #include <hpx/modules/threading_base.hpp>
 #include <hpx/modules/util.hpp>
 
-/*
-#ifndef SHMEM_H
-#define SHMEM_H
-*/
+#include <mpp/shmem-def.h>
 #include <mpp/shmem.h>
-/*
-#ifndef SHMEM_SIGNAL_SET
-#define SHMEM_SIGNAL_SET 0
-#endif
 
-#endif
-*/
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
