@@ -18,7 +18,7 @@
 #endif
 
 #ifndef SHMEM_H
-#include <shmem.h>
+#include <mpp/shmem.h>
 #endif
 
 #if defined(__clang__)
