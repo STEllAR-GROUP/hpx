@@ -17,10 +17,11 @@
 #include <hpx/modules/util.hpp>
 
 #ifndef SHMEM_H
-#include <shmem.h>
+#define SHMEM_H
+#include <mpp/shmem.h>
 
 #ifndef SHMEM_SIGNAL_SET
-#define SHMEM_SIGNAL_SET        0
+#define SHMEM_SIGNAL_SET 0
 #endif
 
 #endif
