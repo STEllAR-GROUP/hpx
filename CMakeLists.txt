@@ -1243,7 +1243,7 @@ if(HPX_WITH_NETWORKING)
     hpx_option(
       HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT STRING
       "Define which conduit to use for the OpenSHMEM parcelport" "sos"
-      STRINGS "sos;ucx"
+      STRINGS "sos;ucx;mpi"
     )
   endif()
 
