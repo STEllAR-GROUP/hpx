@@ -26,6 +26,7 @@ set(tests
     local_barrier_reset
     local_event
     local_mutex
+    range_lock
     sliding_semaphore
     stop_token
     stop_token_cb2
