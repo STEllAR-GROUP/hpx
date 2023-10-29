@@ -32,9 +32,7 @@ macro(hpx_setup_openshmem)
       )
 
     elseif(
-      HPX_WITH_PARCELPORT_MPI
-      AND (MPI_FOUND OR Mpi::mpi)
-      AND HPX_WITH_PARCELPORT_OPENSHMEM
+      HPX_WITH_PARCELPORT_OPENSHMEM
       AND (NOT HPX_WITH_FETCH_OPENSHMEM)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
@@ -44,7 +42,7 @@ macro(hpx_setup_openshmem)
       if(NOT OPENSHMEM_FOUND)
         message(
           FATAL_ERROR
-            "oshmem-cxx not found for HPX_WITH_PARCELPORT_MPI, HPX_WITH_PARCELPORT_OPENSHMEM, and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'"
+            "oshmem-cxx not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'"
         )
       endif()
 
