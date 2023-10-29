@@ -11,7 +11,42 @@ macro(hpx_setup_openshmem)
   if(NOT TARGET PkgConfig::OPENSHMEM)
 
     set(OPENSHMEM_PC "")
-    if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
+    if(HPX_WITH_PARCELPORT_MPI AND HPX_WITH_PARCELPORT_OPENSHMEM AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")))
+      message(FATAL "HPX_WITH_PARCELPORT_MPI & HPX_WITH_PARCELPORT_OPENSHMEM both set to ON and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT != 'mpi'")
+
+    elseif(HPX_WITH_PARCELPORT_MPI AND HPX_WITH_PARCELPORT_OPENSHMEM AND HPX_WITH_FETCH_OPENSHMEM AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+      message(
+        FATAL_ERROR
+          "HPX_WITH_FETCH_OPENSHMEM for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi' not supported" 
+      )
+
+    elseif(HPX_WITH_PARCELPORT_MPI AND (MPI_FOUND OR Mpi::mpi) AND HPX_WITH_PARCELPORT_OPENSHMEM AND (NOT HPX_WITH_FETCH_OPENSHMEM) AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+      set(OPENSHMEM_PC "oshmem-cxx")
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem-cxx)
+
+      if(NOT OPENSHMEM_FOUND)
+        message(
+          FATAL_ERROR
+            "oshmem-cxx not found for HPX_WITH_PARCELPORT_MPI, HPX_WITH_PARCELPORT_OPENSHMEM, and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'"
+        )
+      endif()
+
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
+                                        "${OPENSHMEM_CFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
+                                        "${OPENSHMEM_LDFLAGS}"
+      )
+      set_target_properties(
+        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                        "${OPENSHMEM_LIBRARY_DIRS}"
+      )
+
+      return()
+
+    elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       set(OPENSHMEM_PC "ucx")
 
       pkg_search_module(UCX IMPORTED_TARGET GLOBAL ucx)
@@ -31,7 +66,7 @@ macro(hpx_setup_openshmem)
     endif()
   endif()
 
-  if((NOT OPENSHMEM_FOUND) AND HPX_WITH_FETCH_OPENSHMEM)
+  if((NOT OPENSHMEM_FOUND) AND HPX_WITH_FETCH_OPENSHMEM AND NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
     if(NOT CMAKE_C_COMPILER)
       message(
         FATAL_ERROR
