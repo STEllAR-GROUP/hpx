@@ -86,6 +86,8 @@ macro(hpx_setup_openshmem)
                      ${OSHMEM_INFO_OUTPUT_CONTENT}
         )
 
+        string(STRIP ${OSHMEM_LIBDIR_PATH} OSHMEM_LIBDIR_PATH)
+
         set(ENV{PKG_CONFIG_PATH}
             "$ENV{PKG_CONFIG_PATH}:${OSHMEM_LIBDIR_PATH}/pkgconfig"
         )
@@ -96,7 +98,7 @@ macro(hpx_setup_openshmem)
 
           message(
             STATUS
-            "1) ${OSHMEM_INFO} 2) ${OSHMEM_INFO_OUTPUT} 3) ${OSHMEM_INFO_OUTPUT_CONTENT} 4) ${OSHMEM_LIBDIR_PATH}"
+              "1) ${OSHMEM_INFO} 2) ${OSHMEM_INFO_OUTPUT} 3) ${OSHMEM_INFO_OUTPUT_CONTENT} 4) ${OSHMEM_LIBDIR_PATH}"
           )
 
           file(READ ${OSHMEM_INFO_ERROR} OSHMEM_INFO_ERROR_CONTENT)
