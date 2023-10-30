@@ -67,7 +67,7 @@ macro(hpx_setup_openshmem)
           ERROR_FILE ${OSHMEM_INFO_ERROR}
         )
 
-        if(NOT OSHMEM_INFO_STATUS)
+        if(OSHMEM_INFO_STATUS)
           message(
             FATAL_ERROR
               "${OSHMEM_INFO} Failed! Program status code: ${OSHMEM_INFO_STATUS}"
