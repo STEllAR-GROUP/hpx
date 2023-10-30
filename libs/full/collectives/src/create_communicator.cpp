@@ -16,7 +16,6 @@
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/modules/async_distributed.hpp>
-#include <hpx/modules/futures.hpp>
 #include <hpx/runtime_components/component_factory.hpp>
 #include <hpx/runtime_components/new.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
@@ -69,7 +68,7 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     void communicator::set_info(
-        std::size_t num_sites, std::size_t this_site) noexcept
+        num_sites_arg num_sites, this_site_arg this_site) noexcept
     {
         auto& [num_sites_, this_site_] =
             get_extra_data<detail::communicator_data>();
@@ -78,7 +77,8 @@ namespace hpx::collectives {
         this_site_ = this_site;
     }
 
-    std::pair<std::size_t, std::size_t> communicator::get_info() const noexcept
+    std::pair<num_sites_arg, this_site_arg> communicator::get_info()
+        const noexcept
     {
         auto const* client_data =
             try_get_extra_data<detail::communicator_data>();
@@ -89,8 +89,7 @@ namespace hpx::collectives {
                 client_data->num_sites_, client_data->this_site_);
         }
 
-        return std::make_pair(
-            static_cast<std::size_t>(-1), static_cast<std::size_t>(-1));
+        return std::make_pair(num_sites_arg{}, this_site_arg{});
     }
 
     ///////////////////////////////////////////////////////////////////////////

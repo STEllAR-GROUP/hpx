@@ -199,6 +199,10 @@ int hpx_main(variables_map& vm)
 #endif
 }
 
+#if defined(JACOBI_SMP_NO_HPX)
+#define HPX_APPLICATION_STRING "jacobi_omp_nonuniform_[static,dynamic]"
+#endif
+
 int main(int argc, char** argv)
 {
     options_description desc_cmd("usage: " HPX_APPLICATION_STRING " [options]");

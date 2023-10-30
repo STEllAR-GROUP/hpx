@@ -28,6 +28,7 @@ namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
     channel_communicator::channel_communicator() = default;
+    channel_communicator::~channel_communicator() = default;
 
     channel_communicator::channel_communicator(char const* basename,
         num_sites_arg num_sites, this_site_arg this_site,

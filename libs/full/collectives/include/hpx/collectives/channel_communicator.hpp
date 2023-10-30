@@ -149,6 +149,7 @@ namespace hpx { namespace collectives {
 
     public:
         HPX_EXPORT channel_communicator();
+        HPX_EXPORT ~channel_communicator();
 
         channel_communicator(channel_communicator const& rhs) = default;
         channel_communicator& operator=(

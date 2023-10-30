@@ -49,11 +49,11 @@ public:
     {
     }
 
-    pointer address(reference value) const
+    static pointer address(reference value)
     {
         return &value;
     }
-    const_pointer address(const_reference value) const
+    static const_pointer address(const_reference value)
     {
         return &value;
     }
@@ -118,7 +118,7 @@ private:
     }
 
 public:
-    zerocopy_server(std::size_t size = 0)
+    explicit zerocopy_server(std::size_t size = 0)
       : data_(size, 3.1415)
     {
     }
@@ -127,7 +127,7 @@ public:
     // Retrieve an array of doubles to the given address
     transfer_buffer_type get_here(std::size_t size, std::size_t remote_buffer)
     {
-        pointer_allocator<double> allocator(
+        pointer_allocator<double> const allocator(
             reinterpret_cast<double*>(remote_buffer), size);
 
         // lock the mutex, will be unlocked by the transfer buffer's deleter
@@ -225,9 +225,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 int main()
 {
-    std::vector<hpx::id_type> localities = hpx::find_all_localities();
-
-    for (hpx::id_type const& id : localities)
+    for (hpx::id_type const& id : hpx::find_all_localities())
     {
         zerocopy zc = hpx::new_<zerocopy_server>(id, ZEROCOPY_DATASIZE);
 
@@ -238,7 +236,10 @@ int main()
             hpx::chrono::high_resolution_timer t;
 
             for (int i = 0; i != 100; ++i)
-                zc.get(hpx::launch::sync, ZEROCOPY_DATASIZE);
+            {
+                [[maybe_unused]] auto r =
+                    zc.get(hpx::launch::sync, ZEROCOPY_DATASIZE);
+            }
 
             double d = t.elapsed();
             std::cout << "Elapsed time 'get' (locality "
@@ -252,7 +253,7 @@ int main()
             for (int i = 0; i != 100; ++i)
                 zc.get_here(hpx::launch::sync, buffer);
 
-            double d = t.elapsed();
+            double const d = t.elapsed();
             std::cout << "Elapsed time 'get_here' (locality "
                       << hpx::naming::get_locality_id_from_id(id) << "): " << d
                       << "[s]\n";

@@ -105,12 +105,12 @@ private:
 
     struct hold_reference
     {
-        hold_reference(buffer_type const& data)
+        explicit hold_reference(buffer_type const& data)
           : data_(data)
         {
         }
 
-        void operator()(double*) {}    // no deletion necessary
+        void operator()(double const*) const {}    // no deletion necessary
 
         buffer_type data_;
     };
