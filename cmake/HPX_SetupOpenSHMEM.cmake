@@ -92,10 +92,10 @@ macro(hpx_setup_openshmem)
 
         messsage(
           STATUS
-          "1)${OSHMEM_INFO} 2)${OSHMEM_INFO_OUTPUT} 3)${OSHMEM_INFO_OUTPUT_CONTENT} 4)${OSHMEM_LIBDIR_PATH}"
+          "1) ${OSHMEM_INFO} 2) ${OSHMEM_INFO_OUTPUT} 3) ${OSHMEM_INFO_OUTPUT_CONTENT} 4) ${OSHMEM_LIBDIR_PATH}"
         )
 
-        pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
+        pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
 
         if(NOT OPENSHMEM_FOUND)
           file(READ ${OSHMEM_INFO_ERROR} OSHMEM_INFO_ERROR_CONTENT)
