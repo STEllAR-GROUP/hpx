@@ -96,6 +96,13 @@ macro(hpx_setup_openshmem)
 
         if(NOT OPENSHMEM_FOUND)
 
+          set(OSHMEM_INFO_INCOUTPUT
+              "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_stdout_inc.log"
+          )
+          set(OSHMEM_INFO_INCERROR
+              "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_error_inc.log"
+          )
+
           execute_process(
             COMMAND bash -c "${OSHMEM_INFO} --path incdir"
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
