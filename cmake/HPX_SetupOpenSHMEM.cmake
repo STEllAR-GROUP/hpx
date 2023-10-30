@@ -37,7 +37,9 @@ macro(hpx_setup_openshmem)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
       set(OPENSHMEM_PC "oshmem")
-      set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/../lib/pkgconfig")
+      set(ENV{PKG_CONFIG_PATH}
+          "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/../lib/pkgconfig"
+      )
       pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
 
       if(NOT OPENSHMEM_FOUND)
