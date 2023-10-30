@@ -262,6 +262,7 @@ def build_cmd(options, args):
             ['--hpx:ini=hpx.parcel.mpi.priority=1000', '--hpx:ini=hpx.parcel.mpi.enable=1', '--hpx:ini=hpx.parcel.bootstrap=mpi'] if pp == 'mpi'
             else ['--hpx:ini=hpx.parcel.lci.priority=1000', '--hpx:ini=hpx.parcel.lci.enable=1', '--hpx:ini=hpx.parcel.bootstrap=lci'] if pp == 'lci'
             else ['--hpx:ini=hpx.parcel.gasnet.priority=1000', '--hpx:ini=hpx.parcel.gasnet.enable=1', '--hpx:ini=hpx.parcel.bootstrap=gasnet'] if pp == 'gasnet'
+            else ['--hpx:ini=hpx.parcel.openshmem.priority=1000', '--hpx:ini=hpx.parcel.openshmem.enable=1', '--hpx:ini=hpx.parcel.bootstrap=openshmem'] if pp == 'openshmem'
             else ['--hpx:ini=hpx.parcel.tcp.priority=1000', '--hpx:ini=hpx.parcel.tcp.enable=1'] if pp == 'tcp'
             else [])
         cmd += select_parcelport(options.parcelport)
@@ -298,14 +299,14 @@ def check_options(parser, options, args):
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 
-    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'gasnet' or x == 'tcp' or x == 'none');
+    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'gasnet' or x == 'tcp' or x == 'openshmem' or x == 'none');
     if not check_valid_parcelport(options.parcelport):
         print('Error: Parcelport option not valid\n', sys.stderr)
         parser.print_help()
         sys.exit(1)
 
     check_valid_runwrapper = (lambda x:
-            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun');
+            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun' or x == 'gasnet' or x == 'openshmem');
     if not check_valid_runwrapper(options.runwrapper):
         print('Error: Runwrapper option not valid\n', sys.stderr)
         parser.print_help()
