@@ -143,23 +143,21 @@ macro(hpx_setup_openshmem)
 
           add_library(PkgConfig::OPENSHMEM INTERFACE IMPORTED GLOBAL)
 
+          set_target_properties(
+            PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
+                                            "${OPENSHMEM_CFLAGS}"
+          )
+          set_target_properties(
+            PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
+                                            "${OPENSHMEM_LDFLAGS}"
+          )
+          set_target_properties(
+            PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
+                                            "${OPENSHMEM_LIBRARY_DIRS}"
+          )
+          return()
         endif()
       endif()
-
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
-                                        "${OPENSHMEM_CFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
-                                        "${OPENSHMEM_LDFLAGS}"
-      )
-      set_target_properties(
-        PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                        "${OPENSHMEM_LIBRARY_DIRS}"
-      )
-
-      return()
 
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       set(OPENSHMEM_PC "ucx")
