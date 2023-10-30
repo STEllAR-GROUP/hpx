@@ -141,6 +141,8 @@ macro(hpx_setup_openshmem)
           )
           set(OPENSHMEM_LIBRARY_DIRS "-L${OSHMEM_LIBDIR_PATH}")
 
+          add_library(PkgConfig::OPENSHMEM INTERFACE IMPORTED GLOBAL)
+
         endif()
       endif()
 
