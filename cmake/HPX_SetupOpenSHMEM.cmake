@@ -37,9 +37,7 @@ macro(hpx_setup_openshmem)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
 
-      set(ENV{PKG_CONFIG_PATH}
-          "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/pkgconfig"
-      )
+      set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/pkgconfig")
 
       set(OPENSHMEM_PC "oshmem")
       pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
@@ -54,16 +52,18 @@ macro(hpx_setup_openshmem)
           )
         endif()
 
-        set(OSHMEM_INFO_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_stdout.log")
-        set(OSHMEM_INFO_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_error.log")
+        set(OSHMEM_INFO_OUTPUT
+            "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_stdout.log"
+        )
+        set(OSHMEM_INFO_ERROR
+            "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_error.log"
+        )
 
         execute_process(
-          COMMAND
-            bash -c
-            "${OSHMEM_INFO} --path libdir"
+          COMMAND bash -c "${OSHMEM_INFO} --path libdir"
           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
           RESULT_VARIABLE OSHMEM_INFO_STATUS
-          OUTPUT_FILE ${OSHMEM_INFO_OUTPUT} 
+          OUTPUT_FILE ${OSHMEM_INFO_OUTPUT}
           ERROR_FILE ${OSHMEM_INFO_ERROR}
         )
 
@@ -78,12 +78,13 @@ macro(hpx_setup_openshmem)
 
         if(NOT OSHMEM_INFO_OUTPUT_CONTENT)
           message(
-            FATAL_ERROR
-              "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}"
+            FATAL_ERROR "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}"
           )
         endif()
 
-        string(REGEX MATCH "(\/.*)" OSHMEM_LIBDIR_PATH ${OSHMEM_INFO_OUTPUT_CONTENT})
+        string(REGEX MATCH "(\/.*)" OSHMEM_LIBDIR_PATH
+                     ${OSHMEM_INFO_OUTPUT_CONTENT}
+        )
 
         set(ENV{PKG_CONFIG_PATH} "${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig")
 
