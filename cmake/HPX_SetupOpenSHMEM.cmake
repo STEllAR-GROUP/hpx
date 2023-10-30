@@ -87,7 +87,12 @@ macro(hpx_setup_openshmem)
         )
 
         set(ENV{PKG_CONFIG_PATH}
-            "$ENV{PKG_CONFIG_PATH}:${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig"
+            "$ENV{PKG_CONFIG_PATH}:${OSHMEM_LIBDIR_PATH}/pkgconfig"
+        )
+
+        messsage(
+          STATUS
+          "1)${OSHMEM_INFO} 2)${OSHMEM_INFO_OUTPUT} 3)${OSHMEM_INFO_OUTPUT_CONTENT} 4)${OSHMEM_LIBDIR_PATH}"
         )
 
         pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
@@ -96,7 +101,7 @@ macro(hpx_setup_openshmem)
           file(READ ${OSHMEM_INFO_ERROR} OSHMEM_INFO_ERROR_CONTENT)
           message(
             FATAL_ERROR
-              "oshmem not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'\n${OSHMEM_INFO_ERROR_CONTENT}\n${${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig}"
+              "oshmem not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'\n${OSHMEM_INFO_ERROR_CONTENT}\n${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig"
           )
         endif()
       endif()
