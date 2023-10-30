@@ -36,17 +36,65 @@ macro(hpx_setup_openshmem)
       AND (NOT HPX_WITH_FETCH_OPENSHMEM)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
-      set(OPENSHMEM_PC "oshmem")
+
       set(ENV{PKG_CONFIG_PATH}
-          "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/../lib/pkgconfig"
+          "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/pkgconfig"
       )
-      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
+
+      set(OPENSHMEM_PC "oshmem")
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
 
       if(NOT OPENSHMEM_FOUND)
-        message(
-          FATAL_ERROR
-            "oshmem not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'"
+        find_program(OSHMEM_INFO NAMES oshmem_info ompi_info REQUIRED)
+
+        if(NOT OSHMEM_INFO)
+          message(
+            FATAL_ERROR
+              "oshmem_info and/or ompi_info not found! pkg-config cannot find OpenMPI's `${OPENSHMEM_PC}.pc`"
+          )
+        endif()
+
+        set(OSHMEM_INFO_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_stdout.log")
+        set(OSHMEM_INFO_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/oshmem_info_error.log")
+
+        execute_process(
+          COMMAND
+            bash -c
+            "${OSHMEM_INFO} --path libdir"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+          RESULT_VARIABLE OSHMEM_INFO_STATUS
+          OUTPUT_FILE ${OSHMEM_INFO_OUTPUT} 
+          ERROR_FILE ${OSHMEM_INFO_ERROR}
         )
+
+        if(NOT OSHMEM_INFO_STATUS)
+          message(
+            FATAL_ERROR
+              "${OSHMEM_INFO} Failed! Program status code: ${OSHMEM_INFO_STATUS}"
+          )
+        endif()
+
+        file(READ ${OSHMEM_INFO_OUTPUT} OSHMEM_INFO_OUTPUT_CONTENT)
+
+        if(NOT OSHMEM_INFO_OUTPUT_CONTENT)
+          message(
+            FATAL_ERROR
+              "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}"
+          )
+        endif()
+
+        string(REGEX MATCH "(\/.*)" OSHMEM_LIBDIR_PATH ${OSHMEM_INFO_OUTPUT_CONTENT})
+
+        set(ENV{PKG_CONFIG_PATH} "${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig")
+
+        pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
+
+        if(NOT OPENSHMEM_FOUND)
+          message(
+            FATAL_ERROR
+              "oshmem not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'"
+          )
+        endif()
       endif()
 
       set_target_properties(
@@ -67,7 +115,7 @@ macro(hpx_setup_openshmem)
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       set(OPENSHMEM_PC "ucx")
 
-      pkg_search_module(UCX IMPORTED_TARGET GLOBAL ucx)
+      pkg_search_module(UCX IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
 
       if(NOT UCX_FOUND)
         message(
@@ -80,7 +128,7 @@ macro(hpx_setup_openshmem)
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "sos")
       set(OPENSHMEM_PC "sandia-openshmem")
 
-      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL sandia-openshmem)
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL ${OPENSHMEM_PC})
     endif()
   endif()
 
