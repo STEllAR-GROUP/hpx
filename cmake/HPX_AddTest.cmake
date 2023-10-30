@@ -91,14 +91,8 @@ function(add_hpx_test category name)
     set(Python_EXECUTABLE ${PYTHON_EXECUTABLE})
   endif()
 
-  set(ENV_VAR "")
-  if(HPX_WITH_PARCELPORT_GASNET)
-    set(ENV_VAR "GASNET_PSHM_NODES=2")
-  endif()
-
   # cmake-format: off
   set(cmd
-      ${ENV_VAR}
       "${Python_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
       ${CMAKE_CROSSCOMPILING_EMULATOR}
@@ -179,7 +173,10 @@ function(add_hpx_test category name)
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "lci" "-r" "mpi"
                                               ${args}
         )
-        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        set_tests_properties(
+          "${_full_name}" PROPERTIES RUN_SERIAL TRUE ENVIRONMENT
+                                     "GASNET_PSHM_NODES=2"
+        )
         if(${name}_TIMEOUT)
           set_tests_properties(
             "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
