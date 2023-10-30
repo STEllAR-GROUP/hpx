@@ -96,16 +96,44 @@ macro(hpx_setup_openshmem)
 
         if(NOT OPENSHMEM_FOUND)
 
-          message(
-            STATUS
-              "1) ${OSHMEM_INFO} 2) ${OSHMEM_INFO_OUTPUT} 3) ${OSHMEM_INFO_OUTPUT_CONTENT} 4) ${OSHMEM_LIBDIR_PATH}"
+          execute_process(
+            COMMAND bash -c "${OSHMEM_INFO} --path incdir"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE OSHMEM_INFO_INCSTATUS
+            OUTPUT_FILE ${OSHMEM_INFO_INCOUTPUT}
+            ERROR_FILE ${OSHMEM_INFO_INCERROR}
           )
 
-          file(READ ${OSHMEM_INFO_ERROR} OSHMEM_INFO_ERROR_CONTENT)
-          message(
-            FATAL_ERROR
-              "oshmem not found for HPX_WITH_PARCELPORT_OPENSHMEM and HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT='mpi'\n${OSHMEM_INFO_ERROR_CONTENT}\n${OSHMEM_INFO_OUTPUT_CONTENT}/pkgconfig"
+          if(OSHMEM_INFO_INCSTATUS)
+            message(
+              FATAL_ERROR
+                "${OSHMEM_INFO} Failed! Program status code: ${OSHMEM_INFO_INCSTATUS}"
+            )
+          endif()
+
+          file(READ ${OSHMEM_INFO_INCOUTPUT} OSHMEM_INFO_OUTPUT_INCCONTENT)
+
+          if(NOT OSHMEM_INFO_OUTPUT_INCCONTENT)
+            message(
+              FATAL_ERROR
+                "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_INCERROR}"
+            )
+          endif()
+
+          string(REGEX MATCH "(\/.*)" OSHMEM_INCDIR_PATH
+                       ${OSHMEM_INFO_OUTPUT_INCCONTENT}
           )
+
+          string(STRIP ${OSHMEM_INCDIR_PATH} OSHMEM_INCDIR_PATH)
+
+          set(OPENSHMEM_CFLAGS
+              "-I${OSHMEM_INCDIR_PATH} -pthread -I${OSHMEM_LIBDIR_PATH}"
+          )
+          set(OPENSHMEM_LDFLAGS
+              "-Wl,-rpath -Wl,${OSHMEM_LIBDIR_PATH} -Wl,--enable-new-dtags -loshmem -lmpi"
+          )
+          set(OPENSHMEM_LIBRARY_DIRS "-L${OSHMEM_LIBDIR_PATH}")
+
         endif()
       endif()
 
