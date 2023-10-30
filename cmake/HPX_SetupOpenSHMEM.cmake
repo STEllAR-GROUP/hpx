@@ -36,8 +36,8 @@ macro(hpx_setup_openshmem)
       AND (NOT HPX_WITH_FETCH_OPENSHMEM)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
-      set(OPENSHMEM_PC "oshmem-cxx")
-      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem-cxx)
+      set(OPENSHMEM_PC "oshmem")
+      pkg_search_module(OPENSHMEM IMPORTED_TARGET GLOBAL oshmem)
 
       if(NOT OPENSHMEM_FOUND)
         message(
