@@ -94,7 +94,7 @@ macro(hpx_setup_openshmem)
 
         if(NOT OPENSHMEM_FOUND)
 
-          messsage(
+          message(
             STATUS
             "1) ${OSHMEM_INFO} 2) ${OSHMEM_INFO_OUTPUT} 3) ${OSHMEM_INFO_OUTPUT_CONTENT} 4) ${OSHMEM_LIBDIR_PATH}"
           )
