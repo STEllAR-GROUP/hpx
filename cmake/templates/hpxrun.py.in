@@ -294,7 +294,7 @@ def check_options(parser, options, args):
         sys.exit(1)
 
     check_valid_runwrapper = (lambda x:
-            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun');
+            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun' or x == 'gasnet');
     if not check_valid_runwrapper(options.runwrapper):
         print('Error: Runwrapper option not valid\n', sys.stderr)
         parser.print_help()
