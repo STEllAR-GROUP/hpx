@@ -762,7 +762,8 @@ namespace hpx {
         }
 
         ////////////////////////////////////////////////////////////////////////
-        void init_environment()
+        void init_environment(
+            [[maybe_unused]] hpx::util::runtime_configuration const& cfg)
         {
             HPX_UNUSED(hpx::filesystem::initial_path());
 
@@ -792,7 +793,7 @@ namespace hpx {
                 &detail::register_locks_predicate);
 #endif
 #if !defined(HPX_HAVE_DISABLED_SIGNAL_EXCEPTION_HANDLERS)
-            set_error_handlers();
+            set_error_handlers(cfg);
 #endif
             hpx::threads::detail::set_get_default_pool(
                 &detail::get_default_pool);
@@ -869,8 +870,6 @@ namespace hpx {
                 f,
             int argc, char** argv, init_params const& params, bool blocking)
         {
-            init_environment();
-
             int result;
             try
             {
@@ -902,6 +901,8 @@ namespace hpx {
                 {
                     result = cmdline.call(
                         params.desc_cmdline, argc, argv, component_registries);
+
+                    init_environment(cmdline.rtcfg_);
 
                     hpx::threads::policies::detail::affinity_data
                         affinity_data{};

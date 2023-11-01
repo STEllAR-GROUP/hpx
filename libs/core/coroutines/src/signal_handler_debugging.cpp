@@ -21,6 +21,6 @@ namespace hpx::threads::coroutines {
     std::size_t trace_depth = 0;
 #endif
 #if !defined(HPX_WINDOWS)
-    bool register_signal_handler = 1;
+    bool register_signal_handler = true;
 #endif
 }    // namespace hpx::threads::coroutines
