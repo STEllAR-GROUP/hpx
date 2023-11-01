@@ -487,7 +487,8 @@ namespace hpx {
         hpx::program_options::options_description app_options_;
     };
 
-    HPX_CORE_EXPORT void set_error_handlers();
+    HPX_CORE_EXPORT void set_error_handlers(
+        hpx::util::runtime_configuration const& cfg);
 
     namespace util {
         ///////////////////////////////////////////////////////////////////////////

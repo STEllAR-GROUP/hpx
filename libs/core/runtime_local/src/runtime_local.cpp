@@ -38,6 +38,7 @@
 #include <hpx/timing/high_resolution_clock.hpp>
 #include <hpx/topology/topology.hpp>
 #include <hpx/util/from_string.hpp>
+#include <hpx/util/get_entry_as.hpp>
 #include <hpx/version.hpp>
 
 #include <atomic>
@@ -58,7 +59,8 @@
 #include <utility>
 
 #if defined(HPX_HAVE_LOGGING)
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     void try_log_runtime_threads()
     {
         // This may be used in non-valid runtime states, let it fail silently
@@ -84,7 +86,7 @@ namespace hpx { namespace detail {
         {
         }
     }
-}};    // namespace hpx::detail
+}    // namespace hpx::detail
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -242,27 +244,29 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    void set_error_handlers()
+    void set_error_handlers(hpx::util::runtime_configuration const& cfg)
     {
         // initialize global variables
         hpx::threads::coroutines::attach_debugger_on_sigv =
-            get_config_entry("hpx.attach_debugger", "") == "exception";
+            hpx::util::get_entry_as<std::string>(
+                cfg, "hpx.attach_debugger", "") == "exception";
         hpx::threads::coroutines::diagnostics_on_terminate =
-            get_config_entry("hpx.diagnostics_on_terminate", "1") == "1";
-        hpx::threads::coroutines::exception_verbosity = util::from_string<int>(
-            get_config_entry("hpx.exception_verbosity", "2"));
+            hpx::util::get_entry_as<std::string>(
+                cfg, "hpx.diagnostics_on_terminate", "1") == "1";
+        hpx::threads::coroutines::exception_verbosity =
+            hpx::util::get_entry_as<int>(cfg, "hpx.exception_verbosity", 2);
         hpx::threads::coroutines::exception_verbosity = 0;
 #if defined(HPX_HAVE_STACKTRACES) && defined(HPX_HAVE_THREAD_BACKTRACE_DEPTH)
         hpx::threads::coroutines::exception_verbosity =
-            util::from_string<int>(get_config_entry(
-                "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH));
+            hpx::util::get_entry_as<int>(
+                cfg, "hpx.trace_depth", HPX_HAVE_THREAD_BACKTRACE_DEPTH);
 #endif
 
 #if defined(HPX_WINDOWS)
         // Set console control handler to allow server to be stopped.
         SetConsoleCtrlHandler(hpx::termination_handler, TRUE);
 #else
-        if (util::from_string<int>(get_config_entry("hpx.handle_signals", 1)))
+        if (hpx::util::get_entry_as<int>(cfg, "hpx.handle_signals", 1))
         {
             struct sigaction new_action;
             new_action.sa_handler = hpx::termination_handler;
@@ -278,11 +282,11 @@ namespace hpx {
             sigaction(SIGSEGV, &new_action, nullptr);    // Segmentation fault
             sigaction(SIGSYS, &new_action, nullptr);     // Bad syscall
 
-            hpx::threads::coroutines::register_signal_handler = false;
+            hpx::threads::coroutines::register_signal_handler = true;
         }
         else
         {
-            hpx::threads::coroutines::register_signal_handler = true;
+            hpx::threads::coroutines::register_signal_handler = false;
         }
 #endif
 

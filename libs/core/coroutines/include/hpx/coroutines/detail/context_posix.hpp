@@ -44,6 +44,7 @@
 #endif
 
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/signal_handler_debugging.hpp>
 #include <hpx/type_support/unused.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 
@@ -267,23 +268,26 @@ namespace hpx::threads::coroutines {
                 // https://rethinkdb.com/blog/handling-stack-overflow-on-custom-stacks/
                 // http://www.evanjones.ca/software/threading.html
                 //
-                segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
-                segv_stack.ss_flags = 0;
-                segv_stack.ss_size = SEGV_STACK_SIZE;
+                if (register_signal_handler)
+                {
+                    segv_stack.ss_sp = valloc(SEGV_STACK_SIZE);
+                    segv_stack.ss_flags = 0;
+                    segv_stack.ss_size = SEGV_STACK_SIZE;
 
-                std::memset(&action, '\0', sizeof(action));
-                action.sa_flags = SA_SIGINFO | SA_ONSTACK;
-                action.sa_sigaction = &ucontext_context_impl::sigsegv_handler;
+                    std::memset(&action, '\0', sizeof(action));
+                    action.sa_flags = SA_SIGINFO | SA_ONSTACK;
+                    action.sa_sigaction =
+                        &ucontext_context_impl::sigsegv_handler;
 
-                sigaltstack(&segv_stack, nullptr);
-                sigemptyset(&action.sa_mask);
-                sigaddset(&action.sa_mask, SIGSEGV);
-                sigaction(SIGSEGV, &action, nullptr);
+                    sigaltstack(&segv_stack, nullptr);
+                    sigemptyset(&action.sa_mask);
+                    sigaddset(&action.sa_mask, SIGSEGV);
+                    sigaction(SIGSEGV, &action, nullptr);
+                }
 #endif
             }
 
 #if defined(HPX_HAVE_STACKOVERFLOW_DETECTION)
-
             static void sigsegv_handler(
                 int signum, siginfo_t* infoptr, void* ctxptr)
             {
@@ -313,9 +317,11 @@ namespace hpx::threads::coroutines {
                     std::cerr
                         << "Configure the hpx runtime to allocate a larger "
                            "coroutine stack size.\n Use the "
-                           "hpx.stacks.small_size, hpx.stacks.medium_size,\n "
+                           "hpx.stacks.small_size, "
+                           "hpx.stacks.medium_size,\n "
                            "hpx.stacks.large_size, or hpx.stacks.huge_size "
-                           "configuration\nflags to configure coroutine stack "
+                           "configuration\nflags to configure coroutine "
+                           "stack "
                            "sizes.\n"
                         << std::endl;
 
