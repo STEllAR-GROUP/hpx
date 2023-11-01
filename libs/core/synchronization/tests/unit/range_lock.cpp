@@ -4,7 +4,7 @@
 
 int main()
 {
-    hpx::synchronization::ByteLock<hpx::mutex, std::lock_guard> bl;
-    std::size_t x = bl.lock(0, 10);
-    bl.unlock(x);
+    hpx::synchronization::RangeLock<hpx::mutex, std::lock_guard> rl;
+    std::size_t x = rl.lock(0, 10);
+    rl.unlock(x);
 }

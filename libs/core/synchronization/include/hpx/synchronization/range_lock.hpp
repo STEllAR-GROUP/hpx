@@ -11,7 +11,7 @@
 namespace hpx::synchronization {
 
     template <typename Lock, template <typename> typename Guard>
-    class ByteLock
+    class RangeLock
     {
         template <typename Key, typename Value>
         using MapTy = boost::container::flat_map<Key, Value>;
@@ -28,7 +28,7 @@ namespace hpx::synchronization {
     };
 
     template <class Lock, template <class> class Guard>
-    std::size_t ByteLock<Lock, Guard>::lock(std::size_t begin, std::size_t end)
+    std::size_t RangeLock<Lock, Guard>::lock(std::size_t begin, std::size_t end)
     {
         std::size_t lockId = 0;
         bool localFlag = false;
@@ -71,7 +71,7 @@ namespace hpx::synchronization {
     }
 
     template <class Lock, template <class> class Guard>
-    void ByteLock<Lock, Guard>::unlock(std::size_t lockId)
+    void RangeLock<Lock, Guard>::unlock(std::size_t lockId)
     {
         const Guard lock_guard(mtx);
 
@@ -84,7 +84,7 @@ namespace hpx::synchronization {
     }
 
     template <class Lock, template <class> class Guard>
-    std::size_t ByteLock<Lock, Guard>::try_lock(
+    std::size_t RangeLock<Lock, Guard>::try_lock(
         std::size_t begin, std::size_t end)
     {
         const Guard lock_guard(mtx);
