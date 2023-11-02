@@ -5,8 +5,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_test category name)
-  set(options FAILURE_EXPECTED RUN_SERIAL NO_PARCELPORT_TCP NO_PARCELPORT_MPI
-              NO_PARCELPORT_LCI NO_PARCELPORT_GASNET NO_PARCELPORT_OPENSHMEM
+  set(options
+      FAILURE_EXPECTED
+      RUN_SERIAL
+      NO_PARCELPORT_TCP
+      NO_PARCELPORT_MPI
+      NO_PARCELPORT_LCI
+      NO_PARCELPORT_GASNET
+      NO_PARCELPORT_OPENSHMEM
   )
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY TIMEOUT
                      RUNWRAPPER
