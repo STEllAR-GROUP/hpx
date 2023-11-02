@@ -15,6 +15,7 @@
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/annotating_executor.hpp>
 #include <hpx/functional/tag_invoke.hpp>
+#include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/properties/property.hpp>
 
 #include <string>
@@ -29,7 +30,7 @@ namespace hpx::execution::experimental {
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_invocable_v<
+            hpx::is_invocable_v<
                 hpx::execution::experimental::with_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type,
                 const char*>
@@ -50,7 +51,7 @@ namespace hpx::execution::experimental {
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_invocable_v<
+            hpx::is_invocable_v<
                 hpx::execution::experimental::with_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type,
                 std::string>
@@ -72,7 +73,7 @@ namespace hpx::execution::experimental {
     template <typename ExPolicy,
         HPX_CONCEPT_REQUIRES_(
             hpx::is_execution_policy_v<ExPolicy> &&
-            hpx::functional::is_tag_invocable_v<
+            hpx::is_invocable_v<
                 hpx::execution::experimental::get_annotation_t,
                 typename std::decay_t<ExPolicy>::executor_type>
         )>
