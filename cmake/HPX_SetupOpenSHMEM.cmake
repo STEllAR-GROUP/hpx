@@ -36,7 +36,6 @@ macro(hpx_setup_openshmem)
       AND (NOT HPX_WITH_FETCH_OPENSHMEM)
       AND ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
     )
-
       set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${MPI_LIBDIR}/pkgconfig")
 
       set(OPENSHMEM_PC "oshmem")
@@ -158,7 +157,6 @@ macro(hpx_setup_openshmem)
           return()
         endif()
       endif()
-
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
       set(OPENSHMEM_PC "ucx")
 
