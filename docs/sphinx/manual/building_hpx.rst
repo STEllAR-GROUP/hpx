@@ -94,6 +94,12 @@ used CMake options.
    this experimental parcelport may provide better performance than the MPI parcelport. Please refer to
    :ref:`using_the_lci_parcelport` for more information about the LCI parcelport.
 
+.. option:: HPX_WITH_PARCELPORT_OPENSHMEM
+
+   Enable the OPENSHMEM parcelport. This enables the use of OpenSHMEM for the networking operations in the HPX runtime.
+   The default value is ``OFF`` because it's not available on all systems and/or requires another dependency. Please
+   refer to :ref:`using_the_openshmem_parcelport` for more information about the OpenSHMEM parcelport.
+
 .. option:: HPX_WITH_APEX
 
    Enable APEX integration. `APEX <https://uo-oaciss.github.io/apex/quickstarthpx/>`_ can be used to profile |hpx|
