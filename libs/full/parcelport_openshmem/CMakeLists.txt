@@ -34,7 +34,6 @@ add_hpx_module(
   SOURCES ${parcelport_openshmem_sources}
   HEADERS ${parcelport_openshmem_headers}
   DEPENDENCIES hpx_core hpx_openshmem_base PkgConfig::OPENSHMEM
-               ${openshmem_additional_dependencies}
   MODULE_DEPENDENCIES hpx_actions hpx_command_line_handling hpx_parcelset
   CMAKE_SUBDIRS examples tests
 )
