@@ -1,104 +1,109 @@
 #pragma once
 
-#include <atomic>
-#include <boost/container/flat_map.hpp>
-#include <map>
-#include <memory>
 #include <mutex>
-#include <unordered_map>
-#include <vector>
+
+#include <hpx/synchronization/detail/range_lock_impl.hpp>
+#include <hpx/synchronization/spinlock.hpp>
+
+namespace hpx::synchronization {
+    using range_lock =
+        hpx::synchronization::detail::RangeLock<hpx::spinlock, std::lock_guard>;
+}
+
+// Lock guards for range_lock
+namespace hpx::synchronization {
+
+    template <typename RangeLock>
+    class range_guard
+    {
+        std::reference_wrapper<RangeLock> lockRef;
+        std::size_t lockId = 0;
+
+    public:
+        range_guard(RangeLock& lock, std::size_t begin, std::size_t end)
+          : lockRef(lock)
+        {
+            lockId = lockRef.get().lock(begin, end);
+        }
+        ~range_guard()
+        {
+            lockRef.get().unlock(lockId);
+        }
+    };
+
+}    // namespace hpx::synchronization
 
 namespace hpx::synchronization {
 
-    template <typename Lock, template <typename> typename Guard>
-    class RangeLock
+    template <typename RangeLock>
+    class range_unique_lock
     {
-        template <typename Key, typename Value>
-        using MapTy = boost::container::flat_map<Key, Value>;
-
-        Lock mtx;
-        std::size_t counter = 0;
-        MapTy<std::size_t, std::pair<std::size_t, std::size_t>> rangeMap;
-        MapTy<std::size_t, std::shared_ptr<std::atomic_bool>> waiting;
+        std::reference_wrapper<RangeLock> lockRef;
+        std::size_t lockId = 0;
 
     public:
-        std::size_t lock(std::size_t begin, std::size_t end);
-        std::size_t try_lock(std::size_t begin, std::size_t end);
-        void unlock(std::size_t lockId);
+        range_unique_lock(RangeLock& lock, std::size_t begin, std::size_t end)
+          : lockRef(lock)
+        {
+            lockId = lockRef.get().lock(begin, end);
+        }
+
+        ~range_unique_lock()
+        {
+            lockRef.get().unlock(lockId);
+        }
+
+        void operator=(range_unique_lock<RangeLock>&& lock)
+        {
+            lockRef.get().unlock(lockId);
+            lockRef = lock.lockRef;
+            lockId = lock.lockRef.get().lock();
+        }
+
+        void lock(std::size_t begin, std::size_t end)
+        {
+            lockId = lockRef.get().lock(begin, end);
+        }
+
+        void try_lock(std::size_t begin, std::size_t end)
+        {
+            lockId = lockRef.get().try_lock(begin, end);
+        }
+
+        void unlock()
+        {
+            lockRef.get().unlock(lockId);
+            lockId = 0;
+        }
+
+        void swap(std::unique_lock<RangeLock>& uLock)
+        {
+            std::swap(lockRef, uLock.lockRef);
+            std::swap(lockId, uLock.lockId);
+        }
+
+        RangeLock* release()
+        {
+            RangeLock* mtx = lockRef.get();
+            lockRef = nullptr;
+            lockId = 0;
+            return mtx;
+        }
+
+        operator bool() const
+        {
+            return lockId != 0;
+        }
+
+        bool owns_lock() const
+        {
+            return lockId != 0;
+        }
+
+        RangeLock* mutex() const
+        {
+            return lockRef.get();
+        }
     };
 
-    template <class Lock, template <class> class Guard>
-    std::size_t RangeLock<Lock, Guard>::lock(std::size_t begin, std::size_t end)
-    {
-        std::size_t lockId = 0;
-        bool localFlag = false;
-        std::size_t blockIdx;
-
-        std::shared_ptr<std::atomic_bool> waitingFlag;
-
-        while (lockId == 0)
-        {
-            {
-                const Guard<Lock> lock_guard(mtx);
-                for (auto const& it : rangeMap)
-                {
-                    std::size_t b = it.second.first;
-                    std::size_t e = it.second.second;
-
-                    if (!(e < begin) & !(end < b))
-                    {
-                        blockIdx = it.first;
-                        localFlag = true;
-                        waitingFlag = waiting[blockIdx];
-                        break;
-                    }
-                }
-                if (localFlag == false)
-                {
-                    ++counter;
-                    rangeMap[counter] = {begin, end};
-                    waiting[counter] = std::shared_ptr<std::atomic_bool>(
-                        new std::atomic_bool(false));
-                    return counter;
-                }
-                localFlag = false;
-            }
-            while (waitingFlag->load() == false)
-            {
-            }
-        }
-        return lockId;
-    }
-
-    template <class Lock, template <class> class Guard>
-    void RangeLock<Lock, Guard>::unlock(std::size_t lockId)
-    {
-        const Guard lock_guard(mtx);
-
-        rangeMap.erase(lockId);
-
-        waiting[lockId]->store(true);
-
-        waiting.erase(lockId);
-        return;
-    }
-
-    template <class Lock, template <class> class Guard>
-    std::size_t RangeLock<Lock, Guard>::try_lock(
-        std::size_t begin, std::size_t end)
-    {
-        const Guard lock_guard(mtx);
-        for (auto const& it : rangeMap)
-        {
-            std::size_t b = it.second.first;
-            std::size_t e = it.second.second;
-
-            if (!(e < begin) && !(end < b))
-            {
-                return 0;
-            }
-        }
-        rangeMap[++counter] = {begin, end};
-        return counter;
-    }
 }    // namespace hpx::synchronization
