@@ -1,26 +1,35 @@
+//  Copyright (c) 2023 Johan511
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//  This work is based on https://github.com/Johan511/ByteLock
+
 #pragma once
 
-#include <mutex>
-
-#include <hpx/synchronization/detail/range_lock_impl.hpp>
+#include <hpx/synchronization/detail/range_mutex_impl.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
-namespace hpx::synchronization {
-    using range_lock =
-        hpx::synchronization::detail::RangeLock<hpx::spinlock, std::lock_guard>;
-}
+#include <cstddef>
+#include <functional>
+#include <mutex>
+#include <utility>
 
-// Lock guards for range_lock
 namespace hpx::synchronization {
+    using range_mutex = hpx::synchronization::detail::range_mutex<hpx::spinlock,
+        std::lock_guard>;
 
-    template <typename RangeLock>
+    // Lock guards for range_mutex
+
+    template <typename RangeMutex>
     class range_guard
     {
-        std::reference_wrapper<RangeLock> lockRef;
+        std::reference_wrapper<RangeMutex> lockRef;
         std::size_t lockId = 0;
 
     public:
-        range_guard(RangeLock& lock, std::size_t begin, std::size_t end)
+        range_guard(RangeMutex& lock, std::size_t begin, std::size_t end)
           : lockRef(lock)
         {
             lockId = lockRef.get().lock(begin, end);
@@ -31,18 +40,14 @@ namespace hpx::synchronization {
         }
     };
 
-}    // namespace hpx::synchronization
-
-namespace hpx::synchronization {
-
-    template <typename RangeLock>
+    template <typename RangeMutex>
     class range_unique_lock
     {
-        std::reference_wrapper<RangeLock> lockRef;
+        std::reference_wrapper<RangeMutex> lockRef;
         std::size_t lockId = 0;
 
     public:
-        range_unique_lock(RangeLock& lock, std::size_t begin, std::size_t end)
+        range_unique_lock(RangeMutex& lock, std::size_t begin, std::size_t end)
           : lockRef(lock)
         {
             lockId = lockRef.get().lock(begin, end);
@@ -53,7 +58,7 @@ namespace hpx::synchronization {
             lockRef.get().unlock(lockId);
         }
 
-        void operator=(range_unique_lock<RangeLock>&& lock)
+        void operator=(range_unique_lock<RangeMutex>&& lock)
         {
             lockRef.get().unlock(lockId);
             lockRef = lock.lockRef;
@@ -76,15 +81,15 @@ namespace hpx::synchronization {
             lockId = 0;
         }
 
-        void swap(std::unique_lock<RangeLock>& uLock)
+        void swap(std::unique_lock<RangeMutex>& uLock)
         {
             std::swap(lockRef, uLock.lockRef);
             std::swap(lockId, uLock.lockId);
         }
 
-        RangeLock* release()
+        RangeMutex* release()
         {
-            RangeLock* mtx = lockRef.get();
+            RangeMutex* mtx = lockRef.get();
             lockRef = nullptr;
             lockId = 0;
             return mtx;
@@ -100,10 +105,9 @@ namespace hpx::synchronization {
             return lockId != 0;
         }
 
-        RangeLock* mutex() const
+        RangeMutex* mutex() const
         {
             return lockRef.get();
         }
     };
-
 }    // namespace hpx::synchronization

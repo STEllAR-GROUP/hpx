@@ -26,7 +26,6 @@ set(tests
     local_barrier_reset
     local_event
     local_mutex
-    range_lock
     sliding_semaphore
     stop_token
     stop_token_cb2
@@ -107,7 +106,7 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
 endif()
 
 # ##############################################################################
-set(subdirs shared_mutex)
+set(subdirs shared_mutex range_mutex)
 
 # add sub directories
 foreach(subdir ${subdirs})
