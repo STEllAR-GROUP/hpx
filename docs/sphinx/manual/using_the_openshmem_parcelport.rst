@@ -47,7 +47,7 @@ and frequently used CMake variables.
    You must set this variable to ``ON`` in order to use the OpenSHMEM parcelport. All the following variables only
    make sense when this variable is set to ``ON``.
 
-.. option:: HPX_WITH_PARCELPORT_OPENSHMEM
+.. option:: HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT 
 
    Defines which OpenSHMEM to utilize. The options are `sos;ucx;mpi`. This feature tells cmake how to compile the
    parcelport against a specific implementation of OpenSHMEM.
@@ -57,7 +57,7 @@ and frequently used CMake variables.
    Use FetchContent to fetch OpenSHMEM. The default value is ``OFF``.
    If this option is set to ``OFF``. This feature tells |hpx| to fetch and build OpenSHMEM for you.
    |hpx| will download either `ucx` or `sos` OpenSHMEM based on the value provided in
-   `HPX_WITH_PARCELPORT_OPENSHMEM`. This feature requires the user to set `CMAKE_C_COMPILER`. The
+   `HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT`. This feature requires the user to set `CMAKE_C_COMPILER`. The
    OpenSHMEM downloaded will be installed into `CMAKE_INSTALL_PREFIX`. PMI support will be compiled
    into the parcelport if it's available. If PMI is not available a barebones implementation for SMP
    systems will be used.
