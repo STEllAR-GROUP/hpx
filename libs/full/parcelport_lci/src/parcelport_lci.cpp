@@ -161,12 +161,14 @@ namespace hpx::parcelset::policies::lci {
                 if (hpx::this_thread::get_pool() ==
                     &hpx::resource::get_thread_pool("lci-progress-pool"))
                 {
-                    std::size_t prg_thread_id =
-                        hpx::get_local_worker_thread_num();
-                    double rate = (double) config_t::ndevices /
-                        config_t::progress_thread_num;
-                    for (int i = prg_thread_id * rate;
-                         i < (prg_thread_id + 1) * rate; ++i)
+                    int prg_thread_id =
+                        static_cast<int>(hpx::get_local_worker_thread_num());
+                    HPX_ASSERT(prg_thread_id < config_t::progress_thread_num);
+                    for (int i = prg_thread_id * config_t::ndevices /
+                             config_t::progress_thread_num;
+                         i < (prg_thread_id + 1) * config_t::ndevices /
+                             config_t::progress_thread_num;
+                         ++i)
                     {
                         devices_to_progress.push_back(&devices[i]);
                     }
