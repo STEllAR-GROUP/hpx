@@ -23,6 +23,10 @@
 #include <cstring>
 #include <string>
 
+#if !defined(SHMEM_SIGNAL_SET)
+#define SHMEM_SIGNAL_SET                (1<<0)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
