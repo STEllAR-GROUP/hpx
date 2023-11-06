@@ -154,6 +154,8 @@ macro(hpx_setup_openshmem)
             PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
                                             "${OPENSHMEM_LIBRARY_DIRS}"
           )
+
+          set(OPENSHMEM_FOUND ON)
         endif()
       endif()
     elseif("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "ucx")
