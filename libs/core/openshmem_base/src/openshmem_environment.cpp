@@ -23,10 +23,6 @@
 #include <cstring>
 #include <string>
 
-#if !defined(SHMEM_SIGNAL_SET)
-#define SHMEM_SIGNAL_SET                (1<<0)
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
@@ -260,9 +256,20 @@ namespace hpx::util {
         {
             const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
 
+#if !defined(SHMEM_SIGNAL_SET)
+            shmem_uint8_put(raddr, addr, size, node);
+            shmem_fence();
+            shmem_uint8_put(
+                reinterpret_cast<std::uint8_t*>(sigaddr), 
+                reinterpret_cast<std::uint8_t*>(sigaddr), 
+                sizeof(sigaddr),
+                node
+            );
+#else
             shmem_uint8_put_signal(raddr, addr, size,
                 reinterpret_cast<std::uint64_t*>(sigaddr), 1, SHMEM_SIGNAL_SET,
                 node);
+#endif
         }
     }
 
