@@ -1093,6 +1093,10 @@ macro(hpx_setup_openshmem)
                  "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
     )
 
+    message(STATUS "OPENSHMEM_CFLAGS:\t${OPENSHMEM_CFLAGS}")
+    message(STATUS "OPENSHMEM_LDFLAGS:\t${OPENSHMEM_LDFLAGS}")
+    message(STATUS "OPENSHMEM_LIBRARY_DIRS:\t${OPENSHMEM_LIBRARY_DIRS}")
+
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
                                       "${OPENSHMEM_CFLAGS}"
@@ -1106,6 +1110,10 @@ macro(hpx_setup_openshmem)
                                       "${OPENSHMEM_LIBRARY_DIRS}"
     )
   else()
+    message(STATUS "OPENSHMEM_CFLAGS:\t${OPENSHMEM_CFLAGS}")
+    message(STATUS "OPENSHMEM_LDFLAGS:\t${OPENSHMEM_LDFLAGS}")
+    message(STATUS "OPENSHMEM_LIBRARY_DIRS:\t${OPENSHMEM_LIBRARY_DIRS}")
+
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
                                       "${OPENSHMEM_CFLAGS}"
