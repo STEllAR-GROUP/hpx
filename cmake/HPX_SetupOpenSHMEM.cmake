@@ -138,7 +138,7 @@ macro(hpx_setup_openshmem)
           set(OPENSHMEM_LDFLAGS
               "-Wl,-rpath -Wl,${OSHMEM_LIBDIR_PATH} -Wl,--enable-new-dtags -loshmem -lmpi"
           )
-          set(OPENSHMEM_LIBRARY_DIRS "-L${OSHMEM_LIBDIR_PATH}")
+          set(OPENSHMEM_LIBRARY_DIRS "${OSHMEM_LIBDIR_PATH}")
 
           add_library(PkgConfig::OPENSHMEM INTERFACE IMPORTED GLOBAL)
 
