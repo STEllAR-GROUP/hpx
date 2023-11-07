@@ -19,6 +19,7 @@
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/execution/algorithms/transfer_just.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
@@ -35,7 +36,6 @@
 
 #include <cstddef>
 #include <exception>
-#include <string>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -122,9 +122,9 @@ namespace hpx::execution::experimental {
         // with this executor.
         using execution_category = parallel_execution_tag;
 
-        // Associate the static_chunk_size executor parameters type as a default
+        // Associate the default_parameters executor parameters type as a default
         // with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = default_parameters;
 
         template <typename T, typename... Ts>
         using future_type = hpx::future<T>;
@@ -291,10 +291,11 @@ namespace hpx::execution::experimental {
             if constexpr (std::is_void_v<result_type>)
             {
                 // the overall return value is future<void>
-                auto prereq =
+                auto pre_req =
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-                auto loop = bulk(transfer(HPX_MOVE(prereq), exec.sched_), shape,
+                auto loop = bulk(transfer(HPX_MOVE(pre_req), exec.sched_),
+                    shape,
                     hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(HPX_MOVE(loop));
@@ -302,13 +303,14 @@ namespace hpx::execution::experimental {
             else
             {
                 // the overall return value is future<std::vector<result_type>>
-                auto prereq =
+                auto pre_req =
                     when_all(keep_future(HPX_FORWARD(Future, predecessor)),
                         just(std::vector<result_type>(hpx::util::size(shape))));
 
-                auto loop = bulk(transfer(HPX_MOVE(prereq), exec.sched_), shape,
-                    detail::captured_args_then(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                auto loop =
+                    bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
+                        detail::captured_args_then(
+                            HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 
                 return make_future(then(
                     HPX_MOVE(loop), [](auto&&, std::vector<result_type>&& v) {

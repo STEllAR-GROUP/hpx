@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,7 +30,8 @@ struct test_executor_get_chunk_size : hpx::execution::parallel_executor
     test_executor_get_chunk_size() = default;
 
     template <typename Parameters>
-    static std::size_t get_chunk_size(Parameters&& /* params */,
+    friend std::size_t tag_invoke(hpx::parallel::execution::get_chunk_size_t,
+        Parameters&&, test_executor_get_chunk_size,
         hpx::chrono::steady_duration const&, std::size_t cores,
         std::size_t count)
     {
@@ -48,7 +49,8 @@ struct hpx::parallel::execution::is_two_way_executor<
 struct test_chunk_size
 {
     template <typename Executor>
-    static std::size_t get_chunk_size(Executor&& /* exec */,
+    friend std::size_t tag_override_invoke(
+        hpx::parallel::execution::get_chunk_size_t, test_chunk_size, Executor&&,
         hpx::chrono::steady_duration const&, std::size_t cores,
         std::size_t count)
     {
@@ -95,6 +97,18 @@ void test_get_chunk_size()
         hpx::parallel::execution::get_chunk_size(
             test_chunk_size{}, test_executor_get_chunk_size{}, 1, 1);
 
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::get_chunk_size(
+            hpx::execution::par.parameters(), test_executor_get_chunk_size{},
+            hpx::chrono::null_duration, 1, 1);
+
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
     }
@@ -103,8 +117,9 @@ void test_get_chunk_size()
         params_count = 0;
         exec_count = 0;
 
-        hpx::parallel::execution::get_chunk_size(test_chunk_size{},
-            test_executor_get_chunk_size{}, hpx::chrono::null_duration, 1, 1);
+        hpx::parallel::execution::get_chunk_size(
+            hpx::execution::par.parameters(), test_executor_get_chunk_size{}, 1,
+            1);
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
@@ -119,7 +134,8 @@ struct test_executor_measure_iteration : hpx::execution::parallel_executor
     test_executor_measure_iteration() = default;
 
     template <typename Parameters, typename F>
-    static auto measure_iteration(Parameters&&, F&&, std::size_t)
+    friend auto tag_invoke(hpx::parallel::execution::measure_iteration_t,
+        Parameters&&, test_executor_measure_iteration, F&&, std::size_t)
     {
         ++exec_count;
         return hpx::chrono::null_duration;
@@ -135,7 +151,9 @@ struct hpx::parallel::execution::is_two_way_executor<
 struct test_measure_iteration
 {
     template <typename Executor, typename F>
-    static auto measure_iteration(Executor&&, F&&, std::size_t)
+    friend auto tag_override_invoke(
+        hpx::parallel::execution::measure_iteration_t, test_measure_iteration,
+        Executor&&, F&&, std::size_t)
     {
         ++params_count;
         return hpx::chrono::null_duration;
@@ -168,11 +186,23 @@ void test_get_measure_iteration()
         exec_count = 0;
 
         hpx::parallel::execution::measure_iteration(
-            test_measure_iteration{}, test_executor_measure_iteration{},
+            hpx::execution::par.parameters(), test_executor_measure_iteration{},
             [](std::size_t) { return 0; }, 1);
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::measure_iteration(
+            test_measure_iteration{}, test_executor_measure_iteration{},
+            [](std::size_t) { return 0; }, 1);
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -185,8 +215,10 @@ struct test_executor_maximal_number_of_chunks
     test_executor_maximal_number_of_chunks() = default;
 
     template <typename Parameters>
-    static std::size_t maximal_number_of_chunks(
-        Parameters&&, std::size_t, std::size_t num_tasks)
+    friend std::size_t tag_invoke(
+        hpx::parallel::execution::maximal_number_of_chunks_t, Parameters&&,
+        test_executor_maximal_number_of_chunks, std::size_t,
+        std::size_t num_tasks)
     {
         ++exec_count;
         return num_tasks;
@@ -202,8 +234,9 @@ struct hpx::parallel::execution::is_two_way_executor<
 struct test_number_of_chunks
 {
     template <typename Executor>
-    static std::size_t maximal_number_of_chunks(
-        Executor&&, std::size_t, std::size_t num_tasks)
+    friend std::size_t tag_override_invoke(
+        hpx::parallel::execution::maximal_number_of_chunks_t,
+        test_number_of_chunks, Executor&&, std::size_t, std::size_t num_tasks)
     {
         ++params_count;
         return num_tasks;
@@ -235,11 +268,23 @@ void test_maximal_number_of_chunks()
         exec_count = 0;
 
         hpx::parallel::execution::maximal_number_of_chunks(
-            test_number_of_chunks{}, test_executor_maximal_number_of_chunks{},
-            1, 1);
+            hpx::execution::par.parameters(),
+            test_executor_maximal_number_of_chunks{}, 1, 1);
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::maximal_number_of_chunks(
+            test_number_of_chunks{}, test_executor_maximal_number_of_chunks{},
+            1, 1);
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -252,7 +297,9 @@ struct test_executor_reset_thread_distribution
     test_executor_reset_thread_distribution() = default;
 
     template <typename Parameters>
-    static void reset_thread_distribution(Parameters&&)
+    friend void tag_invoke(
+        hpx::parallel::execution::reset_thread_distribution_t, Parameters&&,
+        test_executor_reset_thread_distribution)
     {
         ++exec_count;
     }
@@ -267,7 +314,9 @@ struct hpx::parallel::execution::is_two_way_executor<
 struct test_thread_distribution
 {
     template <typename Executor>
-    static void reset_thread_distribution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::reset_thread_distribution_t,
+        test_thread_distribution, Executor&&)
     {
         ++params_count;
     }
@@ -298,11 +347,23 @@ void test_reset_thread_distribution()
         exec_count = 0;
 
         hpx::parallel::execution::reset_thread_distribution(
-            test_thread_distribution{},
+            hpx::execution::par.parameters(),
             test_executor_reset_thread_distribution{});
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::reset_thread_distribution(
+            test_thread_distribution{},
+            test_executor_reset_thread_distribution{});
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -314,8 +375,10 @@ struct test_executor_processing_units_count : hpx::execution::parallel_executor
     test_executor_processing_units_count() = default;
 
     template <typename Parameters>
-    static std::size_t processing_units_count(
-        Parameters&&, hpx::chrono::steady_duration const&, std::size_t)
+    friend std::size_t tag_invoke(
+        hpx::parallel::execution::processing_units_count_t, Parameters&&,
+        test_executor_processing_units_count,
+        hpx::chrono::steady_duration const&, std::size_t)
     {
         ++exec_count;
         return 1;
@@ -331,10 +394,11 @@ struct hpx::parallel::execution::is_two_way_executor<
 struct test_processing_units
 {
     template <typename Executor>
-    friend std::size_t tag_invoke(
+    friend std::size_t tag_override_invoke(
         hpx::parallel::execution::processing_units_count_t,
-        test_processing_units, Executor&&, hpx::chrono::steady_duration const&,
-        std::size_t)
+        test_processing_units, Executor&&,
+        hpx::chrono::steady_duration const& = hpx::chrono::null_duration,
+        std::size_t = 0)
     {
         ++params_count;
         return 1;
@@ -356,7 +420,7 @@ void test_processing_units_count()
         hpx::parallel::execution::processing_units_count(
             test_processing_units{}, hpx::execution::parallel_executor());
 
-        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
     }
 
     {
@@ -381,8 +445,8 @@ void test_processing_units_count()
             hpx::parallel::execution::processing_units_count(
                 test_processing_units{}, p.executor());
 
-        HPX_TEST_EQ(num_cores, static_cast<std::size_t>(2));
-        HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
+        HPX_TEST_EQ(num_cores, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
     }
 
     {
@@ -417,19 +481,22 @@ struct test_executor_begin_end : hpx::execution::parallel_executor
     test_executor_begin_end() = default;
 
     template <typename Parameters>
-    static void mark_begin_execution(Parameters&&)
+    friend void tag_invoke(hpx::parallel::execution::mark_begin_execution_t,
+        Parameters&&, test_executor_begin_end)
     {
         ++exec_count;
     }
 
     template <typename Parameters>
-    static void mark_end_of_scheduling(Parameters&&)
+    friend void tag_invoke(hpx::parallel::execution::mark_end_of_scheduling_t,
+        Parameters&&, test_executor_begin_end)
     {
         ++exec_count;
     }
 
     template <typename Parameters>
-    static void mark_end_execution(Parameters&&)
+    friend void tag_invoke(hpx::parallel::execution::mark_end_execution_t,
+        Parameters&&, test_executor_begin_end)
     {
         ++exec_count;
     }
@@ -444,19 +511,25 @@ struct hpx::parallel::execution::is_two_way_executor<test_executor_begin_end>
 struct test_begin_end
 {
     template <typename Executor>
-    static void mark_begin_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_begin_execution_t, test_begin_end,
+        Executor&&)
     {
         ++params_count;
     }
 
     template <typename Executor>
-    static void mark_end_of_scheduling(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_of_scheduling_t, test_begin_end,
+        Executor&&)
     {
         ++params_count;
     }
 
     template <typename Executor>
-    static void mark_end_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_execution_t, test_begin_end,
+        Executor&&)
     {
         ++params_count;
     }
@@ -487,10 +560,21 @@ void test_mark_begin_execution()
         exec_count = 0;
 
         hpx::parallel::execution::mark_begin_execution(
-            test_begin_end{}, test_executor_begin_end{});
+            hpx::execution::par.parameters(), test_executor_begin_end{});
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::mark_begin_execution(
+            test_begin_end{}, test_executor_begin_end{});
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -512,10 +596,21 @@ void test_mark_end_of_scheduling()
         exec_count = 0;
 
         hpx::parallel::execution::mark_end_of_scheduling(
-            test_begin_end{}, test_executor_begin_end{});
+            hpx::execution::par.parameters(), test_executor_begin_end{});
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::mark_end_of_scheduling(
+            test_begin_end{}, test_executor_begin_end{});
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -537,10 +632,21 @@ void test_mark_end_execution()
         exec_count = 0;
 
         hpx::parallel::execution::mark_end_execution(
-            test_begin_end{}, test_executor_begin_end{});
+            hpx::execution::par.parameters(), test_executor_begin_end{});
 
         HPX_TEST_EQ(params_count, static_cast<std::size_t>(0));
         HPX_TEST_EQ(exec_count, static_cast<std::size_t>(1));
+    }
+
+    {
+        params_count = 0;
+        exec_count = 0;
+
+        hpx::parallel::execution::mark_end_execution(
+            test_begin_end{}, test_executor_begin_end{});
+
+        HPX_TEST_EQ(params_count, static_cast<std::size_t>(1));
+        HPX_TEST_EQ(exec_count, static_cast<std::size_t>(0));
     }
 }
 
@@ -561,7 +667,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
