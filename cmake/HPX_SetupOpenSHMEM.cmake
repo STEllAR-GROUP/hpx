@@ -137,7 +137,7 @@ macro(hpx_setup_openshmem)
           if("${OSHMEM_INFO_OUTPUT_INCCONTENT}" STREQUAL "")
             message(
               FATAL_ERROR
-                "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_INCERROR}"
+                "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_INCERROR}\n${OSHMEM_INFO_OUTPUT_INCCONTENT}"
             )
           endif()
 
