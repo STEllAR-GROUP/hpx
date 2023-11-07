@@ -136,7 +136,7 @@ macro(hpx_setup_openshmem)
               "-I${OSHMEM_INCDIR_PATH} -pthread -I${OSHMEM_LIBDIR_PATH}"
           )
           set(OPENSHMEM_LDFLAGS
-              "-Wl,-rpath -Wl,${OSHMEM_LIBDIR_PATH} -Wl,--enable-new-dtags -loshmem -lmpi"
+              "-Wl,-rpath -Wl,${OSHMEM_LIBDIR_PATH} -loshmem -lmpi"
           )
           set(OPENSHMEM_LIBRARY_DIRS "${OSHMEM_LIBDIR_PATH}")
 
