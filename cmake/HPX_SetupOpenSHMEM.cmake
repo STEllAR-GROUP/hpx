@@ -135,9 +135,7 @@ macro(hpx_setup_openshmem)
           set(OPENSHMEM_CFLAGS
               "-I${OSHMEM_INCDIR_PATH} -pthread -I${OSHMEM_LIBDIR_PATH}"
           )
-          set(OPENSHMEM_LDFLAGS
-              "-loshmem"
-          )
+          set(OPENSHMEM_LDFLAGS "-loshmem")
           set(OPENSHMEM_LIBRARY_DIRS "${OSHMEM_LIBDIR_PATH}")
 
           add_library(PkgConfig::OPENSHMEM INTERFACE IMPORTED GLOBAL)
