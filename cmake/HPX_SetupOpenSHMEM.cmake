@@ -354,7 +354,9 @@ macro(hpx_setup_openshmem)
     )
   endif()
 
-  if(OPENSHMEM_CFLAGS)
+  if(OPENSHMEM_CFLAGS AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}"
+                                STREQUAL "mpi"))
+  )
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
     set(NEWPARAM "")
@@ -392,7 +394,9 @@ macro(hpx_setup_openshmem)
     endforeach()
   endif()
 
-  if(OPENSHMEM_CFLAGS_OTHER)
+  if(OPENSHMEM_CFLAGS_OTHER AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}"
+                                      STREQUAL "mpi"))
+  )
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
     set(NEWPARAM "")
@@ -430,7 +434,9 @@ macro(hpx_setup_openshmem)
     endforeach()
   endif()
 
-  if(OPENSHMEM_LDFLAGS)
+  if(OPENSHMEM_LDFLAGS AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}"
+                                 STREQUAL "mpi"))
+  )
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
     set(NEWPARAM "")
@@ -443,11 +449,7 @@ macro(hpx_setup_openshmem)
 
     foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS})
       string(FIND "${X}" "--param" PARAM_FOUND)
-      if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
-        string(FIND "${X}" "-loshmem" IDX)
-      else()
-        string(FIND "${X}" "-lsma" IDX)
-      endif()
+      string(FIND "${X}" "-lsma" IDX)
       string(FIND "${X}" "-l" LIDX)
       string(FIND "${X}" "-L" DIRIDX)
       string(FIND "${X}" "-Wl" SKIP)
@@ -572,7 +574,9 @@ macro(hpx_setup_openshmem)
     endif()
   endif()
 
-  if(OPENSHMEM_LDFLAGS_OTHER)
+  if(OPENSHMEM_LDFLAGS_OTHER
+     AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+  )
     unset(FOUND_LIB)
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
@@ -586,11 +590,7 @@ macro(hpx_setup_openshmem)
 
     foreach(X IN ITEMS ${OPENSHMEM_LDFLAGS_OTHER})
       string(FIND "${X}" "--param" PARAM_FOUND)
-      if("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi")
-        string(FIND "${X}" "-loshmem" IDX)
-      else()
-        string(FIND "${X}" "-lsma" IDX)
-      endif()
+      string(FIND "${X}" "-lsma" IDX)
       string(FIND "${X}" "-L" DIRIDX)
       string(FIND "${X}" "-Wl" SKIP)
 
@@ -715,7 +715,9 @@ macro(hpx_setup_openshmem)
 
   endif()
 
-  if(OPENSHMEM_STATIC_CFLAGS)
+  if(OPENSHMEM_STATIC_CFLAGS
+     AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+  )
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
     set(NEWPARAM "")
@@ -753,7 +755,9 @@ macro(hpx_setup_openshmem)
     endforeach()
   endif()
 
-  if(OPENSHMEM_STATIC_CFLAGS_OTHER)
+  if(OPENSHMEM_STATIC_CFLAGS_OTHER
+     AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+  )
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
     set(NEWPARAM "")
@@ -791,7 +795,9 @@ macro(hpx_setup_openshmem)
     endforeach()
   endif()
 
-  if(OPENSHMEM_STATIC_LDFLAGS)
+  if(OPENSHMEM_STATIC_LDFLAGS
+     AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+  )
     unset(FOUND_LIB)
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
@@ -934,7 +940,9 @@ macro(hpx_setup_openshmem)
     endif()
   endif()
 
-  if(OPENSHMEM_STATIC_LDFLAGS_OTHER)
+  if(OPENSHMEM_STATIC_LDFLAGS_OTHER
+     AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL "mpi"))
+  )
     unset(FOUND_LIB)
     set(IS_PARAM "0")
     set(PARAM_FOUND "0")
@@ -1079,7 +1087,9 @@ macro(hpx_setup_openshmem)
     endif()
   endif()
 
-  if(OPENSHMEM_DIR)
+  if(OPENSHMEM_DIR AND (NOT ("${HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT}" STREQUAL
+                             "mpi"))
+  )
     list(TRANSFORM OPENSHMEM_CFLAGS
          REPLACE "${OPENSHMEM_DIR}/install"
                  "$<BUILD_INTERFACE:${OPENSHMEM_DIR}/install>"
