@@ -75,7 +75,13 @@ macro(hpx_setup_openshmem)
 
         file(READ ${OSHMEM_INFO_OUTPUT} OSHMEM_INFO_OUTPUT_CONTENT)
 
-        if(NOT OSHMEM_INFO_OUTPUT_CONTENT)
+        if(NOT DEFINED OSHMEM_INFO_OUTPUT_CONTENT)
+          message(
+            FATAL_ERROR "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}"
+          )
+        endif()
+
+        if("${OSHMEM_INFO_OUTPUT_CONTENT}" STREQUAL "")
           message(
             FATAL_ERROR "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}"
           )
@@ -119,7 +125,14 @@ macro(hpx_setup_openshmem)
 
           file(READ ${OSHMEM_INFO_INCOUTPUT} OSHMEM_INFO_OUTPUT_INCCONTENT)
 
-          if(NOT OSHMEM_INFO_OUTPUT_INCCONTENT)
+          if(NOT DEFINED OSHMEM_INFO_OUTPUT_INCCONTENT)
+            message(
+              FATAL_ERROR
+                "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_INCERROR}"
+            )
+          endif()
+
+          if("${OSHMEM_INFO_OUTPUT_INCCONTENT}" STREQUAL "")
             message(
               FATAL_ERROR
                 "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_INCERROR}"
