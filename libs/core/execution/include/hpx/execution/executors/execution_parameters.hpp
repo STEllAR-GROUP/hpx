@@ -1,5 +1,5 @@
 //  Copyright (c) 2016 Marcin Copik
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@
 #include <hpx/serialization/base_object.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>
-#include <hpx/type_support/detail/wrap_int.hpp>
 #include <hpx/type_support/pack.hpp>
 
 #include <hpx/execution/executors/execution.hpp>
@@ -31,7 +30,6 @@
 #include <functional>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::parallel::execution {
@@ -46,7 +44,7 @@ namespace hpx::parallel::execution {
                 get_parameters_property_t<Property, CheckForProperty>>
         {
         private:
-            using derived_propery_t =
+            using derived_property_t =
                 get_parameters_property_t<Property, CheckForProperty>;
 
             template <typename T>
@@ -60,8 +58,8 @@ namespace hpx::parallel::execution {
                 )>
             // clang-format on
             friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
-                derived_propery_t, Executor&& /*exec*/, Parameters&& /*params*/,
-                Property prop) noexcept
+                derived_property_t, Executor&& /*exec*/,
+                Parameters&& /*params*/, Property prop) noexcept
             {
                 return std::make_pair(prop, prop);
             }
@@ -76,7 +74,7 @@ namespace hpx::parallel::execution {
                 )>
             // clang-format on
             friend HPX_FORCEINLINE constexpr decltype(auto) tag_fallback_invoke(
-                derived_propery_t, Executor&& exec, Parameters&& params,
+                derived_property_t, Executor&& exec, Parameters&& params,
                 Property /*prop*/) noexcept
             {
                 return std::pair<Parameters&&, Executor&&>(
@@ -94,7 +92,7 @@ namespace hpx::parallel::execution {
                 )>
             // clang-format on
             friend HPX_FORCEINLINE constexpr decltype(auto) tag_invoke(
-                derived_propery_t, Executor&& exec, Parameters&& params,
+                derived_property_t, Executor&& exec, Parameters&& params,
                 Property /*prop*/) noexcept
             {
                 return std::pair<Executor&&, Parameters&&>(
@@ -146,12 +144,12 @@ namespace hpx::parallel::execution {
                 hpx::chrono::steady_duration const& iteration_duration,
                 std::size_t cores, std::size_t num_tasks)
             {
-                auto getprop =
+                auto get_prop =
                     get_parameters_chunk_size(HPX_FORWARD(Executor, exec),
                         params, get_chunk_size_property{});
 
-                return getprop.first.get_chunk_size(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                return get_prop.first.get_chunk_size(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second),
                     iteration_duration, cores, num_tasks);
             }
 
@@ -207,12 +205,12 @@ namespace hpx::parallel::execution {
                 Parameters& params, Executor&& exec, F&& f,
                 std::size_t num_tasks)
             {
-                auto getprop = get_parameters_measure_iteration(
+                auto get_prop = get_parameters_measure_iteration(
                     HPX_FORWARD(Executor, exec), params,
                     measure_iteration_property{});
 
-                return getprop.first.measure_iteration(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                return get_prop.first.measure_iteration(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second),
                     HPX_FORWARD(F, f), num_tasks);
             }
 
@@ -273,12 +271,12 @@ namespace hpx::parallel::execution {
                 Parameters& params, Executor&& exec, std::size_t cores,
                 std::size_t num_tasks)
             {
-                auto getprop =
+                auto get_prop =
                     get_maximal_number_of_chunks(HPX_FORWARD(Executor, exec),
                         params, maximal_number_of_chunks_property{});
 
-                return getprop.first.maximal_number_of_chunks(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                return get_prop.first.maximal_number_of_chunks(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second),
                     cores, num_tasks);
             }
 
@@ -329,12 +327,12 @@ namespace hpx::parallel::execution {
             HPX_FORCEINLINE static constexpr void call(
                 Parameters& params, Executor&& exec)
             {
-                auto getprop =
+                auto get_prop =
                     get_reset_thread_distribution(HPX_FORWARD(Executor, exec),
                         params, reset_thread_distribution_property{});
 
-                getprop.first.reset_thread_distribution(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second));
+                get_prop.first.reset_thread_distribution(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -388,12 +386,12 @@ namespace hpx::parallel::execution {
                 hpx::chrono::steady_duration const& iteration_duration,
                 std::size_t num_tasks)
             {
-                auto getprop = get_processing_units_count_target(
+                auto get_prop = get_processing_units_count_target(
                     HPX_FORWARD(Executor, exec), params,
                     processing_units_count_property{});
 
-                return getprop.first.processing_units_count(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second),
+                return get_prop.first.processing_units_count(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second),
                     iteration_duration, num_tasks);
             }
 
@@ -458,12 +456,12 @@ namespace hpx::parallel::execution {
             HPX_FORCEINLINE static constexpr void call(
                 Parameters& params, Executor&& exec)
             {
-                auto getprop =
+                auto get_prop =
                     get_mark_begin_execution(HPX_FORWARD(Executor, exec),
                         params, mark_begin_execution_property{});
 
-                getprop.first.mark_begin_execution(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second));
+                get_prop.first.mark_begin_execution(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -512,12 +510,12 @@ namespace hpx::parallel::execution {
             HPX_FORCEINLINE static constexpr void call(
                 Parameters& params, Executor&& exec)
             {
-                auto getprop =
+                auto get_prop =
                     get_mark_end_of_scheduling(HPX_FORWARD(Executor, exec),
                         params, mark_end_of_scheduling_property{});
 
-                getprop.first.mark_end_of_scheduling(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second));
+                get_prop.first.mark_end_of_scheduling(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second));
             }
 
             template <typename AnyParameters, typename Executor>
@@ -565,12 +563,12 @@ namespace hpx::parallel::execution {
             HPX_FORCEINLINE static constexpr void call(
                 Parameters& params, Executor&& exec)
             {
-                auto getprop =
+                auto get_prop =
                     get_mark_end_execution(HPX_FORWARD(Executor, exec), params,
                         mark_end_execution_property{});
 
-                getprop.first.mark_end_execution(
-                    HPX_FORWARD(decltype(getprop.second), getprop.second));
+                get_prop.first.mark_end_execution(
+                    HPX_FORWARD(decltype(get_prop.second), get_prop.second));
             }
 
             template <typename AnyParameters, typename Executor>

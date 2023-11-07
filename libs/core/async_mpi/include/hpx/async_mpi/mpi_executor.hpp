@@ -8,7 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/async_mpi/mpi_future.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/modules/mpi_base.hpp>
@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace mpi { namespace experimental {
+namespace hpx::mpi::experimental {
 
     struct executor
     {
@@ -27,7 +27,7 @@ namespace hpx { namespace mpi { namespace experimental {
 
         // default params type as we don't do anything special
         using executor_parameters_type =
-            hpx::execution::experimental::static_chunk_size;
+            hpx::execution::experimental::default_parameters;
 
         constexpr explicit executor(MPI_Comm communicator = MPI_COMM_WORLD)
           : communicator_(communicator)
@@ -70,9 +70,10 @@ namespace hpx { namespace mpi { namespace experimental {
     private:
         MPI_Comm communicator_;
     };
-}}}    // namespace hpx::mpi::experimental
+}    // namespace hpx::mpi::experimental
+// namespace hpx::mpi::experimental
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
 
     /// \cond NOINTERNAL
     template <>
@@ -81,4 +82,5 @@ namespace hpx { namespace parallel { namespace execution {
     {
     };
     /// \endcond
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
+// namespace hpx::parallel::execution

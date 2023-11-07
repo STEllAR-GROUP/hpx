@@ -16,7 +16,6 @@
 #include <hpx/compute_local/host/block_executor.hpp>
 #include <hpx/compute_local/host/target.hpp>
 #include <hpx/datastructures/tuple.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
 #include <hpx/functional/invoke_fused.hpp>
@@ -35,7 +34,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host {
+namespace hpx::compute::host {
     namespace detail {
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
@@ -294,4 +293,5 @@ namespace hpx { namespace compute { namespace host {
             return this->policy().executor().targets();
         }
     };
-}}}    // namespace hpx::compute::host
+}    // namespace hpx::compute::host
+// namespace hpx::compute::host

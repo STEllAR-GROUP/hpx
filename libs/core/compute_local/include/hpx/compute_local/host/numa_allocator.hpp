@@ -11,7 +11,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_combinators/wait_all.hpp>
 #include <hpx/execution/executors/execution_information.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/parallel/algorithms/for_each.hpp>
@@ -29,7 +28,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace hpx { namespace parallel { namespace util {
+namespace hpx::parallel::util {
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Executors>
     class numa_allocator
@@ -102,10 +102,7 @@ namespace hpx { namespace parallel { namespace util {
                 pointer begin = p + i * part_size;
                 pointer end = begin + part_size;
                 first_touch.push_back(hpx::for_each(
-                    hpx::execution::par(hpx::execution::task)
-                        .on(executors_[i])
-                        .with(
-                            hpx::execution::experimental::static_chunk_size()),
+                    hpx::execution::par(hpx::execution::task).on(executors_[i]),
                     begin, end,
 #if defined(HPX_DEBUG)
                     [this, i]
@@ -186,4 +183,5 @@ namespace hpx { namespace parallel { namespace util {
         Executors const& executors_;
         hpx::threads::topology& topo_;
     };
-}}}    // namespace hpx::parallel::util
+}    // namespace hpx::parallel::util
+// namespace hpx::parallel::util

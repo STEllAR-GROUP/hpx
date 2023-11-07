@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -58,7 +58,7 @@ void chunk_size_test_par(Parameters&& params)
 
 struct timer_hooks_parameters
 {
-    timer_hooks_parameters(char const* name)
+    explicit timer_hooks_parameters(char const* name)
       : name_(name)
       , time_(0)
       , count_(0)
@@ -66,22 +66,28 @@ struct timer_hooks_parameters
     }
 
     template <typename Executor>
-    void mark_begin_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_begin_execution_t,
+        timer_hooks_parameters& this_, Executor&&)
     {
-        ++count_;
-        time_ = hpx::chrono::high_resolution_clock::now();
+        ++this_.count_;
+        this_.time_ = hpx::chrono::high_resolution_clock::now();
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_of_scheduling_t,
+        timer_hooks_parameters const&, Executor&&)
     {
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_execution_t,
+        timer_hooks_parameters& this_, Executor&&)
     {
-        time_ = hpx::chrono::high_resolution_clock::now() - time_;
-        ++count_;
+        this_.time_ = hpx::chrono::high_resolution_clock::now() - this_.time_;
+        ++this_.count_;
     }
 
     std::string name_;
@@ -90,6 +96,7 @@ struct timer_hooks_parameters
 };
 
 namespace hpx::parallel::execution {
+
     template <>
     struct is_executor_parameters<timer_hooks_parameters> : std::true_type
     {

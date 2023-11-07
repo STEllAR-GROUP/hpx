@@ -31,6 +31,7 @@ namespace hpx::execution {
 
         struct adaptive_static_chunk_size;
         struct auto_chunk_size;
+        struct default_parameters;
         struct dynamic_chunk_size;
         struct guided_chunk_size;
         struct persistent_auto_chunk_size;
@@ -162,7 +163,7 @@ namespace hpx::parallel::execution {
 
     public:
         using type = hpx::util::detected_or_t<
-            hpx::execution::experimental::static_chunk_size, parameters_type,
+            hpx::execution::experimental::default_parameters, parameters_type,
             Executor>;
     };
 

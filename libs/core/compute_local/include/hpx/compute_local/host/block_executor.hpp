@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/async_combinators/when_all.hpp>
 #include <hpx/compute_local/host/target.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
@@ -41,7 +41,7 @@ namespace hpx { namespace compute { namespace host {
     {
     public:
         using executor_parameters_type =
-            hpx::execution::experimental::static_chunk_size;
+            hpx::execution::experimental::default_parameters;
 
         explicit block_executor(std::vector<host::target> const& targets,
             threads::thread_priority priority = threads::thread_priority::high,

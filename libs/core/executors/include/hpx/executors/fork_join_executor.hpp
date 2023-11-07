@@ -17,9 +17,9 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
-#include <hpx/execution/executors/static_chunk_size.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/runtime_get.hpp>
@@ -80,7 +80,7 @@ namespace hpx::execution::experimental {
         /// \cond NOINTERNAL
         using execution_category = hpx::execution::parallel_execution_tag;
         using executor_parameters_type =
-            hpx::execution::experimental::static_chunk_size;
+            hpx::execution::experimental::default_parameters;
         /// \endcond
 
     private:
