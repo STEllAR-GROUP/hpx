@@ -77,13 +77,15 @@ macro(hpx_setup_openshmem)
 
         if(NOT DEFINED OSHMEM_INFO_OUTPUT_CONTENT)
           message(
-            FATAL_ERROR "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}\n${OSHMEM_INFO_OUTPUT_CONTENT}"
+            FATAL_ERROR
+              "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}\n${OSHMEM_INFO_OUTPUT_CONTENT}"
           )
         endif()
 
         if("${OSHMEM_INFO_OUTPUT_CONTENT}" STREQUAL "")
           message(
-            FATAL_ERROR "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}\n${OSHMEM_INFO_OUTPUT_CONTENT}"
+            FATAL_ERROR
+              "${OSHMEM_INFO} Failed! Check: ${OSHMEM_INFO_ERROR}\n${OSHMEM_INFO_OUTPUT_CONTENT}"
           )
         endif()
 
