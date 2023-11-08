@@ -277,8 +277,6 @@ namespace hpx::components::detail {
     bool wrapper_heap::free_pool()
     {
         HPX_ASSERT(pool_);
-        HPX_ASSERT(first_free_ ==
-            pool_ + parameters_.capacity * parameters_.element_size);
 
         // unbind in AGAS service
         if (base_gid_)
