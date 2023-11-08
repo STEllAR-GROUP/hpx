@@ -109,7 +109,7 @@ namespace hpx::lcos::local::detail {
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
     bool condition_variable::notify_one(std::unique_lock<mutex_type>& lock,
-        threads::thread_priority priority, bool unlock, error_code& ec)
+        threads::thread_priority /* priority */, bool unlock, error_code& ec)
     {
         // Caller failing to hold lock 'lock' before calling function
 #if defined(HPX_MSVC)
