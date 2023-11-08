@@ -12,6 +12,7 @@
 
 #if defined(DOXYGEN)
 // clang-format off
+/// Top level HPX namespace
 namespace hpx { namespace collectives {
 
     /// A communicator instance represents the list of sites that participate in
@@ -30,7 +31,7 @@ namespace hpx { namespace collectives {
 
         /// Retrieve the number of used sites and the index of the current site
         /// for this communicator instance.
-        [[nodiscard] std::pair<num_sites_arg, this_site_arg>
+        [[nodiscard]] std::pair<num_sites_arg, this_site_arg>
         get_info() const noexcept;
 
         /// Return whether this communicator instance represents the root site
@@ -139,7 +140,6 @@ struct hpx::util::extra_data_helper<hpx::collectives::detail::communicator_data>
 
 namespace hpx::collectives {
 
-    ///////////////////////////////////////////////////////////////////////////
     struct communicator
       : hpx::components::client_base<communicator, detail::communicator_server,
             detail::communicator_data>

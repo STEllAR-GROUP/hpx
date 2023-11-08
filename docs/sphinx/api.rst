@@ -62,4 +62,9 @@ a heading brings in the features listed under that heading.
 .. toctree::
    :maxdepth: 1
 
+   api/public_distributed_api.rst
+
+.. toctree::
+   :maxdepth: 1
+
    api/full_api.rst

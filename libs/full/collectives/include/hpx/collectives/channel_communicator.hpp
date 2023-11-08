@@ -11,8 +11,14 @@
 #include <hpx/config.hpp>
 
 #if defined(DOXYGEN)
-// clang-format off
+
+/// Top level HPX namespace
 namespace hpx { namespace collectives {
+    // clang-format off
+
+    /// A handle identifying the communication channel to use for get/set
+    /// operations
+    class channel_communicator{};
 
     /// Create a new communicator object usable with peer-to-peer
     /// channel-based operations
@@ -91,9 +97,8 @@ namespace hpx { namespace collectives {
     template <typename T>
     hpx::future<T> get(channel_communicator comm, that_site_arg site,
         tag_arg tag = tag_arg());
-
-}}
-// clang-format on
+    // clang-format on
+}}    // namespace hpx::collectives
 
 #else
 
@@ -112,10 +117,8 @@ namespace hpx { namespace collectives {
 #include <utility>
 #include <vector>
 
-///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace collectives {
 
-    ///////////////////////////////////////////////////////////////////////////
     // forward declarations
     class channel_communicator;
 
@@ -127,7 +130,6 @@ namespace hpx { namespace collectives {
     hpx::future<void> set(
         channel_communicator, that_site_arg, T&&, tag_arg = tag_arg());
 
-    ///////////////////////////////////////////////////////////////////////////
     class channel_communicator
     {
     private:
