@@ -28,9 +28,10 @@ std::size_t const max_threads = (std::min)(
 
 int hpx_main()
 {
+    std::size_t const num_os_threads = hpx::get_os_thread_count();
     std::size_t const num_threads = hpx::resource::get_num_threads("worker");
 
-    HPX_TEST_EQ(std::size_t(max_threads - 1), num_threads);
+    HPX_TEST_EQ(std::size_t(num_os_threads - 1), num_threads);
 
     hpx::threads::thread_pool_base& tp =
         hpx::resource::get_thread_pool("worker");
@@ -76,7 +77,7 @@ int hpx_main()
 
             // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            for (std::size_t i = 0; i < num_os_threads - 1; ++i)
             {
                 fs.push_back(
                     hpx::threads::suspend_processing_unit(tp, thread_num));
@@ -88,7 +89,7 @@ int hpx_main()
 
             // Launching the same number of tasks as worker threads may deadlock
             // as no thread is available to steal from the current thread.
-            for (std::size_t i = 0; i < max_threads - 1; ++i)
+            for (std::size_t i = 0; i < num_os_threads - 1; ++i)
             {
                 fs.push_back(
                     hpx::threads::resume_processing_unit(tp, thread_num));
@@ -167,7 +168,8 @@ void test_scheduler(
             hpx::threads::policies::scheduler_mode::default_ |
                 hpx::threads::policies::scheduler_mode::enable_elasticity);
 
-        std::size_t const worker_pool_threads = max_threads - 1;
+        std::size_t const worker_pool_threads =
+            rp.get_number_requested_threads() - 1;
         std::size_t worker_pool_threads_added = 0;
 
         for (hpx::resource::numa_domain const& d : rp.numa_domains())

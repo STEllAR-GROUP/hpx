@@ -22,8 +22,9 @@ std::size_t const max_threads = (std::min)(
 
 int hpx_main()
 {
-    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads());
-    HPX_TEST_EQ(std::size_t(max_threads), hpx::resource::get_num_threads(0));
+    std::size_t const num_os_threads = hpx::get_os_thread_count();
+    HPX_TEST_EQ(num_os_threads, hpx::resource::get_num_threads());
+    HPX_TEST_EQ(num_os_threads, hpx::resource::get_num_threads(0));
     HPX_TEST_EQ(std::size_t(1), hpx::resource::get_num_thread_pools());
     HPX_TEST_EQ(std::size_t(0), hpx::resource::get_pool_index("default"));
     HPX_TEST_EQ(std::string("default"), hpx::resource::get_pool_name(0));

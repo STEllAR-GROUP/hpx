@@ -145,13 +145,14 @@ void test_scheduler(
     hpx::local::init_params init_args;
 
     init_args.cfg = {"hpx.os_threads=" + std::to_string(max_threads)};
-    init_args.rp_callback = [scheduler](auto& rp,
+    init_args.rp_callback = [scheduler](hpx::resource::partitioner& rp,
                                 hpx::program_options::variables_map const&) {
         rp.create_thread_pool("worker", scheduler,
             hpx::threads::policies::scheduler_mode::default_ |
                 hpx::threads::policies::scheduler_mode::enable_elasticity);
 
-        std::size_t const worker_pool_threads = max_threads - 1;
+        std::size_t const worker_pool_threads =
+            rp.get_number_requested_threads() - 1;
         HPX_ASSERT(worker_pool_threads >= 1);
         std::size_t worker_pool_threads_added = 0;
 
