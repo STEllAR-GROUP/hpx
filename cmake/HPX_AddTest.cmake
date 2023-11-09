@@ -197,7 +197,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet" ${args}
+                                              "gasnet-smp" ${args}
         )
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE ENVIRONMENT
             "PATH=${PROJECT_BINARY_DIR}/_deps/gasnet-src/install/bin:$ENV{PATH}")
