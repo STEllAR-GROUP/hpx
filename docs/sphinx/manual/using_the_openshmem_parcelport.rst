@@ -7,9 +7,9 @@
 
 .. _using_the_openshmem_parcelport:
 
-========================
+==============================
 Using the OpenSHMEM parcelport
-========================
+==============================
 
 .. _info_openshmem:
 
