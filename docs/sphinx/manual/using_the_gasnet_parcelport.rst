@@ -7,9 +7,9 @@
 
 .. _using_the_gasnet_parcelport:
 
-========================
+===========================
 Using the GASNet parcelport
-========================
+===========================
 
 .. _info_gasnet:
 
