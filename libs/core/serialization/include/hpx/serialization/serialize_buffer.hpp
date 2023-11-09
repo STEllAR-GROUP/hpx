@@ -127,7 +127,7 @@ namespace hpx::serialization {
             auto* p = detail::array_allocator<allocator_type>()(alloc_, size);
             data_.reset(
                 p, [alloc = this->alloc_, size = this->size_](T* p) noexcept {
-                    serialize_buffer::deleter<allocator_type>()(p, alloc, size);
+                    detail::array_deleter<allocator_type>()(p, alloc, size);
                 });
         }
 
