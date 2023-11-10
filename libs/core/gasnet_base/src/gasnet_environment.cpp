@@ -263,8 +263,8 @@ namespace hpx::util {
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))) ||
             (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) &&
-                (get_entry_as(cfg, "hpx.parcel.gasnet.priority", 1) >
-                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
+                (get_entry_as(cfg, "hpx.parcel.mpi.priority", 1) >
+                    get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))))
         {
             LBT_(info)
                 << "GASNET support disabled via configuration settings\n";
