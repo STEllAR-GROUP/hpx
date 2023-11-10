@@ -160,19 +160,18 @@ macro(hpx_setup_gasnet)
           if(MPI_EXTRA_LIBRARY)
             target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
           endif()
-            hpx_info("MPI version: " ${MPI_CXX_VERSION})
-        endif()
-
-        if(NOT MPI_C_LIBRARIES)
-          message(FATAL_ERROR "GASNet MPI: $MPI_C_LIBRARIES not found!")
-        elseif(NOT MPI_LIBRARY)
-          message(FATAL_ERROR "GASNet MPI: $MPI_C_LIBRARY not found!")
+          hpx_info("MPI version: " ${MPI_CXX_VERSION})
         endif()
 
         if(MPI_C_LIBRARIES)
           set(MPI_LIBS "${MPI_C_LIBRARIES}")
         elseif(MPI_LIBRARY)
           set(MPI_LIBS "${MPI_LIBRARY}")
+        else()
+          message(
+            FATAL_ERROR
+              "GASNet MPI: $MPI_C_LIBRARIES and $MPI_LIBRARY not found!"
+          )
         endif()
 
         execute_process(
