@@ -177,7 +177,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_LIBS} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_LIBS} --with-mpi-cflags=-fPIC --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
