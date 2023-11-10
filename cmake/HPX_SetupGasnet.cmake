@@ -149,31 +149,36 @@ macro(hpx_setup_gasnet)
         endif()
 
         if(NOT TARGET Mpi::mpi)
-          message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
+          find_package(MPI REQUIRED QUIET COMPONENTS CXX)
+          add_library(Mpi::mpi INTERFACE IMPORTED)
+          target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
+
+          # Ensure compatibility with older versions
+          if(MPI_LIBRARY)
+            target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY})
+          endif()
+          if(MPI_EXTRA_LIBRARY)
+            target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
+          endif()
+            hpx_info("MPI version: " ${MPI_CXX_VERSION})
         endif()
 
-        if(${MPI_C_COMPILER})
-          set(MPI_C_COMPILER ${CMAKE_C_COMPILER})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        elseif(${MPI_CC})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        elseif($ENV{MPI_CC})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        else()
-          message(FATAL_ERROR "GASNet MPI Conduit selected; $MPI_CC not found!")
+        if(NOT MPI_C_LIBRARIES)
+          message(FATAL_ERROR "GASNet MPI: $MPI_C_LIBRARIES not found!")
+        elseif(NOT MPI_LIBRARY)
+          message(FATAL_ERROR "GASNet MPI: $MPI_C_LIBRARY not found!")
         endif()
 
-        if(NOT "$CMAKE_C_COMPILER" STREQUAL "${MPI_CC}")
-          message(FATAL_ERROR "GASNet MPI: $MPI_CC != $CMAKE_C_COMPILER!")
+        if(MPI_C_LIBRARIES)
+          set(MPI_LIBS "${MPI_C_LIBRARIES}")
+        elseif(MPI_LIBRARY)
+          set(MPI_LIBS "${MPI_LIBRARY}")
         endif()
 
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_LIBS} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
