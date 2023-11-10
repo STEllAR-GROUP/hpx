@@ -251,7 +251,7 @@ namespace hpx::util {
     bool gasnet_environment::check_gasnet_environment(
         util::runtime_configuration const& cfg)
     {
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
         // We disable the GASNET parcelport if any of these hold:
         //
         // - The parcelport is explicitly disabled
@@ -262,9 +262,9 @@ namespace hpx::util {
             (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))) ||
-            (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) &&
-                (get_entry_as(cfg, "hpx.parcel.gasnet.priority", 1) >
-                    get_entry_as(cfg, "hpx.parcel.mpi.priority", 0))))
+            (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) &&
+                (get_entry_as(cfg, "hpx.parcel.mpi.priority", 1) >
+                    get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))))
         {
             LBT_(info)
                 << "GASNET support disabled via configuration settings\n";
@@ -278,7 +278,7 @@ namespace hpx::util {
     }
 }    // namespace hpx::util
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE))
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET))
 
 namespace hpx::util {
 
