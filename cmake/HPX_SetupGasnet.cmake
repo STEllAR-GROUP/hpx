@@ -145,23 +145,23 @@ macro(hpx_setup_gasnet)
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
-          message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
-        endif()
-
-        if(NOT TARGET Mpi::mpi)
           find_package(MPI REQUIRED QUIET COMPONENTS CXX)
-          add_library(Mpi::mpi INTERFACE IMPORTED)
-          target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
-
-          # Ensure compatibility with older versions
-          if(MPI_LIBRARY)
-            target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY})
+          if(NOT MPI_FOUND)
+            message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
-          if(MPI_EXTRA_LIBRARY)
-            target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
-          endif()
-          hpx_info("MPI version: " ${MPI_CXX_VERSION})
         endif()
+
+        add_library(Mpi::mpi INTERFACE IMPORTED)
+        target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
+
+        # Ensure compatibility with older versions
+        if(MPI_LIBRARY)
+          target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY})
+        endif()
+        if(MPI_EXTRA_LIBRARY)
+          target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
+        endif()
+        hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
         if(MPI_C_LIBRARIES)
           set(MPI_LIBS "${MPI_C_LIBRARIES}")
