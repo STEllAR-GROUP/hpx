@@ -107,12 +107,16 @@ while i < len(sys.argv):
 
 pkgconf = None
 for path in pkgconfpath:
-    for suffix in [pkgconf_suffix, "_release", "_relwithdebuginfo","_debug","_minsizerel"]:
+    found = False
+    for suffix in [pkgconf_suffix, "_release", "_relwithdebuginfo","_debug"]:
         hpath = os.path.join(path,"hpx_application")+suffix+".pc"
         if os.path.exists(hpath):
             pkgconf = path
             pkgconf_suffix = suffix
+            found = True
             break
+    if found:
+       break
 
 if pkgconf == None:
     sys.stderr.write('Cannot locate HPX\n')
