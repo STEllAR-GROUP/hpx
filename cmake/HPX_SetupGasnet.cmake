@@ -151,7 +151,10 @@ macro(hpx_setup_gasnet)
           endif()
         endif()
 
-        add_library(Mpi::mpi INTERFACE IMPORTED)
+        if(NOT Mpi::mpi)
+          add_library(Mpi::mpi INTERFACE IMPORTED)
+        endif()
+
         target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
 
         # Ensure compatibility with older versions
