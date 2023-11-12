@@ -151,21 +151,24 @@ macro(hpx_setup_gasnet)
           endif()
         endif()
 
-        target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
+        #add_library(Mpi::mpi INTERFACE IMPORTED)
+        #target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
 
         # Ensure compatibility with older versions
-        if(MPI_LIBRARY)
-          target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY})
-        endif()
-        if(MPI_EXTRA_LIBRARY)
-          target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
-        endif()
+        #if(MPI_LIBRARY)
+        #  target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY})
+        #endif()
+        #if(MPI_EXTRA_LIBRARY)
+        #  target_link_libraries(Mpi::mpi INTERFACE ${MPI_EXTRA_LIBRARY})
+        #endif()
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
         if(MPI_C_LIBRARIES)
           set(MPI_LIBS "${MPI_C_LIBRARIES}")
         elseif(MPI_LIBRARY)
           set(MPI_LIBS "${MPI_LIBRARY}")
+        elseif(MPI_EXTRA_LIBRARY)
+          set(MPI_LIBS "${MPI_EXTRA_LIBRARY}")
         else()
           message(
             FATAL_ERROR
