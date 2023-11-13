@@ -277,14 +277,17 @@ void measure_function_futures_sliding_semaphore(
 struct unlimited_number_of_chunks
 {
     template <typename Executor>
-    std::size_t maximal_number_of_chunks(
-        Executor&& /*executor*/, std::size_t /*cores*/, std::size_t num_tasks)
+    friend std::size_t tag_override_invoke(
+        hpx::parallel::execution::maximal_number_of_chunks_t,
+        unlimited_number_of_chunks, Executor&&, std::size_t,
+        std::size_t num_tasks)
     {
         return num_tasks;
     }
 };
 
 namespace hpx::parallel::execution {
+
     template <>
     struct is_executor_parameters<unlimited_number_of_chunks> : std::true_type
     {

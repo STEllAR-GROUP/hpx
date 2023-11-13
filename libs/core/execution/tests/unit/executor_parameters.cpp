@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2016 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,10 +6,8 @@
 
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
-#include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <iostream>
@@ -88,6 +86,7 @@ void test_static_chunk_size()
         parameters_test(scs);
     }
 }
+
 void test_adaptive_static_chunk_size()
 {
     {
@@ -95,6 +94,7 @@ void test_adaptive_static_chunk_size()
         parameters_test(asc);
     }
 }
+
 void test_guided_chunk_size()
 {
     {
@@ -158,35 +158,40 @@ void test_num_cores()
 ///////////////////////////////////////////////////////////////////////////////
 struct timer_hooks_parameters
 {
-    timer_hooks_parameters(char const* name)
+    explicit timer_hooks_parameters(char const* name)
       : name_(name)
     {
     }
 
     template <typename Executor>
-    void mark_begin_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_begin_execution_t,
+        timer_hooks_parameters const&, Executor&&)
     {
     }
 
     template <typename Executor>
-    void mark_end_of_scheduling(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_of_scheduling_t,
+        timer_hooks_parameters const&, Executor&&)
     {
     }
 
     template <typename Executor>
-    void mark_end_execution(Executor&&)
+    friend void tag_override_invoke(
+        hpx::parallel::execution::mark_end_execution_t,
+        timer_hooks_parameters const&, Executor&&)
     {
     }
 
     std::string name_;
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<timer_hooks_parameters> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<timer_hooks_parameters>
+  : std::true_type
+{
+};
 
 void test_combined_hooks()
 {
@@ -230,7 +235,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX
