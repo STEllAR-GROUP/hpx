@@ -493,8 +493,10 @@ namespace hpx::util {
         if (!nodelist.empty())
         {
             using_nodelist = true;
-            ini_config.emplace_back(
-                "hpx.nodes!=" + env.init_from_nodelist(nodelist, agas_host));
+            bool const have_tcp =
+                rtcfg_.get_entry("hpx.parcel.tcp.enable", "1") != "0";
+            ini_config.emplace_back("hpx.nodes!=" +
+                env.init_from_nodelist(nodelist, agas_host, have_tcp));
         }
 
         // let the batch environment decide about the AGAS host
@@ -762,7 +764,7 @@ namespace hpx::util {
             }
             else if (env.found_batch_environment())
             {
-                // in batch mode, if the network addresses are different and we
+                // in batch mode, if the network addresses are different, and we
                 // should not run the AGAS server we assume to be in worker mode
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
 
