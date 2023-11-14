@@ -421,7 +421,7 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
                 std::size_t count, F&& f, Proj&& proj /* = Proj()*/)
             {
-                static constexpr bool has_scheduler_executor =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)
@@ -506,7 +506,7 @@ namespace hpx::parallel {
                     hpx::parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIterB>;
 
-                static constexpr bool has_scheduler_executor =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)
