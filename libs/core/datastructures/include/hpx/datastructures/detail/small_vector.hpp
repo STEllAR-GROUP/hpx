@@ -34,6 +34,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/type_support/construct_at.hpp>
+#include <hpx/type_support/is_trivially_relocatable.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
 #include <array>
@@ -294,20 +296,6 @@ namespace hpx::detail {
                 reinterpret_cast<T*>(m_data.data() + std::alignment_of_v<T>));
         }
 
-        static void uninitialized_move_and_destroy(
-            T* source_ptr, T* target_ptr, std::size_t size) noexcept
-        {
-            if constexpr (std::is_trivially_copyable_v<T>)
-            {
-                std::memcpy(target_ptr, source_ptr, size * sizeof(T));
-            }
-            else
-            {
-                std::uninitialized_move_n(source_ptr, size, target_ptr);
-                std::destroy_n(source_ptr, size);
-            }
-        }
-
         void realloc(std::size_t new_capacity)
         {
             if (new_capacity <= N)
@@ -319,8 +307,9 @@ namespace hpx::detail {
                 {
                     // indirect -> direct
                     auto* storage = indirect();
-                    uninitialized_move_and_destroy(
-                        storage->data(), direct_data(), storage->size());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            storage->data(), storage->size(), direct_data());
                     set_direct_and_size(storage->size());
                     detail::storage<T>::dealloc(storage);
                 }
@@ -332,15 +321,19 @@ namespace hpx::detail {
                 if (is_direct())
                 {
                     // direct -> indirect
-                    uninitialized_move_and_destroy(data<direction::direct>(),
-                        storage->data(), size<direction::direct>());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            data<direction::direct>(),
+                            size<direction::direct>(), storage->data());
                     storage->size(size<direction::direct>());
                 }
                 else
                 {
                     // indirect -> indirect
-                    uninitialized_move_and_destroy(data<direction::indirect>(),
-                        storage->data(), size<direction::indirect>());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            data<direction::indirect>(),
+                            size<direction::indirect>(), storage->data());
                     storage->size(size<direction::indirect>());
                     detail::storage<T>::dealloc(indirect());
                 }
@@ -501,9 +494,12 @@ namespace hpx::detail {
             auto* const erase_end =
                 (std::min)(const_cast<T*>(to), container_end);
 
-            std::move(erase_end, container_end, erase_begin);
+            // forward relocation
+            ::hpx::experimental::util::uninitialized_relocate_primitive(
+                erase_end, container_end, erase_begin);
+
             auto const num_erased = std::distance(erase_begin, erase_end);
-            std::destroy(container_end - num_erased, container_end);
+
             set_size<D>(size<D>() - num_erased);
             return erase_begin;
         }
@@ -547,9 +543,8 @@ namespace hpx::detail {
                 auto s = other.size<direction::direct>();
                 auto* other_end = other_ptr + s;
 
-                std::uninitialized_move(
+                ::hpx::experimental::util::uninitialized_relocate_primitive(
                     other_ptr, other_end, data<direction::direct>());
-                std::destroy(other_ptr, other_end);
                 set_size(s);
             }
             other.set_direct_and_size(0);
@@ -563,24 +558,45 @@ namespace hpx::detail {
         // * source_begin <= target_begin
         // * source_end onwards is uninitialized memory
         //
-        // Destroys then empty elements in [source_begin, source_end)
+        // Destroys the empty elements in [source_begin, source_end)
         auto shift_right(
             T* source_begin, T* source_end, T* target_begin) noexcept
         {
             // 1. uninitialized moves
             auto const num_moves = std::distance(source_begin, source_end);
             auto const target_end = target_begin + num_moves;
-            auto const num_uninitialized_move =
-                (std::min)(num_moves, std::distance(source_end, target_end));
-            std::uninitialized_move(source_end - num_uninitialized_move,
-                source_end, target_end - num_uninitialized_move);
-            std::move_backward(source_begin,
-                source_end - num_uninitialized_move,
-                target_end - num_uninitialized_move);
-            std::destroy(source_begin, (std::min)(source_end, target_begin));
+
+            ::hpx::experimental::util::uninitialized_relocate_backward_primitive(
+                source_begin, source_end, target_end);
+
+
+            // In the following commented code we split the move into an
+            // uninitialized move and a move, using relocation only when it is
+            // a memcpy. The thought process was that a move assignment might
+            // be faster than a move construction in certain cases, but since
+            // this is likely not the usual case we always choose relocation.
+
+//            if constexpr (hpx::experimental::is_trivially_relocatable_v<T>)
+//            {
+//                ::hpx::experimental::util::uninitialized_relocate_backward_primitive(
+//                    source_begin, source_end, target_end);
+//            }
+//            else
+//            {
+//                auto const num_uninitialized_move = (std::min)(
+//                    num_moves, std::distance(source_end, target_end));
+//
+//                std::uninitialized_move(source_end - num_uninitialized_move,
+//                    source_end, target_end - num_uninitialized_move);
+//                std::move_backward(source_begin,
+//                    source_end - num_uninitialized_move,
+//                    target_end - num_uninitialized_move);
+//                std::destroy(
+//                    source_begin, (std::min)(source_end, target_begin));
+//            }
         }
 
-        // makes space for uninitialized data of cout elements. Also updates
+        // makes space for uninitialized data of count elements. Also updates
         // size.
         template <direction D>
         [[nodiscard]] auto make_uninitialized_space_new(
@@ -592,14 +608,25 @@ namespace hpx::detail {
             target.reserve(s + count);
 
             // move everything [begin, pos[
-            auto* target_pos = std::uninitialized_move(
-                data<D>(), p, target.template data<direction::indirect>());
+            auto* target_pos =
+                std::get<1>(::hpx::experimental::util::uninitialized_relocate_primitive(
+                    data<D>(), p, target.template data<direction::indirect>()));
 
             // move everything [pos, end]
-            std::uninitialized_move(p, data<D>() + s, target_pos + count);
+            ::hpx::experimental::util::uninitialized_relocate_primitive(
+                p, data<D>() + s, target_pos + count);
 
             target.template set_size<direction::indirect>(s + count);
-            *this = HPX_MOVE(target);
+
+            // objects are already destroyed from the relocation
+            if (!is_direct())
+            {
+                detail::storage<T>::dealloc(indirect());
+            }
+            set_direct_and_size(0);
+
+            do_move_assign(HPX_MOVE(target));
+
             return target_pos;
         }
 
