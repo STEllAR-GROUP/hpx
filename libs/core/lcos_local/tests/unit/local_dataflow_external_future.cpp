@@ -61,7 +61,7 @@ struct external_future_executor
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize(Frame&& frame, F&& f, Futures&& futures)
     {
-        static constexpr bool is_void =
+        constexpr bool is_void =
             std::remove_pointer_t<std::decay_t<Frame>>::is_void::value;
 
         hpx::detail::try_catch_exception_ptr(
@@ -139,7 +139,7 @@ struct external_future_additional_argument_executor
     template <typename Frame, typename F, typename Futures>
     void dataflow_finalize(Frame&& frame, F&& f, Futures&& futures)
     {
-        static constexpr bool is_void =
+        constexpr bool is_void =
             std::remove_pointer_t<std::decay_t<Frame>>::is_void::value;
 
         hpx::detail::try_catch_exception_ptr(

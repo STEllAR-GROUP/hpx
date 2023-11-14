@@ -268,7 +268,7 @@ namespace hpx::parallel {
                 hpx::launch::sync,
                 [=](auto&& f1, auto&& f2) mutable {
                     // propagate exceptions, if appropriate
-                    static constexpr bool handle_futures =
+                    constexpr bool handle_futures =
                         hpx::traits::is_future_v<decltype((f1))> &&
                         hpx::traits::is_future_v<decltype((f2))>;
 

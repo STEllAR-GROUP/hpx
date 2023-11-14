@@ -23,7 +23,7 @@ namespace hpx::parallel::util {
     decltype(auto) adapt_sharing_mode(
         ExPolicy&& policy, hpx::threads::thread_sharing_hint sharing)
     {
-        static constexpr bool supports_sharing_hint =
+        constexpr bool supports_sharing_hint =
             hpx::functional::is_tag_invocable_v<
                 hpx::execution::experimental::with_hint_t,
                 std::decay_t<ExPolicy>, hpx::threads::thread_schedule_hint>;

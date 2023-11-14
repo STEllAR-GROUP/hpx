@@ -23,7 +23,7 @@ namespace hpx::parallel::util {
     decltype(auto) adapt_placement_mode(
         ExPolicy&& policy, hpx::threads::thread_placement_hint placement)
     {
-        static constexpr bool supports_placement_hint =
+        constexpr bool supports_placement_hint =
             hpx::functional::is_tag_invocable_v<
                 hpx::execution::experimental::with_hint_t,
                 std::decay_t<ExPolicy>, hpx::threads::thread_schedule_hint>;

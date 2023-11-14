@@ -45,7 +45,7 @@ namespace hpx::serialization {
     {
         using pair_type = std::pair<Key, Value>;
 
-        static constexpr bool optimized =
+        constexpr bool optimized =
             hpx::traits::is_bitwise_serializable_v<pair_type> ||
             !hpx::traits::is_not_bitwise_serializable_v<pair_type>;
 
@@ -81,7 +81,7 @@ namespace hpx::serialization {
     {
         using pair_type = std::pair<Key, Value>;
 
-        static constexpr bool optimized =
+        constexpr bool optimized =
             hpx::traits::is_bitwise_serializable_v<pair_type> ||
             !hpx::traits::is_not_bitwise_serializable_v<pair_type>;
 

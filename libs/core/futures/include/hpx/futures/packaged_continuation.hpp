@@ -55,7 +55,7 @@ namespace hpx::lcos::detail {
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
-                static constexpr bool is_void =
+                constexpr bool is_void =
                     std::is_void_v<util::invoke_result_t<Func, Future&&>>;
 
                 if constexpr (is_void)
@@ -75,7 +75,7 @@ namespace hpx::lcos::detail {
     void invoke_continuation(Func& func, Future&& future, Continuation& cont)
     {
         using inner_future = util::invoke_result_t<Func, Future>;
-        static constexpr bool is_unique_future =
+        constexpr bool is_unique_future =
             traits::detail::is_unique_future_v<inner_future>;
 
         if constexpr (!is_unique_future)
