@@ -63,7 +63,7 @@ namespace hpx {
     template <typename InIter1, typename InIter2, typename FwdIter>
     FwdIter uninitialized_relocate(InIter1 first, InIter2 last, FwdIter dest);
 
-    /// Relocates the elements in the range defined by [first, first + count), to an
+    /// Relocates the elements in the range defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
     /// thrown during the move-construction of an element, all elements left
     /// in the input range, as well as all objects already constructed in the
@@ -134,6 +134,125 @@ namespace hpx {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_relocate(
         ExPolicy&& policy, InIter1 first, InIter2 last, FwdIter dest);
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area ending at \a dest_last. The objects are
+    /// processed in reverse order. If an exception is thrown during the
+    /// the move-construction of an element, all elements left in the
+    /// input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam BiIter1     The type of the source range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    /// \tparam BiIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_last    Refers to the beginning of the destination range.
+    ///  
+    /// The assignments in the parallel \a uninitialized_relocate algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_backward algorithm returns \a BiIter2.
+    ///           The \a uninitialized_relocate_backward algorithm returns the 
+    ///           bidirectional iterator to the first element in the destination range.
+    ///
+    template <typename BiIter1, typename BiIter2>
+    BiIter2 uninitialized_relocate_backward(BiIter1 first, BiIter1 last,
+            BiIter2 dest_last)
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area ending at \a dest_last. The order of the 
+    /// relocation of the objects depends on the execution policy. If an 
+    /// exception is thrown during the  the move-construction of an element, 
+    /// all elements left in the input range, as well as all objects already 
+    /// constructed in the destination range are destroyed. After this algorithm 
+    /// completes, the source range should be freed or reused without destroying 
+    /// the objects.
+    ///
+    /// \note   Using the \a uninitialized_relocate_backward algorithm with the
+    ///         with a non-sequenced execution policy, will not guarantee the
+    ///         order of the relocation of the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam BiIter1     The type of the source range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    /// \tparam BiIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_last    Refers to the end of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate_backward algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_backward algorithm returns a
+    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a BiIter2 otherwise.
+    ///           The \a uninitialized_relocate_backward algorithm returns the 
+    ///           bidirectional iterator to the first element in the destination 
+    ///           range.
+    ///
+    template <typename ExPolicy, typename BiIter1, typename BiIter2>
+    hpx::parallel::util::detail::algorithm_result<ExPolicy, BiIter2>
+    uninitialized_relocate_backward(
+        ExPolicy&& policy, BiIter1 first, BiIter1 last, BiIter2 dest_last)
 
     /// Relocates the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
