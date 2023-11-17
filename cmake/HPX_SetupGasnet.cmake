@@ -174,8 +174,14 @@ macro(hpx_setup_gasnet)
 
         if(MPI_C_LIBRARIES)
           set(MPI_LIBS "${MPI_C_LIBRARIES}")
+          set(MPI_CFLAGS "-fPIC ${MPI_C_COMPILE_FLAGS} ${MPI_C_INCLUDE_PATH}")
+          set(MPI_CXXFLAGS
+              "-fPIC ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_INCLUDE_PATH}"
+          )
         elseif(MPI_LIBRARY)
           set(MPI_LIBS "${MPI_LIBRARY}")
+          set(MPI_CFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
+          set(MPI_CXXFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
         elseif(MPI_EXTRA_LIBRARY)
           set(MPI_LIBS "${MPI_EXTRA_LIBRARY}")
         else()
