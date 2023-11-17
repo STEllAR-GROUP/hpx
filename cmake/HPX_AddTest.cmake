@@ -95,7 +95,6 @@ function(add_hpx_test category name)
 
   # cmake-format: off
   set(cmd
-      ${ENV_VAR}
       "${Python_EXECUTABLE}"
       "${_script_location}/bin/hpxrun.py"
       ${CMAKE_CROSSCOMPILING_EMULATOR}
@@ -126,7 +125,7 @@ function(add_hpx_test category name)
 
   if(${name}_LOCALITIES STREQUAL "1")
     set(_full_name "${category}.${name}")
-    add_test(NAME "${category}.${name}" COMMAND ${cmd} ${args})
+    add_test(NAME "${_full_name}" COMMAND ${cmd} ${args})
     if(${run_serial})
       set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
     endif()
@@ -177,6 +176,7 @@ function(add_hpx_test category name)
                                               ${args}
         )
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+
         if(${name}_TIMEOUT)
           set_tests_properties(
             "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
@@ -198,9 +198,14 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet" ${args}
+                                              "gasnet-smp" ${args}
         )
-        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
+        set_tests_properties(
+          "${_full_name}"
+          PROPERTIES
+            RUN_SERIAL TRUE ENVIRONMENT
+            "PATH=${PROJECT_BINARY_DIR}/_deps/gasnet-src/install/bin:$ENV{PATH}"
+        )
         if(${name}_TIMEOUT)
           set_tests_properties(
             "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}

@@ -262,7 +262,7 @@ namespace hpx::util {
             (get_entry_as(cfg, "hpx.parcel.tcp.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.tcp.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))) ||
-            (get_entry_as(cfg, "hpx.parcel.mpi.enable", 1) &&
+            (get_entry_as(cfg, "hpx.parcel.gasnet.enable", 1) &&
                 (get_entry_as(cfg, "hpx.parcel.mpi.priority", 1) >
                     get_entry_as(cfg, "hpx.parcel.gasnet.priority", 0))))
         {

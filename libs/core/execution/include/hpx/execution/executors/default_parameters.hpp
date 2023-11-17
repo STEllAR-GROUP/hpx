@@ -4,14 +4,13 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file parallel/executors/static_chunk_size.hpp
+/// \file parallel/executors/default_parameters.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution/executors/execution_parameters.hpp>
+#include <hpx/execution/executors/execution_parameters_fwd.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
@@ -27,44 +26,26 @@ namespace hpx::execution::experimental {
     /// \note This executor parameters type is equivalent to OpenMP's STATIC
     ///       scheduling directive.
     ///
-    struct static_chunk_size
+    struct default_parameters
     {
-        /// Construct a \a static_chunk_size executor parameters object
+        /// Construct a \a default_parameters executor parameters object
         ///
         /// \note By default the number of loop iterations is determined from
         ///       the number of available cores and the overall number of loop
         ///       iterations to schedule.
         ///
-        static_chunk_size() = default;
-
-        /// Construct a \a static_chunk_size executor parameters object
-        ///
-        /// \param chunk_size   [in] The optional chunk size to use as the
-        ///                     number of loop iterations to run on a single
-        ///                     thread.
-        ///
-        constexpr explicit static_chunk_size(std::size_t chunk_size) noexcept
-          : chunk_size_(chunk_size)
-        {
-        }
+        default_parameters() = default;
 
         /// \cond NOINTERNAL
         template <typename Executor>
-        friend std::size_t tag_override_invoke(
-            hpx::parallel::execution::get_chunk_size_t,
-            static_chunk_size& this_, Executor& exec,
+        std::size_t get_chunk_size(Executor&& exec,
             hpx::chrono::steady_duration const&, std::size_t cores,
             std::size_t num_tasks)
         {
             // Make sure the internal round-robin counter of the executor is
             // reset
-            parallel::execution::reset_thread_distribution(this_, exec);
-
-            // use the given chunk size if given
-            if (this_.chunk_size_ != 0)
-            {
-                return this_.chunk_size_;
-            }
+            parallel::execution::reset_thread_distribution(
+                *this, HPX_FORWARD(Executor, exec));
 
             if (cores == 1)
             {
@@ -82,39 +63,13 @@ namespace hpx::execution::experimental {
             return chunk_size;
         }
         /// \endcond
-
-    private:
-        /// \cond NOINTERNAL
-        friend class hpx::serialization::access;
-
-        template <typename Archive>
-        void serialize(Archive& ar, unsigned int const /* version */)
-        {
-            // clang-format off
-            ar & chunk_size_;
-            // clang-format on
-        }
-        /// \endcond
-
-    private:
-        /// \cond NOINTERNAL
-        std::size_t chunk_size_ = 0;
-        /// \endcond
     };
 }    // namespace hpx::execution::experimental
 
 /// \cond NOINTERNAL
 template <>
 struct hpx::parallel::execution::is_executor_parameters<
-    hpx::execution::experimental::static_chunk_size> : std::true_type
+    hpx::execution::experimental::default_parameters> : std::true_type
 {
 };
 /// \endcond
-
-namespace hpx::execution {
-
-    using static_chunk_size HPX_DEPRECATED_V(1, 9,
-        "hpx::execution::static_chunk_size is deprecated, use "
-        "hpx::execution::experimental::static_chunk_size instead") =
-        hpx::execution::experimental::static_chunk_size;
-}

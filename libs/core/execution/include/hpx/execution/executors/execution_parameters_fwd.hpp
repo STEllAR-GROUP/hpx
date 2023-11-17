@@ -13,7 +13,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
-#include <hpx/functional/detail/tag_fallback_invoke.hpp>
+#include <hpx/functional/detail/tag_priority_invoke.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/decay.hpp>
 
@@ -94,7 +94,7 @@ namespace hpx::parallel::execution {
     ///                 that should be used for parallel execution.
     ///
     inline constexpr struct get_chunk_size_t final
-      : hpx::functional::detail::tag_fallback<get_chunk_size_t>
+      : hpx::functional::detail::tag_priority<get_chunk_size_t>
     {
     private:
         // clang-format off
@@ -154,7 +154,7 @@ namespace hpx::parallel::execution {
     /// \return The execution time for one of the tasks.
     ///
     inline constexpr struct measure_iteration_t final
-      : hpx::functional::detail::tag_fallback<measure_iteration_t>
+      : hpx::functional::detail::tag_priority<measure_iteration_t>
     {
     private:
         // clang-format off
@@ -189,7 +189,7 @@ namespace hpx::parallel::execution {
     ///                 determined for
     ///
     inline constexpr struct maximal_number_of_chunks_t final
-      : hpx::functional::detail::tag_fallback<maximal_number_of_chunks_t>
+      : hpx::functional::detail::tag_priority<maximal_number_of_chunks_t>
     {
     private:
         // clang-format off
@@ -221,7 +221,7 @@ namespace hpx::parallel::execution {
     ///       otherwise it does nothing.
     ///
     inline constexpr struct reset_thread_distribution_t final
-      : hpx::functional::detail::tag_fallback<reset_thread_distribution_t>
+      : hpx::functional::detail::tag_priority<reset_thread_distribution_t>
     {
     private:
         // clang-format off
@@ -257,7 +257,7 @@ namespace hpx::parallel::execution {
     /// \return The number of cores to use
     ///
     inline constexpr struct processing_units_count_t final
-      : hpx::functional::detail::tag_fallback<processing_units_count_t>
+      : hpx::functional::detail::tag_priority<processing_units_count_t>
     {
     private:
         // clang-format off
@@ -329,7 +329,7 @@ namespace hpx::parallel::execution {
     /// Generate a policy that supports setting the number of cores for
     /// execution.
     inline constexpr struct with_processing_units_count_t final
-      : hpx::functional::detail::tag_fallback<with_processing_units_count_t>
+      : hpx::functional::detail::tag_priority<with_processing_units_count_t>
     {
     } with_processing_units_count{};
 
@@ -342,7 +342,7 @@ namespace hpx::parallel::execution {
     ///       otherwise it does nothing.
     ///
     inline constexpr struct mark_begin_execution_t final
-      : hpx::functional::detail::tag_fallback<mark_begin_execution_t>
+      : hpx::functional::detail::tag_priority<mark_begin_execution_t>
     {
     private:
         // clang-format off
@@ -371,7 +371,7 @@ namespace hpx::parallel::execution {
     ///       otherwise it does nothing.
     ///
     inline constexpr struct mark_end_of_scheduling_t final
-      : hpx::functional::detail::tag_fallback<mark_end_of_scheduling_t>
+      : hpx::functional::detail::tag_priority<mark_end_of_scheduling_t>
     {
     private:
         // clang-format off
@@ -400,7 +400,7 @@ namespace hpx::parallel::execution {
     ///       otherwise it does nothing.
     ///
     inline constexpr struct mark_end_execution_t final
-      : hpx::functional::detail::tag_fallback<mark_end_execution_t>
+      : hpx::functional::detail::tag_priority<mark_end_execution_t>
     {
     private:
         // clang-format off
@@ -421,12 +421,8 @@ namespace hpx::parallel::execution {
     } mark_end_execution{};
 }    // namespace hpx::parallel::execution
 
-namespace hpx::execution::experimental {
-
-    template <>
-    struct is_scheduling_property<
-        hpx::parallel::execution::with_processing_units_count_t>
-      : std::true_type
-    {
-    };
-}    // namespace hpx::execution::experimental
+template <>
+struct hpx::execution::experimental::is_scheduling_property<
+    hpx::parallel::execution::with_processing_units_count_t> : std::true_type
+{
+};

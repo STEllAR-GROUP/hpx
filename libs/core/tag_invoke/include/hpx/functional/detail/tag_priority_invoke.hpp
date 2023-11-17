@@ -190,7 +190,7 @@ namespace hpx::functional::detail {
     {
     };
 
-    // CUDA versions less than 11.2 have a template instantiation bug that
+    // CUDA versions less than 11.2 have a template instantiation problem that
     // leaves out certain template arguments and leads to us not being able to
     // correctly check this condition. We default to the more relaxed
     // noexcept(true) to not falsely exclude correct overloads. However, this
