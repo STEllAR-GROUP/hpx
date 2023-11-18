@@ -193,6 +193,11 @@ macro(hpx_setup_gasnet)
           )
         endif()
 
+        message(
+          STATUS
+          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBS}\" --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+        )
+
         execute_process(
           COMMAND
             bash -c
