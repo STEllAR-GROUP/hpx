@@ -216,6 +216,51 @@ macro(hpx_setup_gasnet)
         )
       else()
 
+        find_file(GASNET_TOOLS_PKGCONFIG_FILE_FOUND
+                  gasnet_tools-par.pc
+                  ${GASNET_DIR}/install/lib/pkgconfig
+        )
+
+        if(NOT GASNET_TOOLS_PKGCONFIG_FILE_FOUND)
+          message(
+            FATAL_ERROR
+              "PKG-CONFIG ERROR (${GASNET_TOOLS_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED GASNET_TOOLS: ${GASNET_DIR}/install/lib/pkgconfig"
+          )
+        endif()
+
+        install(CODE "set(GASNET_PATH \"${GASNET_DIR}\")")
+
+        install(
+          CODE [[
+          file(
+            READ
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet_tools-par.pc
+            GASNET_TOOLS_PKGCONFIG_FILE_CONTENT
+          )
+
+          if(NOT GASNET_TOOLS_PKGCONFIG_FILE_CONTENT)
+            message(FATAL_ERROR "ERROR INSTALLING GASNET_TOOLS")
+          endif()
+
+          string(REPLACE "${GASNET_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                         GASNET_TOOLS_PKGCONFIG_FILE_CONTENT
+                         ${GASNET_TOOLS_PKGCONFIG_FILE_CONTENT}
+          )
+
+          file(
+            WRITE
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet_tools-par.pc
+            ${GASNET_TOOLS_PKGCONFIG_FILE_CONTENT}
+          )
+
+          file(GLOB_RECURSE GASNET_FILES ${GASNET_PATH}/install/*)
+
+          if(NOT GASNET_FILES)
+            message(STATUS "ERROR INSTALLING GASNET")
+          endif()
+        ]]
+        )
+
         find_file(GASNET_PKGCONFIG_FILE_FOUND
                   gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc
                   ${GASNET_DIR}/install/lib/pkgconfig
