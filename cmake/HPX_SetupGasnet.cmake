@@ -157,7 +157,12 @@ macro(hpx_setup_gasnet)
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
-          find_package(MPI REQUIRED QUIET COMPONENTS CXX)
+          #find_package(MPI REQUIRED QUIET COMPONENTS CXX)
+          pkg_search_module(
+            GASNET IMPORTED_TARGET GLOBAL
+            gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
+          )
+
           if(NOT MPI_FOUND)
             message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
