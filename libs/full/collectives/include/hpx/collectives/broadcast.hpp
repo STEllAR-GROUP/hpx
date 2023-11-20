@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -234,10 +234,10 @@ namespace hpx::traits {
 
             return communicator.template handle_data<data_type>(
                 which, generation,
-                // step function (invoked for each get)
+                // no step function
                 nullptr,
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, bool&) {
+                [](auto& data, auto&) {
                     return Communicator::template handle_bool<data_type>(
                         data[0]);
                 },
@@ -253,7 +253,7 @@ namespace hpx::traits {
                 // step function (invoked once for set)
                 [&](auto& data) { data[0] = HPX_FORWARD(T, t); },
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, bool&) {
+                [](auto& data, auto&) {
                     return Communicator::template handle_bool<std::decay_t<T>>(
                         data[0]);
                 },
@@ -286,13 +286,13 @@ namespace hpx::collectives {
             [local_result = HPX_FORWARD(T, local_result), this_site,
                 generation](communicator&& c) mutable -> hpx::future<arg_type> {
             using action_type =
-                detail::communicator_server::communication_set_action<
+                detail::communicator_server::communication_set_direct_action<
                     traits::communication::broadcast_tag, hpx::future<arg_type>,
                     arg_type>;
 
             // explicitly unwrap returned future
-            hpx::future<arg_type> result = async(action_type(), c, this_site,
-                generation, HPX_MOVE(local_result));
+            hpx::future<arg_type> result = hpx::async(action_type(), c,
+                this_site, generation, HPX_MOVE(local_result));
 
             if (!result.is_ready())
             {
@@ -347,13 +347,13 @@ namespace hpx::collectives {
         auto broadcast_data = [this_site, generation](
                                   communicator&& c) -> hpx::future<T> {
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::broadcast_tag, hpx::future<T>>;
 
             // make sure id is kept alive as long as the returned future,
             // explicitly unwrap returned future
             hpx::future<T> result =
-                async(action_type(), c, this_site, generation);
+                hpx::async(action_type(), c, this_site, generation);
 
             if (!result.is_ready())
             {

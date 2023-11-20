@@ -20,6 +20,7 @@
 #include <hpx/functional/traits/get_function_address.hpp>
 #include <hpx/functional/traits/get_function_annotation.hpp>
 #include <hpx/futures/future.hpp>
+#include <hpx/modules/allocator_support.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/threading.hpp>
@@ -163,8 +164,7 @@ namespace hpx::detail {
     bool can_invoke_locally()
     {
         std::ptrdiff_t const requested_stack_size =
-            threads::get_stack_size(static_cast<threads::thread_stacksize>(
-                traits::action_stacksize<Action>::value));
+            threads::get_stack_size(traits::action_stacksize_v<Action>);
         constexpr bool df = traits::action_decorate_function<Action>::value;
         return !df && this_thread::get_stack_size() >= requested_stack_size &&
             this_thread::has_sufficient_stack_space(requested_stack_size);
@@ -202,7 +202,12 @@ namespace hpx::detail {
             future<Result> f;
             {
                 handle_managed_target<Result> hmt(id, f);
-                lcos::packaged_action<Action, Result> p;
+
+                using allocator_type =
+                    hpx::util::thread_local_caching_allocator<char,
+                        hpx::util::internal_allocator<>>;
+                lcos::packaged_action<Action, Result> p(
+                    std::allocator_arg, allocator_type{});
 
                 f = p.get_future();
                 p.post_cb(HPX_MOVE(addr), hmt.get_id(),
@@ -226,7 +231,13 @@ namespace hpx::detail {
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
+
             f = p.get_future();
             p.post(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
             f.wait();
@@ -246,7 +257,13 @@ namespace hpx::detail {
         hpx::future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
+
             f = p.get_future();
             p.post(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
         }
@@ -265,7 +282,13 @@ namespace hpx::detail {
         hpx::future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
+
             f = p.get_future();
             p.post_deferred(
                 HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
@@ -523,7 +546,11 @@ namespace hpx::detail {
 
             if (policy == launch::sync || hpx::detail::has_async_policy(policy))
             {
-                lcos::packaged_action<action_type, result_type> p;
+                using allocator_type =
+                    hpx::util::thread_local_caching_allocator<char,
+                        hpx::util::internal_allocator<>>;
+                lcos::packaged_action<action_type, result_type> p(
+                    std::allocator_arg, allocator_type{});
 
                 f = p.get_future();
                 p.post_cb(HPX_MOVE(addr), hmt.get_id(),
@@ -533,7 +560,11 @@ namespace hpx::detail {
             }
             else if (policy == launch::deferred)
             {
-                lcos::packaged_action<action_type, result_type> p;
+                using allocator_type =
+                    hpx::util::thread_local_caching_allocator<char,
+                        hpx::util::internal_allocator<>>;
+                lcos::packaged_action<action_type, result_type> p(
+                    std::allocator_arg, allocator_type{});
 
                 f = p.get_future();
                 p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
@@ -597,7 +628,12 @@ namespace hpx::detail {
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
 
             f = p.get_future();
             p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
@@ -672,7 +708,12 @@ namespace hpx::detail {
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
 
             f = p.get_future();
             p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
@@ -696,7 +737,12 @@ namespace hpx::detail {
         future<result_type> f;
         {
             handle_managed_target<result_type> hmt(id, f);
-            lcos::packaged_action<action_type, result_type> p;
+
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+            lcos::packaged_action<action_type, result_type> p(
+                std::allocator_arg, allocator_type{});
 
             f = p.get_future();
             p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),

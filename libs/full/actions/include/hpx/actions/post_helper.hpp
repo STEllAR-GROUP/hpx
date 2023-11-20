@@ -75,7 +75,7 @@ namespace hpx::detail {
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize = traits::action_stacksize<Action>::value;
+        data.stacksize = traits::action_stacksize_v<Action>;
 
         while (!threads::threadmanager_is_at_least(hpx::state::running))
         {
@@ -110,8 +110,7 @@ namespace hpx::detail {
 #endif
 #endif
         data.priority = fix_priority<Action>(priority);
-        data.stacksize = static_cast<threads::thread_stacksize>(
-            traits::action_stacksize<Action>::value);
+        data.stacksize = traits::action_stacksize_v<Action>;
 
         while (!threads::threadmanager_is_at_least(hpx::state::running))
         {

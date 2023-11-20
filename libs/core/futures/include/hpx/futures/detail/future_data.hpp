@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/detail/small_vector.hpp>
@@ -92,13 +93,14 @@ namespace hpx::lcos::detail {
     public:
         using completed_callback_type = hpx::move_only_function<void()>;
         using completed_callback_vector_type =
-            hpx::detail::small_vector<completed_callback_type, 1>;
+            hpx::detail::small_vector<completed_callback_type, 1,
+                hpx::util::internal_allocator<completed_callback_type>>;
 
         virtual ~future_data_refcnt_base();
 
         virtual void set_on_completed(completed_callback_type) = 0;
 
-        virtual bool requires_delete() noexcept
+        HPX_FORCEINLINE bool requires_delete() noexcept
         {
             return 0 == --count_;
         }
@@ -256,7 +258,7 @@ namespace hpx::lcos::detail {
             exception = 4 | ready
         };
 
-        // Return whether or not the data is available for this \a future.
+        // Return whether the data is available for this \a future.
         bool is_ready(
             std::memory_order order = std::memory_order_acquire) const noexcept
         {
@@ -319,6 +321,11 @@ namespace hpx::lcos::detail {
             error_code& ec = throws);
 
         virtual std::exception_ptr get_exception_ptr() const = 0;
+
+        void reserve_callbacks(std::size_t capacity)
+        {
+            on_completed_.reserve(capacity);
+        }
 
     protected:
         // try to perform scoped execution of the associated thread (if any)
@@ -641,7 +648,7 @@ namespace hpx::lcos::detail {
             // and no reader
 
             // release any stored data and callback functions
-            switch (state_.exchange(empty))
+            switch (state_.exchange(empty, std::memory_order_relaxed))
             {
             case value:
             {
@@ -745,7 +752,7 @@ namespace hpx::lcos::detail {
 
         template <typename... T>
         future_data_allocator(init_no_addref no_addref,
-            std::in_place_t in_place, other_allocator const& alloc, T&&... ts)
+            other_allocator const& alloc, std::in_place_t in_place, T&&... ts)
           : future_data<Result>(no_addref, in_place, HPX_FORWARD(T, ts)...)
           , alloc_(alloc)
         {

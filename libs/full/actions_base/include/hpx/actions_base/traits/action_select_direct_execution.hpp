@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
 
         struct select_direct_execution_helper
         {
-            // by default we return the unchanged function
+            // by default, we return the unchanged function
             template <typename Action>
             static constexpr launch call(
                 wrap_int, launch policy, naming::address_type) noexcept

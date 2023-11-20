@@ -10,44 +10,44 @@
 #include <string>
 #include <vector>
 
-#include "is_sorted_range_tests.hpp"
+#include "is_sorted_range_tests3.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
-void test_sorted1()
+void test_sorted3()
 {
     using namespace hpx::execution;
-    test_sorted1(seq, IteratorTag());
-    test_sorted1(par, IteratorTag());
-    test_sorted1(par_unseq, IteratorTag());
+    test_sorted3(seq, IteratorTag());
+    test_sorted3(par, IteratorTag());
+    test_sorted3(par_unseq, IteratorTag());
 
-    test_sorted1_async(seq(task), IteratorTag());
-    test_sorted1_async(par(task), IteratorTag());
+    test_sorted3_async(seq(task), IteratorTag());
+    test_sorted3_async(par(task), IteratorTag());
 
-    test_sorted1_seq(IteratorTag());
+    test_sorted3_seq(IteratorTag());
 }
 
-void sorted_test1()
+void sorted_test3()
 {
-    test_sorted1<std::random_access_iterator_tag>();
-    test_sorted1<std::forward_iterator_tag>();
+    test_sorted3<std::random_access_iterator_tag>();
+    test_sorted3<std::forward_iterator_tag>();
 
     using namespace hpx::execution;
 
-    test_sorted1(seq);
-    test_sorted1(par);
-    test_sorted1(par_unseq);
+    test_sorted3(seq);
+    test_sorted3(par);
+    test_sorted3(par_unseq);
 
-    test_sorted1_async(seq(task));
-    test_sorted1_async(par(task));
+    test_sorted3_async(seq(task));
+    test_sorted3_async(par(task));
 
-    test_sorted1_seq();
+    test_sorted3_seq();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int hpx_main()
 {
-    sorted_test1();
+    sorted_test3();
 
     return hpx::local::finalize();
 }

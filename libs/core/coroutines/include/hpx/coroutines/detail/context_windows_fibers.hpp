@@ -292,10 +292,10 @@ namespace hpx::threads::coroutines {
             static constexpr void rebind_stack() noexcept {}
 #endif
 
-            // Detect remaining stack space (approximate), taken from here:
-            // https://stackoverflow.com/a/20930496/269943
             static std::ptrdiff_t get_available_stack_space() noexcept
             {
+                // Detect remaining stack space (approximate), taken from here:
+                // https://stackoverflow.com/a/20930496/269943
                 MEMORY_BASIC_INFORMATION mbi = {};    // page range
                 std::memset(&mbi, '\0', sizeof(mbi));
                 VirtualQuery(&mbi, &mbi, sizeof(mbi));    // get range

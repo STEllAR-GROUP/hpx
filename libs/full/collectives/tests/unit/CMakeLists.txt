@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 Hartmut Kaiser
+# Copyright (c) 2019-2023 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,25 +9,31 @@ set(tests
     all_reduce
     all_to_all
     barrier
+    broadcast
     broadcast_component
     broadcast_post
     channel_communicator
-    exclusive_scan_
     fold
     global_spmd_block
-    inclusive_scan_
-    reduce
     reduce_direct
     remote_latch
 )
 
 if(HPX_WITH_NETWORKING)
-  set(tests ${tests} broadcast broadcast_direct gather scatter)
-endif()
+  set(tests
+      ${tests}
+      broadcast_direct
+      exclusive_scan_
+      gather
+      inclusive_scan_
+      reduce
+      scatter
+  )
 
-foreach(test ${tests})
-  set(${test}_PARAMETERS LOCALITIES 2)
-endforeach()
+  foreach(test ${tests})
+    set(${test}_PARAMETERS LOCALITIES 2)
+  endforeach()
+endif()
 
 # communication_set should run on one locality
 set(tests ${tests} communication_set)

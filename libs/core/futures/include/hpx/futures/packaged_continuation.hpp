@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -585,7 +586,9 @@ namespace hpx::lcos::detail {
     inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap(Future&& future, error_code& ec)
     {
+        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+            hpx::util::internal_allocator<>>;
         return unwrap_impl_alloc(
-            util::internal_allocator<>{}, HPX_FORWARD(Future, future), ec);
+            allocator_type{}, HPX_FORWARD(Future, future), ec);
     }
 }    // namespace hpx::lcos::detail

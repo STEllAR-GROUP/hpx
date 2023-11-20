@@ -606,13 +606,12 @@ namespace hpx::actions {
 #define HPX_ACTION_USES_HUGE_STACK(action)   /**/
 #else
 #define HPX_ACTION_USES_STACK(action, size)                                    \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct action_stacksize<action>                                    \
-            {                                                                  \
-                static constexpr threads::thread_stacksize value = size;       \
-            };                                                                 \
-        }                                                                      \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct action_stacksize<action>                                        \
+        {                                                                      \
+            static constexpr threads::thread_stacksize value = size;           \
+        };                                                                     \
     }                                                                          \
     /**/
 
@@ -642,18 +641,17 @@ namespace hpx::actions {
 #else
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_HAS_PRIORITY(action, priority)                              \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct action_priority<action>                                     \
-            {                                                                  \
-                static constexpr threads::thread_priority value = priority;    \
-            };                                                                 \
-            /* make sure the action is not executed directly */                \
-            template <>                                                        \
-            struct has_decorates_action<action> : std::true_type               \
-            {                                                                  \
-            };                                                                 \
-        }                                                                      \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct action_priority<action>                                         \
+        {                                                                      \
+            static constexpr threads::thread_priority value = priority;        \
+        };                                                                     \
+        /* make sure the action is not executed directly */                    \
+        template <>                                                            \
+        struct has_decorates_action<action> : std::true_type                   \
+        {                                                                      \
+        };                                                                     \
     }                                                                          \
     /**/
 

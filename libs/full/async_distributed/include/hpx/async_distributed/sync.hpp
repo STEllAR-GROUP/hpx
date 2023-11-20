@@ -80,7 +80,7 @@ namespace hpx::detail {
             typename Data, typename... Ts>
         HPX_FORCEINLINE static sync_result_t<Action> call(
             Policy_&& launch_policy,
-            components::client_base<Client, Stub, Data> c, Ts&&... ts)
+            components::client_base<Client, Stub, Data> const& c, Ts&&... ts)
         {
             // make sure the action is compatible with the component type
             using component_type = typename components::client_base<Client,
@@ -98,12 +98,10 @@ namespace hpx::detail {
             }
 
             // defer invocation otherwise
-            return c
-                .then(util::one_shot(
+            return c.then(launch_policy,
+                util::one_shot(
                     hpx::bind_back(sync_action_client_dispatch<Action>(),
-                        HPX_FORWARD(Policy_, launch_policy),
-                        HPX_FORWARD(Ts, ts)...)))
-                .get();
+                        launch_policy, HPX_FORWARD(Ts, ts)...)));
         }
     };
 

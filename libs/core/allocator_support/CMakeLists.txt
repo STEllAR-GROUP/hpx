@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2023 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@ set(allocator_support_headers
     hpx/allocator_support/allocator_deleter.hpp
     hpx/allocator_support/detail/new.hpp
     hpx/allocator_support/internal_allocator.hpp
+    hpx/allocator_support/thread_local_caching_allocator.hpp
     hpx/allocator_support/traits/is_allocator.hpp
 )
 

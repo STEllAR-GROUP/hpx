@@ -295,12 +295,12 @@ namespace hpx::collectives {
         auto scatter_from_data = [this_site, generation](
                                      communicator&& c) -> hpx::future<T> {
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::scatter_tag, hpx::future<T>>;
 
             // explicitly unwrap returned future
             hpx::future<T> result =
-                async(action_type(), c, this_site, generation);
+                hpx::async(action_type(), c, this_site, generation);
 
             if (!result.is_ready())
             {
@@ -356,12 +356,12 @@ namespace hpx::collectives {
                                    this_site, generation](
                                    communicator&& c) mutable -> hpx::future<T> {
             using action_type =
-                detail::communicator_server::communication_set_action<
+                detail::communicator_server::communication_set_direct_action<
                     traits::communication::scatter_tag, hpx::future<T>,
                     std::vector<T>>;
 
             // explicitly unwrap returned future
-            hpx::future<T> result = async(action_type(), c, this_site,
+            hpx::future<T> result = hpx::async(action_type(), c, this_site,
                 generation, HPX_MOVE(local_result));
 
             if (!result.is_ready())

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/context_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
@@ -25,7 +26,8 @@ namespace hpx::execution_base {
         virtual void yield(char const* desc) = 0;
         virtual void yield_k(std::size_t k, char const* desc) = 0;
         virtual void suspend(char const* desc) = 0;
-        virtual void resume(char const* desc) = 0;
+        virtual void resume(
+            hpx::threads::thread_priority priority, char const* desc) = 0;
         virtual void abort(char const* desc) = 0;
         virtual void sleep_for(
             hpx::chrono::steady_duration const& sleep_duration,

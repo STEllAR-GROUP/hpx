@@ -247,8 +247,7 @@ namespace hpx::actions {
     transfer_action<Action>::~transfer_action() noexcept
     {
         // make sure proper register action function is instantiated
-        auto* ptr = &detail::register_action<Action>::create;
-        (void) ptr;
+        [[maybe_unused]] auto* ptr = &detail::register_action<Action>::create;
     }
 }    // namespace hpx::actions
 

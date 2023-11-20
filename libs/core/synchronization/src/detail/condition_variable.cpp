@@ -18,7 +18,6 @@
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -108,8 +107,8 @@ namespace hpx::lcos::local::detail {
 
     // Return false if no more threads are waiting (returns true if queue
     // is non-empty).
-    bool condition_variable::notify_one(std::unique_lock<mutex_type> lock,
-        threads::thread_priority /* priority */, error_code& ec)
+    bool condition_variable::notify_one(std::unique_lock<mutex_type>& lock,
+        threads::thread_priority priority, bool unlock, error_code& ec)
     {
         // Caller failing to hold lock 'lock' before calling function
 #if defined(HPX_MSVC)
@@ -138,15 +137,19 @@ namespace hpx::lcos::local::detail {
             }
 
             bool const not_empty = !queue_.empty();
-            lock.unlock();
+            if (unlock)
+                lock.unlock();
 
-            ctx.resume();
+            ctx.resume(priority);
 
             return not_empty;
         }
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        if (unlock)
+            lock.unlock();
 
         return false;
 
@@ -155,8 +158,8 @@ namespace hpx::lcos::local::detail {
 #endif
     }
 
-    void condition_variable::notify_all(std::unique_lock<mutex_type> lock,
-        threads::thread_priority /* priority */, error_code& ec)
+    void condition_variable::notify_all(std::unique_lock<mutex_type>& lock,
+        threads::thread_priority priority, bool unlock, error_code& ec)
     {
         // Caller failing to hold lock 'lock' before calling function
 #if defined(HPX_MSVC)
@@ -196,16 +199,18 @@ namespace hpx::lcos::local::detail {
                     return;
                 }
 
-                util::ignore_while_checking const il(&lock);
-                HPX_UNUSED(il);
+                [[maybe_unused]] util::ignore_while_checking const il(&lock);
 
-                ctx.resume();
+                ctx.resume(priority);
 
             } while (!queue.empty());
         }
 
         if (&ec != &throws)
             ec = make_success_code();
+
+        if (unlock)
+            lock.unlock();
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

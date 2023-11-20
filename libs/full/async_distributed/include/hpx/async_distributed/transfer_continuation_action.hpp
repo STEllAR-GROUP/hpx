@@ -271,8 +271,8 @@ namespace hpx::actions {
         Action>::~transfer_continuation_action() noexcept
     {
         // make sure proper register action function is instantiated
-        auto* ptr = &detail::register_action<Action>::create_cont;
-        (void) ptr;
+        [[maybe_unused]] auto* ptr =
+            &detail::register_action<Action>::create_cont;
     }
 }    // namespace hpx::actions
 

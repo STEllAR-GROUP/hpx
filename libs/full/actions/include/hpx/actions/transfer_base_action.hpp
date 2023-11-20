@@ -170,7 +170,7 @@ namespace hpx { namespace actions {
         // (statically). This value might be different from the stacksize member
         // holding the runtime value an action has been created with
         static constexpr threads::thread_stacksize stacksize_value =
-            traits::action_stacksize<Action>::value;
+            traits::action_stacksize_v<Action>;
 
         using direct_execution = typename Action::direct_execution;
 
