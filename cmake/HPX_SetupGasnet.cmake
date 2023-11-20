@@ -158,55 +158,51 @@ macro(hpx_setup_gasnet)
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
           #find_package(MPI REQUIRED QUIET COMPONENTS CXX)
+
           pkg_search_module(
-            GASNET IMPORTED_TARGET GLOBAL
-            gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par
+            MPI IMPORTED_TARGET GLOBAL
+            ompi
           )
 
           if(NOT MPI_FOUND)
             message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
+
+          list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
+          list(JOIN MPI_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
+
+          list(JOIN MPI_LDFLAGS " " MPI_LDFLAGS_STR)
+          list(JOIN MPI_LDFLAGS_OTHER " " MPI_LDFLAGS_OTHER_STR)
+
+          list(JOIN MPI_LIBRARY_DIRS " -L" MPI_LIBRARY_DIRS_STR)
+          set(MPI_LIBRARY_DIRS_STR "-L${MPI_LIBRARY_DIRS_STR}")
+
+          list(JOIN MPI_LIBRARIES " -l" MPI_LIBRARIES_STR)
+          set(MPI_LIBRARIES "-l${MPI_LIBRARIES_STR}")
+
+          list(JOIN MPI_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
+          set(MPI_INCLUDE_DIRS_STR "-I${MPI_INCLUDE_DIRS_STR}")
+
         endif()
 
-        # add_library(Mpi::mpi INTERFACE IMPORTED)
-        # target_link_libraries(Mpi::mpi INTERFACE MPI::MPI_CXX)
-
-        # Ensure compatibility with older versions if(MPI_LIBRARY)
-        # target_link_libraries(Mpi::mpi INTERFACE ${MPI_LIBRARY}) endif()
-        # if(MPI_EXTRA_LIBRARY) target_link_libraries(Mpi::mpi INTERFACE
-        # ${MPI_EXTRA_LIBRARY}) endif()
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
-        if(MPI_C_LIBRARIES)
-          set(MPI_LIBS "${MPI_C_LIBRARIES}")
-          set(MPI_CFLAGS "-fPIC ${MPI_C_COMPILE_FLAGS} ${MPI_C_INCLUDE_PATH}")
-          set(MPI_CXXFLAGS
-              "-fPIC ${MPI_CXX_COMPILE_FLAGS} ${MPI_CXX_INCLUDE_PATH}"
-          )
-        elseif(MPI_LIBRARY)
-          set(MPI_LIBS "${MPI_LIBRARY}")
-          set(MPI_CFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
-          set(MPI_CXXFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
-        elseif(MPI_EXTRA_LIBRARY)
-          set(MPI_LIBS "${MPI_EXTRA_LIBRARY}")
-          set(MPI_CFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
-          set(MPI_CXXFLAGS "-fPIC ${MPI_COMPILE_FLAGS} ${MPI_INCLUDE_PATH}")
-        else()
+        if(MPI_FOUND)
           message(
             FATAL_ERROR
-              "GASNet MPI: $MPI_C_LIBRARIES and $MPI_LIBRARY not found!"
+              "GASNet MPI: MPI not found!"
           )
         endif()
 
         message(
           STATUS
-          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBS}\" --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CCFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CXXFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBRARIES_STR}\" --prefix=${GASNET_DIR}/install --with-cflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" --with-cxxflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
         )
 
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBS}\" --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CCFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CXXFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBRARIES_STR}\" --prefix=${GASNET_DIR}/install --with-cflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" --with-cxxflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
