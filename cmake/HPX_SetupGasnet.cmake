@@ -187,7 +187,7 @@ macro(hpx_setup_gasnet)
 
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
-        if(MPI_FOUND)
+        if(NOT MPI_FOUND)
           message(
             FATAL_ERROR
               "GASNet MPI: MPI not found!"
