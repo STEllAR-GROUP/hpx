@@ -168,6 +168,12 @@ macro(hpx_setup_gasnet)
             message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
 
+          message(STATUS "MPI_CFLAGS\t${MPI_CFLAGS}")
+          message(STATUS "MPI_CFLAGS_OTHER\t${MPI_CFLAGS_OTHER}")
+          message(STATUS "MPI_LDFLAGS\t${MPI_LDFLAGS}")
+          message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARY_DIRS})
+          message(STATUS "MPI_INCLUDE_DIRS\t${MPI_INCLUDE_DIRS}")
+
           set(MPI_CFLAGS_STR "")
           list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
           set(MPI_CFLAGS_OTHER_STR "")
@@ -201,7 +207,6 @@ macro(hpx_setup_gasnet)
           )
         endif()
 
-        message(STATUS "${MPI_LIBRARIES} ${MPI_LIBRARIES_STR}")
         message(
           STATUS
           "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CCFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" CXXFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBRARIES_STR}\" --prefix=${GASNET_DIR}/install --with-cflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" --with-cxxflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_INCLUDE_DIRS_STR} ${MPI_LIBRARY_DIRS_STR}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
