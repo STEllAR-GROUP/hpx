@@ -167,36 +167,36 @@ macro(hpx_setup_gasnet)
           if(NOT MPI_FOUND)
             message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
-
-          message(STATUS "MPI_CFLAGS\t${MPI_CFLAGS}")
-          message(STATUS "MPI_CFLAGS_OTHER\t${MPI_CFLAGS_OTHER}")
-          message(STATUS "MPI_LDFLAGS\t${MPI_LDFLAGS}")
-          message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARY_DIRS}")
-          message(STATUS "MPI_INCLUDE_DIRS\t${MPI_INCLUDE_DIRS}")
-
-          set(MPI_CFLAGS_STR "")
-          list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
-          set(MPI_CFLAGS_OTHER_STR "")
-          list(JOIN MPI_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
-
-          set(MPI_LDFLAGS_STR "")
-          list(JOIN MPI_LDFLAGS " " MPI_LDFLAGS_STR)
-          set(MPI_LDFLAGS_OTHER_STR "")
-          list(JOIN MPI_LDFLAGS_OTHER " " MPI_LDFLAGS_OTHER_STR)
-
-          set(MPI_LIBRARY_DIRS_STR "")
-          list(JOIN MPI_LIBRARY_DIRS " -L" MPI_LIBRARY_DIRS_STR)
-          set(MPI_LIBRARY_DIRS_STR "-L${MPI_LIBRARY_DIRS_STR}")
-
-          set(MPI_LIBRARIES_STR "")
-          list(JOIN MPI_LIBRARIES " -l" MPI_LIBRARIES_STR)
-          set(MPI_LIBRARIES "-l${MPI_LIBRARIES_STR}")
-
-          set(MPI_INCLUDE_DIRS_STR "")
-          list(JOIN MPI_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
-          set(MPI_INCLUDE_DIRS_STR "-I${MPI_INCLUDE_DIRS_STR}")
-
         endif()
+
+
+        message(STATUS "MPI_CFLAGS\t${MPI_CFLAGS}")
+        message(STATUS "MPI_CFLAGS_OTHER\t${MPI_CFLAGS_OTHER}")
+        message(STATUS "MPI_LDFLAGS\t${MPI_LDFLAGS}")
+        message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARY_DIRS}")
+        message(STATUS "MPI_INCLUDE_DIRS\t${MPI_INCLUDE_DIRS}")
+
+        set(MPI_CFLAGS_STR "")
+        list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
+        set(MPI_CFLAGS_OTHER_STR "")
+        list(JOIN MPI_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
+
+        set(MPI_LDFLAGS_STR "")
+        list(JOIN MPI_LDFLAGS " " MPI_LDFLAGS_STR)
+        set(MPI_LDFLAGS_OTHER_STR "")
+        list(JOIN MPI_LDFLAGS_OTHER " " MPI_LDFLAGS_OTHER_STR)
+
+        set(MPI_LIBRARY_DIRS_STR "")
+        list(JOIN MPI_LIBRARY_DIRS " -L" MPI_LIBRARY_DIRS_STR)
+        set(MPI_LIBRARY_DIRS_STR "-L${MPI_LIBRARY_DIRS_STR}")
+
+        set(MPI_LIBRARIES_STR "")
+        list(JOIN MPI_LIBRARIES " -l" MPI_LIBRARIES_STR)
+        set(MPI_LIBRARIES "-l${MPI_LIBRARIES_STR}")
+
+        set(MPI_INCLUDE_DIRS_STR "")
+        list(JOIN MPI_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
+        set(MPI_INCLUDE_DIRS_STR "-I${MPI_INCLUDE_DIRS_STR}")
 
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
