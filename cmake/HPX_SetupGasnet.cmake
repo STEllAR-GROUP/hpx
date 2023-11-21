@@ -171,7 +171,7 @@ macro(hpx_setup_gasnet)
           message(STATUS "MPI_CFLAGS\t${MPI_CFLAGS}")
           message(STATUS "MPI_CFLAGS_OTHER\t${MPI_CFLAGS_OTHER}")
           message(STATUS "MPI_LDFLAGS\t${MPI_LDFLAGS}")
-          message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARY_DIRS})
+          message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARY_DIRS}")
           message(STATUS "MPI_INCLUDE_DIRS\t${MPI_INCLUDE_DIRS}")
 
           set(MPI_CFLAGS_STR "")
