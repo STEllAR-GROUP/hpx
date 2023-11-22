@@ -157,9 +157,8 @@ macro(hpx_setup_gasnet)
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
-          #find_package(MPI REQUIRED QUIET COMPONENTS CXX)
           pkg_check_modules(
-            MPI_C
+            MPI
             REQUIRED
             GLOBAL
             ompi
@@ -168,36 +167,30 @@ macro(hpx_setup_gasnet)
             openmpi
             mpi
           )
-          if(NOT MPI_C_FOUND)
+          if(NOT MPI_FOUND)
             message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
           endif()
         endif()
 
-        message(STATUS "MPI_CFLAGS\t${MPI_C_CFLAGS}")
-        message(STATUS "MPI_CFLAGS_OTHER\t${MPI_C_CFLAGS_OTHE}")
-        message(STATUS "MPI_LDFLAGS\t${MPI_C_LDFLAGS}")
-        message(STATUS "MPI_LIBRARY_DIRS\t${MPI_C_LIBRARIES} ${MPI_C_LIBRARY_DIRS}")
-        message(STATUS "MPI_INCLUDE_DIRS\t${MPI_C_INCLUDE_DIRS}")
-
         set(MPI_CFLAGS_STR "")
-        list(JOIN MPI_C_CFLAGS " " MPI_CFLAGS_STR)
+        list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
 
         set(MPI_CFLAGS_OTHER_STR "")
-        list(JOIN MPI_C_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
+        list(JOIN MPI_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
 
         set(MPI_LDFLAGS_STR "")
-        list(JOIN MPI_C_LDFLAGS " " MPI_LDFLAGS_STR)
+        list(JOIN MPI_LDFLAGS " " MPI_LDFLAGS_STR)
 
         set(MPI_LIBRARIES_STR "")
-        list(JOIN MPI_C_LIBRARIES " -l" MPI_LIBRARIES_STR)
+        list(JOIN MPI_LIBRARIES " -l" MPI_LIBRARIES_STR)
         set(MPI_LIBRARIES_STR "-l${MPI_LIBRARIES_STR}")
 
         set(MPI_LIBRARY_DIR_STR "")
-        list(JOIN MPI_C_LIBRARY_DIRS " -l" MPI_LIBRARY_DIR_STR)
+        list(JOIN MPI_LIBRARY_DIRS " -l" MPI_LIBRARY_DIR_STR)
         set(MPI_LIBRARY_DIR_STR "-l${MPI_LIBRARY_DIR_STR}")
 
         set(MPI_INCLUDE_DIRS_STR "")
-        list(JOIN MPI_C_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
+        list(JOIN MPI_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
         set(MPI_INCLUDE_DIRS_STR "-I${MPI_INCLUDE_DIRS_STR}")
 
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
