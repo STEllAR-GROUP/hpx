@@ -383,6 +383,8 @@ namespace hpx::util {
             node != static_cast<std::size_t>(-1) && vm.count("hpx:debug-clp");
 
         // create host name mapping
+        [[maybe_unused]] bool const have_tcp =
+            rtcfg_.get_entry("hpx.parcel.tcp.enable", "1") != "0";
         util::map_hostnames mapnames(debug_clp);
 
         if (vm.count("hpx:ifsuffix"))
@@ -493,8 +495,8 @@ namespace hpx::util {
         if (!nodelist.empty())
         {
             using_nodelist = true;
-            ini_config.emplace_back(
-                "hpx.nodes!=" + env.init_from_nodelist(nodelist, agas_host));
+            ini_config.emplace_back("hpx.nodes!=" +
+                env.init_from_nodelist(nodelist, agas_host, have_tcp));
         }
 
         // let the batch environment decide about the AGAS host
@@ -503,8 +505,8 @@ namespace hpx::util {
 #endif
 
         bool run_agas_server = false;
-        std::string hpx_host;
-        std::uint16_t hpx_port = 0;
+        [[maybe_unused]] std::string hpx_host;
+        [[maybe_unused]] std::uint16_t hpx_port = 0;
 
 #if defined(HPX_HAVE_NETWORKING)
         bool expect_connections = false;
@@ -724,9 +726,14 @@ namespace hpx::util {
         // handle high-priority threads
         handle_high_priority_threads(vm, ini_config);
 
+#if defined(HPX_HAVE_PARCELPORT_TCP)
         // map host names to ip addresses, if requested
-        hpx_host = mapnames.map(hpx_host, hpx_port);
-        agas_host = mapnames.map(agas_host, agas_port);
+        if (have_tcp)
+        {
+            hpx_host = mapnames.map(hpx_host, hpx_port);
+            agas_host = mapnames.map(agas_host, agas_port);
+        }
+#endif
 
         // sanity checks
         if (rtcfg_.mode_ != hpx::runtime_mode::local && num_localities_ == 1 &&
@@ -762,7 +769,7 @@ namespace hpx::util {
             }
             else if (env.found_batch_environment())
             {
-                // in batch mode, if the network addresses are different and we
+                // in batch mode, if the network addresses are different, and we
                 // should not run the AGAS server we assume to be in worker mode
                 rtcfg_.mode_ = hpx::runtime_mode::worker;
 

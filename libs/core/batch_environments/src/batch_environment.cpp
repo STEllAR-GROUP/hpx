@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2013 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -120,7 +120,8 @@ namespace hpx::util {
 
     // this function initializes the map of nodes from the given a list of nodes
     std::string batch_environment::init_from_nodelist(
-        std::vector<std::string> const& nodes, std::string const& agas_host)
+        std::vector<std::string> const& nodes, std::string const& agas_host,
+        bool have_tcp)
     {
         if (debug_)
             std::cerr << "got node list" << std::endl;
@@ -139,29 +140,41 @@ namespace hpx::util {
                 if (debug_)
                     std::cerr << "extracted: '" << s << "'" << std::endl;
 
-                asio::ip::tcp::endpoint ep =
-                    util::resolve_hostname(s, 0, io_service);
-
+#if defined(HPX_HAVE_PARCELPORT_TCP)
                 if (!found_agas_host &&
                     ((agas_host.empty() && nodes_.empty()) || s == agas_host))
                 {
-                    agas_node_ = s;
                     found_agas_host = true;
+                    agas_node_ = s;
                     agas_node_num_ = agas_node_num;
                 }
 
-                if (0 == nodes_.count(ep))
+                if (have_tcp)
                 {
-                    if (debug_)
-                        std::cerr << "incrementing agas_node_num" << std::endl;
-                    ++agas_node_num;
+                    asio::ip::tcp::endpoint ep =
+                        util::resolve_hostname(s, 0, io_service);
+
+                    if (0 == nodes_.count(ep))
+                    {
+                        if (debug_)
+                            std::cerr << "incrementing agas_node_num"
+                                      << std::endl;
+                        ++agas_node_num;
+                    }
+
+                    std::pair<std::string, std::size_t>& data = nodes_[ep];
+                    if (data.first.empty())
+                        data.first = s;
+                    ++data.second;
                 }
-
-                std::pair<std::string, std::size_t>& data = nodes_[ep];
-                if (data.first.empty())
-                    data.first = s;
-                ++data.second;
-
+#else
+                if (!found_agas_host && (agas_host.empty() || s == agas_host))
+                {
+                    found_agas_host = true;
+                    agas_node_ = s;
+                    agas_node_num_ = agas_node_num;
+                }
+#endif
                 nodes_list += s + ' ';
             }
         }
@@ -184,6 +197,7 @@ namespace hpx::util {
                           << std::endl;
             }
 
+#if defined(HPX_HAVE_PARCELPORT_TCP)
             std::cerr << "Nodes from nodelist:" << std::endl;
             node_map_type::const_iterator const end = nodes_.end();
             for (node_map_type::const_iterator it = nodes_.begin(); it != end;
@@ -192,6 +206,7 @@ namespace hpx::util {
                 std::cerr << (*it).second.first << ": " << (*it).second.second
                           << " (" << (*it).first << ")" << std::endl;
             }
+#endif
         }
         HPX_UNUSED(nodes);
         return nodes_list;
@@ -199,7 +214,7 @@ namespace hpx::util {
 
     // The number of threads is either one (if no PBS/SLURM information was
     // found), or it is the same as the number of times this node has been
-    // listed in the node file. Additionally this takes into account the number
+    // listed in the node file. Additionally, this takes into account the number
     // of tasks run on this node.
     std::size_t batch_environment::retrieve_number_of_threads() const noexcept
     {
@@ -233,7 +248,11 @@ namespace hpx::util {
     std::string batch_environment::host_name(
         std::string const& def_hpx_name) const
     {
+#if defined(HPX_HAVE_PARCELPORT_TCP)
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
+#else
+        std::string host = host_name();
+#endif
         if (debug_)
             std::cerr << "host_name: " << host << std::endl;
         return host;
