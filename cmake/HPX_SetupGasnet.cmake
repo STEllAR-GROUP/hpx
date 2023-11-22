@@ -158,7 +158,7 @@ macro(hpx_setup_gasnet)
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
           #find_package(MPI REQUIRED QUIET COMPONENTS CXX)
-          pkg_search_module(
+          pkg_check_modules(
             MPI_C
             REQUIRED
             GLOBAL
