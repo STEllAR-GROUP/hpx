@@ -249,12 +249,6 @@ macro(hpx_setup_gasnet)
 
         hpx_info("MPI version: " ${MPI_CXX_VERSION})
 
-        message(STATUS "MPI_CFLAGS\t${MPI_CFLAGS_STR}")
-        message(STATUS "MPI_CFLAGS_OTHER\t${MPI_CFLAGS_OTHER_STR}")
-        message(STATUS "MPI_LDFLAGS\t${MPI_LDFLAGS_STR}")
-        message(STATUS "MPI_LIBRARY_DIRS\t${MPI_LIBRARIES_STR} ${MPI_LIBRARY_DIRS_STR}")
-        message(STATUS "MPI_INCLUDE_DIRS\t${MPI_INCLUDE_DIRS_STR}")
-
         if(NOT MPI_FOUND)
           message(
             FATAL_ERROR
@@ -264,13 +258,13 @@ macro(hpx_setup_gasnet)
 
         message(
           STATUS
-          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_LDFLAGS_STR} ${MPI_LIBRARY_DIRS_STR} ${MPI_LIBRARIES_STR} ${MPI_INCLUDE_DIRS_STR}\" CCFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_LDFLAGS_STR} ${MPI_LIBRARY_DIRS_STR} ${MPI_LIBRARIES_STR} ${MPI_INCLUDE_DIRS_STR}\" CXXFLAGS=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_LDFLAGS_STR} ${MPI_LIBRARY_DIRS_STR} ${MPI_LIBRARIES_STR} ${MPI_INCLUDE_DIRS_STR}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=\"${MPI_LIBRARIES_STR}\" --prefix=${GASNET_DIR}/install --with-cflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_LDFLAGS_STR} ${MPI_LIBRARY_DIRS_STR} ${MPI_LIBRARIES_STR} ${MPI_INCLUDE_DIRS_STR}\" --with-cxxflags=\"${MPI_CFLAGS_STR} ${MPI_CFLAGS_OTHER_STR} ${MPI_LDFLAGS_STR} ${MPI_LIBRARY_DIRS_STR} ${MPI_LIBRARIES_STR} ${MPI_INCLUDE_DIRS_STR}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
         )
 
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
