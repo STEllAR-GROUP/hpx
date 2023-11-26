@@ -270,6 +270,55 @@ macro(hpx_setup_gasnet)
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
           ERROR_FILE ${GASNET_ERROR_FILE}
         )
+
+        if(GASNET_BUILD_STATUS)
+          execute_process(
+            COMMAND
+              bash -c
+              "pkg-config --cflags ompi"
+            WORKING_DIRECTORY ${GASNET_DIR}
+            RESULT_VARIABLE PKGCONFIG_CFLAGS_STATUS
+            OUTPUT_VARIABLE PKGCONFIG_CFLAGS_FLAGS
+            OUTPUT_FILE ${PKGCONFIG_CFLAGS_OUTPUT}
+            ERROR_FILE ${PKGCONFIG_CFLAGS_ERROR_FILE}
+          )
+
+          if(PKGCONFIG_CFLAGS_STATUS)
+            message(
+              FATAL_ERROR
+              "`pkg-config --cflags ompi` result = ${PKGCONFIG_CFLAGS_STATUS} - see ${PKGCONFIG_CFLAGS_OUTPUT} for more details"
+            )
+          endif()
+
+          execute_process(
+            COMMAND
+              bash -c
+              "pkg-config --libs ompi"
+            WORKING_DIRECTORY ${GASNET_DIR}
+            RESULT_VARIABLE PKGCONFIG_LIBS_STATUS
+            OUTPUT_VARIABLE PKGCONFIG_LIBS_FLAGS
+            OUTPUT_FILE ${PKGCONFIG_LIBS_OUTPUT}
+            ERROR_FILE ${PKGCONFIG_LIBS_ERROR_FILE}
+          )
+
+          if(PKGCONFIG_LIBS_STATUS)
+            message(
+              FATAL_ERROR
+              "`pkg-config --libs ompi` result = ${PKGCONFIG_LIBS_STATUS} - see ${PKGCONFIG_LIBS_OUTPUT} for more details"
+            )
+          endif()
+
+          execute_process(
+            COMMAND
+              bash -c
+              "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            WORKING_DIRECTORY ${GASNET_DIR}
+            RESULT_VARIABLE GASNET_BUILD_STATUS
+            OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+            ERROR_FILE ${GASNET_ERROR_FILE}
+          )
+
+        endif()
       endif()
 
       if(GASNET_BUILD_STATUS)
