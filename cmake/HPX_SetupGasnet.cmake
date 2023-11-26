@@ -264,14 +264,14 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
-          RESULT_VARIABLE GASNET_BUILD_STATUS
+          RESULT_VARIABLE GASNET_BUILD_STATUS_A
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
           ERROR_FILE ${GASNET_ERROR_FILE}
         )
 
-        if(GASNET_BUILD_STATUS)
+        if(GASNET_BUILD_STATUS_A)
           execute_process(
             COMMAND
               bash -c
@@ -318,7 +318,7 @@ macro(hpx_setup_gasnet)
             execute_process(
               COMMAND
                 bash -c
-                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
               WORKING_DIRECTORY ${GASNET_DIR}
               RESULT_VARIABLE GASNET_BUILD_STATUS
               OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
