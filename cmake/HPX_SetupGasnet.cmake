@@ -279,8 +279,8 @@ macro(hpx_setup_gasnet)
             WORKING_DIRECTORY ${GASNET_DIR}
             RESULT_VARIABLE PKGCONFIG_CFLAGS_STATUS
             OUTPUT_VARIABLE PKGCONFIG_CFLAGS_FLAGS
-            OUTPUT_FILE ${PKGCONFIG_CFLAGS_OUTPUT}
-            ERROR_FILE ${PKGCONFIG_CFLAGS_ERROR_FILE}
+            OUTPUT_FILE PKGCONFIG_CFLAGS_OUTPUT
+            ERROR_FILE PKGCONFIG_CFLAGS_ERROR_FILE
           )
 
           if(PKGCONFIG_CFLAGS_STATUS)
@@ -297,8 +297,8 @@ macro(hpx_setup_gasnet)
             WORKING_DIRECTORY ${GASNET_DIR}
             RESULT_VARIABLE PKGCONFIG_LIBS_STATUS
             OUTPUT_VARIABLE PKGCONFIG_LIBS_FLAGS
-            OUTPUT_FILE ${PKGCONFIG_LIBS_OUTPUT}
-            ERROR_FILE ${PKGCONFIG_LIBS_ERROR_FILE}
+            OUTPUT_FILE PKGCONFIG_LIBS_OUTPUT
+            ERROR_FILE PKGCONFIG_LIBS_ERROR_FILE
           )
 
           if(PKGCONFIG_LIBS_STATUS)
@@ -307,6 +307,11 @@ macro(hpx_setup_gasnet)
               "`pkg-config --libs ompi` result = ${PKGCONFIG_LIBS_STATUS} - see ${PKGCONFIG_LIBS_OUTPUT} for more details"
             )
           endif()
+
+          message(
+            STATUS
+            "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+          )
 
           execute_process(
             COMMAND
