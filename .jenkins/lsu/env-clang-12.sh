@@ -29,7 +29,7 @@ configure_extra_options+=" -DCMAKE_C_COMPILER=clang"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_GASNET=ON"
-configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET_CONDUIT=mpi"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET_CONDUIT=udp"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 
 # The pwrapi library still needs to be set up properly on rostam
