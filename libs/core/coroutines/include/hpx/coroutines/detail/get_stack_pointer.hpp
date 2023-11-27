@@ -11,7 +11,7 @@
 #include <hpx/config/compiler_specific.hpp>
 
 #if defined(HPX_WINDOWS)
-//#define HPX_HAVE_THREADS_GET_STACK_POINTER
+#define HPX_HAVE_THREADS_GET_STACK_POINTER
 #else
 #if defined(HPX_GCC_VERSION)
 #define HPX_HAVE_THREADS_GET_STACK_POINTER

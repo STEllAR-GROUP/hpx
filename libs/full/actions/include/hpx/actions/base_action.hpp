@@ -33,14 +33,14 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <type_traits>
 #include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions {
+namespace hpx::actions {
+
     ///////////////////////////////////////////////////////////////////////////
     // The \a base_action class is an abstract class used as the base class
     // for all action types. It's main purpose is to allow polymorphic
@@ -180,11 +180,12 @@ namespace hpx { namespace actions {
         std::uint64_t parent_phase_ = 0;
 #endif
     };
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
 ///////////////////////////////////////////////////////////////////////////////
 // serialization support for basic_action
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
+
     template <typename Archive, typename Component, typename R,
         typename... Args, typename Derived>
     HPX_FORCEINLINE void serialize(Archive& /* ar */,
@@ -192,7 +193,7 @@ namespace hpx { namespace serialization {
         unsigned int const /* version */ = 0)
     {
     }
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization
 
 #include <hpx/config/warnings_suffix.hpp>
 

@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
 namespace hpx::actions {
 
     template <typename Action>
-    constexpr threads::thread_priority action_priority() noexcept
+    constexpr threads::thread_stacksize action_stacksize() noexcept
     {
         //  The mapping to 'normal' is now done at the last possible moment in
         //  the scheduler.
         using action_type = typename hpx::traits::extract_action<Action>::type;
-        return hpx::traits::action_priority_v<action_type>;
+        return hpx::traits::action_stacksize_v<action_type>;
     }
 }    // namespace hpx::actions

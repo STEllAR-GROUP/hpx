@@ -26,8 +26,8 @@ namespace hpx::detail {
 
     template <typename Action, typename Continuation, typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
-        Continuation&& c, hpx::id_type const& id,
-        threads::thread_priority priority, Ts&&... vs)
+        Continuation&& c, hpx::id_type const& id, hpx::launch policy,
+        Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
         using component_type = typename action_type::component_type;
@@ -55,7 +55,7 @@ namespace hpx::detail {
                 !r.first)
             {
                 return hpx::detail::post_l_p<action_type>(
-                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), policy,
                     HPX_FORWARD(Ts, vs)...);
             }
 
@@ -67,7 +67,7 @@ namespace hpx::detail {
             if (agas::is_local_address_cached(id, addr))
             {
                 return hpx::detail::post_l_p<action_type>(
-                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), policy,
                     HPX_FORWARD(Ts, vs)...);
             }
 
@@ -79,7 +79,7 @@ namespace hpx::detail {
 
         // apply remotely
         return hpx::detail::post_r_p<action_type>(HPX_MOVE(addr),
-            HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
+            HPX_FORWARD(Continuation, c), id, policy, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_impl",
             "unexpected attempt to send a parcel with networking disabled");
@@ -89,11 +89,11 @@ namespace hpx::detail {
     template <typename Action, typename Continuation, typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
         Continuation&& c, hpx::id_type const& id, naming::address&& addr,
-        threads::thread_priority priority, Ts&&... vs)
+        hpx::launch policy, Ts&&... vs)
     {
         if (!addr)
         {
-            return post_impl<Action>(HPX_FORWARD(Continuation, c), id, priority,
+            return post_impl<Action>(HPX_FORWARD(Continuation, c), id, policy,
                 HPX_FORWARD(Ts, vs)...);
         }
 
@@ -123,14 +123,14 @@ namespace hpx::detail {
             }
 
             return hpx::detail::post_l_p<action_type>(
-                HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
+                HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), policy,
                 HPX_FORWARD(Ts, vs)...);
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // object was migrated or is not local, apply remotely
         return hpx::detail::post_r_p<action_type>(HPX_MOVE(addr),
-            HPX_FORWARD(Continuation, c), id, priority, HPX_FORWARD(Ts, vs)...);
+            HPX_FORWARD(Continuation, c), id, policy, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "hpx::detail::post_impl",
@@ -139,8 +139,7 @@ namespace hpx::detail {
     }
 
     template <typename Action, typename... Ts>
-    bool post_impl(
-        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs)
+    bool post_impl(hpx::id_type const& id, hpx::launch policy, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
         using component_type = typename action_type::component_type;
@@ -168,7 +167,7 @@ namespace hpx::detail {
                 !r.first)
             {
                 return hpx::detail::post_l_p<action_type>(
-                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                    id, HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
             }
 
             // fall through
@@ -179,7 +178,7 @@ namespace hpx::detail {
             if (agas::is_local_address_cached(id, addr))
             {
                 return hpx::detail::post_l_p<action_type>(
-                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                    id, HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
             }
 
             // fall through
@@ -190,7 +189,7 @@ namespace hpx::detail {
 
         // object was migrated or is not local, apply remotely
         return hpx::detail::post_r_p<Action>(
-            HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
+            HPX_MOVE(addr), id, policy, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_impl",
             "unexpected attempt to send a parcel with networking disabled");
@@ -199,11 +198,11 @@ namespace hpx::detail {
 
     template <typename Action, typename... Ts>
     bool post_impl(hpx::id_type const& id, naming::address&& addr,
-        threads::thread_priority priority, Ts&&... vs)
+        hpx::launch policy, Ts&&... vs)
     {
         if (!addr)
         {
-            return post_impl<Action>(id, priority, HPX_FORWARD(Ts, vs)...);
+            return post_impl<Action>(id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -232,13 +231,13 @@ namespace hpx::detail {
             }
 
             return hpx::detail::post_l_p<action_type>(
-                id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                id, HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
         }
 
 #if defined(HPX_HAVE_NETWORKING)
         // object was migrated or is not local, apply remotely
         return hpx::detail::post_r_p<action_type>(
-            HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
+            HPX_MOVE(addr), id, policy, HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "hpx::detail::post_impl",
@@ -249,76 +248,7 @@ namespace hpx::detail {
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool>
-    post_cb_impl(Continuation&& c, hpx::id_type const& id,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
-    {
-        using action_type = hpx::traits::extract_action_t<Action>;
-        using component_type = typename action_type::component_type;
-
-        if (!traits::action_is_target_valid<action_type>::call(id))
-        {
-            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
-                "hpx::detail::post_cb_impl",
-                "the target (destination) does not match the action type ({})",
-                hpx::actions::detail::get_action_name<action_type>());
-        }
-
-        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
-        naming::address addr;
-
-        if constexpr (traits::component_supports_migration<
-                          component_type>::call())
-        {
-            auto f = [id](naming::address const& addr) {
-                return traits::action_was_object_migrated<action_type>::call(
-                    id, addr.address_);
-            };
-
-            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
-                !r.first)
-            {
-                bool const result = hpx::detail::post_l_p<action_type>(
-                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
-                    HPX_FORWARD(Ts, vs)...);
-
-                invoke_callback(HPX_FORWARD(Callback, cb));
-                return result;
-            }
-
-            // fall through
-        }
-        else
-        {
-            // non-migratable objects
-            if (agas::is_local_address_cached(id, addr))
-            {
-                bool const result = hpx::detail::post_l_p<action_type>(
-                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), priority,
-                    HPX_FORWARD(Ts, vs)...);
-
-                invoke_callback(HPX_FORWARD(Callback, cb));
-                return result;
-            }
-
-            // fall through
-        }
-
-#if defined(HPX_HAVE_NETWORKING)
-        // Note: the pinned_ptr is still being held, if necessary
-
-        // object was migrated or is not local, apply remotely
-        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr),
-            HPX_FORWARD(Continuation, c), id, priority,
-            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
-#else
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "hpx::detail::post_cb_impl",
-            "unexpected attempt to send a parcel with networking disabled");
-#endif
-    }
-
-    template <typename Action, typename Callback, typename... Ts>
-    bool post_cb_impl(hpx::id_type const& id, threads::thread_priority priority,
+    post_cb_impl(Continuation&& c, hpx::id_type const& id, hpx::launch policy,
         Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -347,7 +277,76 @@ namespace hpx::detail {
                 !r.first)
             {
                 bool const result = hpx::detail::post_l_p<action_type>(
-                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), policy,
+                    HPX_FORWARD(Ts, vs)...);
+
+                invoke_callback(HPX_FORWARD(Callback, cb));
+                return result;
+            }
+
+            // fall through
+        }
+        else
+        {
+            // non-migratable objects
+            if (agas::is_local_address_cached(id, addr))
+            {
+                bool const result = hpx::detail::post_l_p<action_type>(
+                    HPX_FORWARD(Continuation, c), id, HPX_MOVE(addr), policy,
+                    HPX_FORWARD(Ts, vs)...);
+
+                invoke_callback(HPX_FORWARD(Callback, cb));
+                return result;
+            }
+
+            // fall through
+        }
+
+#if defined(HPX_HAVE_NETWORKING)
+        // Note: the pinned_ptr is still being held, if necessary
+
+        // object was migrated or is not local, apply remotely
+        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr),
+            HPX_FORWARD(Continuation, c), id, policy, HPX_FORWARD(Callback, cb),
+            HPX_FORWARD(Ts, vs)...);
+#else
+        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+            "hpx::detail::post_cb_impl",
+            "unexpected attempt to send a parcel with networking disabled");
+#endif
+    }
+
+    template <typename Action, typename Callback, typename... Ts>
+    bool post_cb_impl(
+        hpx::id_type const& id, hpx::launch policy, Callback&& cb, Ts&&... vs)
+    {
+        using action_type = hpx::traits::extract_action_t<Action>;
+        using component_type = typename action_type::component_type;
+
+        if (!traits::action_is_target_valid<action_type>::call(id))
+        {
+            HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
+                "hpx::detail::post_cb_impl",
+                "the target (destination) does not match the action type ({})",
+                hpx::actions::detail::get_action_name<action_type>());
+        }
+
+        [[maybe_unused]] std::pair<bool, components::pinned_ptr> r;
+        naming::address addr;
+
+        if constexpr (traits::component_supports_migration<
+                          component_type>::call())
+        {
+            auto f = [id](naming::address const& addr) {
+                return traits::action_was_object_migrated<action_type>::call(
+                    id, addr.address_);
+            };
+
+            if (agas::is_local_address_cached(id, addr, r, HPX_MOVE(f)) &&
+                !r.first)
+            {
+                bool const result = hpx::detail::post_l_p<action_type>(
+                    id, HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
 
                 invoke_callback(HPX_FORWARD(Callback, cb));
                 return result;
@@ -361,7 +360,7 @@ namespace hpx::detail {
             if (agas::is_local_address_cached(id, addr))
             {
                 bool const result = hpx::detail::post_l_p<action_type>(
-                    id, HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                    id, HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
 
                 invoke_callback(HPX_FORWARD(Callback, cb));
                 return result;
@@ -374,8 +373,8 @@ namespace hpx::detail {
         // Note: the pinned_ptr is still being held, if necessary
 
         // object was migrated or is not local, apply remotely
-        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr), id,
-            priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+        return hpx::detail::post_r_p_cb<action_type>(HPX_MOVE(addr), id, policy,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status,
             "hpx::detail::post_cb_impl",

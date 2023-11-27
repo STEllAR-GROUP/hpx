@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,6 +17,7 @@
 #include <hpx/performance_counters/performance_counter.hpp>
 #include <hpx/performance_counters/query_counters.hpp>
 #include <hpx/runtime_local/config_entry.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 #include <hpx/runtime_local/get_thread_name.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/external_timer.hpp>
@@ -39,7 +40,7 @@
 #include <map>
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     query_counters::query_counters(std::vector<std::string> const& names,
         std::vector<std::string> const& reset_names, std::int64_t interval,
@@ -132,7 +133,7 @@ namespace hpx { namespace util {
     ///////////////////////////////////////////////////////////////////////////
     namespace strings {
 
-        char const* const counter_type_short_names[] = {
+        constexpr char const* counter_type_short_names[] = {
             "counter_type::text",
             "counter_type::raw",
             "counter_type::monotonically_increasing",
@@ -199,7 +200,7 @@ namespace hpx { namespace util {
             print_name_csv(*out, name);
             *out << "," << value.count_ << ",";
 
-            double elapsed = static_cast<double>(value.time_) * 1e-9;
+            double const elapsed = static_cast<double>(value.time_) * 1e-9;
             *out << hpx::util::format("{:.6}", elapsed) << ",[s]," << val;
             if (!uom.empty())
                 *out << ",[" << uom << "]";
@@ -235,7 +236,7 @@ namespace hpx { namespace util {
         print_name_csv(*out, name);
         *out << "," << value.count_ << ",";
 
-        double elapsed = static_cast<double>(value.time_) * 1e-9;
+        double const elapsed = static_cast<double>(value.time_) * 1e-9;
         *out << hpx::util::format("{:.6}", elapsed) << ",[s],";
 
         bool first = true;
@@ -435,7 +436,7 @@ namespace hpx { namespace util {
         else
         {
             std::size_t idx = 0;
-            for (std::size_t i : indices)
+            for (std::size_t const i : indices)
             {
                 print_value(output, infos[i], values[idx]);
                 ++idx;
@@ -637,8 +638,8 @@ namespace hpx { namespace util {
             return false;
         }
 
-        bool destination_is_cout = false;
-        bool no_output = false;
+        bool destination_is_cout;
+        bool no_output;
 
         {
             std::lock_guard<mutex_type> l(mtx_);
@@ -661,11 +662,10 @@ namespace hpx { namespace util {
             return false;
         }
 
-        bool result = false;
-        std::vector<performance_counters::counter_info> infos =
+        std::vector<performance_counters::counter_info> const infos =
             counters_.get_counter_infos();
 
-        result = print_raw_counters(
+        bool result = print_raw_counters(
             destination_is_cout, reset, no_output, description, infos, ec);
         if (ec)
             return false;
@@ -681,4 +681,4 @@ namespace hpx { namespace util {
 
         return result;
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

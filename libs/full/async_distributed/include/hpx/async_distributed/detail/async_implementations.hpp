@@ -248,7 +248,7 @@ namespace hpx::detail {
     template <typename Action, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_remote_impl(launch::async_policy, hpx::id_type const& id,
+    async_remote_impl(launch::async_policy policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -265,7 +265,8 @@ namespace hpx::detail {
                 std::allocator_arg, allocator_type{});
 
             f = p.get_future();
-            p.post(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
+            p.post_p(
+                HPX_MOVE(addr), hmt.get_id(), policy, HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -273,7 +274,7 @@ namespace hpx::detail {
     template <typename Action, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_remote_impl(launch::deferred_policy, hpx::id_type const& id,
+    async_remote_impl(launch::deferred_policy policy, hpx::id_type const& id,
         naming::address&& addr, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -291,7 +292,7 @@ namespace hpx::detail {
 
             f = p.get_future();
             p.post_deferred(
-                HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Ts, vs)...);
+                HPX_MOVE(addr), hmt.get_id(), policy, HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -553,7 +554,7 @@ namespace hpx::detail {
                     std::allocator_arg, allocator_type{});
 
                 f = p.get_future();
-                p.post_cb(HPX_MOVE(addr), hmt.get_id(),
+                p.post_p_cb(HPX_MOVE(addr), hmt.get_id(), policy,
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
                 if (policy == launch::sync)
                     f.wait();
@@ -567,7 +568,7 @@ namespace hpx::detail {
                     std::allocator_arg, allocator_type{});
 
                 f = p.get_future();
-                p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+                p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(), policy,
                     HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             else
@@ -582,7 +583,7 @@ namespace hpx::detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_cb_impl(hpx::detail::sync_policy, hpx::id_type const& id,
+    async_cb_impl(hpx::detail::sync_policy policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -636,8 +637,8 @@ namespace hpx::detail {
                 std::allocator_arg, allocator_type{});
 
             f = p.get_future();
-            p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+            p.post_p_cb(HPX_MOVE(addr), hmt.get_id(), policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             f.wait();
         }
         return f;
@@ -716,8 +717,8 @@ namespace hpx::detail {
                 std::allocator_arg, allocator_type{});
 
             f = p.get_future();
-            p.post_cb(HPX_MOVE(addr), hmt.get_id(), HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+            p.post_p_cb(HPX_MOVE(addr), hmt.get_id(), async_policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
         return f;
     }
@@ -725,7 +726,7 @@ namespace hpx::detail {
     template <typename Action, typename Callback, typename... Ts>
     hpx::future<
         typename hpx::traits::extract_action_t<Action>::local_result_type>
-    async_cb_impl(hpx::detail::deferred_policy, hpx::id_type const& id,
+    async_cb_impl(hpx::detail::deferred_policy policy, hpx::id_type const& id,
         Callback&& cb, Ts&&... vs)
     {
         using action_type = hpx::traits::extract_action_t<Action>;
@@ -745,7 +746,7 @@ namespace hpx::detail {
                 std::allocator_arg, allocator_type{});
 
             f = p.get_future();
-            p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(),
+            p.post_deferred_cb(HPX_MOVE(addr), hmt.get_id(), policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
         return f;

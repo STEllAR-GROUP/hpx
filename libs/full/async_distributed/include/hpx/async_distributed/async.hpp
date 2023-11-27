@@ -212,11 +212,10 @@ namespace hpx::detail {
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
             hpx::id_type const& id, Ts&&... vs)
         {
+            constexpr auto priority = traits::action_priority_v<Derived>;
             constexpr auto stacksize = traits::action_stacksize_v<Derived>;
-            return async<Derived>(
-                launch::async_policy(
-                    threads::thread_priority::default_, stacksize),
-                id, HPX_FORWARD(Ts, vs)...);
+            return async<Derived>(launch::async_policy(priority, stacksize), id,
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,
@@ -233,10 +232,9 @@ namespace hpx::detail {
             static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
+            constexpr auto priority = traits::action_priority_v<Derived>;
             constexpr auto stacksize = traits::action_stacksize_v<Derived>;
-            return async<Derived>(
-                launch::async_policy(
-                    threads::thread_priority::default_, stacksize),
+            return async<Derived>(launch::async_policy(priority, stacksize),
                 c.get_id(), HPX_FORWARD(Ts, vs)...);
         }
 

@@ -181,9 +181,8 @@ namespace hpx::actions {
                     hpx::functional::invoke_fused{},
                     action_invoke<Action>{lva_, comptype_}, HPX_MOVE(args_));
 
-                return threads::thread_result_type(
-                    threads::thread_schedule_state::terminated,
-                    threads::invalid_thread_id);
+                return {threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id};
             }
 
         private:

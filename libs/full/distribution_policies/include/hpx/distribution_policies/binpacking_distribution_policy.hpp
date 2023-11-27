@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -369,12 +369,10 @@ namespace hpx {
     using hpx::components::binpacked;
     using hpx::components::binpacking_distribution_policy;
 
-    namespace traits {
-        template <>
-        struct is_distribution_policy<
-            components::binpacking_distribution_policy> : std::true_type
-        {
-        };
-    }    // namespace traits
+    template <>
+    struct traits::is_distribution_policy<
+        components::binpacking_distribution_policy> : std::true_type
+    {
+    };    // namespace traits
 }    // namespace hpx
 /// \endcond

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Thomas Heller
 //
@@ -28,6 +28,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/runtime_local.hpp>
@@ -48,7 +49,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     // If one or more arguments of the action are non-default-constructible,
@@ -67,7 +68,7 @@ namespace hpx { namespace actions {
             }
 
             template <typename... Ts>
-            argument_holder(Ts&&... ts)
+            explicit argument_holder(Ts&&... ts)
               : data_(new Args(HPX_FORWARD(Ts, ts)...))
             {
             }
@@ -96,7 +97,7 @@ namespace hpx { namespace actions {
             std::unique_ptr<Args> data_;
         };
     }    // namespace detail
-}}       // namespace hpx::actions
+}    // namespace hpx::actions
 
 namespace hpx {
 
@@ -135,7 +136,7 @@ namespace hpx {
     }
 }    // namespace hpx
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
@@ -152,10 +153,10 @@ namespace hpx { namespace actions {
         using derived_type = typename Action::derived_type;
         using result_type = typename Action::result_type;
         using arguments_base_type = typename Action::arguments_type;
-        using arguments_type = typename std::conditional<
-            std::is_constructible<arguments_base_type>::value,
-            arguments_base_type,
-            detail::argument_holder<arguments_base_type>>::type;
+        using arguments_type =
+            std::conditional_t<std::is_constructible_v<arguments_base_type>,
+                arguments_base_type,
+                detail::argument_holder<arguments_base_type>>;
 
         using continuation_type =
             typename traits::action_continuation<Action>::type;
@@ -164,7 +165,7 @@ namespace hpx { namespace actions {
         // (statically). This value might be different from the priority member
         // holding the runtime value an action has been created with
         static constexpr threads::thread_priority priority_value =
-            traits::action_priority<Action>::value;
+            traits::action_priority_v<Action>;
 
         // This is the stacksize value this action has been instantiated with
         // (statically). This value might be different from the stacksize member
@@ -178,17 +179,19 @@ namespace hpx { namespace actions {
         transfer_base_action() = default;
 
         // construct an action from its arguments
-        template <typename... Ts>
-        explicit transfer_base_action(Ts&&... vs)
+        template <typename T, typename... Ts,
+            typename = std::enable_if_t<
+                !std::is_convertible_v<std::decay_t<T>, hpx::launch>>>
+        explicit transfer_base_action(T&& t, Ts&&... vs)
           : base_action_data(threads::thread_priority::default_,
                 threads::thread_stacksize::default_)
-          , arguments_(HPX_FORWARD(Ts, vs)...)
+          , arguments_(HPX_FORWARD(T, t), HPX_FORWARD(Ts, vs)...)
         {
         }
 
         template <typename... Ts>
-        transfer_base_action(threads::thread_priority priority, Ts&&... vs)
-          : base_action_data(priority, threads::thread_stacksize::default_)
+        explicit transfer_base_action(hpx::launch policy, Ts&&... vs)
+          : base_action_data(policy.priority(), policy.stacksize())
           , arguments_(HPX_FORWARD(Ts, vs)...)
         {
         }
@@ -347,13 +350,14 @@ namespace hpx { namespace actions {
     {
         return args.template get<N>();
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS) &&                                   \
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
+
     /// \cond NOINTERNAL
     template <typename Action>
     void register_per_action_data_counter_types(
@@ -363,7 +367,8 @@ namespace hpx { namespace actions { namespace detail {
             hpx::actions::detail::get_action_name<Action>());
     }
     /// \endcond
-}}}       // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
+// namespace hpx::actions::detail
 #endif    // HPX_HAVE_PARCELPORT_ACTION_COUNTERS
 
 #endif    // HPX_HAVE_NETWORKING
