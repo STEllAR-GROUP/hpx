@@ -237,9 +237,6 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'gasnet':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_gasnet(cmd, localities, verbose)
-    if runwrapper == 'gasnet-smp':
-        assert nodes is None, "nodes option only valid with smp parcelport."
-        run_gasnet_smp(cmd, localities, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
@@ -390,7 +387,7 @@ Used by the tcp parcelport only.
     parser.add_option('-r', '--runwrapper'
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
-      , help='Which runwrapper to use (Options are: none, mpi, gasnet, gasnet-smp, srun, jsrun) '
+      , help='Which runwrapper to use (Options are: none, mpi, gasnet, srun, jsrun) '
              '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'
