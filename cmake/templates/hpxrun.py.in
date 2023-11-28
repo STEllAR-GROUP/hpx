@@ -219,10 +219,9 @@ def run(cmd, runwrapper, localities, nodes, verbose):
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
     if runwrapper == 'gasnet':
-        assert nodes is None, "nodes option only valid with tcp parcelport."
         os.environ['GASNET_QUIET'] = 'yes'
         os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-        run_srun(cmd, localities, verbose)
+        run_none(cmd, localities, nodes, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
