@@ -195,22 +195,6 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
-def run_gasnet(cmd, localities, verbose):
-    os.environ['GASNET_QUIET'] = 'yes'
-    os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-    mpiexec = '@MPIEXEC@'
-    if mpiexec == '':
-        mpiexec = '@MPIEXEC_EXECUTABLE@'
-    if mpiexec == '':
-        msg = 'mpiexec not available on this platform. '
-        msg += 'Please rerun CMake with HPX_PARCELPORT_MPI=True.'
-        print(msg, sys.stderr)
-        sys.exit(1)
-    exec_cmd = [mpiexec, '@MPIEXEC_NUMPROC_FLAG@', str(localities)] + cmd
-    if verbose:
-        print('Executing command: ' + ' '.join(exec_cmd))
-    subproc(exec_cmd)
-
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
 def run_srun(cmd, localities, verbose):
@@ -236,7 +220,9 @@ def run(cmd, runwrapper, localities, nodes, verbose):
         run_mpi(cmd, localities, verbose)
     if runwrapper == 'gasnet':
         assert nodes is None, "nodes option only valid with tcp parcelport."
-        run_gasnet(cmd, localities, verbose)
+        os.environ['GASNET_QUIET'] = 'yes'
+        os.environ['GASNET_ROUTE_OUTPUT'] = '0'
+        run_srun(cmd, localities, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
