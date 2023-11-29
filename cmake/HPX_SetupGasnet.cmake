@@ -119,7 +119,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-udp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-udp --disable-mpi --disable-smp --disable-ofi --disable-ucx && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -129,7 +129,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-smp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-smp --disable-udp --disable-ofi --disable-mpi --disable-ucx && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -139,7 +139,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --disable-smp --disable-mpi --disable-ucx --disable-udp --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -149,7 +149,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --disable-smp --disable-mpi --disable-ofi --disable-udp --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -258,13 +258,13 @@ macro(hpx_setup_gasnet)
 
         message(
           STATUS
-          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
         )
 
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS_A
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -297,13 +297,13 @@ macro(hpx_setup_gasnet)
           if(NOT (PKGCONFIG_LIBS_STATUS AND PKGCONFIG_CFLAGS_STATUS))
             message(
               STATUS
-              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
             )
 
             execute_process(
               COMMAND
                 bash -c
-                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
               WORKING_DIRECTORY ${GASNET_DIR}
               RESULT_VARIABLE GASNET_BUILD_STATUS
               OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -312,13 +312,13 @@ macro(hpx_setup_gasnet)
           else()
             message(
               STATUS
-              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
             )
 
             execute_process(
               COMMAND
                 bash -c
-                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
               WORKING_DIRECTORY ${GASNET_DIR}
               RESULT_VARIABLE GASNET_BUILD_STATUS
               OUTPUT_FILE ${GASNET_BUILD_OUTPUT}

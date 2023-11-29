@@ -229,7 +229,8 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'none':
         run_none(cmd, localities, nodes, verbose)
     if runwrapper == 'gasnet':
-        run_amudprun(cmd, localities, nodes, verbose)
+        #run_amudprun(cmd, localities, nodes, verbose)
+        run_srun(cmd, localities, verbose)
     if runwrapper == 'mpi':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
