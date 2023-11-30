@@ -198,7 +198,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet" ${args}
+                                              "amudprun" ${args}
         )
         set_tests_properties(
           "${_full_name}"
