@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,13 +31,13 @@ namespace hpx::util {
     {
         // the constructor tries to read initial values from a batch
         // environment, filling our map of nodes and thread counts
-        batch_environment(std::vector<std::string>& nodelist,
+        explicit batch_environment(std::vector<std::string>& nodelist,
             bool have_mpi = false, bool debug = false, bool enable = true);
 
         // this function initializes the map of nodes from the given (space
         // separated) list of nodes
         std::string init_from_nodelist(std::vector<std::string> const& nodes,
-            std::string const& agas_host);
+            std::string const& agas_host, bool have_tcp);
 
         // The number of threads is either one (if no PBS information was
         // found), or it is the same as the number of times this node has been
@@ -71,17 +71,20 @@ namespace hpx::util {
         // Return a string containing the name of the batch system
         std::string get_batch_name() const;
 
-        using node_map_type = std::map<asio::ip::tcp::endpoint,
-            std::pair<std::string, std::size_t>>;
-
         std::string agas_node_;
         std::size_t agas_node_num_;
         std::size_t node_num_;
         std::size_t num_threads_;
-        node_map_type nodes_;
         std::size_t num_localities_;
         std::string batch_name_;
         bool debug_;
+
+#if defined(HPX_HAVE_PARCELPORT_TCP)
+        using node_map_type = std::map<asio::ip::tcp::endpoint,
+            std::pair<std::string, std::size_t>>;
+
+        node_map_type nodes_;
+#endif
     };
 }    // namespace hpx::util
 
