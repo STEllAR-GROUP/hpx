@@ -980,6 +980,16 @@ hpx_option(
   ADVANCED
 )
 
+# Option for automatically fetching Hwloc
+hpx_option(
+  HPX_WITH_FETCH_HWLOC
+  BOOL
+  "Use FetchContent to fetch Hwloc. By default an installed Hwloc will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
