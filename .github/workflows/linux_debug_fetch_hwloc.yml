@@ -10,7 +10,7 @@ on:
   push: 
     branches: [cmake_options] 
     paths:
-      - ".github/workflows/linux_debug_hwloc_fetch.yml"
+      - ".github/workflows/linux_debug_fetch_hwloc.yml"
       - "CMakeLists.txt"
       - "cmake/**"
 
