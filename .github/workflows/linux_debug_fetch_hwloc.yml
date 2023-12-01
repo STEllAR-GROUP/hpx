@@ -35,7 +35,9 @@ jobs:
               -DHPX_WITH_MALLOC=system \
               -DHPX_WITH_FETCH_ASIO=ON \
               -DHPX_WITH_FETCH_HWLOC=ON \
+              -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
 
     - name: Build

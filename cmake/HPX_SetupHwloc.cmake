@@ -32,6 +32,8 @@ else()
       execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/hwloc-src && ./configure --prefix=${CMAKE_BINARY_DIR}/_deps/hwloc-installed && make -j && make install")
     endif()
     set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-installed")
+    set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
+    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.so CACHE INTERNAL "")
   elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64")
     FetchContent_Declare(HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-win64-build-2.9.3.zip
@@ -49,7 +51,11 @@ else()
   else()
     FetchContent_Declare(HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-win64-build-2.9.3.zip
-      TLS_VERIFY true
+      TLS_VERIFY trueadd_library(Hwloc::hwloc INTERFACE IMPORTED)
+      target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
+      target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
+      message(${Hwloc_INCLUDE_DIR})
+      message(${Hwloc_LIBRARY})
     )
     if(NOT HWLoc_POPULATED)
       FetchContent_Populate(HWLoc)
@@ -64,5 +70,7 @@ else()
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
+  message(${Hwloc_INCLUDE_DIR})
+  message(${Hwloc_LIBRARY})
 
 endif()
