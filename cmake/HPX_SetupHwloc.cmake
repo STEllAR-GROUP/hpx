@@ -63,6 +63,6 @@ else()
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
-  target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARIES})
+  target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
 
 endif()
