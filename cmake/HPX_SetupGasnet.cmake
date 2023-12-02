@@ -106,11 +106,12 @@ macro(hpx_setup_gasnet)
       if(CMAKE_BUILD_PARALLEL_LEVEL)
         set(GASNET_BUILD_PARALLEL_LEVEL ${CMAKE_BUILD_PARALLEL_LEVEL})
       else()
-        cmake_host_system_information(RESULT GASNET_BUILD_PARALLEL_LEVEL
-                                QUERY NUMBER_OF_PHYSICAL_CORES)
+        cmake_host_system_information(
+          RESULT GASNET_BUILD_PARALLEL_LEVEL QUERY NUMBER_OF_PHYSICAL_CORES
+        )
       endif()
 
-      if (NOT ${GASNET_BUILD_PARALLEL_LEVEL})
+      if(NOT ${GASNET_BUILD_PARALLEL_LEVEL})
         set(GASNET_BUILD_PARALLEL_LEVEL 1)
       endif()
 
