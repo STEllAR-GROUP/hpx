@@ -202,7 +202,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet-smp" ${args}
+                                              "amudprun" ${args}
         )
         set_tests_properties(
           "${_full_name}"
@@ -231,7 +231,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.openshmem.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "openshmem" "-r"
-                                              "openshmem" ${args}
+                                              "oshrun" ${args}
         )
         if(${name}_TIMEOUT)
           set_tests_properties(
