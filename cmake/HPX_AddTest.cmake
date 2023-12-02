@@ -233,7 +233,6 @@ function(add_hpx_test category name)
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "openshmem" "-r"
                                               "openshmem" ${args}
         )
-        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
         if(${name}_TIMEOUT)
           set_tests_properties(
             "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
