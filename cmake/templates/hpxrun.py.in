@@ -179,6 +179,20 @@ def run_none(cmd, localities, nodes, verbose):
                  print('Executing command: ' + ' '.join(cmd))
              subproc(cmd)
 
+
+ def run_amudprun(cmd, localities, nodes, verbose):
+     assert len(nodes) == localities, "Number of localities must match number of nodes."
+     os.environ['GASNET_SPAWNFN'] = 'S'
+     os.environ['GASNET_SSH_SERVERS'] = ' '.join([ str(node) for node in nodes ]) 
+     os.environ['SSH_SERVERS'] = os.environ['GASNET_SSH_SERVERS']
+     os.environ['GASNET_ROUTE_OUTPUT'] = '0'
+
+     exec_cmd = ['amudprun', '-np', len(nodes), cmd]
+
+     if verbose:
+         print('Executing command: ' + ' '.join(exec_cmd))
+     subproc(exec_cmd)
+
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
 def run_mpi(cmd, localities, verbose):
