@@ -7,7 +7,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/allocator_support/config/defines.hpp>
 
+#include <cstddef>
 #include <memory>
 #include <new>
 #include <stack>
@@ -16,8 +18,10 @@
 
 namespace hpx::util {
 
+#if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHING) &&                             \
+    !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) ||                       \
+        defined(HPX_HAVE_HIP))
     ///////////////////////////////////////////////////////////////////////////
-#if !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) || defined(HPX_HAVE_HIP))
     template <typename T = char, typename Allocator = std::allocator<T>>
     struct thread_local_caching_allocator
     {
@@ -62,6 +66,44 @@ namespace hpx::util {
 
             ~allocated_cache()
             {
+                clear_cache();
+            }
+
+            pointer allocate(size_type n)
+            {
+                pointer p;
+                if (data.empty())
+                {
+                    p = traits::allocate(alloc, n);
+                    if (p == nullptr)
+                    {
+                        throw std::bad_alloc();
+                    }
+                }
+                else
+                {
+                    p = data.top().first;
+                    data.pop();
+                }
+
+                ++allocated;
+                return p;
+            }
+
+            void deallocate(pointer p, size_type n) noexcept
+            {
+                data.push(std::make_pair(p, n));
+                if (++deallocated > 2 * (allocated + 16))
+                {
+                    clear_cache();
+                    allocated = 0;
+                    deallocated = 0;
+                }
+            }
+
+        private:
+            void clear_cache() noexcept
+            {
                 while (!data.empty())
                 {
                     traits::deallocate(
@@ -72,12 +114,14 @@ namespace hpx::util {
 
             HPX_NO_UNIQUE_ADDRESS Allocator alloc;
             std::stack<std::pair<T*, size_type>> data;
+            std::size_t allocated = 0;
+            std::size_t deallocated = 0;
         };
 
-        std::stack<std::pair<T*, size_type>>& cache()
+        allocated_cache& cache()
         {
             thread_local allocated_cache allocated_data(alloc);
-            return allocated_data.data;
+            return allocated_data;
         }
 
     public:
@@ -114,29 +158,12 @@ namespace hpx::util {
             {
                 throw std::bad_array_new_length();
             }
-
-            pointer p;
-
-            if (auto& c = cache(); c.empty())
-            {
-                p = traits::allocate(alloc, n);
-                if (p == nullptr)
-                {
-                    throw std::bad_alloc();
-                }
-            }
-            else
-            {
-                p = c.top().first;
-                c.pop();
-            }
-
-            return p;
+            return cache().allocate(n);
         }
 
         void deallocate(pointer p, size_type n) noexcept
         {
-            cache().push(std::make_pair(p, n));
+            cache().deallocate(p, n);
         }
 
         [[nodiscard]] constexpr size_type max_size() noexcept

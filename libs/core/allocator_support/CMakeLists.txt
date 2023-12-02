@@ -4,14 +4,34 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+# Allow to disable caching allocator
+hpx_option(
+  HPX_ALLOCATOR_SUPPORT_WITH_CACHING BOOL
+  "Enable caching allocator. (default: ON)" ON ADVANCED
+  CATEGORY "Modules"
+  MODULE ALLOCATOR_SUPPORT
+)
+
+if(HPX_ALLOCATOR_SUPPORT_WITH_CACHING)
+  hpx_add_config_define_namespace(
+    DEFINE HPX_ALLOCATOR_SUPPORT_HAVE_CACHING NAMESPACE ALLOCATOR_SUPPORT
+  )
+endif()
+
 set(allocator_support_headers
     hpx/allocator_support/aligned_allocator.hpp
     hpx/allocator_support/allocator_deleter.hpp
     hpx/allocator_support/detail/new.hpp
     hpx/allocator_support/internal_allocator.hpp
-    hpx/allocator_support/thread_local_caching_allocator.hpp
     hpx/allocator_support/traits/is_allocator.hpp
 )
+
+if(HPX_ALLOCATOR_SUPPORT_WITH_CACHING)
+  set(allocator_support_headers
+      ${allocator_support_headers}
+      hpx/allocator_support/thread_local_caching_allocator.hpp
+  )
+endif()
 
 # cmake-format: off
 set(allocator_support_compat_headers
