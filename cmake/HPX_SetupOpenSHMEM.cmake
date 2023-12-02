@@ -1150,5 +1150,4 @@ macro(hpx_setup_openshmem)
                                       "${OPENSHMEM_LIBRARY_DIRS}"
     )
   endif()
-
 endmacro()
