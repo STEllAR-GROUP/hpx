@@ -47,15 +47,11 @@ else()
     include_directories(${HWLOC_ROOT}/include)
     link_directories(${HWLOC_ROOT}/lib)
     set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
-    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib CACHE INTERNAL "")
+    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.dll.a CACHE INTERNAL "")
   else()
     FetchContent_Declare(HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-win64-build-2.9.3.zip
-      TLS_VERIFY trueadd_library(Hwloc::hwloc INTERFACE IMPORTED)
-      target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
-      target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
-      message(${Hwloc_INCLUDE_DIR})
-      message(${Hwloc_LIBRARY})
+      TLS_VERIFY true
     )
     if(NOT HWLoc_POPULATED)
       FetchContent_Populate(HWLoc)
@@ -64,7 +60,7 @@ else()
     include_directories(${HWLOC_ROOT}/include)
     link_directories(${HWLOC_ROOT}/lib)
     set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
-    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib CACHE INTERNAL "")
+    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.dll.a CACHE INTERNAL "")
   endif() # End hwloc installation
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
@@ -72,5 +68,4 @@ else()
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
   message(${Hwloc_INCLUDE_DIR})
   message(${Hwloc_LIBRARY})
-
 endif()
