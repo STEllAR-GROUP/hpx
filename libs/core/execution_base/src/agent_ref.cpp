@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution_base/agent_ref.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
@@ -42,10 +43,11 @@ namespace hpx::execution_base {
         impl_->suspend(desc);
     }
 
-    void agent_ref::resume(const char* desc) const
+    void agent_ref::resume(
+        hpx::threads::thread_priority priority, const char* desc) const
     {
         HPX_ASSERT(*this != hpx::execution_base::this_thread::agent());
-        impl_->resume(desc);
+        impl_->resume(priority, desc);
     }
 
     void agent_ref::abort(const char* desc) const

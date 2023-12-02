@@ -185,28 +185,27 @@ namespace hpx::components {
         ///       this class
         ///
         template <typename Action, typename Continuation, typename... Ts>
-        bool apply(Continuation&& c, threads::thread_priority priority,
-            Ts&&... vs) const
+        bool apply(Continuation&& c, launch policy, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::post_impl<Action>(
                     HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, HPX_FORWARD(Ts, vs)...);
+                    policy, HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
-        bool apply(threads::thread_priority priority, Ts&&... vs) const
+        bool apply(launch policy, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::post_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, HPX_FORWARD(Ts, vs)...);
+                    policy, HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated<Action>(
                 id_, HPX_FORWARD(Ts, vs)...);
@@ -217,16 +216,15 @@ namespace hpx::components {
         ///
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
-        bool apply_cb(Continuation&& c, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs) const
+        bool apply_cb(
+            Continuation&& c, launch policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::post_cb_impl<Action>(
                     HPX_FORWARD(Continuation, c),
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, HPX_FORWARD(Callback, cb),
-                    HPX_FORWARD(Ts, vs)...);
+                    policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated_cb<Action>(
                 HPX_FORWARD(Continuation, c), id_, HPX_FORWARD(Callback, cb),
@@ -234,15 +232,13 @@ namespace hpx::components {
         }
 
         template <typename Action, typename Callback, typename... Ts>
-        bool apply_cb(
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        bool apply_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
             if (!id_)
             {
                 return hpx::detail::post_cb_impl<Action>(
                     naming::get_id_from_locality_id(agas::get_locality_id()),
-                    priority, HPX_FORWARD(Callback, cb),
-                    HPX_FORWARD(Ts, vs)...);
+                    policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
             }
             return hpx::detail::post_colocated_cb<Action>(
                 id_, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
@@ -302,13 +298,10 @@ namespace hpx {
     using hpx::components::colocated;
     using hpx::components::colocating_distribution_policy;
 
-    namespace traits {
-
-        template <>
-        struct is_distribution_policy<
-            components::colocating_distribution_policy> : std::true_type
-        {
-        };
-    }    // namespace traits
+    template <>
+    struct traits::is_distribution_policy<
+        components::colocating_distribution_policy> : std::true_type
+    {
+    };    // namespace traits
 }    // namespace hpx
 /// \endcond

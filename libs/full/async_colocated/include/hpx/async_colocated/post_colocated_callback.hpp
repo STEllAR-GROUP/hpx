@@ -13,6 +13,7 @@
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/agas_base/primary_namespace.hpp>
 #include <hpx/agas_base/server/primary_namespace.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_colocated/functional/colocated_helpers.hpp>
 #include <hpx/async_colocated/post_colocated_callback_fwd.hpp>
 #include <hpx/async_colocated/register_post_colocated.hpp>
@@ -70,9 +71,11 @@ namespace hpx::detail {
         // shortcut co-location code if target already is a locality
         if (naming::is_locality(gid))
         {
+            constexpr hpx::launch::async_policy policy(
+                actions::action_priority<Action>(),
+                actions::action_stacksize<Action>());
             return hpx::post_p_cb<Action>(HPX_FORWARD(Continuation, cont), gid,
-                actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+                policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         // Attach the requested action as a continuation to a resolve_async

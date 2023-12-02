@@ -50,7 +50,8 @@ namespace hpx::threads {
         void yield(char const* desc) override;
         void yield_k(std::size_t k, char const* desc) override;
         void suspend(char const* desc) override;
-        void resume(char const* desc) override;
+        void resume(
+            hpx::threads::thread_priority priority, char const* desc) override;
         void abort(char const* desc) override;
         void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
             char const* desc) override;
@@ -63,8 +64,8 @@ namespace hpx::threads {
         hpx::threads::thread_restart_state do_yield(
             char const* desc, threads::thread_schedule_state state);
 
-        void do_resume(
-            char const* desc, hpx::threads::thread_restart_state statex) const;
+        void do_resume(hpx::threads::thread_priority priority, char const* desc,
+            hpx::threads::thread_restart_state statex) const;
 
         execution_context context_;
     };

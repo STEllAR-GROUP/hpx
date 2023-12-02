@@ -9,9 +9,11 @@
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/action_is_target_valid.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
+#include <hpx/actions_base/traits/action_stacksize.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
 #include <hpx/actions_base/traits/is_distribution_policy.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -30,11 +32,11 @@ namespace hpx {
 
         template <typename Action, typename Callback, typename... Ts>
         bool post_r_p_cb(naming::address&& addr, hpx::id_type const& id,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+            hpx::launch policy, Callback&& cb, Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
-            return detail::put_parcel_cb<Action>(id, HPX_MOVE(addr), priority,
+            return detail::put_parcel_cb<Action>(id, HPX_MOVE(addr), policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
@@ -42,27 +44,32 @@ namespace hpx {
         bool post_r_cb(naming::address&& addr, hpx::id_type const& gid,
             Callback&& cb, Ts&&... vs)
         {
-            return post_r_p_cb<Action>(HPX_MOVE(addr), gid,
-                actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+            constexpr launch::async_policy policy(
+                actions::action_priority<Action>(),
+                actions::action_stacksize<Action>());
+            return post_r_p_cb<Action>(HPX_MOVE(addr), gid, policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     }    // namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
-    bool post_p_cb(hpx::id_type const& gid, threads::thread_priority priority,
-        Callback&& cb, Ts&&... vs)
+    bool post_p_cb(
+        hpx::id_type const& gid, hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::post_cb_impl<Action>(
-            gid, priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Callback, typename... Ts>
     bool post_cb(hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p_cb<Action>(gid, actions::action_priority<Action>(),
-            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
+        return hpx::post_p_cb<Action>(
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -71,18 +78,21 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p_cb<Derived>(gid, actions::action_priority<Derived>(),
-            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy policy(
+            actions::action_priority<Derived>(),
+            actions::action_stacksize<Derived>());
+        return hpx::post_p_cb<Derived>(
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename Callback,
         typename... Ts>
     std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool>
-    post_p_cb(DistPolicy const& policy, threads::thread_priority priority,
+    post_p_cb(DistPolicy const& policy, hpx::launch launch_policy,
         Callback&& cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(
-            priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            launch_policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename DistPolicy, typename Callback,
@@ -90,9 +100,11 @@ namespace hpx {
     std::enable_if_t<traits::is_distribution_policy_v<DistPolicy>, bool>
     post_cb(DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p_cb<Action>(policy,
-            actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy launch_policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
+        return hpx::post_p_cb<Action>(policy, launch_policy,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Signature, typename Derived,
@@ -101,9 +113,11 @@ namespace hpx {
     post_cb(hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p_cb<Derived>(policy,
-            actions::action_priority<Derived>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy launch_policy(
+            actions::action_priority<Derived>(),
+            actions::action_stacksize<Derived>());
+        return hpx::post_p_cb<Derived>(policy, launch_policy,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -113,14 +127,14 @@ namespace hpx {
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
         bool post_r_p_cb(naming::address&& addr, Continuation&& c,
-            hpx::id_type const& id, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs)
+            hpx::id_type const& id, hpx::launch policy, Callback&& cb,
+            Ts&&... vs)
         {
             // If remote, create a new parcel to be sent to the destination
             // Create a new parcel with the gid, action, and arguments
             return detail::put_parcel_cont_cb<Action>(id, HPX_MOVE(addr),
-                priority, HPX_FORWARD(Continuation, c),
-                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                policy, HPX_FORWARD(Continuation, c), HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Continuation, typename Callback,
@@ -128,10 +142,12 @@ namespace hpx {
         bool post_r_cb(naming::address&& addr, Continuation&& c,
             hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
         {
+            constexpr launch::async_policy policy(
+                actions::action_priority<Action>(),
+                actions::action_stacksize<Action>());
             return post_r_p_cb<Action>(HPX_MOVE(addr),
-                HPX_FORWARD(Continuation, c), gid,
-                actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+                HPX_FORWARD(Continuation, c), gid, policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     }    // namespace detail
 #endif
@@ -140,8 +156,7 @@ namespace hpx {
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     bool post_p_cb(Continuation&& c, naming::address&& addr,
-        hpx::id_type const& gid, threads::thread_priority priority,
-        Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         if (!traits::action_is_target_valid<Action>::call(gid))
         {
@@ -158,7 +173,7 @@ namespace hpx {
             // apply locally
             bool const result =
                 hpx::detail::post_l_p<Action>(HPX_FORWARD(Continuation, c), gid,
-                    HPX_MOVE(addr), priority, HPX_FORWARD(Ts, vs)...);
+                    HPX_MOVE(addr), policy, HPX_FORWARD(Ts, vs)...);
 
             detail::invoke_callback(HPX_FORWARD(Callback, cb));
             return result;
@@ -167,7 +182,7 @@ namespace hpx {
 #if defined(HPX_HAVE_NETWORKING)
         // apply remotely
         return hpx::detail::post_r_p_cb<Action>(HPX_MOVE(addr),
-            HPX_FORWARD(Continuation, c), gid, priority,
+            HPX_FORWARD(Continuation, c), gid, policy,
             HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
 #else
         HPX_THROW_EXCEPTION(hpx::error::invalid_status, "hpx::post_cb",
@@ -178,10 +193,10 @@ namespace hpx {
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     bool post_p_cb(Continuation&& c, hpx::id_type const& gid,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+        hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         return hpx::detail::post_cb_impl<Action>(HPX_FORWARD(Continuation, c),
-            gid, priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename Callback,
@@ -189,9 +204,11 @@ namespace hpx {
     bool post_cb(
         Continuation&& c, hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p_cb<Action>(HPX_FORWARD(Continuation, c), gid,
-            actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
+        return hpx::post_p_cb<Action>(HPX_FORWARD(Continuation, c), gid, policy,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Continuation, typename Signature,
@@ -200,9 +217,11 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         hpx::id_type const& gid, Callback&& cb, Ts&&... vs)
     {
-        return hpx::post_p<Derived>(HPX_FORWARD(Continuation, c), gid,
-            actions::action_priority<Derived>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+        constexpr launch::async_policy policy(
+            actions::action_priority<Derived>(),
+            actions::action_stacksize<Derived>());
+        return hpx::post_p<Derived>(HPX_FORWARD(Continuation, c), gid, policy,
+            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
@@ -211,10 +230,10 @@ namespace hpx {
             traits::is_distribution_policy_v<DistPolicy>,
         bool>
     post_p_cb(Continuation&& c, DistPolicy const& policy,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+        hpx::launch launch_policy, Callback&& cb, Ts&&... vs)
     {
         return policy.template apply_cb<Action>(HPX_FORWARD(Continuation, c),
-            priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            launch_policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Continuation, typename DistPolicy,
@@ -225,9 +244,11 @@ namespace hpx {
     post_cb(
         Continuation&& c, DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
+        constexpr launch::async_policy launch_policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
         return hpx::post_p_cb<Action>(HPX_FORWARD(Continuation, c), policy,
-            actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+            launch_policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Component, typename Continuation, typename Signature,
@@ -238,9 +259,11 @@ namespace hpx {
         hpx::actions::basic_action<Component, Signature, Derived> /*act*/,
         DistPolicy const& policy, Callback&& cb, Ts&&... vs)
     {
+        constexpr launch::async_policy launch_policy(
+            actions::action_priority<Derived>(),
+            actions::action_stacksize<Derived>());
         return hpx::post_p<Derived>(HPX_FORWARD(Continuation, c), policy,
-            actions::action_priority<Derived>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+            launch_policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -249,8 +272,8 @@ namespace hpx {
 
         template <typename Action, typename Callback, typename... Ts>
         bool post_c_p_cb(naming::address&& addr, hpx::id_type const& contgid,
-            hpx::id_type const& gid, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs)
+            hpx::id_type const& gid, hpx::launch policy, Callback&& cb,
+            Ts&&... vs)
         {
             using remote_result_type = typename hpx::traits::extract_action<
                 Action>::remote_result_type;
@@ -260,8 +283,7 @@ namespace hpx {
             return post_r_p_cb<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(contgid),
-                gid, priority, HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+                gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Callback, typename... Ts>
@@ -273,11 +295,13 @@ namespace hpx {
             using local_result_type =
                 typename hpx::traits::extract_action<Action>::local_result_type;
 
+            constexpr launch::async_policy policy(
+                actions::action_priority<Action>(),
+                actions::action_stacksize<Action>());
             return post_r_p_cb<Action>(HPX_MOVE(addr),
                 actions::typed_continuation<local_result_type,
                     remote_result_type>(contgid),
-                gid, actions::action_priority<Action>(),
-                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     }    // namespace detail
 #endif
@@ -285,7 +309,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Callback, typename... Ts>
     bool post_c_p_cb(hpx::id_type const& contgid, hpx::id_type const& gid,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+        hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         using remote_result_type =
             typename hpx::traits::extract_action<Action>::remote_result_type;
@@ -295,7 +319,7 @@ namespace hpx {
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
-            gid, priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Callback, typename... Ts>
@@ -307,17 +331,18 @@ namespace hpx {
         using local_result_type =
             typename hpx::traits::extract_action<Action>::local_result_type;
 
+        constexpr launch::async_policy policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
-            gid, actions::action_priority<Action>(), HPX_FORWARD(Callback, cb),
-            HPX_FORWARD(Ts, vs)...);
+            gid, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
     }
 
     template <typename Action, typename Callback, typename... Ts>
     bool post_c_p_cb(hpx::id_type const& contgid, naming::address&& addr,
-        hpx::id_type const& gid, threads::thread_priority priority,
-        Callback&& cb, Ts&&... vs)
+        hpx::id_type const& gid, hpx::launch policy, Callback&& cb, Ts&&... vs)
     {
         using remote_result_type =
             typename hpx::traits::extract_action<Action>::remote_result_type;
@@ -327,7 +352,7 @@ namespace hpx {
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
-            HPX_MOVE(addr), gid, priority, HPX_FORWARD(Callback, cb),
+            HPX_MOVE(addr), gid, policy, HPX_FORWARD(Callback, cb),
             HPX_FORWARD(Ts, vs)...);
     }
 
@@ -340,14 +365,18 @@ namespace hpx {
         using local_result_type =
             typename hpx::traits::extract_action<Action>::local_result_type;
 
+        constexpr launch::async_policy policy(
+            actions::action_priority<Action>(),
+            actions::action_stacksize<Action>());
         return hpx::post_p_cb<Action>(
             actions::typed_continuation<local_result_type, remote_result_type>(
                 contgid),
-            HPX_MOVE(addr), gid, actions::action_priority<Action>(),
-            HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            HPX_MOVE(addr), gid, policy, HPX_FORWARD(Callback, cb),
+            HPX_FORWARD(Ts, vs)...);
     }
 
     namespace functional {
+
         template <typename Action, typename Callback, typename... Ts>
         struct post_c_p_cb_impl
         {
@@ -356,37 +385,26 @@ namespace hpx {
 
             template <typename... Ts_>
             post_c_p_cb_impl(hpx::id_type const& contid, naming::address&& addr,
-                hpx::id_type const& id, threads::thread_priority p,
-                Callback&& cb, Ts_&&... vs)
+                hpx::id_type const& id, hpx::launch policy, Callback&& cb,
+                Ts_&&... vs)
               : contid_(contid)
               , addr_(HPX_MOVE(addr))
               , id_(id)
-              , p_(p)
+              , policy_(policy)
               , cb_(HPX_MOVE(cb))
               , args_(HPX_FORWARD(Ts_, vs)...)
             {
             }
 
-            post_c_p_cb_impl(post_c_p_cb_impl&& rhs) noexcept
-              : contid_(HPX_MOVE(rhs.contid_))
-              , addr_(HPX_MOVE(rhs.addr_))
-              , id_(HPX_MOVE(rhs.id_))
-              , p_(HPX_MOVE(rhs.p_))
-              , cb_(HPX_MOVE(rhs.cb_))
-              , args_(HPX_MOVE(rhs.args_))
-            {
-            }
+            post_c_p_cb_impl(post_c_p_cb_impl const& rhs) noexcept = delete;
+            post_c_p_cb_impl(post_c_p_cb_impl&& rhs) noexcept = default;
 
-            post_c_p_cb_impl& operator=(post_c_p_cb_impl&& rhs) noexcept
-            {
-                contid_ = HPX_MOVE(rhs.contid_);
-                addr_ = HPX_MOVE(rhs.addr_);
-                id_ = HPX_MOVE(rhs.id_);
-                p_ = HPX_MOVE(rhs.p_);
-                cb_ = HPX_MOVE(rhs.cb_);
-                args_ = HPX_MOVE(rhs.args_);
-                return *this;
-            }
+            post_c_p_cb_impl& operator=(
+                post_c_p_cb_impl const& rhs) noexcept = delete;
+            post_c_p_cb_impl& operator=(
+                post_c_p_cb_impl&& rhs) noexcept = default;
+
+            ~post_c_p_cb_impl() = default;
 
             void operator()()
             {
@@ -400,13 +418,14 @@ namespace hpx {
             {
                 if (addr_)
                 {
-                    hpx::post_c_p_cb<Action>(contid_, HPX_MOVE(addr_), id_, p_,
-                        HPX_MOVE(cb_),
+                    hpx::post_c_p_cb<Action>(contid_, HPX_MOVE(addr_), id_,
+                        policy_, HPX_MOVE(cb_),
                         hpx::get<Is>(HPX_FORWARD(tuple_type, args_))...);
                 }
                 else
                 {
-                    hpx::post_c_p_cb<Action>(contid_, id_, p_, HPX_MOVE(cb_),
+                    hpx::post_c_p_cb<Action>(contid_, id_, policy_,
+                        HPX_MOVE(cb_),
                         hpx::get<Is>(HPX_FORWARD(tuple_type, args_))...);
                 }
             }
@@ -415,7 +434,7 @@ namespace hpx {
             hpx::id_type contid_;
             naming::address addr_;
             hpx::id_type id_;
-            threads::thread_priority p_;
+            hpx::launch policy_;
             Callback cb_;
             tuple_type args_;
         };
@@ -423,13 +442,13 @@ namespace hpx {
         template <typename Action, typename Callback, typename... Ts>
         post_c_p_cb_impl<Action, std::decay_t<Callback>, std::decay_t<Ts>...>
         post_c_p_cb(hpx::id_type const& contid, naming::address&& addr,
-            hpx::id_type const& id, threads::thread_priority p, Callback&& cb,
+            hpx::id_type const& id, hpx::launch policy, Callback&& cb,
             Ts&&... vs)
         {
             using result_type = post_c_p_cb_impl<Action, std::decay_t<Callback>,
                 std::decay_t<Ts>...>;
 
-            return result_type(contid, HPX_MOVE(addr), id, p,
+            return result_type(contid, HPX_MOVE(addr), id, policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     }    // namespace functional

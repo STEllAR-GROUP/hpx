@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -18,6 +18,7 @@
 #include <hpx/actions_base/actions_base_support.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/datastructures/serialization/tuple.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
@@ -39,7 +40,7 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action>
-    struct transfer_action : transfer_base_action<Action>
+    struct transfer_action final : transfer_base_action<Action>
     {
     public:
         transfer_action(transfer_action const&) = delete;
@@ -60,7 +61,7 @@ namespace hpx::actions {
         explicit transfer_action(Ts&&... vs);
 
         template <typename... Ts>
-        explicit transfer_action(threads::thread_priority priority, Ts&&... vs);
+        explicit transfer_action(hpx::launch policy, Ts&&... vs);
 
         bool has_continuation() const override;
 
@@ -68,8 +69,10 @@ namespace hpx::actions {
         /// a \a thread, encapsulating the functionality and the arguments
         /// of the action it is called for.
         ///
+        /// \param target
         /// \param lva    [in] This is the local virtual address of the
         ///               component the action has to be invoked on.
+        /// \param comptype
         ///
         /// \returns      This function returns a proper thread function usable
         ///               for a \a thread.
@@ -122,9 +125,8 @@ namespace hpx::actions {
 
     template <typename Action>
     template <typename... Ts>
-    transfer_action<Action>::transfer_action(
-        threads::thread_priority priority, Ts&&... vs)
-      : base_type(priority, HPX_FORWARD(Ts, vs)...)
+    transfer_action<Action>::transfer_action(hpx::launch policy, Ts&&... vs)
+      : base_type(policy, HPX_FORWARD(Ts, vs)...)
     {
     }
 
@@ -171,7 +173,13 @@ namespace hpx::actions {
 
         threads::thread_init_data data;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
+#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+        data.description = threads::thread_description(
+            actions::detail::get_action_name<Action>(),
+            actions::detail::get_action_name_itt<Action>());
+#else
         data.description = actions::detail::get_action_name<Action>();
+#endif
 #endif
 #if defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         data.parent_id = this->parent_id_;
@@ -181,8 +189,11 @@ namespace hpx::actions {
         data.timer_data = hpx::util::external_timer::new_task(
             data.description, data.parent_locality_id, data.parent_id);
 #endif
+        data.priority = this->priority_;
+        data.stacksize = this->stacksize_;
+
         hpx::detail::post_helper<typename base_type::derived_type>::call(
-            HPX_MOVE(data), HPX_MOVE(target), lva, comptype, this->priority_,
+            HPX_MOVE(data), HPX_MOVE(target), lva, comptype,
             HPX_MOVE(hpx::get<Is>(this->arguments_))...);
     }
 
@@ -222,7 +233,7 @@ namespace hpx::actions {
         if (deferred_schedule)
         {
             // If this is a direct action and deferred schedule was requested,
-            // that is we are not the last parcel, return immediately
+            // i.e. if we are not the last parcel, return immediately
             if constexpr (base_type::direct_execution::value)
             {
                 return;
@@ -247,8 +258,7 @@ namespace hpx::actions {
     transfer_action<Action>::~transfer_action() noexcept
     {
         // make sure proper register action function is instantiated
-        auto* ptr = &detail::register_action<Action>::create;
-        (void) ptr;
+        [[maybe_unused]] auto* ptr = &detail::register_action<Action>::create;
     }
 }    // namespace hpx::actions
 

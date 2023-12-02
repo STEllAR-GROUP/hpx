@@ -10,6 +10,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution/detail/async_launch_policy_dispatch.hpp>
 #include <hpx/execution/detail/future_exec.hpp>
@@ -388,11 +389,13 @@ namespace hpx::execution {
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
 #endif
 
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 lcos::detail::make_continuation_alloc_nounwrap<result_type>(
-                    hpx::util::internal_allocator<>{},
-                    HPX_FORWARD(Future, predecessor), exec.policy_,
-                    HPX_MOVE(func));
+                    allocator_type{}, HPX_FORWARD(Future, predecessor),
+                    exec.policy_, HPX_MOVE(func));
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(
                 HPX_MOVE(p));

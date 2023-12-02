@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2018 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,20 @@
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/performance_counters/counters.hpp>
 #include <hpx/performance_counters/server/base_performance_counter.hpp>
+#include <hpx/runtime_local/get_locality_id.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 //[performance_counter_base_class
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
+
     template <typename Derived>
     class base_performance_counter;
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters
 //]
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
+
     template <typename Derived>
     class base_performance_counter
       : public hpx::performance_counters::server::base_performance_counter
@@ -38,7 +41,7 @@ namespace hpx { namespace performance_counters {
 
         base_performance_counter() = default;
 
-        base_performance_counter(
+        explicit base_performance_counter(
             hpx::performance_counters::counter_info const& info)
           : base_type_holder(info)
         {
@@ -59,4 +62,4 @@ namespace hpx { namespace performance_counters {
                 const_cast<Derived*>(static_cast<Derived const*>(this)));
         }
     };
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

@@ -15,6 +15,7 @@ set(actions_base_headers
     hpx/actions_base/actions_base_fwd.hpp
     hpx/actions_base/actions_base_support.hpp
     hpx/actions_base/action_priority.hpp
+    hpx/actions_base/action_stacksize.hpp
     hpx/actions_base/basic_action.hpp
     hpx/actions_base/basic_action_fwd.hpp
     hpx/actions_base/component_action.hpp

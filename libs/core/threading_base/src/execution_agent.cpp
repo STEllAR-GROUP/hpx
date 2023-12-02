@@ -82,14 +82,16 @@ namespace hpx::threads {
         }
     }
 
-    void execution_agent::resume(char const* desc)
+    void execution_agent::resume(
+        hpx::threads::thread_priority priority, char const* desc)
     {
-        do_resume(desc, threads::thread_restart_state::signaled);
+        do_resume(priority, desc, threads::thread_restart_state::signaled);
     }
 
     void execution_agent::abort(char const* desc)
     {
-        do_resume(desc, threads::thread_restart_state::abort);
+        do_resume(hpx::threads::thread_priority::default_, desc,
+            threads::thread_restart_state::abort);
     }
 
     void execution_agent::suspend(char const* desc)
@@ -217,11 +219,11 @@ namespace hpx::threads {
         return statex;
     }
 
-    void execution_agent::do_resume(
+    void execution_agent::do_resume(hpx::threads::thread_priority priority,
         char const* /* desc */, hpx::threads::thread_restart_state statex) const
     {
         threads::detail::set_thread_state(self_.get_thread_id(),
-            thread_schedule_state::pending, statex, thread_priority::normal,
+            thread_schedule_state::pending, statex, priority,
             thread_schedule_hint{}, false);
     }
 }    // namespace hpx::threads

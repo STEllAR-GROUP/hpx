@@ -116,6 +116,7 @@ namespace hpx { namespace collectives {
 
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_distributed/async.hpp>
+#include <hpx/async_distributed/sync.hpp>
 #include <hpx/collectives/argument_types.hpp>
 #include <hpx/collectives/create_communicator.hpp>
 #include <hpx/components_base/agas_interface.hpp>
@@ -154,14 +155,15 @@ namespace hpx::traits {
                 // step function (invoked for each get)
                 [&](auto& data) { data[which] = HPX_MOVE(t); },
                 // finalizer (invoked after all data has been received)
-                [which](auto& data, bool&) {
+                [which](auto& data, auto&) {
                     // slice the overall data based on the locality id of the
                     // requesting site
                     std::vector<T> result;
                     result.reserve(data.size());
-                    for (auto const& v : data)
+                    for (auto& v : data)
                     {
-                        result.push_back(v[which]);
+                        result.push_back(Communicator::template handle_bool<T>(
+                            HPX_MOVE(v[which])));
                     }
                     return result;
                 });
@@ -172,7 +174,7 @@ namespace hpx::traits {
 namespace hpx::collectives {
 
     ///////////////////////////////////////////////////////////////////////////
-    // all_to_all plain values
+    // all_to_all
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(communicator fid,
         std::vector<T>&& local_result,
@@ -195,12 +197,12 @@ namespace hpx::collectives {
             [local_result = HPX_MOVE(local_result), this_site, generation](
                 communicator&& c) mutable -> hpx::future<std::vector<T>> {
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::all_to_all_tag,
                     hpx::future<std::vector<T>>, std::vector<T>>;
 
             // explicitly unwrap returned future
-            hpx::future<std::vector<T>> result = async(action_type(), c,
+            hpx::future<std::vector<T>> result = hpx::async(action_type(), c,
                 this_site, generation, HPX_MOVE(local_result));
 
             if (!result.is_ready())
@@ -216,6 +218,7 @@ namespace hpx::collectives {
         return fid.then(hpx::launch::sync, HPX_MOVE(all_to_all_data));
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(communicator fid,
         std::vector<T>&& local_result, generation_arg generation,
@@ -225,6 +228,7 @@ namespace hpx::collectives {
             HPX_MOVE(fid), HPX_MOVE(local_result), this_site, generation);
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     template <typename T>
     hpx::future<std::vector<T>> all_to_all(char const* basename,
         std::vector<T>&& local_result,

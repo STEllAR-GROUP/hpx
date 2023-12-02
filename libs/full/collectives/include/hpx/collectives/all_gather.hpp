@@ -153,7 +153,7 @@ namespace hpx::traits {
                 // step function (invoked for each get)
                 [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
                 // finalizer (invoked after all data has been received)
-                [](auto& data, bool&) { return data; });
+                [](auto& data, auto&) { return data; });
         }
     };
 }    // namespace hpx::traits
@@ -186,13 +186,14 @@ namespace hpx::collectives {
                                    generation](communicator&& c) mutable
             -> hpx::future<std::vector<arg_type>> {
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::all_gather_tag,
                     hpx::future<std::vector<arg_type>>, arg_type>;
 
             // explicitly unwrap returned future
-            hpx::future<std::vector<arg_type>> result = async(action_type(), c,
-                this_site, generation, HPX_MOVE(local_result));
+            hpx::future<std::vector<arg_type>> result =
+                hpx::async(action_type(), c, this_site, generation,
+                    HPX_MOVE(local_result));
 
             if (!result.is_ready())
             {

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,6 +20,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/format.hpp>
 #include <hpx/functional/bind.hpp>
+#include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/itt_notify/thread_name.hpp>
 #include <hpx/modules/errors.hpp>
@@ -114,7 +115,8 @@ namespace hpx {
 
 #if defined(HPX_HAVE_BACKGROUND_THREAD_COUNTERS) &&                            \
     defined(HPX_HAVE_THREAD_IDLE_RATES)
-        bool network_background_callback(std::size_t num_thread,
+        bool network_background_callback(
+            [[maybe_unused]] runtime_distributed* rt, std::size_t num_thread,
             std::int64_t& background_work_exec_time_send,
             std::int64_t& background_work_exec_time_receive)
         {
@@ -128,8 +130,8 @@ namespace hpx {
                 threads::detail::background_exec_time_wrapper bg_exec_time(
                     bg_send_duration);
 
-                if (hpx::parcelset::do_background_work(
-                        num_thread, parcelset::parcelport_background_mode_send))
+                if (rt->get_parcel_handler().do_background_work(num_thread,
+                        false, parcelset::parcelport_background_mode_send))
                 {
                     result = true;
                 }
@@ -141,33 +143,38 @@ namespace hpx {
                 threads::detail::background_exec_time_wrapper bg_exec_time(
                     bg_receive_duration);
 
-                if (hpx::parcelset::do_background_work(num_thread,
-                        parcelset::parcelport_background_mode_receive))
+                if (rt->get_parcel_handler().do_background_work(num_thread,
+                        false, parcelset::parcelport_background_mode_receive))
                 {
                     result = true;
                 }
             }
 #endif
-
             if (0 == num_thread)
-                hpx::agas::garbage_collect_non_blocking();
+            {
+                rt->get_agas_client().garbage_collect_non_blocking();
+            }
+
             return result;
         }
 #else
-        bool network_background_callback(std::size_t num_thread)
+        bool network_background_callback(
+            [[maybe_unused]] runtime_distributed* rt, std::size_t num_thread)
         {
             bool result = false;
 
 #if defined(HPX_HAVE_NETWORKING)
-            if (hpx::parcelset::do_background_work(
-                    num_thread, parcelset::parcelport_background_mode_all))
+            if (rt->get_parcel_handler().do_background_work(num_thread, false,
+                    parcelset::parcelport_background_mode_all))
             {
                 result = true;
             }
 #endif
-
             if (0 == num_thread)
-                hpx::agas::garbage_collect_non_blocking();
+            {
+                rt->get_agas_client().garbage_collect_non_blocking();
+            }
+
             return result;
         }
 #endif
@@ -190,12 +197,9 @@ namespace hpx {
       : runtime(rtcfg)
       , mode_(rtcfg_.mode_)
 #if defined(HPX_HAVE_NETWORKING)
-      , parcel_handler_notifier_()
       , parcel_handler_(rtcfg_)
 #endif
       , agas_client_(rtcfg_)
-      , applier_()
-      , runtime_support_()
       , pre_main_(pre_main)
       , post_main_(post_main)
     {
@@ -213,7 +217,7 @@ namespace hpx {
                 "timer-thread", runtime_local::os_thread_type::timer_thread),
 #endif
             threads::detail::network_background_callback_type(
-                &detail::network_background_callback));
+                hpx::bind_front(&detail::network_background_callback, this)));
 
 #if defined(HPX_HAVE_NETWORKING)
         parcel_handler_notifier_ = runtime_distributed::get_notification_policy(
@@ -241,13 +245,14 @@ namespace hpx {
         // now, launch AGAS and register all nodes, launch all other components
         initialize_agas();
 
-        applier_.initialize(std::uint64_t(runtime_support_.get()));
+        applier_.initialize(
+            reinterpret_cast<std::uint64_t>(runtime_support_.get()));
     }
 
     void runtime_distributed::initialize_agas()
     {
 #if defined(HPX_HAVE_NETWORKING)
-        std::shared_ptr<parcelset::parcelport> pp =
+        std::shared_ptr<parcelset::parcelport> const pp =
             parcel_handler_.get_bootstrap_parcelport();
 
         agas::create_big_boot_barrier(
@@ -256,9 +261,11 @@ namespace hpx {
         if (agas_client_.is_bootstrap())
         {
             // store number of cores used by other processes
-            std::uint32_t cores_needed = runtime_distributed::assign_cores();
-            std::uint32_t first_used_core = runtime_distributed::assign_cores(
-                pp ? pp->get_locality_name() : "<console>", cores_needed);
+            std::uint32_t const cores_needed =
+                runtime_distributed::assign_cores();
+            std::uint32_t const first_used_core =
+                runtime_distributed::assign_cores(
+                    pp ? pp->get_locality_name() : "<console>", cores_needed);
 
             rtcfg_.set_first_used_core(first_used_core);
             HPX_ASSERT(pp ? pp->here() == pp->agas_locality(rtcfg_) : true);
@@ -272,10 +279,11 @@ namespace hpx {
                     if (pp)
                         pp->run(false);
                 },
-                [&](std::exception_ptr&& e) {
+                [&](std::exception_ptr const& e) {
                     std::cerr << hpx::util::format(
                         "the bootstrap parcelport ({}) has failed to "
-                        "initialize on locality {}:\n{},\nbailing out\n",
+                        "initialize on locality {}:\n{},\n"
+                        "bailing out\n",
                         pp->type(), hpx::get_locality_id(),
                         hpx::get_error_what(e));
                     std::terminate();
@@ -290,10 +298,11 @@ namespace hpx {
                     if (pp)
                         pp->run(false);
                 },
-                [&](std::exception_ptr&& e) {
+                [&](std::exception_ptr const& e) {
                     std::cerr << hpx::util::format(
                         "the bootstrap parcelport ({}) has failed to "
-                        "initialize on locality {}:\n{},\nbailing out\n",
+                        "initialize on locality {}:\n{},\n"
+                        "bailing out\n",
                         pp->type(), hpx::get_locality_id(),
                         hpx::get_error_what(e));
                     std::terminate();
@@ -305,7 +314,8 @@ namespace hpx {
                 agas_client_.get_symbol_ns_lva());
         }
 
-        agas_client_.initialize(std::uint64_t(runtime_support_.get()));
+        agas_client_.initialize(
+            reinterpret_cast<std::uint64_t>(runtime_support_.get()));
         parcel_handler_.initialize();
 #else
         if (agas_client_.is_bootstrap())
@@ -504,15 +514,15 @@ namespace hpx {
 
     int runtime_distributed::start(bool blocking)
     {
-        hpx::function<hpx_main_function_type> empty_main;
+        hpx::function<hpx_main_function_type> const empty_main;
         return start(empty_main, blocking);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     std::string locality_prefix(util::runtime_configuration const& cfg)
     {
-        std::string localities = cfg.get_entry("hpx.localities", "1");
-        std::size_t num_localities =
+        std::string const localities = cfg.get_entry("hpx.localities", "1");
+        std::size_t const num_localities =
             util::from_string<std::size_t>(localities, 1);
         if (num_localities > 1)
         {
@@ -538,10 +548,10 @@ namespace hpx {
         }
 
         // prefix thread name with locality number, if needed
-        std::string locality = locality_prefix(get_config());
+        std::string const locality = locality_prefix(get_config());
 
         // register this thread with any possibly active Intel tool
-        std::string thread_name(locality + "main-thread#wait_helper");
+        std::string const thread_name(locality + "main-thread#wait_helper");
         HPX_ITT_THREAD_SET_NAME(thread_name.c_str());
 
         // set thread name as shown in Visual Studio
@@ -718,7 +728,7 @@ namespace hpx {
             report_exception = on_error_func_(num_thread, e);
         }
 
-        // Early and late exceptions, errors outside of HPX-threads
+        // Early and late exceptions, errors outside HPX-threads
         if (!threads::get_self_ptr() ||
             !threads::threadmanager_is(hpx::state::running))
         {
@@ -802,7 +812,7 @@ namespace hpx {
         start();
 
         // now wait for everything to finish
-        int result = wait();
+        int const result = wait();
         stop();
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -840,40 +850,41 @@ namespace hpx {
         active_counters_ = active_counters;
     }
 
-    void runtime_distributed::start_active_counters(error_code& ec)
+    void runtime_distributed::start_active_counters(error_code& ec) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->start_counters(ec);
     }
 
-    void runtime_distributed::stop_active_counters(error_code& ec)
+    void runtime_distributed::stop_active_counters(error_code& ec) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->stop_counters(ec);
     }
 
-    void runtime_distributed::reset_active_counters(error_code& ec)
+    void runtime_distributed::reset_active_counters(error_code& ec) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->reset_counters(ec);
     }
 
-    void runtime_distributed::reinit_active_counters(bool reset, error_code& ec)
+    void runtime_distributed::reinit_active_counters(
+        bool reset, error_code& ec) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->reinit_counters(reset, ec);
     }
 
     void runtime_distributed::evaluate_active_counters(
-        bool reset, char const* description, error_code& ec)
+        bool reset, char const* description, error_code& ec) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->evaluate_counters(reset, description, true, ec);
     }
 
-    void runtime_distributed::stop_evaluating_counters(bool terminate)
+    void runtime_distributed::stop_evaluating_counters(bool terminate) const
     {
-        if (active_counters_.get())
+        if (active_counters_)
             active_counters_->stop_evaluating_counters(terminate);
     }
 
@@ -947,7 +958,7 @@ namespace hpx {
     ///        instance
     void runtime_distributed::register_counter_types()
     {
-        performance_counters::generic_counter_type_data
+        performance_counters::generic_counter_type_data const
             statistic_counter_types[] =
         {    // averaging counter
             {"/statistics/average",
@@ -1106,11 +1117,10 @@ namespace hpx {
                 ""}
 #endif
         };
-        performance_counters::install_counter_types(statistic_counter_types,
-            sizeof(statistic_counter_types) /
-                sizeof(statistic_counter_types[0]));
+        performance_counters::install_counter_types(
+            statistic_counter_types, std::size(statistic_counter_types));
 
-        performance_counters::generic_counter_type_data
+        performance_counters::generic_counter_type_data const
             arithmetic_counter_types[] = {
                 // adding counter
                 {"/arithmetics/add",
@@ -1237,16 +1247,15 @@ namespace hpx {
                         arithmetics_counter_extended_creator,
                     &performance_counters::default_counter_discoverer, ""},
             };
-        performance_counters::install_counter_types(arithmetic_counter_types,
-            sizeof(arithmetic_counter_types) /
-                sizeof(arithmetic_counter_types[0]));
+        performance_counters::install_counter_types(
+            arithmetic_counter_types, std::size(arithmetic_counter_types));
     }
 
     ///////////////////////////////////////////////////////////////////////////
     void start_active_counters(error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
         {
             rtd->start_active_counters(ec);
         }
@@ -1260,8 +1269,8 @@ namespace hpx {
 
     void stop_active_counters(error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
         {
             rtd->stop_active_counters(ec);
         }
@@ -1275,8 +1284,8 @@ namespace hpx {
 
     void reset_active_counters(error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
         {
             rtd->reset_active_counters(ec);
         }
@@ -1290,8 +1299,8 @@ namespace hpx {
 
     void reinit_active_counters(bool reset, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
         {
             rtd->reinit_active_counters(reset, ec);
         }
@@ -1306,8 +1315,8 @@ namespace hpx {
     void evaluate_active_counters(
         bool reset, char const* description, error_code& ec)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
         {
             rtd->evaluate_active_counters(reset, description, ec);
         }
@@ -1322,9 +1331,11 @@ namespace hpx {
     // helper function to stop evaluating counters during shutdown
     void stop_evaluating_counters(bool terminate)
     {
-        runtime_distributed* rtd = get_runtime_distributed_ptr();
-        if (nullptr != rtd)
+        if (runtime_distributed const* rtd = get_runtime_distributed_ptr();
+            nullptr != rtd)
+        {
             rtd->stop_evaluating_counters(terminate);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1360,7 +1371,7 @@ namespace hpx {
         char const* postfix, bool service_thread)
     {
         // prefix thread name with locality number, if needed
-        std::string locality = locality_prefix(get_config());
+        std::string const locality = locality_prefix(get_config());
 
         error_code ec(throwmode::lightweight);
         return init_tss_ex(locality, context, type, local_thread_num,
@@ -1371,7 +1382,7 @@ namespace hpx {
         char const* context, runtime_local::os_thread_type type,
         std::size_t local_thread_num, std::size_t global_thread_num,
         char const* pool_name, char const* postfix, bool service_thread,
-        error_code& ec)
+        error_code& ec) const
     {
         // set the thread's name, if it's not already set
         HPX_ASSERT(detail::thread_name().empty());
@@ -1450,7 +1461,7 @@ namespace hpx {
     }
 
     void runtime_distributed::deinit_tss_helper(
-        char const* context, std::size_t global_thread_num)
+        char const* context, std::size_t global_thread_num) const
     {
         threads::reset_continuation_recursion_count();
 
@@ -1522,7 +1533,7 @@ namespace hpx {
         std::size_t global_thread_num, bool service_thread, error_code& ec)
     {
         // prefix thread name with locality number, if needed
-        std::string locality = locality_prefix(get_config());
+        std::string const locality = locality_prefix(get_config());
 
         std::string thread_name(name);
         thread_name += "-thread";
@@ -1536,7 +1547,8 @@ namespace hpx {
 
 #if defined(HPX_HAVE_NETWORKING)
     void runtime_distributed::register_message_handler(
-        char const* message_handler_type, char const* action, error_code& ec)
+        char const* message_handler_type, char const* action,
+        error_code& ec) const
     {
         return runtime_support_->register_message_handler(
             message_handler_type, action, ec);
@@ -1546,7 +1558,7 @@ namespace hpx {
     runtime_distributed::create_message_handler(
         char const* message_handler_type, char const* action,
         parcelset::parcelport* pp, std::size_t num_messages,
-        std::size_t interval, error_code& ec)
+        std::size_t interval, error_code& ec) const
     {
         return runtime_support_->create_message_handler(
             message_handler_type, action, pp, num_messages, interval, ec);
@@ -1554,7 +1566,7 @@ namespace hpx {
 
     serialization::binary_filter* runtime_distributed::create_binary_filter(
         char const* binary_filter_type, bool compress,
-        serialization::binary_filter* next_filter, error_code& ec)
+        serialization::binary_filter* next_filter, error_code& ec) const
     {
         return runtime_support_->create_binary_filter(
             binary_filter_type, compress, next_filter, ec);
@@ -1616,7 +1628,7 @@ namespace hpx {
     {
         std::lock_guard<std::mutex> l(mtx_);
 
-        used_cores_map_type::iterator it =
+        used_cores_map_type::iterator const it =
             used_cores_map_.find(locality_basename);
         if (it == used_cores_map_.end())
         {
@@ -1624,8 +1636,8 @@ namespace hpx {
             return 0;
         }
 
-        std::uint32_t current = (*it).second;
-        (*it).second += cores_needed;
+        std::uint32_t const current = it->second;
+        it->second += cores_needed;
 
         return current;
     }
@@ -1634,9 +1646,9 @@ namespace hpx {
     {
         // adjust thread assignments to allow for more than one locality per
         // node
-        std::size_t first_core =
+        std::size_t const first_core =
             static_cast<std::size_t>(this->get_config().get_first_used_core());
-        std::size_t cores_needed =
+        std::size_t const cores_needed =
             hpx::resource::get_partitioner().assign_cores(first_core);
 
         return static_cast<std::uint32_t>(cores_needed);
@@ -1709,7 +1721,7 @@ namespace hpx {
     // Helpers
     hpx::id_type find_here(error_code& ec)
     {
-        runtime* rt = get_runtime_ptr();
+        runtime const* rt = get_runtime_ptr();
         if (nullptr == rt)
         {
             HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::find_here",
@@ -1745,8 +1757,7 @@ namespace hpx {
         if (&ec != &throws)
             ec = make_success_code();
 
-        return hpx::id_type(
-            console_locality, hpx::id_type::management_type::unmanaged);
+        return {console_locality, hpx::id_type::management_type::unmanaged};
     }
 
     std::vector<hpx::id_type> find_all_localities(
@@ -1837,7 +1848,7 @@ namespace hpx {
     std::uint32_t get_num_localities(hpx::launch::sync_policy,
         components::component_type type, error_code& ec)
     {
-        runtime_distributed* rt = get_runtime_distributed_ptr();
+        runtime_distributed const* rt = get_runtime_distributed_ptr();
         if (nullptr == rt)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
@@ -1889,7 +1900,7 @@ namespace hpx::parcelset {
     {
         return get_runtime_distributed()
             .get_parcel_handler()
-            .do_background_work(num_thread, mode);
+            .do_background_work(num_thread, false, mode);
     }
 
     // shortcut for get_runtime().get_parcel_handler()

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename... Ts>
@@ -40,4 +40,4 @@ namespace hpx { namespace detail {
     template <typename Action,
         bool DirectExecute = Action::direct_execution::value>
     struct post_helper;
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

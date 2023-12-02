@@ -103,8 +103,6 @@ namespace hpx::traits {
 
             auto on_ready = [&communicator](shared_future<void>&& f) {
                 f.get();    // propagate any exceptions
-
-                std::unique_lock<mutex_type> l(communicator.mtx_);
                 communicator.which_ = 0;
             };
 
