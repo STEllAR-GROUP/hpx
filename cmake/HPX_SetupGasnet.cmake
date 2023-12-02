@@ -119,7 +119,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-udp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-udp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -129,7 +129,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-smp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-smp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -139,7 +139,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-ofi --with-ofi-home=${OFI_DIR} && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -149,7 +149,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-ucx --with-ucx-home=${UCX_DIR} && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -185,7 +185,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_C_LIBRARIES} && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
