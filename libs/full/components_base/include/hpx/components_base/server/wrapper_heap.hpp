@@ -16,6 +16,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <memory>

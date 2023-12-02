@@ -12,7 +12,8 @@
 
 #include <hpx/config.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/memory/intrusive_ptr.hpp>
+#include <hpx/lock_registration/detail/register_locks.hpp>
+#include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
@@ -65,6 +66,7 @@ namespace hpx::detail {
 
         void release_waiters(std::unique_lock<mutex_type>& lk)
         {
+            [[maybe_unused]] util::ignore_while_checking il(&lk);
             exclusive_cond.notify_one_no_unlock(lk);
             shared_cond.notify_all(HPX_MOVE(lk));
         }

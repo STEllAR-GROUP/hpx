@@ -139,7 +139,7 @@ namespace hpx::util {
 
     // The following functions are used to store the held locks information
     // during thread suspension. The data is stored on a thread_local basis,
-    // so we must make sure that locks the are being ignored are restored
+    // so we must make sure that locks that are being ignored are restored
     // after suspension even if the thread is being resumed on a different core.
 
     // retrieve the current thread_local data about held locks
