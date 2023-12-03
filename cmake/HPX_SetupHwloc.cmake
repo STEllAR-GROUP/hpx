@@ -13,7 +13,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if (NOT HPX_WITH_FETCH_HWLOC)
+if(NOT HPX_WITH_FETCH_HWLOC)
   find_package(Hwloc)
   if(NOT Hwloc_FOUND)
     hpx_error(
@@ -26,44 +26,75 @@ else()
   )
   if(UNIX)
     include(FetchContent)
-    FetchContent_Declare(HWLoc
+    fetchcontent_declare(
+      HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-2.9.3.tar.gz
       TLS_VERIFY true
     )
     if(NOT HWLoc_POPULATED)
-      FetchContent_Populate(HWLoc)
-      execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/hwloc-src && ./configure --prefix=${CMAKE_BINARY_DIR}/_deps/hwloc-installed && make -j && make install")
+      fetchcontent_populate(HWLoc)
+      execute_process(
+        COMMAND
+          sh -c
+          "cd ${CMAKE_BINARY_DIR}/_deps/hwloc-src && ./configure --prefix=${CMAKE_BINARY_DIR}/_deps/hwloc-installed && make -j && make install"
+      )
     endif()
     set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-installed")
-    set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
-    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.so CACHE INTERNAL "")
+    set(Hwloc_INCLUDE_DIR
+        ${HWLOC_ROOT}/include
+        CACHE INTERNAL ""
+    )
+    set(Hwloc_LIBRARY
+        ${HWLOC_ROOT}/lib/libhwloc.so
+        CACHE INTERNAL ""
+    )
   elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64")
-    FetchContent_Declare(HWLoc
+    fetchcontent_declare(
+      HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-win64-build-2.9.3.zip
       TLS_VERIFY true
     )
     if(NOT HWLoc_POPULATED)
-      FetchContent_Populate(HWLoc)
+      fetchcontent_populate(HWLoc)
     endif()
-    set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-src" CACHE INTERNAL "")
+    set(HWLOC_ROOT
+        "${CMAKE_BINARY_DIR}/_deps/hwloc-src"
+        CACHE INTERNAL ""
+    )
     find_package(hwloc REQUIRED PATHS ${HWLOC_ROOT} NO_DEFAULT_PATH)
     include_directories(${HWLOC_ROOT}/include)
     link_directories(${HWLOC_ROOT}/lib)
-    set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
-    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.dll.a CACHE INTERNAL "")
+    set(Hwloc_INCLUDE_DIR
+        ${HWLOC_ROOT}/include
+        CACHE INTERNAL ""
+    )
+    set(Hwloc_LIBRARY
+        ${HWLOC_ROOT}/lib/libhwloc.dll.a
+        CACHE INTERNAL ""
+    )
   else()
-    FetchContent_Declare(HWLoc
+    fetchcontent_declare(
+      HWLoc
       URL https://download.open-mpi.org/release/hwloc/v2.9/hwloc-win64-build-2.9.3.zip
       TLS_VERIFY true
     )
     if(NOT HWLoc_POPULATED)
-      FetchContent_Populate(HWLoc)
+      fetchcontent_populate(HWLoc)
     endif()
-    set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-src" CACHE INTERNAL "")
+    set(HWLOC_ROOT
+        "${CMAKE_BINARY_DIR}/_deps/hwloc-src"
+        CACHE INTERNAL ""
+    )
     include_directories(${HWLOC_ROOT}/include)
     link_directories(${HWLOC_ROOT}/lib)
-    set(Hwloc_INCLUDE_DIR ${HWLOC_ROOT}/include CACHE INTERNAL "")
-    set(Hwloc_LIBRARY ${HWLOC_ROOT}/lib/libhwloc.dll.a CACHE INTERNAL "")
+    set(Hwloc_INCLUDE_DIR
+        ${HWLOC_ROOT}/include
+        CACHE INTERNAL ""
+    )
+    set(Hwloc_LIBRARY
+        ${HWLOC_ROOT}/lib/libhwloc.dll.a
+        CACHE INTERNAL ""
+    )
   endif() # End hwloc installation
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
