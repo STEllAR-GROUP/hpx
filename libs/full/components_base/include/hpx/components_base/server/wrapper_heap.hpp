@@ -11,10 +11,12 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/modules/itt_notify.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -78,7 +80,7 @@ namespace hpx::components::detail {
 
     public:
         explicit wrapper_heap(char const* class_name, std::size_t count,
-            heap_parameters parameters);
+            heap_parameters const& parameters);
 
         wrapper_heap();
         ~wrapper_heap() override;
@@ -104,23 +106,20 @@ namespace hpx::components::detail {
         void set_gid(naming::gid_type const& g);
 
     protected:
-        bool test_release(std::unique_lock<mutex_type>& lk);
-        bool ensure_pool(std::size_t count);
+        bool free_pool();
 
         bool init_pool();
         void tidy();
 
     protected:
         char* pool_;
-        char* first_free_;
         heap_parameters const parameters_;
-        std::size_t free_size_;
-
+        util::cache_aligned_data_derived<std::atomic<char*>> first_free_;
+        util::cache_aligned_data_derived<std::atomic<std::size_t>> free_size_;
         // these values are used for AGAS registration of all elements of this
         // managed_component heap
+        mutable util::cache_aligned_data_derived<mutex_type> mtx_;
         naming::gid_type base_gid_;
-
-        mutable mutex_type mtx_;
 
     public:
         std::string const class_name_;
@@ -161,7 +160,7 @@ namespace hpx::components::detail {
         using value_type = T;
 
         explicit fixed_wrapper_heap(char const* class_name, std::size_t count,
-            heap_parameters parameters)
+            heap_parameters const& parameters)
           : base_type(class_name, count, parameters)
         {
         }
