@@ -21,6 +21,9 @@ if (NOT HPX_WITH_FETCH_HWLOC)
     )
   endif()
 else()
+  hpx_info(
+    "HPX_WITH_FETCH_HWLOC=${HPX_WITH_FETCH_HWLOC}, Hwloc will be fetched using CMake's FetchContent"
+  )
   if(UNIX)
     include(FetchContent)
     FetchContent_Declare(HWLoc

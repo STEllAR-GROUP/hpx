@@ -6,13 +6,7 @@
 
 name: Linux CI (Debug) with HWLoc fetch
 
-on: 
-  push: 
-    branches: [cmake_options] 
-    paths:
-      - ".github/workflows/linux_debug_fetch_hwloc.yml"
-      - "CMakeLists.txt"
-      - "cmake/**"
+on: [pull_request]
 
 jobs:
   build:

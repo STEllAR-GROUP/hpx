@@ -4,15 +4,9 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: macOS CI (Debug)
+name: macOS CI (Debug) with HWLoc fetch
 
-on: 
-  push: 
-    branches: [cmake_options] 
-    paths:
-      - ".github/workflows/macos_debug_fetch_hwloc.yml"
-      - "CMakeLists.txt"
-      - "cmake/**"
+on: [pull_request]
 
 jobs:
   build:
