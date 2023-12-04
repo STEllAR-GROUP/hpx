@@ -23,7 +23,11 @@
 using namespace hpx::collectives;
 
 constexpr char const* scatter_direct_basename = "/test/scatter_direct/";
+#if defined(HPX_DEBUG)
+constexpr int ITERATIONS = 100;
+#else
 constexpr int ITERATIONS = 1000;
+#endif
 
 void test_one_shot_use()
 {

@@ -22,7 +22,11 @@
 using namespace hpx::collectives;
 
 constexpr char const* inclusive_scan_basename = "/test/inclusive_scan/";
+#if defined(HPX_DEBUG)
+constexpr int ITERATIONS = 100;
+#else
 constexpr int ITERATIONS = 1000;
+#endif
 
 void test_one_shot_use()
 {

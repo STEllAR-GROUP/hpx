@@ -21,7 +21,11 @@
 using namespace hpx::collectives;
 
 constexpr char const* all_reduce_direct_basename = "/test/all_reduce_direct/";
+#if defined(HPX_DEBUG)
+constexpr int ITERATIONS = 100;
+#else
 constexpr int ITERATIONS = 1000;
+#endif
 
 void test_one_shot_use()
 {
