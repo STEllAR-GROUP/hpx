@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file unlock_guard.hpp
+/// \page hpx::unlock_guard
+/// \headerfile hpx/mutex.hpp
 
 #pragma once
 

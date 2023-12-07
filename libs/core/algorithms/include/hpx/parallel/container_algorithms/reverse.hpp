@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/reverse.hpp
+/// \page hpx::ranges::reverse, hpx::ranges::reverse_copy
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

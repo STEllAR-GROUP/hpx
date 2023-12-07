@@ -5,6 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \page hpx::functional::unwrap, hpx::functional::unwrap_n, hpx::functional::unwrap_all, hpx::unwrap, hpx::unwrap_n, hpx::unwrap_all, hpx::unwrapping, hpx::unwrapping_n, hpx::unwrapping_all
+/// \headerfile hpx/unwrap.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

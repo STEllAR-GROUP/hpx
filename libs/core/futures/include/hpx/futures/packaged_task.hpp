@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file packaged_task.hpp
+/// \page hpx::packaged_task
+/// \headerfile hpx/future.hpp
 
 #pragma once
 

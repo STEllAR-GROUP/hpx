@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/destroy.hpp
+/// \page hpx::destroy, hpx::destroy_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

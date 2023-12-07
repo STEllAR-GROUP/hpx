@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file startup_function.hpp
+/// \page hpx::startup_function_type, hpx::register_pre_startup_function, hpx::register_startup_function
+/// \headerfile hpx/runtime.hpp
 
 #pragma once
 

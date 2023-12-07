@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \page hpx::get_worker_thread_num, hpx::get_local_worker_thread_num, hpx::get_local_worker_thread_num, hpx::get_thread_pool_num, hpx::get_thread_pool_num
+/// \headerfile hpx/runtime.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

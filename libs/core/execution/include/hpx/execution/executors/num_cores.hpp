@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/executors/numcores.hpp
+/// \page hpx::execution::experimental::num_cores
+/// \headerfile hpx/execution.hpp
 
 #pragma once
 

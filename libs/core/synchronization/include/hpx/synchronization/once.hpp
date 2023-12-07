@@ -9,6 +9,8 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file once.hpp
+/// \page hpx::once_flag, hpx::call_once
+/// \headerfile hpx/mutex.hpp
 
 #pragma once
 

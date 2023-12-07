@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file error_code.hpp
+/// \page hpx::error_code
+/// \headerfile hpx/system_error.hpp
 
 #pragma once
 

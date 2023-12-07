@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/find.hpp
+/// \page hpx::ranges::find, hpx::ranges::find_if, hpx::ranges::find_if_not, hpx::ranges::find_end, hpx::ranges::find_first_of
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

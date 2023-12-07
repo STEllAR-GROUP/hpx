@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/for_each.hpp
+/// \page hpx::ranges::for_each, hpx::ranges::for_each_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

@@ -61,6 +61,22 @@ breathe_projects_source = {}
 hpx_source_dir = '@HPX_SOURCE_DIR@'
 hpx_libs_dir = hpx_source_dir + '/libs'
 hpx_libs = {}
+header_info = {}
+
+def get_info_from_file(source):
+    title = "None"
+    header = "None"
+
+    if os.path.exists(source):
+        with open(source, 'r') as file:
+            # Search for patterns indicating the title and header
+            for line in file:
+                if "/// \page" in line:
+                    title = line.split("/// \page", 1)[-1].strip()
+                elif "/// \headerfile" in line:
+                    header = line.split("/// \headerfile", 1)[-1].strip()
+
+    return title, header
 
 # Scan the libs directory for source files to be included in
 # the documentation
@@ -103,18 +119,24 @@ for lib_dir in os.listdir(hpx_libs_dir):
             for f in files:
                 if not file_regex.match(f) is None:
                     skip = True
+                    header_file_path = subdir_full + '/' + f
                     try:
-                        for line in open(subdir_full + '/' + f):
+                        for line in open(header_file_path):
                             if '/// \\' in line:
+                                page_title, include_header = get_info_from_file(header_file_path)
                                 skip = False
                                 break
                     except:
                         print('Exception while processing %s' % f)
                         print(traceback.format_exc())
-
                     if skip:
                         continue
                     breathe_projects_source[module][1].append(subdir + '/' + f)
+                    include_prefix = 'include/'
+                    include_index = header_file_path.find(include_prefix)
+                    if include_index != -1:
+                        header = header_file_path[include_index + len(include_prefix):]
+                        header_info[header] = (page_title, include_header)
 
 # Generate the rst files for the API documentation
 api_refs = ''
@@ -151,8 +173,10 @@ api_header_file = '''
 .. _modules_{0}_api:
 
 -------------------------------------------------------------------------------
-{0}
+{2}
 -------------------------------------------------------------------------------
+
+Defined in header {3}
 
 See :ref:`public_api` for a list of names and headers that are part of the public
 |hpx| API.
@@ -191,8 +215,15 @@ for lib in hpx_libs.keys():
                 header_name = '{0}_{1}'.format(header_splitted[-3], header_name)
             header_names.add(header_name)
 
+            # Get the info from the dictionary using the header file path
+            page_title, include_header = header_info.get(header, ("None", "None"))
+            if page_title == "None":
+                page_title = header
+            if include_header == "None":
+                include_header = header
+
             header_ref = open(basedir + '/' + header_name + '.rst', 'w')
-            header_ref.write(api_header_file.format(header, module))
+            header_ref.write(api_header_file.format(header, module, page_title, include_header))
             header_ref.close()
             header_refs += '   /libs/' + lib + '/' + module + '/api/' + header_name + '.rst\n'
         module_api_ref.write(api_file)

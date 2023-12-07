@@ -8,6 +8,9 @@
 //
 //  (C) Copyright 2006-7 Anthony Williams
 
+/// \page hpx::recursive_mutex
+/// \headerfile hpx/mutex.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

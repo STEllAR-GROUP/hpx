@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/is_sorted.hpp
+/// \page hpx::is_sorted, hpx::is_sorted_until
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

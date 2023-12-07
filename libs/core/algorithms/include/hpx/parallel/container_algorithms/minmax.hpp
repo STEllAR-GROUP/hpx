@@ -7,6 +7,8 @@
 // make inspect happy: hpxinspect:nominmax
 
 /// \file parallel/container_algorithms/minmax.hpp
+/// \page hpx::ranges::min_element, hpx::ranges::max_element, hpx::ranges::minmax_element
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

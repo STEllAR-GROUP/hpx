@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/partition.hpp
+/// \page hpx::ranges::partition, hpx::ranges::stable_partition, hpx::ranges::partition_copy
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

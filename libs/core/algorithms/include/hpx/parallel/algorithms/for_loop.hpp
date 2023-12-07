@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/for_loop.hpp
+/// \page hpx::experimental::for_loop, hpx::experimental::for_loop_strided, hpx::experimental::for_loop_n, hpx::experimental::for_loop_n_strided
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

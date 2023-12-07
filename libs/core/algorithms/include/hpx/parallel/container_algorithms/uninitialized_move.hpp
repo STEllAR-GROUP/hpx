@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/uninitialized_move.hpp
+/// \page hpx::ranges::uninitialized_move, hpx::ranges::uninitialized_move_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

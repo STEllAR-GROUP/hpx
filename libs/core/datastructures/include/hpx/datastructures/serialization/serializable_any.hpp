@@ -14,6 +14,8 @@
 ==============================================================================*/
 
 /// \file serializable_any.hpp
+/// \page hpx::any, hpx::make_any
+/// \headerfile hpx/any.hpp
 
 #pragma once
 

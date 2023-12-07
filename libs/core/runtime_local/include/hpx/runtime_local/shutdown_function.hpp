@@ -5,7 +5,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file startup_function.hpp
+/// \file shutdown_function.hpp
+/// \page hpx::shutdown_function_type, hpx::register_pre_shutdown_function, hpx::register_shutdown_function
+/// \headerfile hpx/runtime.hpp
 
 #pragma once
 

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file task_block.hpp
+/// \page hpx::experimental::task_canceled_exception, hpx::experimental::task_block, hpx::experimental::define_task_block, hpx::experimental::define_task_block_restore_thread
+/// \headerfile hpx/task_block.hpp
 
 #pragma once
 

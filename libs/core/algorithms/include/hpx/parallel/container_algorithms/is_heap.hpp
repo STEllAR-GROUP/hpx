@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/is_heap.hpp
+/// \page hpx::ranges::is_heap, hpx::ranges::is_heap_until
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
