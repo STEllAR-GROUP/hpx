@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include <hpx/datastructures/detail/flat_map.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 
 #include <atomic>
-#include <boost/container/flat_map.hpp>
 #include <cstddef>
 #include <memory>
 #include <utility>
@@ -23,7 +23,7 @@ namespace hpx::synchronization::detail {
     class range_mutex
     {
         template <typename Key, typename Value>
-        using map_ty = boost::container::flat_map<Key, Value>;
+        using map_ty = hpx::detail::flat_map<Key, Value>;
 
         Mtx mtx;
         std::size_t counter = 0;
@@ -40,7 +40,6 @@ namespace hpx::synchronization::detail {
     std::size_t range_mutex<Mtx, Guard>::lock(
         std::size_t begin, std::size_t end)
     {
-        std::size_t lock_id = 0;
         bool localFlag = false;
         std::size_t blocker_id;
 
@@ -98,8 +97,7 @@ namespace hpx::synchronization::detail {
         Guard const lock_guard(mtx);
         for (auto const& it : range_map)
         {
-            std::size_t b = it.second.first;
-            std::size_t e = it.second.second;
+            auto [b, e] = it.second;
 
             if (!(e < begin) && !(end < b))
             {

@@ -81,7 +81,7 @@ namespace hpx::synchronization {
             lockId = 0;
         }
 
-        void swap(std::unique_lock<RangeMutex>& uLock)
+        void swap(range_unique_lock<RangeMutex>& uLock)
         {
             std::swap(lockRef, uLock.lockRef);
             std::swap(lockId, uLock.lockId);
