@@ -25,89 +25,114 @@ namespace hpx::synchronization {
     template <typename RangeMutex>
     class range_guard
     {
-        std::reference_wrapper<RangeMutex> lockRef;
-        std::size_t lockId = 0;
+        std::reference_wrapper<RangeMutex> mutex_ref;
+        std::size_t lock_id = 0;
 
     public:
         range_guard(RangeMutex& lock, std::size_t begin, std::size_t end)
-          : lockRef(lock)
+          : mutex_ref(lock)
         {
-            lockId = lockRef.get().lock(begin, end);
+            lock_id = mutex_ref.get().lock(begin, end);
         }
         ~range_guard()
         {
-            lockRef.get().unlock(lockId);
+            mutex_ref.get().unlock(lock_id);
+        }
+
+        range_guard(range_guard<RangeMutex>&) = delete;
+        range_guard<RangeMutex>& operator=(range_guard<RangeMutex>&) = delete;
+
+        range_guard(range_guard<RangeMutex>&& rhs_lock)
+        {
+            mutex_ref.get().unlock(lock_id);
+            mutex_ref = rhs_lock.mutex_ref;
+            lock_id = rhs_lock.lock_id;
+            rhs_lock.lock_id = 0;
+        }
+
+        range_guard<RangeMutex>& operator=(range_guard<RangeMutex>&& rhs_lock)
+        {
+            mutex_ref.get().unlock(lock_id);
+            mutex_ref = rhs_lock.mutex_ref;
+            lock_id = rhs_lock.lock_id;
+            rhs_lock.lock_id = 0;    // invalidating rhs_lock
         }
     };
 
     template <typename RangeMutex>
     class range_unique_lock
     {
-        std::reference_wrapper<RangeMutex> lockRef;
-        std::size_t lockId = 0;
+        std::reference_wrapper<RangeMutex> mutex_ref;
+        std::size_t lock_id = 0;
 
     public:
         range_unique_lock(RangeMutex& lock, std::size_t begin, std::size_t end)
-          : lockRef(lock)
+          : mutex_ref(lock)
         {
-            lockId = lockRef.get().lock(begin, end);
+            lock_id = mutex_ref.get().lock(begin, end);
         }
 
         ~range_unique_lock()
         {
-            lockRef.get().unlock(lockId);
+            mutex_ref.get().unlock(lock_id);
         }
 
-        void operator=(range_unique_lock<RangeMutex>&& lock)
+        range_unique_lock(range_guard<RangeMutex>&) = delete;
+        range_unique_lock<RangeMutex>& operator=(
+            range_unique_lock<RangeMutex>) = delete;
+
+        range_unique_lock<RangeMutex>& operator=(
+            range_unique_lock<RangeMutex>&& rhs_lock)
         {
-            lockRef.get().unlock(lockId);
-            lockRef = lock.lockRef;
-            lockId = lock.lockRef.get().lock();
+            mutex_ref.get().unlock(lock_id);
+            mutex_ref = rhs_lock.mutex_ref;
+            lock_id = rhs_lock.lock_id;
+            rhs_lock.lock_id = 0;    // invalidating rhs_lock
         }
 
         void lock(std::size_t begin, std::size_t end)
         {
-            lockId = lockRef.get().lock(begin, end);
+            lock_id = mutex_ref.get().lock(begin, end);
         }
 
         void try_lock(std::size_t begin, std::size_t end)
         {
-            lockId = lockRef.get().try_lock(begin, end);
+            lock_id = mutex_ref.get().try_lock(begin, end);
         }
 
         void unlock()
         {
-            lockRef.get().unlock(lockId);
-            lockId = 0;
+            mutex_ref.get().unlock(lock_id);
+            lock_id = 0;
         }
 
         void swap(range_unique_lock<RangeMutex>& uLock)
         {
-            std::swap(lockRef, uLock.lockRef);
-            std::swap(lockId, uLock.lockId);
+            std::swap(mutex_ref, uLock.mutex_ref);
+            std::swap(lock_id, uLock.lock_id);
         }
 
         RangeMutex* release()
         {
-            RangeMutex* mtx = lockRef.get();
-            lockRef = nullptr;
-            lockId = 0;
+            RangeMutex* mtx = mutex_ref.get();
+            mutex_ref = nullptr;
+            lock_id = 0;
             return mtx;
         }
 
         operator bool() const
         {
-            return lockId != 0;
+            return lock_id != 0;
         }
 
         bool owns_lock() const
         {
-            return lockId != 0;
+            return lock_id != 0;
         }
 
         RangeMutex* mutex() const
         {
-            return lockRef.get();
+            return mutex_ref.get();
         }
     };
 }    // namespace hpx::synchronization

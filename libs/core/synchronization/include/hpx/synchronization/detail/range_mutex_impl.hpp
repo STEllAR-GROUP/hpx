@@ -80,6 +80,8 @@ namespace hpx::synchronization::detail {
     template <class Mtx, template <class> class Guard>
     void range_mutex<Mtx, Guard>::unlock(std::size_t lock_id)
     {
+        if (lock_id == 0)
+            return;
         Guard const lock_guard(mtx);
 
         range_map.erase(lock_id);
