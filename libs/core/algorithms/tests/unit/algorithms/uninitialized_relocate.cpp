@@ -361,13 +361,11 @@ void test()
     return;
 }
 
-// template <typename Ex>
-// void test_overlapping(Ex&& ex)
+template <typename Ex>
 void test_overlapping()
 {
-    using Ex = hpx::execution::sequenced_policy;
-
-    static_assert(std::is_same_v<Ex, hpx::execution::sequenced_policy>);
+    // using Ex = hpx::execution::sequenced_policy;
+    // static_assert(std::is_same_v<Ex, hpx::execution::sequenced_policy>);
 
     constexpr int offset = 4;
 
@@ -515,7 +513,8 @@ int hpx_main()
     test<hpx::execution::sequenced_policy>();
     test<hpx::execution::parallel_policy>();
 
-    test_overlapping();
+    test_overlapping<hpx::execution::sequenced_policy>();
+    test_overlapping<hpx::execution::parallel_policy>();
 
     return hpx::local::finalize();
 }
