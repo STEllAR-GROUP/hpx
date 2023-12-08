@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <functional>
 #include <mutex>
+#include <system_error>
 #include <utility>
 
 namespace hpx::synchronization {
@@ -25,78 +26,97 @@ namespace hpx::synchronization {
     template <typename RangeMutex>
     class range_guard
     {
+        std::size_t lock_id;
         std::reference_wrapper<RangeMutex> mutex_ref;
-        std::size_t lock_id = 0;
 
     public:
-        range_guard(RangeMutex& lock, std::size_t begin, std::size_t end)
-          : mutex_ref(lock)
+        range_guard(RangeMutex& mtx, std::size_t begin, std::size_t end)
+          : lock_id(mtx.lock(begin, end))
+          , mutex_ref(mtx)
         {
-            lock_id = mutex_ref.get().lock(begin, end);
         }
         ~range_guard()
         {
             mutex_ref.get().unlock(lock_id);
         }
 
-        range_guard(range_guard<RangeMutex>&) = delete;
-        range_guard<RangeMutex>& operator=(range_guard<RangeMutex>&) = delete;
+        range_guard(range_guard const&) = delete;
+        range_guard& operator=(range_guard const&) = delete;
 
-        range_guard(range_guard<RangeMutex>&& rhs_lock)
+        range_guard(range_guard&& rhs_lock)
+          : lock_id(rhs_lock.lock_id)
+          , mutex_ref(rhs_lock.mutex_ref)
         {
-            mutex_ref.get().unlock(lock_id);
-            mutex_ref = rhs_lock.mutex_ref;
-            lock_id = rhs_lock.lock_id;
             rhs_lock.lock_id = 0;
         }
 
-        range_guard<RangeMutex>& operator=(range_guard<RangeMutex>&& rhs_lock)
+        range_guard& operator=(range_guard&& rhs_lock)
         {
             mutex_ref.get().unlock(lock_id);
             mutex_ref = rhs_lock.mutex_ref;
             lock_id = rhs_lock.lock_id;
             rhs_lock.lock_id = 0;    // invalidating rhs_lock
+            return *this;
         }
     };
 
     template <typename RangeMutex>
     class range_unique_lock
     {
+        std::size_t lock_id;
         std::reference_wrapper<RangeMutex> mutex_ref;
-        std::size_t lock_id = 0;
 
     public:
-        range_unique_lock(RangeMutex& lock, std::size_t begin, std::size_t end)
-          : mutex_ref(lock)
+        range_unique_lock(RangeMutex& mtx, std::size_t begin, std::size_t end)
+          : lock_id(mtx.lock(begin, end))
+          , mutex_ref(mtx)
         {
-            lock_id = mutex_ref.get().lock(begin, end);
         }
-
         ~range_unique_lock()
         {
             mutex_ref.get().unlock(lock_id);
         }
 
-        range_unique_lock(range_guard<RangeMutex>&) = delete;
-        range_unique_lock<RangeMutex>& operator=(
-            range_unique_lock<RangeMutex>) = delete;
+        range_unique_lock(range_unique_lock const&) = delete;
+        range_unique_lock& operator=(range_unique_lock const&) = delete;
 
-        range_unique_lock<RangeMutex>& operator=(
-            range_unique_lock<RangeMutex>&& rhs_lock)
+        range_unique_lock(range_unique_lock&& rhs_lock)
+          : mutex_ref(rhs_lock.mutex_ref)
+          , lock_id(rhs_lock.lock_id)
+        {
+            rhs_lock.lock_id = 0;
+        }
+
+        range_unique_lock& operator=(range_unique_lock&& rhs_lock)
         {
             mutex_ref.get().unlock(lock_id);
             mutex_ref = rhs_lock.mutex_ref;
             lock_id = rhs_lock.lock_id;
             rhs_lock.lock_id = 0;    // invalidating rhs_lock
+            return *this;
         }
 
         void lock(std::size_t begin, std::size_t end)
         {
+            if (lock_id != 0)
+            {
+                std::error_code ec = std::make_error_code(
+                    std::errc::resource_deadlock_would_occur);
+                throw std::system_error(
+                    ec, "unique_lock::lock: already locked");
+            }
             lock_id = mutex_ref.get().lock(begin, end);
         }
 
         void try_lock(std::size_t begin, std::size_t end)
         {
+            if (lock_id != 0)
+            {
+                std::error_code ec = std::make_error_code(
+                    std::errc::resource_deadlock_would_occur);
+                throw std::system_error(
+                    ec, "unique_lock::lock: already locked");
+            }
             lock_id = mutex_ref.get().try_lock(begin, end);
         }
 
@@ -106,7 +126,7 @@ namespace hpx::synchronization {
             lock_id = 0;
         }
 
-        void swap(range_unique_lock<RangeMutex>& uLock)
+        void swap(range_unique_lock& uLock)
         {
             std::swap(mutex_ref, uLock.mutex_ref);
             std::swap(lock_id, uLock.lock_id);
@@ -115,7 +135,6 @@ namespace hpx::synchronization {
         RangeMutex* release()
         {
             RangeMutex* mtx = mutex_ref.get();
-            mutex_ref = nullptr;
             lock_id = 0;
             return mtx;
         }
