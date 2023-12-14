@@ -27,7 +27,7 @@ using hpx::experimental::uninitialized_relocate;
 std::mutex m;
 
 template <typename F>
-void lazy_mutex_op(F&& f)
+void simple_mutex_operation(F&& f)
 {
     std::lock_guard<std::mutex> lk(m);
     f();
@@ -53,7 +53,7 @@ struct counted_struct
       : data(data)
     {
         // Check that we are not constructing an object on top of another
-        lazy_mutex_op([&]() {
+        simple_mutex_operation([&]() {
             HPX_TEST(!made.count(this));
             made.insert(this);
         });
@@ -76,7 +76,7 @@ struct counted_struct
         }
 
         // Check that we are not constructing an object on top of another
-        lazy_mutex_op([&]() {
+        simple_mutex_operation([&]() {
             // Unless we are testing overlapping relocation
             // we should not be move-constructing an object on top of another
             if constexpr (!overlapping_test)
@@ -93,7 +93,7 @@ struct counted_struct
 
         // Check that the object was constructed
         // and not already destroyed
-        lazy_mutex_op([&]() {
+        simple_mutex_operation([&]() {
             HPX_TEST(made.count(this));
             made.erase(this);
         });
