@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,18 +14,15 @@
 #include <type_traits>
 #include <utility>
 
-///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace detail {
-    // bound action
-    template <typename Bound>
-    struct post_dispatch<Bound, std::enable_if_t<hpx::is_bound_action_v<Bound>>>
+// bound action
+template <typename Bound>
+struct hpx::detail::post_dispatch<Bound,
+    std::enable_if_t<hpx::is_bound_action_v<Bound>>>
+{
+    template <typename Action, typename Is, typename... Ts, typename... Us>
+    HPX_FORCEINLINE static bool call(
+        hpx::detail::bound_action<Action, Is, Ts...> const& bound, Us&&... vs)
     {
-        template <typename Action, typename Is, typename... Ts, typename... Us>
-        HPX_FORCEINLINE static bool call(
-            hpx::detail::bound_action<Action, Is, Ts...> const& bound,
-            Us&&... vs)
-        {
-            return bound.post(HPX_FORWARD(Us, vs)...);
-        }
-    };
-}}    // namespace hpx::detail
+        return bound.post(HPX_FORWARD(Us, vs)...);
+    }
+};

@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2020 Hartmut Kaiser
+//  Copyright (c) 2018-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
@@ -19,7 +19,7 @@ namespace hpx { namespace traits {
 
         struct select_direct_execution_helper
         {
-            // by default we return the unchanged function
+            // by default, we return the unchanged function
             template <typename Action>
             static constexpr launch call(
                 wrap_int, launch policy, naming::address_type) noexcept
@@ -49,4 +49,4 @@ namespace hpx { namespace traits {
                 Action>(0, policy, lva);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

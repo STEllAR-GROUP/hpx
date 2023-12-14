@@ -30,10 +30,10 @@ namespace hpx {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // MSVC complains about ambiguities if it sees this forward declaration
+    // clang-format off
     template <typename Action, typename F, typename... Ts>
     HPX_FORCEINLINE auto async_cb(F&& f, Ts&&... ts)
         -> decltype(detail::async_cb_action_dispatch<Action,
-            typename std::decay<F>::type>::call(HPX_FORWARD(F, f),
-            HPX_FORWARD(Ts, ts)...));
+            std::decay_t<F>>::call(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+    // clang-format on
 }    // namespace hpx

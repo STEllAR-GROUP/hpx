@@ -15,17 +15,17 @@ namespace hpx {
     template <typename T>
     struct future_or_value
     {
-        future_or_value(T const& value)
+        constexpr future_or_value(T const& value)
           : data(value)
         {
         }
 
-        future_or_value(T&& value) noexcept
+        constexpr future_or_value(T&& value) noexcept
           : data(HPX_MOVE(value))
         {
         }
 
-        future_or_value(hpx::future<T>&& value) noexcept
+        constexpr future_or_value(hpx::future<T>&& value) noexcept
           : data(HPX_MOVE(value))
         {
         }
@@ -39,28 +39,28 @@ namespace hpx {
             return hpx::holds_alternative<hpx::future<T>>(data);
         }
 
-        T& get_value() &
+        constexpr T& get_value() &
         {
             return hpx::get<T>(data);
         }
-        T const& get_value() const&
+        constexpr T const& get_value() const&
         {
             return hpx::get<T>(data);
         }
-        T&& get_value() &&
+        constexpr T&& get_value() &&
         {
             return hpx::get<T>(HPX_MOVE(data));
         }
 
-        hpx::future<T>& get_future() &
+        constexpr hpx::future<T>& get_future() &
         {
             return hpx::get<hpx::future<T>>(data);
         }
-        hpx::future<T> const& get_future() const&
+        constexpr hpx::future<T> const& get_future() const&
         {
             return hpx::get<hpx::future<T>>(data);
         }
-        hpx::future<T>&& get_future() &&
+        constexpr hpx::future<T>&& get_future() &&
         {
             return hpx::get<hpx::future<T>>(HPX_MOVE(data));
         }

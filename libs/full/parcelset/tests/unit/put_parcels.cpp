@@ -33,7 +33,7 @@ hpx::parcelset::parcel generate_parcel(
     hpx::parcelset::parcel p(hpx::parcelset::detail::create_parcel::call(
         std::move(dest), std::move(addr),
         hpx::actions::typed_continuation<hpx::id_type>(cont), Action(),
-        hpx::threads::thread_priority::normal, std::forward<T>(data)));
+        hpx::launch::async, std::forward<T>(data)));
 
     p.set_source_id(hpx::find_here());
     p.size() = 4096;

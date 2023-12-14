@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/is_continuation.hpp>
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/components_base/traits/component_pin_support.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
@@ -24,58 +25,56 @@ namespace hpx::detail {
     // forward declaration only
     template <typename Action, typename Continuation, typename... Ts>
     bool post_l_p(Continuation&& c, hpx::id_type const& target,
-        naming::address&& addr, threads::thread_priority priority, Ts&&... vs);
+        naming::address&& addr, hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename... Ts>
     bool post_l_p(hpx::id_type const& target, naming::address&& addr,
-        threads::thread_priority priority, Ts&&... vs);
+        hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
     bool post_r_p(naming::address&& addr, Continuation&& c,
-        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
+        hpx::id_type const& id, hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename... Ts>
     bool post_r_p(naming::address&& addr, hpx::id_type const& id,
-        threads::thread_priority priority, Ts&&... vs);
+        hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     bool post_r_p_cb(naming::address&& addr, Continuation&& c,
-        hpx::id_type const& id, threads::thread_priority priority,
-        Callback&& cb, Ts&&... vs);
+        hpx::id_type const& id, hpx::launch policy, Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename Callback, typename... Ts>
     bool post_r_p_cb(naming::address&& addr, hpx::id_type const& id,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs);
+        hpx::launch policy, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, typename Continuation, typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
-        Continuation&& c, hpx::id_type const& id,
-        threads::thread_priority priority, Ts&&... vs);
+        Continuation&& c, hpx::id_type const& id, hpx::launch policy,
+        Ts&&... vs);
 
     template <typename Action, typename Continuation, typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool> post_impl(
         Continuation&& c, hpx::id_type const& id, naming::address&& addr,
-        threads::thread_priority priority, Ts&&... vs);
+        hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename Continuation, typename Callback,
         typename... Ts>
     std::enable_if_t<traits::is_continuation_v<Continuation>, bool>
-    post_cb_impl(Continuation&& c, hpx::id_type const& id,
-        threads::thread_priority priority, Callback&& cb, Ts&&... vs);
+    post_cb_impl(Continuation&& c, hpx::id_type const& id, hpx::launch policy,
+        Callback&& cb, Ts&&... vs);
 
     template <typename Action, typename... Ts>
-    bool post_impl(
-        hpx::id_type const& id, threads::thread_priority priority, Ts&&... vs);
+    bool post_impl(hpx::id_type const& id, hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename... Ts>
     bool post_impl(hpx::id_type const& id, naming::address&&,
-        threads::thread_priority priority, Ts&&... vs);
+        hpx::launch policy, Ts&&... vs);
 
     template <typename Action, typename Callback, typename... Ts>
-    bool post_cb_impl(hpx::id_type const& id, threads::thread_priority priority,
-        Callback&& cb, Ts&&... vs);
+    bool post_cb_impl(
+        hpx::id_type const& id, hpx::launch policy, Callback&& cb, Ts&&... vs);
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>

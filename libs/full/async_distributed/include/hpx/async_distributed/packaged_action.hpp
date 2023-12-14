@@ -140,7 +140,7 @@ namespace hpx::lcos {
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
         void do_post(naming::address&& addr, hpx::id_type const& id,
-            threads::thread_priority priority, Ts&&... vs)
+            hpx::launch policy, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_post({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
@@ -157,18 +157,17 @@ namespace hpx::lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            this->shared_state_->mark_as_started();
+
             hpx::post_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                HPX_MOVE(addr), id, priority, HPX_MOVE(f),
+                HPX_MOVE(addr), id, policy, HPX_MOVE(f),
                 HPX_FORWARD(Ts, vs)...);
-
-            this->shared_state_->mark_as_started();
         }
 
         template <typename... Ts>
-        void do_post(hpx::id_type const& id, threads::thread_priority priority,
-            Ts&&... vs)
+        void do_post(hpx::id_type const& id, hpx::launch policy, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_post({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
@@ -186,17 +185,17 @@ namespace hpx::lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            this->shared_state_->mark_as_started();
+
             hpx::post_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
-
-            this->shared_state_->mark_as_started();
+                id, policy, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
         void do_post_cb(naming::address&& addr, hpx::id_type const& id,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+            hpx::launch policy, Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_post_cb({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
@@ -216,12 +215,14 @@ namespace hpx::lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            this->shared_state_->mark_as_started();
+
             if (addr)
             {
                 hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                    HPX_MOVE(addr), id, priority, HPX_MOVE(f),
+                    HPX_MOVE(addr), id, policy, HPX_MOVE(f),
                     HPX_FORWARD(Ts, vs)...);
             }
             else
@@ -229,15 +230,13 @@ namespace hpx::lcos {
                 hpx::post_p_cb<action_type>(
                     actions::typed_continuation<Result, remote_result_type>(
                         HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                    id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
+                    id, policy, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
             }
-
-            this->shared_state_->mark_as_started();
         }
 
         template <typename Callback, typename... Ts>
-        void do_post_cb(hpx::id_type const& id,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+        void do_post_cb(hpx::id_type const& id, hpx::launch policy,
+            Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format("packaged_action::do_post_cb({}, {}) args({})",
                 hpx::actions::detail::get_action_name<action_type>(), id,
@@ -257,12 +256,12 @@ namespace hpx::lcos {
             hpx::id_type cont_id(this->get_id(false));
             naming::detail::set_dont_store_in_cache(cont_id);
 
+            this->shared_state_->mark_as_started();
+
             hpx::post_p_cb<action_type>(
                 actions::typed_continuation<Result, remote_result_type>(
                     HPX_MOVE(cont_id), HPX_MOVE(resolved_addr)),
-                id, priority, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
-
-            this->shared_state_->mark_as_started();
+                id, policy, HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
         }
 
     public:
@@ -283,67 +282,75 @@ namespace hpx::lcos {
         template <typename... Ts>
         void post(hpx::id_type const& id, Ts&&... vs)
         {
-            do_post(id, actions::action_priority<action_type>(),
-                HPX_FORWARD(Ts, vs)...);
+            constexpr launch::async_policy policy(
+                actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            do_post(id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         void post(naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
         {
-            do_post(HPX_MOVE(addr), id, actions::action_priority<action_type>(),
-                HPX_FORWARD(Ts, vs)...);
+            constexpr launch::async_policy policy(
+                actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            do_post(HPX_MOVE(addr), id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
         void post_cb(hpx::id_type const& id, Callback&& cb, Ts&&... vs)
         {
-            do_post_cb(id, actions::action_priority<action_type>(),
-                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            constexpr launch::async_policy policy(
+                actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            do_post_cb(
+                id, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
         void post_cb(naming::address&& addr, hpx::id_type const& id,
             Callback&& cb, Ts&&... vs)
         {
-            do_post_cb(HPX_MOVE(addr), id,
+            constexpr launch::async_policy policy(
                 actions::action_priority<action_type>(),
-                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+                actions::action_stacksize<action_type>());
+            do_post_cb(HPX_MOVE(addr), id, policy, HPX_FORWARD(Callback, cb),
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
-        void post_p(hpx::id_type const& id, threads::thread_priority priority,
-            Ts&&... vs)
+        void post_p(hpx::id_type const& id, hpx::launch policy, Ts&&... vs)
         {
-            do_post(id, priority, HPX_FORWARD(Ts, vs)...);
+            do_post(id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
         void post_p(naming::address&& addr, hpx::id_type const& id,
-            threads::thread_priority priority, Ts&&... vs)
+            hpx::launch policy, Ts&&... vs)
         {
-            do_post(HPX_MOVE(addr), id, priority, HPX_FORWARD(Ts, vs)...);
+            do_post(HPX_MOVE(addr), id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
-        void post_p_cb(hpx::id_type const& id,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+        void post_p_cb(hpx::id_type const& id, hpx::launch policy,
+            Callback&& cb, Ts&&... vs)
         {
-            do_post_cb(id, priority, HPX_FORWARD(Callback, cb),
-                HPX_FORWARD(Ts, vs)...);
+            do_post_cb(
+                id, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
         void post_p_cb(naming::address&& addr, hpx::id_type const& id,
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs)
+            hpx::launch policy, Callback&& cb, Ts&&... vs)
         {
-            do_post_cb(HPX_MOVE(addr), id, priority, HPX_FORWARD(Callback, cb),
+            do_post_cb(HPX_MOVE(addr), id, policy, HPX_FORWARD(Callback, cb),
                 HPX_FORWARD(Ts, vs)...);
         }
 
         ///////////////////////////////////////////////////////////////////////
         template <typename... Ts>
-        void post_deferred(
-            naming::address&& addr, hpx::id_type const& id, Ts&&... vs)
+        void post_deferred(naming::address&& addr, hpx::id_type const& id,
+            hpx::launch policy, Ts&&... vs)
         {
             LLCO_(info).format(
                 "packaged_action::post_deferred({}, {}) args({})",
@@ -362,15 +369,15 @@ namespace hpx::lcos {
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto fut = hpx::functional::post_c_p_cb<action_type>(cont_id,
-                HPX_MOVE(addr), id, actions::action_priority<action_type>(),
-                HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
+                HPX_MOVE(addr), id, policy, HPX_MOVE(f),
+                HPX_FORWARD(Ts, vs)...);
 
             this->shared_state_->set_task(HPX_MOVE(fut));
         }
 
         template <typename Callback, typename... Ts>
         void post_deferred_cb(naming::address&& addr, hpx::id_type const& id,
-            Callback&& cb, Ts&&... vs)
+            hpx::launch policy, Callback&& cb, Ts&&... vs)
         {
             LLCO_(info).format(
                 "packaged_action::post_deferred({}, {}) args({})",
@@ -391,8 +398,8 @@ namespace hpx::lcos {
             naming::detail::set_dont_store_in_cache(cont_id);
 
             auto fut = hpx::functional::post_c_p_cb<action_type>(cont_id,
-                HPX_MOVE(addr), id, actions::action_priority<action_type>(),
-                HPX_MOVE(f), HPX_FORWARD(Ts, vs)...);
+                HPX_MOVE(addr), id, policy, HPX_MOVE(f),
+                HPX_FORWARD(Ts, vs)...);
 
             this->shared_state_->set_task(HPX_MOVE(fut));
         }
@@ -447,9 +454,9 @@ namespace hpx::lcos {
                         component_type>::call(addr));
 
                     // local, direct execution
+                    this->shared_state_->mark_as_started();
                     auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
                     return;
                 }
@@ -465,9 +472,9 @@ namespace hpx::lcos {
                         component_type>::call(addr));
 
                     // local, direct execution
+                    this->shared_state_->mark_as_started();
                     auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
                     return;
                 }
@@ -476,8 +483,10 @@ namespace hpx::lcos {
             }
 
             // remote execution
-            this->do_post(id, actions::action_priority<action_type>(),
-                HPX_FORWARD(Ts, vs)...);
+            constexpr launch::sync_policy policy(
+                actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            this->do_post(id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename... Ts>
@@ -506,17 +515,18 @@ namespace hpx::lcos {
                 }
 
                 // local, direct execution
+                this->shared_state_->mark_as_started();
                 auto&& result = action_type::execute_function(
                     addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                this->shared_state_->mark_as_started();
                 this->shared_state_->set_remote_data(HPX_MOVE(result));
                 return;
             }
 
             // remote execution
-            this->do_post(HPX_MOVE(addr), id,
+            constexpr launch::sync_policy policy(
                 actions::action_priority<action_type>(),
-                HPX_FORWARD(Ts, vs)...);
+                actions::action_stacksize<action_type>());
+            this->do_post(HPX_MOVE(addr), id, policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
@@ -540,9 +550,9 @@ namespace hpx::lcos {
                     !r.first)
                 {
                     // local, direct execution
+                    this->shared_state_->mark_as_started();
                     auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                     hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
@@ -560,9 +570,9 @@ namespace hpx::lcos {
                         component_type>::call(addr));
 
                     // local, direct execution
+                    this->shared_state_->mark_as_started();
                     auto&& result = action_type::execute_function(
                         addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                    this->shared_state_->mark_as_started();
                     this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                     hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
@@ -573,8 +583,11 @@ namespace hpx::lcos {
             }
 
             // remote execution
-            this->do_post_cb(id, actions::action_priority<action_type>(),
-                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            constexpr launch::sync_policy policy(
+                actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            this->do_post_cb(
+                id, policy, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Callback, typename... Ts>
@@ -602,9 +615,9 @@ namespace hpx::lcos {
                 }
 
                 // local, direct execution
+                this->shared_state_->mark_as_started();
                 auto&& result = action_type::execute_function(
                     addr.address_, addr.type_, HPX_FORWARD(Ts, vs)...);
-                this->shared_state_->mark_as_started();
                 this->shared_state_->set_remote_data(HPX_MOVE(result));
 
                 hpx::detail::invoke_callback(HPX_FORWARD(Callback, cb));
@@ -612,8 +625,10 @@ namespace hpx::lcos {
             }
 
             // remote execution
-            this->do_post_cb(HPX_MOVE(addr), id,
+            constexpr launch::sync_policy policy(
                 actions::action_priority<action_type>(),
+                actions::action_stacksize<action_type>());
+            this->do_post_cb(HPX_MOVE(addr), id, policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
     };

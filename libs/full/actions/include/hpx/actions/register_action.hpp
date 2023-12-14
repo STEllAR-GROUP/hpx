@@ -15,7 +15,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     template <typename Action>
     struct register_action
@@ -26,6 +26,7 @@ namespace hpx { namespace actions { namespace detail {
         register_action& operator=(register_action&&) = delete;
 
         register_action();
+        ~register_action() = default;
 
         // defined in actions/transfer_action.hpp
         static base_action* create();
@@ -33,7 +34,7 @@ namespace hpx { namespace actions { namespace detail {
         // defined in async_distributed/transfer_continuation_action.hpp
         static base_action* create_cont();
 
-        register_action& instantiate();
+        register_action& instantiate() noexcept;
 
         static register_action instance;
     };
@@ -55,10 +56,10 @@ namespace hpx { namespace actions { namespace detail {
     }
 
     template <typename Action>
-    register_action<Action>& register_action<Action>::instantiate()
+    register_action<Action>& register_action<Action>::instantiate() noexcept
     {
         return *this;
     }
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #endif

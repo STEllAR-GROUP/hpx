@@ -203,9 +203,9 @@ struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
     {
     }
 
-    template <typename... T>
-    future_data(init_no_addref no_addref, std::in_place_t in_place, T&&... ts)
-      : future_data_base(no_addref, in_place, HPX_FORWARD(T, ts)...)
+    template <typename... Ts>
+    future_data(init_no_addref no_addref, std::in_place_t in_place, Ts&&... ts)
+      : future_data_base(no_addref, in_place, HPX_FORWARD(Ts, ts)...)
     {
     }
 
@@ -533,7 +533,8 @@ namespace hpx::components {
 
     public:
         template <typename F>
-        hpx::traits::future_then_result_t<Derived, F> then(launch l, F&& f)
+        hpx::traits::future_then_result_t<Derived, F> then(
+            launch l, F&& f) const
         {
             using result_type =
                 typename hpx::traits::future_then_result<Derived,
@@ -559,7 +560,7 @@ namespace hpx::components {
 
         template <typename F>
         hpx::traits::future_then_result_t<Derived, F> then(
-            launch::sync_policy l, F&& f)
+            launch::sync_policy l, F&& f) const
         {
             using func_result = decltype(HPX_FORWARD(F, f)(Derived(*this)));
             using future_result = hpx::traits::future_then_result_t<Derived, F>;
@@ -574,7 +575,7 @@ namespace hpx::components {
         }
 
         template <typename F>
-        hpx::traits::future_then_result_t<Derived, F> then(F&& f)
+        hpx::traits::future_then_result_t<Derived, F> then(F&& f) const
         {
             return then(launch::all, HPX_FORWARD(F, f));
         }

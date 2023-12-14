@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //  Copyright (c) 2017 Ajai V George
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -20,10 +20,6 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-// The vector types to be used are defined in partitioned_vector module.
-// HPX_REGISTER_PARTITIONED_VECTOR(double)
-// HPX_REGISTER_PARTITIONED_VECTOR(int)
-
 struct pfo
 {
     template <typename T>
@@ -63,7 +59,7 @@ template <typename ExPolicy, typename T>
 void verify_values(
     ExPolicy&&, hpx::partitioned_vector<T> const& v, T const& val)
 {
-    typedef typename hpx::partitioned_vector<T>::const_iterator const_iterator;
+    using const_iterator = typename hpx::partitioned_vector<T>::const_iterator;
 
     std::size_t size = 0;
 
@@ -112,18 +108,6 @@ void test_for_each(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
 }
 
 template <typename ExPolicy, typename T>
-void test_for_each_n(ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
-{
-    verify_values(policy, v, val);
-    verify_values_count(policy, v, val);
-
-    hpx::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo());
-
-    verify_values(policy, v, ++val);
-    verify_values_count(policy, v, val);
-}
-
-template <typename ExPolicy, typename T>
 void verify_values_count_async(
     ExPolicy&& policy, hpx::partitioned_vector<T> const& v, T const& val)
 {
@@ -143,19 +127,6 @@ void test_for_each_async(
     verify_values_count_async(policy, v, val);
 
     hpx::for_each(policy, v.begin(), v.end(), pfo()).get();
-
-    verify_values(policy, v, ++val);
-    verify_values_count_async(policy, v, val);
-}
-
-template <typename ExPolicy, typename T>
-void test_for_each_n_async(
-    ExPolicy&& policy, hpx::partitioned_vector<T>& v, T val)
-{
-    verify_values(policy, v, val);
-    verify_values_count_async(policy, v, val);
-
-    hpx::for_each_n(policy, v.begin(), v.end() - v.begin(), pfo()).get();
 
     verify_values(policy, v, ++val);
     verify_values_count_async(policy, v, val);
@@ -192,57 +163,10 @@ void for_each_tests(std::vector<hpx::id_type>& localities)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-void for_each_n_tests(std::vector<hpx::id_type>& localities)
-{
-    std::size_t const length = 12;
-
-    {
-        hpx::partitioned_vector<T> v;
-        hpx::for_each_n(hpx::execution::seq, v.begin(), 0, pfo());
-        hpx::for_each_n(hpx::execution::par, v.begin(), 0, pfo());
-        hpx::for_each_n(
-            hpx::execution::seq(hpx::execution::task), v.begin(), 0, pfo())
-            .get();
-        hpx::for_each_n(
-            hpx::execution::par(hpx::execution::task), v.begin(), 0, pfo())
-            .get();
-    }
-
-    {
-        hpx::partitioned_vector<T> v;
-        hpx::for_each_n(hpx::execution::seq, v.begin(), -1, pfo());
-        hpx::for_each_n(hpx::execution::par, v.begin(), -1, pfo());
-        hpx::for_each_n(
-            hpx::execution::seq(hpx::execution::task), v.begin(), -1, pfo())
-            .get();
-        hpx::for_each_n(
-            hpx::execution::par(hpx::execution::task), v.begin(), -1, pfo())
-            .get();
-    }
-
-    {
-        hpx::partitioned_vector<T> v(
-            length, T(0), hpx::container_layout(localities));
-        test_for_each_n(hpx::execution::seq, v, T(0));
-        test_for_each_n(hpx::execution::par, v, T(1));
-        test_for_each_n_async(
-            hpx::execution::seq(hpx::execution::task), v, T(2));
-        test_for_each_n_async(
-            hpx::execution::par(hpx::execution::task), v, T(3));
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     std::vector<hpx::id_type> localities = hpx::find_all_localities();
     for_each_tests<int>(localities);
-    for_each_tests<double>(localities);
-    for_each_n_tests<int>(localities);
-    for_each_n_tests<double>(localities);
     return hpx::util::report_errors();
 }
 #endif

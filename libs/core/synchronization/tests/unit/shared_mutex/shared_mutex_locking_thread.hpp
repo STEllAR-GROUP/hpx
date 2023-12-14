@@ -1,5 +1,5 @@
 //  (C) Copyright 2008 Anthony Williams
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See
@@ -45,7 +45,7 @@ namespace test {
         {
         }
 
-        void operator()()
+        void operator()() const
         {
             // acquire lock
             Lock lock(rw_mutex);
@@ -93,7 +93,7 @@ namespace test {
         {
         }
 
-        void operator()()
+        void operator()() const
         {
             std::unique_lock<hpx::shared_mutex> lk(rwm);
             {
@@ -124,7 +124,7 @@ namespace test {
         {
         }
 
-        void operator()()
+        void operator()() const
         {
             std::shared_lock<hpx::shared_mutex> lk(rwm);
             {

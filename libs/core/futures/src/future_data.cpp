@@ -230,7 +230,7 @@ namespace hpx::lcos::detail {
         hpx::detail::try_catch_exception_ptr(
             [&]() {
                 hpx::scoped_annotation annotate(on_completed);
-                on_completed();
+                HPX_MOVE(on_completed)();
             },
             [&](std::exception_ptr ep) {
                 // If the completion handler throws an exception, there's
@@ -249,7 +249,7 @@ namespace hpx::lcos::detail {
     void future_data_base<traits::detail::future_data_void>::run_on_completed(
         completed_callback_vector_type&& on_completed) noexcept
     {
-        for (auto&& func : on_completed)
+        for (auto&& func : HPX_MOVE(on_completed))
         {
             run_on_completed(HPX_MOVE(func));
         }

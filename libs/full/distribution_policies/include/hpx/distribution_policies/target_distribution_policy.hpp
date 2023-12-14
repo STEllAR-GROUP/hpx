@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
@@ -144,18 +144,17 @@ namespace hpx { namespace components {
         ///       this class
         ///
         template <typename Action, typename Continuation, typename... Ts>
-        bool apply(Continuation&& c, threads::thread_priority priority,
-            Ts&&... vs) const
+        bool apply(Continuation&& c, launch policy, Ts&&... vs) const
         {
             return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, c),
-                get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
+                get_next_target(), policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
-        bool apply(threads::thread_priority priority, Ts&&... vs) const
+        bool apply(launch policy, Ts&&... vs) const
         {
             return hpx::detail::post_impl<Action>(
-                get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
+                get_next_target(), policy, HPX_FORWARD(Ts, vs)...);
         }
 
         /// \note This function is part of the invocation policy implemented by
@@ -163,20 +162,19 @@ namespace hpx { namespace components {
         ///
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
-        bool apply_cb(Continuation&& c, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs) const
+        bool apply_cb(
+            Continuation&& c, launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::post_cb_impl<Action>(
-                HPX_FORWARD(Continuation, c), get_next_target(), priority,
+                HPX_FORWARD(Continuation, c), get_next_target(), policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Callback, typename... Ts>
-        bool apply_cb(
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        bool apply_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::post_cb_impl<Action>(get_next_target(),
-                priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            return hpx::detail::post_cb_impl<Action>(get_next_target(), policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// Returns the number of associated localities for this distribution
@@ -223,7 +221,7 @@ namespace hpx { namespace components {
     /// A predefined instance of the \a target_distribution_policy. It will
     /// represent the local locality and will place all items to create here.
     static target_distribution_policy const target{};
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 /// \cond NOINTERNAL
 namespace hpx {
@@ -231,12 +229,10 @@ namespace hpx {
     using hpx::components::target;
     using hpx::components::target_distribution_policy;
 
-    namespace traits {
-        template <>
-        struct is_distribution_policy<components::target_distribution_policy>
-          : std::true_type
-        {
-        };
-    }    // namespace traits
+    template <>
+    struct traits::is_distribution_policy<
+        components::target_distribution_policy> : std::true_type
+    {
+    };    // namespace traits
 }    // namespace hpx
 /// \endcond

@@ -209,22 +209,23 @@ namespace hpx {
 
         /// \brief Install all performance counters related to this runtime
         ///        instance
-        void register_counter_types();
+        static void register_counter_types();
 
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
             std::shared_ptr<util::query_counters> const& active_counters);
 
-        void start_active_counters(error_code& ec = throws);
-        void stop_active_counters(error_code& ec = throws);
-        void reset_active_counters(error_code& ec = throws);
-        void reinit_active_counters(bool reset = true, error_code& ec = throws);
+        void start_active_counters(error_code& ec = throws) const;
+        void stop_active_counters(error_code& ec = throws) const;
+        void reset_active_counters(error_code& ec = throws) const;
+        void reinit_active_counters(
+            bool reset = true, error_code& ec = throws) const;
         void evaluate_active_counters(bool reset = false,
-            char const* description = nullptr, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws) const;
 
         // stop periodic evaluation of counters during shutdown
-        void stop_evaluating_counters(bool terminate = false);
+        void stop_evaluating_counters(bool terminate = false) const;
 
         ///////////////////////////////////////////////////////////////////////
         /// \brief Allow access to the AGAS client instance used by the HPX
@@ -268,14 +269,15 @@ namespace hpx {
 
 #if defined(HPX_HAVE_NETWORKING)
         void register_message_handler(char const* message_handler_type,
-            char const* action, error_code& ec = throws);
+            char const* action, error_code& ec = throws) const;
         parcelset::policies::message_handler* create_message_handler(
             char const* message_handler_type, char const* action,
             parcelset::parcelport* pp, std::size_t num_messages,
-            std::size_t interval, error_code& ec = throws);
+            std::size_t interval, error_code& ec = throws) const;
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
-            serialization::binary_filter* next_filter, error_code& ec = throws);
+            serialization::binary_filter* next_filter,
+            error_code& ec = throws) const;
 #endif
 
         /// Initialize AGAS operation
@@ -381,12 +383,12 @@ namespace hpx {
             std::size_t global_thread_num, char const* pool_name,
             char const* postfix, bool service_thread);
 
-        void deinit_tss_helper(char const* context, std::size_t num);
+        void deinit_tss_helper(char const* context, std::size_t num) const;
 
         void init_tss_ex(std::string const& locality, char const* context,
             runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
-            char const* postfix, bool service_thread, error_code& ec);
+            char const* postfix, bool service_thread, error_code& ec) const;
 
         static void default_errorsink(std::string const&);
 

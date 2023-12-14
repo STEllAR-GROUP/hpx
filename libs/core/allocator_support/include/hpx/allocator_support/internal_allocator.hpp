@@ -29,7 +29,7 @@ namespace hpx::util {
 
 #if defined(HPX_HAVE_JEMALLOC_PREFIX)
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = int>
+    template <typename T = char>
     struct internal_allocator
     {
         using value_type = T;
@@ -57,12 +57,13 @@ namespace hpx::util {
         {
         }
 
-        [[nodiscard]] static pointer address(reference x) noexcept
+        [[nodiscard]] static constexpr pointer address(reference x) noexcept
         {
             return &x;
         }
 
-        [[nodiscard]] static const_pointer address(const_reference x) noexcept
+        [[nodiscard]] static constexpr const_pointer address(
+            const_reference x) noexcept
         {
             return &x;
         }
@@ -75,7 +76,7 @@ namespace hpx::util {
                 throw std::bad_array_new_length();
             }
 
-            auto p = reinterpret_cast<pointer>(
+            auto p = static_cast<pointer>(
                 HPX_PP_CAT(HPX_HAVE_JEMALLOC_PREFIX, malloc)(n * sizeof(T)));
             if (p == nullptr)
             {
@@ -122,7 +123,7 @@ namespace hpx::util {
     }
 #else
     // fall back to system allocator if no special internal allocator is needed
-    template <typename T = int>
+    template <typename T = char>
     using internal_allocator = std::allocator<T>;
 #endif
 }    // namespace hpx::util

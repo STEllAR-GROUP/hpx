@@ -159,15 +159,17 @@ namespace hpx::traits {
                 which, generation,
                 // step function (invoked for each get)
                 [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
-                // finalizer (invoked after all data has been received)
+                // finalizer (invoked non-concurrently after all data has been
+                // received)
                 [op = HPX_FORWARD(F, op)](
                     auto& data, bool& data_available) mutable {
                     HPX_ASSERT(!data.empty());
                     if (!data_available && data.size() > 1)
                     {
                         // compute reduction result only once
-                        data[0] = hpx::reduce(++data.begin(), data.end(),
-                            data[0], HPX_FORWARD(F, op));
+                        auto it = data.begin();
+                        data[0] = hpx::reduce(
+                            ++it, data.end(), data[0], HPX_FORWARD(F, op));
                         data_available = true;
                     }
                     return Communicator::template handle_bool<std::decay_t<T>>(
@@ -205,13 +207,13 @@ namespace hpx::collectives {
                 this_site](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::all_reduce_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
 
             // explicitly unwrap returned future
-            hpx::future<arg_type> result = async(action_type(), c, this_site,
-                generation, HPX_MOVE(local_result), HPX_MOVE(op));
+            hpx::future<arg_type> result = hpx::async(action_type(), c,
+                this_site, generation, HPX_MOVE(local_result), HPX_MOVE(op));
 
             if (!result.is_ready())
             {

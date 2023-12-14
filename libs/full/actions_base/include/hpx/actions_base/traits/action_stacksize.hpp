@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action stack size
@@ -23,4 +23,4 @@ namespace hpx { namespace traits {
     template <typename Action>
     inline constexpr threads::thread_stacksize action_stacksize_v =
         action_stacksize<Action>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

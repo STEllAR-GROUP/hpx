@@ -225,11 +225,10 @@ namespace hpx::components {
         ///       this class
         ///
         template <typename Action, typename Continuation, typename... Ts>
-        bool apply(Continuation&& c, threads::thread_priority priority,
-            Ts&&... vs) const
+        bool apply(Continuation&& c, launch policy, Ts&&... vs) const
         {
             return hpx::detail::post_impl<Action>(HPX_FORWARD(Continuation, c),
-                get_next_target(), priority, HPX_FORWARD(Ts, vs)...);
+                get_next_target(), policy, HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename... Ts>
@@ -244,20 +243,19 @@ namespace hpx::components {
         ///
         template <typename Action, typename Continuation, typename Callback,
             typename... Ts>
-        bool apply_cb(Continuation&& c, threads::thread_priority priority,
-            Callback&& cb, Ts&&... vs) const
+        bool apply_cb(
+            Continuation&& c, launch policy, Callback&& cb, Ts&&... vs) const
         {
             return hpx::detail::post_cb_impl<Action>(
-                HPX_FORWARD(Continuation, c), get_next_target(), priority,
+                HPX_FORWARD(Continuation, c), get_next_target(), policy,
                 HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Action, typename Callback, typename... Ts>
-        bool apply_cb(
-            threads::thread_priority priority, Callback&& cb, Ts&&... vs) const
+        bool apply_cb(launch policy, Callback&& cb, Ts&&... vs) const
         {
-            return hpx::detail::post_cb_impl<Action>(get_next_target(),
-                priority, HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
+            return hpx::detail::post_cb_impl<Action>(get_next_target(), policy,
+                HPX_FORWARD(Callback, cb), HPX_FORWARD(Ts, vs)...);
         }
 
         /// Returns the number of associated localities for this distribution

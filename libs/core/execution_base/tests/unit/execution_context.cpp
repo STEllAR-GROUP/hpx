@@ -44,7 +44,7 @@ struct dummy_agent : hpx::execution_base::agent_base
     }
     void yield_k(std::size_t, char const*) override {}
     void suspend(char const*) override {}
-    void resume(char const*) override {}
+    void resume(hpx::threads::thread_priority, char const*) override {}
     void abort(char const*) override {}
     void sleep_for(hpx::chrono::steady_duration const&, char const*) override {}
     void sleep_until(

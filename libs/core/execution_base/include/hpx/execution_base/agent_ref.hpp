@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 #include <chrono>
@@ -50,7 +51,8 @@ namespace hpx::execution_base {
             char const* desc = "hpx::execution_base::agent_ref::yield_k") const;
         void suspend(
             char const* desc = "hpx::execution_base::agent_ref::suspend") const;
-        void resume(
+        void resume(hpx::threads::thread_priority priority =
+                        hpx::threads::thread_priority::default_,
             char const* desc = "hpx::execution_base::agent_ref::resume") const;
         void abort(
             char const* desc = "hpx::execution_base::agent_ref::abort") const;

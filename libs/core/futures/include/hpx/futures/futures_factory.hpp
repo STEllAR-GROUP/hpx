@@ -769,13 +769,17 @@ namespace hpx::lcos::local {
                 !std::is_same_v<std::decay_t<F>, futures_factory>>>
         explicit futures_factory(F&& f)
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                hpx::util::internal_allocator<>{}, HPX_FORWARD(F, f)))
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>{},
+                HPX_FORWARD(F, f)))
         {
         }
 
         explicit futures_factory(Result (*f)())
           : task_(detail::create_task_object<Result, Cancelable>::call(
-                hpx::util::internal_allocator<>{}, f))
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>{},
+                f))
         {
         }
 

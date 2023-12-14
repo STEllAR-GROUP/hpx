@@ -256,17 +256,18 @@ namespace hpx::traits {
                 which, generation,
                 // step function (invoked once for get)
                 [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
-                // finalizer (invoked after all data has been received)
+                // finalizer (invoked once after all data has been received)
                 [op = HPX_FORWARD(F, op)](auto& data, bool&) mutable {
                     HPX_ASSERT(!data.empty());
                     if (data.size() > 1)
                     {
+                        auto it = data.begin();
                         return Communicator::template handle_bool<
-                            std::decay_t<T>>(hpx::reduce(++data.begin(),
-                            data.end(), data[0], HPX_FORWARD(F, op)));
+                            std::decay_t<T>>(hpx::reduce(++it, data.end(),
+                            HPX_MOVE(data[0]), HPX_FORWARD(F, op)));
                     }
                     return Communicator::template handle_bool<std::decay_t<T>>(
-                        data[0]);
+                        HPX_MOVE(data[0]));
                 });
         }
 
@@ -278,7 +279,7 @@ namespace hpx::traits {
                 which, generation,
                 // step function (invoked for each set)
                 [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
-                // finalizer (invoked after all data has been received)
+                // no finalizer
                 nullptr);
         }
     };
@@ -312,13 +313,14 @@ namespace hpx::collectives {
                 generation](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::reduce_tag, hpx::future<arg_type>,
                     arg_type, func_type>;
 
             // explicitly unwrap returned future
-            hpx::future<arg_type> result = async(action_type(), c, this_site,
-                generation, HPX_FORWARD(T, local_result), HPX_FORWARD(F, op));
+            hpx::future<arg_type> result =
+                hpx::async(action_type(), c, this_site, generation,
+                    HPX_FORWARD(T, local_result), HPX_FORWARD(F, op));
 
             if (!result.is_ready())
             {
@@ -375,12 +377,12 @@ namespace hpx::collectives {
             [local_result = HPX_FORWARD(T, local_result), this_site,
                 generation](communicator&& c) mutable -> hpx::future<void> {
             using action_type =
-                detail::communicator_server::communication_set_action<
+                detail::communicator_server::communication_set_direct_action<
                     traits::communication::reduce_tag, hpx::future<void>,
                     std::decay_t<T>>;
 
             // explicitly unwrap returned future
-            hpx::future<void> result = async(action_type(), c, this_site,
+            hpx::future<void> result = hpx::async(action_type(), c, this_site,
                 generation, HPX_MOVE(local_result));
 
             if (!result.is_ready())

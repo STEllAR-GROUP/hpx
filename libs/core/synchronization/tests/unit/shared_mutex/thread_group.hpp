@@ -1,5 +1,5 @@
 // (C) Copyright 2007-9 Anthony Williams
-// Copyright (c) 2015-2022 Hartmut Kaiser
+// Copyright (c) 2015-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 // Distributed under the Boost Software License, Version 1.0. (See
@@ -27,10 +27,11 @@
 #endif
 
 namespace test {
+
     class thread_group
     {
     private:
-        typedef hpx::shared_mutex mutex_type;
+        using mutex_type = hpx::shared_mutex;
 
     public:
         thread_group() {}
@@ -40,16 +41,16 @@ namespace test {
 
         ~thread_group()
         {
-            for (hpx::thread* t : threads)
+            for (hpx::thread const* t : threads)
                 delete t;
         }
 
     private:
-        bool is_this_thread_in()
+        bool is_this_thread_in() const
         {
-            hpx::thread::id id = hpx::this_thread::get_id();
+            hpx::thread::id const id = hpx::this_thread::get_id();
             std::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t : threads)
+            for (hpx::thread const* t : threads)
             {
                 if (t->get_id() == id)
                     return true;
@@ -57,14 +58,14 @@ namespace test {
             return false;
         }
 
-        bool is_thread_in(hpx::thread* thrd)
+        bool is_thread_in(hpx::thread const* thrd) const
         {
             if (!thrd)
                 return false;
 
-            hpx::thread::id id = thrd->get_id();
+            hpx::thread::id const id = thrd->get_id();
             std::shared_lock<mutex_type> guard(mtx_);
-            for (hpx::thread* t : threads)
+            for (hpx::thread const* t : threads)
             {
                 if (t->get_id() == id)
                     return true;
@@ -93,7 +94,6 @@ namespace test {
                         "thread_group::add_thread",
                         "resource_deadlock_would_occur: trying to add a "
                         "duplicated thread");
-                    return;
                 };
 
                 std::lock_guard<mutex_type> guard(mtx_);
@@ -101,7 +101,7 @@ namespace test {
             }
         }
 
-        void remove_thread(hpx::thread* thrd)
+        void remove_thread(hpx::thread const* thrd)
         {
             std::lock_guard<mutex_type> guard(mtx_);
             std::list<hpx::thread*>::iterator const it =
@@ -111,14 +111,13 @@ namespace test {
                 threads.erase(it);
         }
 
-        void join_all()
+        void join_all() const
         {
             if (is_this_thread_in())
             {
                 HPX_THROW_EXCEPTION(hpx::error::thread_resource_error,
                     "thread_group::join_all",
                     "resource_deadlock_would_occur: trying joining itself");
-                return;
             }
 
             std::shared_lock<mutex_type> guard(mtx_);
@@ -129,7 +128,7 @@ namespace test {
             }
         }
 
-        void interrupt_all()
+        void interrupt_all() const
         {
             std::shared_lock<mutex_type> guard(mtx_);
             for (hpx::thread* t : threads)

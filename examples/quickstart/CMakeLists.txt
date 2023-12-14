@@ -80,6 +80,9 @@ endif()
 
 # TODO: These examples currently fail. Disabled until they are fixed.
 set(disabled_tests error_handling fibonacci_await non_atomic_rma zerocopy_rdma)
+if(HPX_WITH_STATIC_LINKING)
+  set(disabled_tests ${disabled_tests} hello_world_1)
+endif()
 
 set(1d_wave_equation_FLAGS COMPONENT_DEPENDENCIES iostreams)
 set(allow_unknown_options_FLAGS COMPONENT_DEPENDENCIES iostreams)

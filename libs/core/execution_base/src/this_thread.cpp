@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/execution_base/agent_base.hpp>
 #include <hpx/execution_base/context_base.hpp>
@@ -66,7 +67,8 @@ namespace hpx::execution_base {
             void yield(char const* desc) override;
             void yield_k(std::size_t k, char const* desc) override;
             void suspend(char const* desc) override;
-            void resume(char const* desc) override;
+            void resume(hpx::threads::thread_priority priority,
+                char const* desc) override;
             void abort(char const* desc) override;
             void sleep_for(hpx::chrono::steady_duration const& sleep_duration,
                 char const* desc) override;
@@ -156,7 +158,7 @@ namespace hpx::execution_base {
             }
         }
 
-        void default_agent::resume(char const* /* desc */)
+        void default_agent::resume(hpx::threads::thread_priority, char const*)
         {
             {
                 std::unique_lock<std::mutex> l(mtx_);

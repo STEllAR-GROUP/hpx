@@ -153,7 +153,7 @@ namespace hpx::util::detail {
 
         ~basic_function() = default;
 
-        void assign(std::nullptr_t) noexcept
+        constexpr void assign(std::nullptr_t) noexcept
         {
             base_type::reset(get_empty_vtable());
         }
@@ -167,8 +167,8 @@ namespace hpx::util::detail {
 
             if (!detail::is_empty_function(f))
             {
-                vtable const* f_vptr = get_vtable<T>();
-                void* buffer = nullptr;
+                constexpr vtable const* f_vptr = get_vtable<T>();
+                void* buffer;
                 if (vptr == f_vptr)
                 {
                     HPX_ASSERT(object != nullptr);
@@ -193,7 +193,7 @@ namespace hpx::util::detail {
             }
         }
 
-        void reset() noexcept
+        constexpr void reset() noexcept
         {
             base_type::reset(get_empty_vtable());
         }
@@ -209,7 +209,7 @@ namespace hpx::util::detail {
             static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
                 "T shall be Callable with the function signature");
 
-            vtable const* f_vptr = get_vtable<TD>();
+            constexpr vtable const* f_vptr = get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
@@ -223,7 +223,7 @@ namespace hpx::util::detail {
             static_assert(hpx::is_invocable_r_v<R, TD&, Ts...>,
                 "T shall be Callable with the function signature");
 
-            vtable const* f_vptr = get_vtable<TD>();
+            constexpr vtable const* f_vptr = get_vtable<TD>();
             if (vptr != f_vptr || empty())
                 return nullptr;
 
