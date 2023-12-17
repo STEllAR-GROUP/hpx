@@ -46,11 +46,19 @@ else()
         ${HWLOC_ROOT}/include
         CACHE INTERNAL ""
     )
-    set(Hwloc_LIBRARY
-        ${HWLOC_ROOT}/lib/libhwloc.so
-        CACHE INTERNAL ""
-    )
-  elseif("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64")
+    if(APPLE)
+      set(Hwloc_LIBRARY
+          ${HWLOC_ROOT}/lib/libhwloc.dylib
+          CACHE INTERNAL ""
+      )
+    else()
+      set(Hwloc_LIBRARY
+          ${HWLOC_ROOT}/lib/libhwloc.so
+          CACHE INTERNAL ""
+      )
+    endif()
+
+  elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
     fetchcontent_declare(
       HWLoc
       URL https://download.open-mpi.org/release/hwloc/v${HPX_WITH_HWLOC_VERSION}/hwloc-win64-build-${HPX_WITH_HWLOC_RELEASE}.zip
@@ -63,7 +71,6 @@ else()
         "${CMAKE_BINARY_DIR}/_deps/hwloc-src"
         CACHE INTERNAL ""
     )
-    find_package(hwloc REQUIRED PATHS ${HWLOC_ROOT} NO_DEFAULT_PATH)
     include_directories(${HWLOC_ROOT}/include)
     link_directories(${HWLOC_ROOT}/lib)
     set(Hwloc_INCLUDE_DIR
@@ -97,7 +104,7 @@ else()
         ${HWLOC_ROOT}/lib/libhwloc.dll.a
         CACHE INTERNAL ""
     )
-  endif()
+  endif() # End hwloc installation
 
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
