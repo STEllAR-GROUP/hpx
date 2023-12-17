@@ -58,7 +58,9 @@ else()
       )
     endif()
 
-  elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+  elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P
+                                                       EQUAL 8
+  )
     fetchcontent_declare(
       HWLoc
       URL https://download.open-mpi.org/release/hwloc/v${HPX_WITH_HWLOC_VERSION}/hwloc-win64-build-${HPX_WITH_HWLOC_RELEASE}.zip
