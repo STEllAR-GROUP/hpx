@@ -118,9 +118,8 @@ namespace hpx::parcelset::policies::lci {
     /// Return the name of this locality
     std::string parcelport::get_locality_name() const
     {
-        // hostname-rank
-        return util::lci_environment::get_processor_name() + "-" +
-            std::to_string(util::lci_environment::rank());
+        // hostname
+        return util::lci_environment::get_processor_name();
     }
 
     std::shared_ptr<sender_connection_base> parcelport::create_connection(
