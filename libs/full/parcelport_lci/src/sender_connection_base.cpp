@@ -73,7 +73,9 @@ namespace hpx::parcelset::policies::lci {
                         while (pp_->background_work(
                             -1, parcelport_background_mode_all))
                             continue;
-                        hpx::this_thread::yield();
+                        if (hpx::threads::get_self_id() !=
+                            hpx::threads::invalid_thread_id)
+                            hpx::this_thread::yield();
                     }
                     if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
