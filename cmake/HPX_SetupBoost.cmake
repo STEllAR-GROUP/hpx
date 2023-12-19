@@ -5,6 +5,39 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if (HPX_WITH_FETCH_BOOST)
+  include(FetchContent)
+  FetchContent_Declare(Boost
+      URL https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.gz
+      TLS_VERIFY true
+  )
+  FetchContent_Populate(Boost)
+
+  set(EX_PRC "Execute process" CACHE STRING "Used by command line tool.")
+  set(EX_PRC_INTERNAL "" CACHE INTERNAL "for internal use only; do not modify")
+
+  if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
+    if(WIN32)
+      execute_process(COMMAND cmd /C "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++20" )
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+      hpx_info("Building fetched boost")
+      execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed && ./b2 && ./b2 install --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed cxxflags=--std=c++20")
+    else()
+      execute_process(COMMAND sh -c "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++20" )
+    endif()
+    set(EX_PRC_INTERNAL ${EX_PRC} CACHE INTERNAL "for internal use only; do not modify")
+  endif()
+
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(Boost_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+    set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+    set(Boost_LIBRARY_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src/stage/lib")
+  else()
+    set(Boost_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+    set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+  endif()
+endif()
+
 # In case find_package(HPX) is called multiple times
 if(NOT TARGET hpx_dependencies_boost)
   # We first try to find the required minimum set of Boost libraries. This will

@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-name: macOS CI (Debug)
+name: macOS CI (Debug) with Boost Fetch
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         brew upgrade
         brew update && \
             brew install --overwrite python-tk && \
-            brew install --overwrite boost hwloc gperftools ninja && \
+            brew install --overwrite hwloc gperftools ninja && \
             brew upgrade cmake
     - name: Configure
       shell: bash
@@ -37,18 +37,19 @@ jobs:
               -GNinja \
               -DCMAKE_BUILD_TYPE=Debug \
               -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_FETCH_BOOST=ON \
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
-              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=3 \
-              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash
       run: |
           cmake --build build --target all
-          cmake --build build --target tests
     - name: Test
       shell: bash
       run: |
+          cmake --build build --target tests
           cd build
           ctest --output-on-failure \
             --exclude-regex \

@@ -958,6 +958,15 @@ if(HPX_WITH_APEX)
   )
 endif()
 
+hpx_option(
+  HPX_WITH_FETCH_BOOST
+  BOOL
+  "Use FetchContent to fetch Asio. By default an installed Asio will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # Options for automatically fetching Asio
 hpx_option(
   HPX_WITH_FETCH_ASIO
