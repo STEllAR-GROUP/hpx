@@ -48,7 +48,8 @@ namespace hpx::actions::detail {
     {
         HPX_ASSERT(id != invalid_id);
 
-        if (!typename_to_id_.emplace(type_name, id).second)
+        if (auto const [it, inserted] = typename_to_id_.emplace(type_name, id);
+            !inserted && it->second != 0)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "action_registry::register_typename",
@@ -190,7 +191,7 @@ namespace hpx::actions::detail {
         if (id_ >= cache_.size())
         {
             cache_.resize(id_ + 1, std::pair<ctor_t, ctor_t>(nullptr, nullptr));
-            cache_[id_] = std::pair<ctor_t, ctor_t>{};
+            cache_[id_] = std::make_pair(ctor, ctor_cont);
             return;
         }
 
