@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -151,12 +151,12 @@ namespace hpx {
 
     std::string copyright()
     {
-        char const* const copyright =
+        constexpr char const* const copyright =
             "HPX - The C++ Standard Library for Parallelism and Concurrency\n"
             "(A general purpose parallel C++ runtime system for distributed "
             "applications\n"
             "of any scale).\n\n"
-            "Copyright (c) 2007-2023, The STE||AR Group,\n"
+            "Copyright (c) 2007-2024, The STE||AR Group,\n"
             "http://stellar-group.org, email:hpx-users@stellar-group.org\n\n"
             "Distributed under the Boost Software License, "
             "Version 1.0. (See accompanying\n"
@@ -249,7 +249,7 @@ namespace hpx {
 
                 for (auto const& e : c.config_entries)
                 {
-                    strm << "  " << e << std::endl;
+                    strm << "  " << e << "\n";
                 }
 
                 strm << "\n";
