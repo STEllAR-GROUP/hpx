@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -224,7 +224,7 @@ namespace hpx::lcos::local {
                                       std::decay_t<F>>)
                     {
                         // invoke callback with the outer lock being held
-                        f(outer_lock, *this);
+                        HPX_FORWARD(F, f)(outer_lock, *this);
                     }
 
                     outer_lock.unlock();
