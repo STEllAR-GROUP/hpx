@@ -379,8 +379,9 @@ namespace hpx::program_options {
 
         std::string error_template = original_error_template;
         // remove duplicates using std::set
-        std::set alternatives_set(m_alternatives.begin(), m_alternatives.end());
-        std::vector const alternatives_vec(
+        std::set<std::string> alternatives_set(
+            m_alternatives.begin(), m_alternatives.end());
+        std::vector<std::string> const alternatives_vec(
             alternatives_set.begin(), alternatives_set.end());
 
         error_template += " and matches ";
