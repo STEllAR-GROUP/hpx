@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
+#include <cstring>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -89,6 +90,8 @@ namespace hpx::collectives::detail {
                 std::size_t, std::size_t, char const*) noexcept
             {
             }
+
+            ~logging_helper() = default;
 #endif
 
             logging_helper(logging_helper const&) = delete;
@@ -165,6 +168,12 @@ namespace hpx::collectives::detail {
         };
 
     private:
+        std::size_t get_num_sites(std::size_t num_values) const noexcept
+        {
+            return num_values == static_cast<std::size_t>(-1) ? num_sites_ :
+                                                                num_values;
+        }
+
         // re-initialize data
         template <typename T>
         void reinitialize_data(std::size_t num_values)
@@ -174,10 +183,8 @@ namespace hpx::collectives::detail {
                 needs_initialization_ = false;
                 data_available_ = false;
 
-                auto const new_size =
-                    num_values == static_cast<std::size_t>(-1) ? num_sites_ :
-                                                                 num_values;
-                auto* data = hpx::any_cast<std::vector<T>>(&data_);
+                auto const new_size = get_num_sites(num_values);
+                auto const* data = hpx::any_cast<std::vector<T>>(&data_);
                 if (data == nullptr || data->size() < new_size)
                 {
                     data_ = std::vector<T>(new_size);
@@ -201,6 +208,8 @@ namespace hpx::collectives::detail {
             {
                 needs_initialization_ = true;
                 data_available_ = false;
+                on_ready_count_ = 0;
+                current_operation_ = nullptr;
             }
         }
 
@@ -212,8 +221,7 @@ namespace hpx::collectives::detail {
             auto sf = gate_.get_shared_future(l);
 
             traits::detail::get_shared_state(sf)->reserve_callbacks(
-                capacity == static_cast<std::size_t>(-1) ? num_sites_ :
-                                                           capacity);
+                get_num_sites(capacity));
 
             auto fut = sf.then(hpx::launch::sync, HPX_FORWARD(F, f));
 
@@ -225,30 +233,94 @@ namespace hpx::collectives::detail {
             return fut;
         }
 
+        template <typename F>
+        struct on_exit
+        {
+            explicit constexpr on_exit(F&& f_) noexcept
+              : f(HPX_MOVE(f_))
+            {
+            }
+
+            on_exit(on_exit const&) = delete;
+            on_exit(on_exit&&) = delete;
+            on_exit& operator=(on_exit const&) = delete;
+            on_exit& operator=(on_exit&&) = delete;
+
+            ~on_exit()
+            {
+                f();
+            }
+
+            F f;
+        };
+
         // Step will be invoked under lock for each site that checks in (either
         // set or get).
         //
         // Finalizer will be invoked under lock after all sites have checked in.
         template <typename Data, typename Step, typename Finalizer>
-        auto handle_data(std::size_t which, std::size_t generation,
-            [[maybe_unused]] Step&& step, Finalizer&& finalizer,
+        auto handle_data(char const* operation, std::size_t which,
+            std::size_t generation, [[maybe_unused]] Step&& step,
+            Finalizer&& finalizer,
             std::size_t num_values = static_cast<std::size_t>(-1))
         {
-            auto on_ready = [this, num_values,
+            auto on_ready = [this, operation, which, num_values,
                                 finalizer = HPX_FORWARD(Finalizer, finalizer)](
                                 shared_future<void>&& f) mutable {
+                // This callback will be invoked once for each participating
+                // site after all sites have checked in.
+
                 f.get();    // propagate any exceptions
+
+                // It does not matter whether the lock will be acquired here. It
+                // either is still being held by the surrounding logic or is
+                // re-acquired here (if `on_ready` happens to run on a new
+                // thread asynchronously).
+                std::unique_lock l(mtx_, std::try_to_lock);
+
+                // Verify that there is no overlap between different types of
+                // operations on the same communicator.
+                if (current_operation_ == nullptr ||
+                    std::strcmp(current_operation_, operation) != 0)
+                {
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "communicator::handle_data::on_ready",
+                        "sequencing error, operation type mismatch: invoked "
+                        "for {}, ongoing operation {}",
+                        operation,
+                        current_operation_ ? current_operation_ : "unknown");
+                }
+
+                // Verify that the number of invocations of this callback is in
+                // the expected range.
+                if (on_ready_count_ >= num_sites_)
+                {
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "communicator::handle_data::on_ready",
+                        "sequencing error, an excessive number of on_ready "
+                        "callbacks have been invoked before the end of the "
+                        "collective {} operation. Expected count {}, received "
+                        "count {}.",
+                        operation, on_ready_count_, num_sites_);
+                }
+
+                // On exit, keep track of number of invocations of this
+                // callback.
+                on_exit _([this] { ++on_ready_count_; });
 
                 if constexpr (!std::is_same_v<std::nullptr_t,
                                   std::decay_t<Finalizer>>)
                 {
                     // call provided finalizer
                     return HPX_FORWARD(Finalizer, finalizer)(
-                        access_data<Data>(num_values), data_available_);
+                        access_data<Data>(num_values), data_available_, which);
                 }
                 else
                 {
                     HPX_UNUSED(this);
+                    HPX_UNUSED(which);
                     HPX_UNUSED(num_values);
                     HPX_UNUSED(finalizer);
                 }
@@ -257,23 +329,73 @@ namespace hpx::collectives::detail {
             std::unique_lock l(mtx_);
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
+            // Verify that there is no overlap between different types of
+            // operations on the same communicator.
+            if (current_operation_ == nullptr)
+            {
+                if (on_ready_count_ != 0)
+                {
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "communicator::handle_data",
+                        "sequencing error, on_ready callback was already "
+                        "invoked before the start of the collective {} "
+                        "operation",
+                        operation);
+                }
+                current_operation_ = operation;
+            }
+            else if (std::strcmp(current_operation_, operation) != 0)
+            {
+                l.unlock();
+                HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    "communicator::handle_data",
+                    "sequencing error, operation type mismatch: invoked for "
+                    "{}, ongoing operation {}",
+                    operation, current_operation_);
+            }
+
             auto f = get_future_and_synchronize(
                 generation, num_values, HPX_MOVE(on_ready), l);
 
             if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
             {
                 // call provided step function for each invocation site
-                HPX_FORWARD(Step, step)(access_data<Data>(num_values));
+                HPX_FORWARD(Step, step)(access_data<Data>(num_values), which);
             }
 
             // Make sure next generation is enabled only after previous
             // generation has finished executing.
-            //
-            // set() consumes the lock
-            gate_.set(
-                which, HPX_MOVE(l), [this, generation](auto& l, auto& gate) {
-                    gate.next_generation(l, generation);
-                    this->invalidate_data(l);
+            gate_.set(which, l,
+                [this, operation, generation](
+                    auto& l, auto& gate, error_code& ec) {
+                    // This callback is invoked synchronously once for each
+                    // collective operation after all data has been received and
+                    // all (shared) futures were triggered.
+
+                    HPX_ASSERT_OWNS_LOCK(l);
+
+                    // Verify that all `on_ready` callbacks have finished
+                    // executing at this point.
+                    if (on_ready_count_ != num_sites_)
+                    {
+                        l.unlock();
+                        HPX_THROWS_IF(ec, hpx::error::invalid_status,
+                            "communicator::handle_data",
+                            "sequencing error, not all on_ready callbacks have "
+                            "been invoked at the end of the collective {} "
+                            "operation. Expected count {}, received count {}.",
+                            operation, on_ready_count_, num_sites_);
+                        return;
+                    }
+
+                    // Reset communicator state before proceeding to the next
+                    // generation.
+                    invalidate_data(l);
+
+                    // Release threads possibly waiting for the next generation
+                    // to be handled.
+                    gate.next_generation(l, generation, ec);
                 });
 
             return f;
@@ -281,7 +403,7 @@ namespace hpx::collectives::detail {
 
         // protect against vector<bool> idiosyncrasies
         template <typename ValueType, typename Data>
-        static constexpr decltype(auto) handle_bool(Data&& data)
+        static constexpr decltype(auto) handle_bool(Data&& data) noexcept
         {
             if constexpr (std::is_same_v<ValueType, bool>)
             {
@@ -298,10 +420,12 @@ namespace hpx::collectives::detail {
 
         mutex_type mtx_;
         hpx::unique_any_nonser data_;
-        lcos::local::and_gate gate_;
+        hpx::lcos::local::and_gate gate_;
         std::size_t const num_sites_;
-        bool needs_initialization_;
-        bool data_available_;
+        std::size_t on_ready_count_ = 0;
+        char const* current_operation_ = nullptr;
+        bool needs_initialization_ = true;
+        bool data_available_ = false;
     };
 }    // namespace hpx::collectives::detail
 

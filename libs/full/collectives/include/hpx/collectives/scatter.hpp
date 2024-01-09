@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -244,12 +244,13 @@ namespace hpx::traits {
         {
             using data_type = typename Result::result_type;
 
-            return communicator.template handle_data<data_type>(which,
-                generation,
+            return communicator.template handle_data<data_type>(
+                communication::communicator_name<communication::scatter_tag>(),
+                which, generation,
                 // step function (invoked once for get)
                 nullptr,
                 // finalizer (invoked after all sites have checked in)
-                [which](auto& data, bool&) {
+                [](auto& data, bool&, std::size_t which) {
                     return Communicator::template handle_bool<data_type>(
                         HPX_MOVE(data[which]));
                 });
@@ -260,11 +261,12 @@ namespace hpx::traits {
             std::size_t generation, std::vector<T>&& t)
         {
             return communicator.template handle_data<T>(
+                communication::communicator_name<communication::scatter_tag>(),
                 which, generation,
                 // step function (invoked once for set)
-                [&](auto& data) { data = HPX_MOVE(t); },
+                [&t](auto& data, std::size_t) { data = HPX_MOVE(t); },
                 // finalizer (invoked after all sites have checked in)
-                [which](auto& data, bool&) {
+                [](auto& data, bool&, std::size_t which) {
                     return Communicator::template handle_bool<T>(
                         HPX_MOVE(data[which]));
                 });
@@ -306,7 +308,7 @@ namespace hpx::collectives {
             {
                 // make sure id is kept alive as long as the returned future
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
             }
 
             return result;

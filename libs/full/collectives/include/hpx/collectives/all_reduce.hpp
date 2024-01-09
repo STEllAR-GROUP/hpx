@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -156,13 +156,17 @@ namespace hpx::traits {
             std::size_t generation, T&& t, F&& op)
         {
             return communicator.template handle_data<std::decay_t<T>>(
+                communication::communicator_name<
+                    communication::all_reduce_tag>(),
                 which, generation,
                 // step function (invoked for each get)
-                [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
+                [&t](auto& data, std::size_t which) {
+                    data[which] = HPX_FORWARD(T, t);
+                },
                 // finalizer (invoked non-concurrently after all data has been
                 // received)
                 [op = HPX_FORWARD(F, op)](
-                    auto& data, bool& data_available) mutable {
+                    auto& data, bool& data_available, std::size_t) mutable {
                     HPX_ASSERT(!data.empty());
                     if (!data_available && data.size() > 1)
                     {
@@ -219,7 +223,7 @@ namespace hpx::collectives {
             {
                 // make sure id is kept alive as long as the returned future
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
             }
 
             return result;

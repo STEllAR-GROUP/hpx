@@ -50,8 +50,6 @@ namespace hpx::collectives {
 
         communicator_server::communicator_server() noexcept    //-V730
           : num_sites_(0)
-          , needs_initialization_(false)
-          , data_available_(false)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
@@ -59,10 +57,9 @@ namespace hpx::collectives {
         communicator_server::communicator_server(std::size_t num_sites) noexcept
           : gate_(num_sites)
           , num_sites_(num_sites)
-          , needs_initialization_(true)
-          , data_available_(false)
         {
-            HPX_ASSERT(num_sites != 0);
+            HPX_ASSERT(
+                num_sites != 0 && num_sites != static_cast<std::size_t>(-1));
         }
     }    // namespace detail
 
