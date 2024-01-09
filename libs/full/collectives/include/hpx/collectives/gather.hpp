@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -250,11 +250,14 @@ namespace hpx::traits {
             std::size_t generation, T&& t)
         {
             return communicator.template handle_data<std::decay_t<T>>(
+                communication::communicator_name<communication::gather_tag>(),
                 which, generation,
                 // step function (invoked once for get)
-                [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
+                [&t](auto& data, std::size_t which) {
+                    data[which] = HPX_FORWARD(T, t);
+                },
                 // finalizer (invoked once after all data has been received)
-                [](auto& data, bool&) { return HPX_MOVE(data); });
+                [](auto& data, bool&, std::size_t) { return HPX_MOVE(data); });
         }
 
         template <typename Result, typename T>
@@ -262,9 +265,12 @@ namespace hpx::traits {
             std::size_t generation, T&& t)
         {
             return communicator.template handle_data<std::decay_t<T>>(
+                communication::communicator_name<communication::gather_tag>(),
                 which, generation,
                 // step function (invoked for each set)
-                [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
+                [&t](auto& data, std::size_t which) {
+                    data[which] = HPX_FORWARD(T, t);
+                },
                 // no finalizer
                 nullptr);
         }
@@ -312,7 +318,7 @@ namespace hpx::collectives {
             {
                 // make sure id is kept alive as long as the returned future
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
             }
 
             return result;

@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2023 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,13 +22,14 @@
 
 #include <cstddef>
 #include <exception>
-#include <functional>
 #include <mutex>
 #include <utility>
 
 namespace hpx::lcos::detail {
 
-    static run_on_completed_error_handler_type run_on_completed_error_handler;
+    namespace {
+        run_on_completed_error_handler_type run_on_completed_error_handler;
+    }
 
     void set_run_on_completed_error_handler(
         run_on_completed_error_handler_type f)
@@ -66,16 +67,12 @@ namespace hpx::lcos::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Callback>
-    static void run_on_completed_on_new_thread(Callback&& f)
+    void run_on_completed_on_new_thread(Callback&& f)
     {
         lcos::local::futures_factory<void()> p(HPX_FORWARD(Callback, f));
 
-        bool const is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
+        HPX_ASSERT(nullptr != hpx::threads::get_self_ptr());
         hpx::launch policy = launch::fork;
-        if (!is_hpx_thread)
-        {
-            policy = launch::async;
-        }
 
         policy.set_priority(threads::thread_priority::boost);
         policy.set_stacksize(threads::thread_stacksize::current);
@@ -84,17 +81,12 @@ namespace hpx::lcos::detail {
         threads::thread_id_ref_type const tid =    //-V821
             p.post("run_on_completed_on_new_thread", policy);
 
-        // wait for the task to run
-        if (is_hpx_thread)
-        {
-            // make sure this thread is executed last
-            this_thread::suspend(
-                threads::thread_schedule_state::pending, tid.noref());
-            return p.get_future().get();
-        }
+        // make sure this thread is executed last
+        this_thread::suspend(
+            threads::thread_schedule_state::pending, tid.noref());
 
-        // If we are not on a HPX thread, we need to return immediately, to
-        // allow the newly spawned thread to execute.
+        // wait for the task to run
+        return p.get_future().get();
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,15 +116,13 @@ namespace hpx::lcos::detail {
         }
 
         auto const state = this->state_.load(std::memory_order_acquire);
-        if (state != this->empty)
+        if (state != future_data_base::empty)
         {
             return false;
         }
 
         // this thread would block on the future
-
-        auto* thrd = get_thread_id_data(runs_child);
-        HPX_UNUSED(thrd);    // might be unused
+        [[maybe_unused]] auto* thrd = get_thread_id_data(runs_child);
 
         LTM_(debug).format("task_object::get_result_void: attempting to "
                            "directly execute child({}), description({})",
@@ -161,8 +151,6 @@ namespace hpx::lcos::detail {
         return false;
     }
 
-    static util::unused_type unused_;
-
     util::unused_type*
     future_data_base<traits::detail::future_data_void>::get_result_void(
         void const* storage, error_code& ec)
@@ -190,6 +178,7 @@ namespace hpx::lcos::detail {
 
         if (s == value)
         {
+            static util::unused_type unused_;
             return &unused_;
         }
 
@@ -232,12 +221,12 @@ namespace hpx::lcos::detail {
                 hpx::scoped_annotation annotate(on_completed);
                 HPX_MOVE(on_completed)();
             },
-            [&](std::exception_ptr ep) {
+            [&](std::exception_ptr const& ep) {
                 // If the completion handler throws an exception, there's
                 // nothing we can do, report the exception and terminate.
                 if (run_on_completed_error_handler)
                 {
-                    run_on_completed_error_handler(HPX_MOVE(ep));
+                    run_on_completed_error_handler(ep);
                 }
                 else
                 {
@@ -272,7 +261,9 @@ namespace hpx::lcos::detail {
             cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
             (hpx::threads::get_self_ptr() == nullptr);
 #endif
-        if (!recurse_asynchronously)
+
+        bool const is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
+        if (!is_hpx_thread || !recurse_asynchronously)
         {
             // directly execute continuation on this thread
             run_on_completed(HPX_FORWARD(Callback, on_completed));
@@ -289,17 +280,17 @@ namespace hpx::lcos::detail {
                     run_on_completed_on_new_thread(util::deferred_call(
                         p, HPX_FORWARD(Callback, on_completed)));
                 },
-                [&](std::exception_ptr ep) {
+                [&](std::exception_ptr const& ep) {
                     // If an exception while creating the new task or inside the
                     // completion handler is thrown, there is nothing we can do...
                     // ... but terminate and report the error
                     if (run_on_completed_error_handler)
                     {
-                        run_on_completed_error_handler(HPX_MOVE(ep));
+                        run_on_completed_error_handler(ep);
                     }
                     else
                     {
-                        std::rethrow_exception(HPX_MOVE(ep));
+                        std::rethrow_exception(ep);
                     }
                 });
         }
