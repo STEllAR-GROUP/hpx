@@ -22,7 +22,7 @@ static_assert(N > M);
 static_assert(M > K);
 
 using hpx::experimental::is_trivially_relocatable_v;
-using hpx::experimental::uninitialized_relocate_n;
+using hpx::experimental::uninitialized_relocate_backward;
 
 std::mutex m;
 
@@ -221,7 +221,7 @@ void test()
         }
 
         // relocate M objects to ptr2
-        uninitialized_relocate_n(Ex{}, ptr1, M, ptr2);
+        uninitialized_relocate_backward(Ex{}, ptr1, ptr1 + M, ptr2 + M);
 
         // bookkeeping
         // Artificially add and remove the objects to the set that are where
@@ -268,7 +268,7 @@ void test()
         auto [ptr1, ptr2] = setup<non_trivially_relocatable_struct>();
 
         // relocate them to ptr2
-        uninitialized_relocate_n(Ex{}, ptr1, M, ptr2);
+        uninitialized_relocate_backward(Ex{}, ptr1, ptr1 + M, ptr2 + M);
 
         // M move constructors were called and M destructors
         HPX_TEST(non_trivially_relocatable_struct::moved == M);
@@ -307,7 +307,7 @@ void test()
         // relocate M objects to ptr2
         try
         {
-            uninitialized_relocate_n(Ex{}, ptr1, M, ptr2);
+            uninitialized_relocate_backward(Ex{}, ptr1, ptr1 + M, ptr2 + M);
             HPX_UNREACHABLE;    // should have thrown
         }
         catch (...)
@@ -376,18 +376,18 @@ void test_overlapping()
         auto [ptr, ___] = setup<trivially_relocatable_struct_overlapping>();
 
         // Destroy the objects that will be overwritten for bookkeeping
-        std::destroy(ptr, ptr + offset);
+        std::destroy(ptr + M, ptr + M + offset);
         HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
 
-        // relocate M objects `offset` positions backwards
-        uninitialized_relocate_n(Ex{}, ptr + offset, M, ptr);
+        // relocate M objects `offset` positions forwards
+        uninitialized_relocate_backward(Ex{}, ptr, ptr + M, ptr + M + offset);
 
         // Artificially remove the objects from the set for bookkeeping
-        for (int i = offset; i < M + offset; i++)
+        for (int i = 0; i < M; i++)
         {
             trivially_relocatable_struct_overlapping::made.erase(ptr + i);
         }    // and add the objects that were relocated
-        for (int i = 0; i < M; i++)
+        for (int i = offset; i < M + offset; i++)
         {
             trivially_relocatable_struct_overlapping::made.insert(ptr + i);
         }
@@ -397,10 +397,10 @@ void test_overlapping()
         HPX_TEST(trivially_relocatable_struct_overlapping::moved == 0);
         HPX_TEST(trivially_relocatable_struct_overlapping::destroyed == offset);
 
-        // Objects relocated backwards
-        for (int i = 0; i < M; i++)
+        // Objects relocated forwards
+        for (int i = offset; i < M + offset; i++)
         {
-            HPX_TEST(ptr[i].data == i + offset);
+            HPX_TEST(ptr[i].data == i - offset);
         }
 
         // Objects not touched
@@ -411,8 +411,7 @@ void test_overlapping()
 
         // Destroy objects within their lifetime
         // from our perspective objects in the range [M, M + offset) are destroyed
-        std::destroy(ptr, ptr + M);
-        std::destroy(ptr + M + offset, ptr + N);
+        std::destroy(ptr + offset, ptr + N);
 
         HPX_TEST(trivially_relocatable_struct_overlapping::made.empty());
 
@@ -422,12 +421,12 @@ void test_overlapping()
         auto [ptr, ___] = setup<non_trivially_relocatable_struct_overlapping>();
 
         // Destroy the objects that will be overwritten for bookkeeping purposes
-        std::destroy(ptr, ptr + offset);
+        std::destroy(ptr + M, ptr + M + offset);
         HPX_TEST(
             non_trivially_relocatable_struct_overlapping::destroyed == offset);
 
         // relocate backwards them to ptr2
-        uninitialized_relocate_n(Ex{}, ptr + offset, M, ptr);
+        uninitialized_relocate_backward(Ex{}, ptr, ptr + M, ptr + M + offset);
 
         // M move constructors were called and M destructors + prior destructors
         HPX_TEST(non_trivially_relocatable_struct_overlapping::moved == M);
@@ -435,9 +434,9 @@ void test_overlapping()
             M + offset);
 
         // Objects relocated forwards
-        for (int i = 0; i < M; i++)
+        for (int i = offset; i < M + offset; i++)
         {
-            HPX_TEST(ptr[i].data == i + offset);
+            HPX_TEST(ptr[i].data == i - offset);
         }
 
         // Objects not touched
@@ -448,8 +447,7 @@ void test_overlapping()
 
         // Destroy objects within their lifetime
         // objects in the range [M, M + offset) are destroyed
-        std::destroy(ptr, ptr + M);
-        std::destroy(ptr + M + offset, ptr + N);
+        std::destroy(ptr + offset, ptr + N);
 
         HPX_TEST(non_trivially_relocatable_struct_overlapping::made.empty());
 
@@ -460,7 +458,7 @@ void test_overlapping()
             setup<non_trivially_relocatable_struct_throwing_overlapping>();
 
         // Destroy the objects that will be overwritten for bookkeeping purposes
-        std::destroy(ptr, ptr + offset);
+        std::destroy(ptr + M, ptr + M + offset);
         HPX_TEST(
             non_trivially_relocatable_struct_throwing_overlapping::destroyed ==
             offset);
@@ -468,7 +466,8 @@ void test_overlapping()
         // relocate them backwards
         try
         {
-            uninitialized_relocate_n(Ex{}, ptr + offset, M, ptr);
+            uninitialized_relocate_backward(
+                Ex{}, ptr, ptr + M, ptr + M + offset);
             HPX_UNREACHABLE;    // should have thrown
         }
         catch (...)

@@ -146,9 +146,9 @@ set(tests
     uninitialized_filln
     uninitialized_move
     uninitialized_moven
+    uninitialized_relocate_backward
     uninitialized_relocate
     uninitialized_relocaten
-    uninitialized_relocate_par
     uninitialized_value_construct
     uninitialized_value_constructn
     unique
