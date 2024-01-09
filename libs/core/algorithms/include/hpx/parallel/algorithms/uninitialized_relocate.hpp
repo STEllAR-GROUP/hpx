@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -172,26 +173,26 @@ namespace hpx {
     /// \param last         Refers to the end of the sequence of elements the
     ///                     algorithm will be applied to.
     /// \param dest_last    Refers to the beginning of the destination range.
-    ///  
+    ///
     /// The assignments in the parallel \a uninitialized_relocate algorithm invoked
     /// without an execution policy object will execute in sequential order in
     /// the calling thread.
     ///
     /// \returns  The \a uninitialized_relocate_backward algorithm returns \a BiIter2.
-    ///           The \a uninitialized_relocate_backward algorithm returns the 
+    ///           The \a uninitialized_relocate_backward algorithm returns the
     ///           bidirectional iterator to the first element in the destination range.
     ///
     template <typename BiIter1, typename BiIter2>
-    BiIter2 uninitialized_relocate_backward(BiIter1 first, BiIter1 last,
-            BiIter2 dest_last)
+    BiIter2 uninitialized_relocate_backward(
+        BiIter1 first, BiIter1 last, BiIter2 dest_last);
 
     /// Relocates the elements in the range, defined by [first, last), to an
-    /// uninitialized memory area ending at \a dest_last. The order of the 
-    /// relocation of the objects depends on the execution policy. If an 
-    /// exception is thrown during the  the move-construction of an element, 
-    /// all elements left in the input range, as well as all objects already 
-    /// constructed in the destination range are destroyed. After this algorithm 
-    /// completes, the source range should be freed or reused without destroying 
+    /// uninitialized memory area ending at \a dest_last. The order of the
+    /// relocation of the objects depends on the execution policy. If an
+    /// exception is thrown during the  the move-construction of an element,
+    /// all elements left in the input range, as well as all objects already
+    /// constructed in the destination range are destroyed. After this algorithm
+    /// completes, the source range should be freed or reused without destroying
     /// the objects.
     ///
     /// \note   Using the \a uninitialized_relocate_backward algorithm with the
@@ -245,14 +246,14 @@ namespace hpx {
     ///           \a sequenced_task_policy or
     ///           \a parallel_task_policy and
     ///           returns \a BiIter2 otherwise.
-    ///           The \a uninitialized_relocate_backward algorithm returns the 
-    ///           bidirectional iterator to the first element in the destination 
+    ///           The \a uninitialized_relocate_backward algorithm returns the
+    ///           bidirectional iterator to the first element in the destination
     ///           range.
     ///
     template <typename ExPolicy, typename BiIter1, typename BiIter2>
     hpx::parallel::util::detail::algorithm_result<ExPolicy, BiIter2>
     uninitialized_relocate_backward(
-        ExPolicy&& policy, BiIter1 first, BiIter1 last, BiIter2 dest_last)
+        ExPolicy&& policy, BiIter1 first, BiIter1 last, BiIter2 dest_last);
 
     /// Relocates the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
@@ -392,7 +393,7 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/construct_at.hpp>
+#include <hpx/type_support/is_contiguous_iterator.hpp>
 #include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
@@ -738,10 +739,37 @@ namespace hpx::experimental {
                     FwdIter>::get(HPX_MOVE(dest));
             }
 
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges are not overlapping in the left
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter> &&
+                    hpx::traits::is_contiguous_iterator_v<FwdIter>)
+                {
+                    auto dest_last = std::next(dest, count);
+                    auto last = std::next(first, count);
+                    // if it is not overlapping in the left direction
+                    if (!((first < dest_last) && (dest_last < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::uninitialized_relocate_n<
+                                parallel::util::in_out_result<InIter,
+                                    FwdIter>>()
+                                .call(HPX_FORWARD(ExPolicy, policy), first,
+                                    count, dest));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
             return parallel::util::get_second_element(
                 hpx::parallel::detail::uninitialized_relocate_n<
                     parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                    .call(hpx::execution::seq, first,
                         static_cast<std::size_t>(count), dest));
         }
     } uninitialized_relocate_n{};
@@ -824,10 +852,37 @@ namespace hpx::experimental {
                     FwdIter>::get(HPX_MOVE(dest));
             }
 
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges are not overlapping in the left
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<FwdIter>)
+                {
+                    auto dest_last = std::next(dest, count);
+                    // if it is not overlapping in the left direction
+                    if (!((first < dest_last) && (dest_last < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::uninitialized_relocate_n<
+                                parallel::util::in_out_result<InIter1,
+                                    FwdIter>>()
+                                .call(HPX_FORWARD(ExPolicy, policy), first,
+                                    count, dest));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
+            // sequential execution policy
             return parallel::util::get_second_element(
                 hpx::parallel::detail::uninitialized_relocate_n<
                     parallel::util::in_out_result<InIter1, FwdIter>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, count, dest));
+                    .call(hpx::execution::seq, first, count, dest));
         }
     } uninitialized_relocate{};
 
@@ -905,11 +960,37 @@ namespace hpx::experimental {
                     BiIter2>::get(HPX_MOVE(dest_last));
             }
 
+            // If running in non-sequence execution policy, we must check
+            // that the ranges are not overlapping in the right
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<BiIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<BiIter2>)
+                {
+                    auto dest_first = std::prev(dest_last, count);
+                    // if it is not overlapping in the right direction
+                    if (!((first < dest_first) && (dest_first < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::
+                                uninitialized_relocate_backward<parallel::util::
+                                        in_out_result<BiIter1, BiIter2>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        last, dest_last));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
+            // sequential execution policy
             return parallel::util::get_second_element(
                 hpx::parallel::detail::uninitialized_relocate_backward<
                     parallel::util::in_out_result<BiIter1, BiIter2>>()
-                    .call(
-                        HPX_FORWARD(ExPolicy, policy), first, last, dest_last));
+                    .call(hpx::execution::seq, first, last, dest_last));
         }
     } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental
