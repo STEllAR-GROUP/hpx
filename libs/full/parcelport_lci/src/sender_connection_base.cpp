@@ -54,7 +54,7 @@ namespace hpx::parcelset::policies::lci {
     {
         auto start_time = util::lci_environment::pcounter_now();
         return_t ret;
-        const int retry_max_spin = 32;
+        // const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
             HPX_UNLIKELY(!pp_->is_initialized))
         {
