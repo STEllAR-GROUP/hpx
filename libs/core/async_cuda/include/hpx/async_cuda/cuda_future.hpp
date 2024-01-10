@@ -1,7 +1,7 @@
-//  Copyright (c) 2023 Gregor Daiß
+//  Copyright (c) 2023 Gregor Daiss
 //  Copyright (c) 2020 John Biddiscombe
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,6 +18,7 @@
 #include <hpx/async_cuda/custom_gpu_api.hpp>
 #include <hpx/async_cuda/detail/cuda_debug.hpp>
 #include <hpx/async_cuda/detail/cuda_event_callback.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -46,26 +47,6 @@ namespace hpx { namespace cuda { namespace experimental {
         // the runtime to set the future ready state
         template <typename Allocator, typename Mode>
         struct future_data;
-
-        // -------------------------------------------------------------
-        // helper struct to delete future data in destructor
-        template <typename Allocator>
-        struct release_on_exit
-        {
-            explicit release_on_exit(
-                future_data<Allocator, callback_mode>* data)
-              : data_(data)
-            {
-            }
-
-            ~release_on_exit()
-            {
-                // release the shared state
-                lcos::detail::intrusive_ptr_release(data_);
-            }
-
-            future_data<Allocator, callback_mode>* data_;
-        };
 
         template <typename Allocator>
         struct future_data<Allocator, event_mode>
@@ -162,7 +143,8 @@ namespace hpx { namespace cuda { namespace experimental {
             {
                 future_data* this_ = static_cast<future_data*>(user_data);
 
-                release_on_exit<Allocator> on_exit(this_);
+                auto on_exit = hpx::experimental::scope_exit(
+                    [&] { hpx::lcos::detail::intrusive_ptr_release(this_); });
 
                 if (error != cudaSuccess)
                 {

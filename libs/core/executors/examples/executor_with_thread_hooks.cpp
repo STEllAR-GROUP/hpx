@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,6 +13,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution.hpp>
+#include <hpx/experimental/scope.hpp>
 #include <hpx/init.hpp>
 
 #include <algorithm>
@@ -29,29 +30,16 @@ namespace executor_example {
     class executor_with_thread_hooks
     {
     private:
-        struct on_exit
-        {
-            explicit on_exit(executor_with_thread_hooks const& exec)
-              : exec_(exec)
-            {
-                exec_.on_start_();
-            }
-
-            ~on_exit()
-            {
-                exec_.on_stop_();
-            }
-
-            executor_with_thread_hooks const& exec_;
-        };
-
         template <typename F>
         struct hook_wrapper
         {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                on_exit _{exec_};
+                exec_.on_start_();
+                auto on_exit = hpx::experimental::scope_exit(
+                    [this]() mutable { exec_.on_stop_(); });
+
                 return hpx::invoke(f_, std::forward<Ts>(ts)...);
             }
 

@@ -151,11 +151,19 @@ function(hpx_perform_cxx_feature_tests)
     )
 
     hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
+
+    hpx_check_for_cxx20_constexpr_destructor(
+      DEFINITIONS HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR
+    )
   endif()
 
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
     hpx_check_for_cxx23_std_generator(DEFINITIONS HPX_HAVE_CXX23_STD_GENERATOR)
   endif()
+
+  hpx_check_for_cxx26_experimental_scope(
+    DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
+  )
 
   hpx_check_for_cxx_lambda_capture_decltype(
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE

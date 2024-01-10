@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,11 +9,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <exception>
@@ -74,23 +74,6 @@ namespace hpx::lcos::local {
             std::map<std::size_t, std::shared_ptr<entry_data>>;
         using iterator = typename buffer_map_type::iterator;
 
-        struct erase_on_exit
-        {
-            erase_on_exit(buffer_map_type& buffer_map, iterator it)
-              : buffer_map_(buffer_map)
-              , it_(it)
-            {
-            }
-
-            ~erase_on_exit()
-            {
-                buffer_map_.erase(it_);
-            }
-
-            buffer_map_type& buffer_map_;
-            iterator it_;
-        };
-
     public:
         receive_buffer() = default;
 
@@ -127,7 +110,8 @@ namespace hpx::lcos::local {
             auto& elem = it->second;
             if (elem->can_be_deleted_)
             {
-                erase_on_exit t(buffer_map_, it);
+                auto on_exit = hpx::experimental::scope_exit(
+                    [this, &it] { buffer_map_.erase(it); });
                 return it->second->get_future();
             }
 
@@ -151,7 +135,8 @@ namespace hpx::lcos::local {
             {
                 if (f != nullptr)
                 {
-                    erase_on_exit t(buffer_map_, it);
+                    auto on_exit = hpx::experimental::scope_exit(
+                        [this, &it] { buffer_map_.erase(it); });
                     *f = elem->get_future();
                 }
                 return true;
@@ -181,8 +166,8 @@ namespace hpx::lcos::local {
 
                 if (!entry->can_be_deleted_)
                 {
-                    // if the future was not retrieved yet mark the entry as
-                    // to be deleted after it was be retrieved
+                    // if the future was not retrieved yet mark the entry as to
+                    // be deleted after it was retrieved
                     entry->can_be_deleted_ = true;
                 }
                 else
@@ -298,23 +283,6 @@ namespace hpx::lcos::local {
             std::map<std::size_t, std::shared_ptr<entry_data>>;
         using iterator = typename buffer_map_type::iterator;
 
-        struct erase_on_exit
-        {
-            erase_on_exit(buffer_map_type& buffer_map, iterator it)
-              : buffer_map_(buffer_map)
-              , it_(it)
-            {
-            }
-
-            ~erase_on_exit()
-            {
-                buffer_map_.erase(it_);
-            }
-
-            buffer_map_type& buffer_map_;
-            iterator it_;
-        };
-
     public:
         receive_buffer() = default;
 
@@ -323,12 +291,12 @@ namespace hpx::lcos::local {
             HPX_ASSERT(buffer_map_.empty());
         }
 
-        receive_buffer(receive_buffer&& other)
+        receive_buffer(receive_buffer&& other) noexcept
           : buffer_map_(HPX_MOVE(other.buffer_map_))
         {
         }
 
-        receive_buffer& operator=(receive_buffer&& other)
+        receive_buffer& operator=(receive_buffer&& other) noexcept
         {
             if (this != &other)
             {
@@ -349,7 +317,8 @@ namespace hpx::lcos::local {
             auto& elem = it->second;
             if (elem->can_be_deleted_)
             {
-                erase_on_exit t(buffer_map_, it);
+                auto on_exit = hpx::experimental::scope_exit(
+                    [this, &it] { buffer_map_.erase(it); });
                 return elem->get_future();
             }
 
@@ -373,7 +342,8 @@ namespace hpx::lcos::local {
             {
                 if (f != nullptr)
                 {
-                    erase_on_exit t(buffer_map_, it);
+                    auto on_exit = hpx::experimental::scope_exit(
+                        [this, &it] { buffer_map_.erase(it); });
                     *f = elem->get_future();
                 }
                 return true;
@@ -403,8 +373,8 @@ namespace hpx::lcos::local {
 
                 if (!entry->can_be_deleted_)
                 {
-                    // if the future was not retrieved yet mark the entry as
-                    // to be deleted after it was be retrieved
+                    // if the future was not retrieved yet mark the entry as to
+                    // be deleted after it was retrieved
                     entry->can_be_deleted_ = true;
                 }
                 else

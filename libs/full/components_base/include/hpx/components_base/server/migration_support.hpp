@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,6 +12,7 @@
 #include <hpx/components_base/pinned_ptr.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/functional/bind_front.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/threading_base.hpp>
@@ -144,34 +145,13 @@ namespace hpx::components {
             }
         }
 
-    private:
-        struct release_on_exit
-        {
-            explicit release_on_exit(
-                detail::migration_support_data<Mutex>* data) noexcept
-              : data_(data)
-            {
-            }
-
-            release_on_exit(release_on_exit const&) = delete;
-            release_on_exit(release_on_exit&&) = delete;
-            release_on_exit& operator=(release_on_exit const&) = delete;
-            release_on_exit& operator=(release_on_exit&&) = delete;
-
-            ~release_on_exit()
-            {
-                intrusive_ptr_release(data_);
-            }
-
-            detail::migration_support_data<Mutex>* data_;
-        };
-
     public:
         bool unpin()
         {
             // pin() acquired an additional reference count that needs to be
             // released after unpinning.
-            release_on_exit _(data_.get());
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { intrusive_ptr_release(data_.get()); });
 
             {
                 // no need to go through AGAS if the object is currently pinned

@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0.
@@ -14,6 +14,7 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/functional/detail/reset_function.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/move_only_function.hpp>
 #if defined(HPX_HAVE_THREAD_LOCAL_STORAGE)
 #include <hpx/coroutines/detail/tss.hpp>
@@ -214,30 +215,6 @@ namespace hpx::threads::coroutines {
             id_.reset();
         }
 
-    private:
-        struct reset_on_exit
-        {
-            explicit constexpr reset_on_exit(stackless_coroutine& that) noexcept
-              : this_(that)
-            {
-                this_.state_ = context_state::running;
-            }
-
-            reset_on_exit(reset_on_exit const&) = delete;
-            reset_on_exit(reset_on_exit&&) = delete;
-
-            reset_on_exit& operator=(reset_on_exit const&) = delete;
-            reset_on_exit& operator=(reset_on_exit&&) = delete;
-
-            ~reset_on_exit()
-            {
-                this_.state_ = context_state::exited;
-            }
-
-            stackless_coroutine& this_;
-        };
-        friend struct reset_on_exit;
-
     public:
         HPX_FORCEINLINE result_type operator()(arg_type arg = arg_type());
 
@@ -298,10 +275,15 @@ namespace hpx::threads::coroutines {
 
         {
             detail::coroutine_stackless_self self(this);
-            detail::reset_self_on_exit on_self_exit(&self, nullptr);
+
+            detail::coroutine_self::set_self(&self);
+            auto on_exit = hpx::experimental::scope_exit(
+                [] { detail::coroutine_self::set_self(nullptr); });
 
             {
-                [[maybe_unused]] reset_on_exit const on_exit{*this};
+                state_ = context_state::running;
+                auto on_exit_inner = hpx::experimental::scope_exit(
+                    [this] { state_ = context_state::exited; });
 
                 result = f_(arg);    // invoke wrapped function
 

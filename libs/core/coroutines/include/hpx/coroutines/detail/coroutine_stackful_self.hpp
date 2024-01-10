@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2021 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/coroutines/detail/coroutine_impl.hpp>
 #include <hpx/coroutines/detail/coroutine_self.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 
 #include <cstddef>
 #include <limits>
@@ -34,7 +35,11 @@ namespace hpx::threads::coroutines::detail {
             this->pimpl_->bind_result(arg);
 
             {
-                reset_self_on_exit on_exit(this);
+                // store the current this and write it back to the TSS on exit
+                set_self(this->next_self_);
+                auto on_exit =
+                    hpx::experimental::scope_exit([this] { set_self(this); });
+
                 this->pimpl_->yield();
             }
 
