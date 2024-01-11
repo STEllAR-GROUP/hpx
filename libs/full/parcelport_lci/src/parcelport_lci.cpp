@@ -461,9 +461,6 @@ namespace hpx::parcelset::policies::lci {
                 hpx::threads::get_self_id() == hpx::threads::invalid_thread_id))
         {
             static thread_local unsigned int tls_rand_seed = rand();
-            util::lci_environment::log(
-                util::lci_environment::log_level_t::debug, "device",
-                "Rank %d unusual phase\n", LCI_RANK);
             return devices[rand_r(&tls_rand_seed) % devices.size()];
         }
         if (tls_device_idx == std::size_t(-1))
