@@ -1199,7 +1199,7 @@ namespace hpx::performance_counters {
                 if (ec)
                     return {};
 
-                // Take target locality from base counter if if this is an
+                // Take target locality from base counter if this is an
                 // aggregating counter (the instance name is a base counter).
                 if (p.parentinstance_is_basename_)
                 {
