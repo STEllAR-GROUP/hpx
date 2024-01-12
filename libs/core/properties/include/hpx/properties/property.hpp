@@ -1,4 +1,5 @@
 //  Copyright (c) 2020 ETH Zurich
+//  Copyright (c) 2023-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,7 +23,9 @@ namespace hpx::experimental {
         template <typename Tag, typename... Tn>
         friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 prefer_t, Tag tag, Tn&&... tn)
-            noexcept(noexcept(tag(HPX_FORWARD(Tn, tn)...)))
+#if !defined(HPX_CUDA_VERSION)
+            noexcept(hpx::functional::is_nothrow_tag_invocable_v<Tag, Tn&&...>)
+#endif
             -> decltype(tag(HPX_FORWARD(Tn, tn)...))
         // clang-format on
         {
