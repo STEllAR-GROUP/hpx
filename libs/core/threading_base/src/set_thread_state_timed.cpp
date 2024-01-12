@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -83,7 +83,7 @@ namespace hpx::threads::detail {
         // create a new thread in suspended state, which will execute the
         // requested set_state when timer fires and will re-awaken this thread,
         // allowing the deadline_timer to go out of scope gracefully
-        thread_id_ref_type const self_id = get_outer_self_id();    // keep alive
+        thread_id_ref_type const self_id = get_self_id();    // keep alive
 
         std::shared_ptr<std::atomic<bool>> triggered(
             std::make_shared<std::atomic<bool>>(false));
