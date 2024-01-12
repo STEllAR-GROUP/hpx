@@ -24,6 +24,7 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/filesystem.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/string_util.hpp>
 #include <hpx/modules/synchronization.hpp>
@@ -307,8 +308,11 @@ namespace hpx { namespace components { namespace server {
             }
 
             // We need the lock here to ensure the mutual exclusion of
-            // hpx::latch::count_down and and hpx::latch::~latch
-            std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
+            // hpx::latch::count_down and hpx::latch::~latch
+            std::unique_lock<dijkstra_mtx_type> l(dijkstra_mtx_);
+            [[maybe_unused]] hpx::util::ignore_while_checking<
+                std::unique_lock<dijkstra_mtx_type>>
+                il(&l);
             dijkstra_cond_->count_down(1);
             return;
         }
@@ -397,8 +401,11 @@ namespace hpx { namespace components { namespace server {
             } while (dijkstra_color_);
 
             // We need the lock here to ensure the mutual exclusion of
-            // hpx::latch::count_down and and hpx::latch::~latch
-            std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
+            // hpx::latch::count_down and hpx::latch::~latch
+            std::unique_lock<dijkstra_mtx_type> l(dijkstra_mtx_);
+            [[maybe_unused]] hpx::util::ignore_while_checking<
+                std::unique_lock<dijkstra_mtx_type>>
+                il(&l);
             dijkstra_cond_.reset();
         }
 
@@ -861,7 +868,7 @@ namespace hpx { namespace components { namespace server {
     // working around non-copy-ability of packaged_task
     struct indirect_packaged_task
     {
-        typedef hpx::packaged_task<void()> packaged_task_type;
+        using packaged_task_type = hpx::packaged_task<void()>;
 
         indirect_packaged_task()
           : pt(std::make_shared<packaged_task_type>([]() {}))
@@ -894,8 +901,8 @@ namespace hpx { namespace components { namespace server {
 
         std::vector<hpx::id_type> locality_ids = find_remote_localities();
 
-        typedef server::runtime_support::remove_from_connection_cache_action
-            action_type;
+        using action_type =
+            server::runtime_support::remove_from_connection_cache_action;
 
         std::vector<future<void>> callbacks;
         callbacks.reserve(locality_ids.size());
@@ -928,8 +935,8 @@ namespace hpx { namespace components { namespace server {
         if (rtd == nullptr)
             return;
 
-        typedef server::runtime_support::remove_from_connection_cache_action
-            action_type;
+        using action_type =
+            server::runtime_support::remove_from_connection_cache_action;
 
         action_type act;
         indirect_packaged_task ipt;
@@ -953,7 +960,7 @@ namespace hpx { namespace components { namespace server {
         char const* message_handler_type, char const* action, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        typedef std::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        using plugin_map_scoped_lock = std::unique_lock<plugin_map_mutex_type>;
         plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it =
@@ -1015,7 +1022,7 @@ namespace hpx { namespace components { namespace server {
         std::size_t interval, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        typedef std::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        using plugin_map_scoped_lock = std::unique_lock<plugin_map_mutex_type>;
         plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it =
@@ -1076,7 +1083,7 @@ namespace hpx { namespace components { namespace server {
         serialization::binary_filter* next_filter, error_code& ec)
     {
         // locate the factory for the requested plugin type
-        typedef std::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        using plugin_map_scoped_lock = std::unique_lock<plugin_map_mutex_type>;
         plugin_map_scoped_lock l(p_mtx_);
 
         plugin_map_type::const_iterator it = plugins_.find(binary_filter_type);
@@ -1224,7 +1231,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         util::section::section_map const& s = (*sec).get_sections();
-        typedef util::section::section_map::const_iterator iterator;
+        using iterator = util::section::section_map::const_iterator;
         iterator end = s.end();
         for (iterator i = s.begin(); i != end; ++i)
         {
@@ -1725,7 +1732,7 @@ namespace hpx { namespace components { namespace server {
         }
 
         util::section::section_map const& s = (*sec).get_sections();
-        typedef util::section::section_map::const_iterator iterator;
+        using iterator = util::section::section_map::const_iterator;
         iterator end = s.end();
         for (iterator i = s.begin(); i != end; ++i)
         {

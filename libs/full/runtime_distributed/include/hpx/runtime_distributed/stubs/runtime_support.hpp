@@ -16,7 +16,6 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_distributed/server/runtime_support.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/type_support/decay.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace components { namespace stubs {
+namespace hpx::components::stubs {
 
     ///////////////////////////////////////////////////////////////////////////
     // The \a runtime_support class is the client side representation of a
@@ -47,7 +46,6 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return hpx::make_ready_future(hpx::invalid_id);
             }
 
             using action_type =
@@ -162,11 +160,9 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::copy_create_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return hpx::make_ready_future(hpx::invalid_id);
             }
 
-            using action_type =
-                typename server::copy_create_component_action<Component>;
+            using action_type = server::copy_create_component_action<Component>;
             return hpx::async<action_type>(gid, p, local_op);
         }
 
@@ -193,11 +189,10 @@ namespace hpx { namespace components { namespace stubs {
                     "stubs::runtime_support::migrate_component_async",
                     "The id passed as the first argument is not representing"
                     " a locality");
-                return hpx::make_ready_future(hpx::invalid_id);
             }
 
             using action_type =
-                typename server::migrate_component_here_action<Component>;
+                server::migrate_component_here_action<Component>;
             return hpx::async<action_type>(target_locality, p, to_migrate);
         }
 
@@ -207,7 +202,7 @@ namespace hpx { namespace components { namespace stubs {
             hpx::id_type const& to_migrate)
         {
             using action_type =
-                typename server::migrate_component_here_action<Component>;
+                server::migrate_component_here_action<Component>;
             return hpx::async<action_type>(policy, p, to_migrate);
         }
 
@@ -264,9 +259,10 @@ namespace hpx { namespace components { namespace stubs {
 
         ///////////////////////////////////////////////////////////////////////
         static hpx::future<hpx::id_type> create_performance_counter_async(
-            hpx::id_type targetgid,
+            hpx::id_type const& targetgid,
             performance_counters::counter_info const& info);
-        static hpx::id_type create_performance_counter(hpx::id_type targetgid,
+        static hpx::id_type create_performance_counter(
+            hpx::id_type const& targetgid,
             performance_counters::counter_info const& info,
             error_code& ec = throws);
 
@@ -282,4 +278,4 @@ namespace hpx { namespace components { namespace stubs {
             hpx::id_type const& target, naming::gid_type const& gid,
             parcelset::endpoints_type const& endpoints);
     };
-}}}    // namespace hpx::components::stubs
+}    // namespace hpx::components::stubs
