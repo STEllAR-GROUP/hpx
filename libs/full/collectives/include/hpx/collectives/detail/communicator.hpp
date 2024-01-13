@@ -21,7 +21,6 @@
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
-#include <cstring>
 #include <mutex>
 #include <type_traits>
 #include <utility>
@@ -35,12 +34,22 @@ namespace hpx::traits {
 
     namespace communication {
 
+        using operation_id_type = void const*;
+
         // Retrieve name of the current communicator
         template <typename Operation>
-        constexpr char const* communicator_name() noexcept
+        struct communicator_data
         {
-            return "<unknown>";
-        }
+            static constexpr char const* name() noexcept
+            {
+                return "<unknown>";
+            }
+
+            static constexpr operation_id_type id() noexcept
+            {
+                return nullptr;
+            }
+        };
     }    // namespace communication
 }    // namespace hpx::traits
 
@@ -70,7 +79,8 @@ namespace hpx::collectives::detail {
             {
                 LHPX_(info, " [COL] ")
                     .format("{}(>>> {}): which({}), generation({})", op,
-                        traits::communication::communicator_name<Operation>(),
+                        traits::communication::communicator_data<
+                            Operation>::name(),
                         which, generation);
             }
 
@@ -78,7 +88,8 @@ namespace hpx::collectives::detail {
             {
                 LHPX_(info, " [COL] ")
                     .format("{}(<<< {}): which({}), generation({})", op_,
-                        traits::communication::communicator_name<Operation>(),
+                        traits::communication::communicator_data<
+                            Operation>::name(),
                         which_, generation_);
             }
 
@@ -259,9 +270,10 @@ namespace hpx::collectives::detail {
         //
         // Finalizer will be invoked under lock after all sites have checked in.
         template <typename Data, typename Step, typename Finalizer>
-        auto handle_data(char const* operation, std::size_t which,
-            std::size_t generation, [[maybe_unused]] Step&& step,
-            Finalizer&& finalizer,
+        auto handle_data(
+            hpx::traits::communication::operation_id_type operation,
+            std::size_t which, std::size_t generation,
+            [[maybe_unused]] Step&& step, Finalizer&& finalizer,
             std::size_t num_values = static_cast<std::size_t>(-1))
         {
             auto on_ready = [this, operation, which, num_values,
@@ -281,7 +293,7 @@ namespace hpx::collectives::detail {
                 // Verify that there is no overlap between different types of
                 // operations on the same communicator.
                 if (current_operation_ == nullptr ||
-                    std::strcmp(current_operation_, operation) != 0)
+                    current_operation_ != operation)
                 {
                     l.unlock();
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,
@@ -345,7 +357,7 @@ namespace hpx::collectives::detail {
                 }
                 current_operation_ = operation;
             }
-            else if (std::strcmp(current_operation_, operation) != 0)
+            else if (current_operation_ != operation)
             {
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
@@ -423,7 +435,8 @@ namespace hpx::collectives::detail {
         hpx::lcos::local::and_gate gate_;
         std::size_t const num_sites_;
         std::size_t on_ready_count_ = 0;
-        char const* current_operation_ = nullptr;
+        hpx::traits::communication::operation_id_type current_operation_ =
+            nullptr;
         bool needs_initialization_ = true;
         bool data_available_ = false;
     };

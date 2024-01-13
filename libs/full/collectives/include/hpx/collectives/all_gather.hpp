@@ -130,13 +130,19 @@ namespace hpx { namespace collectives {
 namespace hpx::traits {
 
     namespace communication {
+
         struct all_gather_tag;
 
         template <>
-        constexpr char const* communicator_name<all_gather_tag>() noexcept
+        struct communicator_data<all_gather_tag>
         {
-            return "all_gather";
-        }
+            static constexpr char const* name() noexcept
+            {
+                return "all_gather";
+            }
+
+            HPX_EXPORT static operation_id_type id() noexcept;
+        };
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,8 +155,8 @@ namespace hpx::traits {
             std::size_t generation, T&& t)
         {
             return communicator.template handle_data<std::decay_t<T>>(
-                communication::communicator_name<
-                    communication::all_gather_tag>(),
+                communication::communicator_data<
+                    communication::all_gather_tag>::id(),
                 which, generation,
                 // step function (invoked for each get)
                 [&t](auto& data, std::size_t which) {

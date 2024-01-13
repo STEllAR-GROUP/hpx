@@ -54,14 +54,23 @@ set(collectives_compat_headers
 
 # Default location is $HPX_ROOT/libs/collectives/src
 set(collectives_sources
+    all_gather.cpp
+    all_reduce.cpp
+    all_to_all.cpp
     barrier.cpp
+    broadcast.cpp
     create_communication_set.cpp
     channel_communicator.cpp
     create_communicator.cpp
-    latch.cpp
     detail/barrier_node.cpp
     detail/channel_communicator_server.cpp
     detail/communication_set_node.cpp
+    exclusive_scan.cpp
+    gather.cpp
+    inclusive_scan.cpp
+    latch.cpp
+    reduce.cpp
+    scatter.cpp
 )
 
 include(HPX_AddModule)
