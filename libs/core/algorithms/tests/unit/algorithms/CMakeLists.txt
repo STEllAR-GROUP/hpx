@@ -74,6 +74,7 @@ set(tests
     is_heap_until
     includes
     inclusive_scan
+    inclusive_scan_exception
     inplace_merge
     is_partitioned
     is_sorted

@@ -36,6 +36,7 @@ set(function_tests
     mem_fn_void_test
     nothrow_swap
     protect_test
+    scope
     stateless_test
     sum_avg
 )

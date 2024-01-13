@@ -31,6 +31,7 @@
 #include <hpx/components_base/server/locking_hook.hpp>
 #include <hpx/modules/collectives.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
@@ -203,22 +204,6 @@ namespace hpx { namespace server {
         /// \return Return the value of the element at position represented
         ///         by \a pos.
         ///
-        struct erase_on_exit
-        {
-            erase_on_exit(data_type& m, typename data_type::iterator& it)
-              : m_(m)
-              , it_(it)
-            {
-            }
-            ~erase_on_exit()
-            {
-                m_.erase(it_);
-            }
-
-            data_type& m_;
-            typename data_type::iterator& it_;
-        };
-
         T get_value(Key const& key, bool erase)
         {
             typename data_type::iterator it =
@@ -234,7 +219,9 @@ namespace hpx { namespace server {
             if (!erase)
                 return it->second;
 
-            erase_on_exit t(partition_unordered_map_, it);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this, &it] { partition_unordered_map_.erase(it); });
+
             return it->second;
         }
 

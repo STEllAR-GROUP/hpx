@@ -44,33 +44,6 @@ namespace hpx::threads::coroutines::detail {
     class coroutine_self
     {
     public:
-        HPX_NON_COPYABLE(coroutine_self);
-
-    protected:
-        // store the current this and write it back to the TSS on exit
-        struct reset_self_on_exit
-        {
-            explicit reset_self_on_exit(coroutine_self* self) noexcept
-              : self_(self)
-            {
-                set_self(self->next_self_);
-            }
-
-            reset_self_on_exit(reset_self_on_exit const&) = delete;
-            reset_self_on_exit(reset_self_on_exit&&) = delete;
-
-            reset_self_on_exit& operator=(reset_self_on_exit const&) = delete;
-            reset_self_on_exit& operator=(reset_self_on_exit&&) = delete;
-
-            ~reset_self_on_exit()
-            {
-                set_self(self_);
-            }
-
-            coroutine_self* self_;
-        };
-
-    public:
         using thread_id_type = hpx::threads::thread_id;
 
         using result_type = std::pair<thread_schedule_state, thread_id_type>;
@@ -82,6 +55,11 @@ namespace hpx::threads::coroutines::detail {
           : next_self_(next_self)
         {
         }
+
+        coroutine_self(coroutine_self const&) = delete;
+        coroutine_self(coroutine_self&&) = delete;
+        coroutine_self& operator=(coroutine_self const&) = delete;
+        coroutine_self& operator=(coroutine_self&&) = delete;
 
         arg_type yield(result_type arg = result_type())
         {
@@ -176,32 +154,8 @@ namespace hpx::threads::coroutines::detail {
             return local_self();
         }
 
-    private:
+    protected:
         yield_decorator_type yield_decorator_;
         coroutine_self* next_self_;
-    };
-
-    ////////////////////////////////////////////////////////////////////////////
-    struct reset_self_on_exit
-    {
-        explicit reset_self_on_exit(
-            coroutine_self* val, coroutine_self* old_val = nullptr) noexcept
-          : old_self(old_val)
-        {
-            coroutine_self::set_self(val);
-        }
-
-        reset_self_on_exit(reset_self_on_exit const&) = delete;
-        reset_self_on_exit(reset_self_on_exit&&) = delete;
-
-        reset_self_on_exit& operator=(reset_self_on_exit const&) = delete;
-        reset_self_on_exit& operator=(reset_self_on_exit&&) = delete;
-
-        ~reset_self_on_exit()
-        {
-            coroutine_self::set_self(old_self);
-        }
-
-        coroutine_self* old_self;
     };
 }    // namespace hpx::threads::coroutines::detail

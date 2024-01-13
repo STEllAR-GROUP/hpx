@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2013 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -18,6 +18,7 @@
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/futures/future_fwd.hpp>
@@ -543,27 +544,6 @@ namespace hpx {
         using shared_state_type = typename base_type::shared_state_type;
 
     private:
-        struct invalidate
-        {
-            constexpr explicit invalidate(future& f) noexcept
-              : f_(f)
-            {
-            }
-
-            invalidate(invalidate const&) = delete;
-            invalidate(invalidate&&) = delete;
-            invalidate& operator=(invalidate const&) = delete;
-            invalidate& operator=(invalidate&&) = delete;
-
-            ~invalidate()
-            {
-                f_.shared_state_.reset();
-            }
-
-            future& f_;
-        };
-
-    private:
         template <typename Future>
         friend struct hpx::traits::future_access;
 
@@ -687,7 +667,8 @@ namespace hpx {
                     "this future has no valid shared state");
             }
 
-            invalidate on_exit(*this);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { this->shared_state_.reset(); });
 
             using result_type = typename shared_state_type::result_type;
             auto* result = lcos::detail::future_get_result<result_type>::call(
@@ -707,7 +688,8 @@ namespace hpx {
                 return lcos::detail::future_value<R>::get_default();
             }
 
-            invalidate on_exit(*this);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { this->shared_state_.reset(); });
 
             using result_type = typename shared_state_type::result_type;
             result_type* result =
@@ -786,7 +768,9 @@ namespace hpx {
             // clang-format on
             return future_type{};
 #else
-            invalidate on_exit(*this);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { this->shared_state_.reset(); });
+
             return base_type::then(HPX_MOVE(*this), HPX_FORWARD(F, f), ec);
 #endif
         }
@@ -821,7 +805,9 @@ namespace hpx {
                 HPX_MOVE(*this), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f), ec));
             return future_type{};
 #else
-            invalidate on_exit(*this);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { this->shared_state_.reset(); });
+
             return base_type::then(
                 HPX_MOVE(*this), HPX_FORWARD(T0, t0), HPX_FORWARD(F, f), ec);
 #endif
@@ -842,7 +828,9 @@ namespace hpx {
                 alloc, std::move(*this), std::forward<F>(f), ec));
             return future_type{};
 #else
-            invalidate on_exit(*this);
+            auto on_exit = hpx::experimental::scope_exit(
+                [this] { this->shared_state_.reset(); });
+
             return base_type::then_alloc(
                 alloc, HPX_MOVE(*this), HPX_FORWARD(F, f), ec);
 #endif

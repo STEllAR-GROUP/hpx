@@ -19,8 +19,9 @@
 # serve to show the default.
 
 import os
-import sys
 import re
+import sys
+import traceback
 from datetime import datetime
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -102,10 +103,15 @@ for lib_dir in os.listdir(hpx_libs_dir):
             for f in files:
                 if not file_regex.match(f) is None:
                     skip = True
-                    for line in open(subdir_full + '/' + f):
-                        if '/// \\' in line:
-                            skip = False
-                            break
+                    try:
+                        for line in open(subdir_full + '/' + f):
+                            if '/// \\' in line:
+                                skip = False
+                                break
+                    except:
+                        print('Exception while processing %s' % f)
+                        print(traceback.format_exc())
+
                     if skip:
                         continue
                     breathe_projects_source[module][1].append(subdir + '/' + f)
