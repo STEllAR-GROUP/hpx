@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -28,6 +28,8 @@ namespace hpx {
         {
             return hpx::make_ready_future(HPX_MOVE(result).get_value());
         }
-        return HPX_MOVE(result).get_future();
+
+        auto f = HPX_MOVE(result).get_future();
+        return f;
     }
 }    // namespace hpx

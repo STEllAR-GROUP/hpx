@@ -224,7 +224,9 @@ namespace hpx {
         {
             return hpx::make_ready_future(HPX_MOVE(result).get_value());
         }
-        return HPX_MOVE(result).get_future();
+
+        auto f = HPX_MOVE(result).get_future();
+        return f;
     }
 
     /// \brief Returns a future referring to the pointer to the

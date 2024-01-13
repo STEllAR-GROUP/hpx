@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -183,7 +183,8 @@ template <>
 struct hpx::util::extra_data_helper<hpx::lcos::detail::registered_name_tracker>
 {
     HPX_EXPORT static extra_data_id_type id() noexcept;
-    HPX_EXPORT static void reset(lcos::detail::registered_name_tracker*);
+    HPX_EXPORT static void reset(
+        lcos::detail::registered_name_tracker*) noexcept;
 };    // namespace hpx::util
 
 // Specialization for shared state of id_type, additionally (optionally) holds a
