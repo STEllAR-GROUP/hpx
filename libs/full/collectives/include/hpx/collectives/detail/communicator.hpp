@@ -14,6 +14,7 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -244,27 +245,6 @@ namespace hpx::collectives::detail {
             return fut;
         }
 
-        template <typename F>
-        struct on_exit
-        {
-            explicit constexpr on_exit(F&& f_) noexcept
-              : f(HPX_MOVE(f_))
-            {
-            }
-
-            on_exit(on_exit const&) = delete;
-            on_exit(on_exit&&) = delete;
-            on_exit& operator=(on_exit const&) = delete;
-            on_exit& operator=(on_exit&&) = delete;
-
-            ~on_exit()
-            {
-                f();
-            }
-
-            F f;
-        };
-
         // Step will be invoked under lock for each site that checks in (either
         // set or get).
         //
@@ -320,7 +300,8 @@ namespace hpx::collectives::detail {
 
                 // On exit, keep track of number of invocations of this
                 // callback.
-                on_exit _([this] { ++on_ready_count_; });
+                auto on_exit = hpx::experimental::scope_exit(
+                    [this] { ++on_ready_count_; });
 
                 if constexpr (!std::is_same_v<std::nullptr_t,
                                   std::decay_t<Finalizer>>)
