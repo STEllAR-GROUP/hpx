@@ -135,10 +135,15 @@ namespace hpx::traits {
         struct all_to_all_tag;
 
         template <>
-        constexpr char const* communicator_name<all_to_all_tag>() noexcept
+        struct communicator_data<all_to_all_tag>
         {
-            return "all_to_all";
-        }
+            static constexpr char const* name() noexcept
+            {
+                return "all_to_all";
+            }
+
+            HPX_EXPORT static operation_id_type id() noexcept;
+        };
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
@@ -151,8 +156,8 @@ namespace hpx::traits {
             std::size_t generation, std::vector<T>&& t)
         {
             return communicator.template handle_data<std::vector<T>>(
-                communication::communicator_name<
-                    communication::all_to_all_tag>(),
+                communication::communicator_data<
+                    communication::all_to_all_tag>::id(),
                 which, generation,
                 // step function (invoked for each get)
                 [&t](auto& data, std::size_t which) {
