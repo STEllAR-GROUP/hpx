@@ -58,6 +58,7 @@ namespace hpx::parcelset::policies::lci {
         hpx::chrono::high_resolution_timer timer_;
         header header_;
         LCI_mbuffer_t header_buffer;
+        std::vector<char> header_buffer_vector;
         bool need_send_data;
         bool need_send_tchunks;
         LCI_tag_t tag;

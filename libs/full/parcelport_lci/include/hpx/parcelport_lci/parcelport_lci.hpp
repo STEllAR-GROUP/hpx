@@ -210,29 +210,30 @@ namespace hpx::traits {
                     hpx::threads::policies::scheduler_mode::
                         do_background_work_only);
 
-                size_t ncores_to_add =
+                size_t npus_to_add =
                     parcelset::policies::lci::config_t::progress_thread_num;
-                std::vector<const hpx::resource::core*> cores;
+                std::vector<const hpx::resource::pu*> pus;
                 for (auto& numa_domain : rp.numa_domains())
                 {
                     for (auto& core : numa_domain.cores())
                     {
-                        cores.push_back(&core);
+                        for (auto& pu : core.pus())
+                            pus.push_back(&pu);
                     }
                 }
-                if (cores.size() <= 1)
+                if (pus.size() <= 1)
                 {
-                    fprintf(stderr, "We don't have enough cores!\n");
+                    fprintf(stderr, "We don't have enough pus!\n");
                     exit(1);
                 }
-                if ((size_t) ncores_to_add > cores.size() / 2)
+                if ((size_t) npus_to_add > pus.size() / 2)
                 {
-                    ncores_to_add = cores.size() / 2;
+                    npus_to_add = pus.size() / 2;
                 }
-                for (size_t i = 0; i < ncores_to_add; ++i)
+                for (size_t i = 0; i < npus_to_add; ++i)
                 {
-                    size_t next_core = i * cores.size() / ncores_to_add;
-                    rp.add_resource(*cores[next_core], "lci-progress-pool");
+                    size_t next_pu = i * pus.size() / npus_to_add;
+                    rp.add_resource(*pus[next_pu], "lci-progress-pool");
                 }
             }
         }
@@ -264,8 +265,9 @@ namespace hpx::traits {
                 "progress_type = rp\n"
                 "prepost_recv_num = 1\n"
                 "reg_mem = 1\n"
-                "ndevices = 2\n"
-                "ncomps = 1\n";
+                "ndevices = 1\n"
+                "ncomps = 1\n"
+                "enable_in_buffer_assembly = 1\n";
         }
     };
 }    // namespace hpx::traits
