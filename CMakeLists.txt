@@ -2322,10 +2322,7 @@ endif()
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  if(HPX_WITH_FETCH_HWLOC
-     AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows"
-     AND CMAKE_SIZEOF_VOID_P EQUAL 8
-  )
+  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
     add_custom_target(
       HwlocDLL ALL
       COMMAND ${CMAKE_COMMAND} -E make_directory
