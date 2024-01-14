@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,11 +30,11 @@ namespace hpx {
         {
         }
 
-        constexpr bool has_value() const noexcept
+        [[nodiscard]] constexpr bool has_value() const noexcept
         {
             return hpx::holds_alternative<T>(data);
         }
-        constexpr bool has_future() const noexcept
+        [[nodiscard]] constexpr bool has_future() const noexcept
         {
             return hpx::holds_alternative<hpx::future<T>>(data);
         }
@@ -43,11 +43,11 @@ namespace hpx {
         {
             return hpx::get<T>(data);
         }
-        constexpr T const& get_value() const&
+        [[nodiscard]] constexpr T const& get_value() const&
         {
             return hpx::get<T>(data);
         }
-        constexpr T&& get_value() &&
+        constexpr T get_value() &&
         {
             return hpx::get<T>(HPX_MOVE(data));
         }
@@ -56,11 +56,11 @@ namespace hpx {
         {
             return hpx::get<hpx::future<T>>(data);
         }
-        constexpr hpx::future<T> const& get_future() const&
+        [[nodiscard]] constexpr hpx::future<T> const& get_future() const&
         {
             return hpx::get<hpx::future<T>>(data);
         }
-        constexpr hpx::future<T>&& get_future() &&
+        constexpr hpx::future<T> get_future() &&
         {
             return hpx::get<hpx::future<T>>(HPX_MOVE(data));
         }

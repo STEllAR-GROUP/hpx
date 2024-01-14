@@ -1,5 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <hpx/assert.hpp>
+#include <hpx/config.hpp>
 
 #include <memory>
 #include <type_traits>
@@ -15,7 +15,7 @@
 
 namespace hpx::util {
 
-    using extra_data_id_type = void*;
+    using extra_data_id_type = void const*;
 
     template <typename T>
     struct extra_data_helper
@@ -61,7 +61,12 @@ namespace hpx::util {
         ~extra_data_node() = default;
 
         template <typename T>
-        [[nodiscard]] T* get() const noexcept;
+        [[nodiscard]] constexpr T* get() const noexcept;
+
+        [[nodiscard]] explicit constexpr operator bool() const noexcept
+        {
+            return id_ != nullptr && ptr_;
+        }
 
         std::unique_ptr<extra_data_member_base> ptr_;
         extra_data_id_type id_ = nullptr;
@@ -89,7 +94,7 @@ namespace hpx::util {
     };
 
     template <typename T>
-    struct extra_data_member : extra_data_member_base
+    struct extra_data_member final : extra_data_member_base
     {
         explicit constexpr extra_data_member(extra_data_node&& next) noexcept
           : extra_data_member_base(HPX_MOVE(next))
@@ -124,17 +129,14 @@ namespace hpx::util {
     }
 
     template <typename T>
-    T* extra_data_node::get() const noexcept
+    constexpr T* extra_data_node::get() const noexcept
     {
-        auto id = extra_data_id<T>();
-        if (id_ == nullptr)
+        if (!*this)
         {
-            HPX_ASSERT(!ptr_);
             return nullptr;
         }
 
-        HPX_ASSERT(ptr_);
-        if (id_ == id)
+        if (id_ == extra_data_id<T>())
         {
             return static_cast<extra_data_member<T>*>(ptr_.get())->value();
         }
@@ -144,7 +146,7 @@ namespace hpx::util {
 
     struct extra_data
     {
-        extra_data() noexcept = default;
+        constexpr extra_data() noexcept = default;
 
         template <typename T>
         T& get()
@@ -159,9 +161,9 @@ namespace hpx::util {
         }
 
         template <typename T>
-        [[nodiscard]] T* try_get() const noexcept
+        [[nodiscard]] constexpr T* try_get() const noexcept
         {
-            return head_.get<T>();
+            return head_ ? head_.get<T>() : nullptr;
         }
 
         // reset all extra archive data
