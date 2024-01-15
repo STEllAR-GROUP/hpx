@@ -17,55 +17,61 @@
 
 namespace hpx::experimental {
 
-    template <typename F>
-    struct scope_exit
-    {
-        explicit constexpr scope_exit(F&& f) noexcept(
-            std::is_nothrow_move_constructible_v<F> ||
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(HPX_MOVE(f))
-        {
-        }
+    namespace detail {
 
-        explicit constexpr scope_exit(F const& f) noexcept(
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(f)
+        template <typename F>
+        struct scope_exit
         {
-        }
-
-        constexpr scope_exit(scope_exit&& rhs) noexcept(
-            std::is_nothrow_move_constructible_v<F> ||
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(HPX_MOVE(rhs.f))
-          , active(rhs.active)
-        {
-            rhs.release();
-        }
-
-        scope_exit(scope_exit const&) = delete;
-        scope_exit& operator=(scope_exit const&) = delete;
-        scope_exit& operator=(scope_exit&& rhs) = delete;
-
-        HPX_CONSTEXPR_DESTRUCTOR ~scope_exit() noexcept
-        {
-            if (active)
+            explicit constexpr scope_exit(F&& f) noexcept(
+                std::is_nothrow_move_constructible_v<F> ||
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(HPX_MOVE(f))
             {
-                f();
             }
-        }
 
-        constexpr void release() noexcept
-        {
-            active = false;
-        }
+            explicit constexpr scope_exit(F const& f) noexcept(
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(f)
+            {
+            }
 
-    private:
-        F f;
-        bool active = true;
-    };
+            constexpr scope_exit(scope_exit&& rhs) noexcept(
+                std::is_nothrow_move_constructible_v<F> ||
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(HPX_MOVE(rhs.f))
+              , active(rhs.active)
+            {
+                rhs.release();
+            }
+
+            scope_exit(scope_exit const&) = delete;
+            scope_exit& operator=(scope_exit const&) = delete;
+            scope_exit& operator=(scope_exit&& rhs) = delete;
+
+            HPX_CONSTEXPR_DESTRUCTOR ~scope_exit() noexcept
+            {
+                if (active)
+                {
+                    f();
+                }
+            }
+
+            constexpr void release() noexcept
+            {
+                active = false;
+            }
+
+        private:
+            F f;
+            bool active = true;
+        };
+    }    // namespace detail
 
     template <typename F>
-    scope_exit(F) -> scope_exit<F>;
+    auto scope_exit(F&& f)
+    {
+        return detail::scope_exit<std::decay_t<F>>(HPX_FORWARD(F, f));
+    }
 }    // namespace hpx::experimental
 
 #endif

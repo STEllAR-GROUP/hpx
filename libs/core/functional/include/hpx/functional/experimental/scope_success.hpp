@@ -18,57 +18,64 @@
 
 namespace hpx::experimental {
 
-    template <typename F>
-    struct scope_success
-    {
-        explicit constexpr scope_success(F&& f) noexcept(
-            std::is_nothrow_move_constructible_v<F> ||
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(HPX_MOVE(f))
-          , active(std::uncaught_exceptions())
-        {
-        }
+    namespace detail {
 
-        explicit constexpr scope_success(F const& f) noexcept(
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(f)
-          , active(std::uncaught_exceptions())
+        template <typename F>
+        struct scope_success
         {
-        }
-
-        constexpr scope_success(scope_success&& rhs) noexcept(
-            std::is_nothrow_move_constructible_v<F> ||
-            std::is_nothrow_copy_constructible_v<F>)
-          : f(HPX_MOVE(rhs.f))
-          , active(rhs.active)
-        {
-            rhs.release();
-        }
-
-        scope_success(scope_success const&) = delete;
-        scope_success& operator=(scope_success const&) = delete;
-        scope_success& operator=(scope_success&& rhs) = delete;
-
-        HPX_CONSTEXPR_DESTRUCTOR ~scope_success() noexcept(noexcept(this->f()))
-        {
-            if (active >= std::uncaught_exceptions())
+            explicit constexpr scope_success(F&& f) noexcept(
+                std::is_nothrow_move_constructible_v<F> ||
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(HPX_MOVE(f))
+              , active(std::uncaught_exceptions())
             {
-                f();
             }
-        }
 
-        constexpr void release() noexcept
-        {
-            active = -1;
-        }
+            explicit constexpr scope_success(F const& f) noexcept(
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(f)
+              , active(std::uncaught_exceptions())
+            {
+            }
 
-    private:
-        F f;
-        int active;
-    };
+            constexpr scope_success(scope_success&& rhs) noexcept(
+                std::is_nothrow_move_constructible_v<F> ||
+                std::is_nothrow_copy_constructible_v<F>)
+              : f(HPX_MOVE(rhs.f))
+              , active(rhs.active)
+            {
+                rhs.release();
+            }
+
+            scope_success(scope_success const&) = delete;
+            scope_success& operator=(scope_success const&) = delete;
+            scope_success& operator=(scope_success&& rhs) = delete;
+
+            HPX_CONSTEXPR_DESTRUCTOR ~scope_success() noexcept(
+                noexcept(this->f()))
+            {
+                if (active >= std::uncaught_exceptions())
+                {
+                    f();
+                }
+            }
+
+            constexpr void release() noexcept
+            {
+                active = -1;
+            }
+
+        private:
+            F f;
+            int active;
+        };
+    }    // namespace detail
 
     template <typename F>
-    scope_success(F) -> scope_success<F>;
+    auto scope_success(F&& f)
+    {
+        return detail::scope_success<std::decay_t<F>>(HPX_FORWARD(F, f));
+    }
 }    // namespace hpx::experimental
 
 #endif
