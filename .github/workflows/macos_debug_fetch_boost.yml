@@ -44,10 +44,10 @@ jobs:
       shell: bash
       run: |
           cmake --build build --target all
+          cmake --build build --target tests
     - name: Test
       shell: bash
       run: |
-          cmake --build build --target tests
           cd build
           ctest --output-on-failure \
             --exclude-regex \
