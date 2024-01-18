@@ -980,6 +980,16 @@ hpx_option(
   ADVANCED
 )
 
+# Option for automatically fetching Hwloc
+hpx_option(
+  HPX_WITH_FETCH_HWLOC
+  BOOL
+  "Use FetchContent to fetch Hwloc. By default an installed Hwloc will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
@@ -2322,6 +2332,18 @@ endif()
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
+  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+    add_custom_target(
+      HwlocDLL ALL
+      COMMAND ${CMAKE_COMMAND} -E make_directory
+              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+      COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        "${HWLOC_ROOT}/bin/libhwloc-15.dll"
+        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+    )
+    add_hpx_pseudo_dependencies(examples HwlocDLL)
+  endif()
 endif()
 
 # ##############################################################################

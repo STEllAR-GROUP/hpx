@@ -1,0 +1,81 @@
+# Copyright (c) 2024 Vedant Nimje
+#
+# SPDX-License-Identifier: BSL-1.0
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+name: macOS CI (Debug) with HWLoc fetch
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        # Workaround for https://github.com/actions/virtual-environments/issues/2322
+        rm -rf /usr/local/bin/2to3*
+        rm -rf /usr/local/bin/idle3*
+        rm -rf /usr/local/bin/pydoc3*
+        rm -rf /usr/local/bin/python3*
+        brew upgrade
+        brew update && \
+            brew install --overwrite python-tk && \
+            brew install --overwrite boost gperftools ninja && \
+            brew upgrade cmake
+    - name: Configure
+      shell: bash
+      run: |
+          cmake \
+              -H. \
+              -Bbuild \
+              -GNinja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DHPX_WITH_FETCH_ASIO=ON \
+              -DHPX_WITH_FETCH_HWLOC=ON \
+              -DHPX_WITH_EXAMPLES=ON \
+              -DHPX_WITH_TESTS=ON \
+              -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=3 \
+              -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
+    - name: Build
+      shell: bash
+      run: |
+          cmake --build build --target all
+          cmake --build build --target tests
+    - name: Test
+      shell: bash
+      run: |
+          cd build
+          ctest --output-on-failure \
+            --exclude-regex \
+          "tests.examples.quickstart.1d_wave_equation|\
+          tests.examples.transpose.transpose_block_numa|\
+          tests.performance.local.wait_all_timings|\
+          tests.regressions.components.distributed.tcp.bulk_new_3054|\
+          tests.regressions.dynamic_counters_loaded_1508|\
+          tests.regressions.lcos.wait_all_hang_1946|\
+          tests.regressions.modules.async_combinators.wait_all_hang_1946|\
+          tests.regressions.modules.collectives.distributed.tcp.broadcast_apply|\
+          tests.regressions.modules.collectives.distributed.tcp.broadcast_unwrap_future_2885|\
+          tests.regressions.modules.collectives.distributed.tcp.remote_latch|\
+          tests.regressions.modules.compute_local.parallel_fill_4132|\
+          tests.regressions.util.distributed.tcp.zero_copy_parcels_1001_no_zero_copy_optimization|\
+          tests.regressions.modules.performance_counters.dynamic_counters_loaded_1508|\
+          tests.regressions.modules.performance_counters.statistics_2666|\
+          tests.unit.modules.runtime_components.distributed.tcp.migrate_component|\
+          tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component|\
+          tests.unit.modules.algorithms.default_construct|\
+          tests.unit.modules.algorithms.destroy|\
+          tests.unit.modules.algorithms.foreach_executors|\
+          tests.unit.modules.algorithms.max_element|\
+          tests.unit.modules.algorithms.replace_copy_if|\
+          tests.unit.modules.compute_local.numa_allocator|\
+          tests.unit.modules.execution.standalone_thread_pool_executor|\
+          tests.unit.modules.resource_partitioner.used_pus|\
+          tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
+          tests.unit.threads.distributed.tcp.thread_stacksize|\
+          tests.unit.topology.numa_allocator|\
+          tests.unit.modules.runtime_components.distributed.tcp.migrate_polymorphic_component"
