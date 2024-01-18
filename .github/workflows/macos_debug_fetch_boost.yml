@@ -6,9 +6,7 @@
 
 name: macOS CI (Debug) with Boost Fetch
 
-on:
-  push:
-    branches: [ boost_fetch ]
+on: [pull_request]
 
 jobs:
   build:
