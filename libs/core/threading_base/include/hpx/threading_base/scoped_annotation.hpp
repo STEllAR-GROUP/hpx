@@ -44,7 +44,7 @@ namespace hpx {
         explicit constexpr scoped_annotation(char const*) noexcept {}
 
         template <typename F>
-        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F &&) noexcept
+        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&&) noexcept
         {
         }
 
@@ -85,7 +85,7 @@ namespace hpx {
         template <typename F,
             typename =
                 std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
-        explicit scoped_annotation(F && f)
+        explicit scoped_annotation(F&& f)
           : task_(thread_domain_,
                 hpx::traits::get_function_annotation_itt<std::decay_t<F>>::call(
                     f))
@@ -160,7 +160,7 @@ namespace hpx {
         template <typename F,
             typename =
                 std::enable_if_t<!std::is_same_v<std::decay_t<F>, std::string>>>
-        explicit scoped_annotation(F && f)
+        explicit scoped_annotation(F&& f)
         {
             auto const* self = hpx::threads::get_self_ptr();
             if (self != nullptr)
@@ -203,8 +203,7 @@ namespace hpx {
         explicit constexpr scoped_annotation(char const* /*name*/) noexcept {}
 
         template <typename F>
-        explicit HPX_HOST_DEVICE constexpr scoped_annotation(
-            F && /*f*/) noexcept
+        explicit HPX_HOST_DEVICE constexpr scoped_annotation(F&& /*f*/) noexcept
         {
         }
 

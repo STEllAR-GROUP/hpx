@@ -534,7 +534,7 @@ namespace hpx {
         template <typename CB,
             typename Enable =
                 std::enable_if_t<std::is_constructible_v<Callback, CB>>>
-        explicit stop_callback(stop_token && st, CB && cb) noexcept(
+        explicit stop_callback(stop_token&& st, CB&& cb) noexcept(
             std::is_nothrow_constructible_v<Callback, CB>)
           : callback_(HPX_FORWARD(CB, cb))
           , state_(HPX_MOVE(st.state_))
@@ -559,7 +559,7 @@ namespace hpx {
         }
 
         stop_callback(stop_callback const&) = delete;
-        stop_callback(stop_callback &&) = delete;
+        stop_callback(stop_callback&&) = delete;
 
         stop_callback& operator=(stop_callback const&) = delete;
         stop_callback& operator=(stop_callback&&) = delete;
@@ -945,8 +945,8 @@ namespace hpx::p2300_stop_token {
         template <typename CB,
             typename Enable =
                 std::enable_if_t<std::is_constructible_v<Callback, CB>>>
-        explicit in_place_stop_callback(in_place_stop_token && st,
-            CB && cb) noexcept(std::is_nothrow_constructible_v<Callback, CB>)
+        explicit in_place_stop_callback(in_place_stop_token&& st,
+            CB&& cb) noexcept(std::is_nothrow_constructible_v<Callback, CB>)
           : callback_(HPX_FORWARD(CB, cb))
           , source_(const_cast<in_place_stop_source*>(st.source_))
         {
@@ -979,12 +979,12 @@ namespace hpx::p2300_stop_token {
         }
 
         in_place_stop_callback(in_place_stop_callback const&) = delete;
-        in_place_stop_callback(in_place_stop_callback &&) noexcept = delete;
+        in_place_stop_callback(in_place_stop_callback&&) noexcept = delete;
 
-        in_place_stop_callback& operator=(in_place_stop_callback const&) =
-            delete;
-        in_place_stop_callback& operator=(in_place_stop_callback&&) noexcept =
-            delete;
+        in_place_stop_callback& operator=(
+            in_place_stop_callback const&) = delete;
+        in_place_stop_callback& operator=(
+            in_place_stop_callback&&) noexcept = delete;
 
     private:
         void execute() noexcept override
