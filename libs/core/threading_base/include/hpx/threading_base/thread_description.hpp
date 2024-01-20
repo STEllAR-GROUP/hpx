@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2023 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -254,12 +254,12 @@ namespace hpx::threads {
         {
         }
 
-        [[nodiscard]] constexpr data_type kind() const noexcept
+        [[nodiscard]] static constexpr data_type kind() noexcept
         {
             return data_type_description;
         }
 
-        [[nodiscard]] constexpr char const* get_description() const noexcept
+        [[nodiscard]] static constexpr char const* get_description() noexcept
         {
             return "<unknown>";
         }

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2023 The STE||AR-Group
+# Copyright (c) 2020-2024 The STE||AR-Group
 #               2011 Bryce Adelstein-Lelbach
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -7,7 +7,7 @@
 
 set(tests)
 
-if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
+if(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_JSON_CONFIGURATION_FILES)
   set(tests json_config_file)
 
   set(json_config_file_PARAMETERS

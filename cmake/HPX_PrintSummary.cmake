@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2022 Hartmut Kaiser
+# Copyright (c) 2017-2024 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -70,6 +70,8 @@ function(create_configuration_summary message module_name)
             PROPERTY VALUE
           )
           hpx_info("    ${_variableName}=${_value}")
+        else()
+          hpx_info("    value not found for ${_variableName}")
         endif()
 
         string(REPLACE "_WITH_" "_HAVE_" __variableName ${_variableName})

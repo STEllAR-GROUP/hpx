@@ -33,7 +33,7 @@ namespace hpx::threads::policies {
     ///////////////////////////////////////////////////////////////////////////
     // The static_priority_queue_scheduler maintains exactly one queue of work
     // items (threads) per OS thread, where this OS thread pulls its next work
-    // from. Additionally it maintains separate queues: several for high
+    // from. Additionally, it maintains separate queues: several for high
     // priority threads and one for low priority threads.
     //
     // High priority threads are executed by the first N OS threads before any

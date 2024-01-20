@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2012-2013 Thomas Heller
 //
@@ -43,52 +43,52 @@ namespace hpx::threads {
     using mask_rvref_type = std::uint64_t;
     using mask_cref_type = std::uint64_t;
 
-    constexpr inline std::uint64_t bits(std::size_t idx) noexcept
+    constexpr std::uint64_t bits(std::size_t idx) noexcept
     {
         HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
-        return std::uint64_t(1) << idx;
+        return static_cast<std::uint64_t>(1) << idx;
     }
 
-    constexpr inline bool any(mask_cref_type mask) noexcept
+    constexpr bool any(mask_cref_type mask) noexcept
     {
         return mask != 0;
     }
 
-    constexpr inline mask_type not_(mask_cref_type mask) noexcept
+    constexpr mask_type not_(mask_cref_type mask) noexcept
     {
         return ~mask;
     }
 
-    constexpr inline bool test(mask_cref_type mask, std::size_t idx) noexcept
+    constexpr bool test(mask_cref_type mask, std::size_t idx) noexcept
     {
         HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
         return (bits(idx) & mask) != 0;
     }
 
-    constexpr inline void set(mask_type& mask, std::size_t idx) noexcept
+    constexpr void set(mask_type& mask, std::size_t idx) noexcept
     {
         HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
         mask |= bits(idx);
     }
 
-    constexpr inline void unset(mask_type& mask, std::size_t idx) noexcept
+    constexpr void unset(mask_type& mask, std::size_t idx) noexcept
     {
         HPX_ASSERT(idx < CHAR_BIT * sizeof(mask_type));
         mask &= not_(bits(idx));
     }
 
-    constexpr inline std::size_t mask_size(mask_cref_type /*mask*/) noexcept
+    constexpr std::size_t mask_size(mask_cref_type /*mask*/) noexcept
     {
         return CHAR_BIT * sizeof(mask_type);
     }
 
-    constexpr inline void resize(
+    constexpr void resize(
         mask_type& /*mask*/, [[maybe_unused]] std::size_t s) noexcept
     {
         HPX_ASSERT(s <= CHAR_BIT * sizeof(mask_type));
     }
 
-    constexpr inline std::size_t find_first(mask_cref_type mask) noexcept
+    constexpr std::size_t find_first(mask_cref_type mask) noexcept
     {
         if (mask)
         {
@@ -101,24 +101,24 @@ namespace hpx::threads {
 
             return c;
         }
-        return ~std::size_t(0);
+        return ~static_cast<std::size_t>(0);
     }
 
-    constexpr inline bool equal(
+    constexpr bool equal(
         mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0) noexcept
     {
         return lhs == rhs;
     }
 
     // return true if at least one of the masks has a bit set
-    constexpr inline bool bit_or(
+    constexpr bool bit_or(
         mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0) noexcept
     {
         return (lhs | rhs) != 0;
     }
 
     // return true if at least one bit is set in both masks
-    constexpr inline bool bit_and(
+    constexpr bool bit_and(
         mask_cref_type lhs, mask_cref_type rhs, std::size_t = 0) noexcept
     {
         return (lhs & rhs) != 0;
@@ -126,7 +126,7 @@ namespace hpx::threads {
 
     // returns the number of bits set, taken from:
     // https://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
-    constexpr inline std::size_t count(mask_type mask) noexcept
+    constexpr std::size_t count(mask_type mask) noexcept
     {
         std::size_t c = 0;    // c accumulates the total bits set in v
         for (; mask; ++c)
@@ -136,7 +136,7 @@ namespace hpx::threads {
         return c;
     }
 
-    constexpr inline void reset(mask_type& mask) noexcept
+    constexpr void reset(mask_type& mask) noexcept
     {
         mask = 0ull;
     }

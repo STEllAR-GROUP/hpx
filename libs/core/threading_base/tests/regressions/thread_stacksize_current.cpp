@@ -29,7 +29,7 @@ void test(hpx::threads::thread_stacksize stacksize)
     hpx::async(exec, [&exec_current, stacksize]() {
         // This thread should have the stack size stacksize; it has been
         // explicitly set in the executor.
-        hpx::threads::thread_stacksize self_stacksize =
+        hpx::threads::thread_stacksize const self_stacksize =
             hpx::threads::get_self_stacksize_enum();
         HPX_TEST_EQ(self_stacksize, stacksize);
         HPX_TEST_NEQ(self_stacksize, hpx::threads::thread_stacksize::current);
@@ -37,7 +37,7 @@ void test(hpx::threads::thread_stacksize stacksize)
         hpx::async(exec_current, [stacksize]() {
             // This thread should also have the stack size stacksize; it has
             // been inherited size from the parent thread.
-            hpx::threads::thread_stacksize self_stacksize =
+            hpx::threads::thread_stacksize const self_stacksize =
                 hpx::threads::get_self_stacksize_enum();
             HPX_TEST_EQ(self_stacksize, stacksize);
             HPX_TEST_NEQ(
@@ -63,7 +63,7 @@ int hpx_main()
 int main(int argc, char** argv)
 {
     // clang-format off
-    std::vector<std::string> schedulers = {
+    std::vector<std::string> const schedulers = {
         "local",
         "local-priority-fifo",
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
@@ -77,7 +77,8 @@ int main(int argc, char** argv)
 #endif
         "shared-priority",
         "local-workrequesting-fifo",
-        "local-workrequesting-lifo"
+        "local-workrequesting-lifo",
+        "local-workrequesting-mc",
     };
     // clang-format on
     for (auto const& scheduler : schedulers)

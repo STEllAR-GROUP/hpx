@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/modules/concurrency.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <atomic>
 #include <cstddef>
@@ -37,7 +36,8 @@ namespace hpx::lcos::local {
     class channel_spsc
     {
     private:
-        HPX_FORCEINLINE bool is_full(std::size_t tail) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) const noexcept
         {
             std::size_t const numitems =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
@@ -49,7 +49,8 @@ namespace hpx::lcos::local {
             return (numitems - size_ == size_ - 1);
         }
 
-        HPX_FORCEINLINE bool is_empty(std::size_t head) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
         {
             return head == tail_.data_.load(std::memory_order_acquire);
         }
@@ -106,6 +107,15 @@ namespace hpx::lcos::local {
             {
                 close();
             }
+        }
+
+        [[nodiscard]] bool is_empty() const noexcept
+        {
+            if (closed_.load(std::memory_order_relaxed))
+            {
+                return true;
+            }
+            return is_empty(head_.data_.load(std::memory_order_relaxed));
         }
 
         bool get(T* val = nullptr) const noexcept
@@ -173,7 +183,7 @@ namespace hpx::lcos::local {
             return 0;
         }
 
-        constexpr std::size_t capacity() const noexcept
+        [[nodiscard]] constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }
@@ -200,7 +210,8 @@ namespace hpx::lcos::local {
     class channel_spsc<T, channel_mode::dont_support_close>
     {
     private:
-        HPX_FORCEINLINE bool is_full(std::size_t tail) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_full(
+            std::size_t tail) const noexcept
         {
             std::size_t const numitems =
                 size_ + tail - head_.data_.load(std::memory_order_acquire);
@@ -212,7 +223,8 @@ namespace hpx::lcos::local {
             return (numitems - size_ == size_ - 1);
         }
 
-        HPX_FORCEINLINE bool is_empty(std::size_t head) const noexcept
+        [[nodiscard]] HPX_FORCEINLINE bool is_empty(
+            std::size_t head) const noexcept
         {
             return head == tail_.data_.load(std::memory_order_acquire);
         }
@@ -227,6 +239,9 @@ namespace hpx::lcos::local {
             head_.data_.store(0, std::memory_order_relaxed);
             tail_.data_.store(0, std::memory_order_relaxed);
         }
+
+        channel_spsc(channel_spsc const& rhs) = delete;
+        channel_spsc& operator=(channel_spsc const& rhs) = delete;
 
         channel_spsc(channel_spsc&& rhs) noexcept
           : size_(rhs.size_)
@@ -252,6 +267,11 @@ namespace hpx::lcos::local {
         }
 
         ~channel_spsc() = default;
+
+        [[nodiscard]] bool is_empty() const noexcept
+        {
+            return is_empty(head_.data_.load(std::memory_order_relaxed));
+        }
 
         bool get(T* val = nullptr) const noexcept
         {
@@ -296,7 +316,7 @@ namespace hpx::lcos::local {
             return true;
         }
 
-        constexpr std::size_t capacity() const noexcept
+        [[nodiscard]] constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }

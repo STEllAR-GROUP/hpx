@@ -60,7 +60,7 @@ namespace hpx::threads::policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_local_priority_queue_scheduler_terminated_queue>
-    class HPX_CORE_EXPORT local_priority_queue_scheduler : public scheduler_base
+    class local_priority_queue_scheduler : public scheduler_base
     {
     public:
         using has_periodic_maintenance = std::false_type;

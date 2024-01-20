@@ -438,4 +438,8 @@
 #  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
+#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+#define HPX_HAVE_MAX_CPU_COUNT 64
+#endif
+
 // clang-format on

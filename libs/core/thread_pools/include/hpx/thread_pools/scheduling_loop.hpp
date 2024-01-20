@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,8 +9,8 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution_base/this_thread.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/hardware/timestamp.hpp>
-#include <hpx/modules/itt_notify.hpp>
 #include <hpx/thread_pools/detail/background_thread.hpp>
 #include <hpx/thread_pools/detail/scheduling_callbacks.hpp>
 #include <hpx/thread_pools/detail/scheduling_counters.hpp>
@@ -20,6 +20,10 @@
 #include <hpx/threading_base/scheduler_state.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
+#include <hpx/modules/itt_notify.hpp>
+#endif
 #if defined(HPX_HAVE_APEX)
 #include <hpx/threading_base/external_timer.hpp>
 #endif
@@ -38,80 +42,39 @@ namespace hpx::threads::detail {
     {
         idle_collect_rate(
             std::int64_t& tfunc_time, std::int64_t& exec_time) noexcept
-          : start_timestamp_(util::hardware::timestamp())
+          : start_timestamp_(
+                static_cast<std::int64_t>(util::hardware::timestamp()))
           , tfunc_time_(tfunc_time)
           , exec_time_(exec_time)
         {
         }
 
-        void collect_exec_time(std::int64_t timestamp) const noexcept
+        void collect_exec_time(std::uint64_t timestamp) const noexcept
         {
-            exec_time_ += util::hardware::timestamp() - timestamp;
+            exec_time_ += static_cast<std::int64_t>(
+                util::hardware::timestamp() - timestamp);
         }
 
         void take_snapshot() noexcept
         {
             if (tfunc_time_ == static_cast<std::int64_t>(-1))
             {
-                start_timestamp_ = util::hardware::timestamp();
+                start_timestamp_ =
+                    static_cast<std::int64_t>(util::hardware::timestamp());
                 tfunc_time_ = 0;
                 exec_time_ = 0;
             }
             else
             {
-                tfunc_time_ = util::hardware::timestamp() - start_timestamp_;
+                tfunc_time_ =
+                    static_cast<std::int64_t>(util::hardware::timestamp()) -
+                    start_timestamp_;
             }
         }
 
         std::int64_t start_timestamp_;
-
         std::int64_t& tfunc_time_;
         std::int64_t& exec_time_;
-    };
-
-    struct exec_time_wrapper
-    {
-        explicit exec_time_wrapper(idle_collect_rate& idle_rate) noexcept
-          : timestamp_(util::hardware::timestamp())
-          , idle_rate_(idle_rate)
-        {
-        }
-
-        exec_time_wrapper(exec_time_wrapper const&) = delete;
-        exec_time_wrapper(exec_time_wrapper&&) = delete;
-
-        exec_time_wrapper& operator=(exec_time_wrapper const&) = delete;
-        exec_time_wrapper& operator=(exec_time_wrapper&&) = delete;
-
-        ~exec_time_wrapper()
-        {
-            idle_rate_.collect_exec_time(timestamp_);
-        }
-
-        std::int64_t timestamp_;
-        idle_collect_rate& idle_rate_;
-    };
-
-    struct tfunc_time_wrapper
-    {
-        explicit constexpr tfunc_time_wrapper(
-            idle_collect_rate& idle_rate) noexcept
-          : idle_rate_(idle_rate)
-        {
-        }
-
-        tfunc_time_wrapper(tfunc_time_wrapper const&) = delete;
-        tfunc_time_wrapper(tfunc_time_wrapper&&) = delete;
-
-        tfunc_time_wrapper& operator=(tfunc_time_wrapper const&) = delete;
-        tfunc_time_wrapper& operator=(tfunc_time_wrapper&&) = delete;
-
-        ~tfunc_time_wrapper()
-        {
-            idle_rate_.take_snapshot();
-        }
-
-        idle_collect_rate& idle_rate_;
     };
 #else
     struct idle_collect_rate
@@ -121,48 +84,17 @@ namespace hpx::threads::detail {
         {
         }
     };
-
-    struct exec_time_wrapper
-    {
-        explicit constexpr exec_time_wrapper(idle_collect_rate&) noexcept {}
-    };
-
-    struct tfunc_time_wrapper
-    {
-        explicit constexpr tfunc_time_wrapper(idle_collect_rate&) noexcept {}
-    };
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    struct is_active_wrapper
-    {
-        explicit is_active_wrapper(bool& is_active) noexcept
-          : is_active_(is_active)
-        {
-            is_active = true;
-        }
-
-        is_active_wrapper(is_active_wrapper const&) = delete;
-        is_active_wrapper(is_active_wrapper&&) = delete;
-
-        is_active_wrapper& operator=(is_active_wrapper const&) = delete;
-        is_active_wrapper& operator=(is_active_wrapper&&) = delete;
-
-        ~is_active_wrapper()
-        {
-            is_active_ = false;
-        }
-
-        bool& is_active_;
-    };
-
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
         scheduling_counters& counters, scheduling_callbacks& params)
     {
         std::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
         util::itt::stack_context ctx;    // helper for itt support
         util::itt::thread_domain const thread_domain;
         util::itt::id threadid(thread_domain, &scheduler);
@@ -176,8 +108,11 @@ namespace hpx::threads::detail {
 
         background_work_exec_time bg_work_exec_time_init(counters);
 
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
         idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
-        [[maybe_unused]] tfunc_time_wrapper tfunc_time_collector(idle_rate);
+        auto tfunc_time_collector = hpx::experimental::scope_exit(
+            [&idle_rate] { idle_rate.take_snapshot(); });
+#endif
 
         // spin for some time after queues have become empty
         bool may_exit = false;
@@ -267,15 +202,24 @@ namespace hpx::threads::detail {
                                 thrd_stat.get_previous(),
                                 thread_schedule_state::active);
 
-                            [[maybe_unused]] tfunc_time_wrapper
-                                tfunc_time_collector_inner(idle_rate);
-
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
+                            auto tfunc_time_collector_inner =
+                                hpx::experimental::scope_exit([&idle_rate] {
+                                    idle_rate.take_snapshot();
+                                });
+#endif
                             // thread returns new required state store the
                             // returned state in the thread
                             {
-                                is_active_wrapper utilization(
-                                    counters.is_active_);
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+                                counters.is_active_ = true;
+                                auto utilization =
+                                    hpx::experimental::scope_exit(
+                                        [&is_active = counters.is_active_] {
+                                            is_active = false;
+                                        });
+
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
                                 util::itt::caller_context cctx(ctx);
                                 // util::itt::undo_frame_context undoframe(fctx);
                                 util::itt::task task =
@@ -285,11 +229,16 @@ namespace hpx::threads::detail {
                                 task.add_metadata(
                                     task_phase, thrdptr->get_thread_phase());
 #endif
+#ifdef HPX_HAVE_THREAD_IDLE_RATES
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
-                                [[maybe_unused]] exec_time_wrapper
-                                    exec_time_collector(idle_rate);
-
+                                auto exec_time_collector =
+                                    hpx::experimental::scope_exit(
+                                        [&idle_rate,
+                                            ts = util::hardware::timestamp()] {
+                                            idle_rate.collect_exec_time(ts);
+                                        });
+#endif
 #if defined(HPX_HAVE_APEX)
                                 // get the APEX data pointer, in case we are
                                 // resuming the thread and have to restore any
@@ -385,9 +334,10 @@ namespace hpx::threads::detail {
                     else if (HPX_UNLIKELY(state_val ==
                                  thread_schedule_state::pending_boost))
                     {
-                        thrdptr->set_state(thread_schedule_state::pending);
+                        [[maybe_unused]] auto oldstate =
+                            thrdptr->set_state(thread_schedule_state::pending);
 
-                        if (HPX_LIKELY(next_thrd == nullptr))
+                        if (HPX_LIKELY(!next_thrd))
                         {
                             // reschedule this thread right away if the
                             // background work will be triggered
@@ -464,7 +414,7 @@ namespace hpx::threads::detail {
             {
                 ++idle_loop_count;
 
-                next_thrd = nullptr;
+                next_thrd = thread_id_ref_type();
                 if (scheduler.wait_or_add_new(num_thread, running,
                         idle_loop_count, enable_stealing_staged, added,
                         &next_thrd))
@@ -503,7 +453,8 @@ namespace hpx::threads::detail {
                                     HPX_ASSERT(background_running);
                                     *background_running = false;    //-V522
 
-                                    // do background work in parcel layer and in agas
+                                    // do background work in parcel layer and in
+                                    // agas
                                     [[maybe_unused]] bool const has_exited =
                                         call_background_thread(
                                             background_thread, next_thrd,
@@ -514,7 +465,7 @@ namespace hpx::threads::detail {
                                     // the background thread should have exited
                                     HPX_ASSERT(has_exited);
 
-                                    background_thread = thread_id_type();
+                                    background_thread.reset();
                                     background_running.reset();
                                 }
                                 else
@@ -625,7 +576,7 @@ namespace hpx::threads::detail {
                         // the background thread should have exited
                         HPX_ASSERT(has_exited);
 
-                        background_thread = thread_id_type();
+                        background_thread.reset();
                         background_running.reset();
                     }
                     else

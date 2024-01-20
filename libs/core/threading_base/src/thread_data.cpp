@@ -28,7 +28,10 @@ namespace hpx::threads {
 
     namespace detail {
 
-        static get_locality_id_type* get_locality_id_f;
+        namespace {
+
+            get_locality_id_type* get_locality_id_f = nullptr;
+        }
 
         void set_get_locality_id(get_locality_id_type* f)
         {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -42,12 +42,18 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Scheduler>
-    class scheduled_thread_pool : public hpx::threads::thread_pool_base
+    class scheduled_thread_pool final : public hpx::threads::thread_pool_base
     {
     public:
         ///////////////////////////////////////////////////////////////////
         scheduled_thread_pool(std::unique_ptr<Scheduler> sched,
             thread_pool_init_parameters const& init);
+
+        scheduled_thread_pool(scheduled_thread_pool const&) = delete;
+        scheduled_thread_pool(scheduled_thread_pool&&) = delete;
+        scheduled_thread_pool& operator=(scheduled_thread_pool const&) = delete;
+        scheduled_thread_pool& operator=(scheduled_thread_pool&&) = delete;
+
         virtual ~scheduled_thread_pool();
 
         void print_pool(std::ostream& os) const override;
@@ -153,7 +159,7 @@ namespace hpx::threads::detail {
         std::thread& get_os_thread_handle(
             std::size_t global_thread_num) override
         {
-            std::size_t num_thread_local =
+            std::size_t const num_thread_local =
                 global_thread_num - this->thread_offset_;
             HPX_ASSERT(num_thread_local < threads_.size());
             return threads_[num_thread_local];

@@ -90,6 +90,10 @@ int main(int argc, char* argv[])
             // an assert in the scheduling_loop if a background thread is not
             // created.
             //hpx::resource::scheduling_policy::shared_priority,
+
+            hpx::resource::scheduling_policy::local_workrequesting_fifo,
+            hpx::resource::scheduling_policy::local_workrequesting_lifo,
+            hpx::resource::scheduling_policy::local_workrequesting_mc,
         };
 
         for (auto const scheduler : schedulers)

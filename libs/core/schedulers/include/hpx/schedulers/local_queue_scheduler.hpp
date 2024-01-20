@@ -53,7 +53,7 @@ namespace hpx::threads::policies {
         typename StagedQueuing = lockfree_fifo,
         typename TerminatedQueuing =
             default_local_queue_scheduler_terminated_queue>
-    class HPX_CORE_EXPORT local_queue_scheduler : public scheduler_base
+    class local_queue_scheduler : public scheduler_base
     {
     public:
         using has_periodic_maintenance = std::false_type;
@@ -925,8 +925,8 @@ namespace hpx::threads::policies {
         detail::affinity_data const& affinity_data_;
 
 #if !defined(HPX_NATIVE_MIC)    // we know that the MIC has one NUMA domain only
-        mask_type steals_in_numa_domain_;
-        mask_type steals_outside_numa_domain_;
+        mask_type steals_in_numa_domain_ = mask_type();
+        mask_type steals_outside_numa_domain_ = mask_type();
 #endif
         std::vector<mask_type> numa_domain_masks_;
         std::vector<mask_type> outside_numa_domain_masks_;

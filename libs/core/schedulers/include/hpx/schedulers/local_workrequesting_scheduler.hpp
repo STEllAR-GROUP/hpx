@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,26 +99,19 @@ namespace hpx::threads::policies {
         lockfree_fifo;
 #endif
 
-    ///////////////////////////////////////////////////////////////////////////
-    // The local_workrequesting_scheduler maintains exactly one queue of work
-    // items (threads) per OS thread, where this OS thread pulls its next work
-    // from.
-    template <typename Mutex = std::mutex,
-        typename PendingQueuing = lockfree_fifo,
-        typename StagedQueuing = lockfree_fifo,
-        typename TerminatedQueuing =
-            default_local_workrequesting_scheduler_terminated_queue>
-    class local_workrequesting_scheduler : public scheduler_base
-    {
-    public:
-        using has_periodic_maintenance = std::false_type;
+    namespace detail {
 
-        using thread_queue_type = thread_queue<Mutex, PendingQueuing,
-            StagedQueuing, TerminatedQueuing>;
-
-        struct init_parameter
+        ////////////////////////////////////////////////////////////////////////
+        inline unsigned int random_seed() noexcept
         {
-            init_parameter(std::size_t num_queues,
+            static std::random_device rd;
+            return rd();
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        struct workrequesting_init_parameter
+        {
+            workrequesting_init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
                 std::size_t num_high_priority_queues = static_cast<std::size_t>(
                     -1),
@@ -136,7 +129,7 @@ namespace hpx::threads::policies {
             {
             }
 
-            init_parameter(std::size_t num_queues,
+            workrequesting_init_parameter(std::size_t num_queues,
                 detail::affinity_data const& affinity_data,
                 char const* description)
               : num_queues_(num_queues)
@@ -152,13 +145,10 @@ namespace hpx::threads::policies {
             detail::affinity_data const& affinity_data_;
             char const* description_;
         };
-        using init_parameter_type = init_parameter;
 
-    private:
-        ////////////////////////////////////////////////////////////////////////
-        struct task_data
+        struct workrequesting_task_data
         {
-            explicit HPX_HOST_DEVICE_CONSTEXPR task_data(
+            explicit workrequesting_task_data(
                 std::uint16_t num_thread = static_cast<std::uint16_t>(
                     -1)) noexcept
               : num_thread_(num_thread)
@@ -167,15 +157,15 @@ namespace hpx::threads::policies {
 
             // core number this task data originated from
             std::uint16_t num_thread_;
-            hpx::detail::small_vector<thread_id_ref_type, 3> tasks_;
+            hpx::detail::small_vector<thread_id_ref_type, 1> tasks_;
         };
 
-        ////////////////////////////////////////////////////////////////////////
-        using task_channel = lcos::local::channel_spsc<task_data,
-            lcos::local::channel_mode::dont_support_close>;
+        using workrequesting_task_channel =
+            lcos::local::channel_spsc<workrequesting_task_data,
+                lcos::local::channel_mode::dont_support_close>;
 
         ////////////////////////////////////////////////////////////////////////
-        struct steal_request
+        struct workrequesting_steal_request
         {
             enum class state : std::uint16_t
             {
@@ -184,10 +174,11 @@ namespace hpx::threads::policies {
                 failed = 4
             };
 
-            steal_request() = default;
+            workrequesting_steal_request() = default;
 
-            steal_request(std::size_t const num_thread, task_channel* channel,
-                mask_cref_type victims, bool idle, bool const stealhalf)
+            workrequesting_steal_request(std::size_t const num_thread,
+                workrequesting_task_channel* channel, mask_cref_type victims,
+                bool idle, bool const stealhalf)
               : channel_(channel)
               , victims_(victims)
               , num_thread_(static_cast<std::uint16_t>(num_thread))
@@ -197,19 +188,45 @@ namespace hpx::threads::policies {
             {
             }
 
-            task_channel* channel_ = nullptr;
-            mask_type victims_;
+            workrequesting_task_channel* channel_ = nullptr;
+            mask_type victims_ = mask_type();
             std::uint16_t num_thread_ = static_cast<std::uint16_t>(-1);
             std::uint16_t attempt_ = 0;
             state state_ = state::failed;
             // true ? attempt steal-half : attempt steal-one
-            bool stealhalf_ = false;
+            bool stealhalf_ = true;
         };
 
-        ////////////////////////////////////////////////////////////////////////
-        using steal_request_channel =
-            lcos::local::base_channel_mpsc<steal_request, util::spinlock,
+        using workrequesting_steal_request_channel =
+            lcos::local::channel_mpsc<workrequesting_steal_request,
                 lcos::local::channel_mode::dont_support_close>;
+    }    // namespace detail
+
+    ///////////////////////////////////////////////////////////////////////////
+    // The local_workrequesting_scheduler maintains several queues of work
+    // items (threads) per OS thread, where this OS thread pulls its next work
+    // from.
+    template <typename Mutex = std::mutex,
+        typename PendingQueuing = lockfree_fifo,
+        typename StagedQueuing = lockfree_fifo,
+        typename TerminatedQueuing =
+            default_local_workrequesting_scheduler_terminated_queue>
+    class local_workrequesting_scheduler final : public scheduler_base
+    {
+    public:
+        using has_periodic_maintenance = std::false_type;
+        using thread_queue_type = thread_queue<Mutex, PendingQueuing,
+            StagedQueuing, TerminatedQueuing>;
+        using init_parameter_type = detail::workrequesting_init_parameter;
+
+    private:
+        ////////////////////////////////////////////////////////////////////////
+        using task_data = detail::workrequesting_task_data;
+        using task_channel = detail::workrequesting_task_channel;
+
+        using steal_request = detail::workrequesting_steal_request;
+        using steal_request_channel =
+            detail::workrequesting_steal_request_channel;
 
         ////////////////////////////////////////////////////////////////////////
         struct scheduler_data
@@ -258,7 +275,7 @@ namespace hpx::threads::policies {
             }
 
             // initial affinity mask for this core
-            mask_type victims_;
+            mask_type victims_ = mask_type();
 
             // queues for threads scheduled on this core
             thread_queue_type* queue_ = nullptr;
@@ -281,7 +298,7 @@ namespace hpx::threads::policies {
             // adaptive stealing
             std::uint16_t num_recent_steals_ = 0;
             std::uint16_t num_recent_tasks_executed_ = 0;
-            bool stealhalf_ = false;
+            bool stealhalf_ = true;
 
 #if defined(HPX_HAVE_WORKREQUESTING_LAST_VICTIM)
             // core number the last stolen tasks originated from
@@ -296,12 +313,6 @@ namespace hpx::threads::policies {
         };
 
     public:
-        static unsigned int random_seed() noexcept
-        {
-            static std::random_device rd;
-            return rd();
-        }
-
         explicit local_workrequesting_scheduler(init_parameter_type const& init,
             bool deferred_initialization = true)
           : scheduler_base(init.num_queues_, init.description_,
@@ -310,7 +321,7 @@ namespace hpx::threads::policies {
           , data_(init.num_queues_)
           , low_priority_queue_(thread_queue_init_)
           , curr_queue_(0)
-          , gen_(random_seed())
+          , gen_(detail::random_seed())
           , affinity_data_(init.affinity_data_)
           , num_queues_(init.num_queues_)
           , num_high_priority_queues_(init.num_high_priority_queues_)
@@ -341,7 +352,7 @@ namespace hpx::threads::policies {
 
         ~local_workrequesting_scheduler() override = default;
 
-        static std::string_view get_scheduler_name()
+        static constexpr std::string_view get_scheduler_name() noexcept
         {
             return "local_workrequesting_scheduler";
         }
@@ -815,18 +826,21 @@ namespace hpx::threads::policies {
             return false;
         }
 
-        // decline_or_forward_all_steal_requests is only called when a worker
+        // decline_or_forward_one_steal_requests is only called when a worker
         // has nothing else to do but to relay steal requests, which means the
         // worker is idle.
-        void decline_or_forward_all_steal_requests(scheduler_data& d) noexcept
+        void decline_or_forward_one_steal_requests(scheduler_data& d) noexcept
         {
-            steal_request req;
-            while (try_receiving_steal_request(d, req))
+            if (!d.requests_->is_empty())
             {
+                steal_request req;
+                if (try_receiving_steal_request(d, req))
+                {
 #if defined(HPX_HAVE_WORKREQUESTING_STEAL_STATISTICS)
-                ++d.steal_requests_received_;
+                    ++d.steal_requests_received_;
 #endif
-                decline_or_forward_steal_request(d, req);
+                    decline_or_forward_steal_request(d, req);
+                }
             }
         }
 
@@ -863,16 +877,19 @@ namespace hpx::threads::policies {
                 task_data thrds(d.num_thread_);
                 thrds.tasks_.reserve(max_num_to_steal);
 
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
                 thread_id_ref_type thrd;
                 while (max_num_to_steal-- != 0 &&
                     d.queue_->get_next_thread(thrd, false, true))
                 {
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
                     d.queue_->increment_num_stolen_from_pending();
-#endif
                     thrds.tasks_.push_back(HPX_MOVE(thrd));
                     thrd = thread_id_ref_type{};
                 }
+#else
+                d.queue_->get_next_threads(
+                    thrds.tasks_.begin(), thrds.tasks_.size(), false, true);
+#endif
 
                 // we are ready to send at least one task
                 if (!thrds.tasks_.empty())
@@ -902,54 +919,46 @@ namespace hpx::threads::policies {
         {
             HPX_ASSERT(num_thread < num_queues_);
 
+            auto const get_thread = [](thread_queue_type* this_queue,
+                                        thread_id_ref_type& thrd) {
+                bool result = false;
+                if (this_queue->get_pending_queue_length(
+                        std::memory_order_relaxed) != 0)
+                {
+                    result = this_queue->get_next_thread(thrd);
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+                    this_queue->increment_num_pending_accesses();
+                    if (!result)
+                        this_queue->increment_num_pending_misses();
+#endif
+                }
+                return result;
+            };
+
             auto& d = data_[num_thread].data_;
-            if (num_thread < num_high_priority_queues_)
-            {
-                bool result = d.high_priority_queue_->get_next_thread(thrd);
 
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                d.high_priority_queue_->increment_num_pending_accesses();
-                if (result)
-                {
-                    ++d.num_recent_tasks_executed_;
-                    return true;
-                }
-                d.high_priority_queue_->increment_num_pending_misses();
-#else
-                if (result)
-                {
-                    ++d.num_recent_tasks_executed_;
-                    return true;
-                }
-#endif
+            if (num_thread < num_high_priority_queues_ &&
+                get_thread(d.high_priority_queue_, thrd))
+            {
+                ++d.num_recent_tasks_executed_;
+                return true;
             }
 
-            bool result = false;
-            for (thread_queue_type* this_queue : {d.bound_queue_, d.queue_})
-            {
-                result = this_queue->get_next_thread(thrd);
-
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                this_queue->increment_num_pending_accesses();
-#endif
-                if (result)
-                    break;
-#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
-                this_queue->increment_num_pending_misses();
-#endif
-            }
-
-            if (allow_stealing && result)
+            if (allow_stealing &&
+                (get_thread(d.bound_queue_, thrd) ||
+                    get_thread(d.queue_, thrd)))
             {
                 // We found a task to run, however before running it we handle
                 // steal requests (assuming that there is more work left that
                 // could be used to satisfy steal requests).
-
-                steal_request req;
-                while (try_receiving_steal_request(d, req))
+                if (!d.requests_->is_empty())
                 {
-                    if (!handle_steal_request(d, req))
-                        break;
+                    steal_request req;
+                    while (try_receiving_steal_request(d, req))
+                    {
+                        if (!handle_steal_request(d, req))
+                            break;
+                    }
                 }
 
                 ++d.num_recent_tasks_executed_;
@@ -964,7 +973,8 @@ namespace hpx::threads::policies {
                 return false;
             }
 
-            if (low_priority_queue_.get_next_thread(thrd))
+            if (num_thread == num_queues_ - 1 &&
+                get_thread(&low_priority_queue_, thrd))
             {
                 ++d.num_recent_tasks_executed_;
                 return true;
@@ -1447,7 +1457,7 @@ namespace hpx::threads::policies {
         // return a random victim for the current stealing operation
         std::size_t random_victim(steal_request const& req) noexcept
         {
-            std::size_t result = 0;
+            std::size_t result;
 
             {
                 // generate at most 3 random numbers before resorting to more
@@ -1591,7 +1601,7 @@ namespace hpx::threads::policies {
         // Try receiving tasks that are sent by another core as a response to
         // one of our steal requests. This returns true if new tasks were
         // received.
-        bool try_receiving_tasks(scheduler_data& d, std::size_t& added,
+        static bool try_receiving_tasks(scheduler_data& d, std::size_t& added,
             thread_id_ref_type* next_thrd)
         {
             task_data thrds{};
@@ -1699,14 +1709,18 @@ namespace hpx::threads::policies {
                 HPX_ASSERT(d.requested_ != 0);
             }
 
-            if (try_receiving_tasks(d, added, next_thrd))
+            if (!d.tasks_->is_empty() &&
+                try_receiving_tasks(d, added, next_thrd))
             {
                 return false;
             }
 
             // if we did not receive any new task, decline or forward all
-            // pending steal requests
-            decline_or_forward_all_steal_requests(d);
+            // pending steal requests, if there are any
+            if (HPX_UNLIKELY(!d.requests_->is_empty()))
+            {
+                decline_or_forward_one_steal_requests(d);
+            }
 
 #ifdef HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION
             // no new work is available, are we deadlocked?
