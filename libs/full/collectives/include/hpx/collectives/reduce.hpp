@@ -239,12 +239,7 @@ namespace hpx::traits {
         template <>
         struct communicator_data<reduce_tag>
         {
-            static constexpr char const* name() noexcept
-            {
-                return "reduce";
-            }
-
-            HPX_EXPORT static operation_id_type id() noexcept;
+            HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
@@ -259,7 +254,7 @@ namespace hpx::traits {
         {
             return communicator.template handle_data<std::decay_t<T>>(
                 communication::communicator_data<
-                    communication::reduce_tag>::id(),
+                    communication::reduce_tag>::name(),
                 which, generation,
                 // step function (invoked once for get)
                 [&t](auto& data, std::size_t which) {
@@ -287,7 +282,7 @@ namespace hpx::traits {
         {
             return communicator.template handle_data<std::decay_t<T>>(
                 communication::communicator_data<
-                    communication::reduce_tag>::id(),
+                    communication::reduce_tag>::name(),
                 which, generation,
                 // step function (invoked for each set)
                 [t = HPX_FORWARD(T, t)](auto& data, std::size_t which) mutable {

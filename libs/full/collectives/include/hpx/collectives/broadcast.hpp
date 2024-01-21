@@ -219,12 +219,7 @@ namespace hpx::traits {
         template <>
         struct communicator_data<broadcast_tag>
         {
-            static constexpr char const* name() noexcept
-            {
-                return "broadcast";
-            }
-
-            HPX_EXPORT static operation_id_type id() noexcept;
+            HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
@@ -239,7 +234,7 @@ namespace hpx::traits {
 
             return communicator.template handle_data<data_type>(
                 communication::communicator_data<
-                    communication::broadcast_tag>::id(),
+                    communication::broadcast_tag>::name(),
                 which, generation,
                 // no step function
                 nullptr,
@@ -257,7 +252,7 @@ namespace hpx::traits {
         {
             return communicator.template handle_data<std::decay_t<T>>(
                 communication::communicator_data<
-                    communication::broadcast_tag>::id(),
+                    communication::broadcast_tag>::name(),
                 which, generation,
                 // step function (invoked once for set)
                 [&t](auto& data, std::size_t) { data[0] = HPX_FORWARD(T, t); },
