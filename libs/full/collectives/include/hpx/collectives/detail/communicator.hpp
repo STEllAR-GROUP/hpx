@@ -35,8 +35,6 @@ namespace hpx::traits {
 
     namespace communication {
 
-        using operation_id_type = void const*;
-
         // Retrieve name of the current communicator
         template <typename Operation>
         struct communicator_data
@@ -44,11 +42,6 @@ namespace hpx::traits {
             static constexpr char const* name() noexcept
             {
                 return "<unknown>";
-            }
-
-            static constexpr operation_id_type id() noexcept
-            {
-                return nullptr;
             }
         };
     }    // namespace communication
@@ -65,7 +58,15 @@ namespace hpx::collectives::detail {
     public:
         HPX_EXPORT communicator_server() noexcept;
 
-        HPX_EXPORT explicit communicator_server(std::size_t num_sites) noexcept;
+        HPX_EXPORT explicit communicator_server(
+            std::size_t num_sites, char const* basename) noexcept;
+
+        communicator_server(communicator_server const&) = delete;
+        communicator_server(communicator_server&&) = delete;
+        communicator_server& operator=(communicator_server const&) = delete;
+        communicator_server& operator=(communicator_server&&) = delete;
+
+        HPX_EXPORT ~communicator_server();
 
     private:
         template <typename Operation>
@@ -245,18 +246,39 @@ namespace hpx::collectives::detail {
             return fut;
         }
 
+        template <typename Lock>
+        bool set_operation_and_check_sequencing(Lock& l, char const* operation,
+            std::size_t which, std::size_t generation)
+        {
+            if (current_operation_ == nullptr)
+            {
+                if (on_ready_count_ != 0)
+                {
+                    l.unlock();
+                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                        "communicator::handle_data",
+                        "communicator: {}: sequencing error, on_ready callback "
+                        "was already invoked before the start of the "
+                        "collective operation {}, which {}, generation {}.",
+                        basename_, operation, which, generation);
+                }
+                current_operation_ = operation;
+                return true;
+            }
+            return false;
+        }
+
         // Step will be invoked under lock for each site that checks in (either
         // set or get).
         //
         // Finalizer will be invoked under lock after all sites have checked in.
         template <typename Data, typename Step, typename Finalizer>
-        auto handle_data(
-            hpx::traits::communication::operation_id_type operation,
-            std::size_t which, std::size_t generation,
-            [[maybe_unused]] Step&& step, Finalizer&& finalizer,
+        auto handle_data(char const* operation, std::size_t which,
+            std::size_t generation, [[maybe_unused]] Step&& step,
+            Finalizer&& finalizer,
             std::size_t num_values = static_cast<std::size_t>(-1))
         {
-            auto on_ready = [this, operation, which, num_values,
+            auto on_ready = [this, operation, which, generation, num_values,
                                 finalizer = HPX_FORWARD(Finalizer, finalizer)](
                                 shared_future<void>&& f) mutable {
                 // This callback will be invoked once for each participating
@@ -278,10 +300,12 @@ namespace hpx::collectives::detail {
                     l.unlock();
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "communicator::handle_data::on_ready",
-                        "sequencing error, operation type mismatch: invoked "
-                        "for {}, ongoing operation {}",
-                        operation,
-                        current_operation_ ? current_operation_ : "unknown");
+                        "communicator {}: sequencing error, operation type "
+                        "mismatch: invoked for {}, ongoing operation {}, which "
+                        "{}, generation {}.",
+                        basename_, operation,
+                        current_operation_ ? current_operation_ : "unknown",
+                        which, generation);
                 }
 
                 // Verify that the number of invocations of this callback is in
@@ -291,11 +315,12 @@ namespace hpx::collectives::detail {
                     l.unlock();
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "communicator::handle_data::on_ready",
-                        "sequencing error, an excessive number of on_ready "
-                        "callbacks have been invoked before the end of the "
-                        "collective {} operation. Expected count {}, received "
-                        "count {}.",
-                        operation, on_ready_count_, num_sites_);
+                        "communictor {}: sequencing error, an excessive "
+                        "number of on_ready callbacks have been invoked before "
+                        "the end of the collective operation {}, which {}, "
+                        "generation {}. Expected count {}, received count {}.",
+                        basename_, operation, which, generation,
+                        on_ready_count_, num_sites_);
                 }
 
                 // On exit, keep track of number of invocations of this
@@ -314,6 +339,7 @@ namespace hpx::collectives::detail {
                 {
                     HPX_UNUSED(this);
                     HPX_UNUSED(which);
+                    HPX_UNUSED(generation);
                     HPX_UNUSED(num_values);
                     HPX_UNUSED(finalizer);
                 }
@@ -324,32 +350,26 @@ namespace hpx::collectives::detail {
 
             // Verify that there is no overlap between different types of
             // operations on the same communicator.
-            if (current_operation_ == nullptr)
-            {
-                if (on_ready_count_ != 0)
-                {
-                    l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-                        "communicator::handle_data",
-                        "sequencing error, on_ready callback was already "
-                        "invoked before the start of the collective {} "
-                        "operation",
-                        operation);
-                }
-                current_operation_ = operation;
-            }
-            else if (current_operation_ != operation)
+            set_operation_and_check_sequencing(l, operation, which, generation);
+
+            auto f = get_future_and_synchronize(
+                generation, num_values, HPX_MOVE(on_ready), l);
+
+            // We may have just finished a different operation, thus we have to
+            // possibly reset the operation type stored in this communicator.
+            if (current_operation_ != operation &&
+                !set_operation_and_check_sequencing(
+                    l, operation, which, generation))
             {
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                     "communicator::handle_data",
-                    "sequencing error, operation type mismatch: invoked for "
-                    "{}, ongoing operation {}",
-                    operation, current_operation_);
+                    "communicator {}: sequencing error, operation type "
+                    "mismatch: invoked for {}, ongoing operation {}, which {}, "
+                    "generation {}.",
+                    basename_, operation, current_operation_, which,
+                    generation);
             }
-
-            auto f = get_future_and_synchronize(
-                generation, num_values, HPX_MOVE(on_ready), l);
 
             if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
             {
@@ -360,7 +380,7 @@ namespace hpx::collectives::detail {
             // Make sure next generation is enabled only after previous
             // generation has finished executing.
             gate_.set(which, l,
-                [this, operation, generation](
+                [this, operation, which, generation](
                     auto& l, auto& gate, error_code& ec) {
                     // This callback is invoked synchronously once for each
                     // collective operation after all data has been received and
@@ -377,8 +397,10 @@ namespace hpx::collectives::detail {
                             "communicator::handle_data",
                             "sequencing error, not all on_ready callbacks have "
                             "been invoked at the end of the collective {} "
-                            "operation. Expected count {}, received count {}.",
-                            operation, on_ready_count_, num_sites_);
+                            "operation. Expected count {}, received count {}, "
+                            "which {}, generation {}.",
+                            *operation, on_ready_count_, num_sites_, which,
+                            generation);
                         return;
                     }
 
@@ -416,10 +438,10 @@ namespace hpx::collectives::detail {
         hpx::lcos::local::and_gate gate_;
         std::size_t const num_sites_;
         std::size_t on_ready_count_ = 0;
-        hpx::traits::communication::operation_id_type current_operation_ =
-            nullptr;
+        char const* current_operation_ = nullptr;
         bool needs_initialization_ = true;
         bool data_available_ = false;
+        char const* basename_ = nullptr;
     };
 }    // namespace hpx::collectives::detail
 

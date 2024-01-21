@@ -142,12 +142,7 @@ namespace hpx::traits {
         template <>
         struct communicator_data<inclusive_scan_tag>
         {
-            static constexpr char const* name() noexcept
-            {
-                return "inclusive_scan";
-            }
-
-            HPX_EXPORT static operation_id_type id() noexcept;
+            HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
@@ -163,7 +158,7 @@ namespace hpx::traits {
         {
             return communicator.template handle_data<std::decay_t<T>>(
                 communication::communicator_data<
-                    communication::inclusive_scan_tag>::id(),
+                    communication::inclusive_scan_tag>::name(),
                 which, generation,
                 // step function (invoked for each get)
                 [&t](auto& data, std::size_t which) {

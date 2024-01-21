@@ -231,12 +231,7 @@ namespace hpx::traits {
         template <>
         struct communicator_data<scatter_tag>
         {
-            static constexpr char const* name() noexcept
-            {
-                return "scatter";
-            }
-
-            HPX_EXPORT static operation_id_type id() noexcept;
+            HPX_EXPORT static char const* name() noexcept;
         };
     }    // namespace communication
 
@@ -251,7 +246,7 @@ namespace hpx::traits {
 
             return communicator.template handle_data<data_type>(
                 communication::communicator_data<
-                    communication::scatter_tag>::id(),
+                    communication::scatter_tag>::name(),
                 which, generation,
                 // step function (invoked once for get)
                 nullptr,
@@ -268,7 +263,7 @@ namespace hpx::traits {
         {
             return communicator.template handle_data<T>(
                 communication::communicator_data<
-                    communication::scatter_tag>::id(),
+                    communication::scatter_tag>::name(),
                 which, generation,
                 // step function (invoked once for set)
                 [&t](auto& data, std::size_t) { data = HPX_MOVE(t); },

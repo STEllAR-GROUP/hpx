@@ -10,16 +10,14 @@
 
 #include <hpx/collectives/scatter.hpp>
 
-#include <cstdint>
-
 namespace hpx::traits::communication {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    operation_id_type communicator_data<scatter_tag>::id() noexcept
+    char const* communicator_data<scatter_tag>::name() noexcept
     {
-        static std::uint8_t id = 0;
-        return &id;
+        static char const* name = "scatter";
+        return name;
     }
 }    // namespace hpx::traits::communication
 

@@ -10,16 +10,14 @@
 
 #include <hpx/collectives/exclusive_scan.hpp>
 
-#include <cstdint>
-
 namespace hpx::traits::communication {
 
     // This is explicitly instantiated to ensure that the id is stable across
     // shared libraries.
-    operation_id_type communicator_data<exclusive_scan_tag>::id() noexcept
+    char const* communicator_data<exclusive_scan_tag>::name() noexcept
     {
-        static std::uint8_t id = 0;
-        return &id;
+        static char const* name = "exclusive_scan";
+        return name;
     }
 }    // namespace hpx::traits::communication
 
