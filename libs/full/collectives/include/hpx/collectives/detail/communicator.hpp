@@ -181,7 +181,8 @@ namespace hpx::collectives::detail {
         };
 
     private:
-        std::size_t get_num_sites(std::size_t num_values) const noexcept
+        [[nodiscard]] constexpr std::size_t get_num_sites(
+            std::size_t num_values) const noexcept
         {
             return num_values == static_cast<std::size_t>(-1) ? num_sites_ :
                                                                 num_values;
@@ -231,19 +232,22 @@ namespace hpx::collectives::detail {
             std::size_t generation, std::size_t capacity, F&& f, Lock& l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            auto sf = gate_.get_shared_future(l);
 
-            traits::detail::get_shared_state(sf)->reserve_callbacks(
-                get_num_sites(capacity));
-
-            auto fut = sf.then(hpx::launch::sync, HPX_FORWARD(F, f));
-
+            // Wait for the requested generation to be processed.
             gate_.synchronize(generation == static_cast<std::size_t>(-1) ?
                     gate_.generation(l) :
                     generation,
                 l);
 
-            return fut;
+            // Get future from gate only after synchronization as otherwise we
+            // may get a future returned that does not belong to the requested
+            // generation.
+            auto sf = gate_.get_shared_future(l);
+
+            traits::detail::get_shared_state(sf)->reserve_callbacks(
+                get_num_sites(capacity));
+
+            return sf.then(hpx::launch::sync, HPX_FORWARD(F, f));
         }
 
         template <typename Lock>
@@ -262,9 +266,16 @@ namespace hpx::collectives::detail {
                         "collective operation {}, which {}, generation {}.",
                         basename_, operation, which, generation);
                 }
-                current_operation_ = operation;
+
+                if (generation == static_cast<std::size_t>(-1) ||
+                    generation == gate_.generation(l))
+                {
+                    current_operation_ = operation;
+                }
+
                 return true;
             }
+
             return false;
         }
 
@@ -284,6 +295,11 @@ namespace hpx::collectives::detail {
                 // This callback will be invoked once for each participating
                 // site after all sites have checked in.
 
+                // On exit, keep track of number of invocations of this
+                // callback.
+                auto on_exit = hpx::experimental::scope_exit(
+                    [this] { ++on_ready_count_; });
+
                 f.get();    // propagate any exceptions
 
                 // It does not matter whether the lock will be acquired here. It
@@ -291,6 +307,7 @@ namespace hpx::collectives::detail {
                 // re-acquired here (if `on_ready` happens to run on a new
                 // thread asynchronously).
                 std::unique_lock l(mtx_, std::try_to_lock);
+                [[maybe_unused]] util::ignore_while_checking il(&l);
 
                 // Verify that there is no overlap between different types of
                 // operations on the same communicator.
@@ -315,18 +332,13 @@ namespace hpx::collectives::detail {
                     l.unlock();
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "communicator::handle_data::on_ready",
-                        "communictor {}: sequencing error, an excessive "
+                        "communicator {}: sequencing error, an excessive "
                         "number of on_ready callbacks have been invoked before "
                         "the end of the collective operation {}, which {}, "
                         "generation {}. Expected count {}, received count {}.",
                         basename_, operation, which, generation,
                         on_ready_count_, num_sites_);
                 }
-
-                // On exit, keep track of number of invocations of this
-                // callback.
-                auto on_exit = hpx::experimental::scope_exit(
-                    [this] { ++on_ready_count_; });
 
                 if constexpr (!std::is_same_v<std::nullptr_t,
                                   std::decay_t<Finalizer>>)
@@ -338,8 +350,6 @@ namespace hpx::collectives::detail {
                 else
                 {
                     HPX_UNUSED(this);
-                    HPX_UNUSED(which);
-                    HPX_UNUSED(generation);
                     HPX_UNUSED(num_values);
                     HPX_UNUSED(finalizer);
                 }
@@ -373,7 +383,7 @@ namespace hpx::collectives::detail {
 
             if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
             {
-                // call provided step function for each invocation site
+                // Call provided step function for each invocation site.
                 HPX_FORWARD(Step, step)(access_data<Data>(num_values), which);
             }
 
@@ -399,7 +409,7 @@ namespace hpx::collectives::detail {
                             "been invoked at the end of the collective {} "
                             "operation. Expected count {}, received count {}, "
                             "which {}, generation {}.",
-                            *operation, on_ready_count_, num_sites_, which,
+                            operation, on_ready_count_, num_sites_, which,
                             generation);
                         return;
                     }
@@ -416,7 +426,7 @@ namespace hpx::collectives::detail {
             return f;
         }
 
-        // protect against vector<bool> idiosyncrasies
+        // Protect against vector<bool> idiosyncrasies.
         template <typename ValueType, typename Data>
         static constexpr decltype(auto) handle_bool(Data&& data) noexcept
         {
@@ -433,15 +443,15 @@ namespace hpx::collectives::detail {
         template <typename Communicator, typename Operation>
         friend struct hpx::traits::communication_operation;
 
-        mutex_type mtx_;
         hpx::unique_any_nonser data_;
         hpx::lcos::local::and_gate gate_;
         std::size_t const num_sites_;
         std::size_t on_ready_count_ = 0;
         char const* current_operation_ = nullptr;
+        char const* basename_ = nullptr;
+        mutex_type mtx_;
         bool needs_initialization_ = true;
         bool data_available_ = false;
-        char const* basename_ = nullptr;
     };
 }    // namespace hpx::collectives::detail
 
