@@ -42,10 +42,13 @@ namespace hpx::lcos::detail {
     ///////////////////////////////////////////////////////////////////////////
     struct handle_continuation_recursion_count
     {
-        handle_continuation_recursion_count() noexcept
-          : count_(threads::get_continuation_recursion_count())
+        handle_continuation_recursion_count() = default;
+
+        std::size_t increment()
         {
-            ++count_;
+            HPX_ASSERT(count_ == nullptr);
+            count_ = &threads::get_continuation_recursion_count();
+            return ++*count_;
         }
 
         handle_continuation_recursion_count(
@@ -59,10 +62,14 @@ namespace hpx::lcos::detail {
 
         ~handle_continuation_recursion_count()
         {
-            --count_;
+            if (count_ != nullptr)
+            {
+                --*count_;
+            }
         }
 
-        std::size_t& count_;
+    private:
+        std::size_t* count_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -252,17 +259,20 @@ namespace hpx::lcos::detail {
     {
         // We need to run the completion on a new thread if we are on a non HPX
         // thread.
-#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
-        bool recurse_asynchronously =
-            !this_thread::has_sufficient_stack_space();
-#else
-        handle_continuation_recursion_count const cnt;
-        bool recurse_asynchronously =
-            cnt.count_ > HPX_CONTINUATION_MAX_RECURSION_DEPTH ||
-            (hpx::threads::get_self_ptr() == nullptr);
-#endif
-
         bool const is_hpx_thread = nullptr != hpx::threads::get_self_ptr();
+        bool recurse_asynchronously = false;
+
+        handle_continuation_recursion_count cnt;
+        if (is_hpx_thread)
+        {
+#if defined(HPX_HAVE_THREADS_GET_STACK_POINTER)
+            recurse_asynchronously = !this_thread::has_sufficient_stack_space();
+#else
+            recurse_asynchronously =
+                cnt.increment() > HPX_CONTINUATION_MAX_RECURSION_DEPTH;
+#endif
+        }
+
         if (!is_hpx_thread || !recurse_asynchronously)
         {
             // directly execute continuation on this thread

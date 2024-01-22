@@ -408,7 +408,7 @@ namespace hpx::lcos::local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct and_gate : public base_and_gate<hpx::no_mutex>
+    struct and_gate : base_and_gate<hpx::no_mutex>
     {
     private:
         using base_type = base_and_gate<hpx::no_mutex>;
