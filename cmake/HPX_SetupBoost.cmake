@@ -35,7 +35,6 @@ if(HPX_WITH_FETCH_BOOST)
           "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++20"
       )
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      hpx_info("Building fetched boost")
       execute_process(
         COMMAND
           sh -c
@@ -56,7 +55,6 @@ if(HPX_WITH_FETCH_BOOST)
 
   set(Boost_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
   set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
-endif()
 endif()
 
 # In case find_package(HPX) is called multiple times
