@@ -25,7 +25,7 @@ void tagged_ptr_test()
         i = j;
 
         HPX_TEST_EQ(i.get_ptr(), &b);
-        HPX_TEST_EQ(i.get_tag(), 1);
+        HPX_TEST_EQ(i.get_tag(), 1UL);
     }
 
     {
@@ -43,7 +43,7 @@ void tagged_ptr_test()
 
     {
         tagged_ptr<int> j(&a, max_tag);
-        HPX_TEST_EQ(j.get_next_tag(), 0);
+        HPX_TEST_EQ(j.get_next_tag(), 0UL);
     }
 
     {
