@@ -57,6 +57,10 @@ namespace hpx::debug {
             std::ostream&, std::int32_t const&, int);
         template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::int64_t const&, int);
+#ifdef __APPLE__
+        template HPX_CORE_EXPORT void print_dec(
+            std::ostream&, unsigned long const&, int);
+#endif
         template HPX_CORE_EXPORT void print_dec(
             std::ostream&, std::uint64_t const&, int);
 
