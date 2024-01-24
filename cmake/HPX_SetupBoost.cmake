@@ -15,6 +15,7 @@ if(HPX_WITH_FETCH_BOOST)
     Boost
     URL https://github.com/boostorg/boost/releases/download/boost-${HPX_WITH_BOOST_VERSION}/boost-${HPX_WITH_BOOST_VERSION}.tar.gz
     TLS_VERIFY true
+    DOWNLOAD_EXTRACT_TIMESTAMP true
   )
   fetchcontent_populate(Boost)
 
@@ -53,8 +54,14 @@ if(HPX_WITH_FETCH_BOOST)
     )
   endif()
 
-  set(Boost_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
-  set(Boost_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/boost-src")
+  set(Boost_DIR
+      "${CMAKE_BINARY_DIR}/_deps/boost-src"
+      CACHE INTERNAL ""
+  )
+  set(Boost_INCLUDE_DIR
+      "${CMAKE_BINARY_DIR}/_deps/boost-src"
+      CACHE INTERNAL ""
+  )
 endif()
 
 # In case find_package(HPX) is called multiple times
