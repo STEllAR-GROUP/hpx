@@ -18,16 +18,16 @@ if(HPX_WITH_FETCH_BOOST)
     DOWNLOAD_EXTRACT_TIMESTAMP true
   )
   fetchcontent_populate(Boost)
-  set(EX_PRC
+  set(HPX_WITH_EX_PRC
       "Execute process"
       CACHE STRING "Used by command line tool."
   )
-  set(EX_PRC_INTERNAL
+  set(HPX_WITH_EX_PRC_INTERNAL
       ""
       CACHE STRING "for internal use only; do not modify"
   )
 
-  if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
+  if(NOT HPX_WITH_EX_PRC STREQUAL HPX_WITH_EX_PRC_INTERNAL)
     if(WIN32)
       execute_process(
         COMMAND
@@ -47,8 +47,8 @@ if(HPX_WITH_FETCH_BOOST)
           "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_WITH_CXX_STANDARD}"
       )
     endif()
-    set(EX_PRC_INTERNAL
-        ${EX_PRC}
+    set(HPX_WITH_EX_PRC_INTERNAL
+        ${HPX_WITH_EX_PRC}
         CACHE INTERNAL "for internal use only; do not modify"
     )
   endif()
