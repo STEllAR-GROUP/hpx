@@ -2300,6 +2300,18 @@ if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
   endif()
 endif()
 
+if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+  add_custom_target(
+    HwlocDLL ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different "${HWLOC_ROOT}/bin/libhwloc-15.dll"
+      "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+  )
+  add_hpx_pseudo_target(HwlocDLL)
+endif()
+
 # ##############################################################################
 # Add custom targets for tests
 # ##############################################################################
@@ -2332,18 +2344,6 @@ endif()
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-    add_custom_target(
-      HwlocDLL ALL
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
-      COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-        "${HWLOC_ROOT}/bin/libhwloc-15.dll"
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
-    )
-    add_hpx_pseudo_dependencies(examples HwlocDLL)
-  endif()
 endif()
 
 # ##############################################################################
