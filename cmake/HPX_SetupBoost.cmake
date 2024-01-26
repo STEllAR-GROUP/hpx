@@ -18,14 +18,13 @@ if(HPX_WITH_FETCH_BOOST)
     DOWNLOAD_EXTRACT_TIMESTAMP true
   )
   fetchcontent_populate(Boost)
-
   set(EX_PRC
       "Execute process"
       CACHE STRING "Used by command line tool."
   )
   set(EX_PRC_INTERNAL
       ""
-      CACHE INTERNAL "for internal use only; do not modify"
+      CACHE STRING "for internal use only; do not modify"
   )
 
   if(NOT EX_PRC STREQUAL EX_PRC_INTERNAL)
@@ -33,19 +32,19 @@ if(HPX_WITH_FETCH_BOOST)
       execute_process(
         COMMAND
           cmd /C
-          "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++20"
+          "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++${HPX_CXX_STANDARD}"
       )
     elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
       execute_process(
         COMMAND
           sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed && ./b2 && ./b2 install --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed cxxflags=--std=c++20"
+          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed && ./b2 && ./b2 install --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed cxxflags=--std=c++${HPX_CXX_STANDARD}"
       )
     else()
       execute_process(
         COMMAND
           sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++20"
+          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_WITH_CXX_STANDARD}"
       )
     endif()
     set(EX_PRC_INTERNAL
