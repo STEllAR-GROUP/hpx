@@ -9,7 +9,6 @@
 
 #include <hpx/parallel/algorithm.hpp>
 
-#include <hpx/parallel/container_algorithms/adjacent_difference.hpp>
 #include <hpx/parallel/container_algorithms/adjacent_find.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/copy.hpp>
