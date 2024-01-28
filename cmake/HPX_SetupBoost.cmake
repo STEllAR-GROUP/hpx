@@ -18,16 +18,20 @@ if(HPX_WITH_FETCH_BOOST)
     DOWNLOAD_EXTRACT_TIMESTAMP true
   )
   fetchcontent_populate(Boost)
-  set(HPX_WITH_EX_PRC
+  set(HPX_WITH_BUILD_FETCHED_BOOST
       "Execute process"
-      CACHE STRING "Used by command line tool."
+      CACHE STRING "Used by command line tool to build fetched Boost"
   )
-  set(HPX_WITH_EX_PRC_INTERNAL
+  set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
       ""
-      CACHE STRING "for internal use only; do not modify"
+      CACHE
+        STRING
+        "for internal use only, do not modify. Checks if fetched Boost is built"
   )
 
-  if(NOT HPX_WITH_EX_PRC STREQUAL HPX_WITH_EX_PRC_INTERNAL)
+  if(NOT HPX_WITH_BUILD_FETCHED_BOOST STREQUAL
+     HPX_WITH_BUILD_FETCHED_BOOST_CHECK
+  )
     if(WIN32)
       execute_process(
         COMMAND
@@ -44,12 +48,14 @@ if(HPX_WITH_FETCH_BOOST)
       execute_process(
         COMMAND
           sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_WITH_CXX_STANDARD}"
+          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_CXX_STANDARD}"
       )
     endif()
-    set(HPX_WITH_EX_PRC_INTERNAL
-        ${HPX_WITH_EX_PRC}
-        CACHE INTERNAL "for internal use only; do not modify"
+    set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
+        ${HPX_WITH_BUILD_FETCHED_BOOST}
+        CACHE
+          INTERNAL
+          "for internal use only, do not modify. Checks if fetched Boost is built"
     )
   endif()
 
