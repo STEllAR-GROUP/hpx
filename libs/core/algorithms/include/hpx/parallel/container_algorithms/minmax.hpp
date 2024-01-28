@@ -14,7 +14,7 @@
 
 #if defined(DOXYGEN)
 
-namespace hpx {
+namespace hpx::ranges {
     // clang-format off
 
     ///////////////////////////////////////////////////////////////////////////
@@ -790,7 +790,7 @@ namespace hpx {
         minmax_element_result<hpx::traits::range_iterator_t<Rng>>>
     minmax_element(ExPolicy&& policy, Rng&& rng, F&& f = F(), Proj&& proj = Proj());
     // clang-format on
-}    // namespace hpx
+}    // namespace hpx::ranges
 
 #else    // DOXYGEN
 
