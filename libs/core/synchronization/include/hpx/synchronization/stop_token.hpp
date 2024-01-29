@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file stop_token.hpp
+/// \page hpx::nostopstate, hpx::stop_callback, hpx::stop_source, hpx::stop_token, hpx::nostopstate_t
+/// \headerfile hpx/stop_token.hpp
 
 #pragma once
 

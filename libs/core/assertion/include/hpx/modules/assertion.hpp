@@ -10,6 +10,9 @@
 //                               hpxinspect:noinclude:HPX_ASSERT_MSG
 //                               hpxinspect:noassert_macro
 
+/// \page HPX_ASSERT, HPX_ASSERT_MSG
+/// \headerfile hpx/assert.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

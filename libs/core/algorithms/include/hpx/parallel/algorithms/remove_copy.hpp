@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/remove_copy.hpp
+/// \page hpx::remove_copy, hpx::remove_copy_if
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

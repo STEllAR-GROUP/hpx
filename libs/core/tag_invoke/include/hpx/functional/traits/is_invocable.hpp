@@ -8,6 +8,8 @@
 // hpxinspect:nodeprecatedname:is_callable
 
 /// \file is_invocable.hpp
+/// \page hpx::is_invocable, hpx::is_invocable_r
+/// \headerfile hpx/type_traits.hpp
 
 #pragma once
 

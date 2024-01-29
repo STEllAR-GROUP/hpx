@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file condition_variable.hpp
+/// \page hpx::condition_variable, hpx::condition_variable_any, hpx::cv_status
+/// \headerfile hpx/condition_variable.hpp
 
 #pragma once
 

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/reduce_by_key.hpp
+/// \page hpx::reduce_by_key
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

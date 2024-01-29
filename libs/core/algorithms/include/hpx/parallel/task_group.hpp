@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file task_group.hpp
+/// \page hpx::experimental::task_group
+/// \headerfile hpx/experimental/task_group.hpp
 
 #pragma once
 

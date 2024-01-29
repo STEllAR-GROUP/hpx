@@ -7,6 +7,9 @@
 
 // appease inspect: hpxinspect:nominmax
 
+/// \page hpx::counting_semaphore
+/// \headerfile hpx/semaphore.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

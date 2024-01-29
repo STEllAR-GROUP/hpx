@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/set_intersection.hpp
+/// \page hpx::set_intersection
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

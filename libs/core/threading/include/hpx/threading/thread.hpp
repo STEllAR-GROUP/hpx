@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file thread.hpp
+/// \page hpx::thread, hpx::this_thread::yield, hpx::this_thread::get_id, hpx::this_thread::sleep_for, hpx::this_thread::sleep_until
+/// \headerfile hpx/thread.hpp
 
 #pragma once
 

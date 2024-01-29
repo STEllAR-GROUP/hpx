@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file find_all_localities.hpp
+/// \page hpx::find_root_locality, hpx::find_all_localities, hpx::find_remote_localities
+/// \headerfile hpx/runtime.hpp
 
 #pragma once
 

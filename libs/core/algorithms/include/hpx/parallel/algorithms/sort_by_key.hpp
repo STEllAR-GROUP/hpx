@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/sort_by_key.hpp
+/// \page hpx::experimental::sort_by_key
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

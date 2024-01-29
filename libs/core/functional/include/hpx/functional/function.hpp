@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file function.hpp
+/// \page hpx::function
+/// \headerfile hpx/functional.hpp
 
 #pragma once
 

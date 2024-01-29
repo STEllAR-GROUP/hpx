@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/count.hpp
+/// \page hpx::count, hpx::count_if
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

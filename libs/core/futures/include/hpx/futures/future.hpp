@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file future.hpp
+/// \page hpx::future, hpx::shared_future, hpx::make_future, hpx::make_shared_future, hpx::make_ready_future, hpx::make_ready_future_alloc, hpx::make_ready_future_at, hpx::make_ready_future_after, hpx::make_exceptional_future
+/// \headerfile hpx/future.hpp
 
 #pragma once
 
@@ -46,7 +48,6 @@
 #include <utility>
 
 namespace hpx::lcos::detail {
-
     ///////////////////////////////////////////////////////////////////////////
     enum class future_state
     {

@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file shared_mutex.hpp
+/// \page hpx::shared_mutex
+/// \headerfile hpx/shared_mutex.hpp
 
 #pragma once
 

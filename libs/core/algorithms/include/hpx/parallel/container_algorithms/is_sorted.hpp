@@ -4,6 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \page hpx::ranges::is_sorted, hpx::ranges::is_sorted_until
+/// \headerfile hpx/algorithm.hpp
+
 #pragma once
 
 #if defined(DOXYGEN)

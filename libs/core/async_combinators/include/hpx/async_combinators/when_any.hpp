@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file when_any.hpp
+/// \page hpx::when_any
+/// \headerfile hpx/future.hpp
 
 #pragma once
 

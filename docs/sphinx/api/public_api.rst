@@ -1122,7 +1122,7 @@ Classes
 ``hpx/unwrap.hpp``
 ==================
 
-The header :hpx-header:`libs/fcore/include_local/include,hpx/unwrap.hpp` contains utilities for
+The header :hpx-header:`libs/core/include_local/include,hpx/unwrap.hpp` contains utilities for
 unwrapping futures.
 
 Classes

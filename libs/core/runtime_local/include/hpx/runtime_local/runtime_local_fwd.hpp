@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file runtime_local_fwd.hpp
+/// \page hpx::register_thread, hpx::unregister_thread, hpx::get_os_thread_data, hpx::enumerate_os_threads, hpx::get_runtime_instance_number, hpx::register_on_exit, hpx::is_starting, hpx::tolerate_node_faults, hpx::is_running, hpx::is_stopped, hpx::is_stopped_or_shutting_down, hpx::get_num_worker_threads, hpx::get_system_uptime
+/// \headerfile hpx/runtime.hpp
 
 #pragma once
 

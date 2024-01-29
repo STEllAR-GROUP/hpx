@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file high_resolution_timer.hpp
+/// \page hpx::chrono::high_resolution_timer
+/// \headerfile hpx/chrono.hpp
 
 #pragma once
 

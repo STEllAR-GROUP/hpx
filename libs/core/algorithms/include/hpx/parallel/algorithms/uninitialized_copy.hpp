@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/uninitialized_copy.hpp
+/// \page hpx::uninitialized_copy, hpx::uninitialized_copy_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
