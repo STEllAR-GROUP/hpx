@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,13 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/topology/topology.hpp>
 
 #include <atomic>
 #include <cstddef>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -40,21 +38,12 @@ namespace hpx::threads::policies::detail {
             std::string const& affinity_description = "balanced",
             bool use_process_mask = false);
 
-        void set_num_threads(size_t num_threads) noexcept
-        {
-            num_threads_ = num_threads;
-        }
+        void set_num_threads(size_t num_threads) noexcept;
 
         void set_affinity_masks(
-            std::vector<threads::mask_type> const& affinity_masks)
-        {
-            affinity_masks_ = affinity_masks;
-        }
+            std::vector<threads::mask_type> const& affinity_masks);
         void set_affinity_masks(
-            std::vector<threads::mask_type>&& affinity_masks) noexcept
-        {
-            affinity_masks_ = HPX_MOVE(affinity_masks);
-        }
+            std::vector<threads::mask_type>&& affinity_masks) noexcept;
 
         constexpr std::size_t get_num_threads() const noexcept
         {
@@ -69,19 +58,9 @@ namespace hpx::threads::policies::detail {
         std::size_t get_thread_occupancy(
             threads::topology const& topo, std::size_t pu_num) const;
 
-        std::size_t get_pu_num(std::size_t num_thread) const noexcept
-        {
-            HPX_ASSERT(num_thread < pu_nums_.size());
-            return pu_nums_[num_thread];
-        }
-        void set_pu_nums(std::vector<std::size_t> const& pu_nums)
-        {
-            pu_nums_ = pu_nums;
-        }
-        void set_pu_nums(std::vector<std::size_t>&& pu_nums) noexcept
-        {
-            pu_nums_ = HPX_MOVE(pu_nums);
-        }
+        std::size_t get_pu_num(std::size_t num_thread) const noexcept;
+        void set_pu_nums(std::vector<std::size_t> const& pu_nums);
+        void set_pu_nums(std::vector<std::size_t>&& pu_nums) noexcept;
 
         void add_punit(std::size_t virt_core, std::size_t thread_num);
         void init_cached_pu_nums(std::size_t hardware_concurrency);

@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,17 +9,25 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Enable reading JSON formatted configuration files on the command line
+set(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES_DEFAULT OFF)
+if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
+  set(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES_DEFAULT
+      ${HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES}
+  )
+endif()
+
 hpx_option(
-  HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES
+  HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_JSON_CONFIGURATION_FILES
   BOOL
-  "Enable reading JSON formatted configuration files on the command line. (default: OFF)"
-  OFF
+  "Enable reading JSON formatted configuration files on the command line.\n
+  (default: ${HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES_DEFAULT})"
+  ${HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES_DEFAULT}
   ADVANCED
   CATEGORY "Modules"
   MODULE COMMAND_LINE_HANDLING_LOCAL
 )
 
-if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
+if(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_JSON_CONFIGURATION_FILES)
   hpx_add_config_define_namespace(
     DEFINE HPX_COMMAND_LINE_HANDLING_HAVE_JSON_CONFIGURATION_FILES
     NAMESPACE COMMAND_LINE_HANDLING_LOCAL
@@ -37,7 +45,7 @@ set(command_line_handling_local_sources
     parse_command_line_local.cpp
 )
 
-if(HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES)
+if(HPX_COMMAND_LINE_HANDLING_LOCAL_WITH_JSON_CONFIGURATION_FILES)
   include(HPX_SetupJSON)
   set(command_line_handling_local_dependencies Json::json)
 

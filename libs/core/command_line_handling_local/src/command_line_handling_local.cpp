@@ -476,12 +476,16 @@ namespace hpx::local::detail {
                     "larger than number of threads (--hpx:threads)");
             }
 
-            if (!(queuing_ == "local-priority" || queuing_ == "abp-priority"))
+            if (!(queuing_ == "local-priority" || queuing_ == "abp-priority" ||
+                    queuing_.find("local-workrequesting") != 0))
             {
                 throw hpx::detail::command_line_error(
                     "Invalid command line option --hpx:high-priority-threads, "
-                    "valid for --hpx:queuing=local-priority and "
-                    "--hpx:queuing=abp-priority only");
+                    "valid for --hpx:queuing=local-priority, "
+                    "--hpx:queuing=local-workrequesting-fifo, "
+                    "--hpx:queuing=local-workrequesting-lifo, "
+                    "--hpx:queuing=local-workrequesting-mc, "
+                    "and --hpx:queuing=abp-priority only");
             }
 
             ini_config.emplace_back("hpx.thread_queue.high_priority_queues!=" +

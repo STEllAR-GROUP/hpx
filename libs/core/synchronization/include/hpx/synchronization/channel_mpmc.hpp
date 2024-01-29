@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +14,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/thread_support.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/type_support/construct_at.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -34,7 +33,7 @@ namespace hpx::lcos::local {
     private:
         using mutex_type = Mutex;
 
-        constexpr bool is_full(std::size_t tail) const noexcept
+        [[nodiscard]] constexpr bool is_full(std::size_t tail) const noexcept
         {
             std::size_t const numitems = size_ + tail - head_.data_;
             if (numitems < size_)
@@ -44,7 +43,7 @@ namespace hpx::lcos::local {
             return numitems - size_ == size_ - 1;
         }
 
-        constexpr bool is_empty(std::size_t head) const noexcept
+        [[nodiscard]] constexpr bool is_empty(std::size_t head) const noexcept
         {
             return head == tail_.data_;
         }
@@ -93,6 +92,16 @@ namespace hpx::lcos::local {
                 std::unique_lock<mutex_type> l(mtx_.data_);
                 close(l);
             }
+        }
+
+        [[nodiscard]] bool is_empty() const noexcept
+        {
+            std::unique_lock<mutex_type> l(mtx_.data_);
+            if (closed_)
+            {
+                return true;
+            }
+            return is_empty(head_.data_);
         }
 
         bool get(T* val = nullptr) const noexcept
@@ -160,7 +169,7 @@ namespace hpx::lcos::local {
             return close(l);
         }
 
-        constexpr std::size_t capacity() const noexcept
+        [[nodiscard]] constexpr std::size_t capacity() const noexcept
         {
             return size_ - 1;
         }

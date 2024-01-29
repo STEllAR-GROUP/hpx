@@ -107,6 +107,7 @@ namespace hpx::resource {
         shared_priority = 7,
         local_workrequesting_fifo = 8,
         local_workrequesting_lifo = 9,
+        local_workrequesting_mc = 10,
     };
 
 #define HPX_SCHEDULING_POLICY_UNSCOPED_ENUM_DEPRECATION_MSG                    \

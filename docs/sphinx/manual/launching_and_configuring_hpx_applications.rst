@@ -1573,15 +1573,15 @@ The predefined command line options for any application using
    ``local-priority-fifo``, ``local-priority-lifo``, ``static``,
    ``static-priority``, ``abp-priority-fifo``,
    ``local-workrequesting-fifo``, ``local-workrequesting-lifo``
-   and ``abp-priority-lifo``
+   ``local-workrequesting-mc``, and ``abp-priority-lifo``
    (default: ``local-priority-fifo``).
 
 .. option:: --hpx:high-priority-threads arg
 
    The number of operating system threads maintaining a high priority queue
    (default: number of OS threads), valid for :option:`--hpx:queuing`\
-   ``=abp-priority``, :option:`--hpx:queuing`\ ``=static-priority`` and
-   :option:`--hpx:queuing`\ ``=local-priority`` only.
+   ``=abp-priority``, :option:`--hpx:queuing`\ ``static-priority`` and
+   :option:`--hpx:queuing`\ ``local-priority`` only.
 
 .. option:: --hpx:numa-sensitive
 

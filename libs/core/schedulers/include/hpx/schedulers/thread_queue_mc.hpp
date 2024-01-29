@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,20 +11,11 @@
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>
-#include <hpx/datastructures/tuple.hpp>
-#include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/lockfree_queue_backends.hpp>
-#include <hpx/schedulers/maintain_queue_wait_times.hpp>
 #include <hpx/schedulers/queue_holder_thread.hpp>
-#include <hpx/schedulers/thread_queue.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
-#include <hpx/topology/topology.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #include <hpx/timing/tick_counter.hpp>
@@ -36,13 +27,10 @@
 #include <exception>
 #include <functional>
 #include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <unordered_set>
 #include <utility>
-#include <vector>
 
 #if !defined(THREAD_QUEUE_MC_DEBUG)
 #if defined(HPX_DEBUG)
@@ -71,8 +59,7 @@ namespace hpx::threads::policies {
         // we use a simple mutex to protect the data members for now
         using mutex_type = Mutex;
 
-        using thread_queue_type = thread_queue_mc<Mutex, PendingQueuing,
-            StagedQueuing, TerminatedQueuing>;
+        using thread_queue_type = thread_queue_mc;
 
         using thread_heap_type =
             std::list<thread_id_type, util::internal_allocator<thread_id_type>>;
@@ -84,9 +71,8 @@ namespace hpx::threads::policies {
             typename PendingQueuing::template apply<thread_id_ref_type>::type;
 
         using task_items_type =
-            typename concurrentqueue_fifo::apply<task_description>::type;
+            concurrentqueue_fifo::apply<task_description>::type;
 
-    public:
         // ----------------------------------------------------------------
         // Take thread init data from the new work queue and convert it into
         // full thread_data items that are added to the pending queue.
@@ -138,7 +124,7 @@ namespace hpx::threads::policies {
 
     public:
         explicit thread_queue_mc(thread_queue_init_parameters const& parameters,
-            std::size_t queue_num = std::size_t(-1))
+            std::size_t queue_num = static_cast<std::size_t>(-1))
           : parameters_(parameters)
           , queue_index_(static_cast<int>(queue_num))
           , holder_(nullptr)
@@ -148,6 +134,11 @@ namespace hpx::threads::policies {
             new_tasks_count_.data_ = 0;
             work_items_count_.data_ = 0;
         }
+
+        thread_queue_mc(thread_queue_mc const&) = delete;
+        thread_queue_mc(thread_queue_mc&&) = delete;
+        thread_queue_mc& operator=(thread_queue_mc const&) = delete;
+        thread_queue_mc& operator=(thread_queue_mc&&) = delete;
 
         // ----------------------------------------------------------------
         void set_holder(queue_holder_thread<thread_queue_type>* holder)
@@ -166,7 +157,7 @@ namespace hpx::threads::policies {
         // items)
         std::int64_t get_queue_length() const noexcept
         {
-            return std::int64_t(work_items_count_.data_.load(
+            return static_cast<std::int64_t>(work_items_count_.data_.load(
                        std::memory_order_relaxed)) +
                 new_tasks_count_.data_.load(std::memory_order_relaxed);
         }
@@ -192,7 +183,6 @@ namespace hpx::threads::policies {
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, "get_thread_count",
                 "use get_queue_length_staged/get_queue_length_pending");
-            return 0;
         }
 
         // create a new thread and schedule it if the initial state is equal to
@@ -267,7 +257,7 @@ namespace hpx::threads::policies {
         bool get_next_thread(threads::thread_id_ref_type& thrd, bool other_end,
             bool check_new = false) HPX_HOT
         {
-            std::int64_t work_items_count_count =
+            std::int64_t const work_items_count_count =
                 work_items_count_.data_.load(std::memory_order_relaxed);
 
             if (0 != work_items_count_count && work_items_.pop(thrd, other_end))
@@ -308,10 +298,10 @@ namespace hpx::threads::policies {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        constexpr void on_start_thread(std::size_t /* num_thread */) noexcept {}
-        constexpr void on_stop_thread(std::size_t /* num_thread */) noexcept {}
-        constexpr void on_error(std::size_t /* num_thread */,
-            std::exception_ptr const& /* e */) noexcept
+        static constexpr void on_start_thread(std::size_t) noexcept {}
+        static constexpr void on_stop_thread(std::size_t) noexcept {}
+        static constexpr void on_error(
+            std::size_t, std::exception_ptr const&) noexcept
         {
         }
 

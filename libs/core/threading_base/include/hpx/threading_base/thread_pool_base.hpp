@@ -1,5 +1,5 @@
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -418,39 +418,17 @@ namespace hpx::threads {
         }
 
         std::int64_t get_thread_count_unknown(
-            std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::unknown,
-                thread_priority::default_, num_thread, reset);
-        }
-        std::int64_t get_thread_count_active(std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::active,
-                thread_priority::default_, num_thread, reset);
-        }
+            std::size_t num_thread, bool reset);
+        std::int64_t get_thread_count_active(
+            std::size_t num_thread, bool reset);
         std::int64_t get_thread_count_pending(
-            std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::pending,
-                thread_priority::default_, num_thread, reset);
-        }
+            std::size_t num_thread, bool reset);
         std::int64_t get_thread_count_suspended(
-            std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::suspended,
-                thread_priority::default_, num_thread, reset);
-        }
+            std::size_t num_thread, bool reset);
         std::int64_t get_thread_count_terminated(
-            std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::terminated,
-                thread_priority::default_, num_thread, reset);
-        }
-        std::int64_t get_thread_count_staged(std::size_t num_thread, bool reset)
-        {
-            return get_thread_count(thread_schedule_state::staged,
-                thread_priority::default_, num_thread, reset);
-        }
+            std::size_t num_thread, bool reset);
+        std::int64_t get_thread_count_staged(
+            std::size_t num_thread, bool reset);
 
         virtual std::int64_t get_scheduler_utilization() const = 0;
 

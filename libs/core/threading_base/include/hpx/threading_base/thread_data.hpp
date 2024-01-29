@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -253,24 +253,25 @@ namespace hpx::threads {
         }
 
 #if !defined(HPX_HAVE_THREAD_DESCRIPTION)
-        threads::thread_description get_description() const
+        static constexpr threads::thread_description get_description() noexcept
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
-        threads::thread_description set_description(
-            threads::thread_description /*value*/)
+        static constexpr threads::thread_description set_description(
+            threads::thread_description /*value*/) noexcept
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
 
-        threads::thread_description get_lco_description() const    //-V524
+        static constexpr threads::thread_description
+        get_lco_description() noexcept    //-V524
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
-        threads::thread_description set_lco_description(    //-V524
-            threads::thread_description /*value*/)
+        static constexpr threads::thread_description set_lco_description(
+            threads::thread_description /*value*/) noexcept    //-V524
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
 #else
         threads::thread_description get_description() const
@@ -306,20 +307,20 @@ namespace hpx::threads {
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         /// Return the locality of the parent thread
-        constexpr std::uint32_t get_parent_locality_id() const noexcept
+        static constexpr std::uint32_t get_parent_locality_id() noexcept
         {
             // this is the same as naming::invalid_locality_id
             return ~static_cast<std::uint32_t>(0);
         }
 
         /// Return the thread id of the parent thread
-        constexpr thread_id_type get_parent_thread_id() const noexcept
+        static constexpr thread_id_type get_parent_thread_id() noexcept
         {
             return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
-        constexpr std::size_t get_parent_thread_phase() const noexcept
+        static constexpr std::size_t get_parent_thread_phase() noexcept
         {
             return 0;
         }

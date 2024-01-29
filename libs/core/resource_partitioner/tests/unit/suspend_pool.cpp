@@ -192,6 +192,10 @@ int main(int argc, char* argv[])
         hpx::resource::scheduling_policy::static_,
         hpx::resource::scheduling_policy::static_priority,
         hpx::resource::scheduling_policy::shared_priority,
+
+        hpx::resource::scheduling_policy::local_workrequesting_fifo,
+        hpx::resource::scheduling_policy::local_workrequesting_lifo,
+        hpx::resource::scheduling_policy::local_workrequesting_mc,
     };
 
     for (auto const scheduler : schedulers)

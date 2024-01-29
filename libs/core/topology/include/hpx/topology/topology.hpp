@@ -416,7 +416,7 @@ namespace hpx::threads {
         // For example, core_affinity_masks[0] is a bitmask, where the
         // elements = 1 indicate the PUs that belong to the core on which
         // PU #0 (zero-based index) lies.
-        mask_type machine_affinity_mask_{};
+        mask_type machine_affinity_mask_ = mask_type();
         std::vector<mask_type> socket_affinity_masks_;
         std::vector<mask_type> numa_node_affinity_masks_;
         std::vector<mask_type> core_affinity_masks_;
