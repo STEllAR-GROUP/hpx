@@ -20,7 +20,6 @@
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -875,9 +874,9 @@ namespace hpx::threads::policies {
             if (max_num_to_steal != 0)
             {
                 task_data thrds(d.num_thread_);
-                thrds.tasks_.reserve(max_num_to_steal);
 
 #ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+                thrds.tasks_.reserve(max_num_to_steal);
                 thread_id_ref_type thrd;
                 while (max_num_to_steal-- != 0 &&
                     d.queue_->get_next_thread(thrd, false, true))
@@ -887,6 +886,7 @@ namespace hpx::threads::policies {
                     thrd = thread_id_ref_type{};
                 }
 #else
+                thrds.tasks_.resize(max_num_to_steal);
                 d.queue_->get_next_threads(
                     thrds.tasks_.begin(), thrds.tasks_.size(), false, true);
 #endif

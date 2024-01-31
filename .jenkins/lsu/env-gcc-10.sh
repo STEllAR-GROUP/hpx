@@ -32,3 +32,4 @@ configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
 
 configure_extra_options+=" -DHPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD=ON"
+configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-mc"
