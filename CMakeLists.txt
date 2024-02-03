@@ -578,6 +578,49 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
   )
 endif()
 
+# ##
+# HPX STDEXEC configuration
+# ##
+
+hpx_option(
+  HPX_WITH_STDEXEC
+  BOOL
+  "Use STDEXEC executors instead of native HPX.(default: OFF)"
+  OFF
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+hpx_option(
+  HPX_WITH_FETCH_STDEXEC
+  BOOL
+  "Use FetchContent to fetch STDEXEC.(default: OFF)"
+  OFF
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+# if STDEXEC_ROOT was provided, HPX_WITH_STDEXEC is set to ON
+if(STDEXEC_ROOT OR HPX_WITH_FETCH_STDEXEC)
+  set(HPX_WITH_STDEXEC ON)
+
+  hpx_add_config_define(HPX_HAVE_STDEXEC)
+elseif(HPX_WITH_STDEXEC)
+  hpx_error(
+    "HPX_WITH_STDEXEC is set to ON, but STDEXEC_ROOT is not provided. Please provide STDEXEC_ROOT or set HPX_WITH_FETCH_STDEXEC to ON."
+  )
+endif()
+
+if(HPX_WITH_STDEXEC)
+  # need cxx20 and over
+  if(HPX_WITH_CXX_STANDARD LESS 20)
+    hpx_error(
+      "HPX_WITH_STDEXEC is set to ON, but HPX_WITH_CXX_STANDARD is less than 20. Please set HPX_WITH_CXX_STANDARD to 20 or higher."
+    )
+  endif()
+  hpx_info("STDEXEC is enabled.")
+endif()
+
 # ##############################################################################
 # HPX SYCL configuration
 # ##############################################################################
@@ -1346,7 +1389,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   endif()
 endif()
 
-# External libraries/frameworks used by sme of the examples and benchmarks
+# External libraries/frameworks used by some of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
@@ -2264,6 +2307,9 @@ include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)
 endif()
+
+# Setup NVIDIA's stdexec if requested
+include(HPX_SetupStdexec)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
