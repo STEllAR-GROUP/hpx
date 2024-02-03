@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/synchronization/stop_token.hpp>
 
 // C++20 stop_token

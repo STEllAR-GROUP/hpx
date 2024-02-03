@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,12 +23,12 @@ namespace hpx {
     /// \brief Return the number of localities which were registered at startup
     ///        for the running application.
     ///
-    /// The function \a get_initial_num_localities returns the number of localities
-    /// which were connected to the console at application startup.
+    /// The function \a get_initial_num_localities returns the number of
+    /// localities which were connected to the console at application startup.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities
@@ -38,9 +38,9 @@ namespace hpx {
     /// \brief Asynchronously return the number of localities which are
     ///        currently registered for the running application.
     ///
-    /// The function \a get_num_localities asynchronously returns the
-    /// number of localities currently connected to the console. The returned
-    /// future represents the actual result.
+    /// The function \a get_num_localities asynchronously returns the number of
+    /// localities currently connected to the console. The returned future
+    /// represents the actual result.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return 0 otherwise.
@@ -56,15 +56,15 @@ namespace hpx {
     /// currently connected to the console.
     ///
     /// \param ec [in,out] this represents the error status on exit, if this
-    ///           is pre-initialized to \a hpx#throws the function will throw
-    ///           on error instead.
+    ///           is pre-initialized to \a hpx#throws the function will throw on
+    ///           error instead.
     ///
     /// \note     This function will return meaningful results only if called
     ///           from an HPX-thread. It will return 0 otherwise.
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// \see      \a hpx::find_all_localities, \a hpx::get_num_localities

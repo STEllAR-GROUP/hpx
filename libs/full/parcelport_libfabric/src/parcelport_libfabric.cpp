@@ -130,7 +130,7 @@ namespace hpx::parcelset::policies::libfabric {
     {
         while (hpx::is_starting())
         {
-            background_work(0, parcelport_background_mode_all);
+            background_work(0, parcelport_background_mode::all);
         }
         LOG_DEBUG_MSG("io service task completed");
     }

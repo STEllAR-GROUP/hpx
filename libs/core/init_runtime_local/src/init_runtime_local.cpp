@@ -44,21 +44,17 @@
 #include <hpx/threading_base/detail/get_default_timer_service.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/type_support/unused.hpp>
-#include <hpx/util/from_string.hpp>
 
 #if defined(HPX_NATIVE_MIC) || defined(__bgq__)
 #include <cstdlib>
 #endif
 
-#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <functional>
 #include <iostream>
 #include <map>
 #include <memory>
-#include <new>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -98,7 +94,7 @@ namespace hpx {
                 }
                 else if (6 == args[i].find("positional", 6))
                 {
-                    std::string::size_type p = args[i].find_first_of('=');
+                    std::string::size_type const p = args[i].find_first_of('=');
                     if (p != std::string::npos)
                     {
                         args[i] = args[i].substr(p + 1);
@@ -116,6 +112,7 @@ namespace hpx {
     }    // namespace detail
 
     namespace local {
+
         // Print stack trace and exit.
 #if defined(HPX_WINDOWS)
         extern BOOL WINAPI termination_handler(DWORD ctrl_type);
@@ -172,9 +169,9 @@ namespace hpx {
                 return -1;
             }
 
-            std::unique_ptr<runtime> rt(
+            std::unique_ptr<runtime> const rt(
                 get_runtime_ptr());    // take ownership!
-            if (nullptr == rt.get())
+            if (!rt)
             {
                 HPX_THROWS_IF(ec, hpx::error::invalid_status, "hpx::stop",
                     "the runtime system is not active (did you already "
@@ -182,7 +179,7 @@ namespace hpx {
                 return -1;
             }
 
-            int result = rt->wait();
+            int const result = rt->wait();
 
             rt->stop();
             rt->rethrow_exception();
@@ -277,12 +274,13 @@ namespace hpx {
 
             ///////////////////////////////////////////////////////////////////////
             void add_startup_functions(hpx::runtime& rt,
-                hpx::program_options::variables_map& vm,
+                hpx::program_options::variables_map const& vm,
                 startup_function_type startup, shutdown_function_type shutdown)
             {
                 if (vm.count("hpx:app-config"))
                 {
-                    std::string config(vm["hpx:app-config"].as<std::string>());
+                    std::string const config(
+                        vm["hpx:app-config"].as<std::string>());
                     rt.get_config().load_application_configuration(
                         config.c_str());
                 }
@@ -321,7 +319,7 @@ namespace hpx {
                 if (!f.empty())
                     return rt.run(hpx::bind_front(f, vm));
 
-                // Run this runtime instance without an hpx_main
+                // Run this runtime instance without hpx_main
                 return rt.run();
             }
 
@@ -342,7 +340,7 @@ namespace hpx {
                     return rt.start(hpx::bind_front(f, vm));
                 }
 
-                // Run this runtime instance without an hpx_main
+                // Run this runtime instance without hpx_main
                 return rt.start();
             }
 
@@ -361,8 +359,7 @@ namespace hpx {
                     HPX_MOVE(startup), HPX_MOVE(shutdown));
 
                 // pointer to runtime is stored in TLS
-                hpx::runtime* p = rt.release();
-                (void) p;
+                [[maybe_unused]] hpx::runtime const* p = rt.release();
 
                 return result;
             }
@@ -447,7 +444,7 @@ namespace hpx {
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {
-                int result = 0;
+                int result;
                 try
                 {
                     if ((result = ensure_no_runtime_is_up()) != 0)
@@ -483,7 +480,7 @@ namespace hpx {
                             0, cmdline.rtcfg_.get_entry("hpx.affinity", ""),
                             cmdline.rtcfg_.get_entry("hpx.bind", ""),
                             hpx::util::get_entry_as<bool>(
-                                cmdline.rtcfg_, "hpx.use_process_mask", 0));
+                                cmdline.rtcfg_, "hpx.use_process_mask", false));
 
                         hpx::resource::partitioner rp =
                             hpx::resource::detail::make_partitioner(

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2017      Denis Blank
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,8 +10,9 @@
 #include <hpx/config.hpp>
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
     /// Attaches a debugger if \c category is equal to the configuration entry
     /// hpx.attach-debugger.
     void HPX_CORE_EXPORT may_attach_debugger(std::string const& category);
-}}    // namespace hpx::util
+}    // namespace hpx::util

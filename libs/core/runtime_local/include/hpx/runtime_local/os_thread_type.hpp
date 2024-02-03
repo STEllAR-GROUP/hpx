@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-namespace hpx { namespace runtime_local {
+namespace hpx::runtime_local {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Types of kernel threads registered with the runtime
@@ -41,7 +41,7 @@ namespace hpx { namespace runtime_local {
         os_thread_type type_;            ///< HPX thread type
     };
 
-}}    // namespace hpx::runtime_local
+}    // namespace hpx::runtime_local
 
 ///////////////////////////////////////////////////////////////////////////////
 // These functions are officially part of the API

@@ -38,7 +38,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         // There is no need to protect these global from thread concurrent
         // access as they are access during early startup only.
@@ -71,10 +73,10 @@ namespace hpx {
 
         /// Construct a new HPX runtime instance
         explicit runtime(
-            hpx::util::runtime_configuration& rtcfg, bool initialize);
+            hpx::util::runtime_configuration rtcfg, bool initialize);
 
     protected:
-        explicit runtime(hpx::util::runtime_configuration& rtcfg);
+        explicit runtime(hpx::util::runtime_configuration rtcfg);
 
         void set_notification_policies(notification_policy_type&& notifier,
 #ifdef HPX_HAVE_IO_POOL
@@ -83,7 +85,7 @@ namespace hpx {
 #ifdef HPX_HAVE_TIMER_POOL
             notification_policy_type&& timer_pool_notifier,
 #endif
-            threads::detail::network_background_callback_type
+            threads::detail::network_background_callback_type const&
                 network_background_callback);
 
         /// Common initialization for different constructors
@@ -117,7 +119,7 @@ namespace hpx {
         static std::uint64_t get_system_uptime();
 
         /// \brief Return a reference to the internal PAPI thread manager
-        util::thread_mapper& get_thread_mapper();
+        util::thread_mapper& get_thread_mapper() const;
 
         threads::topology const& get_topology() const;
 
@@ -172,7 +174,7 @@ namespace hpx {
         /// \returns          If a blocking is a true, this function will
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
-        ///                   parameter \p func. Otherwise it will return zero.
+        ///                   parameter \p func. Otherwise, it will return zero.
         virtual int start(hpx::function<hpx_main_function_type> const& func,
             bool blocking = false);
 
@@ -187,7 +189,7 @@ namespace hpx {
         /// \returns          If a blocking is a true, this function will
         ///                   return the value as returned as the result of the
         ///                   invocation of the function object given by the
-        ///                   parameter \p func. Otherwise it will return zero.
+        ///                   parameter \p func. Otherwise, it will return zero.
         virtual int start(bool blocking = false);
 
         /// \brief Wait for the shutdown action to be executed
@@ -232,6 +234,8 @@ namespace hpx {
         ///                   the error has been detected in.
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
+        /// \param terminate_all [in] signal whether all localities should be
+        ///                      terminated
         virtual bool report_error(std::size_t num_thread,
             std::exception_ptr const& e, bool terminate_all = true);
 
@@ -239,6 +243,8 @@ namespace hpx {
         ///
         /// \param e          [in] This is an instance encapsulating an
         ///                   exception which lead to this function call.
+        /// \param terminate_all [in] signal whether all localities should be
+        ///                      terminated
         ///
         /// \note This function will retrieve the number of the current
         ///       shepherd thread and forward to the report_error function
@@ -252,7 +258,7 @@ namespace hpx {
         ///
         /// \param  f   The function 'f' will be called from inside a HPX
         ///             thread before hpx_main is executed. This is very useful
-        ///             to setup the runtime environment of the application
+        ///             to set up the runtime environment of the application
         ///             (install performance counters, etc.)
         ///
         /// \note       The difference to a startup function is that all
@@ -264,7 +270,7 @@ namespace hpx {
         ///
         /// \param  f   The function 'f' will be called from inside a HPX
         ///             thread before hpx_main is executed. This is very useful
-        ///             to setup the runtime environment of the application
+        ///             to set up the runtime environment of the application
         ///             (install performance counters, etc.)
         virtual void add_startup_function(startup_function_type f);
 
@@ -299,19 +305,24 @@ namespace hpx {
 
         /// \brief Register an external OS-thread with HPX
         ///
-        /// This function should be called from any OS-thread which is external to
-        /// HPX (not created by HPX), but which needs to access HPX functionality,
-        /// such as setting a value on a promise or similar.
+        /// This function should be called from any OS-thread which is external
+        /// to HPX (not created by HPX), but which needs to access HPX
+        /// functionality, such as setting a value on a promise or similar.
         ///
-        /// \param name             [in] The name to use for thread registration.
+        /// \param name             [in] The name to use for thread
+        ///                         registration.
         /// \param num              [in] The sequence number to use for thread
         ///                         registration. The default for this parameter
         ///                         is zero.
         /// \param service_thread   [in] The thread should be registered as a
-        ///                         service thread. The default for this parameter
-        ///                         is 'true'. Any service threads will be pinned
-        ///                         to cores not currently used by any of the HPX
-        ///                         worker threads.
+        ///                         service thread. The default for this
+        ///                         parameter is 'true'. Any service threads
+        ///                         will be pinned to cores not currently used
+        ///                         by any of the HPX worker threads.
+        /// \param ec               [in,out] this represents the error status on
+        ///                         exit, if this is pre-initialized to \a
+        ///                         hpx#throws the function will throw on error
+        ///                         instead.
         ///
         /// \note The function will compose a thread name of the form
         ///       '<name>-thread#<num>' which is used to register the thread. It
@@ -321,8 +332,8 @@ namespace hpx {
         ///
         ///         'main', 'io', 'timer', 'parcel', 'worker'
         ///
-        /// \note This function should be called for each thread exactly once. It
-        ///       will fail if it is called more than once.
+        /// \note This function should be called for each thread exactly once.
+        ///       It will fail if it is called more than once.
         ///
         /// \returns This function will return whether the requested operation
         ///          succeeded or not.
@@ -394,7 +405,7 @@ namespace hpx {
 
     protected:
         void init_global_data();
-        void deinit_global_data();
+        static void deinit_global_data();
 
         threads::thread_result_type run_helper(
             hpx::function<runtime::hpx_main_function_type> const& func,
@@ -455,20 +466,22 @@ namespace hpx {
         ///                   return immediately. Use a second call to stop
         ///                   with this parameter set to \a true to wait for
         ///                   all internal work to be completed.
-        void stop_helper(
-            bool blocking, std::condition_variable& cond, std::mutex& mtx);
+        /// \param cond
+        /// \param mtx
+        void stop_helper(bool blocking, std::condition_variable& cond,
+            std::mutex& mtx) const;
 
-        void deinit_tss_helper(char const* context, std::size_t num);
+        void deinit_tss_helper(char const* context, std::size_t num) const;
 
         void init_tss_ex(char const* context,
             runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
-            char const* postfix, bool service_thread, error_code& ec);
+            char const* postfix, bool service_thread, error_code& ec) const;
 
         void init_tss_helper(char const* context,
             runtime_local::os_thread_type type, std::size_t local_thread_num,
             std::size_t global_thread_num, char const* pool_name,
-            char const* postfix, bool service_thread);
+            char const* postfix, bool service_thread) const;
 
         void notify_finalize();
         void wait_finalize();
@@ -491,6 +504,7 @@ namespace hpx {
         hpx::util::runtime_configuration const& cfg);
 
     namespace util {
+
         ///////////////////////////////////////////////////////////////////////////
         // retrieve the command line arguments for the current locality
         HPX_CORE_EXPORT bool retrieve_commandline_arguments(
@@ -505,6 +519,7 @@ namespace hpx {
     }    // namespace util
 
     namespace threads {
+
         /// \brief Returns the stack size name.
         ///
         /// Get the readable string representing the given stack size constant.

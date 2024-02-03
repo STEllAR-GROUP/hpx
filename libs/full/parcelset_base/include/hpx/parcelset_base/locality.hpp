@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -42,7 +42,7 @@ namespace hpx::parcelset {
             virtual bool equal(impl_base const& rhs) const = 0;
             virtual bool less_than(impl_base const& rhs) const = 0;
             virtual bool valid() const = 0;
-            virtual const char* type() const = 0;
+            virtual char const* type() const = 0;
             virtual std::ostream& print(std::ostream& os) const = 0;
             virtual void save(serialization::output_archive& ar) const = 0;
             virtual void load(serialization::input_archive& ar) = 0;
@@ -60,7 +60,7 @@ namespace hpx::parcelset {
             Impl const& get() const
             {
                 HPX_ASSERT(Impl::type() == type());
-                return static_cast<const impl<Impl>*>(this)->impl_;
+                return static_cast<impl<Impl> const*>(this)->impl_;
             }
         };
 
@@ -136,7 +136,7 @@ namespace hpx::parcelset {
         class impl : public impl_base
         {
         public:
-            explicit impl(Impl&& i)
+            explicit impl(Impl&& i) noexcept
               : impl_(HPX_MOVE(i))
             {
             }
@@ -163,7 +163,7 @@ namespace hpx::parcelset {
                 return !!impl_;
             }
 
-            const char* type() const override
+            char const* type() const override
             {
                 return Impl::type();
             }

@@ -76,6 +76,7 @@ set(runtime_local_sources
     runtime_handlers.cpp
     runtime_local.cpp
     serialize_exception.cpp
+    service_executors.cpp
     state.cpp
     thread_mapper.cpp
     thread_pool_helpers.cpp

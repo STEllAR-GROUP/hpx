@@ -1,5 +1,5 @@
 //  Copyright (c) 2012 Maciej Brodowicz
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -27,7 +27,7 @@
 #include <sys/syscall.h>
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // enumerates active OS threads and maintains their metadata
@@ -83,23 +83,23 @@ namespace hpx { namespace util {
     public:
         HPX_NON_COPYABLE(thread_mapper);
 
-    public:
         using callback_type = detail::thread_mapper_callback_type;
 
         // erroneous thread index
-        static constexpr std::uint32_t invalid_index = std::uint32_t(-1);
+        static constexpr std::uint32_t invalid_index =
+            static_cast<std::uint32_t>(-1);
 
         // erroneous low-level thread ID
-        static constexpr std::uint64_t invalid_tid = std::uint64_t(-1);
+        static constexpr std::uint64_t invalid_tid =
+            static_cast<std::uint64_t>(-1);
 
-    public:
         thread_mapper();
         ~thread_mapper();
 
         ///////////////////////////////////////////////////////////////////////
         // registers invoking OS thread with a unique label
         std::uint32_t register_thread(
-            char const* label, runtime_local::os_thread_type type);
+            char const* name, runtime_local::os_thread_type type);
 
         // unregisters the calling OS thread
         bool unregister_thread();
@@ -158,6 +158,6 @@ namespace hpx { namespace util {
         // mapping between HPX thread labels and thread indices
         label_map_type label_map_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

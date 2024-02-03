@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2019 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <functional>
 #include <string>
 #include <utility>
 
@@ -22,8 +21,10 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     /// \cond NODETAIL
     namespace detail {
+
         ///////////////////////////////////////////////////////////////////////
         // Stores the information about the locality id the exception has been
         // raised on. This information will show up in error messages under the
@@ -128,21 +129,20 @@ namespace hpx {
     /// The function \a hpx::diagnostic_information can be used to extract all
     /// diagnostic information stored in the given exception instance as a
     /// formatted string. This simplifies debug output as it composes the
-    /// diagnostics into one, easy to use function call. This includes
-    /// the name of the source file and line number, the sequence number of the
-    /// OS-thread and the HPX-thread id, the locality id and the stack backtrace
-    /// of the point where the original exception was thrown.
+    /// diagnostics into one, easy to use function call. This includes the name
+    /// of the source file and line number, the sequence number of the OS-thread
+    /// and the HPX-thread id, the locality id and the stack backtrace of the
+    /// point where the original exception was thrown.
     ///
     /// \param xi   The parameter \p e will be inspected for all diagnostic
     ///             information elements which have been stored at the point
-    ///             where the exception was thrown. This parameter can be one
-    ///             of the following types: \a hpx::exception_info,
+    ///             where the exception was thrown. This parameter can be one of
+    ///             the following types: \a hpx::exception_info,
     ///             \a hpx::error_code, \a std::exception, or
     ///             \a std::exception_ptr.
     ///
-    /// \returns    The formatted string holding all of the available
-    ///             diagnostic information stored in the given exception
-    ///             instance.
+    /// \returns    The formatted string holding all the available diagnostic
+    ///             information stored in the given exception instance.
     ///
     /// \throws     std#bad_alloc (if any of the required allocation operations
     ///             fail)
@@ -203,11 +203,11 @@ namespace hpx {
     ///             \a hpx::get_error_state()
     ///
     HPX_CORE_EXPORT std::uint32_t get_error_locality_id(
-        hpx::exception_info const& xi);
+        hpx::exception_info const& xi) noexcept;
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::uint32_t get_error_locality_id(E const& e)
+    std::uint32_t get_error_locality_id(E const& e) noexcept
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_locality_id(*xi) :
@@ -288,11 +288,11 @@ namespace hpx {
     ///             \a hpx::get_error_state()
     ///
     HPX_CORE_EXPORT std::int64_t get_error_process_id(
-        hpx::exception_info const& xi);
+        hpx::exception_info const& xi) noexcept;
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::int64_t get_error_process_id(E const& e)
+    std::int64_t get_error_process_id(E const& e) noexcept
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
             return xi ? get_error_process_id(*xi) : -1;
@@ -413,14 +413,14 @@ namespace hpx {
     ///             \a hpx::get_error_state()
     ///
     HPX_CORE_EXPORT std::size_t get_error_os_thread(
-        hpx::exception_info const& xi);
+        hpx::exception_info const& xi) noexcept;
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::size_t get_error_os_thread(E const& e)
+    std::size_t get_error_os_thread(E const& e) noexcept
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
-            return xi ? get_error_os_thread(*xi) : std::size_t(-1);
+            return xi ? get_error_os_thread(*xi) : static_cast<std::size_t>(-1);
         });
     }
     /// \endcond
@@ -456,14 +456,14 @@ namespace hpx {
     ///             \a hpx::get_error_state()
     ///
     HPX_CORE_EXPORT std::size_t get_error_thread_id(
-        hpx::exception_info const& xi);
+        hpx::exception_info const& xi) noexcept;
 
     /// \cond NOINTERNAL
     template <typename E>
-    std::size_t get_error_thread_id(E const& e)
+    std::size_t get_error_thread_id(E const& e) noexcept
     {
         return invoke_with_exception_info(e, [](exception_info const* xi) {
-            return xi ? get_error_thread_id(*xi) : std::size_t(-1);
+            return xi ? get_error_thread_id(*xi) : static_cast<std::size_t>(-1);
         });
     }
     /// \endcond
@@ -603,7 +603,5 @@ namespace hpx {
     /// \endcond
 
 }    // namespace hpx
-
-#include <hpx/modules/errors.hpp>
 
 #include <hpx/config/warnings_suffix.hpp>

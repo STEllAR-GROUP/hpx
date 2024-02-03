@@ -1,4 +1,4 @@
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@
 #include <hpx/iterator_support/counting_shape.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/modules/concepts.hpp>
-#include <hpx/modules/topology.hpp>
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 
 #include <chrono>
@@ -66,7 +65,8 @@ namespace hpx::execution::experimental {
             {
                 // don't build a hierarchy of executors if there is only one
                 // mask provided
-                auto target_mask = targets[0].native_handle().get_device();
+                auto const target_mask =
+                    targets[0].native_handle().get_device();
                 if (!hpx::threads::test(target_mask, this_pu))
                 {
                     HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -87,7 +87,7 @@ namespace hpx::execution::experimental {
             bool this_thread_is_represented = false;
             for (auto const& t : targets)
             {
-                auto target_mask = t.native_handle().get_device();
+                auto const target_mask = t.native_handle().get_device();
                 if (!this_thread_is_represented &&
                     hpx::threads::test(target_mask, this_pu))
                 {
@@ -102,7 +102,7 @@ namespace hpx::execution::experimental {
             }
 
             // The block_fork_join_executor will expose bad performance if the
-            // current thread is not part of any of the given targets.
+            // current thread is not part of the given targets.
             if (!this_thread_is_represented)
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
@@ -337,9 +337,9 @@ namespace hpx::execution::experimental {
             hpx::parallel::execution::async_invoke_t,
             block_fork_join_executor const& exec, F&& f, Fs&&... fs)
         {
-            // Forward to the synchronous version as we can't create
-            // futures to the completion of the parallel region (this HPX
-            // thread participates in computation).
+            // Forward to the synchronous version as we can't create futures to
+            // the completion of the parallel region (this HPX thread
+            // participates in computation).
             return hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     exec.sync_invoke_helper(
@@ -389,6 +389,7 @@ namespace hpx::execution::experimental {
 }    // namespace hpx::execution::experimental
 
 namespace hpx::parallel::execution {
+
     /// \cond NOINTERNAL
     template <>
     struct is_bulk_one_way_executor<

@@ -1,6 +1,6 @@
 //  Copyright (c)      2021 ETH Zurich
 //  Copyright (c)      2018 Mikael Simberg
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -11,6 +11,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
 #include <hpx/functional/bind.hpp>
 #include <hpx/functional/bind_back.hpp>
 #include <hpx/functional/function.hpp>
@@ -26,7 +27,6 @@
 #include <cstring>
 #include <functional>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -53,16 +53,19 @@ extern char** environ;
 #endif
 
 namespace hpx {
+
     namespace detail {
         HPX_CORE_EXPORT int init_helper(hpx::program_options::variables_map&,
             hpx::function<int(int, char**)> const&);
     }
 
     namespace local {
+
         namespace detail {
+
             struct dump_config
             {
-                dump_config(hpx::runtime const& rt)
+                explicit dump_config(hpx::runtime const& rt)
                   : rt_(std::cref(rt))
                 {
                 }
@@ -115,6 +118,7 @@ namespace hpx {
         };
 
         namespace detail {
+
             HPX_CORE_EXPORT int run_or_start(
                 hpx::function<int(
                     hpx::program_options::variables_map& vm)> const& f,
@@ -122,7 +126,8 @@ namespace hpx {
                 bool blocking);
 
             inline int init_start_impl(
-                hpx::function<int(hpx::program_options::variables_map&)> f,
+                hpx::function<int(hpx::program_options::variables_map&)> const&
+                    f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {
                 if (argc == 0 || argv == nullptr)
@@ -136,10 +141,16 @@ namespace hpx {
                 freebsd_environ = environ;
 #endif
                 // set a handler for std::abort
-                std::signal(SIGABRT, hpx::detail::on_abort);
-                std::atexit(hpx::detail::on_exit);
+                [[maybe_unused]] auto prev_sh =
+                    std::signal(SIGABRT, hpx::detail::on_abort);
+
+                [[maybe_unused]] auto ret = std::atexit(hpx::detail::on_exit);
+                HPX_ASSERT_MSG(ret == 0, "std::atexit returned error code");
+
 #if defined(HPX_HAVE_CXX11_STD_QUICK_EXIT)
-                std::at_quick_exit(hpx::detail::on_exit);
+                ret = std::at_quick_exit(hpx::detail::on_exit);
+                HPX_ASSERT_MSG(
+                    ret == 0, "std::at_quick_exit returned error code");
 #endif
                 return run_or_start(f, argc, argv, params, blocking);
             }
@@ -157,7 +168,7 @@ namespace hpx {
             char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::bind_back(hpx::detail::init_helper, f);
+                hpx::bind_back(hpx::detail::init_helper, HPX_MOVE(f));
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -166,7 +177,7 @@ namespace hpx {
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::bind(f);
+                hpx::bind(HPX_MOVE(f));
             return detail::init_start_impl(
                 HPX_MOVE(main_f), argc, argv, params, true);
         }
@@ -191,7 +202,7 @@ namespace hpx {
             char** argv, init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::bind_back(hpx::detail::init_helper, f);
+                hpx::bind_back(hpx::detail::init_helper, HPX_MOVE(f));
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);
@@ -201,7 +212,7 @@ namespace hpx {
             init_params const& params = init_params())
         {
             hpx::function<int(hpx::program_options::variables_map&)> main_f =
-                hpx::bind(f);
+                hpx::bind(HPX_MOVE(f));
             return 0 ==
                 detail::init_start_impl(
                     HPX_MOVE(main_f), argc, argv, params, false);

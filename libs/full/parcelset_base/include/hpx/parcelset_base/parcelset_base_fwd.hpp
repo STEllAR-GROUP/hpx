@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/modules/functional.hpp>
 
+#include <cstdint>
 #include <system_error>
 
 namespace hpx::parcelset {
@@ -19,7 +20,7 @@ namespace hpx::parcelset {
 
     extern HPX_EXPORT parcel empty_parcel;
 
-    /// The type of a function that can be registered as a parcel write handler
+    /// The type of the function that can be registered as a parcel write handler
     /// using the function \a hpx::set_parcel_write_handler.
     ///
     /// \note A parcel write handler is a function which is called by the
@@ -31,17 +32,45 @@ namespace hpx::parcelset {
 
     ////////////////////////////////////////////////////////////////////////
     /// Type of background work to perform
-    enum parcelport_background_mode
+    enum class parcelport_background_mode : std::uint8_t
     {
         /// perform buffer flush operations
-        parcelport_background_mode_flush_buffers = 0x01,
+        flush_buffers = 0x01,
         /// perform send operations (includes buffer flush)
-        parcelport_background_mode_send = 0x03,
+        send = 0x03,
         /// perform receive operations
-        parcelport_background_mode_receive = 0x04,
+        receive = 0x04,
         /// perform all operations
-        parcelport_background_mode_all = 0x07
+        all = 0x07
     };
+
+    inline bool operator&(
+        parcelport_background_mode lhs, parcelport_background_mode rhs)
+    {
+        return static_cast<std::uint8_t>(lhs) & static_cast<std::uint8_t>(rhs);
+    }
+
+#define HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG                    \
+    "The unscoped hpx::parcelset::parcelport_background_mode names are "       \
+    "deprecated. Please use "                                                  \
+    "hpx::parcelset::parcelport_background_mode::<value> instead."
+
+    HPX_DEPRECATED_V(1, 10, HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG)
+    inline constexpr parcelport_background_mode
+        parcelport_background_mode_flush_buffers =
+            parcelport_background_mode::flush_buffers;
+    HPX_DEPRECATED_V(1, 10, HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG)
+    inline constexpr parcelport_background_mode
+        parcelport_background_mode_send = parcelport_background_mode::send;
+    HPX_DEPRECATED_V(1, 10, HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG)
+    inline constexpr parcelport_background_mode
+        parcelport_background_mode_receive =
+            parcelport_background_mode::receive;
+    HPX_DEPRECATED_V(1, 10, HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG)
+    inline constexpr parcelport_background_mode parcelport_background_mode_all =
+        parcelport_background_mode::all;
+
+#undef HPX_PARCELPORT_BACKGROUND_MODE_ENUM_DEPRECATION_MSG
 
     HPX_EXPORT char const* get_parcelport_background_mode_name(
         parcelport_background_mode mode);

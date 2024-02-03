@@ -1,4 +1,4 @@
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,11 +10,8 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/modules/errors.hpp>
-
 #include <hpx/parcelset_base/parcelset_base_fwd.hpp>
-#include <hpx/parcelset_base/policies/message_handler.hpp>
 
-#include <cstddef>
 #include <string>
 #include <system_error>
 

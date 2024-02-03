@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,12 +12,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
 #include <hpx/modules/errors.hpp>
 
 #include <cstdint>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the number of the locality this function is being called
     ///        from.
@@ -35,7 +35,7 @@ namespace hpx {
     ///
     /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
     ///           function doesn't throw but returns the result code using the
-    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           parameter \a ec. Otherwise, it throws an instance of
     ///           hpx::exception.
     ///
     /// \note     This function needs to be executed on a HPX-thread. It will

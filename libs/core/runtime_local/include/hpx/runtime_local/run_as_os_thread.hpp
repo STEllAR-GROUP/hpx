@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,6 @@
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/execution/executors/execution.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/runtime_local/service_executors.hpp>
 
@@ -26,9 +25,8 @@ namespace hpx {
         HPX_ASSERT(threads::get_self_ptr() != nullptr);
 
         parallel::execution::io_pool_executor executor;
-        auto result = parallel::execution::async_execute(
+        return parallel::execution::async_execute(
             executor, HPX_FORWARD(F, f), HPX_FORWARD(Ts, vs)...);
-        return result;
     }
 }    // namespace hpx
 

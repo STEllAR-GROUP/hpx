@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2020 ETH Zurich
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,13 +29,14 @@
 
 #include <cstddef>
 #include <limits>
-#include <memory>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace hpx::compute::host {
+
     namespace detail {
+
         /// The policy_allocator allocates blocks of memory touched according to
         /// the distribution policy of the given executor.
         template <typename T, typename Policy,
@@ -61,48 +62,51 @@ namespace hpx::compute::host {
                 using other = policy_allocator<U, policy_type>;
             };
 
-            policy_allocator(Policy&& policy)
+            explicit policy_allocator(Policy&& policy) noexcept
               : policy_(HPX_MOVE(policy))
             {
             }
 
-            policy_allocator(Policy const& policy)
+            explicit policy_allocator(Policy const& policy)
               : policy_(policy)
             {
             }
 
-            policy_type const& policy() const
+            policy_type const& policy() const noexcept
             {
                 return policy_;
             }
 
             // Returns the actual address of x even in presence of overloaded
             // operator&
-            pointer address(reference x) const noexcept
+            static pointer address(reference x) noexcept
             {
                 return &x;
             }
 
-            const_pointer address(const_reference x) const noexcept
+            static const_pointer address(const_reference x) noexcept
             {
                 return &x;
             }
 
             // Allocates n * sizeof(T) bytes of uninitialized storage by calling
-            // topo.allocate(). The pointer hint may be used to provide locality of
-            // reference: the allocator, if supported by the implementation, will
-            // attempt to allocate the new memory block as close as possible to hint.
-            pointer allocate(size_type n, void const* /* hint */ = nullptr)
+            // topo.allocate(). The pointer hint may be used to provide locality
+            // of reference: the allocator, if supported by the implementation,
+            // will attempt to allocate the new memory block as close as
+            // possible to hint.
+            static pointer allocate(
+                size_type n, void const* /* hint */ = nullptr)
             {
-                return reinterpret_cast<pointer>(
+                return static_cast<pointer>(
                     hpx::threads::create_topology().allocate(n * sizeof(T)));
             }
 
-            // Deallocates the storage referenced by the pointer p, which must be a
-            // pointer obtained by an earlier call to allocate(). The argument n
-            // must be equal to the first argument of the call to allocate() that
-            // originally produced p; otherwise, the behavior is undefined.
-            void deallocate(pointer p, size_type n) noexcept
+            // Deallocates the storage referenced by the pointer p, which must
+            // be a pointer obtained by an earlier call to allocate(). The
+            // argument n must be equal to the first argument of the call to
+            // allocate() that originally produced p; otherwise, the behavior is
+            // undefined.
+            static void deallocate(pointer p, size_type n) noexcept
             {
                 try
                 {
@@ -110,27 +114,27 @@ namespace hpx::compute::host {
                 }
                 catch (...)
                 {
-                    ;    // just ignore errors from create_topology
+                    // just ignore errors from create_topology
                 }
             }
 
-            // Returns the maximum theoretically possible value of n, for which the
-            // call allocate(n, 0) could succeed. In most implementations, this
-            // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-            size_type max_size() const noexcept
+            // Returns the maximum theoretically possible value of n, for which
+            // the call allocate(n, 0) could succeed. In most implementations,
+            // this returns std::numeric_limits<size_type>::max() /
+            // sizeof(value_type).
+            static size_type max_size() noexcept
             {
                 return (std::numeric_limits<size_type>::max)();
             }
 
-        public:
             // Constructs count objects of type T in allocated uninitialized
             // storage pointed to by p, using placement-new. This will use the
-            // underlying executors to distribute the memory according to
-            // first touch memory placement.
+            // underlying executors to distribute the memory according to first
+            // touch memory placement.
             template <typename U, typename... Args>
             void bulk_construct(U* p, std::size_t count, Args&&... args)
             {
-                if (count == std::size_t(0))
+                if (count == static_cast<std::size_t>(0))
                 {
                     return;
                 }
@@ -144,8 +148,7 @@ namespace hpx::compute::host {
                 using partitioner =
                     parallel::util::partitioner_with_cleanup<decltype(policy_),
                         void, partition_result_type>;
-                using cancellation_token = parallel::util::cancellation_token<
-                    parallel::util::detail::no_data>;
+                using cancellation_token = parallel::util::cancellation_token<>;
 
                 auto&& arguments =
                     hpx::forward_as_tuple(HPX_FORWARD(Args, args)...);
@@ -172,7 +175,8 @@ namespace hpx::compute::host {
                                         arguments);
                                 },
                                 // cleanup function, called for all elements of
-                                // current partition which succeeded before exception
+                                // current partition which succeeded before
+                                // exception
                                 [p](iterator_type it) {
                                     std::destroy_at(p + *it);
                                 });
@@ -182,8 +186,8 @@ namespace hpx::compute::host {
                     [](auto&&) {
                         // do nothing
                     },
-                    // cleanup function, called for each partition which
-                    // didn't fail, but only if at least one failed
+                    // cleanup function, called for each partition which didn't
+                    // fail, but only if at least one failed
                     [p](partition_result_type&& r) -> void {
                         while (r.first != r.second)
                         {
@@ -207,7 +211,7 @@ namespace hpx::compute::host {
             template <typename U>
             void bulk_destroy(U* p, std::size_t count)
             {
-                if (count == std::size_t(0))
+                if (count == static_cast<std::size_t>(0))
                 {
                     return;
                 }
@@ -220,7 +224,7 @@ namespace hpx::compute::host {
 
             // Calls the destructor of the object pointed to by p
             template <typename U>
-            void destroy(U* p)
+            static void destroy(U* p)
             {
                 std::destroy_at(p);
             }
@@ -275,13 +279,13 @@ namespace hpx::compute::host {
         {
         }
 
-        block_allocator(target_type const& targets)
+        explicit block_allocator(target_type const& targets)
           : base_type(
                 policy_type(executor_type(targets), executor_parameters_type()))
         {
         }
 
-        block_allocator(target_type&& targets)
+        explicit block_allocator(target_type&& targets)
           : base_type(policy_type(
                 executor_type(HPX_MOVE(targets)), executor_parameters_type()))
         {

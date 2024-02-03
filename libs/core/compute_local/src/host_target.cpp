@@ -21,11 +21,11 @@ namespace hpx::compute::host {
 
     std::pair<std::size_t, std::size_t> target::num_pus() const
     {
-        auto& rp = hpx::resource::get_partitioner();
-        std::size_t num_os_threads = hpx::get_os_thread_count();
+        auto const& rp = hpx::resource::get_partitioner();
+        std::size_t const num_os_threads = hpx::get_os_thread_count();
 
-        hpx::threads::mask_type mask = native_handle().get_device();
-        std::size_t mask_size = hpx::threads::mask_size(mask);
+        hpx::threads::mask_type const mask = native_handle().get_device();
+        std::size_t const mask_size = hpx::threads::mask_size(mask);
 
         std::size_t num_thread = 0;
         for (/**/; num_thread != num_os_threads; ++num_thread)
@@ -44,7 +44,8 @@ namespace hpx::compute::host {
         ar >> handle_.mask_;
     }
 
-    void target::serialize(serialization::output_archive& ar, unsigned int)
+    void target::serialize(
+        serialization::output_archive& ar, unsigned int) const
     {
         ar << handle_.mask_;
     }

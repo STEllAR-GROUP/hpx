@@ -24,7 +24,6 @@ namespace hpx::compute::host {
 
     struct HPX_CORE_EXPORT target
     {
-    public:
         struct native_handle_type
         {
             native_handle_type()
@@ -53,7 +52,6 @@ namespace hpx::compute::host {
             hpx::threads::mask_type mask_;
         };
 
-    public:
         // Constructs default target
         target() = default;
 
@@ -74,12 +72,12 @@ namespace hpx::compute::host {
 
         std::pair<std::size_t, std::size_t> num_pus() const;
 
-        constexpr void synchronize() const noexcept
+        static constexpr void synchronize() noexcept
         {
             // nothing to do here...
         }
 
-        hpx::future<void> get_future() const
+        static hpx::future<void> get_future()
         {
             return hpx::make_ready_future();
         }
@@ -93,12 +91,16 @@ namespace hpx::compute::host {
         {
             return lhs.handle_.get_device() == rhs.handle_.get_device();
         }
+        friend bool operator!=(target const& lhs, target const& rhs)
+        {
+            return !(lhs == rhs);
+        }
 
     private:
         friend class hpx::serialization::access;
 
         void serialize(serialization::input_archive& ar, unsigned int);
-        void serialize(serialization::output_archive& ar, unsigned int);
+        void serialize(serialization::output_archive& ar, unsigned int) const;
 
         native_handle_type handle_;
     };

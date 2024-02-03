@@ -31,7 +31,8 @@ namespace hpx {
         using tag = Tag;
         using type = Type;
 
-        explicit error_info(Type const& value)
+        explicit error_info(Type const& value) noexcept(
+            std::is_nothrow_copy_constructible_v<Type>)
           : _value(value)
         {
         }
@@ -47,13 +48,14 @@ namespace hpx {
 #define HPX_DEFINE_ERROR_INFO(NAME, TYPE)                                      \
     struct NAME : ::hpx::error_info<NAME, TYPE>                                \
     {                                                                          \
-        explicit NAME(TYPE const& value)                                       \
+        explicit NAME(TYPE const& value) noexcept(                             \
+            std::is_nothrow_copy_constructible_v<TYPE>)                        \
           : error_info(value)                                                  \
         {                                                                      \
         }                                                                      \
                                                                                \
         explicit NAME(TYPE&& value) noexcept                                   \
-          : error_info(HPX_FORWARD(TYPE, value))                               \
+          : error_info(HPX_MOVE(value))                                        \
         {                                                                      \
         }                                                                      \
     } /**/
@@ -65,6 +67,15 @@ namespace hpx {
         {
         public:
             virtual ~exception_info_node_base() = default;
+
+            exception_info_node_base() = default;
+
+            exception_info_node_base(exception_info_node_base const&) = default;
+            exception_info_node_base(exception_info_node_base&&) = default;
+            exception_info_node_base& operator=(
+                exception_info_node_base const&) = default;
+            exception_info_node_base& operator=(
+                exception_info_node_base&&) = default;
 
             [[nodiscard]] virtual void const* lookup(
                 std::type_info const& tag) const noexcept = 0;
@@ -80,7 +91,7 @@ namespace hpx {
         public:
             template <typename... ErrorInfo>
             explicit exception_info_node(ErrorInfo&&... tagged_values)
-              : Ts(tagged_values)...
+              : Ts(HPX_FORWARD(ErrorInfo, tagged_values))...
             {
             }
 
@@ -111,10 +122,7 @@ namespace hpx {
         using node_ptr = std::shared_ptr<detail::exception_info_node_base>;
 
     public:
-        constexpr exception_info() noexcept
-          : _data(nullptr)
-        {
-        }
+        constexpr exception_info() noexcept = default;
 
         exception_info(exception_info const& other) noexcept = default;
         exception_info(exception_info&& other) noexcept = default;
@@ -146,7 +154,7 @@ namespace hpx {
         }
 
     private:
-        node_ptr _data;
+        node_ptr _data = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -217,16 +225,21 @@ namespace hpx {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename E, typename F>
-    auto invoke_with_exception_info(E const& e, F&& f)
+    auto invoke_with_exception_info(E const& e, F&& f) noexcept(
+        noexcept(HPX_FORWARD(F, f)(std::declval<exception_info const*>())))
         -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
     {
         return HPX_FORWARD(F, f)(
             dynamic_cast<exception_info const*>(std::addressof(e)));
     }
 
+    // clang-format off
     template <typename F>
-    auto invoke_with_exception_info(std::exception_ptr const& p, F&& f)
+    auto invoke_with_exception_info(
+        std::exception_ptr const& p, F&& f) noexcept(
+        noexcept(HPX_FORWARD(F, f)(std::declval<exception_info const*>())))
         -> decltype(HPX_FORWARD(F, f)(std::declval<exception_info const*>()))
+    // clang-format on
     {
         try
         {

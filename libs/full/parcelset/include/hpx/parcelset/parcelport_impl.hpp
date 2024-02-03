@@ -467,7 +467,7 @@ namespace hpx::parcelset {
                               ConnectionHandler>::send_early_parcel::value)
             {
                 put_parcel(dest, HPX_MOVE(p),
-                    [HPX_CXX20_CAPTURE_THIS(=)](std::error_code const& ec,
+                    [](std::error_code const& ec,
                         parcel const& parcel) -> void {
                         return early_pending_parcel_handler(ec, parcel);
                     });
