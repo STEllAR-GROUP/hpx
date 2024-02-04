@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2021 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/components_base/get_lva.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/executors/execution.hpp>
@@ -20,7 +19,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     // This is a base class which allows to associate the execution of all
     // actions for a particular component instance with a given executor.
@@ -34,7 +33,7 @@ namespace hpx { namespace components {
 
     public:
         template <typename... Arg>
-        executor_component(executor_type const& exec, Arg&&... arg)
+        explicit executor_component(executor_type const& exec, Arg&&... arg)
           : base_type(HPX_FORWARD(Arg, arg)...)
           , exec_(exec)
         {
@@ -45,7 +44,8 @@ namespace hpx { namespace components {
         // executor
         static void execute(hpx::threads::thread_function_type const& f)
         {
-            f(hpx::threads::thread_restart_state::signaled);
+            [[maybe_unused]] auto _ =
+                f(hpx::threads::thread_restart_state::signaled);
         }
 
         /// This is the default hook implementation for schedule_thread which
@@ -71,4 +71,4 @@ namespace hpx { namespace components {
     protected:
         executor_type exec_;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

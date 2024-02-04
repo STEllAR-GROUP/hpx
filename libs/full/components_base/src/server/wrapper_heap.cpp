@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2023 Hartmut Kaiser
+//  Copyright (c) 1998-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -68,15 +68,12 @@ namespace hpx::components::detail {
     ///////////////////////////////////////////////////////////////////////////
     wrapper_heap::wrapper_heap(char const* class_name,
         [[maybe_unused]] std::size_t count, heap_parameters const& parameters)
-      : pool_(nullptr)
-      , parameters_(parameters)
+      : parameters_(parameters)
       , first_free_(nullptr)
       , free_size_(0)
       , base_gid_(naming::invalid_gid)
       , class_name_(class_name)
 #if defined(HPX_DEBUG)
-      , alloc_count_(0)
-      , free_count_(0)
       , heap_count_(count)
 #endif
       , heap_alloc_function_("wrapper_heap::alloc", class_name)
@@ -100,16 +97,9 @@ namespace hpx::components::detail {
     }
 
     wrapper_heap::wrapper_heap()
-      : pool_(nullptr)
-      , parameters_({0, 0, 0})
-      , first_free_(nullptr)
+      : first_free_(nullptr)
       , free_size_(0)
       , base_gid_(naming::invalid_gid)
-#if defined(HPX_DEBUG)
-      , alloc_count_(0)
-      , free_count_(0)
-      , heap_count_(0)
-#endif
       , heap_alloc_function_("wrapper_heap::alloc", "<unknown>")
       , heap_free_function_("wrapper_heap::free", "<unknown>")
     {
@@ -155,8 +145,8 @@ namespace hpx::components::detail {
 
     bool wrapper_heap::alloc(void** result, std::size_t count)
     {
-        util::itt::heap_allocate heap_allocate(heap_alloc_function_, result,
-            count * parameters_.element_size,
+        [[maybe_unused]] util::itt::heap_allocate heap_allocate(
+            heap_alloc_function_, result, count * parameters_.element_size,
             HPX_WRAPPER_HEAP_INITIALIZED_MEMORY);
 
         if (nullptr == pool_)
@@ -197,7 +187,7 @@ namespace hpx::components::detail {
 
     void wrapper_heap::free([[maybe_unused]] void* p, std::size_t count)
     {
-        util::itt::heap_free heap_free(heap_free_function_, p);
+        [[maybe_unused]] util::itt::heap_free heap_free(heap_free_function_, p);
 
 #if HPX_DEBUG_WRAPPER_HEAP != 0
         HPX_ASSERT(did_alloc(p));
@@ -367,4 +357,17 @@ namespace hpx::components::detail {
             free_size_.store(0, std::memory_order_release);
         }
     }
+
+    // make sure the ABI of this is stable across configurations
+#if defined(HPX_DEBUG)
+    std::size_t wrapper_heap::heap_count() const
+    {
+        return heap_count_;
+    }
+#else
+    std::size_t wrapper_heap::heap_count() const
+    {
+        return 0;
+    }
+#endif
 }    // namespace hpx::components::detail

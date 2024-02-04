@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,11 +17,10 @@
 // Add factory registration functionality.
 HPX_REGISTER_COMPONENT_MODULE()
 
-typedef hpx::components::server::component_storage component_storage_type;
+using component_storage_type = hpx::components::server::component_storage;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::component<component_storage_type>,
-    component_storage_factory, hpx::components::factory_enabled)
+HPX_REGISTER_COMPONENT(hpx::components::component<component_storage_type>,
+    component_storage_factory, hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(component_storage_type)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,6 +30,5 @@ HPX_REGISTER_ACTION(
 HPX_REGISTER_ACTION(
     hpx::components::server::component_storage::migrate_from_here_action,
     component_storage_migrate_component_from_here_action)
-HPX_REGISTER_ACTION(
-    hpx::components::server::component_storage::size_action,
+HPX_REGISTER_ACTION(hpx::components::server::component_storage::size_action,
     component_storage_size_action)

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     class HPX_EXPORT raw_values_counter
       : public base_performance_counter
@@ -38,7 +38,7 @@ namespace hpx { namespace performance_counters { namespace server {
         void reset_counter_value() override;
 
         // finalize() will be called just before the instance gets destructed
-        void finalize();
+        static void finalize();
 
         naming::address get_current_address() const;
 
@@ -46,4 +46,4 @@ namespace hpx { namespace performance_counters { namespace server {
         hpx::function<std::vector<std::int64_t>(bool)> f_;
         bool reset_;
     };
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server

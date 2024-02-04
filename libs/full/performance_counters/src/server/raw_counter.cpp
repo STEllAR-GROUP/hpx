@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,22 +11,20 @@
 #include <hpx/performance_counters/server/raw_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::component<
-    hpx::performance_counters::server::raw_counter>
-    raw_counter_type;
+using raw_counter_type =
+    hpx::components::component<hpx::performance_counters::server::raw_counter>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(raw_counter_type, raw_counter,
-    "base_performance_counter", hpx::components::factory_enabled)
+    "base_performance_counter", hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(hpx::performance_counters::server::raw_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     raw_counter::raw_counter()
       : reset_(false)
@@ -68,7 +66,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
     void raw_counter::reset_counter_value()
     {
-        f_(true);
+        [[maybe_unused]] auto _ = f_(true);
     }
 
     void raw_counter::finalize()
@@ -84,4 +82,4 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<raw_counter>(),
             const_cast<raw_counter*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server

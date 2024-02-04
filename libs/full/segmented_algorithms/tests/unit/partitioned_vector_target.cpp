@@ -1,4 +1,4 @@
-//  Copyright (c) 2016 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,18 +13,19 @@
 #include <hpx/modules/testing.hpp>
 
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define the vector types to be used.
-typedef hpx::compute::host::block_allocator<int> target_allocator_int;
-typedef hpx::compute::vector<int, target_allocator_int> target_vector_int;
+using target_allocator_int = hpx::compute::host::block_allocator<int>;
+using target_vector_int = hpx::compute::vector<int, target_allocator_int>;
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(int, target_vector_int)
 HPX_REGISTER_PARTITIONED_VECTOR(int, target_vector_int)
 
-typedef hpx::compute::host::block_allocator<double> target_allocator_double;
-typedef hpx::compute::vector<double, target_allocator_double>
-    target_vector_double;
+using target_allocator_double = hpx::compute::host::block_allocator<double>;
+using target_vector_double =
+    hpx::compute::vector<double, target_allocator_double>;
 HPX_REGISTER_PARTITIONED_VECTOR_DECLARATION(double, target_vector_double)
 HPX_REGISTER_PARTITIONED_VECTOR(double, target_vector_double)
 
@@ -32,20 +33,17 @@ HPX_REGISTER_PARTITIONED_VECTOR(double, target_vector_double)
 template <typename T>
 void allocation_tests()
 {
-    std::size_t const length = 12;
-
-    typedef hpx::compute::host::block_allocator<T> target_allocator;
-    typedef hpx::compute::vector<T, target_allocator> target_vector;
+    using target_allocator = hpx::compute::host::block_allocator<T>;
+    using target_vector = hpx::compute::vector<T, target_allocator>;
 
     for (hpx::id_type const& locality : hpx::find_all_localities())
     {
         std::vector<hpx::compute::host::distributed::target> targets =
             hpx::compute::host::distributed::get_targets(locality).get();
 
-        {
-            hpx::partitioned_vector<T, target_vector> v(
-                length, T(42), hpx::compute::host::target_layout);
-        }
+        constexpr std::size_t length = 12;
+        hpx::partitioned_vector<T, target_vector> v(length, T(42),
+            hpx::compute::host::target_layout(std::move(targets)));
     }
 
     //{
@@ -78,4 +76,5 @@ int main()
 
     return 0;
 }
+
 #endif

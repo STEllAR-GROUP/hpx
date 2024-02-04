@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2021 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     namespace detail {
 
@@ -37,4 +37,4 @@ namespace hpx { namespace traits {
     template <typename Continuation>
     inline constexpr bool is_continuation_v =
         is_continuation<Continuation>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

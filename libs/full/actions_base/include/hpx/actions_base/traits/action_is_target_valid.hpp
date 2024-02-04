@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,7 +9,7 @@
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for Action::component_type::is_target_valid
@@ -17,7 +17,7 @@ namespace hpx { namespace traits {
 
         struct is_target_valid_helper
         {
-            // by default we return true if the given id is not referring to a
+            // by default, we return true if the given id is not referring to a
             // locality
             template <typename Action>
             static bool call(wrap_int, hpx::id_type const& id) noexcept
@@ -32,7 +32,7 @@ namespace hpx { namespace traits {
             static auto call(int, hpx::id_type const& id) noexcept
                 -> decltype(Action::component_type::is_target_valid(id))
             {
-                // by default we forward this to the component type
+                // by default, we forward this to the component type
                 using component_type = typename Action::component_type;
                 return component_type::is_target_valid(id);
             }
@@ -47,4 +47,5 @@ namespace hpx { namespace traits {
             return detail::is_target_valid_helper::template call<Action>(0, id);
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits
+// namespace hpx::traits

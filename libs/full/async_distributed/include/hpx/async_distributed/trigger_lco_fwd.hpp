@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -98,12 +98,11 @@ namespace hpx {
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     template <typename Result>
-    typename std::enable_if<!std::is_same<typename std::decay<Result>::type,
-        naming::address>::value>::type
+    std::enable_if_t<!std::is_same_v<std::decay_t<Result>, naming::address>>
     set_lco_value(hpx::id_type const& id, Result&& t, bool move_credits = true)
     {
-        naming::address addr(
-            nullptr, components::component_base_lco_with_value);
+        naming::address addr(nullptr,
+            to_int(components::component_enum_type::base_lco_with_value));
         set_lco_value(id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
     }
 
@@ -116,13 +115,13 @@ namespace hpx {
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     template <typename Result>
-    typename std::enable_if<!std::is_same<typename std::decay<Result>::type,
-        naming::address>::value>::type
+    std::enable_if_t<!std::is_same_v<std::decay_t<Result>, naming::address>>
     set_lco_value_unmanaged(
         hpx::id_type const& id, Result&& t, bool move_credits = true)
     {
-        naming::address addr(
-            nullptr, components::component_base_lco_with_value_unmanaged);
+        naming::address addr(nullptr,
+            to_int(components::component_enum_type::
+                    base_lco_with_value_unmanaged));
         set_lco_value(id, HPX_MOVE(addr), HPX_FORWARD(Result, t), move_credits);
     }
 
@@ -151,13 +150,12 @@ namespace hpx {
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     template <typename Result>
-    typename std::enable_if<!std::is_same<typename std::decay<Result>::type,
-        naming::address>::value>::type
+    std::enable_if_t<!std::is_same_v<std::decay_t<Result>, naming::address>>
     set_lco_value(hpx::id_type const& id, Result&& t, hpx::id_type const& cont,
         bool move_credits = true)
     {
-        naming::address addr(
-            nullptr, components::component_base_lco_with_value);
+        naming::address addr(nullptr,
+            to_int(components::component_enum_type::base_lco_with_value));
         set_lco_value(
             id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
     }
@@ -172,13 +170,13 @@ namespace hpx {
     ///                     send all credits in \a id along with the generated
     ///                     message. The default value is \a true.
     template <typename Result>
-    typename std::enable_if<!std::is_same<typename std::decay<Result>::type,
-        naming::address>::value>::type
+    std::enable_if_t<!std::is_same_v<std::decay_t<Result>, naming::address>>
     set_lco_value_unmanaged(hpx::id_type const& id, Result&& t,
         hpx::id_type const& cont, bool move_credits = true)
     {
-        naming::address addr(
-            nullptr, components::component_base_lco_with_value_unmanaged);
+        naming::address addr(nullptr,
+            to_int(components::component_enum_type::
+                    base_lco_with_value_unmanaged));
         set_lco_value(
             id, HPX_MOVE(addr), HPX_FORWARD(Result, t), cont, move_credits);
     }

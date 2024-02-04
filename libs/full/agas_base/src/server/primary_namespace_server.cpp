@@ -242,7 +242,9 @@ namespace hpx::agas::server {
                         "cannot change block size of existing binding");
                 }
 
-                if (HPX_UNLIKELY(components::component_invalid == g.type))
+                if (HPX_UNLIKELY(
+                        to_int(hpx::components::component_enum_type::invalid) ==
+                        g.type))
                 {
                     l.unlock();
 
@@ -340,7 +342,9 @@ namespace hpx::agas::server {
                 "MSBs of lower and upper range bound do not match");
         }
 
-        if (HPX_UNLIKELY(components::component_invalid == g.type))
+        if (HPX_UNLIKELY(
+                to_int(hpx::components::component_enum_type::invalid) ==
+                g.type))
         {
             l.unlock();
 
@@ -794,7 +798,9 @@ namespace hpx::agas::server {
             gva& g = get<1>(r);
 
             // REVIEW: Should we do more to make sure the GVA is valid?
-            if (HPX_UNLIKELY(components::component_invalid == g.type))
+            if (HPX_UNLIKELY(
+                    to_int(hpx::components::component_enum_type::invalid) ==
+                    g.type))
             {
                 l.unlock();
 

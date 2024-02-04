@@ -10,12 +10,12 @@
 
 #include <cstdint>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
     using component_type = std::int32_t;
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
@@ -27,14 +27,14 @@ namespace hpx { namespace traits {
         HPX_ALWAYS_EXPORT static void set(components::component_type);
     };
 
+    // components::component_invalid;
     template <typename Component, typename Enable>
     components::component_type
-        component_type_database<Component, Enable>::value =
-            components::component_type(-1);    // components::component_invalid;
+        component_type_database<Component, Enable>::value = -1;
 
     template <typename Component, typename Enable>
     struct component_type_database<Component const, Enable>
       : component_type_database<Component, Enable>
     {
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

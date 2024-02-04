@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -123,7 +123,7 @@ HPX_REGISTER_ACTION_ID(
 HPX_DEFINE_COMPONENT_NAME(
     hpx::components::server::runtime_support, hpx_runtime_support)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::runtime_support,
-    hpx::components::component_runtime_support)
+    to_int(hpx::components::component_enum_type::runtime_support))
 
 namespace hpx {
     // helper function to stop evaluating counters during shutdown

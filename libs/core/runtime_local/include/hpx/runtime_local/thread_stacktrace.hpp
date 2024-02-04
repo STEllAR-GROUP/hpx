@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <string>
 #include <vector>

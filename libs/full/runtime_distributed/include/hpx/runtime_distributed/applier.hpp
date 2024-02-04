@@ -94,15 +94,17 @@ namespace hpx { namespace applier {
         ///                 on the returned localities.
         ///
         /// \returns The function returns \a true if there is at least one
-        ///          remote locality known to the AGASservice
+        ///          remote locality known to the AGAS service
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(
             std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid,
+            components::component_type type = to_int(
+                hpx::components::component_enum_type::invalid),
             error_code& ec = throws) const;
 
         bool get_remote_localities(std::vector<hpx::id_type>& locality_ids,
-            components::component_type type = components::component_invalid,
+            components::component_type type = to_int(
+                hpx::components::component_enum_type::invalid),
             error_code& ec = throws) const;
 
         /// \brief Return list of locality_ids of all localities
@@ -119,11 +121,11 @@ namespace hpx { namespace applier {
         ///                 on the returned localities.
         ///
         /// \returns The function returns \a true if there is at least one
-        ///          remote locality known to the AGASservice
+        ///          remote locality known to the AGAS service
         ///          (!prefixes.empty()).
         bool get_raw_localities(std::vector<naming::gid_type>& locality_ids,
-            components::component_type type =
-                components::component_invalid) const;
+            components::component_type type = to_int(
+                hpx::components::component_enum_type::invalid)) const;
 
         bool get_localities(std::vector<hpx::id_type>& locality_ids,
             error_code& ec = throws) const;

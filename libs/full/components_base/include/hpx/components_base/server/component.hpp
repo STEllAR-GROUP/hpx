@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2015-2017 Thomas Heller
 //  Copyright (c)      2011 Bryce Lelbach
 //
@@ -25,12 +25,12 @@ namespace hpx::components::detail {
     template <typename Component>
     struct simple_heap
     {
-        void* alloc(std::size_t count)
+        static void* alloc(std::size_t count)
         {
             HPX_ASSERT(1 == count);
             return alloc_.allocate(count);
         }
-        void free(void* p, std::size_t count) noexcept
+        static void free(void* p, std::size_t count) noexcept
         {
             HPX_ASSERT(1 == count);
             alloc_.deallocate(static_cast<Component*>(p), count);

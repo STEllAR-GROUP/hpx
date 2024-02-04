@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2021 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,16 +11,13 @@
 #include <hpx/agas_base/locality_namespace.hpp>
 #include <hpx/agas_base/server/locality_namespace.hpp>
 #include <hpx/async_distributed/base_lco_with_value.hpp>
-#include <hpx/async_distributed/detail/post.hpp>
 #include <hpx/serialization/vector.hpp>
-
-using hpx::components::component_agas_locality_namespace;
 
 using hpx::agas::server::locality_namespace;
 
 HPX_DEFINE_COMPONENT_NAME(locality_namespace, hpx_locality_namespace)
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    locality_namespace, component_agas_locality_namespace)
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(locality_namespace,
+    to_int(hpx::components::component_enum_type::agas_locality_namespace))
 
 HPX_REGISTER_BASE_LCO_WITH_VALUE_ID(hpx::parcelset::endpoints_type,
     parcelset_endpoints_type,

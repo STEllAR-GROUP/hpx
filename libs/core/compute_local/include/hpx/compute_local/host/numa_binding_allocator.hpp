@@ -603,7 +603,7 @@ namespace hpx::compute::host {
                     helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom == numa_domain)
                 {
-                    HPX_ASSERT((static_cast<std::size_t>(page_ptr) &
+                    HPX_ASSERT((reinterpret_cast<std::size_t>(page_ptr) &
                                    (threads::get_memory_page_size() - 1)) == 0);
                     // trigger a memory read and rewrite without changing contents
                     T volatile* vaddr = const_cast<T volatile*>(page_ptr);

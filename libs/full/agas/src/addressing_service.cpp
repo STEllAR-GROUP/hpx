@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -425,7 +425,7 @@ namespace hpx::agas {
     {
         try
         {
-            if (type != components::component_invalid)
+            if (type != to_int(hpx::components::component_enum_type::invalid))
             {
                 std::vector<std::uint32_t> const p =
                     component_ns_->resolve_id(type);
@@ -468,7 +468,7 @@ namespace hpx::agas {
     {
         try
         {
-            if (type == components::component_invalid)
+            if (type == to_int(hpx::components::component_enum_type::invalid))
             {
                 return locality_ns_->get_num_localities();
             }
@@ -485,7 +485,7 @@ namespace hpx::agas {
     hpx::future<std::uint32_t> addressing_service::get_num_localities_async(
         components::component_type type) const
     {
-        if (type == components::component_invalid)
+        if (type == to_int(hpx::components::component_enum_type::invalid))
         {
             return locality_ns_->get_num_localities_async();
         }
@@ -546,7 +546,7 @@ namespace hpx::agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::get_component_id");
-            return components::component_invalid;
+            return to_int(hpx::components::component_enum_type::invalid);
         }
     }
 
@@ -587,7 +587,7 @@ namespace hpx::agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::register_factory");
-            return components::component_invalid;
+            return to_int(hpx::components::component_enum_type::invalid);
         }
     }
 
@@ -854,7 +854,8 @@ namespace hpx::agas {
             {
                 HPX_ASSERT(rts_lva_);
 
-                addr.type_ = components::component_runtime_support;
+                addr.type_ = to_int(
+                    hpx::components::component_enum_type::runtime_support);
                 addr.address_ =
                     reinterpret_cast<naming::address::address_type>(rts_lva_);
                 return true;
@@ -876,7 +877,8 @@ namespace hpx::agas {
         if (naming::is_locality(id))
         {
             addr.locality_ = id;
-            addr.type_ = components::component_runtime_support;
+            addr.type_ =
+                to_int(hpx::components::component_enum_type::runtime_support);
             // addr.address_ will be supplied on the target locality
             return true;
         }
@@ -905,7 +907,8 @@ namespace hpx::agas {
             else
             {
                 addr.locality_ = dest;
-                addr.type_ = hpx::components::component_agas_primary_namespace;
+                addr.type_ = to_int(
+                    components::component_enum_type::agas_primary_namespace);
                 // addr.address_ will be supplied on the target locality
             }
             return true;
@@ -922,7 +925,8 @@ namespace hpx::agas {
             else
             {
                 addr.locality_ = dest;
-                addr.type_ = hpx::components::component_agas_symbol_namespace;
+                addr.type_ = to_int(
+                    components::component_enum_type::agas_symbol_namespace);
                 // addr.address_ will be supplied on the target locality
             }
             return true;

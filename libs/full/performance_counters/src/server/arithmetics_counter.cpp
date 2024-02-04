@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,6 @@
 #include <hpx/performance_counters/server/arithmetics_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -25,16 +24,18 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
+
         template <typename Operation>
         struct init_value;
 
         template <>
         struct init_value<std::plus<double>>
         {
-            static double call()
+            static constexpr double call() noexcept
             {
                 return 0.0;
             }
@@ -43,7 +44,7 @@ namespace hpx { namespace performance_counters { namespace server {
         template <>
         struct init_value<std::minus<double>>
         {
-            static double call()
+            static constexpr double call() noexcept
             {
                 return 0.0;
             }
@@ -52,7 +53,7 @@ namespace hpx { namespace performance_counters { namespace server {
         template <>
         struct init_value<std::multiplies<double>>
         {
-            static double call()
+            static constexpr double call() noexcept
             {
                 return 1.0;
             }
@@ -61,7 +62,7 @@ namespace hpx { namespace performance_counters { namespace server {
         template <>
         struct init_value<std::divides<double>>
         {
-            static double call()
+            static constexpr double call() noexcept
             {
                 return 1.0;
             }
@@ -169,7 +170,7 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<arithmetics_counter>(),
             const_cast<arithmetics_counter*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server
 
 ///////////////////////////////////////////////////////////////////////////////
 template class HPX_EXPORT
@@ -183,48 +184,47 @@ template class HPX_EXPORT hpx::performance_counters::server::
 
 ///////////////////////////////////////////////////////////////////////////////
 // Addition
-typedef hpx::components::component<
-    hpx::performance_counters::server::arithmetics_counter<std::plus<double>>>
-    adding_counter_type;
+using adding_counter_type = hpx::components::component<
+    hpx::performance_counters::server::arithmetics_counter<std::plus<double>>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(adding_counter_type, adding_counter,
-    "base_performance_counter", hpx::components::factory_enabled)
+    "base_performance_counter", hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(adding_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Subtraction
-typedef hpx::components::component<
-    hpx::performance_counters::server::arithmetics_counter<std::minus<double>>>
-    subtracting_counter_type;
+using subtracting_counter_type = hpx::components::component<
+    hpx::performance_counters::server::arithmetics_counter<std::minus<double>>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(subtracting_counter_type,
     subtracting_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(subtracting_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Multiply
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter<std::multiplies<double>>>
-    multiplying_counter_type;
+using multiplying_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter<std::multiplies<double>>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(multiplying_counter_type,
     multiplying_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(multiplying_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Division
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter<std::divides<double>>>
-    dividing_counter_type;
+using dividing_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter<std::divides<double>>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(dividing_counter_type, dividing_counter,
-    "base_performance_counter", hpx::components::factory_enabled)
+    "base_performance_counter", hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(dividing_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace detail {
+namespace hpx::performance_counters::detail {
+
     /// Creation function for aggregating performance counters to be registered
     /// with the counter types.
     naming::gid_type arithmetics_counter_creator(
@@ -259,7 +259,6 @@ namespace hpx { namespace performance_counters { namespace detail {
 
                 for (std::string const& name : names)
                 {
-                    counter_path_elements paths;
                     if (counter_status::valid_data !=
                             get_counter_path_elements(name, paths, ec) ||
                         ec)
@@ -275,15 +274,13 @@ namespace hpx { namespace performance_counters { namespace detail {
 
                 return create_arithmetics_counter(info, names, ec);
             }
-            else
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "arithmetics_counter_creator",
-                    "the parameter specification for an arithmetic counter "
-                    "has to be a comma separated list of performance "
-                    "counter names, none is given: {}",
-                    remove_counter_prefix(info.fullname_));
-            }
+
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "arithmetics_counter_creator",
+                "the parameter specification for an arithmetic counter "
+                "has to be a comma separated list of performance "
+                "counter names, none is given: {}",
+                remove_counter_prefix(info.fullname_));
         }
         break;
 
@@ -295,4 +292,4 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
         return naming::invalid_gid;
     }
-}}}    // namespace hpx::performance_counters::detail
+}    // namespace hpx::performance_counters::detail

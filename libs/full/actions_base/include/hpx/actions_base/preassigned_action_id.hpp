@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -10,12 +10,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 namespace hpx::actions {
 
     /// \cond NOINTERNAL
-
     enum preassigned_action_id
     {
         register_worker_action_id = 0,
@@ -181,6 +178,5 @@ namespace hpx::actions {
 
         last_action_id
     };
-
     /// \endcond
 }    // namespace hpx::actions

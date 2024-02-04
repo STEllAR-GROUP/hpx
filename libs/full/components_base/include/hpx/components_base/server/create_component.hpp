@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,22 +12,20 @@
 #include <hpx/components_base/server/component_heap.hpp>
 #include <hpx/components_base/server/create_component_fwd.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/naming_base/address.hpp>
 
 #include <cstddef>
-#include <memory>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Create a component and forward the passed parameters
     template <typename Component, typename... Ts>
     naming::gid_type create(Ts&&... ts)
     {
-        component_type type =
+        component_type const type =
             get_component_type<typename Component::wrapped_type>();
         if (!enabled(type))
         {
@@ -35,7 +33,6 @@ namespace hpx { namespace components { namespace server {
                 "components::server::::create",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
-            return naming::invalid_gid;
         }
 
         void* storage = component_heap<Component>().alloc(1);
@@ -70,7 +67,7 @@ namespace hpx { namespace components { namespace server {
     naming::gid_type create_migrated(
         naming::gid_type const& gid, void** p, Ts&&... ts)
     {
-        component_type type =
+        component_type const type =
             get_component_type<typename Component::wrapped_type>();
         if (!enabled(type))
         {
@@ -78,7 +75,6 @@ namespace hpx { namespace components { namespace server {
                 "components::server::create_migrated",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
-            return naming::invalid_gid;
         }
 
         void* storage = component_heap<Component>().alloc(1);
@@ -94,7 +90,7 @@ namespace hpx { namespace components { namespace server {
             throw;
         }
 
-        naming::gid_type assigned_gid = c->get_base_gid(gid);
+        naming::gid_type const assigned_gid = c->get_base_gid(gid);
         if (assigned_gid && assigned_gid == gid)
         {
             // everything is ok, return the new id
@@ -115,8 +111,6 @@ namespace hpx { namespace components { namespace server {
             "the global id {} is already bound to a different component "
             "instance",
             gid);
-
-        return naming::invalid_gid;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -124,7 +118,7 @@ namespace hpx { namespace components { namespace server {
     template <typename Component, typename... Ts>
     std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&... ts)
     {
-        component_type type =
+        component_type const type =
             get_component_type<typename Component::wrapped_type>();
         std::vector<naming::gid_type> gids;
         if (!enabled(type))
@@ -133,7 +127,6 @@ namespace hpx { namespace components { namespace server {
                 "components::server::bulk_create",
                 "the component is disabled for this locality ({})",
                 get_component_type_name(type));
-            return gids;
         }
 
         gids.reserve(count);
@@ -178,4 +171,4 @@ namespace hpx { namespace components { namespace server {
 
         return gids;
     }
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

@@ -1,4 +1,5 @@
-//  Copyright (c)      2016 Thomas Heller
+//  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -204,19 +205,21 @@ namespace hpx::actions::detail {
     std::string action_registry::collect_registered_typenames() const
     {
 #if defined(HPX_DEBUG)
-        std::string msg("\nknown constructors:\n");
+        // clang-format off
+        std::string msg("\n" "known constructors:\n");
 
         for (auto const& [desc, _] : typename_to_ctor_)
         {
             msg += desc + "\n";
         }
 
-        msg += "\nknown typenames:\n";
+        msg += "\n" "known typenames:\n";
         for (auto const& [desc, id] : typename_to_id_)
         {
             msg += desc + " (";
             msg += std::to_string(id) + ")\n";
         }
+        // clang-format on
 
         return msg;
 #else

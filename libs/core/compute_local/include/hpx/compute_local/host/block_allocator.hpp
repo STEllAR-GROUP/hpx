@@ -279,13 +279,13 @@ namespace hpx::compute::host {
         {
         }
 
-        explicit block_allocator(target_type const& targets)
+        block_allocator(target_type const& targets)
           : base_type(
                 policy_type(executor_type(targets), executor_parameters_type()))
         {
         }
 
-        explicit block_allocator(target_type&& targets)
+        block_allocator(target_type&& targets)
           : base_type(policy_type(
                 executor_type(HPX_MOVE(targets)), executor_parameters_type()))
         {

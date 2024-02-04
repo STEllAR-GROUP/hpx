@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,7 @@
 #include <hpx/components_base/component_type.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename ServerComponent>
@@ -26,4 +26,4 @@ namespace hpx { namespace components {
             return components::get_component_type<ServerComponent>();
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

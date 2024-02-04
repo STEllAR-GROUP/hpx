@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
 //  Copyright (c) 2016 Thomas Heller
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,13 +26,11 @@
 #include <utility>
 #include <vector>
 
-using hpx::components::component_agas_symbol_namespace;
-
 using hpx::agas::server::symbol_namespace;
 
 HPX_DEFINE_COMPONENT_NAME(symbol_namespace, hpx_symbol_namespace)
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    symbol_namespace, component_agas_symbol_namespace)
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(symbol_namespace,
+    to_int(components::component_enum_type::agas_symbol_namespace))
 
 HPX_REGISTER_ACTION_ID(symbol_namespace::bind_action,
     symbol_namespace_bind_action, hpx::actions::symbol_namespace_bind_action_id)
@@ -132,7 +130,8 @@ namespace hpx::agas {
     naming::address symbol_namespace::addr() const
     {
         return {agas::get_locality(),
-            components::component_agas_symbol_namespace, this->ptr()};
+            to_int(components::component_enum_type::agas_symbol_namespace),
+            this->ptr()};
     }
 
     hpx::id_type symbol_namespace::gid() const

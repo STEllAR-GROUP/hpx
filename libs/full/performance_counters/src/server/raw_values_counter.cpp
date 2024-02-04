@@ -11,25 +11,23 @@
 #include <hpx/performance_counters/server/raw_values_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::component<
-    hpx::performance_counters::server::raw_values_counter>
-    raw_values_counter_type;
+using raw_values_counter_type = hpx::components::component<
+    hpx::performance_counters::server::raw_values_counter>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(raw_values_counter_type,
     raw_values_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::raw_values_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     raw_values_counter::raw_values_counter()
       : reset_(false)
@@ -69,7 +67,7 @@ namespace hpx { namespace performance_counters { namespace server {
 
     void raw_values_counter::reset_counter_value()
     {
-        f_(true);
+        [[maybe_unused]] auto _ = f_(true);
     }
 
     void raw_values_counter::finalize()
@@ -85,4 +83,4 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<raw_values_counter>(),
             const_cast<raw_values_counter*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server

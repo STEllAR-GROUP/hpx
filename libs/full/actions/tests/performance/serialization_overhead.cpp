@@ -52,7 +52,8 @@ double benchmark_serialization(std::size_t data_size, std::size_t iterations,
 {
     hpx::id_type const here = hpx::find_here();
     hpx::naming::address addr(hpx::get_locality(),
-        hpx::components::component_invalid, (void*) &test_function);
+        to_int(hpx::components::component_enum_type::invalid),
+        (void*) &test_function);
 
     // compose archive flags
     std::string endian_out = hpx::get_config_entry("hpx.parcel.endian_out",

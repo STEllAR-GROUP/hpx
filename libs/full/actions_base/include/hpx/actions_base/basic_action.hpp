@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -17,6 +17,7 @@
 #include <hpx/actions_base/detail/action_factory.hpp>
 #include <hpx/actions_base/detail/invocation_count_registry.hpp>
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
+#include <hpx/actions_base/preassigned_action_id.hpp>
 #include <hpx/actions_base/traits/action_continuation.hpp>
 #include <hpx/actions_base/traits/action_priority.hpp>
 #include <hpx/actions_base/traits/action_remote_result.hpp>
@@ -41,11 +42,11 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/stringize.hpp>
 #include <hpx/runtime_local/report_error.hpp>
 #include <hpx/type_support/pack.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
@@ -216,19 +217,17 @@ namespace hpx::actions {
     {
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
         // Flag the use of raw pointer types as action arguments
-        static_assert(!util::any_of<std::is_pointer<Args>...>::value,
+        static_assert(!util::any_of_v<std::is_pointer<Args>...>,
             "Using raw pointers as arguments for actions is not supported.");
 #endif
 
         // Flag the use of array types as action arguments
         static_assert(
-            !util::any_of<
-                std::is_array<std::remove_reference_t<Args>>...>::value,
+            !util::any_of_v<std::is_array<std::remove_reference_t<Args>>...>,
             "Using arrays as arguments for actions is not supported.");
 
         // Flag the use of non-const reference types as action arguments
-        static_assert(
-            !util::any_of<detail::is_non_const_reference<Args>...>::value,
+        static_assert(!util::any_of_v<detail::is_non_const_reference<Args>...>,
             "Using non-const references as arguments for actions is not "
             "supported.");
 
@@ -445,6 +444,7 @@ namespace hpx::actions {
         basic_action<Component, R(Args...), Derived>::invocation_count_(0);
 
     namespace detail {
+
         template <typename Action>
         void register_local_action_invocation_count(
             invocation_count_registry& registry)
@@ -457,20 +457,15 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        // simple type allowing to distinguish whether an action is the most
-        // derived one
-        struct this_type
-        {
-        };
 
-        template <typename Action, typename Derived>
+        template <typename Action, typename Derived = void>
         struct action_type
         {
             using type = Derived;
         };
 
         template <typename Action>
-        struct action_type<Action, this_type>
+        struct action_type<Action, void>
         {
             using type = Action;
         };
@@ -481,11 +476,11 @@ namespace hpx::actions {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived = detail::this_type>
+    template <typename TF, TF F, typename Derived = void>
     struct action;
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename TF, TF F, typename Derived = detail::this_type>
+    template <typename TF, TF F, typename Derived = void>
     struct direct_action
       : action<TF, F,
             detail::action_type_t<direct_action<TF, F, Derived>, Derived>>
@@ -505,7 +500,7 @@ namespace hpx::actions {
     // Base template allowing to generate a concrete action type from a function
     // pointer. It is instantiated only if the supplied pointer is not a
     // supported function pointer.
-    template <typename TF, TF F, typename Derived = detail::this_type,
+    template <typename TF, TF F, typename Derived = void,
         typename Direct = std::false_type>
     struct make_action
     {
@@ -518,11 +513,11 @@ namespace hpx::actions {
         using type = direct_action<TF, F, Derived>;
     };
 
-    template <typename TF, TF F, typename Derived = detail::this_type,
+    template <typename TF, TF F, typename Derived = void,
         typename Direct = std::false_type>
     using make_action_t = typename make_action<TF, F, Derived, Direct>::type;
 
-    template <typename TF, TF F, typename Derived = detail::this_type>
+    template <typename TF, TF F, typename Derived = void>
     struct make_direct_action : make_action<TF, F, Derived, std::true_type>
     {
     };
@@ -582,7 +577,8 @@ namespace hpx::actions {
 #if !defined(HPX_HAVE_NETWORKING)
 
 #define HPX_DEFINE_GET_ACTION_NAME(action) /**/
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
 #define HPX_DEFINE_GET_ACTION_NAME_ITT(action, actionname) /**/
 #endif
 #define HPX_REGISTER_ACTION_EXTERN_DECLARATION(action) /**/

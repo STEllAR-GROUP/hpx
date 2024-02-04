@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -31,7 +31,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Statistic>
@@ -127,9 +127,8 @@ namespace hpx { namespace performance_counters { namespace server {
             counters_.get_counter_values(hpx::launch::sync);
 
         // apply arithmetic Statistic
-        typedef boost::accumulators::accumulator_set<double,
-            boost::accumulators::stats<Statistic>>
-            accumulator_type;
+        using accumulator_type = boost::accumulators::accumulator_set<double,
+            boost::accumulators::stats<Statistic>>;
 
         accumulator_type accum;
         for (counter_value const& base_value : base_values)
@@ -191,7 +190,7 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<arithmetics_counter_extended>(),
             const_cast<arithmetics_counter_extended*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server
 
 ///////////////////////////////////////////////////////////////////////////////
 template class HPX_EXPORT hpx::performance_counters::server::
@@ -209,72 +208,73 @@ template class HPX_EXPORT hpx::performance_counters::server::
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/mean
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::mean>>
-    mean_arithmetics_counter_type;
+using mean_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::mean>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(mean_arithmetics_counter_type,
     mean_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(mean_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/variance
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::variance>>
-    variance_arithmetics_counter_type;
+using variance_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::variance>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(variance_arithmetics_counter_type,
     variance_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(variance_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/median
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::median>>
-    median_arithmetics_counter_type;
+using median_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::median>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(median_arithmetics_counter_type,
     median_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(median_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/min
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::min>>
-    min_arithmetics_counter_type;
+using min_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::min>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(min_arithmetics_counter_type,
     min_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(min_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/max
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::max>>
-    max_arithmetics_counter_type;
+using max_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::max>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(max_arithmetics_counter_type,
     max_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // /arithmetic/count
-typedef hpx::components::component<hpx::performance_counters::server::
-        arithmetics_counter_extended<boost::accumulators::tag::count>>
-    count_arithmetics_counter_type;
+using count_arithmetics_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            arithmetics_counter_extended<boost::accumulators::tag::count>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(count_arithmetics_counter_type,
     count_arithmetics_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(count_arithmetics_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace detail {
+namespace hpx::performance_counters::detail {
+
     /// Creation function for aggregating performance counters to be registered
     /// with the counter types.
     naming::gid_type arithmetics_counter_extended_creator(
@@ -345,4 +345,4 @@ namespace hpx { namespace performance_counters { namespace detail {
         }
         return naming::invalid_gid;
     }
-}}}    // namespace hpx::performance_counters::detail
+}    // namespace hpx::performance_counters::detail

@@ -487,20 +487,19 @@ namespace hpx::agas {
                 "agas::register_worker",
                 "attempt to register locality {} more than once",
                 header.endpoints);
-            return;
         }
 
         naming::address locality_addr(agas::get_locality(),
-            hpx::components::component_agas_locality_namespace,
+            to_int(components::component_enum_type::agas_locality_namespace),
             agas_client.locality_ns_->ptr());
         naming::address primary_addr(agas::get_locality(),
-            hpx::components::component_agas_primary_namespace,
+            to_int(components::component_enum_type::agas_primary_namespace),
             agas_client.primary_ns_.ptr());
         naming::address component_addr(agas::get_locality(),
-            hpx::components::component_agas_component_namespace,
+            to_int(components::component_enum_type::agas_component_namespace),
             agas_client.component_ns_->ptr());
         naming::address symbol_addr(agas::get_locality(),
-            hpx::components::component_agas_symbol_namespace,
+            to_int(components::component_enum_type::agas_symbol_namespace),
             agas_client.symbol_ns_.ptr());
 
         // assign cores to the new locality

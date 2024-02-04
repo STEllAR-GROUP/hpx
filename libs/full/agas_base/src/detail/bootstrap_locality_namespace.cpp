@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -31,7 +31,8 @@ namespace hpx { namespace agas { namespace detail {
     naming::address bootstrap_locality_namespace::addr() const
     {
         return naming::address(agas::get_locality(),
-            components::component_agas_locality_namespace, this->ptr());
+            to_int(components::component_enum_type::agas_locality_namespace),
+            this->ptr());
     }
 
     hpx::id_type bootstrap_locality_namespace::gid() const

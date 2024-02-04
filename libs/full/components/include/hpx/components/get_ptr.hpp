@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -152,7 +152,7 @@ namespace hpx {
             hpx::error_code ec(hpx::throwmode::lightweight);
 
             // shortcut for local, non-migratable objects
-            naming::gid_type gid = id.get_gid();
+            naming::gid_type const gid = id.get_gid();
             if (naming::refers_to_local_lva(gid) &&
                 naming::get_locality_id_from_gid(gid) ==
                     agas::get_locality_id(ec) &&
@@ -209,7 +209,7 @@ namespace hpx {
     ///
     /// \note      This function will successfully return the requested result
     ///            only if the given component is currently located on the
-    ///            calling locality. Otherwise the function will raise an
+    ///            calling locality. Otherwise, the function will raise an
     ///            error.
     ///
     /// \note      The component instance the returned pointer refers to can
@@ -244,7 +244,7 @@ namespace hpx {
     ///
     /// \note      This function will successfully return the requested result
     ///            only if the given component is currently located on the
-    ///            calling locality. Otherwise the function will raise an
+    ///            calling locality. Otherwise, the function will raise an
     ///            error.
     ///
     /// \note      The component instance the returned pointer refers to can
@@ -275,15 +275,15 @@ namespace hpx {
     ///            is pre-initialized to \a hpx#throws the function will throw
     ///            on error instead.
     ///
-    /// \tparam    The only template parameter has to be the type of the
-    ///            server side component.
+    /// \tparam    Component The only template parameter has to be the type of
+    ///            the server side component.
     ///
     /// \returns   This function returns the pointer to the underlying memory
     ///            for the component instance with the given \a id.
     ///
     /// \note      This function will successfully return the requested result
     ///            only if the given component is currently located on the
-    ///            requesting locality. Otherwise the function will raise and
+    ///            requesting locality. Otherwise, the function will raise and
     ///            error.
     ///
     /// \note      The component instance the returned pointer refers to can
@@ -292,7 +292,7 @@ namespace hpx {
     ///
     /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
     ///            function doesn't throw but returns the result code using the
-    ///            parameter \a ec. Otherwise it throws an instance of
+    ///            parameter \a ec. Otherwise, it throws an instance of
     ///            hpx::exception.
     ///
 #if defined(DOXYGEN)
@@ -331,7 +331,7 @@ namespace hpx {
     ///
     /// \note      This function will successfully return the requested result
     ///            only if the given component is currently located on the
-    ///            requesting locality. Otherwise the function will raise and
+    ///            requesting locality. Otherwise, the function will raise and
     ///            error.
     ///
     /// \note      The component instance the returned pointer refers to can
@@ -340,7 +340,7 @@ namespace hpx {
     ///
     /// \note      As long as \a ec is not pre-initialized to \a hpx::throws this
     ///            function doesn't throw but returns the result code using the
-    ///            parameter \a ec. Otherwise it throws an instance of
+    ///            parameter \a ec. Otherwise, it throws an instance of
     ///            hpx::exception.
     ///
     template <typename Derived, typename Stub, typename Data>

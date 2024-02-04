@@ -73,7 +73,7 @@ namespace hpx { namespace performance_counters { namespace detail {
             components::component_type type =
                 agas::get_component_id(paths.parameters_);
 
-            if (type == components::component_invalid)
+            if (type == to_int(hpx::components::component_enum_type::invalid))
             {
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "component_instance_counter_creator",
