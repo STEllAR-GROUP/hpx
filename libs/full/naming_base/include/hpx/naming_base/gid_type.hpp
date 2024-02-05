@@ -390,9 +390,8 @@ namespace hpx::naming {
     constexpr gid_type get_gid_from_locality_id(
         std::uint32_t locality_id) noexcept
     {
-        return gid_type(((static_cast<std::uint64_t>(locality_id) + 1)
-                            << gid_type::locality_id_shift) |
-                gid_type::dont_cache_mask,
+        return gid_type((static_cast<std::uint64_t>(locality_id) + 1)
+                << gid_type::locality_id_shift,
             static_cast<std::uint64_t>(0));
     }
 

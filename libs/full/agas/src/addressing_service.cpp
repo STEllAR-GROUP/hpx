@@ -842,7 +842,9 @@ namespace hpx::agas {
     {
         // NOTE: This should still be migration safe.
         return naming::detail::strip_internal_bits_and_component_type_from_gid(
-                   msb) == get_local_locality().get_msb();
+                   msb) ==
+            naming::detail::strip_internal_bits_and_component_type_from_gid(
+                get_local_locality().get_msb());
     }
 
     bool addressing_service::resolve_locally_known_addresses(
@@ -1019,7 +1021,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1131,7 +1133,7 @@ namespace hpx::agas {
         }
 
         // Resolve the gva to the real resolved address (which is just a gva
-        // with as fully resolved LVA and and offset of zero).
+        // with as fully resolved LVA and offset of zero).
         naming::gid_type const base_gid = hpx::get<0>(rep);
         gva const base_gva = hpx::get<1>(rep);
 
@@ -1220,8 +1222,9 @@ namespace hpx::agas {
                     if (get<0>(rep) == naming::invalid_gid ||
                         get<2>(rep) == naming::invalid_gid)
                         return false;
+
                     // Resolve the gva to the real resolved address (which is
-                    // just a gva with as fully resolved LVA and and offset of
+                    // just a gva with as fully resolved LVA and offset of
                     // zero).
                     naming::gid_type base_gid = get<0>(rep);
                     gva const base_gva = get<1>(rep);
@@ -1695,7 +1698,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1863,17 +1866,15 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
             return;
         }
 
-        naming::gid_type gid = naming::detail::get_stripped_gid(id);
-
         // don't look at the cache if the id is locally managed
-        if (naming::get_locality_id_from_gid(gid) ==
+        if (naming::get_locality_id_from_gid(id) ==
             naming::get_locality_id_from_gid(locality_))
         {
             if (&ec != &throws)
@@ -1881,6 +1882,7 @@ namespace hpx::agas {
             return;
         }
 
+        naming::gid_type gid = naming::detail::get_stripped_gid(id);
         try
         {
             LAGAS_(warning).format("addressing_service::remove_cache_entry");
