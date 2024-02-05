@@ -23,6 +23,7 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/parcelset/parcelset_fwd.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 
 #include <atomic>
@@ -70,7 +71,7 @@ namespace hpx { namespace agas {
         using migrated_objects_table_type = std::set<naming::gid_type>;
         using refcnt_requests_type = std::map<naming::gid_type, std::int64_t>;
 
-        mutable mutex_type gva_cache_mtx_;
+        mutable hpx::shared_mutex gva_cache_mtx_;
         std::shared_ptr<gva_cache_type> gva_cache_;
 
         mutable mutex_type migrated_objects_mtx_;

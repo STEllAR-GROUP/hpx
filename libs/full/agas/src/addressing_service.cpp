@@ -32,6 +32,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -42,6 +43,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <sstream>
 #include <string>
 #include <system_error>
@@ -1745,7 +1747,7 @@ namespace hpx::agas {
             gva_cache_key const key(gid, count);
 
             {
-                std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+                std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
                 if (!gva_cache_->update_if(key, g, check_for_collisions))
                 {
                     if (LAGAS_ENABLED(warning))
@@ -1798,7 +1800,7 @@ namespace hpx::agas {
 
         gva_cache_key const k(gid);
 
-        std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         if (gva_cache_key idbase_key; gva_cache_->get_entry(k, idbase_key, gva))
         {
             std::uint64_t const id_msb =
@@ -1836,7 +1838,7 @@ namespace hpx::agas {
             LAGAS_(warning).format(
                 "addressing_service::clear_cache, clearing cache");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->clear();
 
@@ -1883,7 +1885,7 @@ namespace hpx::agas {
         {
             LAGAS_(warning).format("addressing_service::remove_cache_entry");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->erase([&gid](std::pair<gva_cache_key, gva> const& p) {
                 return gid == p.first.get_gid();
@@ -1914,31 +1916,31 @@ namespace hpx::agas {
     // Helper functions to access the current cache statistics
     std::uint64_t addressing_service::get_cache_entries(bool /* reset */) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->size();
     }
 
     std::uint64_t addressing_service::get_cache_hits(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().hits(reset);
     }
 
     std::uint64_t addressing_service::get_cache_misses(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().misses(reset);
     }
 
     std::uint64_t addressing_service::get_cache_evictions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().evictions(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().insertions(reset);
     }
 
@@ -1946,55 +1948,55 @@ namespace hpx::agas {
     std::uint64_t addressing_service::get_cache_get_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_get_entry_time(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_time(reset);
     }
 
