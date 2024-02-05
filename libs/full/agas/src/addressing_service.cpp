@@ -1793,6 +1793,9 @@ namespace hpx::agas {
             return false;
         }
 
+        // don't look at cache if gid is marked as non-cache-able
+        HPX_ASSERT(naming::detail::store_in_cache(gid));
+
         gva_cache_key const k(gid);
 
         std::unique_lock<mutex_type> lock(gva_cache_mtx_);
