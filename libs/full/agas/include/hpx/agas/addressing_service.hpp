@@ -104,7 +104,7 @@ namespace hpx { namespace agas {
         std::atomic<hpx::state> state_;
         naming::gid_type locality_;
 
-        mutable mutex_type resolved_localities_mtx_;
+        mutable hpx::shared_mutex resolved_localities_mtx_;
         using resolved_localities_type =
             std::map<naming::gid_type, parcelset::endpoints_type>;
         resolved_localities_type resolved_localities_;
