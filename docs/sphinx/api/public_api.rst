@@ -855,11 +855,11 @@ Functions
 
 .. _public_api_header_hpx_scope:
 
-``hpx/scope.hpp``
-=================
+``hpx/experimental/scope.hpp``
+==============================
 
 The header :hpx-header:`libs/core/include_local/include,hpx/experimental/scope.hpp` corresponds to the
-C++ standard library header :cppreference-header:`scope`.
+C++ standard library header :cppreference-header:`experimental/scope`.
 
 Classes
 -------

@@ -8,7 +8,7 @@
 //  This is inspired by https://github.com/martinmoene/scope-lite
 
 /// \page hpx::experimental::scope_success
-/// \headerfile hpx/scope.hpp
+/// \headerfile hpx/experimental/scope.hpp
 
 #pragma once
 
