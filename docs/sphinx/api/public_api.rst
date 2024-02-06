@@ -159,7 +159,11 @@ Functions
    :cpp:func:`hpx::ranges::is_sorted`                       :cppreference-generic:`algorithm/ranges,is_sorted`
    :cpp:func:`hpx::ranges::is_sorted_until`                 :cppreference-generic:`algorithm/ranges,is_sorted_until`
    :cpp:func:`hpx::ranges::make_heap`                       :cppreference-generic:`algorithm/ranges,make_heap`
+   :cpp:func:`hpx::ranges::max_element`                     :cppreference-generic:`algorithm/ranges,max_element`
    :cpp:func:`hpx::ranges::merge`                           :cppreference-generic:`algorithm/ranges,merge`
+   :cpp:func:`hpx::ranges::min_element`                     :cppreference-generic:`algorithm/ranges,min_element`
+   :cpp:func:`hpx::ranges::minmax_element`                  :cppreference-generic:`algorithm/ranges,minmax_element`
+   :cpp:func:`hpx::ranges::mismatch`                        :cppreference-generic:`algorithm/ranges,mismatch`
    :cpp:func:`hpx::ranges::move`                            :cppreference-generic:`algorithm/ranges,move`
    :cpp:func:`hpx::ranges::none_of`                         :cppreference-generic:`algorithm/ranges,all_any_none_of,none_of`
    :cpp:func:`hpx::ranges::nth_element`                     :cppreference-generic:`algorithm/ranges,nth_element`
@@ -849,6 +853,66 @@ Functions
    | :cpp:func:`hpx::get_locality_name`               |
    +--------------------------------------------------+
 
+.. _public_api_header_hpx_scope:
+
+``hpx/scope.hpp``
+=================
+
+The header :hpx-header:`libs/core/include_local/include,hpx/experimental/scope.hpp` corresponds to the
+C++ standard library header :cppreference-header:`scope`.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/scope.hpp``
+
+   ==============================================  ==================================================
+   Class                                           C++ standard
+   ==============================================  ==================================================
+   :cpp:class:`hpx::experimental::scope_exit`      :cppreference-generic:`experimental,scope_exit`
+   :cpp:class:`hpx::experimental::scope_fail`      :cppreference-generic:`experimental,scope_fail`
+   :cpp:class:`hpx::experimental::scope_success`   :cppreference-generic:`experimental,scope_success`
+   ==============================================  ==================================================
+
+.. _public_api_header_hpx_semaphore:
+
+``hpx/semaphore.hpp``
+=====================
+
+The header :hpx-header:`libs/core/include_local/include,hpx/semaphore.hpp` corresponds to the
+C++ standard library header :cppreference-header:`semaphore`.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/semaphore.hpp``
+
+   ==========================================  =================================================
+   Class                                       C++ standard
+   ==========================================  =================================================
+   :cpp:class:`hpx::binary_semaphore`          :cppreference-generic:`thread,counting_semaphore`
+   :cpp:class:`hpx::counting_semaphore`        :cppreference-generic:`thread,counting_semaphore`
+   ==========================================  =================================================
+
+.. _public_api_header_hpx_shared_mutex:
+
+``hpx/shared_mutex.hpp``
+========================
+
+The header :hpx-header:`libs/core/include_local/include,hpx/shared_mutex.hpp` corresponds to the
+C++ standard library header :cppreference-header:`shared_mutex`.
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/shared_mutex.hpp``
+
+   +--------------------------------+---------------------------------------------+
+   | Class                          | C++ standard                                |
+   +================================+=============================================+
+   | :cpp:class:`hpx::shared_mutex` | :cppreference-generic:`thread,shared_mutex` |
+   +--------------------------------+---------------------------------------------+
+
 .. _public_api_header_hpx_source_location:
 
 ``hpx/source_location.hpp``
@@ -867,6 +931,39 @@ Classes
    +===================================+=================================================+
    | :cpp:class:`hpx::source_location` | :cppreference-generic:`utility,source_location` |
    +-----------------------------------+-------------------------------------------------+
+
+.. _public_api_header_hpx_stop_token:
+
+``hpx/stop_token.hpp``
+======================
+
+The header :hpx-header:`libs/core/include_local/include,hpx/stop_token.hpp` corresponds to the
+C++ standard library header :cppreference-header:`stop_token`.
+
+Constants
+---------
+
+.. table:: Constants of header ``hpx/stop_token.hpp``
+
+   +-----------------------------+--------------------------------------------------------+
+   | Constant                    | C++ standard                                           |
+   +=============================+========================================================+
+   | :cpp:var:`hpx::nostopstate` | :cppreference-generic:`thread/stop_source,nostopstate` |
+   +-----------------------------+--------------------------------------------------------+
+
+Classes
+-------
+
+.. table:: Classes of header ``hpx/stop_token.hpp``
+
+   ================================  ========================================================
+   Class                             C++ standard
+   ================================  ========================================================
+   :cpp:class:`hpx::stop_callback`   :cppreference-generic:`thread,stop_callback`
+   :cpp:class:`hpx::stop_source`     :cppreference-generic:`thread,stop_source`
+   :cpp:class:`hpx::stop_token`      :cppreference-generic:`thread,stop_token`
+   :cpp:struct:`hpx::nostopstate_t`  :cppreference-generic:`thread/stop_source,nostopstate_t`
+   ================================  ========================================================
 
 .. _public_api_header_hpx_system_error:
 
@@ -976,78 +1073,6 @@ Functions
    :cpp:func:`hpx::this_thread::sleep_for`    :cppreference-generic:`thread,sleep_for`
    :cpp:func:`hpx::this_thread::sleep_until`  :cppreference-generic:`thread,sleep_until`
    =========================================  ==========================================
-
-.. _public_api_header_hpx_semaphore:
-
-``hpx/semaphore.hpp``
-=====================
-
-The header :hpx-header:`libs/core/include_local/include,hpx/semaphore.hpp` corresponds to the
-C++ standard library header :cppreference-header:`semaphore`.
-
-Classes
--------
-
-.. table:: Classes of header ``hpx/semaphore.hpp``
-
-   ==========================================  =================================================
-   Class                                       C++ standard
-   ==========================================  =================================================
-   :cpp:class:`hpx::binary_semaphore`          :cppreference-generic:`thread,counting_semaphore`
-   :cpp:class:`hpx::counting_semaphore`        :cppreference-generic:`thread,counting_semaphore`
-   ==========================================  =================================================
-
-.. _public_api_header_hpx_shared_mutex:
-
-``hpx/shared_mutex.hpp``
-========================
-
-The header :hpx-header:`libs/core/include_local/include,hpx/shared_mutex.hpp` corresponds to the
-C++ standard library header :cppreference-header:`shared_mutex`.
-
-Classes
--------
-
-.. table:: Classes of header ``hpx/shared_mutex.hpp``
-
-   +--------------------------------+---------------------------------------------+
-   | Class                          | C++ standard                                |
-   +================================+=============================================+
-   | :cpp:class:`hpx::shared_mutex` | :cppreference-generic:`thread,shared_mutex` |
-   +--------------------------------+---------------------------------------------+
-
-.. _public_api_header_hpx_stop_token:
-
-``hpx/stop_token.hpp``
-======================
-
-The header :hpx-header:`libs/core/include_local/include,hpx/stop_token.hpp` corresponds to the
-C++ standard library header :cppreference-header:`stop_token`.
-
-Constants
----------
-
-.. table:: Constants of header ``hpx/stop_token.hpp``
-
-   +-----------------------------+--------------------------------------------------------+
-   | Constant                    | C++ standard                                           |
-   +=============================+========================================================+
-   | :cpp:var:`hpx::nostopstate` | :cppreference-generic:`thread/stop_source,nostopstate` |
-   +-----------------------------+--------------------------------------------------------+
-
-Classes
--------
-
-.. table:: Classes of header ``hpx/stop_token.hpp``
-
-   ================================  ========================================================
-   Class                             C++ standard
-   ================================  ========================================================
-   :cpp:class:`hpx::stop_callback`   :cppreference-generic:`thread,stop_callback`
-   :cpp:class:`hpx::stop_source`     :cppreference-generic:`thread,stop_source`
-   :cpp:class:`hpx::stop_token`      :cppreference-generic:`thread,stop_token`
-   :cpp:struct:`hpx::nostopstate_t`  :cppreference-generic:`thread/stop_source,nostopstate_t`
-   ================================  ========================================================
 
 .. _public_api_header_hpx_tuple:
 
