@@ -11,8 +11,9 @@
 Quick start
 ===========
 
-The following steps will help you get started with |hpx|. After :ref:`installing_hpx`, you
-can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
+The following steps will help you get started with |hpx|. Before getting started, make sure you have
+all the necessary prerequisites, which are listed in :ref:`_prerequisites`. After :ref:`installing_hpx`,
+you can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
 explains how you can get started with |hpx|. You can refer to our :ref:`migration_guide` if you use
 other APIs for parallelism (like |openmp|, |mpi| or |tbb|) and you would like to convert your code to
 |hpx| code.
