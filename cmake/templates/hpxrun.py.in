@@ -179,6 +179,20 @@ def run_none(cmd, localities, nodes, verbose):
                  print('Executing command: ' + ' '.join(cmd))
              subproc(cmd)
 
+
+ def run_amudprun(cmd, localities, nodes, verbose):
+     assert len(nodes) == localities, "Number of localities must match number of nodes."
+     os.environ['GASNET_SPAWNFN'] = 'S'
+     os.environ['GASNET_SSH_SERVERS'] = ' '.join([ str(node) for node in nodes ]) 
+     os.environ['SSH_SERVERS'] = os.environ['GASNET_SSH_SERVERS']
+     os.environ['GASNET_ROUTE_OUTPUT'] = '0'
+
+     exec_cmd = ['amudprun', '-np', len(nodes), cmd]
+
+     if verbose:
+         print('Executing command: ' + ' '.join(exec_cmd))
+     subproc(exec_cmd)
+
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
 def run_mpi(cmd, localities, verbose):
@@ -195,19 +209,26 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
-def run_gasnet(cmd, localities, verbose):
-    os.environ['GASNET_PSHM_NODES'] = str(localities)
-    os.environ['GASNET_QUIET'] = 'yes'
+def run_amudprun(cmd, localities, nodes, verbose):
+    assert len(nodes) == localities, "Number of localities must match number of nodes."
+    os.environ['GASNET_SPAWNFN'] = 'S'
+    os.environ['GASNET_SSH_SERVERS'] = ' '.join([ str(node) for node in nodes ]) 
+    os.environ['SSH_SERVERS'] = os.environ['GASNET_SSH_SERVERS']
     os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-    run_mpi(cmd, localities, verbose)
 
-def run_gasnet_smp(cmd, localities, verbose):
-    os.environ['GASNET_PSHM_NODES'] = str(localities)
-    os.environ['GASNET_BARRIER'] = 'PSHM'
-    os.environ['GASNET_QUIET'] = 'yes'
-    os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-    # No launcher needed
-    run_none(cmd, localities, nodes, verbose)
+    exec_cmd = ['amudprun', '-np', len(nodes), cmd]
+
+    if verbose:
+        print('Executing command: ' + ' '.join(exec_cmd))
+    subproc(exec_cmd)
+
+# Run with oshrun
+# This is executing amudprun with the "-np" option set to the number of localities
+def run_oshrun(cmd, localities, verbose):
+    exec_cmd = ['oshrun', '-np', str(localities)] + cmd
+    if verbose:
+        print('Executing command: ' + ' '.join(exec_cmd))
+    subproc(exec_cmd)
 
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
@@ -232,12 +253,11 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'mpi':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
-    if runwrapper == 'gasnet':
+    if runwrapper == 'amudprun':
+        run_amudprun(cmd, localities, nodes, verbose)
+    if runwrapper == 'oshrun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
-        run_gasnet(cmd, localities, verbose)
-    if runwrapper == 'gasnet-smp':
-        assert nodes is None, "nodes option only valid with smp parcelport."
-        run_gasnet_smp(cmd, localities, verbose)
+        run_oshrun(cmd, localities, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
@@ -260,6 +280,7 @@ def build_cmd(options, args):
             ['--hpx:ini=hpx.parcel.mpi.priority=1000', '--hpx:ini=hpx.parcel.mpi.enable=1', '--hpx:ini=hpx.parcel.bootstrap=mpi'] if pp == 'mpi'
             else ['--hpx:ini=hpx.parcel.lci.priority=1000', '--hpx:ini=hpx.parcel.lci.enable=1', '--hpx:ini=hpx.parcel.bootstrap=lci'] if pp == 'lci'
             else ['--hpx:ini=hpx.parcel.gasnet.priority=1000', '--hpx:ini=hpx.parcel.gasnet.enable=1', '--hpx:ini=hpx.parcel.bootstrap=gasnet'] if pp == 'gasnet'
+            else ['--hpx:ini=hpx.parcel.openshmem.priority=1000', '--hpx:ini=hpx.parcel.openshmem.enable=1', '--hpx:ini=hpx.parcel.bootstrap=openshmem'] if pp == 'openshmem'
             else ['--hpx:ini=hpx.parcel.tcp.priority=1000', '--hpx:ini=hpx.parcel.tcp.enable=1'] if pp == 'tcp'
             else [])
         cmd += select_parcelport(options.parcelport)
@@ -296,14 +317,14 @@ def check_options(parser, options, args):
         print('Can not start less than one thread per locality', sys.stderr)
         sys.exit(1)
 
-    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'gasnet' or x == 'tcp' or x == 'none');
+    check_valid_parcelport = (lambda x: x == 'mpi' or x == 'lci' or x == 'gasnet' or x == 'tcp' or x == 'openshmem' or x == 'none');
     if not check_valid_parcelport(options.parcelport):
         print('Error: Parcelport option not valid\n', sys.stderr)
         parser.print_help()
         sys.exit(1)
 
     check_valid_runwrapper = (lambda x:
-            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun' or x == 'gasnet' or x == 'gasnet-smp');
+            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun' or x == 'amudprun' or x == 'oshrun');
     if not check_valid_runwrapper(options.runwrapper):
         print('Error: Runwrapper option not valid\n', sys.stderr)
         parser.print_help()
@@ -382,13 +403,13 @@ Used by the tcp parcelport only.
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-      , help='Which parcelport to use (Options are: mpi, lci, gasnet, tcp) '
+      , help='Which parcelport to use (Options are: mpi, lci, openshmem, gasnet, tcp) '
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
-      , help='Which runwrapper to use (Options are: none, mpi, gasnet, gasnet-smp, srun, jsrun) '
+      , help='Which runwrapper to use (Options are: none, mpi, oshrun, amudprun, srun, jsrun) '
              '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'

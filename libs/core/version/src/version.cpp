@@ -46,6 +46,14 @@
 #include <lci.h>
 #endif
 
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
+#include <shmem.h>
+
+#define OPENSHMEM_CONDUIT_NAME_STR_HELPER(x) #x
+#define OPENSHMEM_CONDUIT_NAME_STR                                             \
+    OPENSHMEM_CONDUIT_NAME_STR_HELPER(HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT)
+#endif
+
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
 #include <gasnet.h>
@@ -132,6 +140,25 @@ namespace hpx {
     {
         std::ostringstream strm;
         strm << "the one and only LCI";
+        return strm.str();
+    }
+#endif
+
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+    std::string openshmem_version()
+    {
+        int major = 0;
+        int minor = 0;
+        shmem_info_get_version(&major, &minor);
+        char vendor_cstr[SHMEM_MAX_NAME_LEN];
+        shmem_info_get_name(vendor_cstr);
+
+        std::ostringstream strm;
+        strm << "OPENSHMEM_VENDOR:" << vendor_cstr << ':' << major << ':'
+             << minor << '-'
+             << "OPENSHMEM_CONDUIT:" << OPENSHMEM_CONDUIT_NAME_STR;
         return strm.str();
     }
 #endif
@@ -312,6 +339,11 @@ namespace hpx {
     defined(HPX_HAVE_MODULE_LCI_BASE)
                                                 "  LCI: {}\n"
 #endif
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+                                                "  OPENSHMEM: {}\n"
+#endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)
                                                 "  GASNET: {}\n"
@@ -331,6 +363,11 @@ namespace hpx {
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)) ||      \
     defined(HPX_HAVE_MODULE_LCI_BASE)
             lci_version(),
+#endif
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+            openshmem_version(),
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
     defined(HPX_HAVE_MODULE_GASNET_BASE)

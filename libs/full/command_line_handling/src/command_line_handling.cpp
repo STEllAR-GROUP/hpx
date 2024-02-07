@@ -21,6 +21,9 @@
 #if defined(HPX_HAVE_MODULE_LCI_BASE)
 #include <hpx/modules/lci_base.hpp>
 #endif
+#if defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+#include <hpx/modules/openshmem_base.hpp>
+#endif
 #if defined(HPX_HAVE_MODULE_GASNET_BASE)
 #include <hpx/modules/gasnet_base.hpp>
 #endif
@@ -1004,6 +1007,18 @@ namespace hpx::util {
             num_localities_ =
                 static_cast<std::size_t>(util::lci_environment::size());
             node_ = static_cast<std::size_t>(util::lci_environment::rank());
+        }
+#endif
+#if (defined(HPX_HAVE_NETWORKING) &&                                           \
+    defined(HPX_HAVE_PARCELPORT_OPENSHMEM)) ||                                 \
+    defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+        if (util::openshmem_environment::check_openshmem_environment(rtcfg_))
+        {
+            util::openshmem_environment::init(&argc, &argv, rtcfg_);
+            num_localities_ =
+                static_cast<std::size_t>(util::openshmem_environment::size());
+            node_ =
+                static_cast<std::size_t>(util::openshmem_environment::rank());
         }
 #endif
 #if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)) ||   \
