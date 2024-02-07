@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Thomas Heller
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +12,7 @@
 #include <hpx/errors/throw_exception.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/functional.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/threading_base/execution_agent.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
@@ -29,7 +31,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <utility>
 
@@ -82,14 +83,16 @@ namespace hpx::threads {
         }
     }
 
-    void execution_agent::resume(char const* desc)
+    void execution_agent::resume(
+        hpx::threads::thread_priority priority, char const* desc)
     {
-        do_resume(desc, threads::thread_restart_state::signaled);
+        do_resume(priority, desc, threads::thread_restart_state::signaled);
     }
 
     void execution_agent::abort(char const* desc)
     {
-        do_resume(desc, threads::thread_restart_state::abort);
+        do_resume(hpx::threads::thread_priority::default_, desc,
+            threads::thread_restart_state::abort);
     }
 
     void execution_agent::suspend(char const* desc)
@@ -129,27 +132,6 @@ namespace hpx::threads {
         } while (now < sleep_time.value());
     }
 
-#if defined(HPX_HAVE_VERIFY_LOCKS)
-    struct on_exit_reset_held_lock_data
-    {
-        on_exit_reset_held_lock_data()
-          : data_(hpx::util::get_held_locks_data())
-        {
-        }
-
-        ~on_exit_reset_held_lock_data()
-        {
-            hpx::util::set_held_locks_data(HPX_MOVE(data_));
-        }
-
-        std::unique_ptr<hpx::util::held_locks_data> data_;
-    };
-#else
-    struct on_exit_reset_held_lock_data
-    {
-    };
-#endif
-
     hpx::threads::thread_restart_state execution_agent::do_yield(
         char const* desc, threads::thread_schedule_state state)
     {
@@ -180,15 +162,19 @@ namespace hpx::threads {
         threads::thread_restart_state statex;
 
         {
-#ifdef HPX_HAVE_THREAD_DESCRIPTION
+#if defined(HPX_HAVE_THREAD_DESCRIPTION)
             [[maybe_unused]] threads::detail::reset_lco_description reset_desc(
                 id.noref(), threads::thread_description(desc));
 #endif
-#ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
+#if defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
             [[maybe_unused]] threads::detail::reset_backtrace reset_bt(id);
 #endif
-            [[maybe_unused]] on_exit_reset_held_lock_data held_locks;
-
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+            [[maybe_unused]] auto held_locks = hpx::experimental::scope_exit(
+                [data = hpx::util::get_held_locks_data()]() mutable {
+                    hpx::util::set_held_locks_data(HPX_MOVE(data));
+                });
+#endif
             HPX_ASSERT(thrd_data != nullptr &&
                 thrd_data->get_state().state() ==
                     thread_schedule_state::active);
@@ -217,11 +203,11 @@ namespace hpx::threads {
         return statex;
     }
 
-    void execution_agent::do_resume(
+    void execution_agent::do_resume(hpx::threads::thread_priority priority,
         char const* /* desc */, hpx::threads::thread_restart_state statex) const
     {
         threads::detail::set_thread_state(self_.get_thread_id(),
-            thread_schedule_state::pending, statex, thread_priority::normal,
+            thread_schedule_state::pending, statex, priority,
             thread_schedule_hint{}, false);
     }
 }    // namespace hpx::threads

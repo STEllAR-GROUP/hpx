@@ -496,7 +496,14 @@ namespace hpx { namespace parallel {
             for (auto res : results)
             {
                 dest = f1(res.begin(), res.end(), dest, last_value, op);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
                 last_value = f2(res, last_value);
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 100000
+#pragma GCC diagnostic pop
+#endif
             }
             return result::get(HPX_MOVE(dest));
         }

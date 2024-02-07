@@ -8,6 +8,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/nth_element.hpp
+/// \page hpx::nth_element
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

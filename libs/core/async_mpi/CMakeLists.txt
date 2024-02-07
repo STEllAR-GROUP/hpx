@@ -12,6 +12,8 @@ if(NOT ${HPX_WITH_ASYNC_MPI})
   return()
 endif()
 
+hpx_add_config_define(HPX_HAVE_ASYNC_MPI)
+
 # setup MPI, if necessary
 if(NOT TARGET Mpi::mpi)
   include(HPX_SetupMPI)

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file promise.hpp
+/// \page hpx::promise
+/// \headerfile hpx/future.hpp
 
 #pragma once
 
@@ -65,8 +67,7 @@ namespace hpx {
                 unique_pointer p(traits::allocate(alloc, 1),
                     util::allocator_deleter<other_allocator>{alloc});
 
-                traits::construct(
-                    alloc, p.get(), init_no_addref{}, std::in_place, alloc);
+                traits::construct(alloc, p.get(), init_no_addref{}, alloc);
                 shared_state_.reset(p.release(), false);
             }
 

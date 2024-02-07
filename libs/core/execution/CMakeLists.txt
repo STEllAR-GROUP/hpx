@@ -41,6 +41,7 @@ set(execution_headers
     hpx/execution/executor_parameters.hpp
     hpx/execution/executors/adaptive_static_chunk_size.hpp
     hpx/execution/executors/auto_chunk_size.hpp
+    hpx/execution/executors/default_parameters.hpp
     hpx/execution/executors/dynamic_chunk_size.hpp
     hpx/execution/executors/execution.hpp
     hpx/execution/executors/execution_information.hpp

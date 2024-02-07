@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,9 +28,9 @@ namespace hpx::util {
     }
 
     void extra_data_helper<lcos::detail::registered_name_tracker>::reset(
-        lcos::detail::registered_name_tracker* registered_name)
+        lcos::detail::registered_name_tracker* registered_name) noexcept
     {
-        if (!registered_name->empty())
+        if (registered_name != nullptr && !registered_name->empty())
         {
             std::string name;
             std::swap(name, *registered_name);
@@ -45,12 +45,8 @@ namespace hpx::lcos::detail {
 
     void future_data<hpx::id_type>::tidy() const noexcept
     {
-        auto* registered_name = try_get_extra_data<registered_name_tracker>();
-        if (registered_name != nullptr && !registered_name->empty())
-        {
-            error_code ec(throwmode::lightweight);
-            agas::unregister_name(launch::sync, HPX_MOVE(*registered_name), ec);
-        }
+        hpx::util::extra_data_helper<registered_name_tracker>::reset(
+            try_get_extra_data<registered_name_tracker>());
     }
 
     std::string const& future_data<hpx::id_type>::get_registered_name()

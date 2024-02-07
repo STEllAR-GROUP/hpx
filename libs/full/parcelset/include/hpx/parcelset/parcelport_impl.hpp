@@ -186,6 +186,11 @@ namespace hpx::parcelset {
             }
         }
 
+        parcelport_impl(parcelport_impl const&) = delete;
+        parcelport_impl(parcelport_impl&&) = delete;
+        parcelport_impl& operator=(parcelport_impl const&) = delete;
+        parcelport_impl& operator=(parcelport_impl&&) = delete;
+
         ~parcelport_impl() override
         {
             connection_cache_.clear();
@@ -254,7 +259,7 @@ namespace hpx::parcelset {
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
             // or GIDs to be split. This is necessary to preserve the identity
-            // of the this pointer.
+            // of the 'this' pointer.
             detail::parcel_await_apply(HPX_MOVE(p), HPX_MOVE(f), archive_flags_,
                 [this, dest](parcel&& p, write_handler_type&& f) {
                     if (connection_handler_traits<
@@ -294,7 +299,7 @@ namespace hpx::parcelset {
             // We create a shared pointer of the parcels_await object since it
             // needs to be kept alive as long as there are futures not ready
             // or GIDs to be split. This is necessary to preserve the identity
-            // of the this pointer.
+            // of the 'this' pointer.
             detail::parcels_await_apply(HPX_MOVE(parcels), HPX_MOVE(handlers),
                 archive_flags_,
                 [this, dest](std::vector<parcel>&& parcels,
@@ -716,8 +721,11 @@ namespace hpx::parcelset {
             hpx::get<0>(e).push_back(HPX_MOVE(p));
             hpx::get<1>(e).push_back(HPX_MOVE(f));
 
-            parcel_destinations_.insert(locality_id);
             ++num_parcel_destinations_;
+            if (!parcel_destinations_.insert(locality_id).second)
+            {
+                --num_parcel_destinations_;
+            }
         }
 
         void enqueue_parcels(locality const& locality_id,
@@ -756,8 +764,11 @@ namespace hpx::parcelset {
                     std::back_inserter(hpx::get<1>(e)));
             }
 
-            parcel_destinations_.insert(locality_id);
             ++num_parcel_destinations_;
+            if (!parcel_destinations_.insert(locality_id).second)
+            {
+                --num_parcel_destinations_;
+            }
         }
 
         bool dequeue_parcels(locality const& locality_id,
@@ -793,7 +804,8 @@ namespace hpx::parcelset {
 
             parcel_destinations_.erase(locality_id);
 
-            HPX_ASSERT(0 != num_parcel_destinations_.load());
+            HPX_ASSERT(
+                0 != num_parcel_destinations_.load(std::memory_order_relaxed));
             --num_parcel_destinations_;
 
             return true;
@@ -838,16 +850,16 @@ namespace hpx::parcelset {
 
             {
                 std::unique_lock const l(mtx_, std::try_to_lock);
-                if (l.owns_lock())
-                {
-                    if (parcel_destinations_.empty())
-                        return true;
+                if (!l.owns_lock())
+                    return true;
 
-                    destinations.reserve(parcel_destinations_.size());
-                    for (locality const& loc : parcel_destinations_)
-                    {
-                        destinations.push_back(loc);
-                    }
+                if (parcel_destinations_.empty())
+                    return true;
+
+                destinations.reserve(parcel_destinations_.size());
+                for (locality const& loc : parcel_destinations_)
+                {
+                    destinations.push_back(loc);
                 }
             }
 
@@ -971,7 +983,7 @@ namespace hpx::parcelset {
             {
                 ++operations_in_flight_;
 
-                // send all of the parcels
+                // send all the parcels
                 sender_connection->async_write(
                     call_for_each(HPX_MOVE(handlers), HPX_MOVE(parcels)),
                     hpx::bind_front(

@@ -141,7 +141,7 @@ namespace hpx::parcelset {
                 {
                     HPX_ASSERT(result.has_future());
 
-                    auto&& split_gid = HPX_MOVE(result).get_future();
+                    auto split_gid = HPX_MOVE(result).get_future();
                     if (split_gid.is_ready())
                     {
                         pp(detail::create_parcel::call_with_action(

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/uninitialized_value_construct.hpp
+/// \page hpx::uninitialized_value_construct, hpx::uninitialized_value_construct_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

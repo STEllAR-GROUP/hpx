@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -74,8 +74,9 @@ namespace hpx::threads::detail {
             get_thread_id_data(background_thread));
 
         // We can now set the state to pending
-        get_thread_id_data(background_thread)
-            ->set_state(thread_schedule_state::pending);
+        [[maybe_unused]] auto old_state =
+            get_thread_id_data(background_thread)
+                ->set_state(thread_schedule_state::pending);
         return background_thread;
     }
 
@@ -110,7 +111,7 @@ namespace hpx::threads::detail {
             }
         }
 
-        constexpr bool is_valid() const noexcept
+        [[nodiscard]] constexpr bool is_valid() const noexcept
         {
             return need_restore_state_;
         }
@@ -129,9 +130,9 @@ namespace hpx::threads::detail {
         }
 
         // Get the state this thread was in before execution (usually pending),
-        // this helps making sure no other worker-thread is started to execute
+        // this helps to make sure no other worker-thread is started to execute
         // this HPX-thread in the meantime.
-        thread_schedule_state get_previous() const noexcept
+        [[nodiscard]] thread_schedule_state get_previous() const noexcept
         {
             return prev_state_.state();
         }
@@ -156,7 +157,8 @@ namespace hpx::threads::detail {
             need_restore_state_ = false;
         }
 
-        constexpr thread_id_ref_type const& get_next_thread() const noexcept
+        [[nodiscard]] constexpr thread_id_ref_type const& get_next_thread()
+            const noexcept
         {
             return next_thread_id_;
         }
@@ -219,10 +221,10 @@ namespace hpx::threads::detail {
                 // invoke background thread
                 thrd_stat = (*thrdptr)(context_storage);
 
-                thread_id_ref_type next = thrd_stat.move_next_thread();
-                if (next != nullptr && next != background_thread)
+                if (thread_id_ref_type next = thrd_stat.move_next_thread();
+                    next && next != background_thread)
                 {
-                    if (next_thrd == nullptr)
+                    if (!next_thrd)
                     {
                         next_thrd = HPX_MOVE(next);
                     }
@@ -243,7 +245,8 @@ namespace hpx::threads::detail {
 
             if (HPX_LIKELY(state_val == thread_schedule_state::pending_boost))
             {
-                thrdptr->set_state(thread_schedule_state::pending);
+                [[maybe_unused]] auto old_state =
+                    thrdptr->set_state(thread_schedule_state::pending);
             }
             else if (thread_schedule_state::terminated == state_val)
             {

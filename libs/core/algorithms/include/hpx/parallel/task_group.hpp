@@ -1,10 +1,12 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file task_group.hpp
+/// \page hpx::experimental::task_group
+/// \headerfile hpx/experimental/task_group.hpp
 
 #pragma once
 
@@ -16,6 +18,7 @@
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/parallel_executor.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/futures/detail/future_data.hpp>
 #include <hpx/modules/memory.hpp>
@@ -44,21 +47,6 @@ namespace hpx::experimental {
         task_group& operator=(task_group const&) = delete;
         task_group& operator=(task_group&&) = delete;
 
-    private:
-        struct on_exit
-        {
-            HPX_CORE_EXPORT explicit on_exit(task_group& tg);
-            HPX_CORE_EXPORT ~on_exit();
-
-            on_exit(on_exit const& rhs) = delete;
-            on_exit& operator=(on_exit const& rhs) = delete;
-
-            HPX_CORE_EXPORT on_exit(on_exit&& rhs) noexcept;
-            HPX_CORE_EXPORT on_exit& operator=(on_exit&& rhs) noexcept;
-
-            hpx::lcos::local::latch* latch_;
-        };
-
     public:
         /// \brief Adds a task to compute \c f() and returns immediately.
         ///
@@ -82,13 +70,19 @@ namespace hpx::experimental {
         void run(Executor&& exec, F&& f, Ts&&... ts)
         {
             // make sure exceptions don't leave the latch in the wrong state
-            on_exit l(*this);
+            if (latch_.reset_if_needed_and_count_up(1, 1))
+            {
+                has_arrived_.store(false, std::memory_order_release);
+            }
+
+            auto on_exit =
+                hpx::experimental::scope_exit([this] { latch_.count_down(1); });
 
             hpx::parallel::execution::post(HPX_FORWARD(Executor, exec),
-                [this, l = HPX_MOVE(l), f = HPX_FORWARD(F, f),
+                [this, on_exit = HPX_MOVE(on_exit), f = HPX_FORWARD(F, f),
                     t = hpx::make_tuple(HPX_FORWARD(Ts, ts)...)]() mutable {
                     // latch needs to be released before the lambda exits
-                    on_exit _(HPX_MOVE(l));
+                    auto _(HPX_MOVE(on_exit));
 
                     hpx::detail::try_catch_exception_ptr(
                         [&]() { hpx::invoke_fused(HPX_MOVE(f), HPX_MOVE(t)); },

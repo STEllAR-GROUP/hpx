@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //
@@ -87,8 +87,8 @@ namespace hpx::threads {
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will be retrieved
         ///                 by using the function \a threadmanager#get_state.
-        thread_state get_state(
-            std::memory_order order = std::memory_order_acquire) const noexcept
+        thread_state get_state(std::memory_order const order =
+                                   std::memory_order_acquire) const noexcept
         {
             return current_state_.load(order);
         }
@@ -108,11 +108,11 @@ namespace hpx::threads {
         ///                 thread's status word. To change the thread's
         ///                 scheduling status \a threadmanager#set_state should
         ///                 be used.
-        thread_state set_state(thread_schedule_state state,
+        thread_state set_state(thread_schedule_state const state,
             thread_restart_state state_ex = thread_restart_state::unknown,
-            std::memory_order load_order = std::memory_order_acquire,
-            std::memory_order exchange_order =
-                std::memory_order_seq_cst) const noexcept
+            std::memory_order const load_order = std::memory_order_acquire,
+            std::memory_order const exchange_order =
+                std::memory_order_acq_rel) const noexcept
         {
             thread_state prev_state = current_state_.load(load_order);
 
@@ -138,10 +138,10 @@ namespace hpx::threads {
             }
         }
 
-        bool set_state_tagged(thread_schedule_state newstate,
+        bool set_state_tagged(thread_schedule_state const newstate,
             thread_state const& prev_state, thread_state& new_tagged_state,
             std::memory_order exchange_order =
-                std::memory_order_seq_cst) const noexcept
+                std::memory_order_acq_rel) const noexcept
         {
             new_tagged_state = thread_state(
                 newstate, prev_state.state_ex(), prev_state.tag() + 1);
@@ -174,10 +174,11 @@ namespace hpx::threads {
         ///
         /// \returns This function returns \a true if the state has been
         ///          changed successfully
-        bool restore_state(thread_state new_state, thread_state old_state,
-            std::memory_order load_order = std::memory_order_relaxed,
-            std::memory_order load_exchange =
-                std::memory_order_seq_cst) const noexcept
+        bool restore_state(thread_state const new_state,
+            thread_state const old_state,
+            std::memory_order const load_order = std::memory_order_relaxed,
+            std::memory_order const load_exchange =
+                std::memory_order_acq_rel) const noexcept
         {
             // ignore the state_ex while compare-exchanging
             thread_state const current_state = current_state_.load(load_order);
@@ -196,9 +197,9 @@ namespace hpx::threads {
         }
 
         bool restore_state(thread_schedule_state new_state,
-            thread_restart_state state_ex, thread_state old_state,
-            std::memory_order load_exchange =
-                std::memory_order_seq_cst) const noexcept
+            thread_restart_state const state_ex, thread_state old_state,
+            std::memory_order const load_exchange =
+                std::memory_order_acq_rel) const noexcept
         {
             // ABA prevention for state only (not for state_ex)
             std::int64_t tag = old_state.tag();
@@ -215,22 +216,26 @@ namespace hpx::threads {
         ///
         /// \param new_state [in] The new extended state to be set for the
         ///                 thread.
+        /// \param load_order [in]
+        /// \param load_exchange [in]
         ///
         /// \note           This function will be seldom used directly. Most of
         ///                 the time the state of a thread will have to be
         ///                 changed using the threadmanager.
-        thread_restart_state set_state_ex(
-            thread_restart_state new_state) const noexcept
+        thread_restart_state set_state_ex(thread_restart_state const new_state,
+            std::memory_order const load_order = std::memory_order_acquire,
+            std::memory_order const load_exchange =
+                std::memory_order_acq_rel) const noexcept
         {
-            thread_state prev_state =
-                current_state_.load(std::memory_order_acquire);
+            thread_state prev_state = current_state_.load(load_order);
 
             for (;;)
             {
                 thread_state tmp = prev_state;
 
-                if (HPX_LIKELY(current_state_.compare_exchange_strong(
-                        tmp, thread_state(tmp.state(), new_state, tmp.tag()))))
+                if (HPX_LIKELY(current_state_.compare_exchange_strong(tmp,
+                        thread_state(tmp.state(), new_state, tmp.tag()),
+                        load_exchange)))
                 {
                     return prev_state.state_ex();
                 }
@@ -248,24 +253,25 @@ namespace hpx::threads {
         }
 
 #if !defined(HPX_HAVE_THREAD_DESCRIPTION)
-        threads::thread_description get_description() const
+        static constexpr threads::thread_description get_description() noexcept
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
-        threads::thread_description set_description(
-            threads::thread_description /*value*/)
+        static constexpr threads::thread_description set_description(
+            threads::thread_description /*value*/) noexcept
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
 
-        threads::thread_description get_lco_description() const    //-V524
+        static constexpr threads::thread_description
+        get_lco_description() noexcept    //-V524
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
-        threads::thread_description set_lco_description(    //-V524
-            threads::thread_description /*value*/)
+        static constexpr threads::thread_description set_lco_description(
+            threads::thread_description /*value*/) noexcept    //-V524
         {
-            return threads::thread_description("<unknown>");
+            return {"<unknown>"};
         }
 #else
         threads::thread_description get_description() const
@@ -301,20 +307,20 @@ namespace hpx::threads {
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
         /// Return the locality of the parent thread
-        constexpr std::uint32_t get_parent_locality_id() const noexcept
+        static constexpr std::uint32_t get_parent_locality_id() noexcept
         {
             // this is the same as naming::invalid_locality_id
             return ~static_cast<std::uint32_t>(0);
         }
 
         /// Return the thread id of the parent thread
-        constexpr thread_id_type get_parent_thread_id() const noexcept
+        static constexpr thread_id_type get_parent_thread_id() noexcept
         {
             return threads::invalid_thread_id;
         }
 
         /// Return the phase of the parent thread
-        constexpr std::size_t get_parent_thread_phase() const noexcept
+        static constexpr std::size_t get_parent_thread_phase() noexcept
         {
             return 0;
         }

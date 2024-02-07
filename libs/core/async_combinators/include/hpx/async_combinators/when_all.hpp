@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file when_all.hpp
+/// \page hpx::when_all
+/// \headerfile hpx/future.hpp
 
 #pragma once
 
@@ -128,6 +130,7 @@ namespace hpx {
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/futures/detail/future_data.hpp>
@@ -223,8 +226,9 @@ namespace hpx::lcos::detail {
         using frame_type = async_when_all_frame<result_type>;
         using no_addref = typename frame_type::base_type::init_no_addref;
 
-        auto frame = hpx::util::traverse_pack_async_allocator(
-            hpx::util::internal_allocator<>{},
+        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+            hpx::util::internal_allocator<>>;
+        auto frame = hpx::util::traverse_pack_async_allocator(allocator_type{},
             hpx::util::async_traverse_in_place_tag<frame_type>{}, no_addref{},
             hpx::traits::acquire_future_disp()(HPX_FORWARD(T, args))...);
 

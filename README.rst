@@ -12,9 +12,9 @@ Documentation: `latest
 `development (master)
 <https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_
 
-===
-HPX
-===
+|hpx_logo|
+
+------
 
 HPX is a C++ Standard Library for Concurrency and Parallelism. It implements all
 of the corresponding facilities as defined by the C++ Standard. Additionally, in
@@ -170,3 +170,7 @@ Past and current funding and support for HPX is listed `here
 .. |OpenSSF| image:: https://bestpractices.coreinfrastructure.org/projects/6093/badge
     :target: https://bestpractices.coreinfrastructure.org/projects/6093
     :alt: OpenSSF Best Practices
+
+.. |hpx_logo| image:: http://hpx.stellar-group.org/files/hpx_logo.png
+    :target: http://hpx.stellar-group.org/
+    :alt: HPX Logo

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2013 Adrian Serio
 //
@@ -74,7 +74,7 @@ namespace hpx {
 ///////////////////////////////////////////////////////////////////////////////
 #if !defined(HPX_CORE_EXPORTS) && !defined(HPX_NO_VERSION_CHECK)
 
-// This is instantiated for each translation unit outside of the HPX core
+// This is instantiated for each translation unit outside the HPX core
 // library, forcing to resolve the variable HPX_CHECK_VERSION.
 namespace {
     // Note: this function is never executed.

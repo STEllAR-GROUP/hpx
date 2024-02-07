@@ -1,14 +1,17 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/executors/guided_chunk_size.hpp
+/// \page hpx::execution::experimental::guided_chunk_size
+/// \headerfile hpx/execution.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -21,7 +24,7 @@ namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Iterations are dynamically assigned to threads in blocks as threads
-    /// request them until no blocks remain to be assigned. Similar to
+    /// request those until no blocks remain to be assigned. Similar to
     /// \a dynamic_chunk_size except that the block size decreases each time a
     /// number of loop iterations is given to a thread. The size of the initial
     /// block is proportional to \a number_of_iterations / \a number_of_cores.
@@ -35,6 +38,13 @@ namespace hpx::execution::experimental {
     ///
     struct guided_chunk_size
     {
+        /// Construct an \a dynamic_chunk_size executor parameters object
+        ///
+        /// \note Default constructed \a dynamic_chunk_size executor parameter
+        ///       types will use a chunk size of '1'.
+        ///
+        guided_chunk_size() = default;
+
         /// Construct a \a guided_chunk_size executor parameters object
         ///
         /// \param min_chunk_size [in] The optional minimal chunk size to use
@@ -43,7 +53,7 @@ namespace hpx::execution::experimental {
         ///                     The default minimal chunk size is 1.
         ///
         constexpr explicit guided_chunk_size(
-            std::size_t min_chunk_size = 1) noexcept
+            std::size_t min_chunk_size) noexcept
           : min_chunk_size_(min_chunk_size)
         {
         }
@@ -53,20 +63,15 @@ namespace hpx::execution::experimental {
         // needs to be invoked for each of the chunks to be combined.
         using has_variable_chunk_size = std::true_type;
 
-        //         template <typename Executor>
-        //         static std::size_t get_maximal_number_of_chunks(
-        //             Executor && exec, std::size_t cores, std:size_t num_tasks)
-        //         {
-        //             // FIXME: find appropriate approximation
-        //             return ...;
-        //         }
-
         template <typename Executor>
-        constexpr std::size_t get_chunk_size(Executor&& /* exec */,
+        friend constexpr std::size_t tag_override_invoke(
+            hpx::parallel::execution::get_chunk_size_t,
+            guided_chunk_size const& this_, Executor&& /* exec */,
             hpx::chrono::steady_duration const&, std::size_t cores,
-            std::size_t num_tasks) const noexcept
+            std::size_t num_tasks) noexcept
         {
-            return (std::max)(min_chunk_size_, (num_tasks + cores - 1) / cores);
+            return (std::max)(
+                this_.min_chunk_size_, (num_tasks + cores - 1) / cores);
         }
         /// \endcond
 
@@ -85,21 +90,18 @@ namespace hpx::execution::experimental {
 
     private:
         /// \cond NOINTERNAL
-        std::size_t min_chunk_size_;
+        std::size_t min_chunk_size_ = 1;
         /// \endcond
     };
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
-
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<
-        hpx::execution::experimental::guided_chunk_size> : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+/// \cond NOINTERNAL
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    hpx::execution::experimental::guided_chunk_size> : std::true_type
+{
+};
+/// \endcond
 
 namespace hpx::execution {
 

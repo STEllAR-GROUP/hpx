@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file source_location.hpp
+/// \page HPX_CURRENT_SOURCE_LOCATION, hpx::source_location
+/// \headerfile hpx/source_location.hpp
 
 #pragma once
 

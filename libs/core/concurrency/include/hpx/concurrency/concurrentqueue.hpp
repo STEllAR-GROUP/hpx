@@ -91,13 +91,13 @@
 #include <thread>    // partly for __WINPTHREADS_VERSION if on MinGW-w64 w/ POSIX threading
 
 // Platform-specific definitions of a numeric thread ID type and an invalid value
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
     template<typename thread_id_t> struct thread_id_converter {
         typedef thread_id_t thread_id_numeric_size_t;
         typedef thread_id_t thread_id_hash_t;
         static thread_id_hash_t prehash(thread_id_t const& x) { return x; }
     };
-} } }
+}
 #if defined(MCDBGQ_USE_RELACY)
 namespace hpx { namespace concurrency { namespace details {
     typedef std::uint32_t thread_id_t;
@@ -109,15 +109,15 @@ namespace hpx { namespace concurrency { namespace details {
 // No sense pulling in windows.h in a header, we'll manually declare the function
 // we use and rely on backwards-compatibility for this not to break
 extern "C" __declspec(dllimport) unsigned long __stdcall GetCurrentThreadId(void);
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
     static_assert(sizeof(unsigned long) == sizeof(std::uint32_t), "Expected size of unsigned long to be 32 bits on Windows");
     typedef std::uint32_t thread_id_t;
-    static const thread_id_t invalid_thread_id  = 0;      // See http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
-    static const thread_id_t invalid_thread_id2 = 0xFFFFFFFFU;  // Not technically guaranteed to be invalid, but is never used in practice. Note that all Win32 thread IDs are presently multiples of 4.
+    static constexpr thread_id_t invalid_thread_id  = 0;      // See http://blogs.msdn.com/b/oldnewthing/archive/2004/02/23/78395.aspx
+    static constexpr thread_id_t invalid_thread_id2 = 0xFFFFFFFFU;  // Not technically guaranteed to be invalid, but is never used in practice. Note that all Win32 thread IDs are presently multiples of 4.
     static inline thread_id_t thread_id() { return static_cast<thread_id_t>(::GetCurrentThreadId()); }
-} } }
+}
 #elif defined(__arm__) || defined(_M_ARM) || defined(__aarch64__) || (defined(__APPLE__) && TARGET_OS_IPHONE)
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
     static_assert(sizeof(std::thread::id) == 4 || sizeof(std::thread::id) == 8, "std::thread::id is expected to be either 4 or 8 bytes");
 
     typedef std::thread::id thread_id_t;
@@ -149,7 +149,7 @@ namespace hpx { namespace concurrency { namespace details {
 #endif
         }
     };
-} } }
+}
 #else
 // Use a nice trick from this answer: http://stackoverflow.com/a/8438730/21475
 // In order to get a numeric thread ID in a platform-independent way, we use a thread-local
@@ -162,12 +162,12 @@ namespace hpx { namespace concurrency { namespace details {
 // Assume C++11 compliant compiler
 #define MOODYCAMEL_THREADLOCAL thread_local
 #endif
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
     typedef std::uintptr_t thread_id_t;
-    static const thread_id_t invalid_thread_id  = 0;    // Address can't be nullptr
-    static const thread_id_t invalid_thread_id2 = 1;    // Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
+    static constexpr thread_id_t invalid_thread_id  = 0;    // Address can't be nullptr
+    static constexpr thread_id_t invalid_thread_id2 = 1;    // Member accesses off a null pointer are also generally invalid. Plus it's not aligned.
     static inline thread_id_t thread_id() { static MOODYCAMEL_THREADLOCAL int x; return reinterpret_cast<thread_id_t>(&x); }
-} } }
+}
 #endif
 
 // Exceptions
@@ -235,7 +235,7 @@ namespace hpx { namespace concurrency { namespace details {
 #endif
 
 // Compiler-specific likely/unlikely hints
-namespace hpx { namespace concurrency { namespace details {
+namespace hpx::concurrency::details {
 #if defined(__GNUC__)
     static inline bool (likely)(bool x) { return __builtin_expect((x), true); }
     static inline bool (unlikely)(bool x) { return __builtin_expect((x), false); }
@@ -243,13 +243,13 @@ namespace hpx { namespace concurrency { namespace details {
     static inline bool (likely)(bool x) { return x; }
     static inline bool (unlikely)(bool x) { return x; }
 #endif
-} } }
+}
 
 #ifdef MOODYCAMEL_QUEUE_INTERNAL_DEBUG
 #include "internal/concurrentqueue_internal_debug.h"
 #endif
 
-namespace hpx { namespace concurrency {
+namespace hpx::concurrency {
 namespace details {
     template<typename T>
     struct const_numeric_max {
@@ -3650,7 +3650,7 @@ inline void swap(typename ConcurrentQueue<T, Traits>::ImplicitProducerKVP& a, ty
     a.swap(b);
 }
 
-} }
+}
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop

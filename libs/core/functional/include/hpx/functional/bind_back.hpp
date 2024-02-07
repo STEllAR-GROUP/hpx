@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file bind_back.hpp
+/// \page hpx::bind_back
+/// \headerfile hpx/functional.hpp
 
 #pragma once
 

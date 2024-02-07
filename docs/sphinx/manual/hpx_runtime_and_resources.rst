@@ -152,8 +152,9 @@ policy use the command line option
 Work requesting scheduling policies
 -----------------------------------
 
-* invoke using: :option:`--hpx:queuing`\ ``local-workrequesting-fifo``
-  or using :option:`--hpx:queuing`\ ``local-workrequesting-lifo``
+* invoke using: :option:`--hpx:queuing`\ ``local-workrequesting-fifo``,
+  using :option:`--hpx:queuing`\ ``local-workrequesting-lifo``,
+  or using :option:`--hpx:queuing`\ ``local-workrequesting-mc``
 
 The work-requesting policies rely on a different mechanism of balancing work
 between cores (compared to the other policies listed above). Instead of actively

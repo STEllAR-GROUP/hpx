@@ -85,8 +85,8 @@ namespace hpx::lcos::detail {
         {
         }
 
-        promise_data_allocator(init_no_addref no_addref, std::in_place_t,
-            other_allocator const& alloc)
+        promise_data_allocator(
+            init_no_addref no_addref, other_allocator const& alloc)
           : promise_data<Result>(no_addref)
           , alloc_(alloc)
         {
@@ -95,7 +95,7 @@ namespace hpx::lcos::detail {
     private:
         void destroy() noexcept
         {
-            typedef std::allocator_traits<other_allocator> traits;
+            using traits = std::allocator_traits<other_allocator>;
 
             other_allocator alloc(alloc_);
             traits::destroy(alloc, this);

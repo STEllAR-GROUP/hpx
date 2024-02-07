@@ -28,6 +28,8 @@ const std::size_t nsteps_default = 1;
 const std::size_t window_default = 10000;
 const std::size_t inject_rate_default = 0;
 const std::size_t batch_size_default = 10;
+const std::size_t nwarmups_default = 1;
+const std::size_t niters_default = 1;
 
 size_t window;
 size_t inject_rate;
@@ -79,6 +81,7 @@ void on_recv(hpx::id_type to, std::vector<char> const& in, std::size_t counter)
         if (result + 1 == window)
         {
             hpx::post<on_done_action>(hpx::find_root_locality());
+            done_counter = 0;
         }
         return;
     }
@@ -104,10 +107,18 @@ int hpx_main(hpx::program_options::variables_map& b_arg)
     window = b_arg["window"].as<std::size_t>();
     inject_rate = b_arg["inject-rate"].as<std::size_t>();
     batch_size = b_arg["batch-size"].as<std::size_t>();
+    std::size_t const nwarmups = b_arg["nwarmups"].as<std::size_t>();
+    std::size_t const niters = b_arg["niters"].as<std::size_t>();
 
     if (nsteps == 0)
     {
         std::cout << "nsteps is 0!" << std::endl;
+        return 0;
+    }
+
+    if (window == 0)
+    {
+        std::cout << "window is 0!" << std::endl;
         return 0;
     }
 
@@ -126,32 +137,43 @@ int hpx_main(hpx::program_options::variables_map& b_arg)
     set_window_action act;
     act(to, window);
 
-    hpx::chrono::high_resolution_timer timer_total;
-
-    for (size_t i = 0; i < window; i += batch_size)
+    double inject_time = 0;
+    double time = 0;
+    for (size_t j = 0; j < nwarmups + niters; ++j)
     {
-        while (inject_rate > 0 &&
-            static_cast<double>(i) / timer_total.elapsed() >
-                static_cast<double>(inject_rate))
+        hpx::chrono::high_resolution_timer timer_total;
+
+        for (size_t i = 0; i < window; i += batch_size)
         {
-            continue;
+            while (inject_rate > 0 &&
+                static_cast<double>(i) / timer_total.elapsed() >
+                    static_cast<double>(inject_rate))
+            {
+                continue;
+            }
+            hpx::post<on_inject_action>(hpx::find_here(), to, nbytes, nsteps);
         }
-        hpx::post<on_inject_action>(hpx::find_here(), to, nbytes, nsteps);
+        if (j >= nwarmups)
+            inject_time += timer_total.elapsed();
+
+        semaphore.wait();
+        if (j >= nwarmups)
+            time += timer_total.elapsed();
     }
+
     double achieved_inject_rate =
-        static_cast<double>(window) / timer_total.elapsed() / 1e3;
-
-    semaphore.wait();
-
-    double time = timer_total.elapsed();
-    double latency = time * 1e6 / static_cast<double>(nsteps);
-    double msg_rate = static_cast<double>(nsteps * window) / time / 1e3;
+        static_cast<double>(window * niters) / inject_time / 1e3;
+    double latency = time * 1e6 / static_cast<double>(nsteps * niters);
+    double msg_rate =
+        static_cast<double>(nsteps * window * niters) / time / 1e3;
     double bandwidth =
-        static_cast<double>(nbytes * nsteps * window) / time / 1e6;
+        static_cast<double>(nbytes * nsteps * window * niters) / time / 1e6;
     if (verbose)
     {
         std::cout << "[hpx_pingpong]" << std::endl
                   << "total_time(secs)=" << time << std::endl
+                  << "nwarmups=" << nwarmups << std::endl
+                  << "niters=" << niters << std::endl
                   << "nbytes=" << nbytes << std::endl
                   << "window=" << window << std::endl
                   << "latency(us)=" << latency << std::endl
@@ -165,6 +187,7 @@ int hpx_main(hpx::program_options::variables_map& b_arg)
     {
         std::cout << "[hpx_pingpong]"
                   << ":total_time(secs)=" << time << ":nbytes=" << nbytes
+                  << ":nwarmups=" << nwarmups << ":niters=" << niters
                   << ":window=" << window << ":latency(us)=" << latency
                   << ":inject_rate(K/s)=" << achieved_inject_rate
                   << ":msg_rate(M/s)=" << msg_rate
@@ -192,7 +215,11 @@ int main(int argc, char* argv[])
         po::value<std::size_t>()->default_value(inject_rate_default),
         "the rate of injecting the first message of ping-pong")("batch-size",
         po::value<std::size_t>()->default_value(batch_size_default),
-        "the number of messages to inject per inject thread")("verbose",
+        "the number of messages to inject per inject thread")("nwarmups",
+        po::value<std::size_t>()->default_value(nwarmups_default),
+        "the iteration count of warmup runs")("niters",
+        po::value<std::size_t>()->default_value(niters_default),
+        "the iteration count of measurement iterations.")("verbose",
         po::value<bool>()->default_value(true),
         "verbosity of output,if false output is for awk");
 

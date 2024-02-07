@@ -30,6 +30,9 @@ set(functional_headers
     hpx/functional/move_only_function.hpp
     hpx/functional/one_shot.hpp
     hpx/functional/protect.hpp
+    hpx/functional/experimental/scope_exit.hpp
+    hpx/functional/experimental/scope_fail.hpp
+    hpx/functional/experimental/scope_success.hpp
     hpx/functional/serialization/detail/serializable_basic_function.hpp
     hpx/functional/serialization/detail/vtable/serializable_function_vtable.hpp
     hpx/functional/serialization/detail/vtable/serializable_vtable.hpp

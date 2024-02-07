@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@ namespace hpx::threads::detail {
 
         thread_nums& thread_nums_tss()
         {
-            static thread_local thread_nums thread_nums_tss_ = {
+            thread_local thread_nums thread_nums_tss_ = {
                 static_cast<std::size_t>(-1), static_cast<std::size_t>(-1),
                 static_cast<std::size_t>(-1)};
             return thread_nums_tss_;

@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2021 Hartmut Kaiser
+//  Copyright (c) 1998-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -12,6 +12,7 @@
 #include <hpx/functional/bind_front.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
+#include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_local/state.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/register_thread.hpp>
@@ -24,6 +25,7 @@
 #include <list>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 
 namespace hpx { namespace util {
@@ -47,72 +49,63 @@ namespace hpx { namespace util {
 
     void* one_size_heap_list::alloc(std::size_t count)
     {
-        std::unique_lock guard(mtx_);
-
         if (HPX_UNLIKELY(0 == count))
         {
-            guard.unlock();
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::alloc",
                 "cannot allocate 0 objects");
         }
 
         void* p = nullptr;
 
-        if (!heap_list_.empty())
         {
-            for (auto& heap : heap_list_)
+            std::shared_lock<hpx::shared_mutex> sl(rwlock_);
+
+            if (!heap_list_.empty())
             {
-                bool allocated = false;
-
+                for (auto& heap : heap_list_)
                 {
-                    hpx::unlock_guard ul(guard);
-                    allocated = heap->alloc(&p, count);
-                }
-
-                if (allocated)
-                {
+                    if (heap->alloc(&p, count))
+                    {
 #if defined(HPX_DEBUG)
-                    // Allocation succeeded, update statistics.
-                    alloc_count_ += count;
-                    if (alloc_count_ - free_count_ > max_alloc_count_)
-                        max_alloc_count_ = alloc_count_ - free_count_;
+                        // Allocation succeeded, update statistics.
+                        alloc_count_ += count;
+                        if (alloc_count_ - free_count_ > max_alloc_count_)
+                            max_alloc_count_ = alloc_count_ - free_count_;
 #endif
-                    return p;
-                }
+                        return p;
+                    }
 
 #if defined(HPX_DEBUG)
-                LOSH_(info).format(
-                    "{1}::alloc: failed to allocate from heap[{2}] "
-                    "(heap[{2}] has allocated {3} objects and has "
-                    "space for {4} more objects)",
-                    name(), heap->heap_count(), heap->size(),
-                    heap->free_size());
+                    LOSH_(info).format(
+                        "{1}::alloc: failed to allocate from heap[{2}] "
+                        "(heap[{2}] has allocated {3} objects and has "
+                        "space for {4} more objects)",
+                        name(), heap->heap_count(), heap->size(),
+                        heap->free_size());
 #endif
+                }
             }
         }
 
         // Create new heap.
-#if defined(HPX_DEBUG)
-        heap_list_.push_front(
-            create_heap_(class_name_.c_str(), heap_count_ + 1, parameters_));
-#else
-        heap_list_.push_front(
-            create_heap_(class_name_.c_str(), 0, parameters_));
-#endif
-
-        auto const itnew = heap_list_.begin();
-        list_type::value_type const heap = *itnew;
         bool result = false;
+        std::shared_ptr<util::wrapper_heap_base> heap;
+#if defined(HPX_DEBUG)
+        heap = create_heap_(class_name_.c_str(), heap_count_ + 1, parameters_);
+#else
+        heap = create_heap_(class_name_.c_str(), 0, parameters_);
+#endif
+        result = heap->alloc((void**) &p, count);
 
+        // Add the heap into the list
         {
-            hpx::unlock_guard ul(guard);
-            result = heap->alloc((void**) &p, count);
+            std::unique_lock<hpx::shared_mutex> ul(rwlock_);
+            heap_list_.push_front(heap);
         }
 
         if (HPX_UNLIKELY(!result || nullptr == p))
         {
             // out of memory
-            guard.unlock();
             HPX_THROW_EXCEPTION(hpx::error::out_of_memory, name() + "::alloc",
                 "new heap failed to allocate {1} objects", count);
         }
@@ -155,32 +148,22 @@ namespace hpx { namespace util {
         if (reschedule(p, count))
             return;
 
-        std::unique_lock ul(mtx_);
-
-        // Find the heap which allocated this pointer.
-        for (auto& heap : heap_list_)
         {
-            bool did_allocate = false;
+            std::shared_lock<hpx::shared_mutex> sl(rwlock_);
 
+            // Find the heap which allocated this pointer.
+            for (auto const& heap : heap_list_)
             {
-                hpx::unlock_guard ull(ul);
-                did_allocate = heap->did_alloc(p);
-                if (did_allocate)
+                if (heap->did_alloc(p))
                 {
                     heap->free(p, count);
+#if defined(HPX_DEBUG)
+                    free_count_ += count;
+#endif
+                    return;
                 }
             }
-
-            if (did_allocate)
-            {
-#if defined(HPX_DEBUG)
-                free_count_ += count;
-#endif
-                return;
-            }
         }
-
-        ul.unlock();
 
         HPX_THROW_EXCEPTION(hpx::error::bad_parameter, name() + "::free",
             "pointer {1} was not allocated by this {2}", p, name());
@@ -188,10 +171,9 @@ namespace hpx { namespace util {
 
     bool one_size_heap_list::did_alloc(void* p) const
     {
-        std::unique_lock ul(mtx_);
-        for (typename list_type::value_type const& heap : heap_list_)
+        std::shared_lock<hpx::shared_mutex> sl(rwlock_);
+        for (auto const& heap : heap_list_)
         {
-            hpx::unlock_guard ull(ul);
             if (heap->did_alloc(p))
             {
                 return true;
@@ -204,7 +186,7 @@ namespace hpx { namespace util {
     {
         if (class_name_.empty())
         {
-            return std::string("one_size_heap_list(unknown)");
+            return {"one_size_heap_list(unknown)"};
         }
         return std::string("one_size_heap_list(") + class_name_ + ")";
     }

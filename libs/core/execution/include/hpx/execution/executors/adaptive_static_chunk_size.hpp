@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2022 Karame M.Shokooh
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,16 +10,14 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <hpx/execution/executors/execution_parameters_fwd.hpp>
-
 #include <chrono>
 #include <cmath>
 #include <cstddef>
-#include <iostream>
 #include <type_traits>
 
 namespace hpx::execution::experimental {
@@ -40,10 +38,7 @@ namespace hpx::execution::experimental {
         ///       the number of available cores and the overall number of loop
         ///       iterations to schedule.
         ///
-        constexpr adaptive_static_chunk_size() noexcept
-          : chunk_size_(0)
-        {
-        }
+        adaptive_static_chunk_size() = default;
 
         /// Construct a \a adaptive_static_chunk_size executor parameters object
         ///
@@ -59,18 +54,20 @@ namespace hpx::execution::experimental {
 
         /// \cond NOINTERNAL
         template <typename Executor>
-        std::size_t get_chunk_size(Executor& exec,
+        friend std::size_t tag_override_invoke(
+            hpx::parallel::execution::get_chunk_size_t,
+            adaptive_static_chunk_size const& this_, Executor& exec,
             hpx::chrono::steady_duration const&, std::size_t cores,
             std::size_t input_size)
         {
-            // Make sure the internal round robin counter of the executor is
+            // Make sure the internal round-robin counter of the executor is
             // reset
-            parallel::execution::reset_thread_distribution(*this, exec);
+            parallel::execution::reset_thread_distribution(this_, exec);
 
             // use the given chunk size if given
-            if (chunk_size_ != 0)
+            if (this_.chunk_size_ != 0)
             {
-                return chunk_size_;
+                return this_.chunk_size_;
             }
 
             if (cores == 1)
@@ -115,22 +112,18 @@ namespace hpx::execution::experimental {
 
     private:
         /// \cond NOINTERNAL
-        std::size_t chunk_size_;
+        std::size_t chunk_size_ = 0;
         /// \endcond
     };
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
-
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<
-        hpx::execution::experimental::adaptive_static_chunk_size>
-      : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+/// \cond NOINTERNAL
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    hpx::execution::experimental::adaptive_static_chunk_size> : std::true_type
+{
+};
+/// \endcond
 
 namespace hpx::execution {
 

@@ -195,13 +195,19 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
-# Run with amudprun
-# This is executing amudprun with the "-np" option set to the number of localities
 def run_gasnet(cmd, localities, verbose):
-    exec_cmd = ['amudprun', '-np', str(localities)] + cmd
-    if verbose:
-        print('Executing command: ' + ' '.join(exec_cmd))
-    subproc(exec_cmd)
+    os.environ['GASNET_PSHM_NODES'] = str(localities)
+    os.environ['GASNET_QUIET'] = 'yes'
+    os.environ['GASNET_ROUTE_OUTPUT'] = '0'
+    run_mpi(cmd, localities, verbose)
+
+def run_gasnet_smp(cmd, localities, verbose):
+    os.environ['GASNET_PSHM_NODES'] = str(localities)
+    os.environ['GASNET_BARRIER'] = 'PSHM'
+    os.environ['GASNET_QUIET'] = 'yes'
+    os.environ['GASNET_ROUTE_OUTPUT'] = '0'
+    # No launcher needed
+    run_none(cmd, localities, nodes, verbose)
 
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
@@ -229,6 +235,9 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'gasnet':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_gasnet(cmd, localities, verbose)
+    if runwrapper == 'gasnet-smp':
+        assert nodes is None, "nodes option only valid with smp parcelport."
+        run_gasnet_smp(cmd, localities, verbose)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
@@ -294,7 +303,7 @@ def check_options(parser, options, args):
         sys.exit(1)
 
     check_valid_runwrapper = (lambda x:
-            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun');
+            x == 'none' or x == 'mpi' or x == 'srun' or x =='jsrun' or x == 'gasnet' or x == 'gasnet-smp');
     if not check_valid_runwrapper(options.runwrapper):
         print('Error: Runwrapper option not valid\n', sys.stderr)
         parser.print_help()
@@ -379,7 +388,7 @@ Used by the tcp parcelport only.
     parser.add_option('-r', '--runwrapper'
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
-      , help='Which runwrapper to use (Options are: none, mpi, gasnet, srun, jsrun) '
+      , help='Which runwrapper to use (Options are: none, mpi, gasnet, gasnet-smp, srun, jsrun) '
              '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'

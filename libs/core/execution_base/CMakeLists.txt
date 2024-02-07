@@ -55,6 +55,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config
+    hpx_coroutines
     hpx_errors
     hpx_format
     hpx_functional

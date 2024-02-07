@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/all_any_none.hpp
+/// \page hpx::all_of, hpx::any_of, hpx::none_of
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

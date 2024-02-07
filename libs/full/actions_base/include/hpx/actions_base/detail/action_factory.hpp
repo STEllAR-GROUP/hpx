@@ -19,7 +19,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     struct action_registry
     {
@@ -37,6 +37,8 @@ namespace hpx { namespace actions { namespace detail {
         static constexpr std::uint32_t invalid_id = ~0;
 
         HPX_EXPORT action_registry();
+        HPX_EXPORT ~action_registry();
+
         HPX_EXPORT void register_factory(
             std::string const& type_name, ctor_t ctor, ctor_t ctor_cont);
         HPX_EXPORT void register_typename(
@@ -52,7 +54,7 @@ namespace hpx { namespace actions { namespace detail {
         HPX_EXPORT static action_registry& instance();
 
         void cache_id(std::uint32_t id, ctor_t ctor, ctor_t ctor_cont);
-        std::string collect_registered_typenames();
+        std::string collect_registered_typenames() const;
 
         std::uint32_t max_id_;
         typename_to_ctor_t typename_to_ctor_;
@@ -72,6 +74,8 @@ namespace hpx { namespace actions { namespace detail {
         add_constant_entry& operator=(add_constant_entry&&) = delete;
 
         add_constant_entry();
+        ~add_constant_entry() = default;
+
         static add_constant_entry instance;
     };
 
@@ -84,19 +88,16 @@ namespace hpx { namespace actions { namespace detail {
         action_registry::instance().register_typename(
             get_action_name_id<Id>(), Id);
     }
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #define HPX_REGISTER_ACTION_FACTORY_ID(Name, Id)                               \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()         \
-                {                                                              \
-                    return HPX_PP_STRINGIZE(Name);                             \
-                }                                                              \
-                template add_constant_entry<Id>                                \
-                    add_constant_entry<Id>::instance;                          \
-            }                                                                  \
+    namespace hpx::actions::detail {                                           \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT std::string get_action_name_id<Id>()                 \
+        {                                                                      \
+            return HPX_PP_STRINGIZE(Name);                                     \
         }                                                                      \
+        template add_constant_entry<Id> add_constant_entry<Id>::instance;      \
     }                                                                          \
     /**/
 

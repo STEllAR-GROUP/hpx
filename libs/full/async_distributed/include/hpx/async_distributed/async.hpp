@@ -14,7 +14,6 @@
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
-#include <hpx/async_distributed/async.hpp>
 #include <hpx/async_distributed/async_continue.hpp>
 #include <hpx/async_distributed/bind_action.hpp>
 #include <hpx/async_distributed/detail/async_implementations.hpp>
@@ -75,7 +74,7 @@ namespace hpx::detail {
         template <typename Policy_, typename Client, typename Stub,
             typename Data, typename... Ts>
         HPX_FORCEINLINE static result_type call(Policy_&& launch_policy,
-            components::client_base<Client, Stub, Data> c, Ts&&... ts)
+            components::client_base<Client, Stub, Data> const& c, Ts&&... ts)
         {
             // make sure the action is compatible with the component type
             using component_type = typename components::client_base<Client,
@@ -213,7 +212,10 @@ namespace hpx::detail {
         call(hpx::actions::basic_action<Component, Signature, Derived> const&,
             hpx::id_type const& id, Ts&&... vs)
         {
-            return async<Derived>(launch::async, id, HPX_FORWARD(Ts, vs)...);
+            constexpr auto priority = traits::action_priority_v<Derived>;
+            constexpr auto stacksize = traits::action_stacksize_v<Derived>;
+            return async<Derived>(launch::async_policy(priority, stacksize), id,
+                HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,
@@ -230,8 +232,10 @@ namespace hpx::detail {
             static_assert(traits::is_valid_action_v<Derived, component_type>,
                 "The action to invoke is not supported by the target");
 
-            return async<Derived>(
-                launch::async, c.get_id(), HPX_FORWARD(Ts, vs)...);
+            constexpr auto priority = traits::action_priority_v<Derived>;
+            constexpr auto stacksize = traits::action_stacksize_v<Derived>;
+            return async<Derived>(launch::async_policy(priority, stacksize),
+                c.get_id(), HPX_FORWARD(Ts, vs)...);
         }
 
         template <typename Component, typename Signature, typename Derived,

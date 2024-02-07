@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx_init.hpp>
 #include <hpx/include/actions.hpp>
@@ -21,7 +22,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 bool on_shutdown_executed = false;
-std::uint32_t locality_id = std::uint32_t(-1);
+std::uint32_t locality_id = static_cast<std::uint32_t>(-1);
 
 std::int32_t final_result = 0;
 hpx::util::spinlock result_mutex;
@@ -59,10 +60,10 @@ struct increment_server
     HPX_DEFINE_COMPONENT_ACTION(increment_server, call)
 };
 
-typedef hpx::components::managed_component<increment_server> server_type;
+using server_type = hpx::components::managed_component<increment_server>;
 HPX_REGISTER_COMPONENT(server_type, increment_server)
 
-typedef increment_server::call_action call_action;
+using call_action = increment_server::call_action;
 HPX_REGISTER_ACTION_DECLARATION(call_action)
 HPX_REGISTER_ACTION(call_action)
 
@@ -84,7 +85,8 @@ int hpx_main()
     hpx::id_type there = here;
     if (hpx::get_num_localities(hpx::launch::sync) > 1)
     {
-        std::vector<hpx::id_type> localities = hpx::find_remote_localities();
+        std::vector<hpx::id_type> const localities =
+            hpx::find_remote_localities();
         there = localities[0];
     }
 
@@ -96,7 +98,7 @@ int hpx_main()
     {
         hpx::future<hpx::id_type> inc_f =
             hpx::components::new_<increment_server>(there);
-        hpx::id_type where = inc_f.get();
+        hpx::id_type const where = inc_f.get();
 
         increment_action inc;
         hpx::post(inc, hpx::colocated(where), here, 1);
@@ -105,7 +107,7 @@ int hpx_main()
     {
         hpx::future<hpx::id_type> inc_f =
             hpx::components::new_<increment_server>(there);
-        hpx::id_type where = inc_f.get();
+        hpx::id_type const where = inc_f.get();
 
         hpx::post<increment_action>(hpx::colocated(where), here, 1);
     }
@@ -126,9 +128,10 @@ int main(int argc, char* argv[])
     HPX_TEST_EQ_MSG(
         hpx::init(argc, argv), 0, "HPX main exited with non-zero status");
 
-    HPX_TEST_NEQ(std::uint32_t(-1), locality_id);
-    HPX_TEST_NEQ(on_shutdown_executed || 0, locality_id);
+    HPX_TEST_NEQ(static_cast<std::uint32_t>(-1), locality_id);
+    HPX_TEST(on_shutdown_executed || locality_id != 0);
 
     return hpx::util::report_errors();
 }
+
 #endif

@@ -14,7 +14,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/server/component_base.hpp>
 #include <hpx/datastructures/any.hpp>
-#include <hpx/futures/future.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/synchronization/spinlock.hpp>
@@ -57,6 +56,48 @@ namespace hpx::collectives::detail {
 
         HPX_EXPORT explicit communicator_server(std::size_t num_sites) noexcept;
 
+    private:
+        template <typename Operation>
+        struct logging_helper
+        {
+#if defined(HPX_HAVE_LOGGING)
+            logging_helper(
+                std::size_t which, std::size_t generation, char const* op)
+              : which_(which)
+              , generation_(generation)
+              , op_(op)
+            {
+                LHPX_(info, " [COL] ")
+                    .format("{}(>>> {}): which({}), generation({})", op,
+                        traits::communication::communicator_name<Operation>(),
+                        which, generation);
+            }
+
+            ~logging_helper()
+            {
+                LHPX_(info, " [COL] ")
+                    .format("{}(<<< {}): which({}), generation({})", op_,
+                        traits::communication::communicator_name<Operation>(),
+                        which_, generation_);
+            }
+
+            std::size_t which_;
+            std::size_t generation_;
+            char const* op_;
+#else
+            constexpr logging_helper(
+                std::size_t, std::size_t, char const*) noexcept
+            {
+            }
+#endif
+
+            logging_helper(logging_helper const&) = delete;
+            logging_helper(logging_helper&&) = delete;
+            logging_helper& operator=(logging_helper const&) = delete;
+            logging_helper& operator=(logging_helper&&) = delete;
+        };
+
+    public:
         ///////////////////////////////////////////////////////////////////////
         // generic get action, dispatches to proper operation
         template <typename Operation, typename Result, typename... Args>
@@ -66,10 +107,8 @@ namespace hpx::collectives::detail {
             using collective_operation =
                 traits::communication_operation<communicator_server, Operation>;
 
-            LHPX_(info, " [COL] ")
-                .format("get({}): which({}), generation({})",
-                    traits::communication::communicator_name<Operation>(),
-                    which, generation);
+            [[maybe_unused]] logging_helper<Operation> log(
+                which, generation, "get");
 
             return collective_operation::template get<Result>(
                 *this, which, generation, HPX_MOVE(args)...);
@@ -77,10 +116,19 @@ namespace hpx::collectives::detail {
 
         template <typename Operation, typename Result, typename... Args>
         struct communication_get_action
-          : hpx::actions::make_action<Result (communicator_server::*)(
-                                          std::size_t, std::size_t, Args...),
+          : hpx::actions::action<Result (communicator_server::*)(
+                                     std::size_t, std::size_t, Args...),
                 &communicator_server::get_result<Operation, Result, Args...>,
-                communication_get_action<Operation, Result, Args...>>::type
+                communication_get_action<Operation, Result, Args...>>
+        {
+        };
+
+        template <typename Operation, typename Result, typename... Args>
+        struct communication_get_direct_action
+          : hpx::actions::direct_action<Result (communicator_server::*)(
+                                            std::size_t, std::size_t, Args...),
+                &communicator_server::get_result<Operation, Result, Args...>,
+                communication_get_direct_action<Operation, Result, Args...>>
         {
         };
 
@@ -91,10 +139,8 @@ namespace hpx::collectives::detail {
             using collective_operation =
                 traits::communication_operation<communicator_server, Operation>;
 
-            LHPX_(info, " [COL] ")
-                .format("set({}): which({}), generation({})",
-                    traits::communication::communicator_name<Operation>(),
-                    which, generation);
+            [[maybe_unused]] logging_helper<Operation> log(
+                which, generation, "set");
 
             return collective_operation::template set<Result>(
                 *this, which, generation, HPX_MOVE(args)...);
@@ -102,35 +148,48 @@ namespace hpx::collectives::detail {
 
         template <typename Operation, typename Result, typename... Args>
         struct communication_set_action
-          : hpx::actions::make_action<Result (communicator_server::*)(
-                                          std::size_t, std::size_t, Args...),
+          : hpx::actions::action<Result (communicator_server::*)(
+                                     std::size_t, std::size_t, Args...),
                 &communicator_server::set_result<Operation, Result, Args...>,
-                communication_set_action<Operation, Result, Args...>>::type
+                communication_set_action<Operation, Result, Args...>>
+        {
+        };
+
+        template <typename Operation, typename Result, typename... Args>
+        struct communication_set_direct_action
+          : hpx::actions::direct_action<Result (communicator_server::*)(
+                                            std::size_t, std::size_t, Args...),
+                &communicator_server::set_result<Operation, Result, Args...>,
+                communication_set_direct_action<Operation, Result, Args...>>
         {
         };
 
     private:
         // re-initialize data
-        template <typename T, typename Lock>
-        void reinitialize_data(Lock& l, std::size_t num_values)
+        template <typename T>
+        void reinitialize_data(std::size_t num_values)
         {
-            HPX_ASSERT_OWNS_LOCK(l);
             if (needs_initialization_)
             {
                 needs_initialization_ = false;
                 data_available_ = false;
-                data_ = std::vector<T>(
+
+                auto const new_size =
                     num_values == static_cast<std::size_t>(-1) ? num_sites_ :
-                                                                 num_values);
+                                                                 num_values;
+                auto* data = hpx::any_cast<std::vector<T>>(&data_);
+                if (data == nullptr || data->size() < new_size)
+                {
+                    data_ = std::vector<T>(new_size);
+                }
             }
         }
 
-        template <typename T, typename Lock>
+        template <typename T>
         std::vector<T>& access_data(
-            Lock& l, std::size_t num_values = static_cast<std::size_t>(-1))
+            std::size_t num_values = static_cast<std::size_t>(-1))
         {
-            HPX_ASSERT_OWNS_LOCK(l);
-            reinitialize_data<T>(l, num_values);
+            reinitialize_data<T>(num_values);
             return hpx::any_cast<std::vector<T>&>(data_);
         }
 
@@ -142,34 +201,21 @@ namespace hpx::collectives::detail {
             {
                 needs_initialization_ = true;
                 data_available_ = false;
-                data_.reset();
-            }
-        }
-
-        template <typename Lock>
-        void set_and_invalidate_data(
-            std::size_t which, std::size_t generation, Lock l) noexcept
-        {
-            HPX_ASSERT_OWNS_LOCK(l);
-
-            // set() consumes lock
-            if (gate_.set(which, HPX_MOVE(l)))
-            {
-                l = Lock(mtx_);
-                if (generation != static_cast<std::size_t>(-1))
-                {
-                    gate_.next_generation(l, generation);
-                }
-                invalidate_data(l);
             }
         }
 
         template <typename F, typename Lock>
-        auto get_future_and_synchronize(std::size_t generation, F&& f, Lock& l)
+        auto get_future_and_synchronize(
+            std::size_t generation, std::size_t capacity, F&& f, Lock& l)
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            auto fut = gate_.get_shared_future(l).then(
-                hpx::launch::sync, HPX_FORWARD(F, f));
+            auto sf = gate_.get_shared_future(l);
+
+            traits::detail::get_shared_state(sf)->reserve_callbacks(
+                capacity == static_cast<std::size_t>(-1) ? num_sites_ :
+                                                           capacity);
+
+            auto fut = sf.then(hpx::launch::sync, HPX_FORWARD(F, f));
 
             gate_.synchronize(generation == static_cast<std::size_t>(-1) ?
                     gate_.generation(l) :
@@ -196,12 +242,9 @@ namespace hpx::collectives::detail {
                 if constexpr (!std::is_same_v<std::nullptr_t,
                                   std::decay_t<Finalizer>>)
                 {
-                    std::unique_lock l(mtx_);
-                    [[maybe_unused]] util::ignore_while_checking il(&l);
-
                     // call provided finalizer
                     return HPX_FORWARD(Finalizer, finalizer)(
-                        access_data<Data>(l, num_values), data_available_);
+                        access_data<Data>(num_values), data_available_);
                 }
                 else
                 {
@@ -214,23 +257,31 @@ namespace hpx::collectives::detail {
             std::unique_lock l(mtx_);
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
-            auto f =
-                get_future_and_synchronize(generation, HPX_MOVE(on_ready), l);
+            auto f = get_future_and_synchronize(
+                generation, num_values, HPX_MOVE(on_ready), l);
 
             if constexpr (!std::is_same_v<std::nullptr_t, std::decay_t<Step>>)
             {
                 // call provided step function for each invocation site
-                HPX_FORWARD(Step, step)(access_data<Data>(l, num_values));
+                HPX_FORWARD(Step, step)(access_data<Data>(num_values));
             }
 
-            set_and_invalidate_data(which, generation, HPX_MOVE(l));
+            // Make sure next generation is enabled only after previous
+            // generation has finished executing.
+            //
+            // set() consumes the lock
+            gate_.set(
+                which, HPX_MOVE(l), [this, generation](auto& l, auto& gate) {
+                    gate.next_generation(l, generation);
+                    this->invalidate_data(l);
+                });
 
             return f;
         }
 
         // protect against vector<bool> idiosyncrasies
         template <typename ValueType, typename Data>
-        static decltype(auto) handle_bool(Data&& data)
+        static constexpr decltype(auto) handle_bool(Data&& data)
         {
             if constexpr (std::is_same_v<ValueType, bool>)
             {

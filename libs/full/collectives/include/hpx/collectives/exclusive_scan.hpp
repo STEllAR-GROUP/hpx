@@ -172,7 +172,8 @@ namespace hpx::traits {
                 which, generation,
                 // step function (invoked for each get)
                 [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
-                // finalizer (invoked after all data has been received)
+                // finalizer (invoked non-concurrently after all data has been
+                // received)
                 [which, op = HPX_FORWARD(F, op)](
                     auto& data, bool& data_available) mutable {
                     if (!data_available)
@@ -180,6 +181,7 @@ namespace hpx::traits {
                         std::vector<std::decay_t<T>> dest;
                         dest.resize(data.size());
 
+                        // first value is not taken into account
                         auto it = data.begin();
                         hpx::exclusive_scan(it, data.end(), dest.begin(), *it,
                             HPX_FORWARD(F, op));
@@ -188,7 +190,7 @@ namespace hpx::traits {
                         data_available = true;
                     }
                     return Communicator::template handle_bool<std::decay_t<T>>(
-                        data[which]);
+                        HPX_MOVE(data[which]));
                 });
         }
     };
@@ -222,13 +224,13 @@ namespace hpx::collectives {
                 generation](communicator&& c) mutable -> hpx::future<arg_type> {
             using func_type = std::decay_t<F>;
             using action_type =
-                detail::communicator_server::communication_get_action<
+                detail::communicator_server::communication_get_direct_action<
                     traits::communication::exclusive_scan_tag,
                     hpx::future<arg_type>, arg_type, func_type>;
 
             // explicitly unwrap returned future
-            hpx::future<arg_type> result = async(action_type(), c, this_site,
-                generation, HPX_MOVE(local_result), HPX_MOVE(op));
+            hpx::future<arg_type> result = hpx::async(action_type(), c,
+                this_site, generation, HPX_MOVE(local_result), HPX_MOVE(op));
 
             if (!result.is_ready())
             {

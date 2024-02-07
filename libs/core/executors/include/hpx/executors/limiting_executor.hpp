@@ -13,6 +13,7 @@
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/detail/invoke.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/threading_base/print.hpp>
 
 #include <atomic>
@@ -42,26 +43,6 @@ namespace hpx::execution::experimental {
     struct limiting_executor
     {
         // --------------------------------------------------------------------
-        // RAII wrapper for counting task completions (count_down)
-        // count_up is done in the executor when the task is first scheduled
-        // This object is destructed when the task has completed
-        // --------------------------------------------------------------------
-        struct on_exit
-        {
-            explicit on_exit(limiting_executor const& this_e) noexcept
-              : executor_(this_e)
-            {
-            }
-            ~on_exit()
-            {
-                lim_debug.debug(hpx::debug::str<>("Count Down"));
-                executor_.count_down();
-            }
-
-            limiting_executor const& executor_;
-        };
-
-        // --------------------------------------------------------------------
         // this is the default wrapper struct that invokes count up / down
         // and uses the limiting executor counter to control throttling
         //
@@ -90,7 +71,11 @@ namespace hpx::execution::experimental {
             template <typename... Ts>
             decltype(auto) operator()(Ts&&... ts)
             {
-                on_exit _{limiting_};
+                auto on_exit = hpx::experimental::scope_exit([&] {
+                    lim_debug.debug(hpx::debug::str<>("Count Down"));
+                    limiting_.count_down();
+                });
+
                 return HPX_INVOKE(f_, HPX_FORWARD(Ts, ts)...);
             }
 

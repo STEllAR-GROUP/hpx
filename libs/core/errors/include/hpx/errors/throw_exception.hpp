@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file throw_exception.hpp
+/// \page HPX_THROW_EXCEPTION, HPX_THROWS_IF
+/// \headerfile hpx/exception.hpp
 
 #pragma once
 

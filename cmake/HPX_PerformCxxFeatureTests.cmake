@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2022 Hartmut Kaiser
+# Copyright (c) 2007-2024 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
 # Copyright (c) 2013-2016 Agustin Berge
 # Copyright (c)      2017 Taeguk Kwon
@@ -85,7 +85,9 @@ function(hpx_perform_cxx_feature_tests)
   )
 
   # C++20 feature tests
-  if(MSVC_VERSION GREATER_EQUAL 1929)
+  if(HPX_WITH_SUPPORT_NO_UNIQUE_ADDRESS_ATTRIBUTE AND MSVC_VERSION
+                                                      GREATER_EQUAL 1929
+  )
     # MSVC supports this attribute for all versions starting VS2019 v16.10 see
     # https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/
     hpx_check_for_cxx20_no_unique_address_attribute(
@@ -112,7 +114,7 @@ function(hpx_perform_cxx_feature_tests)
       DEFINITIONS HPX_HAVE_CXX20_PERFECT_PACK_CAPTURE
     )
 
-    if(NOT MSVC) # see above
+    if(HPX_WITH_SUPPORT_NO_UNIQUE_ADDRESS_ATTRIBUTE AND NOT MSVC) # see above
       hpx_check_for_cxx20_no_unique_address_attribute(
         DEFINITIONS HPX_HAVE_CXX20_NO_UNIQUE_ADDRESS_ATTRIBUTE
       )
@@ -149,11 +151,19 @@ function(hpx_perform_cxx_feature_tests)
     )
 
     hpx_check_for_cxx20_std_bit_cast(DEFINITIONS HPX_HAVE_CXX20_STD_BIT_CAST)
+
+    hpx_check_for_cxx20_constexpr_destructor(
+      DEFINITIONS HPX_HAVE_CXX20_CONSTEXPR_DESTRUCTOR
+    )
   endif()
 
   if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 23)
     hpx_check_for_cxx23_std_generator(DEFINITIONS HPX_HAVE_CXX23_STD_GENERATOR)
   endif()
+
+  hpx_check_for_cxx26_experimental_scope(
+    DEFINITIONS HPX_HAVE_CXX26_EXPERIMENTAL_SCOPE
+  )
 
   hpx_check_for_cxx_lambda_capture_decltype(
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE

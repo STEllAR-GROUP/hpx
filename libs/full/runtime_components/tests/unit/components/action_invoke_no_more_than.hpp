@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,6 +14,7 @@
 #include <hpx/async_distributed/continuation.hpp>
 #include <hpx/components_base/traits/action_decorate_function.hpp>
 #include <hpx/functional/bind_back.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/futures/traits/is_future.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/counting_semaphore.hpp>
@@ -25,31 +26,13 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace actions { namespace detail {
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename Semaphore>
-    struct signal_on_exit
-    {
-        signal_on_exit(Semaphore& sem)
-          : sem_(sem)
-        {
-            sem_.wait();
-        }
-
-        ~signal_on_exit()
-        {
-            sem_.signal();
-        }
-
-    private:
-        Semaphore& sem_;
-    };
+namespace hpx::actions::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Action, int N>
     struct action_decorate_function_semaphore
     {
-        typedef hpx::counting_semaphore_var<hpx::spinlock, N> semaphore_type;
+        using semaphore_type = hpx::counting_semaphore_var<hpx::spinlock, N>;
 
         struct tag
         {
@@ -67,19 +50,20 @@ namespace hpx { namespace actions { namespace detail {
     struct action_decorate_function
     {
         static constexpr bool value = true;
+
         // This wrapper is needed to stop infinite recursion when
         // trying to get the possible additional function decoration
         // from the component
         struct action_wrapper
         {
-            typedef typename Action::component_type component_type;
+            using component_type = typename Action::component_type;
         };
 
         static_assert(!Action::direct_execution::value,
             "explicit decoration of direct actions is not supported");
 
-        typedef action_decorate_function_semaphore<Action, N>
-            construct_semaphore_type;
+        using construct_semaphore_type =
+            action_decorate_function_semaphore<Action, N>;
 
         // If the action returns something which is not a future, we inject
         // a semaphore into the call graph.
@@ -87,11 +71,10 @@ namespace hpx { namespace actions { namespace detail {
             threads::thread_restart_state state,
             threads::thread_function_type f)
         {
-            typedef typename construct_semaphore_type::semaphore_type
-                semaphore_type;
+            construct_semaphore_type::get_sem().wait();
+            auto on_exit = hpx::experimental::scope_exit(
+                [] { construct_semaphore_type::get_sem().signal(); });
 
-            signal_on_exit<semaphore_type> on_exit(
-                construct_semaphore_type::get_sem());
             return f(state);
         }
 
@@ -159,7 +142,9 @@ namespace hpx { namespace actions { namespace detail {
         template <typename Archive>
         void serialize(Archive& ar, unsigned int)
         {
-            ar& addr_;
+            // clang-format off
+            ar & addr_;
+            // clang-format on
         }
     };
 
@@ -197,24 +182,22 @@ namespace hpx { namespace actions { namespace detail {
             }
         }
     };
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_ACTION_INVOKE_NO_MORE_THAN(action, maxnum)                         \
-    namespace hpx { namespace traits {                                         \
-            template <>                                                        \
-            struct action_decorate_function<action>                            \
-              : hpx::actions::detail::action_decorate_function<action, maxnum> \
-            {                                                                  \
-            };                                                                 \
+    namespace hpx::traits {                                                    \
+        template <>                                                            \
+        struct action_decorate_function<action>                                \
+          : hpx::actions::detail::action_decorate_function<action, maxnum>     \
+        {                                                                      \
+        };                                                                     \
                                                                                \
-            template <>                                                        \
-            struct action_decorate_continuation<action>                        \
-              : hpx::actions::detail::action_decorate_continuation<action,     \
-                    maxnum>                                                    \
-            {                                                                  \
-            };                                                                 \
-        }                                                                      \
+        template <>                                                            \
+        struct action_decorate_continuation<action>                            \
+          : hpx::actions::detail::action_decorate_continuation<action, maxnum> \
+        {                                                                      \
+        };                                                                     \
     }                                                                          \
     /**/
 

@@ -54,27 +54,29 @@ namespace hpx::parcelset::policies::lci {
     {
         auto start_time = util::lci_environment::pcounter_now();
         return_t ret;
-        const int retry_max_spin = 32;
+        // const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
             HPX_UNLIKELY(!pp_->is_initialized))
         {
             // If we are sending early parcels, we should not expect the
             // thread make progress on the backlog queue
-            int retry_count = 0;
+            //            int retry_count = 0;
             do
             {
                 ret = send_nb();
                 if (ret.status == return_status_t::retry)
                 {
-                    ++retry_count;
-                    if (retry_count > retry_max_spin)
-                    {
-                        retry_count = 0;
-                        while (pp_->background_work(
-                            -1, parcelport_background_mode_all))
-                            continue;
-                        hpx::this_thread::yield();
-                    }
+                    //                    ++retry_count;
+                    //                    if (retry_count > retry_max_spin)
+                    //                    {
+                    //                        retry_count = 0;
+                    //                        while (pp_->background_work(
+                    //                            -1, parcelport_background_mode_all))
+                    //                            continue;
+                    //                        if (hpx::threads::get_self_id() !=
+                    //                            hpx::threads::invalid_thread_id)
+                    //                            hpx::this_thread::yield();
+                    //                    }
                     if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
                         config_t::progress_type ==
@@ -115,10 +117,10 @@ namespace hpx::parcelset::policies::lci {
         char buf[1024];
         size_t consumed = 0;
         consumed += snprintf(buf + consumed, sizeof(buf) - consumed,
-            "%d:%lf:send_connection(%p) start:%d:%d:%d:[", LCI_RANK,
+            "%d:%lf:send_connection(%p) start:%d:%d:%d:%d:[", LCI_RANK,
             hpx::chrono::high_resolution_clock::now() / 1e9, (void*) this,
-            header_.numbytes_nonzero_copy(), header_.numbytes_tchunk(),
-            header_.num_zero_copy_chunks());
+            dst_rank, header_.numbytes_nonzero_copy(),
+            header_.numbytes_tchunk(), header_.num_zero_copy_chunks());
         HPX_ASSERT(sizeof(buf) > consumed);
         for (int i = 0; i < header_.num_zero_copy_chunks(); ++i)
         {

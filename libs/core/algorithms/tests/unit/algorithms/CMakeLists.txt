@@ -74,6 +74,7 @@ set(tests
     is_heap_until
     includes
     inclusive_scan
+    inclusive_scan_exception
     inplace_merge
     is_partitioned
     is_sorted
@@ -146,9 +147,9 @@ set(tests
     uninitialized_filln
     uninitialized_move
     uninitialized_moven
+    uninitialized_relocate_backward
     uninitialized_relocate
     uninitialized_relocaten
-    uninitialized_relocate_par
     uninitialized_value_construct
     uninitialized_value_constructn
     unique

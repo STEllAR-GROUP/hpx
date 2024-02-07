@@ -1,5 +1,5 @@
 //  Copyright (c) 2006, Giovanni P. Deretta
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  This code may be used under either of the following two licences:
 //
@@ -55,7 +55,7 @@ namespace hpx::threads::coroutines::detail {
         using context_state = super_type::context_state;
         using context_exit_status = super_type::context_exit_status;
 
-        context_exit_status status = context_exit_status::not_exited;
+        auto status = context_exit_status::not_exited;
 
         // yield value once the thread function has finished executing
         result_type result_last(
@@ -71,7 +71,11 @@ namespace hpx::threads::coroutines::detail {
             {
                 coroutine_self* old_self = coroutine_self::get_self();
                 coroutine_stackful_self self(this, old_self);
-                reset_self_on_exit on_exit(&self, old_self);
+
+                coroutine_self::set_self(&self);
+                auto on_exit = hpx::experimental::scope_exit(
+                    [&] { coroutine_self::set_self(old_self); });
+
                 try
                 {
                     result_last = m_fun(*this->args());
@@ -108,9 +112,9 @@ namespace hpx::threads::coroutines::detail {
         using context_state = super_type::context_state;
         using context_exit_status = super_type::context_exit_status;
 
-        context_exit_status status = context_exit_status::not_exited;
+        auto status = context_exit_status::not_exited;
 
-        result_type result_last(
+        result_type const result_last(
             thread_schedule_state::unknown, invalid_thread_id);
 
         this->m_state = context_state::running;
@@ -119,7 +123,11 @@ namespace hpx::threads::coroutines::detail {
         {
             coroutine_self* old_self = coroutine_self::get_self();
             coroutine_stackful_self_direct self(this, old_self);
-            reset_self_on_exit on_exit(&self, old_self);
+
+            coroutine_self::set_self(&self);
+            auto on_exit = hpx::experimental::scope_exit(
+                [&] { coroutine_self::set_self(old_self); });
+
             try
             {
                 this->m_result = this->m_fun(arg);

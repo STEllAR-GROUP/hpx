@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file get_locality_id.hpp
+/// \page hpx::get_locality_id
+/// \headerfile hpx/runtime.hpp
 
 #pragma once
 

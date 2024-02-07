@@ -1,10 +1,12 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/executors/auto_chunk_size.hpp
+/// \page hpx::execution::experimental::auto_chunk_size
+/// \headerfile hpx/execution.hpp
 
 #pragma once
 
@@ -17,6 +19,7 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <type_traits>
@@ -53,6 +56,8 @@ namespace hpx::execution::experimental {
         /// \param rel_time     [in] The time duration to use as the minimum
         ///                     to decide how many loop iterations should be
         ///                     combined.
+        /// \param num_iters_for_timing [in] The number of iterations to use for
+        ///                             the timing operation
         ///
         explicit auto_chunk_size(hpx::chrono::steady_duration const& rel_time,
             std::uint64_t num_iters_for_timing = 0) noexcept
@@ -68,29 +73,32 @@ namespace hpx::execution::experimental {
 
         // Estimate execution time for one iteration
         template <typename Executor, typename F>
-        auto measure_iteration(Executor&& exec, F&& f, std::size_t count)
+        friend auto tag_override_invoke(
+            hpx::parallel::execution::measure_iteration_t,
+            auto_chunk_size& this_, Executor&& exec, F&& f, std::size_t count)
         {
             // by default use 1% of the iterations
-            if (num_iters_for_timing_ == 0)
+            if (this_.num_iters_for_timing_ == 0)
             {
-                num_iters_for_timing_ = count / 100;
+                this_.num_iters_for_timing_ = count / 100;
             }
 
             // perform measurements only if necessary
-            if (num_iters_for_timing_ > 0)
+            if (this_.num_iters_for_timing_ > 0)
             {
                 using hpx::chrono::high_resolution_clock;
                 std::uint64_t t = high_resolution_clock::now();
 
                 // use executor to launch given function for measurements
-                std::size_t test_chunk_size =
+                std::size_t const test_chunk_size =
                     hpx::parallel::execution::sync_execute(
-                        HPX_FORWARD(Executor, exec), f, num_iters_for_timing_);
+                        HPX_FORWARD(Executor, exec), f,
+                        this_.num_iters_for_timing_);
 
                 if (test_chunk_size != 0)
                 {
                     t = (high_resolution_clock::now() - t) / test_chunk_size;
-                    if (t != 0 && min_time_ >= t)
+                    if (t != 0 && this_.min_time_ >= t)
                     {
                         // return execution time for one iteration
                         return std::chrono::nanoseconds(t);
@@ -103,16 +111,20 @@ namespace hpx::execution::experimental {
 
         // Estimate a chunk size based on number of cores used.
         template <typename Executor>
-        std::size_t get_chunk_size(Executor&&,
+        friend std::size_t tag_override_invoke(
+            hpx::parallel::execution::get_chunk_size_t,
+            auto_chunk_size const& this_, Executor&&,
             hpx::chrono::steady_duration const& iteration_duration,
             std::size_t cores, std::size_t count) noexcept
         {
             // return chunk size which will create the required amount of work
             if (iteration_duration.value().count() != 0)
             {
-                auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    iteration_duration.value());
-                return (std::min)(count, (std::size_t)(min_time_ / ns.count()));
+                auto const ns =
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        iteration_duration.value());
+                return (std::min)(
+                    count, (std::size_t)(this_.min_time_ / ns.count()));
             }
             return (count + cores - 1) / cores;
         }
@@ -142,16 +154,13 @@ namespace hpx::execution::experimental {
     };
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
-
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<hpx::execution::experimental::auto_chunk_size>
-      : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+/// \cond NOINTERNAL
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    hpx::execution::experimental::auto_chunk_size> : std::true_type
+{
+};
+/// \endcond
 
 namespace hpx::execution {
 

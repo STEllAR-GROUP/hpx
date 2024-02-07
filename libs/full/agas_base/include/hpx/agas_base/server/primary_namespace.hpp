@@ -148,8 +148,6 @@ namespace hpx::agas::server {
         naming::gid_type locality_;    // our locality id
         migration_table_type migrating_objects_;
 
-        struct update_time_on_exit;
-
     public:
         // data structure holding all counters for the component_namespace
         // component

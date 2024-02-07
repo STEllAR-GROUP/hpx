@@ -50,11 +50,11 @@ static std::uint64_t num_threads = 1;
 static std::string info_string = "";
 
 ///////////////////////////////////////////////////////////////////////////////
-void print_stats(const char* title, const char* wait, const char* exec,
+void print_stats(char const* title, char const* wait, char const* exec,
     std::int64_t count, double duration, bool csv)
 {
     std::ostringstream temp;
-    double us = 1e6 * duration / count;
+    double const us = 1e6 * duration / count;
     if (csv)
     {
         hpx::util::format_to(temp,
@@ -76,12 +76,12 @@ void print_stats(const char* title, const char* wait, const char* exec,
     //hpx::util::print_cdash_timing(title, duration);
 }
 
-const char* exec_name(hpx::execution::parallel_executor const&)
+char const* exec_name(hpx::execution::parallel_executor const&)
 {
     return "parallel_executor";
 }
 
-const char* exec_name(hpx::execution::experimental::scheduler_executor<
+char const* exec_name(hpx::execution::experimental::scheduler_executor<
     hpx::execution::experimental::thread_pool_scheduler> const&)
 {
     return "scheduler_executor<thread_pool_scheduler>";
@@ -89,15 +89,15 @@ const char* exec_name(hpx::execution::experimental::scheduler_executor<
 
 ///////////////////////////////////////////////////////////////////////////////
 // we use globals here to prevent the delay from being optimized away
-double global_scratch = 0;
-std::uint64_t num_iterations = 0;
+double volatile global_scratch = 0;
+std::uint64_t volatile num_iterations = 0;
 
 ///////////////////////////////////////////////////////////////////////////////
 double null_function() noexcept
 {
     if (num_iterations > 0)
     {
-        const int array_size = 4096;
+        constexpr int array_size = 4096;
         std::array<double, array_size> dummy;
         for (std::uint64_t i = 0; i < num_iterations; ++i)
         {
@@ -106,6 +106,7 @@ double null_function() noexcept
                 dummy[j] = 1.0 / (2.0 * i * j + 1.0);
             }
         }
+        global_scratch = dummy[0];
         return dummy[0];
     }
     return 0.0;
@@ -115,7 +116,7 @@ struct scratcher
 {
     void operator()(future<double> r) const
     {
-        global_scratch += r.get();
+        global_scratch = global_scratch + r.get();
     }
 };
 
@@ -125,36 +126,36 @@ HPX_PLAIN_ACTION(null_function, null_action)
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_each(std::uint64_t count, bool csv)
 {
-    const hpx::id_type here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
     hpx::wait_each(scratcher(), futures);
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("action", "WaitEach", "no-executor", count, duration, csv);
 }
 
 // Time async action execution using wait each on futures vector
 void measure_action_futures_wait_all(std::uint64_t count, bool csv)
 {
-    const hpx::id_type here = hpx::find_here();
+    hpx::id_type const here = hpx::find_here();
     std::vector<future<double>> futures;
     futures.reserve(count);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async<null_action>(here));
     hpx::wait_all(futures);
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("action", "WaitAll", "no-executor", count, duration, csv);
 }
 #endif
@@ -168,13 +169,13 @@ void measure_function_futures_wait_each(
     futures.reserve(count);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
     hpx::wait_each(scratcher(), futures);
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("async", "WaitEach", exec_name(exec), count, duration, csv);
 }
 
@@ -186,12 +187,12 @@ void measure_function_futures_wait_all(
     futures.reserve(count);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
         futures.push_back(async(exec, &null_function));
     hpx::wait_all(futures);
 
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("async", "WaitAll", exec_name(exec), count, duration, csv);
 }
 
@@ -226,7 +227,7 @@ void measure_function_futures_limiting_executor(
     hpx::execution::experimental::static_chunk_size fixed(chunk_size);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     {
         hpx::execution::experimental::limiting_executor<Executor> signal_exec(
             exec, tasks, tasks + 1000);
@@ -234,7 +235,7 @@ void measure_function_futures_limiting_executor(
             hpx::execution::par.with(fixed), 0, count, [&](std::uint64_t) {
                 hpx::post(signal_exec, [&]() {
                     null_function();
-                    sanity_check--;
+                    --sanity_check;
                 });
             });
     }
@@ -246,7 +247,7 @@ void measure_function_futures_limiting_executor(
     }
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats(
         "apply", "limiting-Exec", exec_name(exec), count, duration, csv);
 }
@@ -256,8 +257,8 @@ void measure_function_futures_sliding_semaphore(
     std::uint64_t count, bool csv, Executor& exec)
 {
     // start the clock
-    high_resolution_timer walltime;
-    const int sem_count = 5000;
+    high_resolution_timer const walltime;
+    constexpr int sem_count = 5000;
     auto sem = std::make_shared<hpx::sliding_semaphore>(sem_count);
     for (std::uint64_t i = 0; i < count; ++i)
     {
@@ -270,33 +271,34 @@ void measure_function_futures_sliding_semaphore(
     sem->wait(count + sem_count - 1);
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("apply", "Sliding-Sem", exec_name(exec), count, duration, csv);
 }
 
 struct unlimited_number_of_chunks
 {
     template <typename Executor>
-    std::size_t maximal_number_of_chunks(
-        Executor&& /*executor*/, std::size_t /*cores*/, std::size_t num_tasks)
+    friend std::size_t tag_override_invoke(
+        hpx::parallel::execution::maximal_number_of_chunks_t,
+        unlimited_number_of_chunks, Executor&&, std::size_t,
+        std::size_t num_tasks)
     {
         return num_tasks;
     }
 };
 
-namespace hpx::parallel::execution {
-    template <>
-    struct is_executor_parameters<unlimited_number_of_chunks> : std::true_type
-    {
-    };
-}    // namespace hpx::parallel::execution
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    unlimited_number_of_chunks> : std::true_type
+{
+};
 
 template <typename Executor>
 void measure_function_futures_for_loop(std::uint64_t count, bool csv,
     Executor& exec, char const* executor_name = nullptr)
 {
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     hpx::experimental::for_loop(
         hpx::execution::par.on(exec).with(
             hpx::execution::experimental::static_chunk_size(1),
@@ -304,7 +306,7 @@ void measure_function_futures_for_loop(std::uint64_t count, bool csv,
         0, count, [](std::uint64_t) { null_function(); });
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("for_loop", "par",
         executor_name ? executor_name : exec_name(exec), count, duration, csv);
 }
@@ -314,7 +316,7 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
     hpx::latch l(count);
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
     {
         hpx::threads::thread_init_data data(
@@ -328,7 +330,7 @@ void measure_function_futures_register_work(std::uint64_t count, bool csv)
     l.wait();
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("register_work", "latch", "none", count, duration, csv);
 }
 
@@ -343,14 +345,14 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     };
     auto const thread_func =
         hpx::threads::detail::thread_function_nullary<decltype(func)>{func};
-    auto const desc = hpx::threads::thread_description();
-    auto const prio = hpx::threads::thread_priority::normal;
-    auto const hint = hpx::threads::thread_schedule_hint();
-    auto const stack_size = hpx::threads::thread_stacksize::small_;
+    constexpr auto desc = hpx::threads::thread_description();
+    constexpr auto prio = hpx::threads::thread_priority::normal;
+    constexpr auto hint = hpx::threads::thread_schedule_hint();
+    constexpr auto stack_size = hpx::threads::thread_stacksize::small_;
     hpx::error_code ec;
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::uint64_t i = 0; i < count; ++i)
     {
         auto init = hpx::threads::thread_init_data(
@@ -362,7 +364,7 @@ void measure_function_futures_create_thread(std::uint64_t count, bool csv)
     l.wait();
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("create_thread", "latch", "none", count, duration, csv);
 }
 
@@ -399,7 +401,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     hpx::error_code ec;
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::size_t t = 0; t < num_threads; ++t)
     {
         auto const hint =
@@ -431,7 +433,7 @@ void measure_function_futures_create_thread_hierarchical_placement(
     l.wait();
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats(
         "create_thread_hierarchical", "latch", "none", count, duration, csv);
 }
@@ -448,7 +450,7 @@ void measure_function_futures_apply_hierarchical_placement(
     auto const num_threads = hpx::get_num_worker_threads();
 
     // start the clock
-    high_resolution_timer walltime;
+    high_resolution_timer const walltime;
     for (std::size_t t = 0; t < num_threads; ++t)
     {
         auto const hint =
@@ -470,7 +472,7 @@ void measure_function_futures_apply_hierarchical_placement(
     l.wait();
 
     // stop the clock
-    const double duration = walltime.elapsed();
+    double const duration = walltime.elapsed();
     print_stats("apply_hierarchical", "latch", "parallel_executor", count,
         duration, csv);
 }
@@ -487,8 +489,8 @@ int hpx_main(variables_map& vm)
         else
             numa_sensitive = 0;
 
-        bool test_all = (vm.count("test-all") > 0);
-        const int repetitions = vm["repetitions"].as<int>();
+        bool const test_all = (vm.count("test-all") > 0);
+        int const repetitions = vm["repetitions"].as<int>();
 
         if (vm.count("info"))
             info_string = vm["info"].as<std::string>();
@@ -497,8 +499,8 @@ int hpx_main(variables_map& vm)
 
         num_iterations = vm["delay-iterations"].as<std::uint64_t>();
 
-        const std::uint64_t count = vm["futures"].as<std::uint64_t>();
-        bool csv = vm.count("csv") != 0;
+        std::uint64_t const count = vm["futures"].as<std::uint64_t>();
+        bool const csv = vm.count("csv") != 0;
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 

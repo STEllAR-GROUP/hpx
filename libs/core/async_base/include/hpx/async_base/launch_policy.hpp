@@ -4,7 +4,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/async_base/launch_policy
+/// \file hpx/async_base/launch_policy.hpp
+/// \page hpx::launch
+/// \headerfile hpx/future.hpp
 
 #pragma once
 

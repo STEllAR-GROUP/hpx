@@ -44,12 +44,24 @@ namespace hpx::parcelset::policies::lci {
         postprocess_handler_ = HPX_MOVE(parcel_postprocess);
 
         // build header
-        while (LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
-            continue;
-        HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
-        header_ = header(
-            buffer_, (char*) header_buffer.address, header_buffer.length);
-        header_buffer.length = header_.size();
+        if (config_t::enable_in_buffer_assembly)
+        {
+            while (
+                LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
+                continue;
+            HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
+            header_ = header(
+                buffer_, (char*) header_buffer.address, header_buffer.length);
+            header_buffer.length = header_.size();
+        }
+        else
+        {
+            header_buffer_vector.resize(
+                header::get_header_size(buffer_, LCI_MEDIUM_SIZE));
+            header_ =
+                header(buffer_, static_cast<char*>(header_buffer_vector.data()),
+                    header_buffer_vector.size());
+        }
         HPX_ASSERT((header_.num_zero_copy_chunks() == 0) ==
             buffer_.transmission_chunks_.empty());
         need_send_data = false;
@@ -85,6 +97,15 @@ namespace hpx::parcelset::policies::lci {
                 "Rank %d Wrap around!\n", LCI_RANK);
         header_.set_device_idx(device_p->idx);
         header_.set_tag(tag);
+        if (!config_t::enable_in_buffer_assembly)
+        {
+            while (
+                LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
+                continue;
+            memcpy(header_buffer.address, header_buffer_vector.data(),
+                header_buffer_vector.size());
+            header_buffer.length = header_buffer_vector.size();
+        }
         send_chunks_idx = 0;
         completion = nullptr;
         segment_to_use = LCI_SEGMENT_ALL;

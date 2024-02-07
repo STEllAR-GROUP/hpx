@@ -1,14 +1,17 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/executors/dynamic_chunk_size.hpp
+/// \page hpx::execution::experimental::dynamic_chunk_size
+/// \headerfile hpx/execution.hpp
 
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/timing/steady_clock.hpp>
@@ -29,25 +32,33 @@ namespace hpx::execution::experimental {
     ///
     struct dynamic_chunk_size
     {
+        /// Construct an \a dynamic_chunk_size executor parameters object
+        ///
+        /// \note Default constructed \a dynamic_chunk_size executor parameter
+        ///       types will use a chunk size of '1'.
+        ///
+        dynamic_chunk_size() = default;
+
         /// Construct a \a dynamic_chunk_size executor parameters object
         ///
         /// \param chunk_size   [in] The optional chunk size to use as the
         ///                     number of loop iterations to schedule together.
         ///                     The default chunk size is 1.
         ///
-        constexpr explicit dynamic_chunk_size(
-            std::size_t chunk_size = 1) noexcept
+        constexpr explicit dynamic_chunk_size(std::size_t chunk_size) noexcept
           : chunk_size_(chunk_size)
         {
         }
 
         /// \cond NOINTERNAL
         template <typename Executor>
-        constexpr std::size_t get_chunk_size(Executor&,
+        friend constexpr std::size_t tag_override_invoke(
+            hpx::parallel::execution::get_chunk_size_t,
+            dynamic_chunk_size const& this_, Executor&&,
             hpx::chrono::steady_duration const&, std::size_t,
-            std::size_t) const noexcept
+            std::size_t) noexcept
         {
-            return chunk_size_;
+            return this_.chunk_size_;
         }
         /// \endcond
 
@@ -66,21 +77,18 @@ namespace hpx::execution::experimental {
 
     private:
         /// \cond NOINTERNAL
-        std::size_t chunk_size_;
+        std::size_t chunk_size_ = 1;
         /// \endcond
     };
 }    // namespace hpx::execution::experimental
 
-namespace hpx::parallel::execution {
-
-    /// \cond NOINTERNAL
-    template <>
-    struct is_executor_parameters<
-        hpx::execution::experimental::dynamic_chunk_size> : std::true_type
-    {
-    };
-    /// \endcond
-}    // namespace hpx::parallel::execution
+/// \cond NOINTERNAL
+template <>
+struct hpx::parallel::execution::is_executor_parameters<
+    hpx::execution::experimental::dynamic_chunk_size> : std::true_type
+{
+};
+/// \endcond
 
 namespace hpx::execution {
 

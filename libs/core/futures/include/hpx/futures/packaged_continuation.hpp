@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -55,7 +56,7 @@ namespace hpx::lcos::detail {
         hpx::intrusive_ptr<Continuation> keep_alive(&cont);
         hpx::detail::try_catch_exception_ptr(
             [&]() {
-                static constexpr bool is_void =
+                constexpr bool is_void =
                     std::is_void_v<util::invoke_result_t<Func, Future&&>>;
 
                 if constexpr (is_void)
@@ -75,7 +76,7 @@ namespace hpx::lcos::detail {
     void invoke_continuation(Func& func, Future&& future, Continuation& cont)
     {
         using inner_future = util::invoke_result_t<Func, Future>;
-        static constexpr bool is_unique_future =
+        constexpr bool is_unique_future =
             traits::detail::is_unique_future_v<inner_future>;
 
         if constexpr (!is_unique_future)
@@ -585,7 +586,9 @@ namespace hpx::lcos::detail {
     inline traits::detail::shared_state_ptr_t<future_unwrap_result_t<Future>>
     unwrap(Future&& future, error_code& ec)
     {
+        using allocator_type = hpx::util::thread_local_caching_allocator<char,
+            hpx::util::internal_allocator<>>;
         return unwrap_impl_alloc(
-            util::internal_allocator<>{}, HPX_FORWARD(Future, future), ec);
+            allocator_type{}, HPX_FORWARD(Future, future), ec);
     }
 }    // namespace hpx::lcos::detail

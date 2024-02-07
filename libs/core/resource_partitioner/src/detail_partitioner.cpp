@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -88,7 +88,7 @@ namespace hpx::resource::detail {
 
     // mechanism for adding resources
     // num threads = number of threads desired on a PU. defaults to 1.
-    // note: if num_threads > 1 => oversubscription
+    // note: if num_threads > 1 => over-subscription
     void init_pool_data::add_resource(
         std::size_t pu_index, bool exclusive, std::size_t num_threads)
     {
@@ -148,6 +148,9 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_workrequesting_lifo:
             sched = "local_workrequesting_lifo";
             break;
+        case resource::scheduling_policy::local_workrequesting_mc:
+            sched = "local_workrequesting_mc";
+            break;
         case resource::scheduling_policy::static_:
             sched = "static";
             break;
@@ -167,7 +170,7 @@ namespace hpx::resource::detail {
 
         os << "\"" << sched << "\" is running on PUs : \n";
 
-        for (threads::mask_cref_type assigned_pu : assigned_pus_)
+        for (threads::mask_cref_type const assigned_pu : assigned_pus_)
         {
             os << hpx::threads::to_string(assigned_pu) << '\n';
         }
@@ -223,9 +226,8 @@ namespace hpx::resource::detail {
 
     ////////////////////////////////////////////////////////////////////////
     partitioner::partitioner()
-      : rtcfg_()
-      , first_core_(std::size_t(-1))
-      , pus_needed_(std::size_t(-1))
+      : first_core_(static_cast<std::size_t>(-1))
+      , pus_needed_(static_cast<std::size_t>(-1))
       , mode_(partitioner_mode::default_)
       , topo_(threads::create_topology())
       , default_scheduler_mode_(threads::policies::scheduler_mode::default_)
@@ -240,7 +242,7 @@ namespace hpx::resource::detail {
 #if defined(HPX_HAVE_MAX_CPU_COUNT)
         if (HPX_HAVE_MAX_CPU_COUNT < topo_.get_number_of_pus())
         {
-            throw_runtime_error("partitioner::partioner",
+            throw_runtime_error("partitioner::partitioner",
                 hpx::util::format(
                     "Currently, HPX_HAVE_MAX_CPU_COUNT is set to {1} "
                     "while your system has {2} processing units. Please "
@@ -251,13 +253,14 @@ namespace hpx::resource::detail {
         }
 #endif
 
-        std::string default_scheduler_mode_str =
+        std::string const default_scheduler_mode_str =
             rtcfg_.get_entry("hpx.default_scheduler_mode", std::string());
         if (!default_scheduler_mode_str.empty())
         {
-            default_scheduler_mode_ = threads::policies::scheduler_mode(
-                hpx::util::from_string<std::size_t>(
-                    default_scheduler_mode_str));
+            default_scheduler_mode_ =
+                static_cast<threads::policies::scheduler_mode>(
+                    hpx::util::from_string<std::size_t>(
+                        default_scheduler_mode_str));
             HPX_ASSERT_MSG(
                 (default_scheduler_mode_ &
                     ~threads::policies::scheduler_mode::all_flags) == 0,
@@ -276,22 +279,22 @@ namespace hpx::resource::detail {
         detail::init_pool_data::num_threads_overall = 0;
     }
 
-    bool partitioner::pu_exposed(std::size_t pu_num)
+    bool partitioner::pu_exposed(std::size_t pu_num) const
     {
         threads::mask_type pu_mask = threads::mask_type();
         threads::resize(
             pu_mask, static_cast<std::size_t>(threads::hardware_concurrency()));
         threads::set(pu_mask, pu_num);
-        threads::topology& topo = get_topology();
 
-        threads::mask_type comp =
+        threads::topology const& topo = get_topology();
+        threads::mask_type const comp =
             affinity_data_.get_used_pus_mask(topo, pu_num);
         return threads::any(comp & pu_mask);
     }
 
     void partitioner::fill_topology_vectors()
     {
-        threads::topology& topo = get_topology();
+        threads::topology const& topo = get_topology();
 
         std::size_t pid = 0;
         std::size_t num_numa_nodes = topo.get_number_of_numa_nodes();
@@ -305,7 +308,8 @@ namespace hpx::resource::detail {
             numa_domains_.emplace_back(i);             // add a numa domain
             numa_domain& nd = numa_domains_.back();    // numa-domain just added
 
-            std::size_t numa_node_cores = topo.get_number_of_numa_node_cores(i);
+            std::size_t const numa_node_cores =
+                topo.get_number_of_numa_node_cores(i);
             nd.cores_.reserve(numa_node_cores);
 
             bool numa_domain_contains_exposed_cores = false;
@@ -316,7 +320,7 @@ namespace hpx::resource::detail {
                 nd.cores_.emplace_back(j, &nd);
                 core& c = nd.cores_.back();
 
-                std::size_t core_pus = topo.get_number_of_core_pus(j);
+                std::size_t const core_pus = topo.get_number_of_core_pus(j);
                 c.pus_.reserve(core_pus);
 
                 bool core_contains_exposed_pus = false;
@@ -328,7 +332,7 @@ namespace hpx::resource::detail {
                     {
                         c.pus_.emplace_back(pid, &c,
                             affinity_data_.get_thread_occupancy(topo, pid));
-                        pu& p = c.pus_.back();
+                        pu const& p = c.pus_.back();
 
                         if (p.thread_occupancy_ == 0)
                         {
@@ -367,10 +371,10 @@ namespace hpx::resource::detail {
         if (first_core_ != first_core)
         {
             std::size_t offset = first_core;
-            std::size_t num_pus_core =
+            std::size_t const num_pus_core =
                 get_topology().get_number_of_core_pus(offset);
 
-            if (first_core_ != std::size_t(-1))
+            if (first_core_ != static_cast<std::size_t>(-1))
             {
                 offset -= first_core_;
             }
@@ -392,10 +396,10 @@ namespace hpx::resource::detail {
 
     std::size_t partitioner::threads_needed() noexcept
     {
-        if (pus_needed_ == std::size_t(-1))
+        if (pus_needed_ == static_cast<std::size_t>(-1))
         {
             pus_needed_ = affinity_data_.get_num_pus_needed();
-            HPX_ASSERT(pus_needed_ != std::size_t(-1));
+            HPX_ASSERT(pus_needed_ != static_cast<std::size_t>(-1));
         }
         return pus_needed_;
     }
@@ -464,7 +468,7 @@ namespace hpx::resource::detail {
         // select the default scheduler
         scheduling_policy default_scheduler;
 
-        std::string default_scheduler_str =
+        std::string const default_scheduler_str =
             rtcfg_.get_entry("hpx.scheduler", std::string());
 
         if (0 == std::string("local").find(default_scheduler_str))
@@ -492,6 +496,11 @@ namespace hpx::resource::detail {
                 .find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::local_workrequesting_lifo;
+        }
+        else if (0 ==
+            std::string("local-workrequesting-mc").find(default_scheduler_str))
+        {
+            default_scheduler = scheduling_policy::local_workrequesting_mc;
         }
         else if (0 == std::string("static").find(default_scheduler_str))
         {
@@ -525,8 +534,8 @@ namespace hpx::resource::detail {
 
         // set this scheduler on the pools that do not have a specified scheduler yet
         std::lock_guard<mutex_type> l(mtx_);
-        std::size_t npools = initial_thread_pools_.size();
-        for (std::size_t i = 0; i != npools; ++i)
+        std::size_t const num_pools = initial_thread_pools_.size();
+        for (std::size_t i = 0; i != num_pools; ++i)
         {
             if (initial_thread_pools_[i].scheduling_policy_ ==
                 scheduling_policy::unspecified)
@@ -586,7 +595,7 @@ namespace hpx::resource::detail {
     // resources called in set_default_pool()
     bool partitioner::check_empty_pools() const
     {
-        std::size_t num_thread_pools = initial_thread_pools_.size();
+        std::size_t const num_thread_pools = initial_thread_pools_.size();
 
         for (std::size_t i = 0; i != num_thread_pools; i++)
         {
@@ -594,7 +603,8 @@ namespace hpx::resource::detail {
             {
                 return true;
             }
-            for (auto assigned_pus : initial_thread_pools_[i].assigned_pus_)
+            for (auto const assigned_pus :
+                initial_thread_pools_[i].assigned_pus_)
             {
                 if (!threads::any(assigned_pus))
                 {
@@ -629,7 +639,7 @@ namespace hpx::resource::detail {
         }
 
         //! if there already exists a pool with this name
-        std::size_t num_thread_pools = initial_thread_pools_.size();
+        std::size_t const num_thread_pools = initial_thread_pools_.size();
         for (std::size_t i = 1; i < num_thread_pools; i++)
         {
             if (pool_name == initial_thread_pools_[i].pool_name_)
@@ -669,7 +679,7 @@ namespace hpx::resource::detail {
         }
 
         //! if there already exists a pool with this name
-        std::size_t num_thread_pools = initial_thread_pools_.size();
+        std::size_t const num_thread_pools = initial_thread_pools_.size();
         for (std::size_t i = 1; i != num_thread_pools; ++i)
         {
             if (pool_name == initial_thread_pools_[i].pool_name_)
@@ -722,11 +732,11 @@ namespace hpx::resource::detail {
 
             // Make sure the total number of requested threads does not exceed
             // the number of threads requested on the command line
-            std::size_t num_threads =
+            std::size_t const num_os_threads =
                 util::get_entry_as<std::size_t>(rtcfg_, "hpx.os_threads", 0);
-            HPX_ASSERT(num_threads != 0);
+            HPX_ASSERT(num_os_threads != 0);
 
-            if (detail::init_pool_data::num_threads_overall > num_threads)
+            if (detail::init_pool_data::num_threads_overall > num_os_threads)
             {
                 l.unlock();
                 throw std::runtime_error("partitioner::add_resource: "
@@ -735,7 +745,7 @@ namespace hpx::resource::detail {
                         detail::init_pool_data::num_threads_overall) +
                     " threads requested by the resource partitioner, but "
                     "only " +
-                    std::to_string(num_threads) +
+                    std::to_string(num_os_threads) +
                     " provided on the command-line.");
             }
         }
@@ -813,7 +823,7 @@ namespace hpx::resource::detail {
         std::unique_lock<mutex_type> l(mtx_);
 
         // look up which scheduler is needed
-        scheduling_policy sched_type =
+        scheduling_policy const sched_type =
             get_pool_data(l, pool_name).scheduling_policy_;
         if (sched_type == scheduling_policy::unspecified)
         {
@@ -836,7 +846,7 @@ namespace hpx::resource::detail {
 
         {
             std::unique_lock<mutex_type> l(mtx_);
-            std::size_t num_thread_pools = initial_thread_pools_.size();
+            std::size_t const num_thread_pools = initial_thread_pools_.size();
             for (size_t i = 0; i != num_thread_pools; ++i)
             {
                 num_threads += get_pool_data(l, i).num_threads_;
@@ -848,7 +858,7 @@ namespace hpx::resource::detail {
         HPX_ASSERT(as_bool(mode_ & partitioner_mode::allow_oversubscription) ||
             num_threads ==
                 util::get_entry_as<std::size_t>(
-                    rtcfg_, "hpx.os_threads", std::size_t(-1)));
+                    rtcfg_, "hpx.os_threads", static_cast<std::size_t>(-1)));
 
         return num_threads;
     }
@@ -1038,7 +1048,7 @@ namespace hpx::resource::detail {
                 "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 
-        for (std::size_t pu_num : pu_nums_to_remove)
+        for (std::size_t const pu_num : pu_nums_to_remove)
         {
             remove_pu(pu_num);
         }
@@ -1085,7 +1095,7 @@ namespace hpx::resource::detail {
                 "pool '{}' has no non-exclusive pus associated", pool_name);
         }
 
-        for (std::size_t pu_num : pu_nums_to_add)
+        for (std::size_t const pu_num : pu_nums_to_add)
         {
             add_pu(pu_num);
         }
@@ -1105,7 +1115,7 @@ namespace hpx::resource::detail {
 
         {
             std::lock_guard<mutex_type> l(mtx_);
-            std::size_t num_pools = initial_thread_pools_.size();
+            std::size_t const num_pools = initial_thread_pools_.size();
             for (std::size_t i = 0; i < num_pools; i++)
             {
                 if (initial_thread_pools_[i].pool_name_ == pool_name)
@@ -1125,7 +1135,7 @@ namespace hpx::resource::detail {
     detail::init_pool_data const& partitioner::get_pool_data(
         std::unique_lock<mutex_type>& l, std::string const& pool_name) const
     {
-        auto pool = std::find_if(initial_thread_pools_.begin(),
+        auto const pool = std::find_if(initial_thread_pools_.begin(),
             initial_thread_pools_.end(),
             [&pool_name](detail::init_pool_data const& itp) -> bool {
                 return (itp.pool_name_ == pool_name);
@@ -1145,7 +1155,7 @@ namespace hpx::resource::detail {
     detail::init_pool_data& partitioner::get_pool_data(
         std::unique_lock<mutex_type>& l, std::string const& pool_name)
     {
-        auto pool = std::find_if(initial_thread_pools_.begin(),
+        auto const pool = std::find_if(initial_thread_pools_.begin(),
             initial_thread_pools_.end(),
             [&pool_name](detail::init_pool_data const& itp) -> bool {
                 return (itp.pool_name_ == pool_name);
@@ -1170,6 +1180,7 @@ namespace hpx::resource::detail {
         os << "the resource partitioner owns "
            << static_cast<std::uint64_t>(initial_thread_pools_.size())
            << " pool(s) : \n";    // -V128
+
         for (auto itp : initial_thread_pools_)
         {
             itp.print_pool(os);

@@ -1,10 +1,13 @@
 //  Copyright (c) 2014-2023 Hartmut Kaiser
+//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/uninitialized_relocate.hpp
+/// \page hpx::unititiallized_relocate, hpx::uninitialized_relocate_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
@@ -63,7 +66,7 @@ namespace hpx {
     template <typename InIter1, typename InIter2, typename FwdIter>
     FwdIter uninitialized_relocate(InIter1 first, InIter2 last, FwdIter dest);
 
-    /// Relocates the elements in the range defined by [first, first + count), to an
+    /// Relocates the elements in the range defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
     /// thrown during the move-construction of an element, all elements left
     /// in the input range, as well as all objects already constructed in the
@@ -134,6 +137,125 @@ namespace hpx {
     hpx::parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
     uninitialized_relocate(
         ExPolicy&& policy, InIter1 first, InIter2 last, FwdIter dest);
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area ending at \a dest_last. The objects are
+    /// processed in reverse order. If an exception is thrown during the
+    /// the move-construction of an element, all elements left in the
+    /// input range, as well as all objects already constructed in the
+    /// destination range are destroyed. After this algorithm completes, the
+    /// source range should be freed or reused without destroying the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam BiIter1     The type of the source range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    /// \tparam BiIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    ///
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_last    Refers to the beginning of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate algorithm invoked
+    /// without an execution policy object will execute in sequential order in
+    /// the calling thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_backward algorithm returns \a BiIter2.
+    ///           The \a uninitialized_relocate_backward algorithm returns the
+    ///           bidirectional iterator to the first element in the destination range.
+    ///
+    template <typename BiIter1, typename BiIter2>
+    BiIter2 uninitialized_relocate_backward(
+        BiIter1 first, BiIter1 last, BiIter2 dest_last);
+
+    /// Relocates the elements in the range, defined by [first, last), to an
+    /// uninitialized memory area ending at \a dest_last. The order of the
+    /// relocation of the objects depends on the execution policy. If an
+    /// exception is thrown during the  the move-construction of an element,
+    /// all elements left in the input range, as well as all objects already
+    /// constructed in the destination range are destroyed. After this algorithm
+    /// completes, the source range should be freed or reused without destroying
+    /// the objects.
+    ///
+    /// \note   Using the \a uninitialized_relocate_backward algorithm with the
+    ///         with a non-sequenced execution policy, will not guarantee the
+    ///         order of the relocation of the objects.
+    ///
+    /// \note   Complexity: time: O(n), space: O(1)
+    ///         1)  For "trivially relocatable" underlying types (T) and
+    ///             a contiguous iterator range [first, last):
+    ///             std::distance(first, last)*sizeof(T) bytes are copied.
+    ///         2)  For "trivially relocatable" underlying types (T) and
+    ///             a non-contiguous iterator range [first, last):
+    ///             std::distance(first, last) memory copies of sizeof(T)
+    ///             bytes each are performed.
+    ///         3)  For "non-trivially relocatable" underlying types (T):
+    ///             std::distance(first, last) move assignments and
+    ///             destructions are performed.
+    ///
+    /// \note   Declare a type as "trivially relocatable" using the
+    ///         `HPX_DECLARE_TRIVIALLY_RELOCATABLE` macros found in
+    ///         <hpx/type_support/is_trivially_relocatable.hpp>.
+    ///
+    /// \tparam ExPolicy    The type of the execution policy to use (deduced).
+    ///                     It describes the manner in which the execution
+    ///                     of the algorithm may be parallelized and the manner
+    ///                     in which it executes the assignments.
+    /// \tparam BiIter1     The type of the source range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    /// \tparam BiIter2     The type of the iterator representing the
+    ///                     destination range (deduced).
+    ///                     This iterator type must meet the requirements of a
+    ///                     Bidirectional iterator.
+    ///
+    /// \param policy       The execution policy to use for the scheduling of
+    ///                     the iterations.
+    /// \param first        Refers to the beginning of the sequence of elements
+    ///                     the algorithm will be applied to.
+    /// \param last         Refers to the end of the sequence of elements the
+    ///                     algorithm will be applied to.
+    /// \param dest_last    Refers to the end of the destination range.
+    ///
+    /// The assignments in the parallel \a uninitialized_relocate_backward algorithm invoked
+    /// with an execution policy object of type \a parallel_policy or
+    /// \a parallel_task_policy are permitted to execute in an
+    /// unordered fashion in unspecified threads, and indeterminately sequenced
+    /// within each thread.
+    ///
+    /// \returns  The \a uninitialized_relocate_backward algorithm returns a
+    ///           \a hpx::future<FwdIter>, if the execution policy is of type
+    ///           \a sequenced_task_policy or
+    ///           \a parallel_task_policy and
+    ///           returns \a BiIter2 otherwise.
+    ///           The \a uninitialized_relocate_backward algorithm returns the
+    ///           bidirectional iterator to the first element in the destination
+    ///           range.
+    ///
+    template <typename ExPolicy, typename BiIter1, typename BiIter2>
+    hpx::parallel::util::detail::algorithm_result<ExPolicy, BiIter2>
+    uninitialized_relocate_backward(
+        ExPolicy&& policy, BiIter1 first, BiIter1 last, BiIter2 dest_last);
 
     /// Relocates the elements in the range, defined by [first, last), to an
     /// uninitialized memory area beginning at \a dest. If an exception is
@@ -273,8 +395,8 @@ namespace hpx {
 #include <hpx/parallel/util/partitioner_with_cleanup.hpp>
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
-#include <hpx/type_support/construct_at.hpp>
-#include <hpx/type_support/uninitialized_relocate_n_primitive.hpp>
+#include <hpx/type_support/is_contiguous_iterator.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -329,11 +451,13 @@ namespace hpx::parallel {
                         InIter part_source = get<0>(iters);
                         FwdIter part_dest = get<1>(iters);
 
-                        // returns (dest begin, dest end)
-                        return std::make_pair(part_dest,
+                        auto [part_source_advanced, part_dest_advanced] =
                             hpx::experimental::util::
                                 uninitialized_relocate_n_primitive(
-                                    part_source, part_size, part_dest));
+                                    part_source, part_size, part_dest);
+
+                        // returns (dest begin, dest end)
+                        return std::make_pair(part_dest, part_dest_advanced);
                     },
                     // finalize, called once if no error occurred
                     [first, dest, count](auto&& data) mutable
@@ -382,9 +506,12 @@ namespace hpx::parallel {
                     experimental::util::detail::relocation_traits<InIter,
                         FwdIter>::is_noexcept_relocatable_v)
             {
-                return util::in_out_result<InIter, FwdIter>{first,
+                auto [first_advanced, dest_advanced] =
                     hpx::experimental::util::uninitialized_relocate_n_primitive(
-                        first, count, dest)};
+                        first, count, dest);
+
+                return util::in_out_result<InIter, FwdIter>{
+                    first_advanced, dest_advanced};
             }
 
             // clang-format off
@@ -437,11 +564,12 @@ namespace hpx::parallel {
                 FwdIter dest) noexcept(hpx::experimental::util::detail::relocation_traits<
                     InIter1, FwdIter>::is_noexcept_relocatable_v)
             {
-                auto count = std::distance(first, last);
+                auto [first_advanced, dest_advanced] =
+                    hpx::experimental::util::uninitialized_relocate_primitive(
+                        first, last, dest);
 
-                return util::in_out_result<InIter1, FwdIter>{first,
-                    hpx::experimental::util::uninitialized_relocate_n_primitive(
-                        first, count, dest)};
+                return util::in_out_result<InIter1, FwdIter>{first_advanced,
+                                dest_advanced};
             }
 
             template <typename ExPolicy, typename InIter1, typename InIter2,
@@ -465,6 +593,67 @@ namespace hpx::parallel {
 
                 return parallel_uninitialized_relocate_n(
                     HPX_FORWARD(ExPolicy, policy), first, count, dest);
+            }
+        };
+        /// \endcond
+
+        /////////////////////////////////////////////////////////////////////////////
+        // uninitialized_relocate_backward
+        /// \cond NOINTERNAL
+        template <typename IterPair>
+        struct uninitialized_relocate_backward
+          : public algorithm<uninitialized_relocate_backward<IterPair>,
+                IterPair>
+        {
+            constexpr uninitialized_relocate_backward() noexcept
+              : algorithm<uninitialized_relocate_backward, IterPair>(
+                    "uninitialized_relocate_backward")
+            {
+            }
+
+            // non vectorized overload
+            template <typename ExPolicy, typename BiIter1, typename BiIter2,
+                // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_sequenced_execution_policy_v<ExPolicy> &&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                )>
+            //  clang-format on
+            static util::in_out_result<BiIter1, BiIter2> sequential(
+                ExPolicy&&, BiIter1 first, BiIter1 last,
+                BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
+                relocation_traits<BiIter1, BiIter2>::is_noexcept_relocatable_v)
+            {
+                auto [last_advanced, dest_last_advanced] =
+                hpx::experimental::util::uninitialized_relocate_backward_primitive(
+                        first, last, dest_last);
+
+                return util::in_out_result<BiIter1, BiIter2>{last_advanced,
+                            dest_last_advanced};
+            }
+
+            template <typename ExPolicy, typename BiIter1, typename BiIter2,
+            // clang-format off
+                HPX_CONCEPT_REQUIRES_(
+                    hpx::is_execution_policy_v<ExPolicy>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter1>&&
+                    hpx::traits::is_bidirectional_iterator_v<BiIter2>
+                )>
+            // clang-format on
+            static util::detail::algorithm_result_t<ExPolicy,
+                util::in_out_result<BiIter1, BiIter2>>
+            parallel(ExPolicy&& policy, BiIter1 first, BiIter1 last,
+                BiIter2 dest_last) noexcept(hpx::experimental::util::detail::
+                    relocation_traits<BiIter1,
+                        BiIter2>::is_noexcept_relocatable_v)
+            {
+                auto count = std::distance(first, last);
+
+                auto dest_first = std::prev(dest_last, count);
+
+                return parallel_uninitialized_relocate_n(
+                    HPX_FORWARD(ExPolicy, policy), first, count, dest_first);
             }
         };
         /// \endcond
@@ -552,10 +741,37 @@ namespace hpx::experimental {
                     FwdIter>::get(HPX_MOVE(dest));
             }
 
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges are not overlapping in the left
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter> &&
+                    hpx::traits::is_contiguous_iterator_v<FwdIter>)
+                {
+                    auto dest_last = std::next(dest, count);
+                    auto last = std::next(first, count);
+                    // if it is not overlapping in the left direction
+                    if (!((first < dest_last) && (dest_last < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::uninitialized_relocate_n<
+                                parallel::util::in_out_result<InIter,
+                                    FwdIter>>()
+                                .call(HPX_FORWARD(ExPolicy, policy), first,
+                                    count, dest));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
             return parallel::util::get_second_element(
                 hpx::parallel::detail::uninitialized_relocate_n<
                     parallel::util::in_out_result<InIter, FwdIter>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                    .call(hpx::execution::seq, first,
                         static_cast<std::size_t>(count), dest));
         }
     } uninitialized_relocate_n{};
@@ -638,11 +854,146 @@ namespace hpx::experimental {
                     FwdIter>::get(HPX_MOVE(dest));
             }
 
+            // If running in non-sequenced execution policy, we must check
+            // that the ranges are not overlapping in the left
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<InIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<FwdIter>)
+                {
+                    auto dest_last = std::next(dest, count);
+                    // if it is not overlapping in the left direction
+                    if (!((first < dest_last) && (dest_last < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::uninitialized_relocate_n<
+                                parallel::util::in_out_result<InIter1,
+                                    FwdIter>>()
+                                .call(HPX_FORWARD(ExPolicy, policy), first,
+                                    count, dest));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
+            // sequential execution policy
             return parallel::util::get_second_element(
                 hpx::parallel::detail::uninitialized_relocate_n<
                     parallel::util::in_out_result<InIter1, FwdIter>>()
-                    .call(HPX_FORWARD(ExPolicy, policy), first, count, dest));
+                    .call(hpx::execution::seq, first, count, dest));
         }
     } uninitialized_relocate{};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // CPO for hpx::uninitialized_relocate_backward
+    inline constexpr struct uninitialized_relocate_backward_t final
+      : hpx::detail::tag_parallel_algorithm<uninitialized_relocate_backward_t>
+    {
+        // clang-format off
+        template <typename BiIter1, typename BiIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::traits::is_iterator_v<BiIter1> &&
+                hpx::traits::is_iterator_v<BiIter2>
+            )>
+        // clang-format on
+        friend BiIter2 tag_fallback_invoke(uninitialized_relocate_backward_t,
+            BiIter1 first, BiIter1 last,
+            BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
+            BiIter2>::is_noexcept_relocatable_v)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1> &&
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of bidirectional iterators.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
+                "The 'dest_last' argument must meet the requirements of a "
+                "bidirectional iterator.");
+            static_assert(util::detail::relocation_traits<BiIter1,
+                              BiIter2>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+            // if count is representing a negative value, we do nothing
+            if (first == last)
+            {
+                return dest_last;
+            }
+
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate_backward<
+                    parallel::util::in_out_result<BiIter1, BiIter2>>()
+                    .call(hpx::execution::seq, first, last, dest_last));
+        }
+
+        // clang-format off
+        template <typename ExPolicy, typename BiIter1, typename BiIter2,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::is_execution_policy_v<ExPolicy> &&
+                hpx::traits::is_iterator_v<BiIter1> &&
+                hpx::traits::is_iterator_v<BiIter2>
+            )>
+        // clang-format on
+        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
+            BiIter2>::type
+        tag_fallback_invoke(uninitialized_relocate_backward_t,
+            ExPolicy&& policy, BiIter1 first, BiIter1 last,
+            BiIter2 dest_last) noexcept(util::detail::relocation_traits<BiIter1,
+            BiIter2>::is_noexcept_relocatable_v)
+        {
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter1>,
+                "The 'first' and 'last' arguments must meet the requirements "
+                "of bidirectional iterators.");
+            static_assert(hpx::traits::is_bidirectional_iterator_v<BiIter2>,
+                "The 'dest' argument must meet the requirements of a "
+                "bidirectional iterator.");
+            static_assert(util::detail::relocation_traits<BiIter1,
+                              BiIter2>::valid_relocation,
+                "Relocating from this source type to this destination type is "
+                "ill-formed");
+
+            auto count = std::distance(first, last);
+
+            // if count is representing a negative value, we do nothing
+            if (hpx::parallel::detail::is_negative(count))
+            {
+                return parallel::util::detail::algorithm_result<ExPolicy,
+                    BiIter2>::get(HPX_MOVE(dest_last));
+            }
+
+            // If running in non-sequence execution policy, we must check
+            // that the ranges are not overlapping in the right
+            if constexpr (!hpx::is_sequenced_execution_policy_v<ExPolicy>)
+            {
+                // if we can check for overlapping ranges
+                if constexpr (hpx::traits::is_contiguous_iterator_v<BiIter1> &&
+                    hpx::traits::is_contiguous_iterator_v<BiIter2>)
+                {
+                    auto dest_first = std::prev(dest_last, count);
+                    // if it is not overlapping in the right direction
+                    if (!((first < dest_first) && (dest_first < last)))
+                    {
+                        // use parallel version
+                        return parallel::util::get_second_element(
+                            hpx::parallel::detail::
+                                uninitialized_relocate_backward<parallel::util::
+                                        in_out_result<BiIter1, BiIter2>>()
+                                    .call(HPX_FORWARD(ExPolicy, policy), first,
+                                        last, dest_last));
+                    }
+                    // if it is we continue to use the sequential version
+                }
+                // else we assume that the ranges are overlapping, and continue
+                // to use the sequential version
+            }
+
+            // sequential execution policy
+            return parallel::util::get_second_element(
+                hpx::parallel::detail::uninitialized_relocate_backward<
+                    parallel::util::in_out_result<BiIter1, BiIter2>>()
+                    .call(hpx::execution::seq, first, last, dest_last));
+        }
+    } uninitialized_relocate_backward{};
 }    // namespace hpx::experimental
 #endif    // DOXYGEN

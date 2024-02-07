@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@ namespace hpx::threads::policies::detail {
         std::vector<mask_type> const& masks) noexcept
     {
         std::size_t count = 0;
-        for (mask_cref_type m : masks)
+        for (mask_cref_type const m : masks)
         {
             if (threads::any(m))
                 ++count;
@@ -38,6 +38,7 @@ namespace hpx::threads::policies::detail {
       , pu_step_(1)
       , used_cores_(0)
       , affinity_domain_("pu")
+      , no_affinity_()
       , use_process_mask_(false)
       , num_pus_needed_(0)
     {
@@ -122,7 +123,7 @@ namespace hpx::threads::policies::detail {
         }
         else if (pu_offset == static_cast<std::size_t>(-1))
         {
-            // calculate the pu offset based on the used cores, but only if its
+            // calculate the pu offset based on the used cores, but only if it's
             // not explicitly specified
             for (std::size_t num_core = 0; num_core != used_cores; ++num_core)
             {
@@ -154,6 +155,23 @@ namespace hpx::threads::policies::detail {
         num_pus_needed_ = (std::max)(num_unique_cores, max_cores);
     }
 
+    void affinity_data::set_num_threads(size_t num_threads) noexcept
+    {
+        num_threads_ = num_threads;
+    }
+
+    void affinity_data::set_affinity_masks(
+        std::vector<threads::mask_type> const& affinity_masks)
+    {
+        affinity_masks_ = affinity_masks;
+    }
+
+    void affinity_data::set_affinity_masks(
+        std::vector<threads::mask_type>&& affinity_masks) noexcept
+    {
+        affinity_masks_ = HPX_MOVE(affinity_masks);
+    }
+
     mask_type affinity_data::get_pu_mask(
         threads::topology const& topo, std::size_t global_thread_num) const
     {
@@ -181,16 +199,15 @@ namespace hpx::threads::policies::detail {
         }
         if (0 == std::string("core").find(affinity_domain_))
         {
-            // The affinity domain is 'core', return a bit mask corresponding
-            // to all processing units of the core containing the given
-            // pu_num.
+            // The affinity domain is 'core', return a bit mask corresponding to
+            // all processing units of the core containing the given pu_num.
             return topo.get_core_affinity_mask(pu_num);
         }
         if (0 == std::string("numa").find(affinity_domain_))
         {
-            // The affinity domain is 'numa', return a bit mask corresponding
-            // to all processing units of the NUMA domain containing the
-            // given pu_num.
+            // The affinity domain is 'numa', return a bit mask corresponding to
+            // all processing units of the NUMA domain containing the given
+            // pu_num.
             return topo.get_numa_node_affinity_mask(pu_num);
         }
 
@@ -219,7 +236,7 @@ namespace hpx::threads::policies::detail {
         for (std::size_t thread_num = 0; thread_num != num_threads_;
              ++thread_num)
         {
-            auto thread_mask = get_pu_mask(topo, thread_num);
+            auto const thread_mask = get_pu_mask(topo, thread_num);
             for (std::size_t i = 0; i != overall_threads; ++i)
             {
                 if (threads::test(thread_mask, i))
@@ -251,12 +268,29 @@ namespace hpx::threads::policies::detail {
             for (std::size_t num_thread = 0; num_thread != num_threads_;
                  ++num_thread)
             {
-                mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
+                mask_cref_type const affinity_mask =
+                    get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))
                     ++count;
             }
         }
         return count;
+    }
+
+    std::size_t affinity_data::get_pu_num(std::size_t num_thread) const noexcept
+    {
+        HPX_ASSERT(num_thread < pu_nums_.size());
+        return pu_nums_[num_thread];
+    }
+
+    void affinity_data::set_pu_nums(std::vector<std::size_t> const& pu_nums)
+    {
+        pu_nums_ = pu_nums;
+    }
+
+    void affinity_data::set_pu_nums(std::vector<std::size_t>&& pu_nums) noexcept
+    {
+        pu_nums_ = HPX_MOVE(pu_nums);
     }
 
     // means of adding a processing unit after initialization
@@ -309,17 +343,16 @@ namespace hpx::threads::policies::detail {
         // The distance between assigned processing units shouldn't be zero
         HPX_ASSERT(pu_step_ > 0 && pu_step_ <= hardware_concurrency);
 
-        // We 'scale' the thread number to compute the corresponding
-        // processing unit number.
+        // We 'scale' the thread number to compute the corresponding processing
+        // unit number.
         //
-        // The base line processing unit number is computed from the given
+        // The baseline processing unit number is computed from the given
         // pu-offset and pu-step.
         std::size_t const num_pu = pu_offset_ + pu_step_ * num_thread;
 
-        // We add an additional offset, which allows to 'roll over' if the
-        // pu number would get larger than the number of available
-        // processing units. Note that it does not make sense to 'roll over'
-        // farther than the given pu-step.
+        // We add an offset, which allows to 'roll over' if the pu number would
+        // get larger than the number of available processing units. Note that
+        // it does not make sense to 'roll over' farther than the given pu-step.
         std::size_t const offset = (num_pu / hardware_concurrency) % pu_step_;
 
         // The resulting pu number has to be smaller than the available

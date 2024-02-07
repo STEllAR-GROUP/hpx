@@ -61,7 +61,7 @@ namespace hpx::serialization {
         using element_type =
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
-        static constexpr bool use_optimized =
+        constexpr bool use_optimized =
             std::is_default_constructible_v<element_type> &&
             (hpx::traits::is_bitwise_serializable_v<element_type> ||
                 !hpx::traits::is_not_bitwise_serializable_v<element_type>);
@@ -126,7 +126,7 @@ namespace hpx::serialization {
         using element_type =
             std::remove_const_t<typename std::vector<T, Allocator>::value_type>;
 
-        static constexpr bool use_optimized =
+        constexpr bool use_optimized =
             std::is_default_constructible_v<element_type> &&
             (hpx::traits::is_bitwise_serializable_v<element_type> ||
                 !hpx::traits::is_not_bitwise_serializable_v<element_type>);

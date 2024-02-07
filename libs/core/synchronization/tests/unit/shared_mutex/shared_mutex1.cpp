@@ -31,24 +31,25 @@
 
 void test_multiple_readers()
 {
-    typedef hpx::shared_mutex shared_mutex_type;
-    typedef hpx::mutex mutex_type;
+    using shared_mutex_type = hpx::shared_mutex;
+    using mutex_type = hpx::mutex;
 
-    unsigned const number_of_threads = 10;
+    constexpr unsigned number_of_threads = 10;
 
     test::thread_group pool;
 
-    hpx::shared_mutex rw_mutex;
-    unsigned unblocked_count = 0;
-    unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
+        hpx::shared_mutex rw_mutex;
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        hpx::condition_variable unblocked_condition;
+
         for (unsigned i = 0; i != number_of_threads; ++i)
         {
             pool.create_thread(
@@ -86,24 +87,25 @@ void test_multiple_readers()
 
 void test_only_one_writer_permitted()
 {
-    typedef hpx::shared_mutex shared_mutex_type;
-    typedef hpx::mutex mutex_type;
+    using shared_mutex_type = hpx::shared_mutex;
+    using mutex_type = hpx::mutex;
 
-    unsigned const number_of_threads = 10;
+    constexpr unsigned number_of_threads = 10;
 
     test::thread_group pool;
 
-    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
-    unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
+        hpx::shared_mutex rw_mutex;
+        unsigned simultaneous_running_count = 0;
+        hpx::condition_variable unblocked_condition;
+
         for (unsigned i = 0; i != number_of_threads; ++i)
         {
             pool.create_thread(
@@ -135,22 +137,23 @@ void test_only_one_writer_permitted()
 
 void test_reader_blocks_writer()
 {
-    typedef hpx::shared_mutex shared_mutex_type;
-    typedef hpx::mutex mutex_type;
+    using shared_mutex_type = hpx::shared_mutex;
+    using mutex_type = hpx::mutex;
 
     test::thread_group pool;
 
-    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
-    unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
     try
     {
+        hpx::shared_mutex rw_mutex;
+        unsigned simultaneous_running_count = 0;
+        hpx::condition_variable unblocked_condition;
+
         pool.create_thread(
             test::locking_thread<std::shared_lock<shared_mutex_type>>(rw_mutex,
                 unblocked_count, unblocked_count_mutex, unblocked_condition,
@@ -195,25 +198,26 @@ void test_reader_blocks_writer()
 
 void test_unlocking_writer_unblocks_all_readers()
 {
-    typedef hpx::shared_mutex shared_mutex_type;
-    typedef hpx::mutex mutex_type;
+    using shared_mutex_type = hpx::shared_mutex;
+    using mutex_type = hpx::mutex;
 
     test::thread_group pool;
 
     hpx::shared_mutex rw_mutex;
     std::unique_lock<hpx::shared_mutex> write_lock(rw_mutex);
-    unsigned unblocked_count = 0;
-    unsigned simultaneous_running_count = 0;
     unsigned max_simultaneous_running = 0;
     mutex_type unblocked_count_mutex;
-    hpx::condition_variable unblocked_condition;
     mutex_type finish_mutex;
     std::unique_lock<mutex_type> finish_lock(finish_mutex);
 
-    unsigned const reader_count = 10;
+    constexpr unsigned reader_count = 10;
 
     try
     {
+        unsigned unblocked_count = 0;
+        unsigned simultaneous_running_count = 0;
+        hpx::condition_variable unblocked_condition;
+
         for (unsigned i = 0; i != reader_count; ++i)
         {
             pool.create_thread(
@@ -257,29 +261,30 @@ void test_unlocking_writer_unblocks_all_readers()
 
 void test_unlocking_last_reader_only_unblocks_one_writer()
 {
-    typedef hpx::shared_mutex shared_mutex_type;
-    typedef hpx::mutex mutex_type;
+    using shared_mutex_type = hpx::shared_mutex;
+    using mutex_type = hpx::mutex;
 
     test::thread_group pool;
 
-    hpx::shared_mutex rw_mutex;
     unsigned unblocked_count = 0;
-    unsigned simultaneous_running_readers = 0;
     unsigned max_simultaneous_readers = 0;
-    unsigned simultaneous_running_writers = 0;
     unsigned max_simultaneous_writers = 0;
     mutex_type unblocked_count_mutex;
-    hpx::condition_variable unblocked_condition;
     mutex_type finish_reading_mutex;
     std::unique_lock<mutex_type> finish_reading_lock(finish_reading_mutex);
     mutex_type finish_writing_mutex;
     std::unique_lock<mutex_type> finish_writing_lock(finish_writing_mutex);
 
-    unsigned const reader_count = 10;
-    unsigned const writer_count = 10;
+    constexpr unsigned reader_count = 10;
+    constexpr unsigned writer_count = 10;
 
     try
     {
+        hpx::shared_mutex rw_mutex;
+        unsigned simultaneous_running_readers = 0;
+        unsigned simultaneous_running_writers = 0;
+        hpx::condition_variable unblocked_condition;
+
         for (unsigned i = 0; i != reader_count; ++i)
         {
             pool.create_thread(
@@ -360,7 +365,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/for_each.hpp
+/// \page hpx::for_each, hpx::for_each_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
@@ -421,7 +423,7 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
                 std::size_t count, F&& f, Proj&& proj /* = Proj()*/)
             {
-                static constexpr bool has_scheduler_executor =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)
@@ -506,7 +508,7 @@ namespace hpx::parallel {
                     hpx::parallel::util::detail::algorithm_result<ExPolicy,
                         FwdIterB>;
 
-                static constexpr bool has_scheduler_executor =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 if constexpr (!has_scheduler_executor)

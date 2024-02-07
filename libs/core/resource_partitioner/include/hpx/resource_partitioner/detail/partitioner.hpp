@@ -1,5 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
-//  Copyright (c) 2017-2022 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -50,7 +50,7 @@ namespace hpx::resource::detail {
         // counter ... overall, in all the thread pools
         static std::size_t num_threads_overall;
 
-        init_pool_data(std::string const& name, scheduling_policy policy,
+        init_pool_data(std::string const& name, scheduling_policy sched,
             hpx::threads::policies::scheduler_mode mode,
             background_work_function func = background_work_function());
 
@@ -75,7 +75,7 @@ namespace hpx::resource::detail {
         hpx::threads::policies::scheduler_mode mode_;
         scheduler_function create_function_;
 
-        // possible additional beckground work to run on this scheduler
+        // possible additional background work to run on this scheduler
         background_work_function background_work_;
     };
 
@@ -86,6 +86,12 @@ namespace hpx::resource::detail {
 
     public:
         partitioner();
+
+        partitioner(partitioner const&) = delete;
+        partitioner(partitioner&&) = delete;
+        partitioner& operator=(partitioner const&) = delete;
+        partitioner& operator=(partitioner&&) = delete;
+
         ~partitioner();
 
         void print_init_pool_data(std::ostream&) const;
@@ -203,7 +209,7 @@ namespace hpx::resource::detail {
     private:
         ////////////////////////////////////////////////////////////////////////
         void fill_topology_vectors();
-        bool pu_exposed(std::size_t pid);
+        bool pu_exposed(std::size_t pu_num) const;
 
         ////////////////////////////////////////////////////////////////////////
         // called in hpx_init run_or_start
@@ -232,7 +238,7 @@ namespace hpx::resource::detail {
         // counter for instance numbers
         static std::atomic<int> instance_number_counter_;
 
-        // holds all of the command line switches
+        // holds all the command line switches
         util::section rtcfg_;
         std::size_t first_core_;
         std::size_t pus_needed_;

@@ -14,6 +14,8 @@
 ==============================================================================*/
 
 /// \file any.hpp
+/// \page hpx::any_nonser. hpx::bad_any_cast, hpx::unique_any_nonser, hpx::any_cast, hpx::make_any_nonser, hpx::make_unique_any_nonser
+/// \headerfile hpx/any.hpp
 
 #pragma once
 

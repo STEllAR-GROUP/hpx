@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
+#include <hpx/allocator_support/thread_local_caching_allocator.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/async_base/traits/is_launch_policy.hpp>
@@ -63,9 +64,13 @@ namespace hpx::lcos::detail {
             using continuation_result_type =
                 hpx::util::invoke_result_t<F, Future>;
 
+            using allocator_type =
+                hpx::util::thread_local_caching_allocator<char,
+                    hpx::util::internal_allocator<>>;
+
             hpx::traits::detail::shared_state_ptr_t<result_type> p =
                 detail::make_continuation_alloc<continuation_result_type>(
-                    hpx::util::internal_allocator<>{}, HPX_MOVE(fut),
+                    allocator_type{}, HPX_MOVE(fut),
                     HPX_FORWARD(Policy_, policy), HPX_FORWARD(F, f));
 
             return hpx::traits::future_access<hpx::future<result_type>>::create(

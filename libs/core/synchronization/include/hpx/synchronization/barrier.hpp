@@ -7,6 +7,9 @@
 //
 //  The algorithm was taken from http://locklessinc.com/articles/barriers/
 
+/// \page hpx::barrier
+/// \headerfile hpx/barrier.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>

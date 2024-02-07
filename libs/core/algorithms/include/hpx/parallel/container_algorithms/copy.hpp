@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/copy.hpp
+/// \page hpx::ranges::copy, hpx::ranges::copy_n, hpx::ranges::copy_if
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/transform_exclusive_scan.hpp
+/// \page hpx::ranges::transform_exclusive_scan
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

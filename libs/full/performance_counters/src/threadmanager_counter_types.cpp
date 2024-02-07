@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach, Katelyn Kufahl
 //  Copyright (c) 2008-2009 Chirag Dekate, Anshul Tandon
 //  Copyright (c) 2015 Patricia Grubel
@@ -19,7 +19,9 @@
 #include <hpx/performance_counters/manage_counter_type.hpp>
 #include <hpx/performance_counters/threadmanager_counter_types.hpp>
 #include <hpx/runtime_local/thread_pool_helpers.hpp>
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
+#endif
 
 #include <cstddef>
 #include <cstdint>
@@ -29,7 +31,7 @@
 namespace hpx::performance_counters::detail {
 
     using threadmanager_counter_func = std::int64_t (threads::threadmanager::*)(
-        bool reset);
+        bool reset) const;
     using threadpool_counter_func = std::int64_t (threads::thread_pool_base::*)(
         std::size_t num_thread, bool reset);
 
@@ -89,7 +91,7 @@ namespace hpx::performance_counters::detail {
         else if (paths.instancename_ == "pool")
         {
             if (paths.instanceindex_ >= 0 &&
-                std::size_t(paths.instanceindex_) <
+                static_cast<std::size_t>(paths.instanceindex_) <
                     hpx::resource::get_num_thread_pools())
             {
                 // specific for given pool counter
@@ -105,7 +107,8 @@ namespace hpx::performance_counters::detail {
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < pool.get_os_thread_count())
+            static_cast<std::size_t>(paths.instanceindex_) <
+                pool.get_os_thread_count())
         {
             // specific counter from default
             using detail::create_raw_counter;
@@ -122,7 +125,8 @@ namespace hpx::performance_counters::detail {
 
     // scheduler utilization counter creation function
     naming::gid_type scheduler_utilization_counter_creator(
-        threads::threadmanager* tm, counter_info const& info, error_code& ec)
+        threads::threadmanager const* tm, counter_info const& info,
+        error_code& ec)
     {
         // verify the validity of the counter instance name
         counter_path_elements paths;
@@ -162,7 +166,7 @@ namespace hpx::performance_counters::detail {
                     &pool);
                 return create_raw_counter(info, HPX_MOVE(f), ec);
             }
-            else if (std::size_t(paths.instanceindex_) <
+            else if (static_cast<std::size_t>(paths.instanceindex_) <
                 hpx::resource::get_num_thread_pools())
             {
                 // counter specific for given pool
@@ -187,7 +191,7 @@ namespace hpx::performance_counters::detail {
     // /threads{locality#%d/worker-thread#%d}/idle-loop-count/instantaneous
     // /threads{locality#%d/pool#%s/worker-thread#%d}/idle-loop-count/instantaneous
     naming::gid_type locality_pool_thread_no_total_counter_creator(
-        threads::threadmanager* tm, threadpool_counter_func pool_func,
+        threads::threadmanager const* tm, threadpool_counter_func pool_func,
         counter_info const& info, error_code& ec)
     {
         // verify the validity of the counter instance name
@@ -218,7 +222,7 @@ namespace hpx::performance_counters::detail {
         else if (paths.instancename_ == "pool")
         {
             if (paths.instanceindex_ >= 0 &&
-                std::size_t(paths.instanceindex_) <
+                static_cast<std::size_t>(paths.instanceindex_) <
                     hpx::resource::get_num_thread_pools())
             {
                 // specific for given pool counter
@@ -234,7 +238,8 @@ namespace hpx::performance_counters::detail {
         }
         else if (paths.instancename_ == "worker-thread" &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < pool.get_os_thread_count())
+            static_cast<std::size_t>(paths.instanceindex_) <
+                pool.get_os_thread_count())
         {
             // specific counter
             using detail::create_raw_counter;
@@ -275,7 +280,7 @@ namespace hpx::performance_counters::detail {
         else if (!individual_creator.empty() &&
             paths.instancename_ == individual_name &&
             paths.instanceindex_ >= 0 &&
-            std::size_t(paths.instanceindex_) < individual_count)
+            static_cast<std::size_t>(paths.instanceindex_) < individual_count)
         {
             // specific counter
             using detail::create_raw_counter;
@@ -354,7 +359,7 @@ namespace hpx::performance_counters {
             hpx::bind_front(&detail::thread_counts_counter_creator));
 #endif
 
-        generic_counter_type_data counter_types[] = {
+        generic_counter_type_data const counter_types[] = {
             // length of thread queue(s)
             {"/threadqueue/length", counter_type::raw,
                 "returns the current queue length for the referenced queue",

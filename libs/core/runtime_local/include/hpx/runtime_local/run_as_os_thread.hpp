@@ -38,7 +38,7 @@ namespace hpx::threads {
     HPX_DEPRECATED_V(1, 10,
         "hpx::threads::run_as_os_thread is deprecated, use "
         "hpx::run_as_os_thread instead")
-    decltype(auto) run_as_os_thread(F const& f, Ts&&... ts)
+    decltype(auto) run_as_os_thread(F&& f, Ts&&... ts)
     {
         return hpx::run_as_os_thread(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
     }

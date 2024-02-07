@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT query_counters
@@ -46,6 +46,7 @@ namespace hpx { namespace util {
         void start();
         void stop_evaluating_counters(bool terminate = false);
         bool evaluate(bool force = false);
+
         void terminate();
 
         void start_counters(error_code& ec = throws);
@@ -87,19 +88,19 @@ namespace hpx { namespace util {
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        void print_name_csv(Stream& out, std::string const& name);
+        static void print_name_csv(Stream& out, std::string const& name);
 
         template <typename Stream>
-        void print_value_csv(Stream* out,
+        static void print_value_csv(Stream* out,
             performance_counters::counter_info const& infos,
             performance_counters::counter_value const& value);
         template <typename Stream>
-        void print_value_csv(Stream* out,
+        static void print_value_csv(Stream* out,
             performance_counters::counter_info const& infos,
             performance_counters::counter_values_array const& value);
 
         template <typename Stream>
-        void print_name_csv_short(Stream& out, std::string const& name);
+        static void print_name_csv_short(Stream& out, std::string const& name);
 
     private:
         using mutex_type = hpx::mutex;
@@ -122,6 +123,6 @@ namespace hpx { namespace util {
         std::map<std::string, util::itt::counter> itt_counters_;
 #endif
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

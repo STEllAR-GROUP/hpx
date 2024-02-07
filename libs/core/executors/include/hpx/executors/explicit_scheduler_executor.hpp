@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,18 +12,17 @@
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/algorithms/bulk.hpp>
 #include <hpx/execution/algorithms/keep_future.hpp>
-#include <hpx/execution/algorithms/make_future.hpp>
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
+#include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
 #include <hpx/execution_base/execution.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/functional/bind_back.hpp>
-#include <hpx/functional/bind_front.hpp>
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/invoke_fused.hpp>
 #include <hpx/functional/tag_invoke.hpp>
@@ -32,11 +31,8 @@
 #include <hpx/timing/steady_clock.hpp>
 
 #include <cstddef>
-#include <exception>
-#include <string>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace hpx::execution::experimental {
 
@@ -122,9 +118,9 @@ namespace hpx::execution::experimental {
         using execution_category =
             hpx::traits::executor_execution_category_t<BaseScheduler>;
 
-        // Associate the static_chunk_size executor parameters type as a default
+        // Associate the default_parameters executor parameters type as a default
         // with this executor.
-        using executor_parameters_type = static_chunk_size;
+        using executor_parameters_type = default_parameters;
 
         // NonBlockingOneWayExecutor interface
         template <typename F, typename... Ts>
@@ -234,10 +230,10 @@ namespace hpx::execution::experimental {
             static_assert(
                 std::is_void_v<result_type>, "std::is_void_v<result_type>");
 
-            auto prereq =
+            auto pre_req =
                 when_all(keep_future(HPX_FORWARD(Future, predecessor)));
 
-            return bulk(transfer(HPX_MOVE(prereq), exec.sched_), shape,
+            return bulk(transfer(HPX_MOVE(pre_req), exec.sched_), shape,
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }
 

@@ -50,6 +50,8 @@ namespace hpx::threads::policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
+        static constexpr bool support_bulk_dequeue = false;
+
         explicit lockfree_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = static_cast<size_type>(-1))
           : queue_(static_cast<std::size_t>(initial_size))
@@ -114,6 +116,8 @@ namespace hpx::threads::policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
+        static constexpr bool support_bulk_dequeue = true;
+
         explicit moodycamel_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = static_cast<size_type>(-1))
           : queue_(static_cast<std::size_t>(initial_size))
@@ -134,6 +138,14 @@ namespace hpx::threads::policies {
             noexcept(std::is_nothrow_copy_constructible_v<T>))
         {
             return queue_.try_dequeue(val);
+        }
+
+        template <typename Iterator>
+        std::size_t pop_bulk(Iterator it, std::int64_t max_items,
+            bool /* steal */ = true) noexcept(noexcept(std::
+                is_nothrow_copy_constructible_v<T>))
+        {
+            return queue_.try_dequeue_bulk(it, max_items);
         }
 
         bool empty() noexcept
@@ -169,6 +181,8 @@ namespace hpx::threads::policies {
         using const_reference = T const&;
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
+
+        static constexpr bool support_bulk_dequeue = false;
 
         explicit lockfree_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = static_cast<size_type>(-1))
@@ -230,6 +244,8 @@ namespace hpx::threads::policies {
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
 
+        static constexpr bool support_bulk_dequeue = false;
+
         explicit lockfree_abp_fifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = static_cast<size_type>(-1))
           : queue_(static_cast<std::size_t>(initial_size))
@@ -286,6 +302,8 @@ namespace hpx::threads::policies {
         using const_reference = T const&;
         using rvalue_reference = T&&;
         using size_type = std::uint64_t;
+
+        static constexpr bool support_bulk_dequeue = false;
 
         explicit lockfree_abp_lifo_backend(size_type initial_size = 0,
             size_type /* num_thread */ = static_cast<size_type>(-1))

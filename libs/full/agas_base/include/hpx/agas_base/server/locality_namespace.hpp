@@ -65,10 +65,8 @@ namespace hpx { namespace agas { namespace server {
         std::uint32_t prefix_counter_;
         primary_namespace* primary_;
 
-        struct update_time_on_exit;
-
     public:
-        // data structure holding all counters for the omponent_namespace
+        // data structure holding all counters for the component_namespace
         // component
         struct counter_data
         {

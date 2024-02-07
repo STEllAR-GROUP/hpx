@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -9,9 +9,9 @@
 
 #ifdef HPX_HAVE_VERIFY_LOCKS
 #include <hpx/assert.hpp>
+#include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -121,21 +121,6 @@ namespace hpx::util {
         bool register_locks::lock_detection_enabled_ = false;
         std::size_t register_locks::lock_detection_trace_depth_ =
             HPX_HAVE_THREAD_BACKTRACE_DEPTH;
-
-        struct reset_lock_enabled_on_exit
-        {
-            reset_lock_enabled_on_exit()
-              : old_value_(register_locks::get_lock_enabled())
-            {
-                register_locks::set_lock_enabled(false);
-            }
-            ~reset_lock_enabled_on_exit()
-            {
-                register_locks::set_lock_enabled(old_value_);
-            }
-
-            bool old_value_;
-        };
     }    // namespace detail
 
     // retrieve the current thread_local data about held locks
@@ -290,7 +275,12 @@ namespace hpx::util {
             {
                 // Temporarily disable verifying locks in case verify_no_locks
                 // gets called recursively.
-                detail::reset_lock_enabled_on_exit e;
+                auto old_value = detail::register_locks::get_lock_enabled();
+
+                detail::register_locks::set_lock_enabled(false);
+                auto on_exit = hpx::experimental::scope_exit([old_value] {
+                    detail::register_locks::set_lock_enabled(old_value);
+                });
 
                 if (detail::some_locks_are_not_ignored(held_locks))
                 {
@@ -346,7 +336,7 @@ namespace hpx::util {
                     held_locks.find(lock);
                 if (it == held_locks.end())
                 {
-                    // this can happen if the lock was registered to be ignore
+                    // this can happen if the lock was registered to be ignored
                     // on a different OS thread
                     // HPX_THROW_EXCEPTION(
                     //     hpx::error::invalid_status, "set_ignore_status",

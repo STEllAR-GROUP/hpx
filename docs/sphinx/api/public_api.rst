@@ -47,7 +47,6 @@ Functions
    =================================================  ==========================================================
    `hpx` function                                     C++ standard
    =================================================  ==========================================================
-   :cpp:func:`hpx::adjacent_difference`               :cppreference-generic:`algorithm,adjacent_difference`
    :cpp:func:`hpx::adjacent_find`                     :cppreference-generic:`algorithm,adjacent_find`
    :cpp:func:`hpx::all_of`                            :cppreference-generic:`algorithm,all_any_none_of,all_of`
    :cpp:func:`hpx::any_of`                            :cppreference-generic:`algorithm,all_any_none_of,any_of`
@@ -748,13 +747,19 @@ Functions
    +--------------------------------------------------+
    | `hpx::ranges` function                           |
    +==================================================+
+   | :cpp:func:`hpx::ranges::adjacent_difference`     |
+   +--------------------------------------------------+
    | :cpp:func:`hpx::ranges::exclusive_scan`          |
    +--------------------------------------------------+
    | :cpp:func:`hpx::ranges::inclusive_scan`          |
    +--------------------------------------------------+
+   | :cpp:func:`hpx::ranges::reduce`                  |
+   +--------------------------------------------------+
    | :cpp:func:`hpx::ranges::transform_exclusive_scan`|
    +--------------------------------------------------+
    | :cpp:func:`hpx::ranges::transform_inclusive_scan`|
+   +--------------------------------------------------+
+   | :cpp:func:`hpx::ranges::transform_reduce`        |
    +--------------------------------------------------+
 
 .. _public_api_header_hpx_optional:
@@ -1117,7 +1122,7 @@ Classes
 ``hpx/unwrap.hpp``
 ==================
 
-The header :hpx-header:`libs/fcore/include_local/include,hpx/unwrap.hpp` contains utilities for
+The header :hpx-header:`libs/core/include_local/include,hpx/unwrap.hpp` contains utilities for
 unwrapping futures.
 
 Classes

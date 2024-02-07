@@ -52,7 +52,11 @@ namespace hpx::parallel::execution {
             hpx::is_invocable_v<
                 with_processing_units_count_t,
                 typename std::decay_t<ExPolicy>::executor_type, std::size_t> &&
-            detail::has_processing_units_count_v<std::decay_t<Params>>
+            hpx::is_invocable_v<
+                processing_units_count_t,
+                std::decay_t<Params>,
+                typename std::decay_t<ExPolicy>::executor_type,
+                hpx::chrono::steady_duration const&, std::size_t>
         )>
     // clang-format on
     constexpr decltype(auto) tag_invoke(
@@ -61,8 +65,8 @@ namespace hpx::parallel::execution {
         // explicitly extract pu count from given parameters object as otherwise
         // the executor might take precedence
         auto exec = with_processing_units_count(policy.executor(),
-            params.processing_units_count(
-                policy.executor(), hpx::chrono::null_duration, 0));
+            processing_units_count(
+                params, policy.executor(), hpx::chrono::null_duration, 0));
 
         return create_rebound_policy(
             policy, HPX_MOVE(exec), policy.parameters());

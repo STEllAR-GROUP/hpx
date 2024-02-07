@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file dataflow.hpp
+/// \page hpx::dataflow
+/// \headerfile hpx/future.hpp
 
 #pragma once
 
@@ -58,12 +60,15 @@ namespace hpx {
             // clang-format on
             friend constexpr HPX_FORCEINLINE auto tag_fallback_invoke(
                 dataflow_t tag, F&& f, Ts&&... ts)
-                -> decltype(tag(hpx::util::internal_allocator<>{},
+                -> decltype(tag(hpx::util::thread_local_caching_allocator<char,
+                                    hpx::util::internal_allocator<>>{},
                     HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
-                return hpx::functional::tag_invoke(tag,
-                    hpx::util::internal_allocator<>{}, HPX_FORWARD(F, f),
-                    HPX_FORWARD(Ts, ts)...);
+                using allocator_type =
+                    hpx::util::thread_local_caching_allocator<char,
+                        hpx::util::internal_allocator<>>;
+                return hpx::functional::tag_invoke(tag, allocator_type{},
+                    HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         } dataflow{};
     }    // namespace detail

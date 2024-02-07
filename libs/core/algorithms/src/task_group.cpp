@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2023 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,37 +15,6 @@
 #include <exception>
 
 namespace hpx::experimental {
-
-    ///////////////////////////////////////////////////////////////////////////
-    task_group::on_exit::on_exit(task_group& tg)
-      : latch_(&tg.latch_)
-    {
-        if (latch_->reset_if_needed_and_count_up(1, 1))
-        {
-            tg.has_arrived_.store(false, std::memory_order_release);
-        }
-    }
-
-    task_group::on_exit::~on_exit()
-    {
-        if (latch_ != nullptr)
-        {
-            latch_->count_down(1);
-        }
-    }
-
-    task_group::on_exit::on_exit(on_exit&& rhs) noexcept
-      : latch_(rhs.latch_)
-    {
-        rhs.latch_ = nullptr;
-    }
-
-    task_group::on_exit& task_group::on_exit::operator=(on_exit&& rhs) noexcept
-    {
-        latch_ = rhs.latch_;
-        rhs.latch_ = nullptr;
-        return *this;
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     task_group::task_group()

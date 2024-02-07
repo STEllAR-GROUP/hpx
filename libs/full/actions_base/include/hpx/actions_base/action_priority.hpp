@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2023 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -11,7 +11,7 @@
 #include <hpx/actions_base/traits/extract_action.hpp>
 #include <hpx/coroutines/thread_enums.hpp>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     template <typename Action>
     constexpr threads::thread_priority action_priority() noexcept
@@ -21,4 +21,4 @@ namespace hpx { namespace actions {
         using action_type = typename hpx::traits::extract_action<Action>::type;
         return hpx::traits::action_priority_v<action_type>;
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions

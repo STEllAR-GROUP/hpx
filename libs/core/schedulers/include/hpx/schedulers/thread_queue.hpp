@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <hpx/functional/function.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
-#include <hpx/schedulers/deadlock_detection.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
@@ -23,14 +22,20 @@
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
-#include <hpx/util/get_and_reset_value.hpp>
 
+#if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
+#include <hpx/schedulers/deadlock_detection.hpp>
+#endif
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
 #include <hpx/schedulers/maintain_queue_wait_times.hpp>
 #include <hpx/timing/high_resolution_clock.hpp>
 #endif
 #ifdef HPX_HAVE_THREAD_CREATION_AND_CLEANUP_RATES
 #include <hpx/timing/tick_counter.hpp>
+#include <hpx/util/get_and_reset_value.hpp>
+#endif
+#ifdef HPX_HAVE_THREAD_STEALING_COUNTS
+#include <hpx/util/get_and_reset_value.hpp>
 #endif
 
 #include <algorithm>
@@ -89,7 +94,8 @@ namespace hpx::threads::policies {
         // we use a simple mutex to protect the data members for now
         using mutex_type = Mutex;
 
-        // this is the type of a map holding all threads (except depleted ones)
+        // this is the type of the map holding all threads (except depleted
+        // ones)
         using thread_map_type =
             std::unordered_set<thread_id_type, std::hash<thread_id_type>,
                 std::equal_to<>, util::internal_allocator<thread_id_type>>;
@@ -888,6 +894,82 @@ namespace hpx::threads::policies {
             }
 #endif
             return false;
+        }
+
+        // Return the next thread to be executed, return false if none is
+        // available
+        template <typename Iterator>
+        std::size_t get_next_threads(Iterator it, std::int64_t max_items,
+            bool allow_stealing = false, bool steal = false)
+        {
+            std::int64_t const work_items_count = (std::min)(
+                work_items_count_.data_.load(std::memory_order_relaxed),
+                max_items);
+
+            if (work_items_count == 0)
+            {
+                return false;
+            }
+
+            if (allow_stealing &&
+                parameters_.min_tasks_to_steal_pending_ > work_items_count)
+            {
+                return false;
+            }
+
+#ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
+            std::size_t const max_items_requested = max_items;
+
+            thread_description_ptr tdesc;
+            while (work_items_.pop(tdesc, steal))
+            {
+                if (get_maintain_queue_wait_times_enabled())
+                {
+                    work_items_wait_ +=
+                        hpx::chrono::high_resolution_clock::now() -
+                        tdesc->waittime;
+                    ++work_items_wait_count_;
+                }
+
+                *it++ = HPX_MOVE(tdesc->data);
+                delete tdesc;
+
+                --max_items;
+                if (--work_items_count_.data_ == 0)
+                {
+                    break;
+                }
+            }
+
+            return max_items_requested - max_items;
+#else
+            if constexpr (work_items_type::support_bulk_dequeue)
+            {
+                std::size_t const dequeued =
+                    work_items_.pop_bulk(it, work_items_count, steal);
+                work_items_count_.data_ -= dequeued;
+                return dequeued;
+            }
+            else
+            {
+                std::size_t const max_items_requested = max_items;
+
+                thread_description_ptr next_thrd;
+                while (max_items != 0 && work_items_.pop(next_thrd, steal))
+                {
+                    *it++ = threads::thread_id_ref_type(next_thrd,
+                        threads::thread_id_addref::no);    // do not addref!
+
+                    --max_items;
+                    if (--work_items_count_.data_ == 0)
+                    {
+                        break;
+                    }
+                }
+
+                return max_items_requested - max_items;
+            }
+#endif
         }
 
         // Schedule the passed thread

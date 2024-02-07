@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file is_bind_expression.hpp
+/// \page hpx::is_bind_expression
+/// \headerfile hpx/functional.hpp
 
 #pragma once
 

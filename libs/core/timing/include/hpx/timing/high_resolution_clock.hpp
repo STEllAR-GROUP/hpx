@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file high_resolution_clock.hpp
+/// \page hpx::chrono::high_resolution_clock
+/// \headerfile hpx/chrono.hpp
 
 #pragma once
 
@@ -18,7 +20,6 @@
 #include <cstdint>
 
 namespace hpx::chrono {
-
     /// \brief Class \c hpx::chrono::high_resolution_clock represents the clock
     ///        with the smallest tick period provided by the implementation. It
     ///        may be an alias of \c std::chrono::system_clock or

@@ -565,7 +565,7 @@ jobs:
       - run:
           name: Building Unit Tests (Segmented Algorithms)
           command: |
-              ninja -j2 -k 0 tests.unit.modules.segmented_algorithms
+              ninja -j1 -k 0 tests.unit.modules.segmented_algorithms
       - run:
           name: Running Unit Tests
           when: always

@@ -58,7 +58,11 @@ set(tests
     is_partitioned_range
     is_partitioned_projection_range
     is_sorted_range
+    is_sorted_range2
+    is_sorted_range3
+    is_sorted_range_exception
     is_sorted_until_range
+    is_sorted_until_range_exception
     lexicographical_compare_range
     make_heap_range
     max_element_range

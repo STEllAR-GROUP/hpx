@@ -72,7 +72,7 @@ namespace hpx::threads::detail {
             HPX_THROWS_IF(ec, hpx::error::null_thread_id,
                 "threads::detail::set_thread_state",
                 "null thread id encountered");
-            return {
+            return thread_state{
                 thread_schedule_state::unknown, thread_restart_state::unknown};
         }
 
@@ -82,7 +82,7 @@ namespace hpx::threads::detail {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "threads::detail::set_thread_state", "invalid new state: {}",
                 new_state);
-            return {
+            return thread_state{
                 thread_schedule_state::unknown, thread_restart_state::unknown};
         }
 
@@ -107,7 +107,7 @@ namespace hpx::threads::detail {
                 if (&ec != &throws)
                     ec = make_success_code();
 
-                return {new_state, previous_state.state_ex()};
+                return thread_state{new_state, previous_state.state_ex()};
             }
 
             // the thread to set the state for is currently running, so we
@@ -194,7 +194,7 @@ namespace hpx::threads::detail {
 
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "threads::detail::set_thread_state", str);
-                    return {thread_schedule_state::unknown,
+                    return thread_state{thread_schedule_state::unknown,
                         thread_restart_state::unknown};
                 }
                 break;
@@ -253,7 +253,7 @@ namespace hpx::threads::detail {
                 new_state == thread_schedule_state::pending_boost))
         {
             // REVIEW: Passing a specific target thread may interfere with the
-            // round robin queuing.
+            // round-robin queuing.
 
             auto const* thrd_data = get_thread_id_data(thrd);
             auto* scheduler = thrd_data->get_scheduler_base();

@@ -35,27 +35,28 @@ namespace hpx::threads::detail {
         // (1L << 48L) - 1;
         static constexpr tagged_state_type tag_mask = 0x0000ffffffffffffull;
 
-        static constexpr tag_type extract_tag(tagged_state_type i) noexcept
+        static constexpr tag_type extract_tag(
+            tagged_state_type const i) noexcept
         {
             return i & tag_mask;
         }
 
         static constexpr thread_state_type extract_state(
-            tagged_state_type i) noexcept
+            tagged_state_type const i) noexcept
         {
             return static_cast<thread_state_type>(
                 (i >> state_shift) & state_mask);
         }
 
         static constexpr thread_state_ex_type extract_state_ex(
-            tagged_state_type i) noexcept
+            tagged_state_type const i) noexcept
         {
             return static_cast<thread_state_ex_type>(
                 (i >> state_ex_shift) & state_ex_mask);
         }
 
         static tagged_state_type pack_state(
-            T1 state_, T2 state_ex_, tag_type tag) noexcept
+            T1 const state_, T2 const state_ex_, tag_type const tag) noexcept
         {
             auto const state = static_cast<tagged_state_type>(state_);
             auto const state_ex = static_cast<tagged_state_type>(state_ex_);
@@ -74,18 +75,20 @@ namespace hpx::threads::detail {
         {
         }
 
-        combined_tagged_state(T1 state, T2 state_ex, tag_type t = 0) noexcept
+        explicit combined_tagged_state(
+            T1 state, T2 state_ex, tag_type const t = 0) noexcept
           : state_(pack_state(state, state_ex, t))
         {
         }
 
-        combined_tagged_state(combined_tagged_state state, tag_type t) noexcept
+        explicit combined_tagged_state(
+            combined_tagged_state const state, tag_type const t) noexcept
           : state_(pack_state(state.state(), state.state_ex(), t))
         {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        void set(T1 state, T2 state_ex, tag_type t) noexcept
+        void set(T1 state, T2 state_ex, tag_type const t) noexcept
         {
             state_ = pack_state(state, state_ex, t);
         }
@@ -103,7 +106,7 @@ namespace hpx::threads::detail {
 
         ///////////////////////////////////////////////////////////////////////
         // state access
-        constexpr T1 state() const noexcept
+        [[nodiscard]] constexpr T1 state() const noexcept
         {
             return static_cast<T1>(extract_state(state_));
         }
@@ -113,7 +116,7 @@ namespace hpx::threads::detail {
             state_ = pack_state(state, state_ex(), tag());
         }
 
-        constexpr T2 state_ex() const noexcept
+        [[nodiscard]] constexpr T2 state_ex() const noexcept
         {
             return static_cast<T2>(extract_state_ex(state_));
         }
@@ -125,12 +128,12 @@ namespace hpx::threads::detail {
 
         ///////////////////////////////////////////////////////////////////////
         // tag access
-        constexpr tag_type tag() const noexcept
+        [[nodiscard]] constexpr tag_type tag() const noexcept
         {
             return extract_tag(state_);
         }
 
-        void set_tag(tag_type t) noexcept
+        void set_tag(tag_type const t) noexcept
         {
             state_ = pack_state(state(), state_ex(), t);
         }

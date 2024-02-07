@@ -377,7 +377,7 @@ namespace hpx::agas::detail::impl {
             return naming::invalid_gid;
         }
 
-        // during bootstrap we use the id pool
+        // during bootstrap, we use the id pool
         if (rt->get_state() == state::invalid)
         {
             return hpx::detail::get_next_id(count);

@@ -6,6 +6,9 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \page hpx::ranges::experimental::for_loop, hpx::ranges::experimental::for_loop_strided, hpx::ranges::experimental::for_loop_n, hpx::ranges::experimental::for_loop_n_strided
+/// \headerfile hpx/algorithm.hpp
+
 #pragma once
 
 #if defined(DOXYGEN)

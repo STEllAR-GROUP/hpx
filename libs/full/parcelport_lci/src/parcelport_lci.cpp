@@ -118,9 +118,8 @@ namespace hpx::parcelset::policies::lci {
     /// Return the name of this locality
     std::string parcelport::get_locality_name() const
     {
-        // hostname-rank
-        return util::lci_environment::get_processor_name() + "-" +
-            std::to_string(util::lci_environment::rank());
+        // hostname
+        return util::lci_environment::get_processor_name();
     }
 
     std::shared_ptr<sender_connection_base> parcelport::create_connection(
@@ -162,12 +161,14 @@ namespace hpx::parcelset::policies::lci {
                 if (hpx::this_thread::get_pool() ==
                     &hpx::resource::get_thread_pool("lci-progress-pool"))
                 {
-                    std::size_t prg_thread_id =
-                        hpx::get_local_worker_thread_num();
-                    double rate = (double) config_t::ndevices /
-                        config_t::progress_thread_num;
-                    for (int i = prg_thread_id * rate;
-                         i < (prg_thread_id + 1) * rate; ++i)
+                    int prg_thread_id =
+                        static_cast<int>(hpx::get_local_worker_thread_num());
+                    HPX_ASSERT(prg_thread_id < config_t::progress_thread_num);
+                    for (int i = prg_thread_id * config_t::ndevices /
+                             config_t::progress_thread_num;
+                         i < (prg_thread_id + 1) * config_t::ndevices /
+                             config_t::progress_thread_num;
+                         ++i)
                     {
                         devices_to_progress.push_back(&devices[i]);
                     }
@@ -460,9 +461,6 @@ namespace hpx::parcelset::policies::lci {
                 hpx::threads::get_self_id() == hpx::threads::invalid_thread_id))
         {
             static thread_local unsigned int tls_rand_seed = rand();
-            util::lci_environment::log(
-                util::lci_environment::log_level_t::debug, "device",
-                "Rank %d unusual phase\n", LCI_RANK);
             return devices[rand_r(&tls_rand_seed) % devices.size()];
         }
         if (tls_device_idx == std::size_t(-1))

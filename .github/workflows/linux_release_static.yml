@@ -44,4 +44,5 @@ jobs:
             --output-on-failure \
             --tests-regex tests.examples \
             --exclude-regex tests.examples.transpose.transpose_block_numa \
+            --exclude-regex tests.examples.quickstart.hello_world_1 \
             --exclude-regex tests.examples.quickstart.distributed.tcp.custom_serialization

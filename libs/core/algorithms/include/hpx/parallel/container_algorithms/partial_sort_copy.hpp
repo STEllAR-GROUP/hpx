@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/container_algorithms/partial_sort_copy.hpp
+/// \page hpx::ranges::partial_sort_copy
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 

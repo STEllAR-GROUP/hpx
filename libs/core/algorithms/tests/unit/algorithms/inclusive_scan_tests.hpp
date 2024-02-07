@@ -22,46 +22,6 @@
 #include "test_utils.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
-void inclusive_scan_benchmark()
-{
-    try
-    {
-#if defined(HPX_DEBUG)
-        std::vector<double> c(1000000);
-#else
-        std::vector<double> c(100000000);
-#endif
-        std::vector<double> d(c.size());
-        std::fill(std::begin(c), std::end(c), 1.0);
-
-        double const val(0);
-        auto op = [](double v1, double v2) { return v1 + v2; };
-
-        hpx::chrono::high_resolution_timer t;
-        hpx::inclusive_scan(hpx::execution::par, std::begin(c), std::end(c),
-            std::begin(d), op, val);
-        double elapsed = t.elapsed();
-
-        // verify values
-        std::vector<double> e(c.size());
-        hpx::parallel::detail::sequential_inclusive_scan(
-            std::begin(c), std::end(c), std::begin(e), val, op);
-
-        bool ok = std::equal(std::begin(d), std::end(d), std::begin(e));
-        HPX_TEST(ok);
-        if (ok)
-        {
-            // CDash graph plotting
-            hpx::util::print_cdash_timing("InclusiveScanTime", elapsed);
-        }
-    }
-    catch (...)
-    {
-        HPX_TEST(false);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_inclusive_scan1(IteratorTag)
 {

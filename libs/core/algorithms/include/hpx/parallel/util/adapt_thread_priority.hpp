@@ -23,10 +23,10 @@ namespace hpx::parallel::util {
     decltype(auto) adapt_thread_priority(
         ExPolicy&& policy, hpx::threads::thread_priority new_priority)
     {
-        static constexpr bool supports_priority =
-            hpx::functional::is_tag_invocable_v<
-                hpx::execution::experimental::with_priority_t,
-                std::decay_t<ExPolicy>, hpx::threads::thread_priority>;
+        constexpr bool supports_priority = hpx::functional::is_tag_invocable_v<
+            hpx::execution::experimental::with_priority_t,
+            std::decay_t<ExPolicy>, hpx::threads::thread_priority>;
+        // clang-format on
 
         if constexpr (supports_priority)
         {

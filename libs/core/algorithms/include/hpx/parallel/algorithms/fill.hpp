@@ -6,6 +6,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file parallel/algorithms/fill.hpp
+/// \page hpx::fill, hpx::fill_n
+/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
