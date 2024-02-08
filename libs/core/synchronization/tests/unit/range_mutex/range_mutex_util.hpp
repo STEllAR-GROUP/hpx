@@ -72,11 +72,12 @@ namespace hpx::ranged_lock::test::util {
     1) Generates increment num_threads * num_incr_per_thread valid ranges
     2) Spawns num_threads threads and assigns all equal amount of work
     3) Checks if result is valid
-    
+
     NOTE : Critical Section should take care of obtaining the lock
             passed as first parameter
     */
-    template <typename Lock, typename RangeEndGen, typename CriticalSection>
+    template <typename RangeMutex, typename RangeEndGen,
+        typename CriticalSection>
     void test_lock_once(std::size_t const len, std::size_t const num_threads,
         std::size_t const num_incr_per_thread, RangeEndGen&& range_end_gen,
         CriticalSection&& critical_section)
@@ -88,7 +89,7 @@ namespace hpx::ranged_lock::test::util {
             get_increment_ranges(num_incr_per_thread * num_threads, len,
                 std::forward<RangeEndGen>(range_end_gen));
 
-        Lock bl;
+        RangeMutex rmtx;
 
         for (std::size_t i = 0; i != num_threads; i++)
         {
@@ -99,18 +100,18 @@ namespace hpx::ranged_lock::test::util {
                 increments.begin() + ((i + 1) * num_incr_per_thread);
 
             threads.emplace_back(
-                [&bl, &v, &critical_section, start_iter, end_iter]() {
+                [&rmtx, &v, &critical_section, start_iter, end_iter]() {
                     increments_ty::iterator it = start_iter;
                     for (; it != end_iter; ++it)
                     {
                         std::size_t begin = it->first;
                         std::size_t end = it->second;
 
-                        std::size_t lockId = bl.lock(begin, end);
+                        std::size_t lockId = rmtx.lock(begin, end);
 
                         critical_section(v, begin, end);
 
-                        bl.unlock(lockId);
+                        rmtx.unlock(lockId);
                     }
                 });
         }

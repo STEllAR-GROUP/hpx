@@ -103,7 +103,7 @@ namespace hpx::synchronization {
                 std::error_code ec = std::make_error_code(
                     std::errc::resource_deadlock_would_occur);
                 throw std::system_error(
-                    ec, "unique_lock::lock: already locked");
+                    ec, "range_unique_lock::lock: already locked");
             }
             lock_id = mutex_ref.get().lock(begin, end);
         }
@@ -115,7 +115,7 @@ namespace hpx::synchronization {
                 std::error_code ec = std::make_error_code(
                     std::errc::resource_deadlock_would_occur);
                 throw std::system_error(
-                    ec, "unique_lock::lock: already locked");
+                    ec, "range_unique_lock::lock: already locked");
             }
             lock_id = mutex_ref.get().try_lock(begin, end);
         }

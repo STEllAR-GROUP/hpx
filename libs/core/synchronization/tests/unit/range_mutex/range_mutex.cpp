@@ -17,8 +17,11 @@
 int main()
 {
     hpx::synchronization::range_mutex rm;
-    hpx::synchronization::range_unique_lock<hpx::synchronization::range_mutex>
-        lg(rm, 1, 2);
+    {
+        hpx::synchronization::range_unique_lock<
+            hpx::synchronization::range_mutex>
+            lg(rm, 1, 2);
+    }
     hpx::ranged_lock::test::util::test_lock_n_times<
         hpx::synchronization::range_mutex>(
         10, 1'00'000, 4, 100,
