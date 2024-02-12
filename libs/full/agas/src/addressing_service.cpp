@@ -214,7 +214,7 @@ namespace hpx::agas {
                 locality_ns_->allocate(endpoints, 0, num_threads, prefix));
 
             {
-                std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+                std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
                 std::pair<resolved_localities_type::iterator, bool> const res =
                     resolved_localities_.emplace(prefix, endpoints);
 
@@ -240,7 +240,7 @@ namespace hpx::agas {
     void addressing_service::register_console(
         parcelset::endpoints_type const& eps)
     {
-        std::lock_guard<mutex_type> l(resolved_localities_mtx_);
+        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         [[maybe_unused]] std::pair<resolved_localities_type::iterator,
             bool> const res =
             resolved_localities_.emplace(
@@ -250,14 +250,14 @@ namespace hpx::agas {
 
     bool addressing_service::has_resolved_locality(naming::gid_type const& gid)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+        std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         return resolved_localities_.find(gid) != resolved_localities_.end();
     }
 
     void addressing_service::pre_cache_endpoints(
         std::vector<parcelset::endpoints_type> const& endpoints)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         std::uint32_t locality_id = 0;
         for (parcelset::endpoints_type const& endpoint : endpoints)
         {
@@ -270,49 +270,54 @@ namespace hpx::agas {
     parcelset::endpoints_type const& addressing_service::resolve_locality(
         naming::gid_type const& gid, error_code& ec)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
-        auto it = resolved_localities_.find(gid);
-        if (it == resolved_localities_.end() || it->second.empty())
+        resolved_localities_type::iterator it;
         {
-            // The locality hasn't been requested to be resolved yet. Do it now.
-            parcelset::endpoints_type endpoints;
-            {
-                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                endpoints = locality_ns_->resolve_locality(gid);
-                if (endpoints.empty())
-                {
-                    std::string const str = hpx::util::format(
-                        "couldn't resolve the given target locality ({})", gid);
-
-                    l.unlock();
-
-                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "addressing_service::resolve_locality", str);
-                    return resolved_localities_[naming::invalid_gid];
-                }
-            }
-
-            // Search again ... might have been added by a different thread
-            // already
+            std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
             it = resolved_localities_.find(gid);
-            if (it == resolved_localities_.end())
+            if (it != resolved_localities_.end() && !it->second.empty())
             {
-                if (HPX_UNLIKELY(!util::insert_checked(
-                        resolved_localities_.emplace(gid, endpoints), it)))
-                {
-                    l.unlock();
+                return it->second;
+            }
+        }
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+        // The locality hasn't been requested to be resolved yet. Do it now.
+        parcelset::endpoints_type endpoints;
+        {
+            hpx::unlock_guard<std::unique_lock<hpx::shared_mutex>> ul(l);
+            endpoints = locality_ns_->resolve_locality(gid);
+            if (endpoints.empty())
+            {
+                std::string const str = hpx::util::format(
+                    "couldn't resolve the given target locality ({})", gid);
 
-                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
-                        "addressing_service::resolve_locality",
-                        "resolved locality insertion failed "
-                        "due to a locking error or memory corruption");
-                    return resolved_localities_[naming::invalid_gid];
-                }
+                l.unlock();
+
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "addressing_service::resolve_locality", str);
+                return resolved_localities_[naming::invalid_gid];
             }
-            else if (it->second.empty() && !endpoints.empty())
+        }
+
+        // Search again ... might have been added by a different thread
+        // already
+        it = resolved_localities_.find(gid);
+        if (it == resolved_localities_.end())
+        {
+            if (HPX_UNLIKELY(!util::insert_checked(
+                    resolved_localities_.emplace(gid, endpoints), it)))
             {
-                resolved_localities_[gid] = HPX_MOVE(endpoints);
+                l.unlock();
+
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
+                    "addressing_service::resolve_locality",
+                    "resolved locality insertion failed "
+                    "due to a locking error or memory corruption");
+                return resolved_localities_[naming::invalid_gid];
             }
+        }
+        else if (it->second.empty() && !endpoints.empty())
+        {
+            resolved_localities_[gid] = HPX_MOVE(endpoints);
         }
         return it->second;
     }
@@ -341,7 +346,7 @@ namespace hpx::agas {
     void addressing_service::remove_resolved_locality(
         naming::gid_type const& gid)
     {
-        std::lock_guard<mutex_type> l(resolved_localities_mtx_);
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         if (auto const it = resolved_localities_.find(gid);
             it != resolved_localities_.end())
         {
