@@ -11,8 +11,9 @@
 Quick start
 ===========
 
-The following steps will help you get started with |hpx|. After :ref:`installing_hpx`, you
-can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
+The following steps will help you get started with |hpx|. Before getting started, make sure you have
+all the necessary prerequisites, which are listed in :ref:`_prerequisites`. After :ref:`installing_hpx`,
+you can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
 explains how you can get started with |hpx|. You can refer to our :ref:`migration_guide` if you use
 other APIs for parallelism (like |openmp|, |mpi| or |tbb|) and you would like to convert your code to
 |hpx| code.
@@ -25,7 +26,7 @@ Installing |hpx|
 The easiest way to install |hpx| on your system is by choosing one of the steps
 below:
 
-#. **vcpkg**
+#.* * vcpkg * *
 
    You can download and install |hpx| using the `vcpkg
    <https://github.com/Microsoft/vcpkg>`_ dependency manager:
@@ -34,7 +35,7 @@ below:
 
       $ vcpkg install hpx
 
-#. **Spack**
+#.* * Spack * *
 
    Another way to install |hpx| is using
    `Spack <https://spack.readthedocs.io/en/latest/>`_:
@@ -43,7 +44,7 @@ below:
 
       $ spack install hpx
 
-#. **Fedora**
+#.* * Fedora * *
 
    Installation can be done with
    `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
@@ -52,7 +53,7 @@ below:
 
       $ dnf install hpx*
 
-#. **Arch Linux**
+#.* * Arch Linux * *
 
    |hpx| is available in the
    `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_

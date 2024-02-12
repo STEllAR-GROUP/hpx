@@ -56,7 +56,6 @@ The table below presents all the necessary prerequisites for building |hpx|.
    **Build System**       |cmake|_            3.18
    **Required Libraries** |boost|_            1.71.0
    \                      |hwloc|_            1.5
-   \                      |asio|_             1.12.0
    ====================== =================== ==================
 
 The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost
