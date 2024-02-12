@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,6 @@
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/max.hpp>
@@ -53,7 +52,8 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
+
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
         template <typename Statistic>
@@ -63,10 +63,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<boost::accumulators::tag::mean>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::mean aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::mean;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
@@ -93,10 +93,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<boost::accumulators::tag::variance>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::variance aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::variance;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
@@ -123,13 +123,13 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<boost::accumulators::tag::median>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::median aggregating_tag;
-            typedef boost::accumulators::with_p_square_quantile
-                aggregating_type_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag(
-                    aggregating_type_tag)>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::median;
+            using aggregating_type_tag =
+                boost::accumulators::with_p_square_quantile;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag(
+                        aggregating_type_tag)>>;
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
@@ -157,10 +157,10 @@ namespace hpx { namespace performance_counters { namespace server {
             boost::accumulators::tag::rolling_mean>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::rolling_mean aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::rolling_mean;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
@@ -198,10 +198,10 @@ namespace hpx { namespace performance_counters { namespace server {
             boost::accumulators::tag::rolling_variance>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::rolling_variance aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::rolling_variance;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
@@ -238,10 +238,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<boost::accumulators::tag::max>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::max aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::max;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
@@ -268,10 +268,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<boost::accumulators::tag::min>
           : counter_type_from_statistic_base
         {
-            typedef boost::accumulators::tag::min aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = boost::accumulators::tag::min;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t /*parameter2*/) {}
 
@@ -298,10 +298,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<hpx::util::tag::rolling_min>
           : counter_type_from_statistic_base
         {
-            typedef hpx::util::tag::rolling_min aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = hpx::util::tag::rolling_min;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
@@ -338,10 +338,10 @@ namespace hpx { namespace performance_counters { namespace server {
         struct counter_type_from_statistic<hpx::util::tag::rolling_max>
           : counter_type_from_statistic_base
         {
-            typedef hpx::util::tag::rolling_max aggregating_tag;
-            typedef boost::accumulators::accumulator_set<double,
-                boost::accumulators::stats<aggregating_tag>>
-                accumulator_type;
+            using aggregating_tag = hpx::util::tag::rolling_max;
+            using accumulator_type =
+                boost::accumulators::accumulator_set<double,
+                    boost::accumulators::stats<aggregating_tag>>;
 
             counter_type_from_statistic(std::size_t parameter2)
               : accum_(boost::accumulators::tag::rolling_window::window_size =
@@ -626,7 +626,7 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<statistics_counter>(),
             const_cast<statistics_counter*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server
 
 ///////////////////////////////////////////////////////////////////////////////
 template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
@@ -650,105 +650,106 @@ template class HPX_EXPORT hpx::performance_counters::server::statistics_counter<
 
 ///////////////////////////////////////////////////////////////////////////////
 // Average
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::mean>>
-    average_count_counter_type;
+using average_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::mean>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(average_count_counter_type,
     average_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(average_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rolling variance
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::rolling_variance>>
-    rolling_variance_count_counter_type;
+using rolling_variance_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::rolling_variance>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(rolling_variance_count_counter_type,
     rolling_variance_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(rolling_variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Variance
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::variance>>
-    variance_count_counter_type;
+using variance_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::variance>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(variance_count_counter_type,
     variance_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(variance_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rolling average
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::rolling_mean>>
-    rolling_mean_count_counter_type;
+using rolling_mean_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::rolling_mean>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(rolling_mean_count_counter_type,
     rolling_mean_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(rolling_mean_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Median
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::median>>
-    median_count_counter_type;
+using median_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::median>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(median_count_counter_type,
     median_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(median_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Max
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::max>>
-    max_count_counter_type;
+using max_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::max>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(max_count_counter_type,
     max_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Min
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<boost::accumulators::tag::min>>
-    min_count_counter_type;
+using min_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<boost::accumulators::tag::min>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(min_count_counter_type,
     min_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(min_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rolling min
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<hpx::util::tag::rolling_min>>
-    rolling_min_count_counter_type;
+using rolling_min_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<hpx::util::tag::rolling_min>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(rolling_min_count_counter_type,
     rolling_min_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(rolling_min_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Rolling max
-typedef hpx::components::component<hpx::performance_counters::server::
-        statistics_counter<hpx::util::tag::rolling_max>>
-    rolling_max_count_counter_type;
+using rolling_max_count_counter_type =
+    hpx::components::component<hpx::performance_counters::server::
+            statistics_counter<hpx::util::tag::rolling_max>>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(rolling_max_count_counter_type,
     rolling_max_count_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(rolling_max_count_counter_type::wrapped_type)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace detail {
+namespace hpx::performance_counters::detail {
+
     /// Creation function for aggregating performance counters to be registered
     /// with the counter types.
     naming::gid_type statistics_counter_creator(
@@ -835,4 +836,4 @@ namespace hpx { namespace performance_counters { namespace detail {
             return naming::invalid_gid;
         }
     }
-}}}    // namespace hpx::performance_counters::detail
+}    // namespace hpx::performance_counters::detail

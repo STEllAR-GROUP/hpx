@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,8 @@
 
 #pragma once
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
+
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for Action::does_termination_detection
     template <typename Action, typename Enable = void>
@@ -17,4 +18,4 @@ namespace hpx { namespace traits {
             return false;
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

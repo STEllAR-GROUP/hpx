@@ -1,4 +1,5 @@
 //  Copyright (c) 2011-2017 Thomas Heller
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,10 +10,11 @@
 #include <hpx/config.hpp>
 #include <hpx/static_reinit/reinitializable_static.hpp>
 
-namespace hpx { namespace components {
+namespace hpx::components {
 
-    // This is a utility to ensure that there exists exactly one heap
-    // per component.
+    // This is a utility to ensure that there exists exactly one heap per
+    // component.
+    //
     // This is the customization point and will be defined by the registration
     // macros
     namespace detail {
@@ -37,18 +39,16 @@ namespace hpx { namespace components {
     {
         return detail::component_heap_helper<Component>(nullptr);
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 #define HPX_REGISTER_COMPONENT_HEAP(Component)                                 \
-    namespace hpx { namespace components { namespace detail {                  \
-                template <>                                                    \
-                HPX_ALWAYS_EXPORT Component::heap_type&                        \
-                component_heap_helper<Component>(...)                          \
-                {                                                              \
-                    util::reinitializable_static<Component::heap_type> heap;   \
-                    return heap.get();                                         \
-                }                                                              \
-            }                                                                  \
+    namespace hpx::components::detail {                                        \
+        template <>                                                            \
+        HPX_ALWAYS_EXPORT Component::heap_type&                                \
+        component_heap_helper<Component>(...)                                  \
+        {                                                                      \
+            util::reinitializable_static<Component::heap_type> heap;           \
+            return heap.get();                                                 \
         }                                                                      \
     }                                                                          \
     /**/

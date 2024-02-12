@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -34,7 +34,7 @@
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_3(                              \
     ComponentType, componentname, basecomponentname)                           \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY_4(ComponentType, componentname,     \
-        basecomponentname, ::hpx::components::factory_check)                   \
+        basecomponentname, ::hpx::components::factory_state::check)            \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
     /**/
 
@@ -61,7 +61,8 @@
 #define HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_3(                      \
     ComponentType, componentname, basecomponentname)                           \
     HPX_REGISTER_DERIVED_COMPONENT_FACTORY_DYNAMIC_4(ComponentType,            \
-        componentname, basecomponentname, ::hpx::components::factory_check)    \
+        componentname, basecomponentname,                                      \
+        ::hpx::components::factory_state::check)                               \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
     /**/
 

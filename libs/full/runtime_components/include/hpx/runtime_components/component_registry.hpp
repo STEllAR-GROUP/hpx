@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -15,20 +15,19 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/runtime_configuration/component_factory_base.hpp>
 #include <hpx/runtime_configuration/component_registry_base.hpp>
 
 #include <string>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     namespace detail {
 
         HPX_EXPORT void get_component_info(std::vector<std::string>& fillini,
             std::string const& filepath, bool is_static, char const* name,
-            char const* component_string, factory_state_enum state,
+            char const* component_string, factory_state state,
             char const* more);
 
         HPX_EXPORT bool is_component_enabled(char const* name);
@@ -42,7 +41,7 @@ namespace hpx { namespace components {
     ///
     /// \tparam Component   The component type this registry should be
     ///                     responsible for.
-    template <typename Component, factory_state_enum state>
+    template <typename Component, factory_state state>
     struct component_registry : component_registry_base
     {
         /// \brief Return the ini-information for all contained components
@@ -51,6 +50,8 @@ namespace hpx { namespace components {
         ///                 with the ini-information (one line per vector
         ///                 element) for all components implemented in this
         ///                 module.
+        /// \param filepath
+        /// \param is_static
         ///
         /// \return Returns \a true if the parameter \a fillini has been
         ///         successfully initialized with the registry data of all
@@ -84,12 +85,12 @@ namespace hpx { namespace components {
             using base_type_holder = typename Component::base_type_holder;
 
             char const* name = get_component_name<type_holder>();
-            bool enabled = detail::is_component_enabled(name);
+            bool const enabled = detail::is_component_enabled(name);
 
             component_type type = components::get_component_type<type_holder>();
-            component_type base_type =
+            component_type const base_type =
                 components::get_component_type<base_type_holder>();
-            if (component_invalid == type)
+            if (to_int(hpx::components::component_enum_type::invalid) == type)
             {
                 // First call to get_component_type, ask AGAS for a unique id.
                 type = detail::get_agas_component_type(name,
@@ -101,7 +102,7 @@ namespace hpx { namespace components {
             components::deleter(type) = &server::destroy<Component>;
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal component registry with
@@ -119,12 +120,12 @@ namespace hpx { namespace components {
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_2(                             \
     ComponentType, componentname)                                              \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                                 \
-        ComponentType, componentname, ::hpx::components::factory_check)        \
+        ComponentType, componentname, ::hpx::components::factory_state::check) \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_3(                             \
     ComponentType, componentname, state)                                       \
-    typedef hpx::components::component_registry<ComponentType, state>          \
-        componentname##_component_registry_type;                               \
+    using componentname##_component_registry_type =                            \
+        hpx::components::component_registry<ComponentType, state>;             \
     HPX_REGISTER_COMPONENT_REGISTRY(                                           \
         componentname##_component_registry_type, componentname)                \
     template struct hpx::components::component_registry<ComponentType, state>; \
@@ -143,12 +144,12 @@ namespace hpx { namespace components {
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_2(                     \
     ComponentType, componentname)                                              \
     HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                         \
-        ComponentType, componentname, ::hpx::components::factory_check)        \
+        ComponentType, componentname, ::hpx::components::factory_state::check) \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_REGISTRY_DYNAMIC_3(                     \
     ComponentType, componentname, state)                                       \
-    typedef hpx::components::component_registry<ComponentType, state>          \
-        componentname##_component_registry_type;                               \
+    using componentname##_component_registry_type =                            \
+        hpx::components::component_registry<ComponentType, state>;             \
     HPX_REGISTER_COMPONENT_REGISTRY_DYNAMIC(                                   \
         componentname##_component_registry_type, componentname)                \
     template struct hpx::components::component_registry<ComponentType, state>; \

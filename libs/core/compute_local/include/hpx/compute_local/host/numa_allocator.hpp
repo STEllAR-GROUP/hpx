@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2015-2022 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,7 +46,6 @@ namespace hpx::parallel::util {
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-    public:
         // convert an allocator<T> to allocator<U>
         template <typename U>
         struct rebind
@@ -54,7 +53,6 @@ namespace hpx::parallel::util {
             using other = numa_allocator<U, Executors>;
         };
 
-    public:
         numa_allocator(Executors const& executors, hpx::threads::topology& topo)
           : executors_(executors)
           , topo_(topo)
@@ -77,11 +75,11 @@ namespace hpx::parallel::util {
         }
 
         // address
-        static pointer address(reference r)
+        static pointer address(reference r) noexcept
         {
             return &r;
         }
-        static const_pointer address(const_reference r)
+        static const_pointer address(const_reference r) noexcept
         {
             return &r;
         }
@@ -119,7 +117,7 @@ namespace hpx::parallel::util {
                             topo_.get_thread_affinity_mask_from_lva(&val);
 
                         std::size_t thread_num = hpx::get_worker_thread_num();
-                        hpx::threads::mask_cref_type thread_mask =
+                        hpx::threads::mask_cref_type const thread_mask =
                             hpx::parallel::execution::get_pu_mask(
                                 executors_[i], topo_, thread_num);
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2017      Thomas Heller
 //  Copyright (c) 2011      Bryce Lelbach
 //
@@ -20,12 +20,11 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace detail {
+namespace hpx::components::detail {
 
     void get_component_info(std::vector<std::string>& fillini,
         std::string const& filepath, bool is_static, char const* name,
-        char const* component_string, factory_state_enum state,
-        char const* more)
+        char const* component_string, factory_state state, char const* more)
     {
         fillini.emplace_back(std::string("[hpx.components.") + name + "]");
         fillini.emplace_back(std::string("name = ") + component_string);
@@ -45,13 +44,13 @@ namespace hpx { namespace components { namespace detail {
 
         switch (state)
         {
-        case factory_enabled:
+        case hpx::components::factory_state::enabled:
             fillini.emplace_back("enabled = 1");
             break;
-        case factory_disabled:
+        case hpx::components::factory_state::disabled:
             fillini.emplace_back("enabled = 0");
             break;
-        case factory_check:
+        case hpx::components::factory_state::check:
             fillini.emplace_back("enabled = $[hpx.components.load_external]");
             break;
         }
@@ -87,4 +86,4 @@ namespace hpx { namespace components { namespace detail {
         }
         return true;
     }
-}}}    // namespace hpx::components::detail
+}    // namespace hpx::components::detail

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -10,7 +10,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/modules/async_base.hpp>
-#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/futures.hpp>
 #include <hpx/naming_base/gid_type.hpp>
 

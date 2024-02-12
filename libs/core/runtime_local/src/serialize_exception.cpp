@@ -27,7 +27,6 @@
 namespace hpx::runtime_local::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    // TODO: This is not scalable, and painful to update.
     void save_custom_exception(hpx::serialization::output_archive& ar,
         std::exception_ptr const& ep, unsigned int /* version */)
     {
@@ -59,66 +58,84 @@ namespace hpx::runtime_local::detail {
         }
         catch (exception_info const& xi)
         {
-            std::string const* function = xi.get<hpx::detail::throw_function>();
-            if (function)
+            if (std::string const* function =
+                    xi.get<hpx::detail::throw_function>())
+            {
                 throw_function_ = *function;
+            }
 
-            std::string const* file = xi.get<hpx::detail::throw_file>();
-            if (file)
+            if (std::string const* file = xi.get<hpx::detail::throw_file>())
+            {
                 throw_file_ = *file;
+            }
 
-            long const* line = xi.get<hpx::detail::throw_line>();
-            if (line)
+            if (long const* line = xi.get<hpx::detail::throw_line>())
+            {
                 throw_line_ = *line;
+            }
 
-            std::uint32_t const* locality =
-                xi.get<hpx::detail::throw_locality>();
-            if (locality)
+            if (std::uint32_t const* locality =
+                    xi.get<hpx::detail::throw_locality>())
+            {
                 throw_locality_ = *locality;
+            }
 
-            std::string const* hostname_ =
-                xi.get<hpx::detail::throw_hostname>();
-            if (hostname_)
+            if (std::string const* hostname_ =
+                    xi.get<hpx::detail::throw_hostname>())
+            {
                 throw_hostname_ = *hostname_;
+            }
 
-            std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>();
-            if (pid_)
+            if (std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>())
+            {
                 throw_pid_ = *pid_;
+            }
 
-            std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
-            if (shepherd)
+            if (std::size_t const* shepherd =
+                    xi.get<hpx::detail::throw_shepherd>())
+            {
                 throw_shepherd_ = *shepherd;
+            }
 
-            std::size_t const* thread_id =
-                xi.get<hpx::detail::throw_thread_id>();
-            if (thread_id)
+            if (std::size_t const* thread_id =
+                    xi.get<hpx::detail::throw_thread_id>())
+            {
                 throw_thread_id_ = *thread_id;
+            }
 
-            std::string const* thread_name =
-                xi.get<hpx::detail::throw_thread_name>();
-            if (thread_name)
+            if (std::string const* thread_name =
+                    xi.get<hpx::detail::throw_thread_name>())
+            {
                 throw_thread_name_ = *thread_name;
+            }
 
-            std::string const* back_trace =
-                xi.get<hpx::detail::throw_stacktrace>();
-            if (back_trace)
+            if (std::string const* back_trace =
+                    xi.get<hpx::detail::throw_stacktrace>())
+            {
                 throw_back_trace_ = *back_trace;
+            }
 
-            std::string const* env_ = xi.get<hpx::detail::throw_env>();
-            if (env_)
+            if (std::string const* env_ = xi.get<hpx::detail::throw_env>())
+            {
                 throw_env_ = *env_;
+            }
 
-            std::string const* config_ = xi.get<hpx::detail::throw_config>();
-            if (config_)
+            if (std::string const* config_ =
+                    xi.get<hpx::detail::throw_config>())
+            {
                 throw_config_ = *config_;
+            }
 
-            std::string const* state_ = xi.get<hpx::detail::throw_state>();
-            if (state_)
+            if (std::string const* state_ = xi.get<hpx::detail::throw_state>())
+            {
                 throw_state_ = *state_;
+            }
 
-            std::string const* auxinfo_ = xi.get<hpx::detail::throw_auxinfo>();
-            if (auxinfo_)
+            if (std::string const* auxinfo_ =
+                    xi.get<hpx::detail::throw_auxinfo>())
+            {
                 throw_auxinfo_ = *auxinfo_;
+            }
         }
         catch (...)
         {    //-V565
@@ -229,7 +246,6 @@ namespace hpx::runtime_local::detail {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // TODO: This is not scalable, and painful to update.
     void load_custom_exception(hpx::serialization::input_archive& ar,
         std::exception_ptr& e, unsigned int /*version*/)
     {

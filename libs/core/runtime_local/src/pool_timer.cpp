@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Bibek Wagle
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +11,6 @@
 #include <hpx/functional/deferred_call.hpp>
 #include <hpx/functional/function.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
-#include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/pool_timer.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
@@ -19,18 +19,18 @@
 
 #include <asio/basic_waitable_timer.hpp>
 
+#include <boost/parameter/aux_/preprocessor/nullptr.hpp>
 #include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <system_error>
 
-namespace hpx ::util::detail {
+namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     class pool_timer : public std::enable_shared_from_this<pool_timer>
     {
-    private:
         friend class util::pool_timer;
 
         using mutex_type = hpx::spinlock;
@@ -39,8 +39,13 @@ namespace hpx ::util::detail {
         pool_timer();
 
         pool_timer(hpx::function<bool()> const& f,
-            hpx::function<void()> const& on_term,
-            std::string const& description, bool pre_shutdown);
+            hpx::function<void()> const& on_term, std::string description,
+            bool pre_shutdown);
+
+        pool_timer(pool_timer const&) = delete;
+        pool_timer(pool_timer&&) = delete;
+        pool_timer& operator=(pool_timer const&) = delete;
+        pool_timer& operator=(pool_timer&&) = delete;
 
         ~pool_timer();
 
@@ -48,11 +53,11 @@ namespace hpx ::util::detail {
             hpx::chrono::steady_duration const& time_duration, bool evaluate);
         bool stop();
 
-        bool is_started() const
+        [[nodiscard]] constexpr bool is_started() const noexcept
         {
             return is_started_;
         }
-        bool is_terminated() const
+        [[nodiscard]] constexpr bool is_terminated() const noexcept
         {
             return is_terminated_;
         }
@@ -70,37 +75,30 @@ namespace hpx ::util::detail {
         hpx::function<void()> on_term_;    ///< function to call on termination
         std::string description_;    ///< description of this interval timer
 
-        bool pre_shutdown_;     ///< execute termination during pre-shutdown
-        bool is_started_;       ///< timer has been started (is running)
-        bool first_start_;      ///< flag to distinguish first start invocation
-        bool is_terminated_;    ///< The timer has been terminated
-        bool is_stopped_;
-        deadline_timer* timer_;
+        bool pre_shutdown_ =
+            false;    ///< execute termination during pre-shutdown
+        bool is_started_ = false;    ///< timer has been started (is running)
+        bool first_start_ =
+            true;    ///< flag to distinguish first start invocation
+        bool is_terminated_ = false;    ///< The timer has been terminated
+        bool is_stopped_ = false;
+        deadline_timer* timer_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     pool_timer::pool_timer()
-      : pre_shutdown_()
-      , is_started_(false)
-      , first_start_(true)
-      , is_terminated_(false)
-      , is_stopped_(false)
-      , timer_(new deadline_timer(
+      : timer_(new deadline_timer(
             hpx::get_runtime().get_thread_pool("timer_pool")->get_io_service()))
     {
     }
 
     pool_timer::pool_timer(hpx::function<bool()> const& f,
-        hpx::function<void()> const& on_term, std::string const& description,
+        hpx::function<void()> const& on_term, std::string description,
         bool pre_shutdown)
       : f_(f)
       , on_term_(on_term)
-      , description_(description)
+      , description_(HPX_MOVE(description))
       , pre_shutdown_(pre_shutdown)
-      , is_started_(false)
-      , first_start_(true)
-      , is_terminated_(false)
-      , is_stopped_(false)
       , timer_(new deadline_timer(
             hpx::get_runtime().get_thread_pool("timer_pool")->get_io_service()))
     {
@@ -112,7 +110,9 @@ namespace hpx ::util::detail {
         {
             is_started_ = false;
             if (!err)
-                f_();
+            {
+                [[maybe_unused]] auto _ = f_();
+            }
         }
     }
 
@@ -201,12 +201,12 @@ namespace hpx ::util::detail {
         }
         catch (...)
         {
-            ;    // there is nothing we can do here
         }
     }
 }    // namespace hpx::util::detail
 
 namespace hpx::util {
+
     pool_timer::pool_timer() = default;
 
     pool_timer::pool_timer(hpx::function<bool()> const& f,
@@ -223,12 +223,12 @@ namespace hpx::util {
     }
 
     bool pool_timer::start(
-        hpx::chrono::steady_duration const& time_duration, bool evaluate)
+        hpx::chrono::steady_duration const& time_duration, bool evaluate) const
     {
         return timer_->start(time_duration, evaluate);
     }
 
-    bool pool_timer::stop()
+    bool pool_timer::stop() const
     {
         return timer_->stop();
     }

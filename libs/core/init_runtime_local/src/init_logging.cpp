@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,7 +32,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: shepherd
-    struct shepherd_thread_id : logging::formatter::manipulator
+    struct shepherd_thread_id final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -52,7 +52,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix
-    struct locality_prefix : logging::formatter::manipulator
+    struct locality_prefix final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -72,7 +72,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread id
-    struct thread_id : logging::formatter::manipulator
+    struct thread_id final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -97,7 +97,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX thread phase
-    struct thread_phase : logging::formatter::manipulator
+    struct thread_phase final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -120,7 +120,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: locality prefix of parent thread
-    struct parent_thread_locality : logging::formatter::manipulator
+    struct parent_thread_locality final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -141,7 +141,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread id
-    struct parent_thread_id : logging::formatter::manipulator
+    struct parent_thread_id final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -163,7 +163,7 @@ namespace hpx::util {
 
     ///////////////////////////////////////////////////////////////////////////
     // custom formatter: HPX parent thread phase
-    struct parent_thread_phase : logging::formatter::manipulator
+    struct parent_thread_phase final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -183,7 +183,7 @@ namespace hpx::util {
 
 #if defined(ANDROID) || defined(__ANDROID__)
     // default log destination for Android
-    struct android_log : logging::destination::manipulator
+    struct android_log final : logging::destination::manipulator
     {
         android_log(char const* tag_)
           : tag(tag_)
@@ -196,9 +196,13 @@ namespace hpx::util {
                 ANDROID_LOG_DEBUG, tag.c_str(), msg.full_string().c_str());
         }
 
-        bool operator==(android_log const& rhs) const
+        friend bool operator==(android_log const& lhs, android_log const& rhs)
         {
-            return tag == rhs.tag;
+            return lhs.tag == rhs.tag;
+        }
+        friend bool operator!=(android_log const& lhs, android_log const& rhs)
+        {
+            return !(lhs == rhs);
         }
 
         std::string tag;
@@ -206,7 +210,7 @@ namespace hpx::util {
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
-    struct dummy_thread_component_id : logging::formatter::manipulator
+    struct dummy_thread_component_id final : logging::formatter::manipulator
     {
         void operator()(std::ostream& to) const override
         {
@@ -308,7 +312,10 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static std::string empty_string;
+        namespace {
+
+            std::string empty_string;
+        }
 
         log_settings get_log_settings(util::section const& ini, char const* sec)
         {
@@ -922,14 +929,16 @@ namespace hpx::util {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        static void (*default_set_console_dest)(logger_writer_type&,
-            char const*, logging::level,
-            logging_destination) = get_console_local;
+        namespace {
 
-        static void (*default_define_formatters)(
-            logging::writer::named_write&) = define_formatters_local;
+            void (*default_set_console_dest)(logger_writer_type&, char const*,
+                logging::level, logging_destination) = get_console_local;
 
-        static bool default_isconsole = true;
+            void (*default_define_formatters)(
+                logging::writer::named_write&) = define_formatters_local;
+
+            bool default_isconsole = true;
+        }    // namespace
 
         void init_logging(runtime_configuration& ini, bool isconsole,
             void (*set_console_dest)(logger_writer_type&, char const*,

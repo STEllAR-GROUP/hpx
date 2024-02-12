@@ -14,6 +14,7 @@
 #include <exception>
 
 namespace hpx {
+
     /// The function report_error reports the given exception to the console
     HPX_CORE_EXPORT void report_error(
         std::size_t num_thread, std::exception_ptr const& e);

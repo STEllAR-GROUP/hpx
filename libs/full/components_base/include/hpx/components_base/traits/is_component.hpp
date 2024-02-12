@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
@@ -125,4 +123,4 @@ namespace hpx { namespace traits {
     inline constexpr bool is_managed_component_v =
         is_managed_component<Component>::value;
 
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

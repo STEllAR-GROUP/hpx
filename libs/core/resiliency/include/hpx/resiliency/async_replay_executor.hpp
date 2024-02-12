@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2023 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/resiliency/config.hpp>
 #include <hpx/resiliency/async_replay.hpp>
 #include <hpx/resiliency/resiliency_cpos.hpp>
@@ -25,7 +26,6 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
-#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -63,7 +63,7 @@ namespace hpx::resiliency::experimental {
             {
                 // launch given function asynchronously
                 using pack_type =
-                    hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
+                    hpx::util::make_index_pack<std::tuple_size_v<Tuple>>;
                 using result_type =
                     hpx::parallel::execution::executor_future_t<Executor,
                         Result>;
@@ -153,7 +153,7 @@ namespace hpx::resiliency::experimental {
             {
                 // launch given function asynchronously
                 using pack_type =
-                    hpx::util::make_index_pack<std::tuple_size<Tuple>::value>;
+                    hpx::util::make_index_pack<std::tuple_size_v<Tuple>>;
                 using result_type =
                     hpx::parallel::execution::executor_future_t<Executor, void>;
 
@@ -214,9 +214,9 @@ namespace hpx::resiliency::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Verify the result of those
-    // invocations using the given predicate \a pred. Repeat launching on error
-    // exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function f. Verify the result of those
+    // invocations using the given predicate pred. Repeat launching on error
+    // exactly n times (except if abort_replay_exception is thrown).
     // clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
@@ -237,14 +237,11 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Repeat launching on error
-    // exactly \a n times (except if abort_replay_exception is thrown).
-    // clang-format off
+    // Asynchronously launch given function f. Repeat launching on error exactly
+    // n times (except if abort_replay_exception is thrown). clang-format off
     template <typename Executor, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>
-        )>
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>)>
     // clang-format on
     decltype(auto) tag_invoke(
         async_replay_t, Executor&& exec, std::size_t n, F&& f, Ts&&... ts)

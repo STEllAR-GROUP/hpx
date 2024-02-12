@@ -1,5 +1,6 @@
-//  Copyright (c) 2015-2023 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/naming_base.hpp>
@@ -54,9 +56,9 @@ namespace hpx::serialization::detail {
             HPX_ASSERT_OWNS_LOCK(l);
 
             // If there are gids left in the map then several parcels got
-            // preprocessed separately, but serialized into the same archive.
-            // In this case we must explicitly return the credits for those
-            // gids before clearing the map.
+            // preprocessed separately, but serialized into the same archive. In
+            // this case we must explicitly return the credits for those gids
+            // before clearing the map.
             if (!split_gids_.empty())
             {
                 std::vector<naming::gid_type> gids;
@@ -97,7 +99,7 @@ namespace hpx::serialization::detail {
         naming::gid_type get_new_gid(naming::gid_type const& gid)
         {
             std::lock_guard<mutex_type> l(mtx_);
-            auto it = split_gids_.find(&gid);
+            auto const it = split_gids_.find(&gid);
 
             HPX_ASSERT(it != split_gids_.end());
             HPX_ASSERT(it->second != naming::invalid_gid);
@@ -126,17 +128,15 @@ namespace hpx::serialization::detail {
     };
 }    // namespace hpx::serialization::detail
 
-namespace hpx::util {
-
-    // This is explicitly instantiated to ensure that the id is stable across
-    // shared libraries.
-    template <>
-    struct extra_data_helper<serialization::detail::preprocess_gid_types>
+// This is explicitly instantiated to ensure that the id is stable across
+// shared libraries.
+template <>
+struct hpx::util::extra_data_helper<
+    hpx::serialization::detail::preprocess_gid_types>
+{
+    HPX_EXPORT static extra_data_id_type id() noexcept;
+    static constexpr void reset(
+        serialization::detail::preprocess_gid_types*) noexcept
     {
-        HPX_EXPORT static extra_data_id_type id() noexcept;
-        static constexpr void reset(
-            serialization::detail::preprocess_gid_types*) noexcept
-        {
-        }
-    };
-}    // namespace hpx::util
+    }
+};

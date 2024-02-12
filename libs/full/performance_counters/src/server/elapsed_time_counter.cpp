@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,23 +11,21 @@
 #include <hpx/performance_counters/server/elapsed_time_counter.hpp>
 #include <hpx/runtime_components/derived_component_factory.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/timing/high_resolution_clock.hpp>
 
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
-typedef hpx::components::component<
-    hpx::performance_counters::server::elapsed_time_counter>
-    elapsed_time_counter_type;
+using elapsed_time_counter_type = hpx::components::component<
+    hpx::performance_counters::server::elapsed_time_counter>;
 
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(elapsed_time_counter_type,
     elapsed_time_counter, "base_performance_counter",
-    hpx::components::factory_enabled)
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(
     hpx::performance_counters::server::elapsed_time_counter)
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     elapsed_time_counter::elapsed_time_counter() = default;
 
@@ -53,7 +51,8 @@ namespace hpx { namespace performance_counters { namespace server {
         }
 
         // gather the current value
-        std::int64_t now = static_cast<std::int64_t>(hpx::get_system_uptime());
+        std::int64_t const now =
+            static_cast<std::int64_t>(hpx::get_system_uptime());
         hpx::performance_counters::counter_value value;
         value.value_ = now;
         value.scaling_ = 1000000000LL;    // coefficient to get seconds
@@ -93,10 +92,11 @@ namespace hpx { namespace performance_counters { namespace server {
             components::get_component_type<elapsed_time_counter>(),
             const_cast<elapsed_time_counter*>(this));
     }
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace detail {
+namespace hpx::performance_counters::detail {
+
     /// Creation function for uptime counters.
     naming::gid_type uptime_counter_creator(
         counter_info const& info, error_code& ec)
@@ -131,4 +131,4 @@ namespace hpx { namespace performance_counters { namespace detail {
             return naming::invalid_gid;
         }
     }
-}}}    // namespace hpx::performance_counters::detail
+}    // namespace hpx::performance_counters::detail

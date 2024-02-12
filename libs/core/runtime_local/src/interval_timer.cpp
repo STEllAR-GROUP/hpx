@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,6 +11,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/runtime_local/interval_timer.hpp>
 #include <hpx/runtime_local/shutdown_function.hpp>
+#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 
@@ -24,21 +25,13 @@
 namespace hpx::util::detail {
 
     ///////////////////////////////////////////////////////////////////////////
-    interval_timer::interval_timer()
-      : microsecs_(0)
-      , id_()
-      , timerid_()
-    {
-    }
+    interval_timer::interval_timer() = default;
 
     interval_timer::interval_timer(hpx::function<bool()> const& f,
         std::int64_t microsecs, std::string const& description,
         bool pre_shutdown)
       : f_(f)
-      , on_term_()
       , microsecs_(microsecs)
-      , id_()
-      , timerid_()
       , description_(description)
       , pre_shutdown_(pre_shutdown)
     {
@@ -50,8 +43,6 @@ namespace hpx::util::detail {
       : f_(f)
       , on_term_(on_term)
       , microsecs_(microsecs)
-      , id_()
-      , timerid_()
       , description_(description)
       , pre_shutdown_(pre_shutdown)
     {
@@ -196,7 +187,6 @@ namespace hpx::util::detail {
         }
         catch (...)
         {
-            ;    // there is nothing we can do here
         }
     }
 
@@ -226,24 +216,22 @@ namespace hpx::util::detail {
                 0 == microsecs_)
             {
                 // object has been finalized, exit
-                return threads::thread_result_type(
-                    threads::thread_schedule_state::terminated,
-                    threads::invalid_thread_id);
+                return {threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id};
             }
 
             if (id_ != nullptr && id_ != threads::get_self_id())
             {
                 // obsolete timer thread
-                return threads::thread_result_type(
-                    threads::thread_schedule_state::terminated,
-                    threads::invalid_thread_id);
+                return {threads::thread_schedule_state::terminated,
+                    threads::invalid_thread_id};
             }
 
             id_.reset();
             timerid_.reset();
             is_started_ = false;
 
-            bool result = false;
+            bool result;
 
             {
                 hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
@@ -268,16 +256,15 @@ namespace hpx::util::detail {
         }
 
         // do not re-schedule this thread
-        return threads::thread_result_type(
-            threads::thread_schedule_state::terminated,
-            threads::invalid_thread_id);
+        return {threads::thread_schedule_state::terminated,
+            threads::invalid_thread_id};
     }
 
     // schedule a high priority task after a given time interval
-    void interval_timer::schedule_thread(std::unique_lock<mutex_type>& l)
+    void interval_timer::schedule_thread(
+        [[maybe_unused]] std::unique_lock<mutex_type>& l)
     {
-        HPX_ASSERT(l.owns_lock());
-        HPX_UNUSED(l);
+        HPX_ASSERT_OWNS_LOCK(l);
 
         using namespace hpx::threads;
 
@@ -308,7 +295,7 @@ namespace hpx::util::detail {
         }
 
         // schedule this thread to be run after the given amount of seconds
-        threads::thread_id_ref_type timerid = threads::set_thread_state(
+        threads::thread_id_ref_type const timerid = threads::set_thread_state(
             id.noref(), std::chrono::microseconds(microsecs_),
             threads::thread_schedule_state::pending,
             threads::thread_restart_state::signaled,
@@ -383,13 +370,13 @@ namespace hpx::util {
         return timer_->get_interval();
     }
 
-    void interval_timer::change_interval(std::int64_t new_interval)
+    void interval_timer::change_interval(std::int64_t new_interval) const
     {
         return timer_->change_interval(new_interval);
     }
 
     void interval_timer::change_interval(
-        hpx::chrono::steady_duration const& new_interval)
+        hpx::chrono::steady_duration const& new_interval) const
     {
         return timer_->change_interval(new_interval.value().count() / 1000);
     }

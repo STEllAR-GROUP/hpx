@@ -228,7 +228,8 @@ namespace hpx::traits {
     {
         static constexpr components::component_type get() noexcept
         {
-            return components::component_base_lco_with_value;
+            return to_int(
+                hpx::components::component_enum_type::base_lco_with_value);
         }
 
         static void set(components::component_type)
@@ -245,7 +246,8 @@ namespace hpx::traits {
     {
         static constexpr components::component_type get() noexcept
         {
-            return components::component_base_lco_with_value_unmanaged;
+            return to_int(hpx::components::component_enum_type::
+                    base_lco_with_value_unmanaged);
         }
 
         static void set(components::component_type)

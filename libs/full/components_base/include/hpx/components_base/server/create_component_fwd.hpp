@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011 Thomas Heller
 //  Copyright (c) 2015 Hartmut Kaiser
 //
@@ -12,12 +12,11 @@
 #include <hpx/naming_base/gid_type.hpp>
 
 #include <cstddef>
-#include <cstdint>
 #include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components { namespace server {
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Create arrays of components using their default constructor
@@ -32,8 +31,8 @@ namespace hpx { namespace components { namespace server {
     std::vector<naming::gid_type> bulk_create(std::size_t count, Ts&&... ts);
 
     template <typename Component, typename... Ts>
-    inline naming::gid_type construct(Ts&&... ts)
+    naming::gid_type construct(Ts&&... ts)
     {
         return create<Component>(HPX_FORWARD(Ts, ts)...);
     }
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server

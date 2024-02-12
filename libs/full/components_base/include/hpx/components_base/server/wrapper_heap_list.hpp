@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2023 Hartmut Kaiser
+//  Copyright (c) 1998-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +10,6 @@
 #include <hpx/components_base/server/one_size_heap_list.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 
 #include <mutex>
 #include <shared_mutex>
@@ -52,16 +51,14 @@ namespace hpx::components::detail {
         {
         }
 
-        naming::gid_type get_gid(void* p)
+        naming::gid_type get_gid(void* p) const
         {
             std::shared_lock<hpx::shared_mutex> sl(rwlock_);
-
-            auto const end = heap_list_.end();
-            for (auto it = heap_list_.begin(); it != end; ++it)
+            for (auto const& e : heap_list_)
             {
-                if ((*it)->did_alloc(p))
+                if (e->did_alloc(p))
                 {
-                    return (*it)->get_gid(p, type_);
+                    return e->get_gid(p, type_);
                 }
             }
             return naming::invalid_gid;

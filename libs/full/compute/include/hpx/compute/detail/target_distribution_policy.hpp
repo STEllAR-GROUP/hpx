@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2022 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace detail {
+namespace hpx::compute::detail {
 
     /// This class specifies the parameters for a simple distribution policy
     /// to use for creating (and evenly distributing) a given number of items
@@ -27,31 +27,28 @@ namespace hpx { namespace compute { namespace detail {
     struct target_distribution_policy
     {
     private:
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
-        typedef Target target_type;
+        using target_type = Target;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         target_distribution_policy()
-          : mtx_()
-          , targets_()
+          : targets_()
           , num_partitions_(1)
           , next_target_(0)
         {
         }
 
         target_distribution_policy(target_distribution_policy const& rhs)
-          : mtx_()
-          , targets_(rhs.targets_)
+          : targets_(rhs.targets_)
           , num_partitions_(rhs.num_partitions_)
           , next_target_(0)
         {
         }
 
-        target_distribution_policy(target_distribution_policy&& rhs)
-          : mtx_()
-          , targets_(HPX_MOVE(rhs.targets_))
+        target_distribution_policy(target_distribution_policy&& rhs) noexcept
+          : targets_(HPX_MOVE(rhs.targets_))
           , num_partitions_(rhs.num_partitions_)
           , next_target_(0)
         {
@@ -69,7 +66,8 @@ namespace hpx { namespace compute { namespace detail {
             return *this;
         }
 
-        target_distribution_policy& operator=(target_distribution_policy&& rhs)
+        target_distribution_policy& operator=(
+            target_distribution_policy&& rhs) noexcept
         {
             if (this != &rhs)
             {
@@ -100,10 +98,11 @@ namespace hpx { namespace compute { namespace detail {
                     Target::get_local_targets());
             }
 
-            std::size_t num_parts = (num_partitions_ == std::size_t(-1)) ?
+            std::size_t const num_parts =
+                (num_partitions_ == static_cast<std::size_t>(-1)) ?
                 targets_.size() :
                 num_partitions_;
-            return (std::max)(num_parts, std::size_t(1));
+            return (std::max)(num_parts, static_cast<std::size_t>(1));
         }
 
     protected:
@@ -126,18 +125,19 @@ namespace hpx { namespace compute { namespace detail {
 
             // this distribution policy places an equal number of items onto
             // each target
-            std::size_t sites = (std::max)(std::size_t(1), targets_.size());
+            std::size_t const sites =
+                (std::max)(static_cast<std::size_t>(1), targets_.size());
 
             // the overall number of items to create is smaller than the number
             // of sites
             if (items < sites)
             {
                 auto it = std::find(targets_.begin(), targets_.end(), t);
-                std::size_t num_loc = std::distance(targets_.begin(), it);
+                std::size_t const num_loc = std::distance(targets_.begin(), it);
                 return (items < num_loc) ? 1 : 0;
             }
 
-            // the last locality might get less items
+            // the last locality might get fewer items
             if (!targets_.empty() && t == targets_.back())
             {
                 return items - round_to_multiple(items, sites, sites - 1);
@@ -146,10 +146,7 @@ namespace hpx { namespace compute { namespace detail {
             // otherwise just distribute evenly
             return (items + sites - 1) / sites;
         }
-        /// \endcond
 
-    protected:
-        /// \cond NOINTERNAL
         target_distribution_policy(
             std::vector<target_type> const& targets, std::size_t num_partitions)
           : targets_(targets)
@@ -182,4 +179,4 @@ namespace hpx { namespace compute { namespace detail {
         mutable std::size_t next_target_;
         /// \endcond
     };
-}}}    // namespace hpx::compute::detail
+}    // namespace hpx::compute::detail

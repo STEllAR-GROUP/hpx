@@ -323,7 +323,7 @@ namespace hpx { namespace agas {
         /// \param type       [in] The component type will be used to determine
         ///                   the set of prefixes having a registered factory
         ///                   for this component. The default value for this
-        ///                   parameter is \a components#component_invalid,
+        ///                   parameter is \a components#component_enum_type#invalid,
         ///                   which will return prefixes of all localities.
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
@@ -332,7 +332,7 @@ namespace hpx { namespace agas {
         /// \note             As long as \a ec is not pre-initialized to
         ///                   \a hpx#throws this function doesn't
         ///                   throw but returns the result code using the
-        ///                   parameter \a ec. Otherwise it throws an instance
+        ///                   parameter \a ec. Otherwise, it throws an instance
         ///                   of hpx#exception.
         bool get_localities(std::vector<naming::gid_type>& locality_ids,
             components::component_type type, error_code& ec = throws) const;
@@ -340,8 +340,8 @@ namespace hpx { namespace agas {
         bool get_localities(std::vector<naming::gid_type>& locality_ids,
             error_code& ec = throws) const
         {
-            return get_localities(
-                locality_ids, components::component_invalid, ec);
+            return get_localities(locality_ids,
+                to_int(components::component_enum_type::invalid), ec);
         }
 
         /// \brief Query for the number of all known localities.
@@ -353,7 +353,7 @@ namespace hpx { namespace agas {
         /// \param type       [in] The component type will be used to determine
         ///                   the set of prefixes having a registered factory
         ///                   for this component. The default value for this
-        ///                   parameter is \a components#component_invalid,
+        ///                   parameter is \a components#component_type#invalid,
         ///                   which will return prefixes of all localities.
         /// \param ec         [in,out] this represents the error status on exit,
         ///                   if this is pre-initialized to \a hpx#throws
@@ -362,18 +362,19 @@ namespace hpx { namespace agas {
         /// \note             As long as \a ec is not pre-initialized to
         ///                   \a hpx#throws this function doesn't
         ///                   throw but returns the result code using the
-        ///                   parameter \a ec. Otherwise it throws an instance
+        ///                   parameter \a ec. Otherwise, it throws an instance
         ///                   of hpx#exception.
         hpx::future<std::uint32_t> get_num_localities_async(
-            components::component_type type =
-                components::component_invalid) const;
+            components::component_type type = to_int(
+                hpx::components::component_enum_type::invalid)) const;
 
         std::uint32_t get_num_localities(
             components::component_type type, error_code& ec = throws) const;
 
         std::uint32_t get_num_localities(error_code& ec = throws) const
         {
-            return get_num_localities(components::component_invalid, ec);
+            return get_num_localities(
+                to_int(hpx::components::component_enum_type::invalid), ec);
         }
 
         hpx::future<std::uint32_t> get_num_overall_threads_async() const;

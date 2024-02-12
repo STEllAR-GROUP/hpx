@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2015-2016 Thomas Heller
 //  Copyright (c) 2007 Richard D Guidry Jr
 //  Copyright (c) 2007 Alexandre (aka Alex) TABBAL
@@ -117,7 +117,6 @@ namespace hpx::parcelset {
 
     class HPX_EXPORT parcel
     {
-    private:
         using split_gids_type = detail::parcel_base::split_gids_type;
 
         bool is_valid() const;
@@ -133,7 +132,6 @@ namespace hpx::parcelset {
 
         ~parcel();
 
-    public:
         void reset() const;
 
         [[nodiscard]] char const* get_action_name() const;

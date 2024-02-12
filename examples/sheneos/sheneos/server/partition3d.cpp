@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -393,13 +393,17 @@ namespace hpx { namespace serialization {
     void serialize(
         input_archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
     {
-        ar& coord.ye_& coord.temp_& coord.rho_;
+        // clang-format off
+        ar & coord.ye_ & coord.temp_ & coord.rho_;
+        // clang-format on
     }
 
     void serialize(
         output_archive& ar, sheneos::sheneos_coord& coord, unsigned int const)
     {
-        ar& coord.ye_& coord.temp_& coord.rho_;
+        // clang-format off
+        ar & coord.ye_ & coord.temp_ & coord.rho_;
+        // clang-format on
     }
 }}    // namespace hpx::serialization
 
@@ -427,12 +431,12 @@ HPX_REGISTER_ACTION(hpx::lcos::base_lco_with_value<
     set_value_action_vector_vector_double)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<std::vector<double>>>,
-    hpx::components::component_base_lco_with_value);
+    to_int(hpx::components::component_enum_type::base_lco_with_value));
 
 HPX_REGISTER_ACTION(
     hpx::lcos::base_lco_with_value<std::vector<double>>::set_value_action,
     set_value_action_vector_double)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
     hpx::lcos::base_lco_with_value<std::vector<double>>,
-    hpx::components::component_base_lco_with_value);
+    to_int(hpx::components::component_enum_type::base_lco_with_value));
 #endif

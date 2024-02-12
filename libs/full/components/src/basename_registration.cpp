@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     namespace detail {
 
         std::string name_from_basename(
@@ -138,7 +139,7 @@ namespace hpx {
     }
 
     hpx::future<bool> register_with_basename(
-        std::string basename, hpx::id_type id, std::size_t sequence_nr)
+        std::string basename, hpx::id_type const& id, std::size_t sequence_nr)
     {
         if (basename.empty())
         {
@@ -157,7 +158,7 @@ namespace hpx {
     }
 
     bool register_with_basename(hpx::launch::sync_policy, std::string basename,
-        hpx::id_type id, std::size_t sequence_nr, error_code& ec)
+        hpx::id_type const& id, std::size_t sequence_nr, error_code& ec)
     {
         if (basename.empty())
         {

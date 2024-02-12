@@ -161,7 +161,9 @@ namespace hpx { namespace agas { namespace server {
         if (primary_)
         {
             naming::gid_type id(naming::get_gid_from_locality_id(prefix));
-            gva const g(id, components::component_runtime_support, count);
+            gva const g(id,
+                to_int(hpx::components::component_enum_type::runtime_support),
+                count);
 
             if (!primary_->bind_gid(g, id, id))
             {

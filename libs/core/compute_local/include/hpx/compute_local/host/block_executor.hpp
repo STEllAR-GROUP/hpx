@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Thomas Heller
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,11 +15,9 @@
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/execution_base/traits/is_executor.hpp>
 #include <hpx/executors/restricted_thread_pool_executor.hpp>
-#include <hpx/functional/deferred_call.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/iterator_support/iterator_range.hpp>
 #include <hpx/iterator_support/range.hpp>
-#include <hpx/pack_traversal/unwrap.hpp>
 
 #include <algorithm>
 #include <atomic>
@@ -29,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host {
+namespace hpx::compute::host {
 
     /// The block executor can be used to build NUMA aware programs.
     /// It will distribute work evenly across the passed targets
@@ -163,7 +162,7 @@ namespace hpx { namespace compute { namespace host {
 
             std::vector<hpx::future<result_type>> results;
             std::size_t cnt = util::size(shape);
-            std::size_t num_executors = executors_.size();
+            std::size_t const num_executors = executors_.size();
 
             results.reserve(cnt);
 
@@ -196,9 +195,9 @@ namespace hpx { namespace compute { namespace host {
                     }
                 }
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
@@ -228,7 +227,7 @@ namespace hpx { namespace compute { namespace host {
 
             std::vector<result_type> results;
             std::size_t cnt = util::size(shape);
-            std::size_t num_executors = executors_.size();
+            std::size_t const num_executors = executors_.size();
 
             results.reserve(cnt);
 
@@ -255,9 +254,9 @@ namespace hpx { namespace compute { namespace host {
                 }
                 return results;
             }
-            catch (std::bad_alloc const& ba)
+            catch (std::bad_alloc const&)
             {
-                throw ba;
+                throw;
             }
             catch (...)
             {
@@ -275,7 +274,7 @@ namespace hpx { namespace compute { namespace host {
         }
 
     public:
-        std::vector<host::target> const& targets() const
+        std::vector<host::target> const& targets() const noexcept
         {
             return targets_;
         }
@@ -300,13 +299,14 @@ namespace hpx { namespace compute { namespace host {
             threads::thread_stacksize::default_;
         threads::thread_schedule_hint schedulehint_ = {};
     };
-}}}    // namespace hpx::compute::host
+}    // namespace hpx::compute::host
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     template <typename Executor>
     struct executor_execution_category<compute::host::block_executor<Executor>>
     {
-        typedef hpx::execution::parallel_execution_tag type;
+        using type = hpx::execution::parallel_execution_tag;
     };
 
     template <typename Executor>
@@ -332,4 +332,4 @@ namespace hpx { namespace parallel { namespace execution {
       : std::true_type
     {
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution

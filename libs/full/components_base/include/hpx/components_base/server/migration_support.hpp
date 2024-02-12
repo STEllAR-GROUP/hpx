@@ -84,7 +84,7 @@ namespace hpx::components {
         using this_component_type = typename base_type::this_component_type;
 
     public:
-        migration_support() noexcept
+        migration_support()
           : data_(new detail::migration_support_data<Mutex>(), false)
         {
         }
@@ -145,7 +145,6 @@ namespace hpx::components {
             }
         }
 
-    public:
         bool unpin()
         {
             // pin() acquired an additional reference count that needs to be

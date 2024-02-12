@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -18,7 +18,8 @@
 #include <hpx/serialization/traits/needs_automatic_registration.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/threading_base/thread_init_data.hpp>
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
@@ -27,13 +28,12 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \namespace actions
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     /// \cond NOINTERNAL
     ///////////////////////////////////////////////////////////////////////
-    // Figure out what priority the action has to be be associated with
-    // A dynamically specified default priority results in using the static
+    // Figure out what priority the action has to be associated with a
+    // dynamically specified default priority results in using the static
     // Priority.
     template <threads::thread_priority Priority>
     struct thread_priority
@@ -64,8 +64,8 @@ namespace hpx { namespace actions { namespace detail {
     };
 
     ///////////////////////////////////////////////////////////////////////
-    // Figure out what stacksize the action has to be be associated with
-    // A dynamically specified default stacksize results in using the static
+    // Figure out what stacksize the action has to be associated with a
+    // dynamically specified default stacksize results in using the static
     // Stacksize.
     template <threads::thread_stacksize Stacksize>
     struct thread_stacksize
@@ -127,7 +127,9 @@ namespace hpx { namespace actions { namespace detail {
         return id;
     }
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
+
     template <typename Action>
     util::itt::string_handle const& get_action_name_itt() noexcept
 #if !defined(HPX_HAVE_AUTOMATIC_SERIALIZATION_REGISTRATION)
@@ -142,6 +144,6 @@ namespace hpx { namespace actions { namespace detail {
 #endif
 
     /// \endcond
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #include <hpx/config/warnings_suffix.hpp>

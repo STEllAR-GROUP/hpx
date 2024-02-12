@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,10 +94,10 @@ namespace hpx::distributed {
 // latch
 typedef hpx::components::managed_component<hpx::lcos::server::latch> latch_type;
 
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::lcos::server::latch, hpx::components::component_latch)
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::lcos::server::latch,
+    to_int(hpx::components::component_enum_type::latch))
 HPX_REGISTER_DERIVED_COMPONENT_FACTORY(latch_type, hpx_lcos_server_latch,
-    "hpx::lcos::base_lco_with_value", hpx::components::factory_enabled)
+    "hpx::lcos::base_lco_with_value", hpx::components::factory_state::enabled)
 
 HPX_REGISTER_ACTION_ID(hpx::lcos::server::latch::create_component_action,
     hpx_lcos_server_latch_create_component_action,

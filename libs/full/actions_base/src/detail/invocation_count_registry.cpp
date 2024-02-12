@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,7 +13,7 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     invocation_count_registry& invocation_count_registry::local_instance()
     {
@@ -39,8 +39,7 @@ namespace hpx { namespace actions { namespace detail {
                 "Cannot register an action with an empty name");
         }
 
-        auto it = map_.find(name);
-        if (it == map_.end())
+        if (map_.find(name) == map_.end())
         {
             map_.emplace(name, fun);
         }
@@ -50,14 +49,13 @@ namespace hpx { namespace actions { namespace detail {
     invocation_count_registry::get_invocation_counter(
         std::string const& name) const
     {
-        map_type::const_iterator it = map_.find(name);
+        map_type::const_iterator const it = map_.find(name);
         if (it == map_.end())
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "invocation_count_registry::get_invocation_counter",
                 "unknown action type");
-            return nullptr;
         }
-        return (*it).second;
+        return it->second;
     }
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail

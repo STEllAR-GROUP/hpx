@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -10,10 +10,11 @@
 
 #include <hpx/type_support/unused.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     /// \cond NOINTERNAL
     namespace detail {
+
         template <typename Result, typename Enable = void>
         struct action_remote_result_customization_point
         {
@@ -37,4 +38,4 @@ namespace hpx { namespace traits {
 
     template <typename Result>
     using action_remote_result_t = typename action_remote_result<Result>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

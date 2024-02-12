@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -8,9 +8,7 @@
 
 #pragma once
 
-#include <hpx/actions_base/preassigned_action_id.hpp>
-
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     /// \tparam Component         component type
@@ -18,4 +16,4 @@ namespace hpx { namespace actions {
     /// \tparam Derived           derived action class
     template <typename Component, typename Signature, typename Derived>
     struct basic_action;
-}}    // namespace hpx::actions
+}    // namespace hpx::actions

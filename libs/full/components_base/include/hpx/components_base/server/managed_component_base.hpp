@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011-2017 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -159,25 +159,24 @@ namespace hpx::components {
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
 
-        struct base_managed_component
-          : public traits::detail::managed_component_tag
+        struct base_managed_component : traits::detail::managed_component_tag
         {
             // finalize() will be called just before the instance gets destructed
             static constexpr void finalize() noexcept {}
 
             static void mark_as_migrated() noexcept
             {
-                // If this assertion is triggered then this component instance is
-                // being migrated even if the component type has not been enabled
-                // to support migration.
+                // If this assertion is triggered then this component instance
+                // is being migrated even if the component type has not been
+                // enabled to support migration.
                 HPX_ASSERT(false);
             }
 
             static void on_migrated() noexcept
             {
-                // If this assertion is triggered then this component instance is being
-                // migrated even if the component type has not been enabled to support
-                // migration.
+                // If this assertion is triggered then this component instance
+                // is being migrated even if the component type has not been
+                // enabled to support migration.
                 HPX_ASSERT(false);
             }
         };
@@ -188,11 +187,14 @@ namespace hpx::components {
     class managed_component_base : public detail::base_managed_component
     {
     public:
-        HPX_NON_COPYABLE(managed_component_base);
+        managed_component_base(managed_component_base const&) = delete;
+        managed_component_base(managed_component_base&&) = delete;
+        managed_component_base& operator=(
+            managed_component_base const&) = delete;
+        managed_component_base& operator=(managed_component_base&&) = delete;
 
-    public:
         using this_component_type =
-            std::conditional_t<std::is_same_v<Component, detail::this_type>,
+            std::conditional_t<std::is_void_v<Component>,
                 managed_component_base, Component>;
 
         using wrapped_type = this_component_type;
@@ -210,10 +212,7 @@ namespace hpx::components {
             "std::is_same_v<ctor_policy, construct_without_back_ptr> || "
             "std::is_same_v<dtor_policy, managed_object_controls_lifetime>");
 
-        constexpr managed_component_base() noexcept
-          : back_ptr_(nullptr)
-        {
-        }
+        constexpr managed_component_base() noexcept = default;
 
         explicit managed_component_base(
             managed_component<Component, Wrapper>* back_ptr) noexcept
@@ -241,7 +240,6 @@ namespace hpx::components {
     protected:
         naming::gid_type get_base_gid() const;
 
-    protected:
         template <typename>
         friend struct detail_adl_barrier::init;
 
@@ -254,7 +252,7 @@ namespace hpx::components {
         }
 
     private:
-        managed_component<Component, Wrapper>* back_ptr_;
+        managed_component<Component, Wrapper>* back_ptr_ = nullptr;
     };
 
     // reference counting
@@ -282,11 +280,11 @@ namespace hpx::components {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The managed_component template is used as a indirection layer
+    /// The managed_component template is used as an indirection layer
     /// for components allowing to gracefully handle the access to non-existing
     /// components.
     ///
-    /// Additionally it provides memory management capabilities for the
+    /// Additionally, it provides memory management capabilities for the
     /// wrapping instances, and it integrates the memory management with the
     /// AGAS service. Every instance of a managed_component gets assigned
     /// a global id.
@@ -307,9 +305,8 @@ namespace hpx::components {
         managed_component& operator=(managed_component const&) = delete;
         managed_component& operator=(managed_component&&) = delete;
 
-        using derived_type =
-            std::conditional_t<std::is_same_v<Derived, detail::this_type>,
-                managed_component, Derived>;
+        using derived_type = std::conditional_t<std::is_void_v<Derived>,
+            managed_component, Derived>;
 
         using wrapped_type = Component;
         using type_holder = Component;
@@ -336,7 +333,6 @@ namespace hpx::components {
 
         // Construct a managed_component instance holding a new wrapped instance
         managed_component()
-          : component_(nullptr)
         {
             detail_adl_barrier::init<traits::managed_component_ctor_policy_t<
                 Component>>::call_new(component_, this);
@@ -347,7 +343,6 @@ namespace hpx::components {
             typename Enable = std::enable_if_t<
                 !std::is_same_v<std::decay_t<T>, managed_component>>>
         explicit managed_component(T&& t, Ts&&... ts)
-          : component_(nullptr)
         {
             detail_adl_barrier::init<traits::managed_component_ctor_policy_t<
                 Component>>::call_new(component_, this, HPX_FORWARD(T, t),
@@ -459,13 +454,13 @@ namespace hpx::components {
         friend void intrusive_ptr_release(managed_component<C, D>* p) noexcept;
 
     protected:
-        Component* component_;
+        Component* component_ = nullptr;
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Wrapper, typename CtorPolicy,
         typename DtorPolicy>
-    inline hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
+    hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_unmanaged_id() const
     {
         HPX_ASSERT(back_ptr_);
@@ -474,7 +469,7 @@ namespace hpx::components {
 
     template <typename Component, typename Wrapper, typename CtorPolicy,
         typename DtorPolicy>
-    inline hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
+    hpx::id_type managed_component_base<Component, Wrapper, CtorPolicy,
         DtorPolicy>::get_id() const
     {
         // all credits should have been taken already
@@ -493,8 +488,8 @@ namespace hpx::components {
 
     template <typename Component, typename Wrapper, typename CtorPolicy,
         typename DtorPolicy>
-    inline naming::gid_type managed_component_base<Component, Wrapper,
-        CtorPolicy, DtorPolicy>::get_base_gid() const
+    naming::gid_type managed_component_base<Component, Wrapper, CtorPolicy,
+        DtorPolicy>::get_base_gid() const
     {
         HPX_ASSERT(back_ptr_);
         return back_ptr_->get_base_gid();

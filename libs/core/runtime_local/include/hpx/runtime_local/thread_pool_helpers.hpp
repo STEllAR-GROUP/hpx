@@ -1,4 +1,4 @@
-//  Copyright (c) 2017 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,7 +16,8 @@
 #include <cstdint>
 #include <string>
 
-namespace hpx { namespace resource {
+namespace hpx::resource {
+
     ///////////////////////////////////////////////////////////////////////////
     /// Return the number of thread pools currently managed by the
     /// \a resource_partitioner
@@ -53,9 +54,10 @@ namespace hpx { namespace resource {
 
     /// Return true if the pool with the given index exists
     HPX_CORE_EXPORT bool pool_exists(std::size_t pool_index);
-}}    // namespace hpx::resource
+}    // namespace hpx::resource
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     ///    The function \a get_thread_count returns the number of currently
     /// known threads.
     ///
@@ -103,4 +105,4 @@ namespace hpx { namespace threads {
     HPX_CORE_EXPORT bool enumerate_threads(
         hpx::function<bool(thread_id_type)> const& f,
         thread_schedule_state state = thread_schedule_state::unknown);
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

@@ -303,7 +303,7 @@ namespace hpx {
                 // set callback functions to executed wait future is ready
                 set_on_completed_callback(*this);
 
-                // if all of the requested futures are already set, our callback
+                // if all the requested futures are already set, our callback
                 // above has already been called often enough, otherwise we
                 // suspend ourselves
                 {

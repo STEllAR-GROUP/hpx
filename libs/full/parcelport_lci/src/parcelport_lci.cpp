@@ -105,7 +105,7 @@ namespace hpx::parcelset::policies::lci {
     // Stop the handling of connections.
     void parcelport::do_stop()
     {
-        while (do_background_work(0, parcelport_background_mode_all))
+        while (do_background_work(0, parcelport_background_mode::all))
         {
             if (threads::get_self_ptr())
                 hpx::this_thread::suspend(
@@ -209,7 +209,7 @@ namespace hpx::parcelset::policies::lci {
             return false;
 
         bool has_work = false;
-        if (mode & parcelport_background_mode_send)
+        if (mode & parcelport_background_mode::send)
         {
             has_work = sender_p->background_work(num_thread);
             if (config_t::progress_type == config_t::progress_type_t::worker ||
@@ -224,7 +224,7 @@ namespace hpx::parcelset::policies::lci {
                         num_thread) ||
                     has_work;
         }
-        if (mode & parcelport_background_mode_receive)
+        if (mode & parcelport_background_mode::receive)
         {
             has_work = receiver_p->background_work() || has_work;
             if (config_t::progress_type == config_t::progress_type_t::worker ||

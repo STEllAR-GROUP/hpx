@@ -158,7 +158,9 @@ namespace hpx::parcelset::detail {
         }
 
         // verify that the action targets the correct type
-        if (action_ && data_.addr_.type_ != components::component_invalid)
+        if (action_ &&
+            data_.addr_.type_ !=
+                to_int(hpx::components::component_enum_type::invalid))
         {
             int const type = action_->get_component_type();
             if (!components::types_are_compatible(type, data_.addr_.type_))
@@ -399,21 +401,21 @@ namespace hpx::parcelset::detail {
         // runtime support component or one of the AGAS components
         if (nullptr == lva)
         {
-            switch (comptype)
+            switch (static_cast<components::component_enum_type>(comptype))
             {
-            case components::component_runtime_support:
+            case components::component_enum_type::runtime_support:
                 lva = agas::get_runtime_support_lva();
                 break;
 
-            case components::component_agas_primary_namespace:
+            case components::component_enum_type::agas_primary_namespace:
                 lva = agas::get_primary_ns_lva();
                 break;
 
-            case components::component_agas_symbol_namespace:
+            case components::component_enum_type::agas_symbol_namespace:
                 lva = agas::get_symbol_ns_lva();
                 break;
 
-            case components::component_plain_function:
+            case components::component_enum_type::plain_function:
                 break;
 
             default:

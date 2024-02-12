@@ -10,7 +10,6 @@
 
 #include <exception>
 #include <stdexcept>
-#include <utility>
 #include <vector>
 
 namespace hpx::resiliency::experimental {

@@ -27,7 +27,7 @@
 #include <unistd.h>
 #endif
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     namespace detail {
 
@@ -35,7 +35,7 @@ namespace hpx { namespace util {
         std::uint64_t get_system_thread_id()
         {
 #if defined(HPX_WINDOWS)
-            return std::uint64_t(::GetCurrentThreadId());
+            return static_cast<std::uint64_t>(::GetCurrentThreadId());
 #else
             return std::uint64_t(::pthread_self());
 #endif
@@ -51,7 +51,6 @@ namespace hpx { namespace util {
     !defined(ANDROID)
           , linux_tid_(syscall(SYS_gettid))
 #endif
-          , cleanup_()
           , type_(type)
         {
         }
@@ -90,7 +89,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto tid = detail::get_system_thread_id();
+        auto const tid = detail::get_system_thread_id();
         for (auto&& tinfo : thread_map_)
         {
             if (tinfo.tid_ == tid)
@@ -104,7 +103,7 @@ namespace hpx { namespace util {
         // create mappings
         thread_map_.emplace_back(name, type);
 
-        std::size_t idx = thread_map_.size() - 1;
+        std::size_t const idx = thread_map_.size() - 1;
         label_map_[name] = idx;
 
         return static_cast<std::uint32_t>(idx);
@@ -115,7 +114,7 @@ namespace hpx { namespace util {
         std::lock_guard<mutex_type> m(mtx_);
 
         std::uint32_t i = 0;
-        auto tid = detail::get_system_thread_id();
+        auto const tid = detail::get_system_thread_id();
         for (auto&& tinfo : thread_map_)
         {
             if (tinfo.tid_ == tid)
@@ -123,10 +122,10 @@ namespace hpx { namespace util {
                 label_map_.erase(tinfo.label_);
                 if (tinfo.cleanup_)
                 {
-                    tinfo.cleanup_(i);
+                    [[maybe_unused]] auto _ = tinfo.cleanup_(i);
                 }
 
-                std::size_t size = thread_map_.size();
+                std::size_t const size = thread_map_.size();
                 if (static_cast<std::size_t>(i) == size)
                 {
                     thread_map_.resize(size - 1);
@@ -147,7 +146,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size() ||
             !thread_map_[tix].is_valid())    //-V108
         {
@@ -162,7 +161,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size() ||
             !thread_map_[tix].is_valid())    //-V108
         {
@@ -177,7 +176,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size())
         {
             return std::thread::id{};
@@ -190,7 +189,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size())
         {
             return thread_mapper::invalid_tid;
@@ -217,7 +216,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size())
         {
             static std::string invalid_label;
@@ -231,7 +230,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto idx = static_cast<std::size_t>(tix);
+        auto const idx = static_cast<std::size_t>(tix);
         if (idx >= thread_map_.size())
         {
             return runtime_local::os_thread_type::unknown;
@@ -244,7 +243,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto it = label_map_.find(label);
+        auto const it = label_map_.find(label);
         if (it == label_map_.end())
         {
             return invalid_index;
@@ -265,7 +264,7 @@ namespace hpx { namespace util {
     {
         std::lock_guard<mutex_type> m(mtx_);
 
-        auto it = label_map_.find(label);
+        auto const it = label_map_.find(label);
         if (it == label_map_.end())
         {
             return runtime_local::os_thread_data{"", std::thread::id{},
@@ -273,7 +272,7 @@ namespace hpx { namespace util {
                 runtime_local::os_thread_type::unknown};
         }
 
-        auto idx = static_cast<std::size_t>(it->second);
+        auto const idx = static_cast<std::size_t>(it->second);
         if (idx >= thread_map_.size())
         {
             return runtime_local::os_thread_data{"", std::thread::id{},
@@ -301,5 +300,4 @@ namespace hpx { namespace util {
         }
         return true;
     }
-
-}}    // namespace hpx::util
+}    // namespace hpx::util

@@ -141,8 +141,8 @@ namespace hpx { namespace applier {
     {
         std::vector<naming::gid_type> raw_prefixes;
 #if defined(HPX_HAVE_NETWORKING)
-        if (!parcel_handler_->get_raw_localities(
-                raw_prefixes, components::component_invalid, ec))
+        if (!parcel_handler_->get_raw_localities(raw_prefixes,
+                to_int(hpx::components::component_enum_type::invalid), ec))
             return false;
 
         for (naming::gid_type& gid : raw_prefixes)

@@ -1,5 +1,5 @@
 //  Copyright (c)      2014 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2020 Google
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -23,7 +23,6 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -39,21 +38,9 @@ namespace hpx::plugins {
     /// \tparam Parcelport The parcelport type this factory should be
     ///                        responsible for.
     template <typename Parcelport>
-    struct parcelport_factory : public parcelport_factory_base
+    struct parcelport_factory : parcelport_factory_base
     {
         /// \brief Construct a new factory instance
-        ///
-        /// \param global   [in] The pointer to a \a hpx#util#section instance
-        ///                 referencing the settings read from the [settings]
-        ///                 section of the global configuration file (hpx.ini)
-        ///                 This pointer may be nullptr if no such section has
-        ///                 been found.
-        /// \param local    [in] The pointer to a \a hpx#util#section instance
-        ///                 referencing the settings read from the section
-        ///                 describing this component type:
-        ///                 [hpx.components.\<name\>], where \<name\> is the
-        ///                 instance name of the component as given in the
-        ///                 configuration files.
         ///
         /// \note The contents of both sections has to be cloned in order to
         ///       save the configuration setting for later use.
@@ -73,6 +60,12 @@ namespace hpx::plugins {
             traits::plugin_config_data<Parcelport>::destroy();
         }
 
+        /// \brief Return the ini-information for all contained components
+        ///
+        /// \param fillini  [in] The module is expected to fill this vector
+        ///                 with the ini-information (one line per vector
+        ///                 element) for all components implemented in this
+        ///                 module.
         void get_plugin_info(std::vector<std::string>& fillini) override
         {
             std::string name = unique_plugin_name<parcelport_factory>::call();

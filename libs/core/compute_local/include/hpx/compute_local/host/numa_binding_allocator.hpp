@@ -46,11 +46,13 @@
 #endif
 
 namespace hpx {
+
     static hpx::debug::enable_print<NUMA_BINDING_ALLOCATOR_DEBUG> nba_deb(
         "NUM_B_A");
 }
 
-namespace hpx { namespace parallel { namespace execution {
+namespace hpx::parallel::execution {
+
     struct numa_binding_allocator_tag
     {
     };
@@ -67,32 +69,34 @@ namespace hpx { namespace parallel { namespace execution {
             return domain;
         }
     };
-}}}    // namespace hpx::parallel::execution
+}    // namespace hpx::parallel::execution
 
-namespace hpx { namespace compute { namespace host {
+namespace hpx::compute::host {
+
     template <typename T>
     struct numa_binding_helper
     {
-        // After memory has been allocated, this operator will be called
-        // for every page of memory in the allocation by one thread in each
-        // numa domain (implying that this function will be called for each page
-        // by N threads, where N = number of domains.
-        // The return from this function should be the domain number that
-        // should touch this page. The thread with the matching domain will
-        // perform a memory read/write on the page.
-        virtual std::size_t operator()(const T* const /*base_ptr*/,
-            const T* const /*page_ptr*/, std::size_t const /*page_size*/,
+        // After memory has been allocated, this operator will be called for
+        // every page of memory in the allocation by one thread in each numa
+        // domain (implying that this function will be called for each page) by
+        // N threads, where N = number of domains. The return from this function
+        // should be the domain number that should touch this page. The thread
+        // with the matching domain will perform a memory read/write on the
+        // page.
+        virtual std::size_t operator()(T const* const /*base_ptr*/,
+            T const* const /*page_ptr*/, std::size_t const /*page_size*/,
             std::size_t const /*domains*/) const
         {
             return 0;
         }
+
         // virtual destructor to quiet compiler warnings
         virtual ~numa_binding_helper() = default;
 
         // The allocator uses the pool name to get numa bitmap masks needed by
         // the allocation function. The "default" pool is assumed
         // @TODO use an executor to retrieve the pool name
-        virtual const std::string& pool_name() const
+        virtual std::string const& pool_name() const
         {
             return pool_name_;
         }
@@ -139,7 +143,6 @@ namespace hpx { namespace compute { namespace host {
         {
             return "";
         };
-        //#endif
 
         std::string pool_name_ = "default";
     };
@@ -148,25 +151,24 @@ namespace hpx { namespace compute { namespace host {
     using numa_binding_helper_ptr = std::shared_ptr<numa_binding_helper<T>>;
 
     /// The numa_binding_allocator allocates memory using a policy based on
-    /// hwloc flags for memory binding.
-    /// This allocator can be used to request data that is bound
-    /// to one or more numa domains via the bitmap mask supplied
-
+    /// hwloc flags for memory binding. This allocator can be used to request
+    /// data that is bound to one or more numa domains via the bitmap mask
+    /// supplied
     template <typename T>
     struct numa_binding_allocator
     {
-        typedef T value_type;
-        typedef T* pointer;
-        typedef const T* const_pointer;
-        typedef T& reference;
-        typedef T const& const_reference;
-        typedef std::size_t size_type;
-        typedef std::ptrdiff_t difference_type;
+        using value_type = T;
+        using pointer = T*;
+        using const_pointer = T const*;
+        using reference = T&;
+        using const_reference = T const&;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
         //
         template <typename U>
         struct rebind
         {
-            typedef numa_binding_allocator<U> other;
+            using other = numa_binding_allocator<U>;
         };
 
         using numa_binding_helper_ptr = std::shared_ptr<numa_binding_helper<T>>;
@@ -180,7 +182,6 @@ namespace hpx { namespace compute { namespace host {
             threads::hpx_hwloc_membind_policy policy, unsigned int flags)
           : policy_(policy)
           , flags_(flags)
-          , init_mutex()
         {
             nba_deb.debug("no binder function");
             HPX_ASSERT(
@@ -194,7 +195,6 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(bind_func)
           , policy_(policy)
           , flags_(flags)
-          , init_mutex()
         {
             nba_deb.debug("allocator");
         }
@@ -204,7 +204,6 @@ namespace hpx { namespace compute { namespace host {
           : binding_helper_(rhs.binding_helper_)
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
-          , init_mutex()
         {
             nba_deb.debug("Copy allocator");
         }
@@ -221,7 +220,7 @@ namespace hpx { namespace compute { namespace host {
         }
 
         // Move constructor
-        numa_binding_allocator(numa_binding_allocator&& rhs)
+        numa_binding_allocator(numa_binding_allocator&& rhs) noexcept
           : binding_helper_(HPX_MOVE(rhs.binding_helper_))
           , policy_(rhs.policy_)
           , flags_(rhs.flags_)
@@ -242,7 +241,7 @@ namespace hpx { namespace compute { namespace host {
         }
 
         // Move assignment
-        numa_binding_allocator& operator=(numa_binding_allocator&& rhs)
+        numa_binding_allocator& operator=(numa_binding_allocator&& rhs) noexcept
         {
             binding_helper_ = rhs.binding_helper_;
             policy_ = rhs.policy_;
@@ -254,20 +253,20 @@ namespace hpx { namespace compute { namespace host {
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        pointer address(reference x) const noexcept
+        static pointer address(reference x) noexcept
         {
             return &x;
         }
 
         // Returns the actual address of x even in presence of overloaded
         // operator&
-        const_pointer address(const_reference x) const noexcept
+        static const_pointer address(const_reference x) noexcept
         {
             return &x;
         }
 
-        // Allocates n * sizeof(T) bytes of uninitialized storage and
-        // then spawns threads to touch memory if membind_user is selected
+        // Allocates n * sizeof(T) bytes of uninitialized storage and then
+        // spawns threads to touch memory if membind_user is selected
         pointer allocate(size_type n)
         {
             pointer result = nullptr;
@@ -275,12 +274,12 @@ namespace hpx { namespace compute { namespace host {
             if (policy_ ==
                 threads::hpx_hwloc_membind_policy::membind_firsttouch)
             {
-                threads::hwloc_bitmap_ptr bitmap =
+                threads::hwloc_bitmap_ptr const bitmap =
                     threads::get_thread_manager().get_pool_numa_bitmap(
                         binding_helper_->pool_name());
                 //
-                result = reinterpret_cast<pointer>(
-                    threads::topology().allocate_membind(
+                result =
+                    static_cast<pointer>(threads::topology().allocate_membind(
                         n * sizeof(T), bitmap, policy_, 0));
                 nba_deb.debug(debug::str<>("alloc:firsttouch"),
                     debug::hex<12, void*>(result));
@@ -288,34 +287,36 @@ namespace hpx { namespace compute { namespace host {
             else if (policy_ ==
                 threads::hpx_hwloc_membind_policy::membind_interleave)
             {
-                threads::hwloc_bitmap_ptr bitmap =
+                threads::hwloc_bitmap_ptr const bitmap =
                     threads::get_thread_manager().get_pool_numa_bitmap(
                         binding_helper_->pool_name());
                 //
-                result = reinterpret_cast<pointer>(
-                    threads::topology().allocate_membind(
+                result =
+                    static_cast<pointer>(threads::topology().allocate_membind(
                         n * sizeof(T), bitmap, policy_, 0));
                 nba_deb.debug(debug::str<>("alloc:interleave"),
                     debug::hex<12, void*>(result));
             }
             else if (policy_ == threads::hpx_hwloc_membind_policy::membind_user)
             {
-                threads::hwloc_bitmap_ptr bitmap =
+                threads::hwloc_bitmap_ptr const bitmap =
                     threads::get_thread_manager().get_pool_numa_bitmap(
                         binding_helper_->pool_name());
                 //
-                result = reinterpret_cast<pointer>(
+                result = static_cast<pointer>(
                     threads::topology().allocate_membind(n * sizeof(T), bitmap,
                         threads::hpx_hwloc_membind_policy::membind_firsttouch,
                         0));
                 nba_deb.debug(debug::str<>("alloc:user(bind)"),
                     debug::hex<12, void*>(result));
+
 #if defined(NUMA_ALLOCATOR_LINUX) && defined(MADV_NOHUGEPAGE)
                 // if Transparent Huge Pages (THP) are enabled, this prevents
                 // pages from being merged into a single numa bound block
                 int ret = madvise(result, n * sizeof(T), MADV_NOHUGEPAGE);
-                // a return of -1 probably means there are no transparent huge pages
-                // so they can't be disabled, we can ignore it
+
+                // a return of -1 probably means there are no transparent huge
+                // pages, so they can't be disabled, we can ignore it
                 if ((ret != 0) && (ret != -1))
                 {
                     std::cerr << "ERROR: MADVISE " << strerror(ret)
@@ -331,7 +332,7 @@ namespace hpx { namespace compute { namespace host {
         // pointer obtained by an earlier call to allocate(). The argument n
         // must be equal to the first argument of the call to allocate() that
         // originally produced p; otherwise, the behavior is undefined.
-        void deallocate(pointer p, size_type n) noexcept
+        static void deallocate(pointer p, size_type n) noexcept
         {
             try
             {
@@ -345,14 +346,14 @@ namespace hpx { namespace compute { namespace host {
             }
             catch (...)
             {
-                ;    // just ignore errors from create_topology
+                // just ignore errors from create_topology
             }
         }
 
         // Returns the maximum theoretically possible value of n, for which the
         // call allocate(n, 0) could succeed. In most implementations, this
         // returns std::numeric_limits<size_type>::max() / sizeof(value_type).
-        size_type max_size() const noexcept
+        static size_type max_size() noexcept
         {
             return (std::numeric_limits<size_type>::max)();
         }
@@ -373,9 +374,10 @@ namespace hpx { namespace compute { namespace host {
 
         // a utility function that is slightly faster than the hwloc provided one
         // @TODO, move this into hpx::topology for cleanliness
-        int get_numa_domain(void* page)
+        static int get_numa_domain(void* page)
         {
-            HPX_ASSERT((std::size_t(page) & 4095) == 0);
+            HPX_ASSERT((reinterpret_cast<std::size_t>(page) & 4095) == 0);
+
 #if defined(NUMA_ALLOCATOR_LINUX)
             // This is an optimized version of the hwloc equivalent
             void* pages[1] = {page};
@@ -396,7 +398,8 @@ namespace hpx { namespace compute { namespace host {
 #endif
         }
 
-        std::string get_page_numa_domains(void* addr, std::size_t len) const
+        static std::string get_page_numa_domains(
+            [[maybe_unused]] void* addr, [[maybe_unused]] std::size_t len)
         {
 #if defined(NUMA_ALLOCATOR_LINUX)
             // @TODO replace with topology::page_size
@@ -429,29 +432,28 @@ namespace hpx { namespace compute { namespace host {
             }
             return temp.str();
 #else
-            (void) addr;
-            (void) len;
+            return {};
 #endif
-            return "";
         }
 
         void initialize_pages(pointer p, size_t n) const
         {
             std::unique_lock<std::mutex> lk(init_mutex);
-            //
-            threads::hwloc_bitmap_ptr bitmap =
+
+            threads::hwloc_bitmap_ptr const bitmap =
                 threads::get_thread_manager().get_pool_numa_bitmap(
                     binding_helper_->pool_name());
             std::vector<threads::hwloc_bitmap_ptr> nodesets =
                 create_nodesets(bitmap);
-            //
+
             using namespace parallel::execution;
             using allocator_hint_type =
                 pool_numa_hint<numa_binding_allocator_tag>;
-            //
-            // Warning :low priority tasks are used here, because the scheduler does
-            // not steal across numa domains for those tasks, so they are sure
-            // to remain on the right queue and be executed on the right domain.
+
+            // Warning :low priority tasks are used here, because the scheduler
+            // does not steal across numa domains for those tasks, so they are
+            // sure to remain on the right queue and be executed on the right
+            // domain.
             guided_pool_executor<allocator_hint_type> numa_executor(
                 &hpx::resource::get_thread_pool(binding_helper_->pool_name()),
                 threads::thread_priority::bound);
@@ -495,13 +497,13 @@ namespace hpx { namespace compute { namespace host {
             if (N == 2)
             {
                 std::size_t Nc = helper->array_size(0);
-                std::size_t Nr = helper->array_size(1);
+                std::size_t const Nr = helper->array_size(1);
                 std::size_t xinc =
                     (std::min)(helper->display_step(0), pagesize);
-                std::size_t yinc =
+                std::size_t const yinc =
                     (std::min)(helper->display_step(1), pagesize);
-                std::size_t xoff = helper->memory_step(0);
-                std::size_t yoff = helper->memory_step(1);
+                std::size_t const xoff = helper->memory_step(0);
+                std::size_t const yoff = helper->memory_step(1);
                 std::size_t m = helper->memory_bytes();
 #ifdef numa_binding_allocator_PRETTY_DISPLAY
                 display << ' ';
@@ -532,8 +534,8 @@ namespace hpx { namespace compute { namespace host {
                         }
                         else
                         {
-                            size_type dom = get_numa_domain(p2);
-                            if (dom == size_type(-1))
+                            size_type const dom = get_numa_domain(p2);
+                            if (dom == static_cast<size_type>(-1))
                             {
                                 display << '-';
                             }
@@ -553,13 +555,13 @@ namespace hpx { namespace compute { namespace host {
         }
 
     protected:
-        std::vector<threads::hwloc_bitmap_ptr> create_nodesets(
-            threads::hwloc_bitmap_ptr bitmap) const
+        static std::vector<threads::hwloc_bitmap_ptr> create_nodesets(
+            threads::hwloc_bitmap_ptr const& bitmap)
         {
             // for each numa domain, we need a nodeset object
-            threads::mask_type numa_mask =
-                dynamic_cast<const threads::topology*>(&threads::get_topology())
-                    ->bitmap_to_mask(bitmap->get_bmp(), HWLOC_OBJ_NUMANODE);
+            threads::mask_type const numa_mask =
+                threads::get_topology().bitmap_to_mask(
+                    bitmap->get_bmp(), HWLOC_OBJ_NUMANODE);
 
             nba_deb.debug(debug::str<>("Pool numa mask"), numa_mask);
 
@@ -597,14 +599,14 @@ namespace hpx { namespace compute { namespace host {
             for (size_type i = 0; i < num_pages; ++i)
             {
                 // we pass the base pointer and current page pointer
-                size_type dom =
+                size_type const dom =
                     helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom == numa_domain)
                 {
-                    HPX_ASSERT((std::size_t(page_ptr) &
+                    HPX_ASSERT((reinterpret_cast<std::size_t>(page_ptr) &
                                    (threads::get_memory_page_size() - 1)) == 0);
                     // trigger a memory read and rewrite without changing contents
-                    volatile T* vaddr = const_cast<volatile T*>(page_ptr);
+                    T volatile* vaddr = const_cast<T volatile*>(page_ptr);
                     *vaddr = *vaddr;
 #ifdef NUMA_BINDING_ALLOCATOR_INIT_MEMORY
 #if defined(NUMA_ALLOCATOR_LINUX)
@@ -642,7 +644,7 @@ namespace hpx { namespace compute { namespace host {
             for (size_type i = 0; i < num_pages; ++i)
             {
                 // we pass the base pointer and current page pointer
-                size_type dom =
+                size_type const dom =
                     helper->operator()(p, page_ptr, pagesize, nodesets.size());
                 if (dom == numa_domain)
                 {
@@ -668,4 +670,4 @@ namespace hpx { namespace compute { namespace host {
     private:
         mutable std::mutex init_mutex;
     };
-}}}    // namespace hpx::compute::host
+}    // namespace hpx::compute::host

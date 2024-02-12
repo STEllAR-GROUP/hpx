@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
@@ -20,7 +18,7 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    constexpr bool is_client_v = is_client<T>::value;
+    inline constexpr bool is_client_v = is_client<T>::value;
 
     template <typename T, typename Enable = void>
     struct is_client_or_client_array : is_client<T>
@@ -38,6 +36,6 @@ namespace hpx { namespace traits {
     };
 
     template <typename T>
-    constexpr bool is_client_or_client_array_v =
+    inline constexpr bool is_client_or_client_array_v =
         is_client_or_client_array<T>::value;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

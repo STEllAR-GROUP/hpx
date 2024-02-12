@@ -4,8 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-/// \file hpx/actions_base/make_action.hpp
-
 #pragma once
 
 #include <hpx/actions_base/plain_action.hpp>
@@ -14,19 +12,14 @@
 #include <type_traits>
 #include <utility>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-        // Helpers to actionize a lambda
 
-        template <typename... T>
-        struct sequence
-        {
-        };
-
+        // Helpers to convert a lambda to an action
         struct addr_add
         {
             template <typename T>
@@ -109,4 +102,4 @@ namespace hpx { namespace actions {
         return hpx::actions::detail::action_maker() +=
             true ? nullptr : hpx::actions::detail::addr_add() + f;
     }
-}}    // namespace hpx::actions
+}    // namespace hpx::actions

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c) 2011-2016 Thomas Heller
 //
@@ -34,7 +34,8 @@
 #include <hpx/modules/runtime_local.hpp>
 #include <hpx/modules/serialization.hpp>
 #include <hpx/modules/util.hpp>
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
 #include <hpx/modules/itt_notify.hpp>
 #endif
 
@@ -102,36 +103,34 @@ namespace hpx::actions {
 namespace hpx {
 
     template <std::size_t I, typename Args>
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::tuple_element<I, Args>::type&
-        get(hpx::actions::detail::argument_holder<Args>& t)
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE hpx::tuple_element_t<I, Args>&
+    get(hpx::actions::detail::argument_holder<Args>& t)
     {
         return hpx::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::tuple_element<I, Args>::type const&
+        hpx::tuple_element_t<I, Args> const&
         get(hpx::actions::detail::argument_holder<Args> const& t)
     {
         return hpx::tuple_element<I, Args>::get(t.data());
     }
 
     template <std::size_t I, typename Args>
-    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::tuple_element<I, Args>::type&&
-        get(hpx::actions::detail::argument_holder<Args>&& t)
+    constexpr HPX_HOST_DEVICE HPX_FORCEINLINE hpx::tuple_element_t<I, Args>&&
+    get(hpx::actions::detail::argument_holder<Args>&& t)
     {
-        return std::forward<typename hpx::tuple_element<I, Args>::type>(
+        return std::forward<hpx::tuple_element_t<I, Args>>(
             hpx::get<I>(t.data()));
     }
 
     template <std::size_t I, typename Args>
     constexpr HPX_HOST_DEVICE HPX_FORCEINLINE
-        typename hpx::tuple_element<I, Args>::type const&&
+        hpx::tuple_element_t<I, Args> const&&
         get(hpx::actions::detail::argument_holder<Args> const&& t)
     {
-        return std::forward<typename hpx::tuple_element<I, Args>::type const>(
+        return std::forward<hpx::tuple_element_t<I, Args> const>(
             hpx::get<I>(t.data()));
     }
 }    // namespace hpx
@@ -142,13 +141,11 @@ namespace hpx::actions {
     template <typename Action>
     struct transfer_base_action : base_action_data
     {
-    public:
         transfer_base_action(transfer_base_action const&) = delete;
         transfer_base_action(transfer_base_action&&) = delete;
         transfer_base_action& operator=(transfer_base_action const&) = delete;
         transfer_base_action& operator=(transfer_base_action&&) = delete;
 
-    public:
         using component_type = typename Action::component_type;
         using derived_type = typename Action::derived_type;
         using result_type = typename Action::result_type;
@@ -202,7 +199,6 @@ namespace hpx::actions {
             detail::register_action<derived_type>::instance.instantiate();
         }
 
-    public:
         /// retrieve component type
         static int get_static_component_type()
         {
@@ -231,9 +227,10 @@ namespace hpx::actions {
             return detail::get_action_id<derived_type>();
         }
 
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
         /// The function \a get_action_name_itt returns the name of this action
-        /// as a ITT string_handle
+        /// as an ITT string_handle
         util::itt::string_handle const& get_action_name_itt() const override
         {
             return detail::get_action_name_itt<derived_type>();
@@ -286,9 +283,8 @@ namespace hpx::actions {
     public:
         /// retrieve the N's argument
         template <std::size_t N>
-        constexpr inline
-            typename hpx::tuple_element<N, arguments_type>::type const&
-            get() const
+        constexpr typename hpx::tuple_element<N, arguments_type>::type const&
+        get() const
         {
             return hpx::get<N>(arguments_);
         }
@@ -308,7 +304,7 @@ namespace hpx::actions {
         }
 
         // saving ...
-        void save_base(hpx::serialization::output_archive& ar)
+        void save_base(hpx::serialization::output_archive& ar) const
         {
             ar << arguments_;
             this->base_action_data::save_base(ar);
@@ -332,6 +328,7 @@ namespace hpx::actions {
         0);
 
     namespace detail {
+
         template <typename Action>
         void register_remote_action_invocation_count(
             invocation_count_registry& registry)
@@ -344,8 +341,8 @@ namespace hpx::actions {
 
     ///////////////////////////////////////////////////////////////////////////
     template <std::size_t N, typename Action>
-    constexpr inline typename hpx::tuple_element<N,
-        typename transfer_action<Action>::arguments_type>::type const&
+    constexpr hpx::tuple_element_t<N,
+        typename transfer_action<Action>::arguments_type> const&
     get(transfer_base_action<Action> const& args)
     {
         return args.template get<N>();
@@ -356,19 +353,15 @@ namespace hpx::actions {
     defined(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
 #include <hpx/actions_base/detail/per_action_data_counter_registry.hpp>
 
-namespace hpx::actions::detail {
+/// \cond NOINTERNAL
+template <typename Action>
+void hpx::actions::detail::register_per_action_data_counter_types(
+    hpx::actions::detail::per_action_data_counter_registry& registry)
+{
+    registry.register_class(hpx::actions::detail::get_action_name<Action>());
+}
+/// \endcond
 
-    /// \cond NOINTERNAL
-    template <typename Action>
-    void register_per_action_data_counter_types(
-        per_action_data_counter_registry& registry)
-    {
-        registry.register_class(
-            hpx::actions::detail::get_action_name<Action>());
-    }
-    /// \endcond
-}    // namespace hpx::actions::detail
-// namespace hpx::actions::detail
 #endif    // HPX_HAVE_PARCELPORT_ACTION_COUNTERS
 
 #endif    // HPX_HAVE_NETWORKING

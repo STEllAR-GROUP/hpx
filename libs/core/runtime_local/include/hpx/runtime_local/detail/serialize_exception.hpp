@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,10 +14,11 @@
 #include <exception>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace runtime_local { namespace detail {
+namespace hpx::runtime_local::detail {
+
     HPX_CORE_EXPORT void save_custom_exception(
         hpx::serialization::output_archive&, std::exception_ptr const&,
         unsigned int);
     HPX_CORE_EXPORT void load_custom_exception(
         hpx::serialization::input_archive&, std::exception_ptr&, unsigned int);
-}}}    // namespace hpx::runtime_local::detail
+}    // namespace hpx::runtime_local::detail

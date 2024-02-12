@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,7 +26,7 @@ namespace hpx::plugins {
     /// \tparam BinaryFilter The message handler type this factory should be
     ///                        responsible for.
     template <typename BinaryFilter>
-    struct binary_filter_factory : public binary_filter_factory_base
+    struct binary_filter_factory : binary_filter_factory_base
     {
         /// \brief Construct a new factory instance
         ///
@@ -41,6 +41,7 @@ namespace hpx::plugins {
         ///                 [hpx.components.\<name\>], where \<name\> is the
         ///                 instance name of the component as given in the
         ///                 configuration files.
+        /// \param isenabled
         ///
         /// \note The contents of both sections has to be cloned in order to
         ///       save the configuration setting for later use.

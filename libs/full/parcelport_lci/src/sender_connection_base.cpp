@@ -54,29 +54,16 @@ namespace hpx::parcelset::policies::lci {
     {
         auto start_time = util::lci_environment::pcounter_now();
         return_t ret;
-        // const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
             HPX_UNLIKELY(!pp_->is_initialized))
         {
-            // If we are sending early parcels, we should not expect the
-            // thread make progress on the backlog queue
-            //            int retry_count = 0;
+            // If we are sending early parcels, we should not expect the thread
+            // make progress on the backlog queue.
             do
             {
                 ret = send_nb();
                 if (ret.status == return_status_t::retry)
                 {
-                    //                    ++retry_count;
-                    //                    if (retry_count > retry_max_spin)
-                    //                    {
-                    //                        retry_count = 0;
-                    //                        while (pp_->background_work(
-                    //                            -1, parcelport_background_mode_all))
-                    //                            continue;
-                    //                        if (hpx::threads::get_self_id() !=
-                    //                            hpx::threads::invalid_thread_id)
-                    //                            hpx::this_thread::yield();
-                    //                    }
                     if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
                         config_t::progress_type ==

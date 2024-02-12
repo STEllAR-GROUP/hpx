@@ -6,13 +6,13 @@
 
 #pragma once
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     template <typename Result, typename RemoteResult = Result>
     struct typed_continuation;
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Trait to determine the continuation type for an action
@@ -26,4 +26,4 @@ namespace hpx { namespace traits {
 
     template <typename Action>
     using action_continuation_t = typename action_continuation<Action>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

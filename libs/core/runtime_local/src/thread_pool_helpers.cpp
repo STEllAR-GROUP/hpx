@@ -1,4 +1,5 @@
-//  Copyright (c)      2017 Shoshana Jakobovits
+//  Copyright (c) 2017 Shoshana Jakobovits
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,14 +14,10 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <memory>
-#include <mutex>
-#include <stdexcept>
 #include <string>
-#include <utility>
-#include <vector>
 
-namespace hpx { namespace resource {
+namespace hpx::resource {
+
     std::size_t get_num_thread_pools()
     {
         return get_partitioner().get_num_pools();
@@ -70,9 +67,10 @@ namespace hpx { namespace resource {
     {
         return get_runtime().get_thread_manager().pool_exists(pool_index);
     }
-}}    // namespace hpx::resource
+}    // namespace hpx::resource
 
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     std::int64_t get_thread_count(thread_schedule_state state)
     {
         return get_thread_manager().get_thread_count(state);
@@ -99,4 +97,4 @@ namespace hpx { namespace threads {
     {
         return get_thread_manager().enumerate_threads(f, state);
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

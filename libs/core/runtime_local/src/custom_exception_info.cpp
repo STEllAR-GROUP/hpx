@@ -47,12 +47,16 @@
 #include <vector>
 
 namespace hpx {
-    char const* get_runtime_state_name(state st);
+
+    char const* get_runtime_state_name(state st) noexcept;
 
     ///////////////////////////////////////////////////////////////////////////
-    // For testing purposes we sometime expect to see exceptions, allow those
+    // For testing purposes we sometimes expect to see exceptions, allow those
     // to go through without attaching a debugger.
-    std::atomic<bool> expect_exception_flag(false);
+    namespace {
+
+        std::atomic<bool> expect_exception_flag(false);
+    }
 
     bool expect_exception(bool flag)
     {
@@ -108,7 +112,7 @@ namespace hpx {
                 strm << "{process-id}: " << *pid_ << "\n";
 
             bool thread_info = false;
-            char const* const thread_prefix = "{os-thread}: ";
+            constexpr auto thread_prefix = "{os-thread}: ";
             if (std::size_t const* shepherd =
                     xi.get<hpx::detail::throw_shepherd>();
                 shepherd && static_cast<std::size_t>(-1) != *shepherd)
@@ -167,7 +171,7 @@ namespace hpx {
 
 namespace hpx::util {
 
-    // This is a local helper used to get the backtrace on a new new stack if
+    // This is a local helper used to get the backtrace on a new stack if
     // possible.
     std::string trace_on_new_stack(
         std::size_t frames_no = HPX_HAVE_THREAD_BACKTRACE_DEPTH)
@@ -188,7 +192,7 @@ namespace hpx::util {
         }
 
         lcos::local::futures_factory<std::string()> p(
-            [&bt]() { return bt.trace(); });
+            [&bt] { return bt.trace(); });
 
         error_code ec(throwmode::lightweight);
         threads::thread_id_ref_type const tid =
@@ -204,7 +208,7 @@ namespace hpx::util {
 
         return p.get_future().get(ec);
 #else
-        return "";
+        return {};
 #endif
     }
 }    // namespace hpx::util
@@ -225,21 +229,21 @@ namespace hpx::detail {
     {
         pre_exception_handler();
 
-        std::cerr << e.what() << std::endl;
+        std::cerr << e.what() << "\n" << std::flush;
     }
 
     void report_exception_and_continue(std::exception_ptr const& e)
     {
         pre_exception_handler();
 
-        std::cerr << diagnostic_information(e) << std::endl;
+        std::cerr << diagnostic_information(e) << "\n" << std::flush;
     }
 
     void report_exception_and_continue(hpx::exception const& e)
     {
         pre_exception_handler();
 
-        std::cerr << diagnostic_information(e) << std::endl;
+        std::cerr << diagnostic_information(e) << "\n" << std::flush;
     }
 
     void report_exception_and_terminate(std::exception const& e)
@@ -297,9 +301,10 @@ namespace hpx::detail {
             return std::current_exception();
         }
 
+        HPX_UNREACHABLE;    // -V779
+
         // need this return to silence a warning with icc
-        HPX_ASSERT(false);    // -V779
-        return std::exception_ptr();
+        return {};
     }
 
     template HPX_CORE_EXPORT std::exception_ptr construct_exception(
@@ -467,7 +472,7 @@ namespace hpx {
     }
 
     /// Return the locality where the exception was thrown.
-    std::uint32_t get_error_locality_id(hpx::exception_info const& xi)
+    std::uint32_t get_error_locality_id(hpx::exception_info const& xi) noexcept
     {
         if (std::uint32_t const* locality =
                 xi.get<hpx::detail::throw_locality>())
@@ -481,10 +486,10 @@ namespace hpx {
 
     /// Return the (operating system) process id of the locality where the
     /// exception was thrown.
-    std::int64_t get_error_process_id(hpx::exception_info const& xi)
+    std::int64_t get_error_process_id(hpx::exception_info const& xi) noexcept
     {
-        if (std::int64_t const* pid_ = xi.get<hpx::detail::throw_pid>())
-            return *pid_;
+        if (std::int64_t const* pid = xi.get<hpx::detail::throw_pid>())
+            return *pid;
         return -1;
     }
 
@@ -516,7 +521,7 @@ namespace hpx {
 
     /// Return the sequence number of the OS-thread used to execute HPX-threads
     /// from which the exception was thrown.
-    std::size_t get_error_os_thread(hpx::exception_info const& xi)
+    std::size_t get_error_os_thread(hpx::exception_info const& xi) noexcept
     {
         if (std::size_t const* shepherd = xi.get<hpx::detail::throw_shepherd>();
             shepherd && static_cast<std::size_t>(-1) != *shepherd)
@@ -528,7 +533,7 @@ namespace hpx {
 
     /// Return the unique thread id of the HPX-thread from which the exception
     /// was thrown.
-    std::size_t get_error_thread_id(hpx::exception_info const& xi)
+    std::size_t get_error_thread_id(hpx::exception_info const& xi) noexcept
     {
         if (std::size_t const* thread_id =
                 xi.get<hpx::detail::throw_thread_id>();

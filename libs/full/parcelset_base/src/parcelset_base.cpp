@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,13 +16,13 @@ namespace hpx::parcelset {
         // clang-format off
         inline constexpr char const* const parcelport_background_mode_names[] = {
             "unknown",
-            "parcelport_background_mode_flush_buffers",
+            "parcelport_background_mode_flush::buffers",
             "unknown",
-            "parcelport_background_mode_send",
-            "parcelport_background_mode_receive",
+            "parcelport_background_mode::send",
+            "parcelport_background_mode::receive",
             "unknown",
             "unknown",
-            "parcelport_background_mode_all",
+            "parcelport_background_mode::all",
         };
         // clang-format on
     }    // namespace strings
@@ -30,9 +30,8 @@ namespace hpx::parcelset {
     char const* get_parcelport_background_mode_name(
         parcelport_background_mode mode)
     {
-        if (mode < parcelport_background_mode::
-                       parcelport_background_mode_flush_buffers ||
-            mode > parcelport_background_mode::parcelport_background_mode_all)
+        if (mode < parcelport_background_mode::flush_buffers ||
+            mode > parcelport_background_mode::all)
         {
             return "unknown";
         }

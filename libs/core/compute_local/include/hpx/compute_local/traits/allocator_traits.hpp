@@ -53,7 +53,7 @@ namespace hpx::compute::traits {
         struct get_reference_type<Allocator,
             std::void_t<typename Allocator::reference>>
         {
-            typedef typename Allocator::reference type;
+            using type = typename Allocator::reference;
         };
 
         template <typename Allocator, typename Enable = void>
@@ -71,7 +71,7 @@ namespace hpx::compute::traits {
         struct get_const_reference_type<Allocator,
             std::void_t<typename Allocator::const_reference>>
         {
-            typedef typename Allocator::const_reference type;
+            using type = typename Allocator::const_reference;
         };
 
         template <typename Allocator, typename Enable = void>
@@ -161,7 +161,7 @@ namespace hpx::compute::traits {
                 Ts&&... vs) -> decltype(alloc.bulk_construct(p, count,
                 HPX_FORWARD(Ts, vs)...))
             {
-                alloc.bulk_construct(p, count, HPX_FORWARD(Ts, vs)...);
+                return alloc.bulk_construct(p, count, HPX_FORWARD(Ts, vs)...);
             }
         };
 
@@ -199,7 +199,7 @@ namespace hpx::compute::traits {
                 typename std::allocator_traits<Allocator>::size_type
                     count) noexcept -> decltype(alloc.bulk_destroy(p, count))
             {
-                alloc.bulk_destroy(p, count);
+                return alloc.bulk_destroy(p, count);
             }
         };
 

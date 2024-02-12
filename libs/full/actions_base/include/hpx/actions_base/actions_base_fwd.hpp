@@ -1,5 +1,5 @@
 //  Copyright (c)      2016 Thomas Heller
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,17 +12,17 @@
 
 #include <cstdint>
 
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
 
     ///////////////////////////////////////////////////////////////////////////
-    /// The type of an action defines whether this action will be executed
+    /// The type of the action defines whether this action will be executed
     /// directly or by an HPX-threads
     enum class action_flavor
     {
         plain_action = 0,    ///< The action will be executed by a newly created
-        ///< thread
+                             ///< thread
         direct_action = 1    ///< The action needs to be executed directly
     };
 
@@ -38,4 +38,4 @@ namespace hpx { namespace actions {
     }    // namespace detail
 
     /// \endcond
-}}    // namespace hpx::actions
+}    // namespace hpx::actions

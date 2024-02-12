@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,7 +19,6 @@
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
-#include <hpx/preprocessor/strip_parens.hpp>
 
 #include <cstdlib>
 #include <stdexcept>
@@ -60,10 +59,9 @@ namespace hpx::actions {
     ///////////////////////////////////////////////////////////////////////////
     template <typename R, typename... Ps, R (*F)(Ps...), typename Derived>
     struct action<R (*)(Ps...), F, Derived>
-      : public basic_action<detail::plain_function, R(Ps...),
+      : basic_action<detail::plain_function, R(Ps...),
             detail::action_type_t<action<R (*)(Ps...), F, Derived>, Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(
@@ -87,11 +85,10 @@ namespace hpx::actions {
     template <typename R, typename... Ps, R (*F)(Ps...) noexcept,
         typename Derived>
     struct action<R (*)(Ps...) noexcept, F, Derived>
-      : public basic_action<detail::plain_function, R(Ps...),
+      : basic_action<detail::plain_function, R(Ps...),
             detail::action_type_t<action<R (*)(Ps...) noexcept, F, Derived>,
                 Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(
@@ -111,7 +108,6 @@ namespace hpx::actions {
             return F(HPX_FORWARD(Ts, vs)...);
         }
     };
-
     /// \endcond
 }    // namespace hpx::actions
 
@@ -122,7 +118,7 @@ namespace hpx::traits {
     HPX_ALWAYS_EXPORT inline components::component_type component_type_database<
         hpx::actions::detail::plain_function>::get() noexcept
     {
-        return hpx::components::component_plain_function;
+        return to_int(hpx::components::component_enum_type::plain_function);
     }
 
     // clang-format off
@@ -237,23 +233,21 @@ namespace hpx::traits {
 /// \a func. It defines the action type \a name representing the given function.
 /// This macro additionally registers the newly define action type with HPX.
 ///
-/// The parameter \p func is a global or free (non-member) function which
-/// should be encapsulated into a plain action. The parameter \p name is the
-/// name of the action type defined by this macro.
+/// The parameter \p func is a global or free (non-member) function which should
+/// be encapsulated into a plain action. The parameter \p name is the name of
+/// the action type defined by this macro.
 ///
 /// \par Example:
 ///
 /// \code
-///     namespace app
-///     {
-///         void some_global_function(double d)
-///         {
+///     namespace app {
+///         void some_global_function(double d) {
 ///             cout << d;
 ///         }
 ///     }
 ///
-///     // This will define the action type 'some_global_action' which represents
-///     // the function 'app::some_global_function'.
+///     // This will define the action type 'some_global_action' which
+///     // represents the function 'app::some_global_function'.
 ///     HPX_PLAIN_ACTION(app::some_global_function, some_global_action)
 /// \endcode
 ///
@@ -261,13 +255,14 @@ namespace hpx::traits {
 /// if the wrapped function is located in some other namespace. The newly
 /// defined action type is placed into the global namespace as well.
 ///
-/// \note The macro \a HPX_PLAIN_ACTION_ID can be used with 1, 2, or 3 arguments.
-/// The second and third arguments are optional. The default value for the
-/// second argument (the typename of the defined action) is derived from the
-/// name of the function (as passed as the first argument) by appending '_action'.
-/// The second argument can be omitted only if the first argument with an
-/// appended suffix '_action' resolves to a valid, unqualified C++ type name.
-/// The default value for the third argument is \a hpx::components::factory_check.
+/// \note The macro \a HPX_PLAIN_ACTION_ID can be used with 1, 2, or 3
+///       arguments. The second and third arguments are optional. The default
+///       value for the second argument (the typename of the defined action) is
+///       derived from the name of the function (as passed as the first
+///       argument) by appending '_action'. The second argument can be omitted
+///       only if the first argument with an appended suffix '_action' resolves
+///       to a valid, unqualified C++ type name. The default value for the third
+///       argument is \a hpx::components::factory_state::check.
 ///
 /// \note Only one of the forms of this macro \a HPX_PLAIN_ACTION or
 ///       \a HPX_PLAIN_ACTION_ID should be used for a particular action,
@@ -282,42 +277,40 @@ namespace hpx::traits {
 /// \brief Defines a plain action type based on the given function \a func and
 ///   registers it with HPX.
 ///
-/// The macro \a HPX_PLAIN_ACTION_ID can be used to define a plain action (e.g. an
-/// action encapsulating a global or free function) based on the given function
-/// \a func. It defines the action type \a actionname representing the given function.
-/// The parameter \a actionid
+/// The macro \a HPX_PLAIN_ACTION_ID can be used to define a plain action (e.g.
+/// an action encapsulating a global or free function) based on the given
+/// function \a func. It defines the action type \a actionname representing the
+/// given function.
 ///
-/// The parameter \a actionid specifies an unique integer value which will be
+/// The parameter \a actionid specifies a unique integer value which will be
 /// used to represent the action during serialization.
 ///
-/// The parameter \p func is a global or free (non-member) function which
-/// should be encapsulated into a plain action. The parameter \p name is the
-/// name of the action type defined by this macro.
+/// The parameter \p func is a global or free (non-member) function which should
+/// be encapsulated into a plain action. The parameter \p name is the name of
+/// the action type defined by this macro.
 ///
 /// The second parameter has to be usable as a plain (non-qualified) C++
-/// identifier, it should not contain special characters which cannot be part
-/// of a C++ identifier, such as '<', '>', or ':'.
+/// identifier, it should not contain special characters which cannot be part of
+/// a C++ identifier, such as '<', '>', or ':'.
 ///
 /// \par Example:
 ///
 /// \code
-///     namespace app
-///     {
-///         void some_global_function(double d)
-///         {
+///     namespace app {
+///         void some_global_function(double d) {
 ///             cout << d;
 ///         }
 ///     }
 ///
-///     // This will define the action type 'some_global_action' which represents
-///     // the function 'app::some_global_function'.
+///     // This will define the action type 'some_global_action' which
+///     // represents the function 'app::some_global_function'.
 ///     HPX_PLAIN_ACTION_ID(app::some_global_function, some_global_action,
-///       some_unique_id);
+///         some_unique_id);
 /// \endcode
 ///
-/// \note The macro \a HPX_PLAIN_ACTION_ID has to be used at global namespace even
-/// if the wrapped function is located in some other namespace. The newly
-/// defined action type is placed into the global namespace as well.
+/// \note The macro \a HPX_PLAIN_ACTION_ID has to be used at global namespace
+///       even if the wrapped function is located in some other namespace. The
+///       newly defined action type is placed into the global namespace as well.
 ///
 /// \note Only one of the forms of this macro \a HPX_PLAIN_ACTION or
 ///       \a HPX_PLAIN_ACTION_ID should be used for a particular action,
