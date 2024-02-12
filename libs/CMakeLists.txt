@@ -113,6 +113,11 @@ if(TARGET APEX::apex)
   target_link_libraries(hpx_full INTERFACE APEX::apex)
 endif()
 
+# Do I need this here?
+# if(TARGET STDEXEC::stdexec)
+#   target_link_libraries(hpx_full INTERFACE STDEXEC::stdexec)
+# endif()
+
 if(TARGET Gperftools::gperftools)
   target_link_libraries(hpx_full PRIVATE Gperftools::gperftools)
 endif()
@@ -374,6 +379,10 @@ endif()
 
 if(HPX_WITH_ITTNOTIFY)
   target_link_libraries(hpx_core PUBLIC Amplifier::amplifier)
+endif()
+
+if(TARGET STDEXEC::stdexec)
+  target_link_libraries(hpx_core INTERFACE STDEXEC::stdexec)
 endif()
 
 if(HPX_WITH_PARCELPORT_GASNET AND GASNET_LIBRARY_DIRS)
