@@ -351,7 +351,7 @@ namespace hpx::components::server {
         typedef hpx::spinlock dijkstra_mtx_type;
         dijkstra_mtx_type dijkstra_mtx_;
         std::unique_ptr<hpx::latch> dijkstra_cond_;
-        bool dijkstra_color_;    // false: white, true: black
+        std::atomic<bool> dijkstra_color_;    // false: white, true: black
 #endif
 
         plugin_map_mutex_type p_mtx_;
