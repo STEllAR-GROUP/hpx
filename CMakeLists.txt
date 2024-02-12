@@ -1,6 +1,7 @@
 # Copyright (c)      2020 Mikael Simberg
 # Copyright (c) 2007-2024 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
+# Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -600,25 +601,37 @@ hpx_option(
   ADVANCED
 )
 
-# if STDEXEC_ROOT was provided, HPX_WITH_STDEXEC is set to ON
-if(STDEXEC_ROOT OR HPX_WITH_FETCH_STDEXEC)
+if(Stdexec_ROOT OR HPX_WITH_FETCH_STDEXEC)
+  # explicitly enable HPX_WITH_STDEXEC
   set(HPX_WITH_STDEXEC ON)
 
-  hpx_add_config_define(HPX_HAVE_STDEXEC)
+  # prefer Stdexec_ROOT over HPX_WITH_FETCH_STDEXEC by default
+  if(Stdexec_ROOT AND HPX_WITH_FETCH_STDEXEC)
+    set(HPX_WITH_FETCH_STDEXEC OFF)
+    hpx_warn(
+      "Both Stdexec_ROOT and HPX_WITH_FETCH_STDEXEC are provided. HPX_WITH_FETCH_STDEXEC is set to OFF."
+    )
+  endif()
 elseif(HPX_WITH_STDEXEC)
   hpx_error(
-    "HPX_WITH_STDEXEC is set to ON, but STDEXEC_ROOT is not provided. Please provide STDEXEC_ROOT or set HPX_WITH_FETCH_STDEXEC to ON."
+    "HPX_WITH_STDEXEC is set to ON, but Stdexec_ROOT is not provided and HPX_WITH_FETCH_STDEXEC is not enabled. Please provide Stdexec_ROOT or set HPX_WITH_FETCH_STDEXEC to ON."
   )
 endif()
 
-if(HPX_WITH_STDEXEC)
-  # need cxx20 and over
-  if(HPX_WITH_CXX_STANDARD LESS 20)
-    hpx_error(
-      "HPX_WITH_STDEXEC is set to ON, but HPX_WITH_CXX_STANDARD is less than 20. Please set HPX_WITH_CXX_STANDARD to 20 or higher."
-    )
-  endif()
-  hpx_info("STDEXEC is enabled.")
+# STDEXEC requires C++20
+if(HPX_WITH_STDEXEC AND HPX_WITH_CXX_STANDARD LESS 20)
+  hpx_error(
+  "HPX_WITH_STDEXEC is set to ON, but HPX_WITH_CXX_STANDARD is less than 20. Please set HPX_WITH_CXX_STANDARD to 20 or higher."
+  )
+endif()
+
+if(HPX_WITH_FETCH_STDEXEC)
+  hpx_option(
+    HPX_WITH_STDEXEC_TAG
+    STRING "STDEXEC repository tag or branch"
+    "main"
+    CATEGORY "Executor"
+  )
 endif()
 
 # ##############################################################################

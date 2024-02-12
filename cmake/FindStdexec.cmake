@@ -1,3 +1,8 @@
+#  Copyright (c) 2024 Isidoros Tsaousis-Seiras
+#
+#  SPDX-License-Identifier: BSL-1.0
+#  Distributed under the Boost Software License, Version 1.0. (See accompanying
+#  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(NOT TARGET STDEXEC::stdexec)
   if (STDEXEC_ROOT AND NOT Stdexec_ROOT)
@@ -28,9 +33,6 @@ if(NOT TARGET STDEXEC::stdexec)
 
     add_library(STDEXEC::stdexec INTERFACE IMPORTED)
     target_include_directories(STDEXEC::stdexec SYSTEM INTERFACE ${Stdexec_INCLUDE_DIR})
-
-
-
 
     mark_as_advanced(Stdexec_INCLUDE_DIR Stdexec_ROOT)
 endif()
