@@ -111,4 +111,17 @@ else()
   add_library(Hwloc::hwloc INTERFACE IMPORTED)
   target_include_directories(Hwloc::hwloc INTERFACE ${Hwloc_INCLUDE_DIR})
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
+
+  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+    add_custom_target(
+      HwlocDLL ALL
+      COMMAND ${CMAKE_COMMAND} -E make_directory
+              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+      COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        "${HWLOC_ROOT}/bin/libhwloc-15.dll"
+        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+    )
+    add_hpx_pseudo_target(HwlocDLL)
+  endif()
 endif()
