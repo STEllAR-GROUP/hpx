@@ -101,7 +101,7 @@ namespace hpx {
         ~id_type() = default;
 
         naming::gid_type& get_gid();
-        naming::gid_type const& get_gid() const;
+        naming::gid_type& get_gid() const;
 
         // This function is used in AGAS unit tests and application code, do not
         // remove.
@@ -195,7 +195,7 @@ namespace hpx {
     namespace naming::detail {
 
         ///////////////////////////////////////////////////////////////////////
-        inline void set_dont_store_in_cache(id_type& id) noexcept
+        inline void set_dont_store_in_cache(id_type const& id) noexcept
         {
             id.set_msb(id.get_msb() | gid_type::dont_cache_mask);
         }
@@ -344,7 +344,7 @@ namespace hpx {
     {
         return *gid_;
     }
-    inline naming::gid_type const& id_type::get_gid() const
+    inline naming::gid_type& id_type::get_gid() const
     {
         return *gid_;
     }

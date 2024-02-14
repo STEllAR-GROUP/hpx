@@ -371,19 +371,34 @@ HPX_IS_BITWISE_SERIALIZABLE(hpx::naming::gid_type)
 
 namespace hpx::naming {
 
+    namespace detail {
+
+        ///////////////////////////////////////////////////////////////////////
+        constexpr bool store_in_cache(gid_type const& id) noexcept
+        {
+            return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
+        }
+
+        constexpr void set_dont_store_in_cache(gid_type& gid) noexcept
+        {
+            gid.set_msb(gid.get_msb() | gid_type::dont_cache_mask);
+        }
+    }    // namespace detail
+
     ///////////////////////////////////////////////////////////////////////////
     //  Handle conversion to/from locality_id
     constexpr gid_type get_gid_from_locality_id(
         std::uint32_t locality_id) noexcept
     {
-        return gid_type(
-            (std::uint64_t(locality_id) + 1) << gid_type::locality_id_shift,
-            std::uint64_t(0));
+        return gid_type((static_cast<std::uint64_t>(locality_id) + 1)
+                << gid_type::locality_id_shift,
+            static_cast<std::uint64_t>(0));
     }
 
     constexpr std::uint32_t get_locality_id_from_gid(std::uint64_t msb) noexcept
     {
-        return std::uint32_t(msb >> gid_type::locality_id_shift) - 1;
+        return static_cast<std::uint32_t>(msb >> gid_type::locality_id_shift) -
+            1;
     }
 
     constexpr std::uint32_t get_locality_id_from_gid(
@@ -440,7 +455,8 @@ namespace hpx::naming {
         std::uint64_t msb = gid.get_msb() & ~gid_type::component_type_mask;
 
         HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
-        msb |= ((std::uint64_t(type) << gid_type::component_type_shift) &
+        msb |= ((static_cast<std::uint64_t>(type)
+                    << gid_type::component_type_shift) &
             gid_type::component_type_mask);
         return gid_type(msb, gid.get_lsb());
     }
@@ -505,7 +521,7 @@ namespace hpx::naming {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline constexpr std::uint32_t get_component_type_from_gid(
+        constexpr std::uint32_t get_component_type_from_gid(
             std::uint64_t msb) noexcept
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
@@ -513,12 +529,13 @@ namespace hpx::naming {
                 gid_type::component_type_base_mask;
         }
 
-        inline constexpr std::uint64_t add_component_type_to_gid(
+        constexpr std::uint64_t add_component_type_to_gid(
             std::uint64_t msb, std::uint32_t type) noexcept
         {
             HPX_ASSERT(!(msb & gid_type::dynamically_assigned));
             return (msb & ~gid_type::component_type_mask) |
-                ((std::uint64_t(type) << gid_type::component_type_shift) &
+                ((static_cast<std::uint64_t>(type)
+                     << gid_type::component_type_shift) &
                     gid_type::component_type_mask);
         }
 
@@ -583,17 +600,6 @@ namespace hpx::naming {
         }
 
         ///////////////////////////////////////////////////////////////////////
-        constexpr bool store_in_cache(gid_type const& id) noexcept
-        {
-            return (id.get_msb() & gid_type::dont_cache_mask) ? false : true;
-        }
-
-        constexpr void set_dont_store_in_cache(gid_type& gid) noexcept
-        {
-            gid.set_msb(gid.get_msb() | gid_type::dont_cache_mask);
-        }
-
-        ///////////////////////////////////////////////////////////////////////
         constexpr bool is_migratable(gid_type const& id) noexcept
         {
             return (id.get_msb() & gid_type::is_migratable) ? true : false;
@@ -631,7 +637,8 @@ namespace hpx::naming {
             gid_type const& gid) noexcept
         {
             HPX_ASSERT(has_credits(gid));
-            return std::int16_t((gid.get_msb() >> gid_type::credit_shift) &
+            return static_cast<std::int16_t>(
+                (gid.get_msb() >> gid_type::credit_shift) &
                 gid_type::credit_base_mask);
         }
 
@@ -651,7 +658,8 @@ namespace hpx::naming {
             HPX_ASSERT(0 == (log2credits & ~gid_type::credit_base_mask));
 
             id.set_msb((id.get_msb() & ~gid_type::credit_mask) |
-                ((std::int64_t(log2credits) << gid_type::credit_shift) &
+                ((static_cast<std::int64_t>(log2credits)
+                     << gid_type::credit_shift) &
                     gid_type::credit_mask) |
                 gid_type::has_credits_mask);
         }

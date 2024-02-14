@@ -32,6 +32,7 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/util/get_entry_as.hpp>
@@ -42,6 +43,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <sstream>
 #include <string>
 #include <system_error>
@@ -840,7 +842,9 @@ namespace hpx::agas {
     {
         // NOTE: This should still be migration safe.
         return naming::detail::strip_internal_bits_and_component_type_from_gid(
-                   msb) == get_local_locality().get_msb();
+                   msb) ==
+            naming::detail::strip_internal_bits_and_component_type_from_gid(
+                get_local_locality().get_msb());
     }
 
     bool addressing_service::resolve_locally_known_addresses(
@@ -1017,7 +1021,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1129,7 +1133,7 @@ namespace hpx::agas {
         }
 
         // Resolve the gva to the real resolved address (which is just a gva
-        // with as fully resolved LVA and and offset of zero).
+        // with as fully resolved LVA and offset of zero).
         naming::gid_type const base_gid = hpx::get<0>(rep);
         gva const base_gva = hpx::get<1>(rep);
 
@@ -1218,8 +1222,9 @@ namespace hpx::agas {
                     if (get<0>(rep) == naming::invalid_gid ||
                         get<2>(rep) == naming::invalid_gid)
                         return false;
+
                     // Resolve the gva to the real resolved address (which is
-                    // just a gva with as fully resolved LVA and and offset of
+                    // just a gva with as fully resolved LVA and offset of
                     // zero).
                     naming::gid_type base_gid = get<0>(rep);
                     gva const base_gva = get<1>(rep);
@@ -1693,7 +1698,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1745,7 +1750,7 @@ namespace hpx::agas {
             gva_cache_key const key(gid, count);
 
             {
-                std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+                std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
                 if (!gva_cache_->update_if(key, g, check_for_collisions))
                 {
                     if (LAGAS_ENABLED(warning))
@@ -1793,9 +1798,12 @@ namespace hpx::agas {
             return false;
         }
 
+        // don't look at cache if gid is marked as non-cache-able
+        HPX_ASSERT(naming::detail::store_in_cache(gid));
+
         gva_cache_key const k(gid);
 
-        std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         if (gva_cache_key idbase_key; gva_cache_->get_entry(k, idbase_key, gva))
         {
             std::uint64_t const id_msb =
@@ -1833,7 +1841,7 @@ namespace hpx::agas {
             LAGAS_(warning).format(
                 "addressing_service::clear_cache, clearing cache");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->clear();
 
@@ -1858,17 +1866,15 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
             return;
         }
 
-        naming::gid_type gid = naming::detail::get_stripped_gid(id);
-
         // don't look at the cache if the id is locally managed
-        if (naming::get_locality_id_from_gid(gid) ==
+        if (naming::get_locality_id_from_gid(id) ==
             naming::get_locality_id_from_gid(locality_))
         {
             if (&ec != &throws)
@@ -1876,11 +1882,12 @@ namespace hpx::agas {
             return;
         }
 
+        naming::gid_type gid = naming::detail::get_stripped_gid(id);
         try
         {
             LAGAS_(warning).format("addressing_service::remove_cache_entry");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->erase([&gid](std::pair<gva_cache_key, gva> const& p) {
                 return gid == p.first.get_gid();
@@ -1911,31 +1918,31 @@ namespace hpx::agas {
     // Helper functions to access the current cache statistics
     std::uint64_t addressing_service::get_cache_entries(bool /* reset */) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->size();
     }
 
     std::uint64_t addressing_service::get_cache_hits(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().hits(reset);
     }
 
     std::uint64_t addressing_service::get_cache_misses(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().misses(reset);
     }
 
     std::uint64_t addressing_service::get_cache_evictions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().evictions(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().insertions(reset);
     }
 
@@ -1943,55 +1950,55 @@ namespace hpx::agas {
     std::uint64_t addressing_service::get_cache_get_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_get_entry_time(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_time(reset);
     }
 

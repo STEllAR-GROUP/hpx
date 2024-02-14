@@ -99,7 +99,7 @@ namespace hpx::parcelset {
         }
 
         template <typename PutParcel>
-        void put_parcel_impl(PutParcel&& pp, hpx::id_type dest,
+        void put_parcel_impl(PutParcel&& pp, hpx::id_type const& dest,
             naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action)
         {
@@ -128,10 +128,9 @@ namespace hpx::parcelset {
             }
             else
             {
-                auto result =
-                    naming::detail::split_gid_if_needed(dest.get_gid());
-
-                if (result.has_value())
+                if (auto result =
+                        naming::detail::split_gid_if_needed(dest.get_gid());
+                    result.has_value())
                 {
                     pp(detail::create_parcel::call_with_action(
                         HPX_MOVE(result).get_value(), HPX_MOVE(addr),
@@ -151,7 +150,7 @@ namespace hpx::parcelset {
                     {
                         split_gid.then(hpx::launch::sync,
                             put_parcel_cont<PutParcel>{
-                                HPX_FORWARD(PutParcel, pp), HPX_MOVE(dest),
+                                HPX_FORWARD(PutParcel, pp), dest,
                                 HPX_MOVE(addr), HPX_MOVE(action)});
                     }
                 }
