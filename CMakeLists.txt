@@ -1027,6 +1027,15 @@ hpx_option(
   ADVANCED
 )
 
+hpx_option(
+  HPX_WITH_NANOBENCH_BENCHMARKS
+  BOOL
+  "Use Nanobench for performance tests. Nanobench will be fetched using FetchContent (defualt: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
+
 # cmake-format: off
 # LibCDS option
 # NOTE: The libcds option is disabled for the 1.5.0 release as it is not ready
@@ -2219,6 +2228,9 @@ endif()
 # should be found separately in the appropriate subdirectory.
 
 include(HPX_SetupThreads)
+if (HPX_WITH_NANOBENCH_BENCHMARKS)
+  include(HPX_SetupNanobench)
+endif()
 
 # Setup our required Boost libraries.
 include(HPX_SetupBoost)
@@ -2548,6 +2560,7 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <boost/fusion/include/vector.hpp>
       <boost/optional.hpp>
       <boost/spirit/home/x3.hpp>
+      <nanobench.h>
   )
 
   if(HPX_WITH_CXX17_FILESYSTEM)
