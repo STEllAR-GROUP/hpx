@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -21,6 +21,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/threading_base/annotated_function.hpp>
+#include <hpx/threading_base/scoped_annotation.hpp>
 #include <hpx/threading_base/thread_description.hpp>
 
 #include <exception>

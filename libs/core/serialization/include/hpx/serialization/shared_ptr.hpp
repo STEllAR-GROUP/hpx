@@ -13,10 +13,6 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_shared_ptr.hpp>    // for backwards compatibility
-#endif
-
 #include <memory>
 
 namespace hpx::serialization {

@@ -11,9 +11,7 @@
 
 #if defined(HPX_HAVE_NETWORKING)
 #include <hpx/assert.hpp>
-#include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/execution.hpp>
 #include <hpx/modules/type_support.hpp>
 
 #include <hpx/actions/actions_fwd.hpp>

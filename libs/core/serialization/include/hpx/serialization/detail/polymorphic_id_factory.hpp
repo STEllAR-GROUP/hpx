@@ -17,7 +17,6 @@
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/polymorphic_traits.hpp>
 #include <hpx/type_support/static.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -94,8 +93,8 @@ namespace hpx::serialization::detail {
 
     public:
         template <class T>
-        [[nodiscard]] static T* create(
-            std::uint32_t id, std::string const* name = nullptr)
+        [[nodiscard]] static T* create(std::uint32_t id,
+            [[maybe_unused]] std::string const* name = nullptr)
         {
             cache_t const& vec = id_registry::instance().cache;
 
@@ -109,8 +108,6 @@ namespace hpx::serialization::detail {
                     msg += ", for typename " + *name + "\n";
                     msg += collect_registered_typenames();
                 }
-#else
-                HPX_UNUSED(name);
 #endif
                 HPX_THROW_EXCEPTION(hpx::error::serialization_error,
                     "polymorphic_id_factory::create", msg);

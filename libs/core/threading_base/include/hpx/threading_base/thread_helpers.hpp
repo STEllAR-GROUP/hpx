@@ -18,7 +18,7 @@
 #include <hpx/threading_base/thread_pool_base.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #if !defined(HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION)
-#include <hpx/modules/debugging.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #endif
 
 #include <atomic>

@@ -10,7 +10,7 @@
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-#include <hpx/modules/debugging.hpp>
+#include <hpx/debugging/backtrace.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
