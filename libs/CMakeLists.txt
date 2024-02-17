@@ -113,11 +113,6 @@ if(TARGET APEX::apex)
   target_link_libraries(hpx_full INTERFACE APEX::apex)
 endif()
 
-# Do I need this here?
-# if(TARGET STDEXEC::stdexec)
-#   target_link_libraries(hpx_full INTERFACE STDEXEC::stdexec)
-# endif()
-
 if(TARGET Gperftools::gperftools)
   target_link_libraries(hpx_full PRIVATE Gperftools::gperftools)
 endif()
