@@ -72,18 +72,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
         ankerl::nanobench::Bench().minEpochIterations(test_count).run("min_element", [&]{
             hpx::min_element(hpx::execution::par, v.begin(), v.end());
-            ankerl::nanobench::doNotOptimizeAway(v);
         });
 
         ankerl::nanobench::Bench().minEpochIterations(test_count).run("max_element", [&]{
             hpx::max_element(hpx::execution::par, v.begin(), v.end());
-            ankerl::nanobench::doNotOptimizeAway(v);
         });
 
         ankerl::nanobench::Bench().minEpochIterations(test_count).run("minmax_element", [&]{
             hpx::minmax_element(hpx::execution::par, v.begin(), v.end());
-            ankerl::nanobench::doNotOptimizeAway(v);
-        });
+        })
+        .render(ankerl::nanobench::templates::pyperf(), std::cout);
 
         return hpx::finalize();
     }
@@ -107,7 +105,7 @@ int main(int argc, char** argv)
     cmdline.add_options()("vector_size",
         hpx::program_options::value<std::size_t>()->default_value(1000),
         "size of vector (default: 1000)")("test_count",
-        hpx::program_options::value<int>()->default_value(1000),
+        hpx::program_options::value<int>()->default_value(100),
         "number of tests to be averaged (default: 100)")(
         "csv_output", "print results in csv format")("seed,s",
         hpx::program_options::value<unsigned int>(),
