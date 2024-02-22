@@ -15,5 +15,5 @@ set(CTEST_PROJECT_NAME "HPX")
 set(CTEST_NIGHTLY_START_TIME "00:00:00 GMT")
 
 set(CTEST_SUBMIT_URL
-    "https://cdash.cscs.ch/submit.php?project=${CTEST_PROJECT_NAME}"
+    "https://https://cdash.rostam.cct.lsu.edu//submit.php?project=${CTEST_PROJECT_NAME}"
 )
