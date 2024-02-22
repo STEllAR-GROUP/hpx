@@ -17,16 +17,9 @@ to write real |hpx| applications and the :ref:`manual` contains detailed
 information about everything from building |hpx| to debugging it. There are
 links to blog posts and videos about |hpx| in :ref:`additional_material`.
 
-If you can't find what you're looking for in the documentation, please:
-
-* open an issue on `GitHub <hpx_github_issues_>`_;
-* contact us on `IRC <stellar_irc_>`_, the HPX channel on the `C++ Slack
-  <cpplang_slack_>`_, or on our `mailing list <stellar_list_>`_; or
-* read or ask questions tagged with |hpx| on `StackOverflow
-  <hpx_stackoverflow_>`_.
-
 You can find a comprehensive list of contact options on `Support for deploying
-and using HPX <hpx_github_support_>`_.
+and using HPX <hpx_github_support_>`_. Do not hesitate to contact us if you
+can't find what you are looking for in the documentation!
 
 See :ref:`citing_hpx` for details on how to cite |hpx| in publications. See
 :ref:`hpx_users` for a list of institutions and projects using |hpx|.
