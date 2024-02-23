@@ -92,7 +92,7 @@ Then, in your project directory run the following:
 .. code-block:: shell-session
 
    $ mkdir build && cd build
-   $ cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
+   $ cmake -DCMAKE_PREFIX_PATH=</path/to/hpx/installation> ..
    $ make all
    $ ./my_hpx_program
 
@@ -130,6 +130,10 @@ the two includes and ``hpx::cout``.
      the |hpx| runtime.
 
 .. caution::
+
+   Ensure that |hpx| is installed with ``HPX_WITH_DISTRIBUTED_RUNTIME=ON`` to
+   prevent encountering an error indicating that the ``HPX::iostreams_component``
+   target is not found.
 
    When including ``hpx_main.hpp`` the user-defined ``main`` gets renamed and
    the real ``main`` function is defined by |hpx|. This means that the
