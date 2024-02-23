@@ -37,3 +37,6 @@ configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
 # testing the topology code under conditions close to those on FreeBSD.
 configure_extra_options+=" -DHPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING=ON"
+
+configure_extra_options+=" -DHPX_WITH_THREAD_BACKTRACE_ON_SUSPENSION=ON"
+configure_extra_options+=" -DHPX_WITH_THREAD_FULLBACKTRACE_ON_SUSPENSION=ON"

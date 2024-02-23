@@ -10,12 +10,15 @@
 
 #ifdef HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION
 
-#include <hpx/modules/debugging.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <memory>
+#ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
 #include <string>
+#endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::threads::detail {
 
@@ -39,5 +42,7 @@ namespace hpx::threads::detail {
         error_code& ec_;
     };
 }    // namespace hpx::threads::detail
+
+#include <hpx/config/warnings_suffix.hpp>
 
 #endif    // HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION

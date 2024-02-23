@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2022 Hartmut Kaiser
+//  Copyright (c) 2020-2023 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,7 +36,7 @@ namespace hpx::threads::detail {
 
     reset_backtrace::~reset_backtrace()
     {
-        threads::set_thread_backtrace(id_, 0, ec_);
+        threads::set_thread_backtrace(id_, nullptr, ec_);
     }
 }    // namespace hpx::threads::detail
 

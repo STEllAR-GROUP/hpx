@@ -422,7 +422,7 @@ namespace hpx::threads {
                 spinlock_pool::spinlock_for(this));
 
             std::string bt;
-            if (0 != backtrace_)
+            if (nullptr != backtrace_)
             {
 #ifdef HPX_HAVE_THREAD_FULLBACKTRACE_ON_SUSPENSION
                 bt = *backtrace_;
