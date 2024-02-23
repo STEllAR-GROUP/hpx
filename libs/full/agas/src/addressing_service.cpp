@@ -1803,7 +1803,7 @@ namespace hpx::agas {
 
         gva_cache_key const k(gid);
 
-        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
+        std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         if (gva_cache_key idbase_key; gva_cache_->get_entry(k, idbase_key, gva))
         {
             std::uint64_t const id_msb =
