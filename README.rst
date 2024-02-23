@@ -91,7 +91,7 @@ If you would like to work with the cutting edge version of this repository
 <https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
-<https://cdash.cscs.ch//index.php?project=HPX>`_. While we try to keep the
+<https://cdash.rostam.cct.lsu.edu/index.php?project=HPX>`_. While we try to keep the
 master branch stable and usable, sometimes new bugs trick their way into the
 code base. The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_
 continuous integration service additionally tracks the current build status for
