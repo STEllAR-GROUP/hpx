@@ -6,9 +6,9 @@
 
 set(benchmarks minmax_element_performance)
 
-if (HPX_WITH_NANOBENCH_BENCHMARKS)
-  set(benchmarks ${benchmarks} minmax_nanobench)
-endif()
+# if (HPX_WITH_NANOBENCH_BENCHMARKS)
+#   set(benchmarks ${benchmarks} minmax_nanobench)
+# endif()
 
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)
@@ -16,9 +16,9 @@ foreach(benchmark ${benchmarks})
   source_group("Source Files" FILES ${sources})
 
   set(deps iostreams_component partitioned_vector_component)
-  if (HPX_WITH_NANOBENCH_BENCHMARKS)
-    set(deps ${deps} nanobench)
-  endif()
+  # if (HPX_WITH_NANOBENCH_BENCHMARKS)
+  #   set(deps ${deps} nanobench)
+  # endif()
 
   # add example executable
   add_hpx_executable(

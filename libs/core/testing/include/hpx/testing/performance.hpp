@@ -13,10 +13,18 @@
 #include <string>
 
 namespace hpx::util {
-
+#if defined(HPX_HAVE_NANOBENCH)
+    HPX_CORE_EXPORT void perftests_report(std::string const& name,
+        std::string const& exec, std::size_t const steps,
+        hpx::function<void()>&& test);
+    HPX_CORE_EXPORT void perftests_print_times(std::ostream& strm, char const* templ);
+    HPX_CORE_EXPORT void perftests_print_times(std::ostream& strm);
+    HPX_CORE_EXPORT void perftests_print_times();
+#else
     HPX_CORE_EXPORT void perftests_report(std::string const& name,
         std::string const& exec, std::size_t const steps,
         hpx::function<void()>&& test);
 
     HPX_CORE_EXPORT void perftests_print_times();
+#endif
 }    // namespace hpx::util
