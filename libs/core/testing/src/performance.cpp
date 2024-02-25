@@ -15,10 +15,46 @@
 #include <type_traits>
 #include <vector>
 
+#if defined(HPX_HAVE_NANOBENCH)
+#define ANKERL_NANOBENCH_IMPLEMENT
+#include <nanobench.h>
+#endif
+
 namespace hpx::util {
 
     namespace detail {
 
+#if defined(HPX_HAVE_NANOBENCH)
+        constexpr int nanobench_epochs = 24;
+        constexpr int nanobench_warmup = 40;
+
+        char const* nanobench_hpx_template() noexcept
+        {
+            return R"DELIM({
+    "outputs": [
+{{#result}}        {
+            "name": "{{name}}",
+            "executor": "{{context(executor)}}",
+            "series": [
+                {{#measurement}}{{elapsed}}{{^-last}},
+                {{/-last}}{{/measurement}}
+            ]
+        }{{^-last}},{{/-last}}
+{{/result}}    ]
+})DELIM";
+        }
+
+        ankerl::nanobench::Bench& bench()
+        {
+            static ankerl::nanobench::Bench b;
+            static ankerl::nanobench::Config cfg;
+
+            cfg.mWarmup = nanobench_warmup;
+            cfg.mNumEpochs = nanobench_epochs;
+
+            return b.config(cfg);
+        }
+#else
         // Json output for performance reports
         class json_perf_times
         {
@@ -90,8 +126,46 @@ namespace hpx::util {
         {
             m_map[key_t(name, executor)].push_back(time);
         }
+#endif
+
     }    // namespace detail
 
+#if defined(HPX_HAVE_NANOBENCH)
+    void perftests_report(std::string const& name, std::string const& exec,
+        std::size_t const steps, hpx::function<void()>&& test)
+    {
+        if (steps == 0)
+            return;
+
+        std::size_t const steps_per_epoch = steps / detail::nanobench_epochs + 1;
+
+        detail::bench()
+            .name(name)
+            .context("executor", exec)
+            .minEpochIterations(steps_per_epoch)
+            .run(test);
+    }
+
+    // Print all collected results to the provided stream,
+    // formatted the json according to the provided
+    // "mustache-style" template
+    void perftests_print_times(char const* templ, std::ostream& strm)
+    {
+        detail::bench().render(templ, strm);
+    }
+
+    // Overload that uses a default nanobench template
+    void perftests_print_times(std::ostream& strm)
+    {
+        perftests_print_times(detail::nanobench_hpx_template(), strm);
+    }
+
+    // Overload that uses a default nanobench template and prints to std::cout
+    void perftests_print_times()
+    {
+        perftests_print_times(detail::nanobench_hpx_template(), std::cout);
+    }
+#else
     void perftests_report(std::string const& name, std::string const& exec,
         std::size_t const steps, hpx::function<void()>&& test)
     {
@@ -119,4 +193,5 @@ namespace hpx::util {
     {
         std::cout << detail::times();
     }
+#endif
 }    // namespace hpx::util

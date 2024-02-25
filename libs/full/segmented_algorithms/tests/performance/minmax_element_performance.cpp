@@ -14,8 +14,8 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/timing.hpp>
-
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -124,17 +124,24 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::generate(hpx::execution::par, v.begin(), v.end(), random_fill());
 
         // run benchmark
-        double time_minmax = run_minmax_element_benchmark(test_count, v);
-        double time_min = run_min_element_benchmark(test_count, v);
-        double time_max = run_max_element_benchmark(test_count, v);
+        hpx::util::perftests_report("hpx::minmax", "par", test_count, [&]{
+            hpx::minmax_element(hpx::execution::par, v.begin(), v.end());});
+
+        hpx::util::perftests_report("hpx::min", "par", test_count, [&]{hpx::min_element(
+            hpx::execution::par, v.begin(), v.end());});
+
+        hpx::util::perftests_report("hpx::max", "par", test_count, [&]{hpx::max_element(
+            hpx::execution::par, v.begin(), v.end());});
+            
+        hpx::util::perftests_print_times();
 
         // if (csvoutput)
-        {
-            std::cout << "minmax" << test_count << "," << time_minmax
-                      << std::endl;
-            std::cout << "min" << test_count << "," << time_min << std::endl;
-            std::cout << "max" << test_count << "," << time_max << std::endl;
-        }
+        // {
+        //     std::cout << "minmax" << test_count << "," << time_minmax
+        //               << std::endl;
+        //     std::cout << "min" << test_count << "," << time_min << std::endl;
+        //     std::cout << "max" << test_count << "," << time_max << std::endl;
+        // }
 
         return hpx::finalize();
     }
