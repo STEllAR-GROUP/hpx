@@ -52,9 +52,12 @@ template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
 
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workrequesting_scheduler<>>;
+
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workrequesting_scheduler<std::mutex,
         hpx::threads::policies::lockfree_lifo>>;
+#endif
 
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workrequesting_scheduler<std::mutex,

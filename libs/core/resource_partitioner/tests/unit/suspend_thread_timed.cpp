@@ -148,7 +148,9 @@ int main(int argc, char* argv[])
             hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif
             hpx::resource::scheduling_policy::local_workrequesting_fifo,
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             hpx::resource::scheduling_policy::local_workrequesting_lifo,
+#endif
             hpx::resource::scheduling_policy::local_workrequesting_mc,
         };
 

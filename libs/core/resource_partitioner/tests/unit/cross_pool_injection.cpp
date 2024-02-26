@@ -289,7 +289,9 @@ int main(int argc, char* argv[])
         // The shared_priority scheduler sometimes hangs in this test.
         //hpx::resource::scheduling_policy::shared_priority,
         hpx::resource::scheduling_policy::local_workrequesting_fifo,
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         hpx::resource::scheduling_policy::local_workrequesting_lifo,
+#endif        
         hpx::resource::scheduling_policy::local_workrequesting_mc,
     };
 
