@@ -330,7 +330,7 @@ namespace hpx::lockfree::detail {
         tag_t tag;
     };
 
-    using tagged_index = util::cache_aligned_data_derived<tagged_index_data>;
+    using tagged_index = tagged_index_data;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, std::size_t Size>
@@ -619,7 +619,7 @@ namespace hpx::lockfree::detail {
             pool_.store(new_pool);
         }
 
-        std::atomic<tagged_index> pool_;
+        util::cache_aligned_data_derived<std::atomic<tagged_index>> pool_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
