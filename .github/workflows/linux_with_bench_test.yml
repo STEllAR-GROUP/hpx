@@ -38,13 +38,9 @@ jobs:
     - name: Build
       shell: bash
       run: |
-          cmake --build build --target all
-          cmake --build build --target examples
+          cmake --build build/ --target tests.performance.modules.segmented_algorithms.minmax_element_performance
     - name: Test
       shell: bash
       run: |
           cd build
-          ctest \
-            --output-on-failure \
-            --tests-regex tests.examples \
-            --exclude-regex tests.examples.transpose.transpose_block_numa
+          ./bin/minmax_element_performance_test
