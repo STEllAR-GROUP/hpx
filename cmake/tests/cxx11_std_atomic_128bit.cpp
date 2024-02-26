@@ -13,6 +13,8 @@ template <typename T>
 void test_atomic()
 {
     std::atomic<T> a;
+    if (!a.is_lock_free())
+        throw -1;
     a.store(T{});
     T i = a.load();
     (void)i;

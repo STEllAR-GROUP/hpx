@@ -330,7 +330,7 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
     HPX_WITH_CXX11_ATOMIC_128BIT
     SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
     LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
-    FILE ${ARGN}
+    FILE EXECUTE
   )
   if(NOT MSVC)
     # Sometimes linking against libatomic is required, if the platform doesn't
@@ -345,7 +345,7 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
         HPX_WITH_CXX11_ATOMIC_128BIT
         SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
-        FILE ${ARGN}
+        FILE EXECUTE
       )
       if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
         # Adding -latomic did not help, so we don't attempt to link to it later
