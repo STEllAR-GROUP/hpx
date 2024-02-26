@@ -31,7 +31,7 @@ namespace hpx::util {
         char const* nanobench_hpx_template() noexcept
         {
             return R"DELIM({
-    "outputs": [
+    "outputs (with nanobench)": [
 {{#result}}        {
             "name": "{{name}}",
             "executor": "{{context(executor)}}",
