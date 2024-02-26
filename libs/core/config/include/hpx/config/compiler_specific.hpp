@@ -209,4 +209,8 @@
 #define HPX_LOCKFREE_DCAS_ALIGNMENT
 #endif
 
+#if !defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
+#define HPX_LOCKFREE_PTR_COMPRESSION 1
+#endif
+
 #endif    // defined(DOXYGEN)
