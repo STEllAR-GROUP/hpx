@@ -60,6 +60,10 @@ cat jenkins-hpx-${configuration_name_with_build_type}.out
 echo "= stderr =================================================="
 cat jenkins-hpx-${configuration_name_with_build_type}.err
 
+# Echo submission status
+echo "= submission =============================================="
+cat jenkins-hpx-${configuration_name_with_build_type}-cdash-submission.txt
+
 # Get build status
 status_file="jenkins-hpx-${configuration_name_with_build_type}-ctest-status.txt"
 if [[ -f "${status_file}" && "$(cat ${status_file})" -eq "0" ]]; then
