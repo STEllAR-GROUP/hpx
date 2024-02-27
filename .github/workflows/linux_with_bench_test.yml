@@ -6,11 +6,7 @@
 
 name: Linux CI (Debug) with Benchmark Test
 
-on:
-  pull_request:
-    branches: [ master ]
-  push:
-    branches: [ nano_test ]
+on: [pull_request]
 
 
 jobs:
