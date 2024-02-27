@@ -4,9 +4,17 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(STDEXEC_ROOT AND NOT Stdexec_ROOT)
+  set(Stdexec_ROOT ${STDEXEC_ROOT})
+  # remove STDEXEC_ROOT from the cache
+  unset(STDEXEC_ROOT CACHE)
+endif()
+
 if(Stdexec_ROOT OR HPX_WITH_FETCH_STDEXEC)
   # explicitly enable HPX_WITH_STDEXEC
   set(HPX_WITH_STDEXEC ON)
+
+  message("HERE")
 
   # prefer Stdexec_ROOT over HPX_WITH_FETCH_STDEXEC by default
   if(Stdexec_ROOT AND HPX_WITH_FETCH_STDEXEC)
