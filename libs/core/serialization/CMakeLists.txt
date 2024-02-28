@@ -201,13 +201,16 @@ set(serialization_compat_headers
 # cmake-format: on
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
-  set(serialization_headers
-      ${serialization_headers}
+  set(boost_serialization_headers
       hpx/serialization/boost_array.hpp
       hpx/serialization/boost_intrusive_ptr.hpp
       hpx/serialization/boost_multi_array.hpp
       hpx/serialization/boost_shared_ptr.hpp
       hpx/serialization/boost_variant.hpp
+  )
+
+  set(serialization_headers ${serialization_headers}
+                            ${boost_serialization_headers}
   )
 
   # cmake-format: off
@@ -246,5 +249,6 @@ add_hpx_module(
     hpx_type_support
   DEPENDENCIES ${serialization_optional_dependencies}
   ADD_TO_GLOBAL_HEADER hpx/serialization/detail/allow_zero_copy_receive.hpp
+  EXCLUDE_FROM_GLOBAL_HEADER ${boost_serialization_headers}
   CMAKE_SUBDIRS examples tests
 )

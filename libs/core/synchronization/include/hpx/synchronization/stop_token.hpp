@@ -12,10 +12,9 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/modules/thread_support.hpp>
-#include <hpx/synchronization/mutex.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 
 #include <atomic>
 #include <cstddef>

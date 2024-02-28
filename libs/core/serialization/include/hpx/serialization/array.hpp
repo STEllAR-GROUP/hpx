@@ -18,10 +18,6 @@
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/serialization/traits/is_not_bitwise_serializable.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_array.hpp>    // for backwards compatibility
-#endif
-
 #include <array>
 #include <cstddef>
 #include <type_traits>

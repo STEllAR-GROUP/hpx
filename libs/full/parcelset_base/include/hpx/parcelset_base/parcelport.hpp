@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
 

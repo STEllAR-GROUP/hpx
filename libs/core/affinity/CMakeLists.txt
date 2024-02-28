@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(affinity_headers
     hpx/affinity/affinity_data.hpp hpx/affinity/detail/partlit.hpp
+    hpx/affinity/detail/parse_mappings.hpp
     hpx/affinity/parse_affinity_options.hpp
 )
 

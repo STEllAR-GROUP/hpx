@@ -11,6 +11,7 @@
 #include <hpx/command_line_handling_local/parse_command_line_local.hpp>
 #include <hpx/coroutines/coroutine.hpp>
 #include <hpx/coroutines/signal_handler_debugging.hpp>
+#include <hpx/debugging/attach_debugger.hpp>
 #include <hpx/debugging/backtrace.hpp>
 #include <hpx/execution_base/this_thread.hpp>
 #include <hpx/functional/bind.hpp>
