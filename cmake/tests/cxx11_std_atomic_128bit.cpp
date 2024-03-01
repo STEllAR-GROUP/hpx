@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <cstdlib>
 
 template <typename T>
 void test_atomic()
