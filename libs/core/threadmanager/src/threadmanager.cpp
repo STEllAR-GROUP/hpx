@@ -573,10 +573,12 @@ namespace hpx::threads {
     }
 
     void threadmanager::create_scheduler_local_workrequesting_lifo(
-        thread_pool_init_parameters const& thread_pool_init,
-        policies::thread_queue_init_parameters const& thread_queue_init,
-        std::size_t numa_sensitive)
+        [[maybe_unused]] thread_pool_init_parameters const& thread_pool_init,
+        [[maybe_unused]] policies::thread_queue_init_parameters const&
+            thread_queue_init,
+        [[maybe_unused]] std::size_t numa_sensitive)
     {
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         // set parameters for scheduler and pool instantiation and
         // perform compatibility checks
         std::size_t const num_high_priority_queues =
@@ -610,6 +612,12 @@ namespace hpx::threads {
             hpx::threads::detail::scheduled_thread_pool<local_sched_type>>(
             HPX_MOVE(sched), thread_pool_init);
         pools_.push_back(HPX_MOVE(pool));
+#else
+        throw hpx::detail::command_line_error(
+            "Command line option --hpx:queuing=local-workrequesting-lifo "
+            "is not configured in this build. Please make sure 128bit "
+            "atomics are available.");
+#endif
     }
 
     void threadmanager::create_pools()

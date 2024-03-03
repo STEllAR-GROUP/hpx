@@ -77,7 +77,9 @@ int main(int argc, char** argv)
 #endif
         "shared-priority",
         "local-workrequesting-fifo",
+#if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         "local-workrequesting-lifo",
+#endif
         "local-workrequesting-mc",
     };
     // clang-format on

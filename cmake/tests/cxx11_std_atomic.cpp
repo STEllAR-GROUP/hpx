@@ -14,8 +14,10 @@ void test_atomic()
 {
     std::atomic<T> a;
     a.store(T{});
-    T i = a.load();
-    (void) i;
+    [[maybe_unused]] T i = a.load();
+
+    // force using libatomic, if needed
+    [[maybe_unused]] bool b = a.is_lock_free();
 }
 
 struct index_data
