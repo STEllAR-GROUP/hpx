@@ -26,4 +26,4 @@ It is also recommended that you check out the latest stable tag:
 
 .. parsed-literal::
 
-    $ git checkout |version|
+    $ git checkout v\ |version|
