@@ -1272,7 +1272,7 @@ if(HPX_WITH_NETWORKING)
   if(HPX_WITH_PARCELPORT_ACTION_COUNTERS)
     hpx_add_config_define(HPX_HAVE_PARCELPORT_ACTION_COUNTERS)
   endif()
-  if (HPX_WITH_NANOBENCH)
+  if(HPX_WITH_NANOBENCH)
     hpx_add_config_define(HPX_HAVE_NANOBENCH)
     include(HPX_SetupNanobench)
   endif()
@@ -2563,7 +2563,7 @@ if(HPX_WITH_PRECOMPILED_HEADERS)
       <boost/spirit/home/x3.hpp>
   )
 
-  if (HPX_WITH_NANOBENCH) 
+  if(HPX_WITH_NANOBENCH)
     set(system_precompiled_headers ${system_precompiled_headers} <nanobench.h>)
   endif()
 
