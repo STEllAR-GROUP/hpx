@@ -267,7 +267,9 @@ namespace hpx::traits {
                 "reg_mem = 1\n"
                 "ndevices = 1\n"
                 "ncomps = 1\n"
-                "enable_in_buffer_assembly = 1\n";
+                "enable_in_buffer_assembly = 1\n"
+                "send_nb_max_retry = 32\n"
+                "mbuffer_alloc_max_retry = 32\n";
         }
     };
 }    // namespace hpx::traits

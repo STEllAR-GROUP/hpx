@@ -12,6 +12,7 @@
 
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/helper.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/receiver_base.hpp>
@@ -46,9 +47,10 @@ namespace hpx::parcelset::policies::lci {
         // build header
         if (config_t::enable_in_buffer_assembly)
         {
+            int retry_count = 0;
             while (
                 LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
-                continue;
+                yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
             HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(
                 buffer_, (char*) header_buffer.address, header_buffer.length);
@@ -99,9 +101,10 @@ namespace hpx::parcelset::policies::lci {
         header_.set_tag(tag);
         if (!config_t::enable_in_buffer_assembly)
         {
+            int retry_count = 0;
             while (
                 LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
-                continue;
+                yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
             memcpy(header_buffer.address, header_buffer_vector.data(),
                 header_buffer_vector.size());
             header_buffer.length = header_buffer_vector.size();

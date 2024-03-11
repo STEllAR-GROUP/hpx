@@ -53,6 +53,10 @@ namespace hpx::parcelset::policies::lci {
         static int ncomps;
         // Whether to enable in-buffer assembly for the header messages.
         static bool enable_in_buffer_assembly;
+        // The max retry count of send_nb before yield.
+        static int send_nb_max_retry;
+        // The max retry count of mbuffer_alloc before yield.
+        static int mbuffer_alloc_max_retry;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };

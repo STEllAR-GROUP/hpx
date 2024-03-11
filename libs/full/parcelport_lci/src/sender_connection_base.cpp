@@ -15,6 +15,7 @@
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/helper.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/receiver_base.hpp>
@@ -59,6 +60,7 @@ namespace hpx::parcelset::policies::lci {
         {
             // If we are sending early parcels, we should not expect the thread
             // make progress on the backlog queue.
+            int retry_count = 0;
             do
             {
                 ret = send_nb();
@@ -70,6 +72,7 @@ namespace hpx::parcelset::policies::lci {
                             config_t::progress_type_t::pthread_worker)
                         while (pp_->do_progress_local())
                             continue;
+                    yield_k(retry_count, config_t::send_nb_max_retry);
                 }
             } while (ret.status == return_status_t::retry);
         }

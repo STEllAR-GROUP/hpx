@@ -29,6 +29,8 @@ namespace hpx::parcelset::policies::lci {
     int config_t::ndevices;
     int config_t::ncomps;
     bool config_t::enable_in_buffer_assembly;
+    int config_t::send_nb_max_retry;
+    int config_t::mbuffer_alloc_max_retry;
 
     void config_t::init_config(util::runtime_configuration const& rtcfg)
     {
@@ -99,15 +101,22 @@ namespace hpx::parcelset::policies::lci {
             throw std::runtime_error(
                 "Unknown progress type " + progress_type_str);
         }
-        progress_thread_num =
-            util::get_entry_as(rtcfg, "hpx.parcel.lci.prg_thread_num", -1);
-        prepost_recv_num =
-            util::get_entry_as(rtcfg, "hpx.parcel.lci.prepost_recv_num", 1);
-        reg_mem = util::get_entry_as(rtcfg, "hpx.parcel.lci.reg_mem", 1);
-        ndevices = util::get_entry_as(rtcfg, "hpx.parcel.lci.ndevices", 1);
-        ncomps = util::get_entry_as(rtcfg, "hpx.parcel.lci.ncomps", 1);
-        enable_in_buffer_assembly = util::get_entry_as(
-            rtcfg, "hpx.parcel.lci.enable_in_buffer_assembly", 1);
+        progress_thread_num = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.prg_thread_num", -1 /* Does not matter*/);
+        prepost_recv_num = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.prepost_recv_num", 1 /* Does not matter*/);
+        reg_mem = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.reg_mem", 1 /* Does not matter*/);
+        ndevices = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.ndevices", 1 /* Does not matter*/);
+        ncomps = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.ncomps", 1 /* Does not matter*/);
+        enable_in_buffer_assembly = util::get_entry_as(rtcfg,
+            "hpx.parcel.lci.enable_in_buffer_assembly", 1 /* Does not matter*/);
+        send_nb_max_retry = util::get_entry_as(
+            rtcfg, "hpx.parcel.lci.send_nb_max_retry", 0 /* Does not matter*/);
+        mbuffer_alloc_max_retry = util::get_entry_as(rtcfg,
+            "hpx.parcel.lci.mbuffer_alloc_max_retry", 0 /* Does not matter*/);
 
         if (!enable_send_immediate && enable_lci_backlog_queue)
         {

@@ -13,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(parcelport_lci_headers
     hpx/parcelport_lci/config.hpp
     hpx/parcelport_lci/header.hpp
+    hpx/parcelport_lci/helper.hpp
     hpx/parcelport_lci/locality.hpp
     hpx/parcelport_lci/receiver_base.hpp
     hpx/parcelport_lci/sender_base.hpp
