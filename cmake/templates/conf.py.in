@@ -325,7 +325,7 @@ rst_prolog += '''
 .. |hpx_circleci| replace:: CircleCI HPX dashboard
 .. _hpx_circleci: https://circleci.com/gh/STEllAR-GROUP/hpx
 .. |hpx_cdash| replace:: CDash HPX dashboard
-.. _hpx_cdash: https://cdash.cscs.ch/index.php?project=HPX
+.. _hpx_cdash: https://cdash.rostam.cct.lsu.edu/index.php?project=HPX
 .. |support| replace:: Support Website
 .. _support: https://stellar.cct.lsu.edu/support/
 .. |hpx_zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.598202.svg
