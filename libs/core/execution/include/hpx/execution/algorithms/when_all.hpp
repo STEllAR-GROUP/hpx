@@ -8,6 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_fowrard.hpp>
+#else
 #include <hpx/async_base/dataflow.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -577,3 +580,5 @@ namespace hpx::execution::experimental {
             HPX_FORWARD(F, f));
     }
 }    // namespace hpx::execution::experimental
+
+#endif

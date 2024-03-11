@@ -8,6 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -27,6 +31,7 @@
 #include <iterator>
 #include <type_traits>
 #include <utility>
+
 
 namespace hpx::execution::experimental {
 
@@ -252,3 +257,5 @@ namespace hpx::execution::experimental {
         }
     } bulk{};
 }    // namespace hpx::execution::experimental
+
+#endif
