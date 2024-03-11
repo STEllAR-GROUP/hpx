@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_fowrard.hpp>
+#endif
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -343,8 +348,14 @@ namespace hpx::when_all_vector_detail {
                     }
                     else
                     {
-                        hpx::execution::experimental::set_stopped(
-                            HPX_MOVE(receiver));
+#ifdef HPX_HAVE_STDEXEC
+                        if constexpr (hpx::execution::experimental::sends_stopped<Sender>) {
+#endif
+                            hpx::execution::experimental::set_stopped(
+                                    HPX_MOVE(receiver));
+#ifdef HPX_HAVE_STDEXEC
+                        } else { HPX_UNREACHABLE; }
+#endif
                     }
                 }
             }

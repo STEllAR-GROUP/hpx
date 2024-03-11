@@ -11,6 +11,7 @@
 
 #include <utility>
 
+#ifdef HPX_HAVE_STDEXEC
 using namespace hpx::execution::experimental;
 
 int main() {
@@ -22,3 +23,6 @@ int main() {
 
   return hpx::util::report_errors();
 }
+#else
+int main() {}
+#endif

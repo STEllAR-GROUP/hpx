@@ -7,6 +7,38 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+
+namespace hpx::execution::experimental {
+   template<typename Scheduler>
+   struct is_scheduler : std::bool_constant<scheduler<Scheduler>>
+   {
+   };
+
+    template<typename Scheduler>
+    inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
+
+    template<typename Sender>
+    struct is_sender : std::bool_constant<sender<Sender>>
+    {
+    };
+
+    template<typename Sender>
+    inline constexpr bool is_sender_v = is_sender<Sender>::value;
+
+    template<typename Sender, typename Receiver>
+    struct is_sender_to : std::bool_constant<sender_to<Sender, Receiver>>
+    {
+    };
+
+    template<typename Sender, typename Receiver>
+    inline constexpr bool is_sender_to_v = is_sender_to<Sender, Receiver>::value;
+}    // namespace hpx::execution::experimental
+#else
+
 #include <hpx/config/constexpr.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -193,3 +225,5 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 }    // namespace hpx::execution::experimental
+
+#endif

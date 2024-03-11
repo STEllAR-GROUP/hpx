@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+
 #include <hpx/datastructures/member_pack.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -194,3 +199,5 @@ namespace hpx::execution::experimental {
         }
     } just_stopped{};
 }    // namespace hpx::execution::experimental
+
+#endif

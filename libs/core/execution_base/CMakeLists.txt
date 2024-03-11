@@ -48,6 +48,12 @@ set(execution_base_sources agent_ref.cpp any_sender.cpp
                            spinlock_deadlock_detection.cpp this_thread.cpp
 )
 
+set(optional_dependencies)
+
+if(TARGET STDEXEC::stdexec)
+    set(optional_dependencies STDEXEC::stdexec)
+endif()
+
 include(HPX_AddModule)
 add_hpx_module(
   core execution_base
@@ -55,8 +61,7 @@ add_hpx_module(
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}
   COMPAT_HEADERS ${execution_base_compat_headers}
-  DEPENDENCIES
-    STDEXEC::stdexec
+  DEPENDENCIES ${optional_dependencies}
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config

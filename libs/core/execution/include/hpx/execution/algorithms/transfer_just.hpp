@@ -8,6 +8,10 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_fowrard.hpp>
+#endif
+
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -38,3 +42,5 @@ namespace hpx::execution::experimental {
         }
     } transfer_just{};
 }    // namespace hpx::execution::experimental
+
+#endif
