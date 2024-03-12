@@ -1,3 +1,4 @@
+# Copyright (c) 2023-2024 Jiakun Yan
 # Copyright (c) 2019-2021 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
@@ -31,6 +32,7 @@ set(parcelport_lci_headers
     hpx/parcelport_lci/completion_manager/completion_manager_queue.hpp
     hpx/parcelport_lci/completion_manager/completion_manager_sync.hpp
     hpx/parcelport_lci/completion_manager/completion_manager_sync_single.hpp
+    hpx/parcelport_lci/completion_manager/completion_manager_sync_single_nolock.hpp
 )
 
 # cmake-format: off
@@ -50,6 +52,10 @@ set(parcelport_lci_sources
     sendrecv/sender_connection_sendrecv.cpp
     sendrecv/receiver_sendrecv.cpp
     sendrecv/receiver_connection_sendrecv.cpp
+    completion_manager/completion_manager_queue.cpp
+    completion_manager/completion_manager_sync.cpp
+    completion_manager/completion_manager_sync_single.cpp
+    completion_manager/completion_manager_sync_single_nolock.cpp
 )
 
 include(HPX_SetupLCI)

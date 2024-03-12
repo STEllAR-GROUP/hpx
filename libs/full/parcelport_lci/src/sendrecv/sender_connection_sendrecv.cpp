@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
@@ -50,7 +51,11 @@ namespace hpx::parcelset::policies::lci {
             int retry_count = 0;
             while (
                 LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
+            {
+                if (config_t::bg_work_when_send)
+                    pp_->do_background_work(0, parcelport_background_mode::all);
                 yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
+            }
             HPX_ASSERT(header_buffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(
                 buffer_, (char*) header_buffer.address, header_buffer.length);
@@ -86,12 +91,13 @@ namespace hpx::parcelset::policies::lci {
         }
         tag = 0;    // If no need to post send, then tag can be ignored.
         sharedPtr_p = nullptr;
-        if (num_send > 0)
+        if (config_t::enable_sendmc || num_send > 0)
         {
-            tag = next_tag.fetch_add(num_send) % LCI_MAX_TAG;
             sharedPtr_p = new std::shared_ptr<sender_connection_sendrecv>(
                 std::dynamic_pointer_cast<sender_connection_sendrecv>(
                     shared_from_this()));
+            if (num_send > 0)
+                tag = next_tag.fetch_add(num_send) % LCI_MAX_TAG;
         }
         if ((int) tag <= LCI_MAX_TAG && (int) tag + num_send > LCI_MAX_TAG)
             util::lci_environment::log(
@@ -104,7 +110,11 @@ namespace hpx::parcelset::policies::lci {
             int retry_count = 0;
             while (
                 LCI_mbuffer_alloc(device_p->device, &header_buffer) != LCI_OK)
+            {
+                if (config_t::bg_work_when_send)
+                    pp_->do_background_work(0, parcelport_background_mode::all);
                 yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
+            }
             memcpy(header_buffer.address, header_buffer_vector.data(),
                 header_buffer_vector.size());
             header_buffer.length = header_buffer_vector.size();
@@ -165,16 +175,26 @@ namespace hpx::parcelset::policies::lci {
         HPX_ASSERT(state.load(std::memory_order_acquire) == current_state);
         HPX_UNUSED(current_state);
         LCI_error_t ret;
+        if (config_t::enable_sendmc)
+        {
+            if (completion == nullptr)
+            {
+                completion =
+                    device_p->completion_manager_p->send->alloc_completion();
+            }
+            state.store(connection_state::locked, std::memory_order_relaxed);
+        }
         if (config_t::protocol == config_t::protocol_t::putsendrecv)
         {
-            ret = LCI_putmna(device_p->endpoint_new, header_buffer, dst_rank, 0,
-                LCI_DEFAULT_COMP_REMOTE);
+            ret = LCI_putmac(device_p->endpoint_new, header_buffer, dst_rank, 0,
+                LCI_DEFAULT_COMP_REMOTE,
+                config_t::enable_sendmc ? completion : nullptr, sharedPtr_p);
         }
         else
         {
             HPX_ASSERT(config_t::protocol == config_t::protocol_t::sendrecv);
-            ret =
-                LCI_sendmn(device_p->endpoint_new, header_buffer, dst_rank, 0);
+            ret = LCI_sendmc(device_p->endpoint_new, header_buffer, dst_rank, 0,
+                config_t::enable_sendmc ? completion : nullptr, sharedPtr_p);
         }
         if (ret == LCI_OK)
         {
@@ -185,12 +205,24 @@ namespace hpx::parcelset::policies::lci {
                     "LCI_putmna" :
                     "LCI_sendmn",
                 LCI_RANK, dst_rank, tag, header_buffer.length);
-            state.store(next_state, std::memory_order_release);
-            return send_transmission_chunks();
+            if (config_t::enable_sendmc)
+            {
+                auto ret_comp = completion;
+                completion = nullptr;
+                state.store(next_state, std::memory_order_release);
+                return {return_status_t::wait, ret_comp};
+            }
+            else
+            {
+                state.store(next_state, std::memory_order_release);
+                return send_transmission_chunks();
+            }
         }
         else
         {
             HPX_ASSERT(ret == LCI_ERR_RETRY);
+            if (config_t::enable_sendmc)
+                state.store(current_state, std::memory_order_release);
             return {return_status_t::retry, nullptr};
         }
     }
@@ -203,8 +235,14 @@ namespace hpx::parcelset::policies::lci {
             LCI_mbuffer_t buffer;
             buffer.address = address;
             buffer.length = length;
-            LCI_error_t ret =
-                LCI_sendm(device_p->endpoint_followup, buffer, dst_rank, tag);
+            if (config_t::enable_sendmc && completion == nullptr)
+            {
+                completion =
+                    device_p->completion_manager_p->send->alloc_completion();
+            }
+            LCI_error_t ret = LCI_sendmc(device_p->endpoint_followup, buffer,
+                dst_rank, tag, config_t::enable_sendmc ? completion : nullptr,
+                sharedPtr_p);
             if (ret == LCI_OK)
             {
                 util::lci_environment::log(
@@ -212,7 +250,14 @@ namespace hpx::parcelset::policies::lci {
                     "sendm (%d, %d, %d) device %d tag %d size %d\n", LCI_RANK,
                     dst_rank, original_tag, device_p->idx, tag, length);
                 tag = (tag + 1) % LCI_MAX_TAG;
-                return {return_status_t::done, nullptr};
+                if (config_t::enable_sendmc)
+                {
+                    auto ret_comp = completion;
+                    completion = nullptr;
+                    return {return_status_t::wait, ret_comp};
+                }
+                else
+                    return {return_status_t::done, nullptr};
             }
             else
             {
@@ -392,6 +437,10 @@ namespace hpx::parcelset::policies::lci {
         {
             LCI_memory_deregister(&segment_used);
             segment_used = LCI_SEGMENT_ALL;
+        }
+        if (config_t::enable_sendmc)
+        {
+            LCI_mbuffer_free(header_buffer);
         }
         HPX_ASSERT(completion == nullptr);
         HPX_ASSERT(segment_to_use == LCI_SEGMENT_ALL);
