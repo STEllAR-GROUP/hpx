@@ -11,6 +11,7 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/execution_base/get_env.hpp>
 
 namespace hpx::execution::experimental {
    template<typename Scheduler>
@@ -21,12 +22,12 @@ namespace hpx::execution::experimental {
     template<typename Scheduler>
     inline constexpr bool is_scheduler_v = is_scheduler<Scheduler>::value;
 
-    template<typename Sender>
+    template<typename Sender, typename Env = empty_env>
     struct is_sender : std::bool_constant<sender<Sender>>
     {
     };
 
-    template<typename Sender>
+    template<typename Sender, typename Env = empty_env>
     inline constexpr bool is_sender_v = is_sender<Sender>::value;
 
     template<typename Sender, typename Receiver>
@@ -36,6 +37,15 @@ namespace hpx::execution::experimental {
 
     template<typename Sender, typename Receiver>
     inline constexpr bool is_sender_to_v = is_sender_to<Sender, Receiver>::value;
+
+
+    namespace detail {
+
+        // Dummy type used in place of a scheduler if none is given
+        struct no_scheduler
+        {
+        };
+    }    // namespace detail
 }    // namespace hpx::execution::experimental
 #else
 

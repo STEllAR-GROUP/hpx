@@ -30,6 +30,22 @@ namespace hpx::execution::experimental {
     template <typename Receiver, typename Completions>
     inline constexpr bool is_receiver_of_v = is_receiver_of<Receiver, Completions>::value;
 
+    namespace detail {
+
+        // What about this implementation instead of using template specialization?
+        template <typename CPO>
+        struct is_receiver_cpo : std::bool_constant<
+                std::is_same_v<CPO, set_value_t> ||
+                std::is_same_v<CPO, set_error_t> ||
+                std::is_same_v<CPO, set_stopped_t>
+                >
+        {
+        };
+
+        template <typename CPO>
+        inline constexpr bool is_receiver_cpo_v = is_receiver_cpo<CPO>::value;
+    }    // namespace detail
+
 }    // namespace hpx::execution::experimental
 
 #else
