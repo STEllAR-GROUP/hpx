@@ -10,7 +10,108 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <hpx/execution_base/sender.hpp>
+#include <hpx/execution_base/get_env.hpp>
+#include <hpx/type_support/meta.hpp>
+#include <hpx/datastructures/tuple.hpp>
+#include <hpx/datastructures/variant.hpp>
+
+namespace hpx::execution::experimental {
+//    template <typename Sender, typename Env, typename Enable = void>
+//    struct completion_signatures_of_is_valid : std::false_type
+//    {
+//    };
+//
+//    template <typename Sender, typename Env>
+//    struct completion_signatures_of_is_valid<Sender, Env,
+//            std::void_t<decltype(get_completion_signatures(
+//                    std::declval<Sender>(), std::declval<Env>()))>> : std::true_type
+//    {
+//    };
+//
+    struct empty_variant
+    {
+        empty_variant() = delete;
+    };
+
+        namespace detail {
+        // use this remove_cv_ref instead of std::decay to avoid
+        // decaying function types, e.g. set_value_t() -> set_value_t(*)()
+        template <typename T>
+        struct remove_cv_ref
+        {
+            using type = std::remove_cv_t<std::remove_reference_t<T>>;
+        };
+
+        template <typename T>
+        using remove_cv_ref_t = meta::type<remove_cv_ref<T>>;
+
+        // If sizeof...(Ts) is greater than zero, variant-or-empty<Ts...> names
+        // the type variant<Us...> where Us... is the pack decay_t<Ts>... with
+        // duplicate types removed.
+        template <template <typename...> typename Variant>
+        struct decay_variant_or_empty
+        {
+            template <typename... Ts>
+            using apply = meta::invoke<
+                    meta::if_<meta::bool_<sizeof...(Ts) != 0>,
+                            meta::transform<
+                                    meta::func1<remove_cv_ref_t>,
+                                    meta::unique<meta::func<Variant>>>,
+                            meta::constant<empty_variant>>,
+                    Ts...>;
+        };
+
+        template <template <typename...> typename Variant>
+        struct decay_variant
+        {
+            template <typename... Ts>
+            using apply = meta::invoke<
+                    meta::transform<
+                            meta::func1<remove_cv_ref_t>,
+                            meta::unique<meta::func<Variant>>>,
+                    Ts...>;
+        };
+
+        template <template <typename...> typename Variant>
+        struct unique_variant
+        {
+            template <typename... Ts>
+            using apply =
+                    meta::invoke<meta::unique<meta::func<Variant>>, Ts...>;
+        };
+        // clang-format on
+
+        template <typename... Ts>
+        using decayed_variant =
+                meta::invoke<decay_variant_or_empty<hpx::variant>, Ts...>;
+
+        template <template <typename...> typename Tuple>
+        struct decay_tuple
+        {
+            template <typename... Ts>
+            using apply = Tuple<remove_cv_ref_t<Ts>...>;
+        };
+
+        template <typename... Ts>
+        using decayed_tuple = meta::invoke<decay_tuple<hpx::tuple>, Ts...>;
+
+        template <typename Signatures>
+        using sends_stopped_from = meta::bool_<Signatures::sends_stopped>;
+    }
+
+    // clang-format off
+    template <typename Sender, typename Env = no_env,
+            typename = std::enable_if_t<is_sender_v<Sender, Env>>>
+    // clang-format on
+    inline constexpr bool sends_stopped_of_v =
+            meta::value<detail::sends_stopped_from<
+                    completion_signatures_of_t<Sender, Env>>>;
+}
 #else
+#endif
+
+#if 0
 
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -1709,3 +1810,5 @@ namespace hpx::execution::experimental {
         meta::type<detail::make_helper<Sender, Env, AddlSignatures,
             meta::func<SetValue>, meta::func1<SetError>, SendsStopped>>;
 }    // namespace hpx::execution::experimental
+
+#endif

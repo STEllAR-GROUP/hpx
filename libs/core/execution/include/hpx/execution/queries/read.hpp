@@ -7,6 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
+
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -87,7 +92,7 @@ namespace hpx::execution::experimental {
             template <typename Tag1>
             friend auto tag_invoke(
                 get_completion_signatures_t, read_sender<Tag1>, no_env)
-                -> dependent_completion_signatures<no_env>;
+                -> std::execution::dependent_completion_signatures<no_env>;
 
             // clang-format off
             template <typename Env>
@@ -110,7 +115,7 @@ namespace hpx::execution::experimental {
                 }
                 else
                 {
-                    return dependent_completion_signatures<Env>{};
+                    return std::execution::dependent_completion_signatures<Env>{};
                 }
             }
             // clang-format on

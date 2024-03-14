@@ -9,8 +9,8 @@
 
 #include <hpx/config.hpp>
 #ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_fowrard.hpp>
-#endif
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
 
 #include <hpx/execution/algorithms/just.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>

@@ -12,6 +12,9 @@
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
+#endif
+
+#if 1
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/datastructures/variant.hpp>
