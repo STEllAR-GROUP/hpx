@@ -376,6 +376,7 @@ namespace hpx::execution::experimental::detail {
     template <typename... Ts>
     struct any_receiver_base
     {
+        struct is_receiver{};
         virtual ~any_receiver_base() = default;
         virtual void move_into(void* p) = 0;
         virtual void set_value(Ts... ts) && = 0;
@@ -479,6 +480,8 @@ namespace hpx::execution::experimental::detail {
         storage_type storage{};
 
     public:
+        struct is_receiver{};
+
         template <typename Receiver,
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
@@ -729,6 +732,8 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
+        struct is_sender {};
+
         unique_any_sender() = default;
 
         template <typename Sender,
@@ -795,6 +800,7 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
+        struct is_sender {}; // Indicate that any_sender is a sender
         any_sender() = default;
 
         template <typename Sender,
