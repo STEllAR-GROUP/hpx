@@ -12,7 +12,27 @@
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
-//#include <hpx/execution_base/stdexec_forward.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+
+namespace hpx::execution::experimental {
+    struct no_env
+    {
+        using type = no_env;
+        using id = no_env;
+
+        template <typename Tag, typename Env>
+        friend std::enable_if_t<std::is_same_v<no_env, std::decay_t<Env>>>
+            tag_invoke(Tag, Env) = delete;
+    };
+
+    struct empty_env
+    {
+        using type = empty_env;
+        using id = empty_env;
+    };
+}
+#else
 
 #include <type_traits>
 #include <utility>
@@ -241,3 +261,5 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_environment_provider_v =
         std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental
+
+#endif

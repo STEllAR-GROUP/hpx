@@ -55,6 +55,7 @@ inline void check_sends_stopped(Sender&&)
 
 struct void_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -84,6 +85,8 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
+    struct is_sender{};
+
     template <typename R>
     struct operation_state
     {
@@ -113,11 +116,15 @@ struct error_sender
         error_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(Ts...),
-            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+            hpx::execution::experimental::set_stopped_t(),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)> {
+            return {};
+        };
 };
 
 struct stopped_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -146,6 +153,8 @@ struct stopped_sender
 
 struct stopped_sender_with_value_type
 {
+    struct is_sender{};
+
     template <typename R>
     struct operation_state
     {
@@ -179,6 +188,8 @@ struct callback_receiver
 {
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
+
+    struct is_receiver{};
 
     template <typename E>
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -276,6 +287,7 @@ struct void_callback_helper
 template <typename T>
 struct error_typed_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -312,6 +324,7 @@ struct error_typed_sender
 template <typename T>
 struct const_reference_sender
 {
+    struct is_sender{};
     std::reference_wrapper<std::decay_t<T>> x;
 
     template <typename R>
@@ -346,6 +359,7 @@ struct const_reference_sender
 
 struct const_reference_error_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -436,6 +450,7 @@ struct custom_sender_tag_invoke
 
 struct custom_sender
 {
+    struct is_sender{};
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
@@ -537,6 +552,7 @@ struct custom_sender_multi_tuple
 template <typename T>
 struct custom_typed_sender
 {
+    struct is_sender{};
     std::decay_t<T> x;
 
     std::atomic<bool>& start_called;
@@ -788,6 +804,7 @@ namespace my_namespace {
 
     struct my_sender
     {
+        struct is_sender{};
         template <typename R>
         struct operation_state
         {

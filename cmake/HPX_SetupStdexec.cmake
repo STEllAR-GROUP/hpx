@@ -14,8 +14,6 @@ if(Stdexec_ROOT OR HPX_WITH_FETCH_STDEXEC)
   # explicitly enable HPX_WITH_STDEXEC
   set(HPX_WITH_STDEXEC ON)
 
-  message("HERE")
-
   # prefer Stdexec_ROOT over HPX_WITH_FETCH_STDEXEC by default
   if(Stdexec_ROOT AND HPX_WITH_FETCH_STDEXEC)
     set(HPX_WITH_FETCH_STDEXEC OFF)
