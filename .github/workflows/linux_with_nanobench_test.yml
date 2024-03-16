@@ -40,3 +40,9 @@ jobs:
       run: |
           cd build
           ./bin/minmax_element_performance_test
+
+      name: Test
+      shell: bash
+      run: |
+          cd build
+          ./bin/minmax_element_performance_test --hpx:verbose_bench

@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/functional/function.hpp>
+#include <hpx/modules/command_line_handling_local.hpp>
 
 #include <cstddef>
 #include <string>

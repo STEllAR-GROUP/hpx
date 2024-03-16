@@ -88,6 +88,8 @@ namespace hpx::local::detail {
             std::vector<std::string>& ini_config) const;
     };
 
+    HPX_CORE_EXPORT inline bool verbose_;
+
     ///////////////////////////////////////////////////////////////////////////
     HPX_CORE_EXPORT std::string runtime_configuration_string(
         command_line_handling const& cfg);
