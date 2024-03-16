@@ -28,6 +28,19 @@ namespace hpx::util {
         constexpr int nanobench_epochs = 24;
         constexpr int nanobench_warmup = 40;
 
+        char const* nanobench_hpx_simple_template() noexcept
+        {
+            return R"DELIM({
+    "outputs (with nanobench)": [
+{{#result}}        {
+            "name": "{{name}}",
+            "executor": "{{context(executor)}}",
+            "median": "{{median(elapsed)}}" 
+        }{{^-last}},{{/-last}}
+{{/result}}    ]
+})DELIM";
+        }
+
         char const* nanobench_hpx_template() noexcept
         {
             return R"DELIM({
@@ -163,7 +176,10 @@ namespace hpx::util {
     // Overload that uses a default nanobench template and prints to std::cout
     void perftests_print_times()
     {
-        perftests_print_times(detail::nanobench_hpx_template(), std::cout);
+        if (local::detail::verbose_)
+            perftests_print_times(detail::nanobench_hpx_template(), std::cout);
+        else 
+            perftests_print_times(detail::nanobench_hpx_simple_template(), std::cout);
     }
 #else
     void perftests_report(std::string const& name, std::string const& exec,
