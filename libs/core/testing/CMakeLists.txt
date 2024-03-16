@@ -27,6 +27,7 @@ set(module_deps
   hpx_functional
   hpx_preprocessor
   hpx_util
+  hpx_command_line_handling_local
 )
 
 if(HPX_WITH_NANOBENCH)
