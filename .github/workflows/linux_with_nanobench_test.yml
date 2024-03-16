@@ -41,7 +41,7 @@ jobs:
           cd build
           ./bin/minmax_element_performance_test
 
-      name: Test
+    - name: Test with detailed output
       shell: bash
       run: |
           cd build
