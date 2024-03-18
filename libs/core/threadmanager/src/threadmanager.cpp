@@ -1171,7 +1171,7 @@ namespace hpx::threads {
     }
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
-    std::int64_t threadmanager::get_average_thread_wait_time(bool reset)
+    std::int64_t threadmanager::get_average_thread_wait_time(bool reset) const
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
@@ -1180,7 +1180,7 @@ namespace hpx::threads {
         return result;
     }
 
-    std::int64_t threadmanager::get_average_task_wait_time(bool reset)
+    std::int64_t threadmanager::get_average_task_wait_time(bool reset) const
     {
         std::int64_t result = 0;
         for (auto const& pool_iter : pools_)
