@@ -202,7 +202,7 @@ set(serialization_compat_headers
 
 if(HPX_SERIALIZATION_WITH_BOOST_TYPES)
   set(boost_serialization_headers
-      hpx/serialization/boost_array.hpp
+      hpx/serialization/std_array.hpp
       hpx/serialization/boost_intrusive_ptr.hpp
       hpx/serialization/boost_multi_array.hpp
       hpx/serialization/boost_shared_ptr.hpp

@@ -10,26 +10,22 @@
 #include <hpx/config.hpp>
 #include <hpx/serialization/config/defines.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-
 #include <hpx/serialization/array.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
-#include <boost/array.hpp>
+#include <array>
 
 #include <cstddef>
 
 namespace hpx::serialization {
 
-    // implement serialization for boost::array
+    // implement serialization for std::array
     template <typename Archive, typename T, std::size_t N>
     void serialize(
-        Archive& ar, boost::array<T, N>& a, unsigned int const /* version */)
+        Archive& ar, std::array<T, N>& a, unsigned int const /* version */)
     {
         // clang-format off
         ar & hpx::serialization::make_array(a.begin(), a.size());
         // clang-format on
     }
 }    // namespace hpx::serialization
-
-#endif
