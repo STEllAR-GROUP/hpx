@@ -13,6 +13,7 @@ module load hwloc
 module load openmpi
 module load pwrapi/1.1.1
 module load papi/7.0.1
+module load otf2/3.0.3
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
@@ -29,5 +30,4 @@ configure_extra_options+=" -DHPX_WITH_APEX=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_APEX=ON"
 configure_extra_options+=" -DHPX_WITH_PAPI=ON"
 configure_extra_options+=" -DAPEX_WITH_PAPI=ON"
-#configure_extra_options+=" -DAPEX_WITH_OTF2=ON"
-#configure_extra_options+=" -DOTF2_ROOT=${OTF2_ROOT}"
+configure_extra_options+=" -DAPEX_WITH_OTF2=ON"

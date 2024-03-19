@@ -170,7 +170,7 @@ namespace hpx::resource::detail {
 
         os << "\"" << sched << "\" is running on PUs : \n";
 
-        for (threads::mask_cref_type const assigned_pu : assigned_pus_)
+        for (threads::mask_cref_type assigned_pu : assigned_pus_)
         {
             os << hpx::threads::to_string(assigned_pu) << '\n';
         }
