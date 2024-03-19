@@ -117,7 +117,7 @@ namespace hpx::parallel::util {
                             topo_.get_thread_affinity_mask_from_lva(&val);
 
                         std::size_t thread_num = hpx::get_worker_thread_num();
-                        hpx::threads::mask_cref_type const thread_mask =
+                        hpx::threads::mask_cref_type thread_mask =
                             hpx::parallel::execution::get_pu_mask(
                                 executors_[i], topo_, thread_num);
 
