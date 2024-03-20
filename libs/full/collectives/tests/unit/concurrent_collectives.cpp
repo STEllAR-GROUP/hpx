@@ -93,7 +93,10 @@ private:
     template <typename Archive>
     void load(Archive& ar, unsigned)
     {
+        // clang-format off
         ar & data;
+        // clang-format on
+
         for (auto& [k, v] : data)
         {
             v.current = 0;
@@ -103,7 +106,9 @@ private:
     template <typename Archive>
     void save(Archive& ar, unsigned) const
     {
+        // clang-format off
         ar & data;
+        // clang-format on
     }
 
     HPX_SERIALIZATION_SPLIT_MEMBER();
@@ -414,7 +419,8 @@ double test_local_all_reduce(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
-    for (std::uint32_t i = 0; local.get_next_generation("all_reduce", gen); ++i)
+    for ([[maybe_unused]] std::uint32_t i = 0;
+         local.get_next_generation("all_reduce", gen); ++i)
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);
@@ -458,7 +464,8 @@ double test_local_all_to_all(std::vector<communicator> const& comms)
     double elapsed = 0.;
 
     std::size_t gen = 0;
-    for (std::uint32_t i = 0; local.get_next_generation("all_to_all", gen); ++i)
+    for ([[maybe_unused]] std::uint32_t i = 0;
+         local.get_next_generation("all_to_all", gen); ++i)
     {
         std::vector<hpx::future<void>> sites;
         sites.reserve(num_sites);

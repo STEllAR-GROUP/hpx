@@ -22,9 +22,11 @@ set(collectives_headers
     hpx/collectives/communication_set.hpp
     hpx/collectives/channel_communicator.hpp
     hpx/collectives/create_communicator.hpp
+    hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/channel_communicator.hpp
     hpx/collectives/detail/communication_set_node.hpp
     hpx/collectives/detail/communicator.hpp
+    hpx/collectives/detail/latch.hpp
     hpx/collectives/exclusive_scan.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp

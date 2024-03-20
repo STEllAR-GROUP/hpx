@@ -16,9 +16,10 @@
 #include <hpx/datastructures/any.hpp>
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lcos_local/and_gate.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
@@ -307,7 +308,7 @@ namespace hpx::collectives::detail {
                 // re-acquired here (if `on_ready` happens to run on a new
                 // thread asynchronously).
                 std::unique_lock l(mtx_, std::try_to_lock);
-                [[maybe_unused]] util::ignore_while_checking il(&l);
+                //[[maybe_unused]] util::ignore_while_checking il(&l);
 
                 // Verify that there is no overlap between different types of
                 // operations on the same communicator.
@@ -356,7 +357,7 @@ namespace hpx::collectives::detail {
             };
 
             std::unique_lock l(mtx_);
-            [[maybe_unused]] util::ignore_while_checking il(&l);
+            [[maybe_unused]] util::ignore_all_while_checking il;
 
             // Verify that there is no overlap between different types of
             // operations on the same communicator.

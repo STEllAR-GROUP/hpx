@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,12 +17,13 @@
 #include <hpx/futures/traits/future_access.hpp>
 #include <hpx/futures/traits/get_remote_result.hpp>
 #include <hpx/modules/errors.hpp>
+#include <hpx/modules/lock_registration.hpp>
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/unused.hpp>
 
@@ -467,6 +468,7 @@ namespace hpx::lcos::detail {
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);
@@ -514,6 +516,7 @@ namespace hpx::lcos::detail {
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
             HPX_ASSERT_DOESNT_OWN_LOCK(l);
+            il.reset_owns_registration();
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())
@@ -544,6 +547,7 @@ namespace hpx::lcos::detail {
             // At this point the lock needs to be acquired to safely access the
             // registered continuations
             std::unique_lock<mutex_type> l(mtx_);
+            [[maybe_unused]] util::ignore_while_checking il(&l);
 
             // handle all threads waiting for the future to become ready
             auto on_completed = HPX_MOVE(on_completed_);
@@ -591,6 +595,7 @@ namespace hpx::lcos::detail {
             // Note: cv.notify_one() above 'consumes' the lock 'l' and leaves
             //       it unlocked when returning.
             HPX_ASSERT_DOESNT_OWN_LOCK(l);
+            il.reset_owns_registration();
 
             // invoke the callback (continuation) function
             if (!on_completed.empty())

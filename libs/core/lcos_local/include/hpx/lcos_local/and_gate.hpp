@@ -18,7 +18,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <mutex>
