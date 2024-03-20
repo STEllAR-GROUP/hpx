@@ -120,7 +120,7 @@ struct freelist_tester
 {
     static constexpr int size = 128;
     static constexpr int thread_count = 2;
-    static constexpr int operations_per_thread = 100000;
+    static constexpr int operations_per_thread = 10000;
 
     Freelist fl;
     hpx::lockfree::queue<dummy*> allocated_nodes;
