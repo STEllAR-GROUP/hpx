@@ -72,6 +72,7 @@ add_hpx_module(
     hpx_errors
     hpx_functional
     hpx_logging
+    hpx_lock_registration
     hpx_memory
     hpx_serialization
     hpx_synchronization

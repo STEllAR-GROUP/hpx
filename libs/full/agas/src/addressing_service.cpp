@@ -33,8 +33,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
 

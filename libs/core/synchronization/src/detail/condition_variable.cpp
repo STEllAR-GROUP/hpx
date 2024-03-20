@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,10 +14,10 @@
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/thread_helpers.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <exception>

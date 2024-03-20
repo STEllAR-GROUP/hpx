@@ -63,5 +63,6 @@ add_hpx_module(
     hpx_logging
     hpx_synchronization
     hpx_threading_base
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

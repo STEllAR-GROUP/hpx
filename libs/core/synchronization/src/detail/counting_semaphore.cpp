@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,7 @@
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/detail/counting_semaphore.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <cstdint>
