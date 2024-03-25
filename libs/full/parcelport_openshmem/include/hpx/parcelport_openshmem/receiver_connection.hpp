@@ -105,14 +105,14 @@ namespace hpx::parcelset::policies::openshmem {
                 {
                     hpx::util::openshmem_environment::scoped_lock l;
                     hpx::util::openshmem_environment::wait_until(
-                        1, &hpx::util::openshmem_environment::rcv);
-                    hpx::util::openshmem_environment::rcv = 0;
+                        1, hpx::util::openshmem_environment::segments[self_].rcv);
+                    (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(
                             buffer_.transmission_chunks_.data()),
                         self_,
-                        hpx::util::openshmem_environment::segments[self_].addr,
+                        hpx::util::openshmem_environment::segments[self_].beg_addr,
                         static_cast<int>(buffer_.transmission_chunks_.size() *
                             sizeof(buffer_type::transmission_chunk_type)));
 
@@ -142,14 +142,14 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 auto self_ = hpx::util::openshmem_environment::rank();
                 hpx::util::openshmem_environment::scoped_lock l;
-                hpx::util::openshmem_environment::wait_until(
-                    1, &hpx::util::openshmem_environment::rcv);
-                hpx::util::openshmem_environment::rcv = 0;
+                    hpx::util::openshmem_environment::wait_until(
+                        1, hpx::util::openshmem_environment::segments[self_].rcv);
+                    (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()),
                     self_,
-                    hpx::util::openshmem_environment::segments[self_].addr,
+                    hpx::util::openshmem_environment::segments[self_].beg_addr,
                     buffer_.data_.size());
 
                 request_ptr_ = true;
@@ -180,16 +180,16 @@ namespace hpx::parcelset::policies::openshmem {
                     hpx::util::openshmem_environment::scoped_lock l;
 
                     hpx::util::openshmem_environment::wait_until(
-                        1, &hpx::util::openshmem_environment::rcv);
-                    hpx::util::openshmem_environment::rcv = 0;
+                        1, hpx::util::openshmem_environment::segments[self_].rcv);
+                    (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(c.data()), self_,
-                        hpx::util::openshmem_environment::segments[self_].addr,
+                        hpx::util::openshmem_environment::segments[self_].beg_addr,
                         c.size());
 
                     hpx::util::openshmem_environment::put_signal(nullptr, src_,
-                        nullptr, 0, &hpx::util::openshmem_environment::xmt);
+                        nullptr, 0, hpx::util::openshmem_environment::segments[self_].xmt);
 
                     request_ptr_ = true;
                 }
@@ -215,12 +215,12 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::scoped_lock l;
 
                 hpx::util::openshmem_environment::wait_until(
-                    1, &hpx::util::openshmem_environment::rcv);
-                hpx::util::openshmem_environment::rcv = 0;
+                    1, hpx::util::openshmem_environment::segments[self_].rcv);
+                (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(&tag_), self_,
-                    hpx::util::openshmem_environment::segments[self_].addr,
+                    hpx::util::openshmem_environment::segments[self_].beg_addr,
                     sizeof(int));
 
                 request_ptr_ = true;

@@ -145,7 +145,7 @@ namespace hpx::parcelset::policies::openshmem {
             std::memcpy(&next_free,
                 hpx::util::openshmem_environment::segments
                     [hpx::util::openshmem_environment::rank()]
-                        .addr,
+                        .beg_addr,
                 sizeof(int));
 
             return next_free;

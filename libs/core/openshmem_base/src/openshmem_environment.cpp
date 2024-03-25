@@ -102,8 +102,6 @@ namespace hpx::util {
     hpx::mutex* openshmem_environment::segment_mutex = nullptr;
     openshmem_seginfo_t* openshmem_environment::segments = nullptr;
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
-    unsigned int openshmem_environment::rcv = 0;
-    unsigned int openshmem_environment::xmt = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     int openshmem_environment::init([[maybe_unused]] int* argc,
@@ -146,19 +144,28 @@ namespace hpx::util {
         //
         //segments.resize(hpx::threads::hardware_concurrency() * size());
         //
-        openshmem_environment::segments = new openshmem_seginfo_t[size()];
-        openshmem_environment::segment_mutex = new hpx::mutex[size()];
+        const std::size_t page_count = size();
+        const std::size_t signal_count = page_count*2;
+        openshmem_environment::segments = new openshmem_seginfo_t[page_count];
+        openshmem_environment::segment_mutex = new hpx::mutex[page_count];
+
+        const std::size_t byte_count = ((sizeof(std::uint8_t)*OPENSHMEM_PER_RANK_PAGESIZE*page_count)+(sizeof(unsigned int)*signal_count)) / sizeof(std::uint8_t);
 
         hpx::util::openshmem_environment::shmem_buffer =
             static_cast<std::uint8_t*>(shmem_calloc(
-                OPENSHMEM_PER_RANK_PAGESIZE, sizeof(std::uint8_t)));
+                byte_count, sizeof(std::uint8_t)));
 
-        for (int i = 0; i < size(); ++i)
+        std::size_t beg_signal = (OPENSHMEM_PER_RANK_PAGESIZE*page_count);
+        for (std::size_t i = 0; i < page_count; ++i)
         {
-            segments[i].addr = hpx::util::openshmem_environment::shmem_buffer +
+            segments[i].beg_addr = hpx::util::openshmem_environment::shmem_buffer +
                 (i * OPENSHMEM_PER_RANK_PAGESIZE);
-            segments[i].size = static_cast<std::uint8_t*>(segments[i].addr) +
+            segments[i].end_addr = static_cast<std::uint8_t*>(segments[i].beg_addr) +
                 OPENSHMEM_PER_RANK_PAGESIZE;
+            segments[i].rcv = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
+                beg_signal + signal_count);
+            segments[i].xmt = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
+                beg_signal + signal_count + 1);
         }
 
         shmem_barrier_all();
