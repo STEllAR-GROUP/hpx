@@ -497,10 +497,8 @@ jobs:
       - run:
           name: Building Unit Tests (Algorithms)
           command: |
-              ninja -j2 -k 0 \
-                tests.unit.modules.algorithms.algorithms \
-                tests.unit.modules.algorithms.block
-#                tests.unit.modules.algorithms.datapar_algorithms
+              ninja -j 1 -k 0 \
+                tests.unit.modules.algorithms.algorithms
       - run:
           name: Running Unit Tests
           when: always
@@ -512,9 +510,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-              "tests.unit.modules.algorithms.algorithms|\
-              tests.unit.modules.algorithms.block"
-#              "|tests.unit.modules.algorithms.datapar_algorithms"
+              "tests.unit.modules.algorithms.algorithms"
       - run:
           <<: *convert_xml
       - run:
@@ -525,6 +521,39 @@ jobs:
           path: tests.unit.algorithms
       - store_artifacts:
           path: tests.unit.algorithms
+
+  tests.unit.algorithms.block:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Algorithms)
+          command: |
+              ninja -j2 -k 0 \
+                tests.unit.modules.algorithms.block
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+              "tests.unit.modules.algorithms.block"
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit.algorithms.block
+      - store_artifacts:
+          path: tests.unit.algorithms.block
 
   tests.unit.container_algorithms:
     <<: *defaults
@@ -913,6 +942,8 @@ workflows:
           <<: *core_dependency
       - tests.unit.algorithms:
           <<: *core_dependency
+      - tests.unit.algorithms.block:
+          <<: *core_dependency
       - tests.unit.container_algorithms:
           <<: *core_dependency
       - tests.unit.segmented_algorithms:
@@ -970,6 +1001,7 @@ workflows:
             - core
             - tests.examples
             - tests.unit.algorithms
+            - tests.unit.algorithms.block
             - tests.unit.container_algorithms
             - tests.unit.segmented_algorithms
             - tests.unit1

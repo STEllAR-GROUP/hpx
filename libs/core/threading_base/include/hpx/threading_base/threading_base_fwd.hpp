@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -101,10 +101,15 @@ namespace hpx::threads {
 
     /// The function \a get_outer_self_id returns the HPX thread id of
     /// the current outer thread (or zero if the current thread is not a HPX
-    /// thread). This usually returns the same as \a get_self_id, except for
-    /// directly executed threads, in which case this returns the thread id
-    /// of the outermost HPX thread.
-    HPX_CORE_EXPORT thread_id_type get_outer_self_id() noexcept;
+    /// thread). This now always returns the same as \a get_self_id, even for
+    /// directly executed threads.
+    HPX_DEPRECATED_V(1, 10,
+        "hpx::threads::get_outer_self_id is deprecated, use "
+        "hpx::threads::get_self_id instead")
+    inline thread_id_type get_outer_self_id() noexcept
+    {
+        return get_self_id();
+    }
 
     /// The function \a get_parent_id returns the HPX thread id of the
     /// current thread's parent (or zero if the current thread is not a

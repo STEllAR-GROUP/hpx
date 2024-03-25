@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -91,7 +91,7 @@ namespace hpx::threads::detail {
         bool reschedule = false;
 
         // don't directly run any threads that have started running 'normally'
-        // and were suspended afterwards
+        // and were suspended afterward
         if (thrdptr->runs_as_child())
         {
             LTM_(error).format(
@@ -131,8 +131,8 @@ namespace hpx::threads::detail {
                 return false;
             }
 
-            // check again, making sure the state has not changed in the mean
-            // time
+            // check again, making sure the state has not changed in the
+            // meantime
             if (thrdptr->runs_as_child())
             {
 #if defined(HPX_HAVE_APEX)
