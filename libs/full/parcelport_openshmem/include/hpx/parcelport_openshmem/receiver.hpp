@@ -143,13 +143,14 @@ namespace hpx::parcelset::policies::openshmem {
         {
             header h = rcv_header_;
             rcv_header_.reset();
+            auto self_ = hpx::util::openshmem_environment::rank();
 
             while (rcv_header_.data() == 0)
             {
-                bo(&hpx::util::openshmem_environment::rcv);
+                bo(hpx::util::openshmem_environment::segments[self_].rcv);
             }
 
-            hpx::util::openshmem_environment::rcv = 0;
+            (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
             return h;
         }
 
