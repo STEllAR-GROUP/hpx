@@ -8,6 +8,7 @@ include(HPX_Message)
 
 macro(hpx_setup_openshmem)
 
+  find_package(PkgConfig REQUIRED)
   if(NOT TARGET PkgConfig::OPENSHMEM)
 
     set(OPENSHMEM_PC "")
