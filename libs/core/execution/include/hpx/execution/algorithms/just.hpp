@@ -104,7 +104,8 @@ namespace hpx::execution::experimental {
             friend auto tag_invoke(
                 connect_t, just_sender&& s, Receiver&& receiver)
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-            noexcept(util::all_of_v<std::is_nothrow_move_constructible<Ts>...>)
+                noexcept(
+                    util::all_of_v<std::is_nothrow_move_constructible<Ts>...>)
 #endif
             {
                 return operation_state<Receiver>{
