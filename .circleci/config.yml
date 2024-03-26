@@ -1,5 +1,6 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
+#  Copyright (c) 2022-2024 Hartmut Kaiser
 #
 #  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -777,7 +778,7 @@ jobs:
               # is enabled, and other machines may fail similarly.
               #
               # Having to reconfigure here forces everything to be rebuilt, thus
-              # we disable it all together.
+              # we disable it altogether.
               #
               # cmake \
               #   -DHPX_WITH_DATAPAR_VC=Off .

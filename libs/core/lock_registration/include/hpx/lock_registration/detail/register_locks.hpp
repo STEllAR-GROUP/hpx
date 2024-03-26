@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,7 +10,7 @@
 #include <hpx/config.hpp>
 #include <hpx/concepts/has_member_xxx.hpp>
 #include <hpx/functional/function.hpp>
-#include <hpx/type_support/unused.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <map>
@@ -21,6 +21,8 @@
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
 #include <string>
 #endif
+
+#include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
@@ -41,6 +43,11 @@ namespace hpx::util {
             explicit lock_data(std::size_t trace_depth);
             lock_data(register_lock_data* data, std::size_t trace_depth);
 
+            lock_data(lock_data const&) = delete;
+            lock_data(lock_data&&) = delete;
+            lock_data& operator=(lock_data const&) = delete;
+            lock_data& operator=(lock_data&&) = delete;
+
             ~lock_data();
 
             bool ignore_;
@@ -60,6 +67,11 @@ namespace hpx::util {
           , ignore_all_locks_(false)
         {
         }
+
+        held_locks_data(held_locks_data const&) = delete;
+        held_locks_data(held_locks_data&&) = delete;
+        held_locks_data& operator=(held_locks_data const&) = delete;
+        held_locks_data& operator=(held_locks_data&&) = delete;
 
         held_locks_map map_;
         bool enabled_;
@@ -108,6 +120,13 @@ namespace hpx::util {
             ignore_all_locks();
         }
 
+        ignore_all_while_checking(ignore_all_while_checking const&) = delete;
+        ignore_all_while_checking(ignore_all_while_checking&&) = delete;
+        ignore_all_while_checking& operator=(
+            ignore_all_while_checking const&) = delete;
+        ignore_all_while_checking& operator=(
+            ignore_all_while_checking&&) = delete;
+
         ~ignore_all_while_checking() noexcept
         {
             reset_ignored_all();
@@ -120,14 +139,50 @@ namespace hpx::util {
     }
 
     template <typename Lock,
-        typename Enable = std::enable_if_t<detail::has_mutex_v<Lock>>>
+        typename Enable = std::enable_if_t<detail::has_mutex_v<Lock> &&
+            detail::has_owns_lock_v<Lock>>>
     struct ignore_while_checking
+    {
+        explicit ignore_while_checking(Lock const* lock) noexcept
+          : mtx_(lock->owns_lock() ? lock->mutex() : nullptr)
+        {
+            if (mtx_ != nullptr)
+            {
+                ignore_lock(mtx_);
+            }
+        }
+
+        ignore_while_checking(ignore_while_checking const&) = delete;
+        ignore_while_checking(ignore_while_checking&&) = delete;
+        ignore_while_checking& operator=(ignore_while_checking const&) = delete;
+        ignore_while_checking& operator=(ignore_while_checking&&) = delete;
+
+        ~ignore_while_checking()
+        {
+            if (mtx_ != nullptr)
+            {
+                reset_ignored(mtx_);
+            }
+        }
+
+        void const* mtx_;
+    };
+
+    template <typename Lock>
+    struct ignore_while_checking<Lock,
+        std::enable_if_t<detail::has_mutex_v<Lock> &&
+            !detail::has_owns_lock_v<Lock>>>
     {
         explicit ignore_while_checking(Lock const* lock) noexcept
           : mtx_(lock->mutex())
         {
             ignore_lock(mtx_);
         }
+
+        ignore_while_checking(ignore_while_checking const&) = delete;
+        ignore_while_checking(ignore_while_checking&&) = delete;
+        ignore_while_checking& operator=(ignore_while_checking const&) = delete;
+        ignore_while_checking& operator=(ignore_while_checking&&) = delete;
 
         ~ignore_while_checking()
         {
@@ -200,3 +255,5 @@ namespace hpx::util {
 
 #endif
 }    // namespace hpx::util
+
+#include <hpx/config/warnings_prefix.hpp>

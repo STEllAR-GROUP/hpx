@@ -315,7 +315,6 @@ namespace hpx::parcelset {
                     {
                         enqueue_parcels(
                             dest, HPX_MOVE(parcels), HPX_MOVE(handlers));
-
                         get_connection_and_send_parcels(dest);
                     }
                 });
