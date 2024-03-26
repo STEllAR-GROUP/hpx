@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <iostream>
 #include <utility>
 
 __global__ void dummy_kernel() {}
