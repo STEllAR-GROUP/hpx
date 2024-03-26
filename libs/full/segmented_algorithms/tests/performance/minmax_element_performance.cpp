@@ -14,8 +14,8 @@
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/iostream.hpp>
 #include <hpx/modules/timing.hpp>
-
 #include <hpx/modules/program_options.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -53,60 +53,6 @@ struct random_fill
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-double run_min_element_benchmark(
-    int test_count, hpx::partitioned_vector<int> const& v)
-{
-    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i != test_count; ++i)
-    {
-        // invoke minmax
-        /*auto iters = */ hpx::min_element(
-            hpx::execution::par, v.begin(), v.end());
-    }
-
-    time = hpx::chrono::high_resolution_clock::now() - time;
-
-    return (time * 1e-9) / test_count;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-double run_max_element_benchmark(
-    int test_count, hpx::partitioned_vector<int> const& v)
-{
-    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i != test_count; ++i)
-    {
-        // invoke minmax
-        /*auto iters = */ hpx::max_element(
-            hpx::execution::par, v.begin(), v.end());
-    }
-
-    time = hpx::chrono::high_resolution_clock::now() - time;
-
-    return (time * 1e-9) / test_count;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-double run_minmax_element_benchmark(
-    int test_count, hpx::partitioned_vector<int> const& v)
-{
-    std::uint64_t time = hpx::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i != test_count; ++i)
-    {
-        // invoke minmax
-        /*auto iters = */ hpx::minmax_element(
-            hpx::execution::par, v.begin(), v.end());
-    }
-
-    time = hpx::chrono::high_resolution_clock::now() - time;
-
-    return (time * 1e-9) / test_count;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     if (hpx::get_locality_id() == 0)
@@ -124,17 +70,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::generate(hpx::execution::par, v.begin(), v.end(), random_fill());
 
         // run benchmark
-        double time_minmax = run_minmax_element_benchmark(test_count, v);
-        double time_min = run_min_element_benchmark(test_count, v);
-        double time_max = run_max_element_benchmark(test_count, v);
+        hpx::util::perftests_report("hpx::minmax", "par", test_count, [&]{
+            hpx::minmax_element(hpx::execution::par, v.begin(), v.end());});
 
-        // if (csvoutput)
-        {
-            std::cout << "minmax" << test_count << "," << time_minmax
-                      << std::endl;
-            std::cout << "min" << test_count << "," << time_min << std::endl;
-            std::cout << "max" << test_count << "," << time_max << std::endl;
-        }
+        hpx::util::perftests_report("hpx::min", "par", test_count, [&]{hpx::min_element(
+            hpx::execution::par, v.begin(), v.end());});
+
+        hpx::util::perftests_report("hpx::max", "par", test_count, [&]{hpx::max_element(
+            hpx::execution::par, v.begin(), v.end());});
+            
+        hpx::util::perftests_print_times();
 
         return hpx::finalize();
     }
