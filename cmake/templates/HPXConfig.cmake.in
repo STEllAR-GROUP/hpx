@@ -77,6 +77,8 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   endif()
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/HPXSimdSortTarget.cmake")
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
