@@ -14,7 +14,7 @@ module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 
 configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
 configure_extra_options+=" -DHPX_WITH_CXX_STANDARD=${CXX_STD}"
@@ -27,6 +27,9 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DCMAKE_C_COMPILER=clang"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
+configure_extra_options+=" -DHPX_WITH_FETCH_GASNET=ON"
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET_CONDUIT=udp"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
