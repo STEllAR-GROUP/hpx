@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2021 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,7 +17,7 @@
 HPX_PLUGIN_EXPORT_LIST(HPX_PLUGIN_COMPONENT_PREFIX, factory)
 HPX_REGISTER_REGISTRY_MODULE()
 
-namespace hpx::components::server {
+namespace hpx { namespace components { namespace server {
 
     void runtime_support::add_pre_startup_function(startup_function_type f)
     {
@@ -54,9 +54,9 @@ namespace hpx::components::server {
             shutdown_functions_.push_back(HPX_MOVE(f));
         }
     }
-}    // namespace hpx::components::server
+}}}    // namespace hpx::components::server
 
-namespace hpx::agas::detail::impl {
+namespace hpx { namespace agas { namespace detail { namespace impl {
 
     /// \brief Invoke an asynchronous garbage collection step on the given target
     ///        locality.
@@ -90,9 +90,9 @@ namespace hpx::agas::detail::impl {
             ec = make_error_code(e.get_error(), e.what());
         }
     }
-}    // namespace hpx::agas::detail::impl
+}}}}    // namespace hpx::agas::detail::impl
 
-namespace hpx::agas {
+namespace hpx { namespace agas {
 
     // initialize AGAS interface function pointers in components_base module
     struct HPX_EXPORT runtime_components_init_interface_functions
@@ -111,9 +111,9 @@ namespace hpx::agas {
             runtime_components_init_;
         return runtime_components_init_;
     }
-}    // namespace hpx::agas
+}}    // namespace hpx::agas
 
-namespace hpx::components {
+namespace hpx { namespace components {
 
     // some compilers try to invoke this function, even if it's actually not
     // needed
@@ -140,4 +140,4 @@ namespace hpx::components {
         static counter_interface_functions counter_init_;
         return counter_init_;
     }
-}    // namespace hpx::components
+}}    // namespace hpx::components
