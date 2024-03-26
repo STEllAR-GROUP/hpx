@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2022 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -39,7 +39,7 @@ void apply_test(hpx::latch& l, hpx::thread::id& id, int passed_through)
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Executor>
-void test_timed_apply(Executor&& exec)
+void test_timed_apply(Executor& exec)
 {
     {
         hpx::latch l(2);
@@ -73,7 +73,7 @@ void test_timed_apply(Executor&& exec)
 }
 
 template <typename Executor>
-void test_timed_sync(Executor&& exec)
+void test_timed_sync(Executor& exec)
 {
     {
         hpx::parallel::execution::timed_executor<Executor> timed_exec(
@@ -93,7 +93,7 @@ void test_timed_sync(Executor&& exec)
 }
 
 template <typename Executor>
-void test_timed_async(Executor&& exec)
+void test_timed_async(Executor& exec)
 {
     {
         hpx::parallel::execution::timed_executor<Executor> timed_exec(
@@ -124,11 +124,11 @@ std::atomic<std::size_t> count_async_at(0);
 template <typename Executor>
 void test_timed_executor(std::array<std::size_t, 6> expected)
 {
-    using execution_category =
-        typename hpx::traits::executor_execution_category<Executor>::type;
+    typedef typename hpx::traits::executor_execution_category<Executor>::type
+        execution_category;
 
-    HPX_TEST((std::is_same_v<hpx::execution::parallel_execution_tag,
-        execution_category>) );
+    HPX_TEST((std::is_same<hpx::execution::parallel_execution_tag,
+        execution_category>::value));
 
     count_sync.store(0);
     count_apply.store(0);
@@ -154,20 +154,15 @@ void test_timed_executor(std::array<std::size_t, 6> expected)
 ///////////////////////////////////////////////////////////////////////////////
 struct test_async_executor1
 {
-    using execution_category = hpx::execution::parallel_execution_tag;
+    typedef hpx::execution::parallel_execution_tag execution_category;
 
     template <typename F, typename... Ts>
     friend decltype(auto) tag_invoke(hpx::parallel::execution::async_execute_t,
         test_async_executor1 const&, F&& f, Ts&&... ts)
     {
         ++count_async;
-
-        auto policy = hpx::launch::async;
-        auto hint = policy.hint();
-        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
-        policy.set_hint(hint);
-
-        return hpx::async(policy, std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::async(
+            hpx::launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -180,14 +175,9 @@ struct test_timed_async_executor1 : test_async_executor1
         hpx::chrono::steady_time_point const& abs_time, F&& f, Ts&&... ts)
     {
         ++count_async_at;
-
-        auto policy = hpx::launch::async;
-        auto hint = policy.hint();
-        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
-        policy.set_hint(hint);
-
         hpx::this_thread::sleep_until(abs_time);
-        return hpx::async(policy, std::forward<F>(f), std::forward<Ts>(ts)...);
+        return hpx::async(
+            hpx::launch::async, std::forward<F>(f), std::forward<Ts>(ts)...);
     }
 };
 
@@ -210,13 +200,8 @@ struct test_timed_async_executor2 : test_async_executor1
         test_timed_async_executor2 const&, F&& f, Ts&&... ts)
     {
         ++count_sync;
-
-        auto policy = hpx::launch::async;
-        auto hint = policy.hint();
-        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
-        policy.set_hint(hint);
-
-        return hpx::async(policy, std::forward<F>(f), std::forward<Ts>(ts)...)
+        return hpx::async(
+            hpx::launch::async, std::forward<F>(f), std::forward<Ts>(ts)...)
             .get();
     }
 };
@@ -231,13 +216,8 @@ struct test_timed_async_executor3 : test_timed_async_executor2
     {
         ++count_sync_at;
         hpx::this_thread::sleep_until(abs_time);
-
-        auto policy = hpx::launch::async;
-        auto hint = policy.hint();
-        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
-        policy.set_hint(hint);
-
-        return hpx::async(policy, std::forward<F>(f), std::forward<Ts>(ts)...)
+        return hpx::async(
+            hpx::launch::async, std::forward<F>(f), std::forward<Ts>(ts)...)
             .get();
     }
 };
@@ -305,7 +285,7 @@ int hpx_main()
 
 int main(int argc, char* argv[])
 {
-    // By default, this test should run on all available cores
+    // By default this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

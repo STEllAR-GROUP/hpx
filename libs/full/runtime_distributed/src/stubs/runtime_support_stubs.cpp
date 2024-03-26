@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2024 Hartmut Kaiser
+//  Copyright (c) 2007-2016 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,32 +19,24 @@
 #include <hpx/runtime_distributed/applier.hpp>
 #include <hpx/runtime_distributed/stubs/runtime_support.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
+#include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <utility>
+#include <vector>
 
-namespace hpx::components::stubs {
-
-    template <typename Policy>
-    auto disable_run_as_child(Policy&& p)
-    {
-        auto policy = p;
-        auto hint = policy.get_hint();
-        hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
-        policy.set_hint(hint);
-        return policy;
-    }
+namespace hpx { namespace components { namespace stubs {
 
     hpx::future<int> runtime_support::load_components_async(
-        [[maybe_unused]] hpx::id_type const& gid)
+        hpx::id_type const& gid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type = server::runtime_support::load_components_action;
-        return hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), gid);
+        typedef server::runtime_support::load_components_action action_type;
+        return hpx::async<action_type>(gid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(gid);
         return hpx::make_ready_future(0);
 #endif
     }
@@ -55,17 +47,16 @@ namespace hpx::components::stubs {
     }
 
     hpx::future<void> runtime_support::call_startup_functions_async(
-        [[maybe_unused]] hpx::id_type const& gid,
-        [[maybe_unused]] bool pre_startup)
+        hpx::id_type const& gid, bool pre_startup)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type =
-            server::runtime_support::call_startup_functions_action;
-
-        return hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), gid, pre_startup);
+        typedef server::runtime_support::call_startup_functions_action
+            action_type;
+        return hpx::async<action_type>(gid, pre_startup);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(gid);
+        HPX_UNUSED(pre_startup);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -78,14 +69,13 @@ namespace hpx::components::stubs {
 
     /// \brief Shutdown the given runtime system
     hpx::future<void> runtime_support::shutdown_async(
-        [[maybe_unused]] hpx::id_type const& targetgid,
-        [[maybe_unused]] double timeout)
+        hpx::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Create a promise directly and execute the required action.
         // This action has implemented special response handling as the
         // back-parcel is sent explicitly (and synchronously).
-        using action_type = server::runtime_support::shutdown_action;
+        typedef server::runtime_support::shutdown_action action_type;
 
         hpx::distributed::promise<void> value;
         auto f = value.get_future();
@@ -98,6 +88,8 @@ namespace hpx::components::stubs {
         return f;
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(timeout);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -112,18 +104,19 @@ namespace hpx::components::stubs {
 
     /// \brief Shutdown the runtime systems of all localities
     void runtime_support::shutdown_all(
-        [[maybe_unused]] hpx::id_type const& targetgid,
-        [[maybe_unused]] double timeout)
+        hpx::id_type const& targetgid, double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::post<server::runtime_support::shutdown_all_action>(
             targetgid, timeout);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(timeout);
 #endif
     }
 
-    void runtime_support::shutdown_all([[maybe_unused]] double timeout)
+    void runtime_support::shutdown_all(double timeout)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::post<server::runtime_support::shutdown_all_action>(
@@ -133,6 +126,7 @@ namespace hpx::components::stubs {
             timeout);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(timeout);
 #endif
     }
 
@@ -140,13 +134,13 @@ namespace hpx::components::stubs {
     /// \brief Retrieve configuration information
     /// \brief Terminate the given runtime system
     hpx::future<void> runtime_support::terminate_async(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+        hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Create a future directly and execute the required action.
         // This action has implemented special response handling as the
         // back-parcel is sent explicitly (and synchronously).
-        using action_type = server::runtime_support::terminate_action;
+        typedef server::runtime_support::terminate_action action_type;
 
         hpx::distributed::promise<void> value;
         auto f = value.get_future();
@@ -155,6 +149,7 @@ namespace hpx::components::stubs {
         return f;
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future();
 #endif
     }
@@ -167,13 +162,13 @@ namespace hpx::components::stubs {
     }
 
     /// \brief Terminate the runtime systems of all localities
-    void runtime_support::terminate_all(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+    void runtime_support::terminate_all(hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         hpx::post<server::runtime_support::terminate_all_action>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
@@ -190,46 +185,44 @@ namespace hpx::components::stubs {
 
     ///////////////////////////////////////////////////////////////////////
     void runtime_support::garbage_collect_non_blocking(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+        hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type = server::runtime_support::garbage_collect_action;
+        typedef server::runtime_support::garbage_collect_action action_type;
         hpx::post<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
     hpx::future<void> runtime_support::garbage_collect_async(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+        hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type = server::runtime_support::garbage_collect_action;
-        return hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), targetgid);
+        typedef server::runtime_support::garbage_collect_action action_type;
+        return hpx::async<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future();
 #endif
     }
 
-    void runtime_support::garbage_collect(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+    void runtime_support::garbage_collect(hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type = server::runtime_support::garbage_collect_action;
-        hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), targetgid)
-            .get();
+        typedef server::runtime_support::garbage_collect_action action_type;
+        hpx::async<action_type>(targetgid).get();
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
 #endif
     }
 
     ///////////////////////////////////////////////////////////////////////
     hpx::future<hpx::id_type> runtime_support::create_performance_counter_async(
-        [[maybe_unused]] hpx::id_type const& targetgid,
-        [[maybe_unused]] performance_counters::counter_info const& info)
+        hpx::id_type targetgid, performance_counters::counter_info const& info)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         if (!naming::is_locality(targetgid))
@@ -238,21 +231,23 @@ namespace hpx::components::stubs {
                 "stubs::runtime_support::create_performance_counter_async",
                 "The id passed as the first argument is not representing"
                 " a locality");
+            return make_ready_future(hpx::invalid_id);
         }
 
-        using action_type =
-            server::runtime_support::create_performance_counter_action;
-        return hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), targetgid, info);
+        typedef server::runtime_support::create_performance_counter_action
+            action_type;
+        return hpx::async<action_type>(targetgid, info);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
+        HPX_UNUSED(info);
         return ::hpx::make_ready_future(hpx::invalid_id);
 #endif
     }
 
     hpx::id_type runtime_support::create_performance_counter(
-        hpx::id_type const& targetgid,
-        performance_counters::counter_info const& info, error_code& ec)
+        hpx::id_type targetgid, performance_counters::counter_info const& info,
+        error_code& ec)
     {
         return create_performance_counter_async(targetgid, info).get(ec);
     }
@@ -260,17 +255,17 @@ namespace hpx::components::stubs {
     ///////////////////////////////////////////////////////////////////////
     /// \brief Retrieve configuration information
     hpx::future<util::section> runtime_support::get_config_async(
-        [[maybe_unused]] hpx::id_type const& targetgid)
+        hpx::id_type const& targetgid)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
         // Create a future, execute the required action,
         // we simply return the initialized future, the caller needs
         // to call get() on the return value to obtain the result
-        using action_type = server::runtime_support::get_config_action;
-        return hpx::async<action_type>(
-            disable_run_as_child(hpx::launch::async), targetgid);
+        typedef server::runtime_support::get_config_action action_type;
+        return hpx::async<action_type>(targetgid);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(targetgid);
         return ::hpx::make_ready_future(util::section{});
 #endif
     }
@@ -285,16 +280,18 @@ namespace hpx::components::stubs {
 
     ///////////////////////////////////////////////////////////////////////
     void runtime_support::remove_from_connection_cache_async(
-        [[maybe_unused]] hpx::id_type const& target,
-        [[maybe_unused]] naming::gid_type const& gid,
-        [[maybe_unused]] parcelset::endpoints_type const& endpoints)
+        hpx::id_type const& target, naming::gid_type const& gid,
+        parcelset::endpoints_type const& endpoints)
     {
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
-        using action_type =
-            server::runtime_support::remove_from_connection_cache_action;
+        typedef server::runtime_support::remove_from_connection_cache_action
+            action_type;
         hpx::post<action_type>(target, gid, endpoints);
 #else
         HPX_ASSERT(false);
+        HPX_UNUSED(target);
+        HPX_UNUSED(gid);
+        HPX_UNUSED(endpoints);
 #endif
     }
-}    // namespace hpx::components::stubs
+}}}    // namespace hpx::components::stubs
