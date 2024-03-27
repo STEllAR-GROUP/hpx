@@ -25,8 +25,20 @@ template <typename ExpectedValType,
     typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_value_types(Sender&&)
 {
+    // Passing check_value_types(s) with s being a `custom_sender` lvalue will
+    // result in Sender being custom_sender&. This is problematic because the
+    // sender<S> concept requires constructible_from<std::remove_cvref_t<S>, S>,
+    // so for S = custom_sender the sender concept requires the following to be
+    // well-defined:
+    // custom_sender s(std::declval<custom_sender>())
+    //                      ^^^-- custom_sender&&
+    // Whereas for some_sender& the concept requires
+    // custom_sender s(std::declval<custom_sender&>())
+    //                      ^^^-- custom_sender&
+
+    using Underlying_Sender = std::remove_reference_t<Sender>;
     namespace ex = hpx::execution::experimental;
-    using value_types = ex::value_types_of_t<Sender, Env, hpx::tuple,
+    using value_types = ex::value_types_of_t<Underlying_Sender , Env, hpx::tuple,
         ex::detail::unique_variant<hpx::variant>::template apply>;
     static_assert(std::is_same_v<value_types, ExpectedValType>);
 }
@@ -36,8 +48,12 @@ template <typename ExpectedErrorType,
     typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_error_types(Sender&&)
 {
+
+    // See check_value_types
+    using Underlying_Sender = std::remove_reference_t<Sender>;
+
     namespace ex = hpx::execution::experimental;
-    using error_types = ex::error_types_of_t<Sender, Env,
+    using error_types = ex::error_types_of_t<Underlying_Sender, Env,
         ex::detail::unique_variant<hpx::variant>::template apply>;
     static_assert(std::is_same_v<error_types, ExpectedErrorType>);
 }
@@ -47,9 +63,17 @@ template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
     typename Sender>
 inline void check_sends_stopped(Sender&&)
 {
+    // See check_value_types
+    using Underlying_Sender = std::remove_reference_t<Sender>;
+
+#ifdef HPX_HAVE_STDEXEC
+    constexpr bool sends_stopped =
+        hpx::execution::experimental::sends_stopped<Underlying_Sender, Env>;
+#else
     constexpr bool sends_stopped =
         hpx::execution::experimental::completion_signatures_of_t<Sender,
             Env>::sends_stopped;
+#endif
     static_assert(sends_stopped == Expected);
 }
 
@@ -85,7 +109,7 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
-    struct is_sender{};
+    using is_sender = void;
 
     template <typename R>
     struct operation_state
