@@ -210,11 +210,25 @@ namespace hpx::when_all_vector_detail {
                         hpx::experimental::in_place_stop_token,
                         hpx::execution::experimental::env_of_t<receiver_type>>
                 {
-                    return hpx::execution::experimental::make_env<
-                        hpx::execution::experimental::get_stop_token_t>(
-                        r.op_state.stop_source_.get_token(),
-                        hpx::execution::experimental::get_env(
-                            r.op_state.receiver));
+#ifdef HPX_HAVE_STDEXEC
+                    /* The new calling convention is:
+                     * make_env(old_env, with(tag, val))*/
+                    return hpx::execution::experimental::make_env (
+                            hpx::execution::experimental::get_env(r.op_state.receiver),
+                            hpx::execution::experimental::with(
+                                hpx::execution::experimental::get_stop_token,
+                                r.op_state.stop_source_.get_token()
+                            )
+                        );
+#else
+                    /* The old calling convention is:
+                     * make_env<tag>(val, old_env) */
+                    return hpx::execution::experimental::make_env
+                        <hpx::execution::experimental::get_stop_token_t>(
+                            r.op_state.stop_source_.get_token(),
+                            hpx::execution::experimental::get_env(r.op_state.receiver)
+                        );
+#endif
                 }
             };
 

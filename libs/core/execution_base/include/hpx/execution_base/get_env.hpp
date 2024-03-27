@@ -14,23 +14,19 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <exec/env.hpp>
 
 namespace hpx::execution::experimental {
-    struct no_env
-    {
-        using type = no_env;
-        using id = no_env;
+    using namespace exec;
+    using std::execution::no_env;
 
-        template <typename Tag, typename Env>
-        friend std::enable_if_t<std::is_same_v<no_env, std::decay_t<Env>>>
-            tag_invoke(Tag, Env) = delete;
+    template <typename Env>
+    struct is_no_env : std::is_same<std::decay_t<Env>, no_env>
+    {
     };
 
-    struct empty_env
-    {
-        using type = empty_env;
-        using id = empty_env;
-    };
+    template <typename Env>
+    inline constexpr bool is_no_env_v = is_no_env<Env>::value;
 }
 #else
 
