@@ -7,6 +7,11 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/concurrency/cache_line_data.hpp>

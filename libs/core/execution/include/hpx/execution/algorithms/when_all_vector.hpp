@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+#endif
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -205,11 +210,25 @@ namespace hpx::when_all_vector_detail {
                         hpx::experimental::in_place_stop_token,
                         hpx::execution::experimental::env_of_t<receiver_type>>
                 {
-                    return hpx::execution::experimental::make_env<
-                        hpx::execution::experimental::get_stop_token_t>(
-                        r.op_state.stop_source_.get_token(),
-                        hpx::execution::experimental::get_env(
-                            r.op_state.receiver));
+#ifdef HPX_HAVE_STDEXEC
+                    /* The new calling convention is:
+                     * make_env(old_env, with(tag, val))*/
+                    return hpx::execution::experimental::make_env (
+                            hpx::execution::experimental::get_env(r.op_state.receiver),
+                            hpx::execution::experimental::with(
+                                hpx::execution::experimental::get_stop_token,
+                                r.op_state.stop_source_.get_token()
+                            )
+                        );
+#else
+                    /* The old calling convention is:
+                     * make_env<tag>(val, old_env) */
+                    return hpx::execution::experimental::make_env
+                        <hpx::execution::experimental::get_stop_token_t>(
+                            r.op_state.stop_source_.get_token(),
+                            hpx::execution::experimental::get_env(r.op_state.receiver)
+                        );
+#endif
                 }
             };
 
@@ -330,8 +349,14 @@ namespace hpx::when_all_vector_detail {
                     }
                     else
                     {
-                        hpx::execution::experimental::set_stopped(
-                            HPX_MOVE(receiver));
+#ifdef HPX_HAVE_STDEXEC
+                        if constexpr (hpx::execution::experimental::sends_stopped<Sender>) {
+#endif
+                            hpx::execution::experimental::set_stopped(
+                                    HPX_MOVE(receiver));
+#ifdef HPX_HAVE_STDEXEC
+                        } else { HPX_UNREACHABLE; }
+#endif
                     }
                 }
             }

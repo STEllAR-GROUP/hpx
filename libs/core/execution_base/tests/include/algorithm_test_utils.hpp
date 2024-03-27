@@ -25,8 +25,20 @@ template <typename ExpectedValType,
     typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_value_types(Sender&&)
 {
+    // Passing check_value_types(s) with s being a `custom_sender` lvalue will
+    // result in Sender being custom_sender&. This is problematic because the
+    // sender<S> concept requires constructible_from<std::remove_cvref_t<S>, S>,
+    // so for S = custom_sender the sender concept requires the following to be
+    // well-defined:
+    // custom_sender s(std::declval<custom_sender>())
+    //                      ^^^-- custom_sender&&
+    // Whereas for some_sender& the concept requires
+    // custom_sender s(std::declval<custom_sender&>())
+    //                      ^^^-- custom_sender&
+
+    using Underlying_Sender = std::remove_reference_t<Sender>;
     namespace ex = hpx::execution::experimental;
-    using value_types = ex::value_types_of_t<Sender, Env, hpx::tuple,
+    using value_types = ex::value_types_of_t<Underlying_Sender , Env, hpx::tuple,
         ex::detail::unique_variant<hpx::variant>::template apply>;
     static_assert(std::is_same_v<value_types, ExpectedValType>);
 }
@@ -36,8 +48,12 @@ template <typename ExpectedErrorType,
     typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_error_types(Sender&&)
 {
+
+    // See check_value_types
+    using Underlying_Sender = std::remove_reference_t<Sender>;
+
     namespace ex = hpx::execution::experimental;
-    using error_types = ex::error_types_of_t<Sender, Env,
+    using error_types = ex::error_types_of_t<Underlying_Sender, Env,
         ex::detail::unique_variant<hpx::variant>::template apply>;
     static_assert(std::is_same_v<error_types, ExpectedErrorType>);
 }
@@ -47,14 +63,23 @@ template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
     typename Sender>
 inline void check_sends_stopped(Sender&&)
 {
+    // See check_value_types
+    using Underlying_Sender = std::remove_reference_t<Sender>;
+
+#ifdef HPX_HAVE_STDEXEC
+    constexpr bool sends_stopped =
+        hpx::execution::experimental::sends_stopped<Underlying_Sender, Env>;
+#else
     constexpr bool sends_stopped =
         hpx::execution::experimental::completion_signatures_of_t<Sender,
             Env>::sends_stopped;
+#endif
     static_assert(sends_stopped == Expected);
 }
 
 struct void_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -84,6 +109,8 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
+    using is_sender = void;
+
     template <typename R>
     struct operation_state
     {
@@ -107,17 +134,27 @@ struct error_sender
         return {std::forward<R>(r)};
     }
 
+//    friend hpx::execution::experimental::empty_env tag_invoke(
+//        hpx::execution::experimental::get_env_t, error_sender const&)
+//    {
+//        return {};
+//    }
+//
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         error_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(Ts...),
-            hpx::execution::experimental::set_error_t(std::exception_ptr)>;
+            hpx::execution::experimental::set_stopped_t(),
+            hpx::execution::experimental::set_error_t(std::exception_ptr)> {
+            return {};
+        };
 };
 
 struct stopped_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -146,6 +183,8 @@ struct stopped_sender
 
 struct stopped_sender_with_value_type
 {
+    struct is_sender{};
+
     template <typename R>
     struct operation_state
     {
@@ -179,6 +218,8 @@ struct callback_receiver
 {
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
+
+    struct is_receiver{};
 
     template <typename E>
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -276,6 +317,7 @@ struct void_callback_helper
 template <typename T>
 struct error_typed_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -312,6 +354,7 @@ struct error_typed_sender
 template <typename T>
 struct const_reference_sender
 {
+    struct is_sender{};
     std::reference_wrapper<std::decay_t<T>> x;
 
     template <typename R>
@@ -346,6 +389,7 @@ struct const_reference_sender
 
 struct const_reference_error_sender
 {
+    struct is_sender{};
     template <typename R>
     struct operation_state
     {
@@ -436,6 +480,7 @@ struct custom_sender_tag_invoke
 
 struct custom_sender
 {
+    struct is_sender{};
     std::atomic<bool>& start_called;
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
@@ -537,6 +582,7 @@ struct custom_sender_multi_tuple
 template <typename T>
 struct custom_typed_sender
 {
+    struct is_sender{};
     std::decay_t<T> x;
 
     std::atomic<bool>& start_called;
@@ -788,6 +834,7 @@ namespace my_namespace {
 
     struct my_sender
     {
+        struct is_sender{};
         template <typename R>
         struct operation_state
         {
