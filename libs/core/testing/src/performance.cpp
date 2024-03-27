@@ -35,7 +35,7 @@ namespace hpx::util {
 {{#result}}        {
             "name": "{{name}}",
             "executor": "{{context(executor)}}",
-            "median": "{{median(elapsed)}}" 
+            "average": "{{average(elapsed)}}" 
         }{{^-last}},{{/-last}}
 {{/result}}    ]
 })DELIM";
@@ -72,7 +72,7 @@ namespace hpx::util {
         class json_perf_times
         {
             using key_t = std::tuple<std::string, std::string>;
-            using value_t = std::vector<double>;
+            using value_t = std::vector<long double>;
             using map_t = std::map<key_t, value_t>;
 
             map_t m_map;
@@ -111,19 +111,27 @@ namespace hpx::util {
                      << "\",\n";
                 strm << R"(      "executor" : ")" << std::get<1>(item.first)
                      << "\",\n";
-                strm << R"(      "series" : [)";
-                double average = 0.0;
+                
+                if (local::detail::verbose_)
+                    strm << R"(      "series" : [)";
+                long double average = 0.0;
                 int series = 0;
-                for (auto const val : item.second)
+                strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
+                for (long double const val : item.second)
                 {
-                    if (series)
-                        strm << ", ";
-                    strm << val;
+                    if (local::detail::verbose_) 
+                    {
+                        if (series)
+                            strm << ", ";
+                        strm << std::scientific << val;
+                    }
                     ++series;
                     average += val;
                 }
-                strm << "],\n";
-                strm << "      \"average\" : " << average / series << "\n";
+                if (local::detail::verbose_)
+                    strm << "]\n";
+                else 
+                    strm << "      \"average\" : " << average / series << "\n";
                 strm << "    }";
                 ++outputs;
             }
