@@ -12,7 +12,13 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
-#endif
+
+namespace hpx::this_thread::experimental {
+    using hpx::execution::experimental::sync_wait_t;
+
+    sync_wait_t const sync_wait{};
+}
+#else
 
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -586,3 +592,5 @@ namespace hpx::this_thread::experimental {
         }
     } sync_wait_with_variant{};
 }    // namespace hpx::this_thread::experimental
+
+#endif
