@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <utility>
 
+namespace ex = hpx::execution::experimental;
+
 struct some_env
 {
 };
@@ -20,12 +22,15 @@ struct some_env
 namespace mylib {
     struct receiver_1
     {
+        using is_receiver = void;
     };
 
     struct receiver_2
     {
+        using is_receiver = void;
+
         friend some_env tag_invoke(
-            hpx::execution::experimental::get_env_t, receiver_2&&)
+            ex::get_env_t, receiver_2 const&) noexcept
         {
             return some_env{};
         }
@@ -37,29 +42,48 @@ namespace mylib {
     } receiver_env{};
 
     using env3_t =
-        hpx::execution::experimental::make_env_t<receiver_env_t, int>;
+        ex::make_env_t<receiver_env_t, int>;
 
     struct receiver_3
     {
+        using is_receiver = void;
+
         friend constexpr auto tag_invoke(
-            hpx::execution::experimental::get_env_t, receiver_3&&) noexcept
+            ex::get_env_t, receiver_3 const&) noexcept
         {
-            return hpx::execution::experimental::make_env<receiver_env_t>(42);
+#ifdef HPX_HAVE_STDEXEC
+            return ex::make_env(ex::with(receiver_env, 42));
+#else
+            return ex::make_env<receiver_env_t>(42);
+#endif
         }
     };
 
-    using env4_t = hpx::execution::experimental::make_env_t<receiver_env_t,
+#ifdef HPX_HAVE_STDEXEC
+#else
+    using env4_t = ex::make_env_t<receiver_env_t,
         std::string, env3_t>;
+#endif
 
     struct receiver_4
     {
+        using is_receiver = void;
+
         friend auto tag_invoke(
-            hpx::execution::experimental::get_env_t, receiver_4&&) noexcept
+            ex::get_env_t, receiver_4 const&) noexcept
         {
             receiver_3 rcv;
-            return hpx::execution::experimental::make_env<receiver_env_t>(
+
+#ifdef HPX_HAVE_STDEXEC
+            auto k = ex::make_env(
+                ex::get_env(rcv),
+                ex::with(receiver_env, std::string("42"))
+                );
+#else
+            return ex::make_env<receiver_env_t>(
                 std::string("42"),
-                hpx::execution::experimental::get_env(std::move(rcv)));
+                ex::get_env(std::move(rcv)));
+#endif
         }
     };
 
@@ -68,27 +92,45 @@ namespace mylib {
     {
     } receiver_env1{};
 
-    using env5_t = hpx::execution::experimental::make_env_t<receiver_env1_t,
+#ifdef HPX_HAVE_STDEXEC
+#else
+    using env5_t = ex::make_env_t<receiver_env1_t,
         std::string, env3_t>;
+#endif
 
     struct receiver_5
     {
+        using is_receiver = void;
+
         friend auto tag_invoke(
-            hpx::execution::experimental::get_env_t, receiver_5&&) noexcept
+            ex::get_env_t, receiver_5 const&) noexcept
         {
             receiver_3 rcv;
-            return hpx::execution::experimental::make_env<receiver_env1_t>(
+#ifdef HPX_HAVE_STDEXEC
+//            static_assert(
+//                std::same_as<decltype(ex::get_env(rcv)), int>
+//                );
+            auto k =  ex::make_env(
+                ex::get_env(rcv),
+                ex::with(receiver_env1, std::string("42"))
+                );
+
+            auto n = receiver_env(k);
+            return k;
+#else
+            return ex::make_env<receiver_env1_t>(
                 std::string("42"),
-                hpx::execution::experimental::get_env(std::move(rcv)));
+                ex::get_env(std::move(rcv)));
+#endif
         }
     };
 }    // namespace mylib
 
 int main()
 {
-    using hpx::execution::experimental::empty_env;
-    using hpx::execution::experimental::is_no_env_v;
-    using hpx::execution::experimental::no_env;
+    using ex::empty_env;
+    using ex::is_no_env_v;
+    using ex::no_env;
 
     static_assert(
         is_no_env_v<no_env>, "no_env is a (possibly cv-qualified) no_env");
@@ -99,29 +141,29 @@ int main()
 
     {
         mylib::receiver_1 rcv;
-        auto env = hpx::execution::experimental::get_env(std::move(rcv));
+        auto env = ex::get_env(std::move(rcv));
         static_assert(
             std::is_same_v<decltype(env), empty_env>, "must return empty_env");
     }
     {
         mylib::receiver_2 rcv;
-        auto env = hpx::execution::experimental::get_env(std::move(rcv));
+        auto env = ex::get_env.operator()<false>(std::move(rcv));
         static_assert(
             std::is_same_v<decltype(env), some_env>, "must return some_env");
     }
     {
         mylib::receiver_3 rcv;
-        auto env = hpx::execution::experimental::get_env(std::move(rcv));
+        auto env = ex::get_env(std::move(rcv));
         HPX_TEST_EQ(mylib::receiver_env(env), 42);
     }
     {
         mylib::receiver_4 rcv;
-        auto env = hpx::execution::experimental::get_env(std::move(rcv));
+        auto env = ex::get_env(rcv);
         HPX_TEST_EQ(mylib::receiver_env(env), std::string("42"));
     }
     {
         mylib::receiver_5 rcv;
-        auto env = hpx::execution::experimental::get_env(std::move(rcv));
+        auto env = ex::get_env(rcv);
         HPX_TEST_EQ(mylib::receiver_env(env), 42);
         HPX_TEST_EQ(mylib::receiver_env1(env), std::string("42"));
     }
