@@ -15,7 +15,7 @@ if(NOT TARGET STDEXEC::stdexec)
     stdexec
     HINTS ${Stdexec_ROOT}
   )
-
+  message(STATUS "stdexec include dir: ${Stdexec_INCLUDE_DIR}")
   if (Stdexec_INCLUDE_DIR)
     file(TO_CMAKE_PATH ${Stdexec_INCLUDE_DIR} Stdexec_INCLUDE_DIR)
   else()
@@ -34,5 +34,5 @@ if(NOT TARGET STDEXEC::stdexec)
   add_library(STDEXEC::stdexec INTERFACE IMPORTED)
   target_include_directories(STDEXEC::stdexec SYSTEM INTERFACE ${Stdexec_INCLUDE_DIR})
 
-  mark_as_advanced(Stdexec_INCLUD`E_DIR Stdexec_ROOT)
+  mark_as_advanced(Stdexec_INCLUDE_DIR Stdexec_ROOT)
 endif()
