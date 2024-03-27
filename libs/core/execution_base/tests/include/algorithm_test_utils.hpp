@@ -134,6 +134,12 @@ struct error_sender
         return {std::forward<R>(r)};
     }
 
+//    friend hpx::execution::experimental::empty_env tag_invoke(
+//        hpx::execution::experimental::get_env_t, error_sender const&)
+//    {
+//        return {};
+//    }
+//
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
