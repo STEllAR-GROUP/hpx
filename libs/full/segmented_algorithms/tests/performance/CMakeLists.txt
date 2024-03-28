@@ -15,16 +15,11 @@ foreach(benchmark ${benchmarks})
 
   source_group("Source Files" FILES ${sources})
 
-  set(deps iostreams_component partitioned_vector_component)
-  # if (HPX_WITH_NANOBENCH_BENCHMARKS)
-  #   set(deps ${deps} nanobench)
-  # endif()
-
   # add example executable
   add_hpx_executable(
     ${benchmark}_test INTERNAL_FLAGS
     SOURCES ${sources} ${${benchmark}_FLAGS}
-    DEPENDENCIES ${deps}
+    DEPENDENCIES iostreams_component partitioned_vector_component
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER "Benchmarks/Modules/Full/SegmentedAlgorithms"

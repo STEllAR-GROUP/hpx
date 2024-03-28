@@ -18,15 +18,13 @@ else:
     test_names = []
     samples = []
 
-    print(json_obj)
     for test in json_obj["outputs"]:
-        test_names.append(test["name"] + "," + test["executor"])
+        test_names.append(test["name"] + ",\n" + test["executor"])
         samples.append(test["series"])
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(20, 6))
     ax = fig.add_subplot()
     bp = ax.boxplot(samples, showfliers=False)
-
-    ax.set_xticklabels(test_names)
+    plt.setp(ax.set_xticklabels(test_names), fontsize=7)
     plt.show()
     

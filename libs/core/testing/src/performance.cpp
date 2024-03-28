@@ -30,15 +30,13 @@ namespace hpx::util {
 
         char const* nanobench_hpx_simple_template() noexcept
         {
-            return R"DELIM({
-    "outputs": [
-{{#result}}        {
-            "name": "{{name}}",
-            "executor": "{{context(executor)}}",
-            "average": "{{average(elapsed)}}" 
-        }{{^-last}},{{/-last}}
-{{/result}}    ]
-})DELIM";
+            return R"DELIM(Results:
+{{#result}}        
+name: {{name}},
+executor: {{context(executor)}},
+average": {{average(elapsed)}} 
+{{/result}}
+)DELIM";
         }
 
         char const* nanobench_hpx_template() noexcept

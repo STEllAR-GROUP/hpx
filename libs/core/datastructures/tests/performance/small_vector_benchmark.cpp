@@ -9,6 +9,7 @@
 #include <hpx/datastructures/detail/small_vector.hpp>
 #include <hpx/functional.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -19,30 +20,25 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Container>
-std::uint64_t measure(std::size_t repeat, std::size_t size)
+void fill(std::size_t size)
 {
-    std::uint64_t start = hpx::chrono::high_resolution_clock::now();
-    for (std::size_t i = 0; i != repeat; ++i)
+    Container cont;
+    for (std::size_t i = 0; i != size; ++i)
     {
-        Container cont;
-        for (std::size_t i = 0; i != size; ++i)
-        {
-            cont.push_back(typename Container::value_type{});
-        }
+        cont.push_back(typename Container::value_type{});
     }
-    return (hpx::chrono::high_resolution_clock::now() - start) / repeat;
 }
 
-template <typename T, std::size_t N>
-void compare(std::size_t repeat, std::size_t size)
-{
-    std::uint64_t time = measure<hpx::detail::small_vector<T, N>>(repeat, size);
+// template <typename T, std::size_t N>
+// void compare(std::size_t repeat, std::size_t size)
+// {
+//     std::uint64_t time = measure<hpx::detail::small_vector<T, N>>(repeat, size);
 
-    std::cout << "-----Average-(hpx::small_vector<" << typeid(T).name() << ", "
-              << N << ">)------ \n"
-              << std::left << "Average execution time : " << std::right
-              << std::setw(8) << time / 1e9 << "\n";
-}
+//     std::cout << "-----Average-(hpx::small_vector<" << typeid(T).name() << ", "
+//               << N << ">)------ \n"
+//               << std::left << "Average execution time : " << std::right
+//               << std::setw(8) << time / 1e9 << "\n";
+// }
 
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -50,30 +46,76 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t repeat = vm["test_count"].as<std::size_t>();
     std::size_t size = vm["vector_size"].as<std::size_t>();
 
-    std::cout << std::left
-              << "----------------Parameters---------------------\n"
-              << std::left
-              << "Vector size                       : " << std::right
-              << std::setw(8) << size << "\n"
-              << std::left
-              << "Number of tests                   : " << std::right
-              << std::setw(8) << repeat << "\n"
-              << std::left
-              << "Display time in                   : " << std::right
-              << std::setw(8) << "Seconds\n"
-              << std::flush;
+    // std::cout << std::left
+    //           << "----------------Parameters---------------------\n"
+    //           << std::left
+    //           << "Vector size                       : " << std::right
+    //           << std::setw(8) << size << "\n"
+    //           << std::left
+    //           << "Number of tests                   : " << std::right
+    //           << std::setw(8) << repeat << "\n"
+    //           << std::left
+    //           << "Display time in                   : " << std::right
+    //           << std::setw(8) << "Seconds\n"
+    //           << std::flush;
 
-    compare<int, 1>(repeat, size);
-    compare<int, 2>(repeat, size);
-    compare<int, 4>(repeat, size);
-    compare<int, 8>(repeat, size);
-    compare<int, 16>(repeat, size);
+    // compare<int, 1>(repeat, size);
+    // compare<int, 2>(repeat, size);
+    // compare<int, 4>(repeat, size);
+    // compare<int, 8>(repeat, size);
+    // compare<int, 16>(repeat, size);
 
-    compare<hpx::move_only_function<void()>, 1>(repeat, size);
-    compare<hpx::move_only_function<void()>, 2>(repeat, size);
-    compare<hpx::move_only_function<void()>, 4>(repeat, size);
-    compare<hpx::move_only_function<void()>, 8>(repeat, size);
-    compare<hpx::move_only_function<void()>, 16>(repeat, size);
+    // compare<hpx::move_only_function<void()>, 1>(repeat, size);
+    // compare<hpx::move_only_function<void()>, 2>(repeat, size);
+    // compare<hpx::move_only_function<void()>, 4>(repeat, size);
+    // compare<hpx::move_only_function<void()>, 8>(repeat, size);
+    // compare<hpx::move_only_function<void()>, 16>(repeat, size);
+
+    // int 
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 1>", repeat, [&] {
+        fill<hpx::detail::small_vector<int, 1>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 2>", repeat, [&] {
+        fill<hpx::detail::small_vector<int, 2>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 4>", repeat, [&] {
+        fill<hpx::detail::small_vector<int, 4>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 8>", repeat, [&] {
+        fill<hpx::detail::small_vector<int, 8>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 16>", repeat, [&] {
+        fill<hpx::detail::small_vector<int, 16>>(size);
+    });
+
+    // hpx::move_only_function<void()>
+
+    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 1>", repeat, [&] {
+        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 1>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 2>", repeat, [&] {
+        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 2>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 4>", repeat, [&] {
+        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 4>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 8>", repeat, [&] {
+        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 8>>(size);
+    });
+
+    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 16>", repeat, [&] {
+        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 16>>(size);
+    });
+
+    hpx::util::perftests_print_times();
 
     return hpx::local::finalize();
 }
