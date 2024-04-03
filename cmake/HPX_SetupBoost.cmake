@@ -5,6 +5,70 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+if(HPX_WITH_FETCH_BOOST)
+  set(HPX_WITH_BOOST_VERSION "1.84.0")
+  hpx_info(
+    "HPX_WITH_FETCH_BOOST=${HPX_WITH_FETCH_BOOST}, Boost v${HPX_WITH_BOOST_VERSION} will be fetched using CMake's FetchContent"
+  )
+  include(FetchContent)
+  fetchcontent_declare(
+    Boost
+    URL https://github.com/boostorg/boost/releases/download/boost-${HPX_WITH_BOOST_VERSION}/boost-${HPX_WITH_BOOST_VERSION}.tar.gz
+    TLS_VERIFY true
+    DOWNLOAD_EXTRACT_TIMESTAMP true
+  )
+  fetchcontent_populate(Boost)
+  set(HPX_WITH_BUILD_FETCHED_BOOST
+      "Execute process"
+      CACHE STRING "Used by command line tool to build fetched Boost"
+  )
+  set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
+      ""
+      CACHE
+        STRING
+        "for internal use only, do not modify. Checks if fetched Boost is built"
+  )
+
+  if(NOT HPX_WITH_BUILD_FETCHED_BOOST STREQUAL
+     HPX_WITH_BUILD_FETCHED_BOOST_CHECK
+  )
+    if(WIN32)
+      execute_process(
+        COMMAND
+          cmd /C
+          "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++${HPX_CXX_STANDARD}"
+      )
+    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+      execute_process(
+        COMMAND
+          sh -c
+          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed && ./b2 && ./b2 install --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed cxxflags=--std=c++${HPX_CXX_STANDARD}"
+      )
+    else()
+      execute_process(
+        COMMAND
+          sh -c
+          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_CXX_STANDARD}"
+      )
+    endif()
+    set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
+        ${HPX_WITH_BUILD_FETCHED_BOOST}
+        CACHE
+          INTERNAL
+          "for internal use only, do not modify. Checks if fetched Boost is built"
+    )
+  endif()
+
+  set(Boost_DIR
+      "${CMAKE_BINARY_DIR}/_deps/boost-src"
+      CACHE INTERNAL ""
+  )
+  set(Boost_INCLUDE_DIR
+      "${CMAKE_BINARY_DIR}/_deps/boost-src"
+      CACHE INTERNAL ""
+  )
+endif()
+
 # In case find_package(HPX) is called multiple times
 if(NOT TARGET hpx_dependencies_boost)
   # We first try to find the required minimum set of Boost libraries. This will
