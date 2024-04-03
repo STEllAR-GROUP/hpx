@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,10 +34,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/errors/throw_exception.hpp>
 #include <hpx/type_support/construct_at.hpp>
 #include <hpx/type_support/is_trivially_relocatable.hpp>
 #include <hpx/type_support/uninitialized_relocation_primitives.hpp>
-#include <hpx/errors/throw_exception.hpp>
 
 #include <algorithm>
 #include <array>
@@ -221,7 +222,8 @@ namespace hpx::detail {
 
     // note: Allocator is currently unused
     template <typename T, std::size_t MinInlineCapacity,
-        typename Allocator = std::allocator<T>, bool emulate_inplace_vector = false>
+        typename Allocator = std::allocator<T>,
+        bool emulate_inplace_vector = false>
     class small_vector
     {
         static_assert(MinInlineCapacity <= 127,
@@ -251,8 +253,10 @@ namespace hpx::detail {
 
         [[nodiscard]] constexpr auto is_direct() const noexcept -> bool
         {
-            if constexpr (emulate_inplace_vector) return true;
-            else return (m_data[0] & 1U) != 0U;
+            if constexpr (emulate_inplace_vector)
+                return true;
+            else
+                return (m_data[0] & 1U) != 0U;
         }
 
         [[nodiscard]] auto indirect() noexcept -> storage<T>*
@@ -299,7 +303,8 @@ namespace hpx::detail {
 
         void realloc(std::size_t new_capacity)
         {
-            static_assert(!emulate_inplace_vector, "If called in an inplace_vector, it is a bug.");
+            static_assert(!emulate_inplace_vector,
+                "If called in an inplace_vector, it is a bug.");
             if (new_capacity <= N)
             {
                 // put everything into direct storage
@@ -527,7 +532,8 @@ namespace hpx::detail {
             if constexpr (emulate_inplace_vector)
             {
                 // Can not have an inplace_vector with a size larger than N
-                if (s <= capacity()) {
+                if (s <= capacity())
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -578,34 +584,37 @@ namespace hpx::detail {
             auto const num_moves = std::distance(source_begin, source_end);
             auto const target_end = target_begin + num_moves;
 
-            ::hpx::experimental::util::uninitialized_relocate_backward_primitive(
-                source_begin, source_end, target_end);
+            ::hpx::experimental::util::
+                uninitialized_relocate_backward_primitive(
+                    source_begin, source_end, target_end);
 
+            /*
+            In the following commented code we split the move into an
+            uninitialized move and a move, using relocation only when it is
+            a memcpy. The thought process was that a move assignment might
+            be faster than a move construction in certain cases, but since
+            this is likely not the usual case we always choose relocation.
 
-            // In the following commented code we split the move into an
-            // uninitialized move and a move, using relocation only when it is
-            // a memcpy. The thought process was that a move assignment might
-            // be faster than a move construction in certain cases, but since
-            // this is likely not the usual case we always choose relocation.
+            if constexpr (hpx::experimental::is_trivially_relocatable_v<T>)
+            {
+                ::hpx::experimental::util::
+                    uninitialized_relocate_backward_primitive(
+                        source_begin, source_end, target_end);
+            }
+            else
+            {
+                auto const num_uninitialized_move = (std::min)(
+                    num_moves, std::distance(source_end, target_end));
 
-//            if constexpr (hpx::experimental::is_trivially_relocatable_v<T>)
-//            {
-//                ::hpx::experimental::util::uninitialized_relocate_backward_primitive(
-//                    source_begin, source_end, target_end);
-//            }
-//            else
-//            {
-//                auto const num_uninitialized_move = (std::min)(
-//                    num_moves, std::distance(source_end, target_end));
-//
-//                std::uninitialized_move(source_end - num_uninitialized_move,
-//                    source_end, target_end - num_uninitialized_move);
-//                std::move_backward(source_begin,
-//                    source_end - num_uninitialized_move,
-//                    target_end - num_uninitialized_move);
-//                std::destroy(
-//                    source_begin, (std::min)(source_end, target_begin));
-//            }
+                std::uninitialized_move(source_end - num_uninitialized_move,
+                    source_end, target_end - num_uninitialized_move);
+                std::move_backward(source_begin,
+                    source_end - num_uninitialized_move,
+                    target_end - num_uninitialized_move);
+                std::destroy(
+                    source_begin, (std::min)(source_end, target_begin));
+            }
+            */
         }
 
         // makes space for uninitialized data of count elements. Also updates
@@ -620,8 +629,8 @@ namespace hpx::detail {
             target.reserve(s + count);
 
             // move everything [begin, pos[
-            auto* target_pos =
-                std::get<1>(::hpx::experimental::util::uninitialized_relocate_primitive(
+            auto* target_pos = std::get<1>(
+                ::hpx::experimental::util::uninitialized_relocate_primitive(
                     data<D>(), p, target.template data<direction::indirect>()));
 
             // move everything [pos, end]
@@ -738,7 +747,8 @@ namespace hpx::detail {
             if constexpr (emulate_inplace_vector)
             {
                 // Can not have an inplace_vector with a size larger than N
-                if (count > N) {
+                if (count > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -751,7 +761,8 @@ namespace hpx::detail {
             if constexpr (emulate_inplace_vector)
             {
                 // Can not have an inplace_vector with a size larger than N
-                if (count > N) {
+                if (count > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -862,9 +873,11 @@ namespace hpx::detail {
 
         void resize(std::size_t count)
         {
-            if constexpr (emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 // Static vector cannot be resized beyond capacity
-                if (count > N) {
+                if (count > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -886,9 +899,11 @@ namespace hpx::detail {
 
         void resize(std::size_t count, value_type const& value)
         {
-            if constexpr (emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 // Static vector cannot resize beyond capacity
-                if (count > N) {
+                if (count > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -910,9 +925,11 @@ namespace hpx::detail {
 
         auto reserve(std::size_t s)
         {
-            if constexpr (emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 // Static vector cannot reserve beyond capacity
-                if (s > N) {
+                if (s > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -926,7 +943,8 @@ namespace hpx::detail {
 
         [[nodiscard]] constexpr auto capacity() const noexcept -> std::size_t
         {
-            if constexpr (emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 return capacity<direction::direct>();
             }
             if (is_direct())
@@ -967,9 +985,11 @@ namespace hpx::detail {
             if (is_direct())
             {
                 s = direct_size();
-                if constexpr (emulate_inplace_vector) {
+                if constexpr (emulate_inplace_vector)
+                {
                     // Exceeded static_storage
-                    if (s + 1 > N) {
+                    if (s + 1 > N)
+                    {
                         throw std::bad_alloc();
                     }
                 }
@@ -1174,7 +1194,8 @@ namespace hpx::detail {
 
         [[nodiscard]] static constexpr auto max_size() -> std::size_t
         {
-            if constexpr (emulate_inplace_vector) return N;
+            if constexpr (emulate_inplace_vector)
+                return N;
             return (std::numeric_limits<std::size_t>::max)();
         }
 
@@ -1182,9 +1203,11 @@ namespace hpx::detail {
         {
             // TODO we could try to do the minimum number of moves
             alignas(small_vector) std::byte buf[sizeof(small_vector)];
-            hpx::experimental::relocate_at(&other, reinterpret_cast<small_vector*>(buf));
+            hpx::experimental::relocate_at(
+                &other, reinterpret_cast<small_vector*>(buf));
             hpx::experimental::relocate_at(this, &other);
-            hpx::experimental::relocate_at(reinterpret_cast<small_vector*>(buf), this);
+            hpx::experimental::relocate_at(
+                reinterpret_cast<small_vector*>(buf), this);
         }
 
         void shrink_to_fit()
@@ -1192,7 +1215,8 @@ namespace hpx::detail {
             // per the standard we wouldn't need to do anything here. But since
             // we are so nice, let's do the shrink.
 
-            if constexpr (emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 // Can not change the capacity of a static vector so noop
                 return;
             }
@@ -1217,9 +1241,11 @@ namespace hpx::detail {
         template <typename... Args>
         auto emplace(const_iterator pos, Args&&... args) -> iterator
         {
-            if constexpr(emulate_inplace_vector) {
+            if constexpr (emulate_inplace_vector)
+            {
                 // it will be expanded by one element
-                if (direct_size() + 1 > N) {
+                if (direct_size() + 1 > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -1241,8 +1267,10 @@ namespace hpx::detail {
         auto insert(const_iterator pos, std::size_t count, T const& value)
             -> iterator
         {
-            if constexpr(emulate_inplace_vector) {
-                if (direct_size() + count > N) {
+            if constexpr (emulate_inplace_vector)
+            {
+                if (direct_size() + count > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -1286,8 +1314,10 @@ namespace hpx::detail {
             std::forward_iterator_tag /*unused*/)
         {
             auto d = std::distance(first, last);
-            if constexpr(emulate_inplace_vector) {
-                if (direct_size() + d > N) {
+            if constexpr (emulate_inplace_vector)
+            {
+                if (direct_size() + d > N)
+                {
                     throw std::bad_alloc();
                 }
             }
@@ -1369,7 +1399,8 @@ namespace hpx::detail {
         return !(a > b);
     }
 
-    template <typename T, std::size_t MinInlineCapacity, typename Allocator = std::allocator<T>>
+    template <typename T, std::size_t MinInlineCapacity,
+        typename Allocator = std::allocator<T>>
     using inplace_vector = small_vector<T, MinInlineCapacity, Allocator, true>;
 }    // namespace hpx::detail
 
@@ -1399,6 +1430,9 @@ namespace std {    //-V1061
 
 namespace hpx::experimental {
     template <typename T, std::size_t N, typename Alloc, bool emul>
-    struct is_trivially_relocatable<hpx::detail::small_vector<T, N, Alloc, emul>> :
-        is_trivially_relocatable<T> {};
-}
+    struct is_trivially_relocatable<
+        hpx::detail::small_vector<T, N, Alloc, emul>>
+      : is_trivially_relocatable<T>
+    {
+    };
+}    // namespace hpx::experimental
