@@ -23,11 +23,6 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-#if !defined(OPENSHMEM_PAGESIZE)
-// GASNet default pagesize is 16384
-#define OPENSHMEM_PER_RANK_PAGESIZE 16384
-#endif
-
 namespace hpx { namespace util {
 
     struct openshmem_seginfo_t
@@ -99,6 +94,7 @@ namespace hpx { namespace util {
 
         static hpx::mutex dshm_mut;
         static int init_val_;
+        static std::size_t nthreads_;
         static hpx::mutex* segment_mutex;
         static openshmem_seginfo_t* segments;
         static std::uint8_t* shmem_buffer;

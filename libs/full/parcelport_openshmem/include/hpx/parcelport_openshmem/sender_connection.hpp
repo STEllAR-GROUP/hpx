@@ -69,11 +69,14 @@ namespace hpx::parcelset::policies::openshmem {
           , sender_(s)
           , tag_(-1)
           , dst_(dst)
+          , thd_id_(-1)
           , chunks_idx_(0)
           , ack_(0)
           , pp_(pp)
           , there_(parcelset::locality(locality(dst_)))
         {
+            thd_id_ =
+               hpx::get_worker_thread_num();    // current worker
         }
 
         parcelset::locality const& destination() const noexcept
@@ -100,7 +103,7 @@ namespace hpx::parcelset::policies::openshmem {
 #endif
             chunks_idx_ = 0;
             tag_ = acquire_tag(sender_);
-            header_ = header(buffer_, tag_);
+            header_ = header(buffer_, tag_, thd_id_);
             header_.assert_valid();
 
             state_ = initialized;
@@ -149,25 +152,28 @@ namespace hpx::parcelset::policies::openshmem {
         bool send_header()
         {
             {
-                hpx::util::openshmem_environment::scoped_lock l;
                 HPX_ASSERT(state_ == initialized);
 
-                // compute + send the number of OPENSHMEM_PAGEs to send and the
-                // remainder number of bytes to a OPENSHMEM_PAGE
-                //
-                std::size_t chunks[] = {static_cast<size_t>(header_.data_size_ /
-                                            OPENSHMEM_PER_RANK_PAGESIZE),
-                    static_cast<size_t>(
-                        header_.data_size_ % OPENSHMEM_PER_RANK_PAGESIZE)};
-                const std::size_t sizeof_chunks = sizeof(chunks);
+                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                const auto idx = (dst_*nthreads_)+thd_id_;
+
+                hpx::util::openshmem_environment::scoped_lock l;
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
+
                 hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(chunks), dst_,
-                    static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[dst_].beg_addr),
-                    sizeof_chunks, reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[dst_].rcv));
+                    reinterpret_cast<std::uint8_t*>(header_.data()),
+                    dst_,
+                    static_cast<std::uint8_t*>(
+                       hpx::util::openshmem_environment::segments[idx].beg_addr
+                    ),
+                    header_.data_size_,
+                    reinterpret_cast<unsigned int*>(
+                       hpx::util::openshmem_environment::segments[idx].rcv
+                    )
+                );
             }
 
             state_ = sent_header;
@@ -184,19 +190,22 @@ namespace hpx::parcelset::policies::openshmem {
 
             std::vector<typename parcel_buffer_type::transmission_chunk_type>&
                 chunks = buffer_.transmission_chunks_;
+
             if (!chunks.empty())
             {
-                const std::size_t rank_ =
-                    hpx::util::openshmem_environment::rank();
+                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                const auto idx = (dst_*nthreads_)+thd_id_;
+
                 hpx::util::openshmem_environment::scoped_lock l;
+
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
                     static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments
-                        [rank_].beg_addr),
+                        [idx].beg_addr),
                     static_cast<int>(chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)),
                     reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments
-                        [rank_].rcv)
+                        [idx].rcv)
                 );
             }
 
@@ -213,13 +222,16 @@ namespace hpx::parcelset::policies::openshmem {
             }
 
             if (!header_.piggy_back())
-            {
+            {   
+                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                const auto idx = (dst_*nthreads_)+thd_id_;
+
                 hpx::util::openshmem_environment::scoped_lock l;
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
-                    static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[dst_].beg_addr),
+                    static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
                     buffer_.data_.size(),
-                    reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[dst_].rcv)
+                    reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[idx].rcv)
                 );
             }
             state_ = sent_data;
@@ -242,19 +254,22 @@ namespace hpx::parcelset::policies::openshmem {
                         return false;
                     }
 
+                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                    const auto idx = (dst_*nthreads_)+thd_id_;
+
                     hpx::util::openshmem_environment::scoped_lock l;
+
                     hpx::util::openshmem_environment::put_signal(
                         reinterpret_cast<const std::uint8_t*>(c.data_.cpos_),
                         dst_,
-                        static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[dst_]
-                            .beg_addr),
+                        static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
                         static_cast<int>(c.size_),
-                        reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[dst_].rcv)
+                        reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[idx].rcv)
                     );
 
                     hpx::util::openshmem_environment::wait_until(
-                        1, hpx::util::openshmem_environment::segments[dst_].xmt);
-                    (*(hpx::util::openshmem_environment::segments[dst_].xmt)) = 0;
+                        1, hpx::util::openshmem_environment::segments[idx].xmt);
+                    (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
                 }
 
                 ++chunks_idx_;
@@ -303,6 +318,7 @@ namespace hpx::parcelset::policies::openshmem {
         sender_type* sender_;
         int tag_;
         int dst_;
+        int thd_id_;
 
         using handler_type = hpx::move_only_function<void(error_code const&)>;
         handler_type handler_;

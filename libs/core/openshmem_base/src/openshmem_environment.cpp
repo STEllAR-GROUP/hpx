@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/openshmem_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -17,6 +18,7 @@
 #include <hpx/modules/util.hpp>
 
 #include <atomic>
+#include <unistd.h>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
@@ -102,6 +104,7 @@ namespace hpx::util {
     hpx::mutex* openshmem_environment::segment_mutex = nullptr;
     openshmem_seginfo_t* openshmem_environment::segments = nullptr;
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
+    std::size_t openshmem_environment::nthreads_ = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     int openshmem_environment::init([[maybe_unused]] int* argc,
@@ -144,28 +147,39 @@ namespace hpx::util {
         //
         //segments.resize(hpx::threads::hardware_concurrency() * size());
         //
-        const std::size_t page_count = size();
-        const std::size_t signal_count = page_count*2;
+
+        auto& rp = hpx::resource::get_partitioner();
+        openshmem_environment::nthreads_ =
+            rp.get_num_threads();
+        const std::size_t total_thread_num =
+            openshmem_environment::nthreads_;
+        const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
+        const std::size_t page_count = size()*total_thread_num;
         openshmem_environment::segments = new openshmem_seginfo_t[page_count];
         openshmem_environment::segment_mutex = new hpx::mutex[page_count];
 
-        const std::size_t byte_count = ((sizeof(std::uint8_t)*OPENSHMEM_PER_RANK_PAGESIZE*page_count)+(sizeof(unsigned int)*signal_count)) / sizeof(std::uint8_t);
+        // symmetric allocation for number of pages total + number of signals
+        //
+        // (allocate page_size * number of PEs * number of threads) + (number of PEs * number of threads * 2 [for signaling])
+        // 
+        const std::size_t byte_count = (sys_pgsz*page_count)+(sizeof(unsigned int)*page_count*2);
 
         hpx::util::openshmem_environment::shmem_buffer =
             static_cast<std::uint8_t*>(shmem_calloc(
                 byte_count, sizeof(std::uint8_t)));
 
-        std::size_t beg_signal = (OPENSHMEM_PER_RANK_PAGESIZE*page_count);
+        const std::size_t beg_signal = (sys_pgsz*page_count);
+
         for (std::size_t i = 0; i < page_count; ++i)
         {
             segments[i].beg_addr = hpx::util::openshmem_environment::shmem_buffer +
-                (i * OPENSHMEM_PER_RANK_PAGESIZE);
+                (i * sys_pgsz);
             segments[i].end_addr = static_cast<std::uint8_t*>(segments[i].beg_addr) +
-                OPENSHMEM_PER_RANK_PAGESIZE;
+                sys_pgsz;
             segments[i].rcv = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
-                beg_signal + signal_count);
+                beg_signal + i);
             segments[i].xmt = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
-                beg_signal + signal_count + 1);
+                beg_signal + page_count + i);
         }
 
         shmem_barrier_all();
