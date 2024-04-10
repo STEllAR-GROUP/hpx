@@ -16,6 +16,7 @@ mkdir -p "${build_dir}"
 
 source ${src_dir}/.jenkins/lsu/env-common.sh
 source ${src_dir}/.jenkins/lsu/env-${configuration_name}.sh
+export PATH="/home/pansysk75/libs/cmake/bin/:$PATH" #temporary, use more recent cmake version
 
 ulimit -l unlimited
 

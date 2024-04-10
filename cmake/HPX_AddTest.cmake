@@ -234,6 +234,12 @@ function(add_hpx_test category name)
       endif()
     endif()
   endif()
+
+  # Works for Cmake >=3.27
+  set_tests_properties(
+    "${_full_name}" PROPERTIES TIMEOUT_SIGNAL_NAME SIGINT TIMEOUT_SIGNAL_GRACE_PERIOD 5
+  )
+  
 endfunction(add_hpx_test)
 
 function(add_hpx_test_target_dependencies category name)
