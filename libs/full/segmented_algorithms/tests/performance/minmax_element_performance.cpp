@@ -69,6 +69,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
         // initialize data
         hpx::generate(hpx::execution::par, v.begin(), v.end(), random_fill());
 
+        hpx::util::perftests_init(vm);
+
         // run benchmark
         hpx::util::perftests_report("hpx::minmax", "par", test_count, [&]{
             hpx::minmax_element(hpx::execution::par, v.begin(), v.end());});
@@ -106,6 +108,8 @@ int main(int argc, char* argv[])
         "csv_output", "print results in csv format")("seed,s",
         hpx::program_options::value<unsigned int>(),
         "the random number generator seed to use for this run");
+
+    hpx::util::perftests_cfg(cmdline);
 
     hpx::init_params init_args;
     init_args.desc_cmdline = cmdline;

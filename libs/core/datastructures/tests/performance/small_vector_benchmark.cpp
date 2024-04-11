@@ -45,34 +45,11 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // pull values from cmd
     std::size_t repeat = vm["test_count"].as<std::size_t>();
     std::size_t size = vm["vector_size"].as<std::size_t>();
+ 
+    hpx::util::perftests_init(vm);
 
-    // std::cout << std::left
-    //           << "----------------Parameters---------------------\n"
-    //           << std::left
-    //           << "Vector size                       : " << std::right
-    //           << std::setw(8) << size << "\n"
-    //           << std::left
-    //           << "Number of tests                   : " << std::right
-    //           << std::setw(8) << repeat << "\n"
-    //           << std::left
-    //           << "Display time in                   : " << std::right
-    //           << std::setw(8) << "Seconds\n"
-    //           << std::flush;
-
-    // compare<int, 1>(repeat, size);
-    // compare<int, 2>(repeat, size);
-    // compare<int, 4>(repeat, size);
-    // compare<int, 8>(repeat, size);
-    // compare<int, 16>(repeat, size);
-
-    // compare<hpx::move_only_function<void()>, 1>(repeat, size);
-    // compare<hpx::move_only_function<void()>, 2>(repeat, size);
-    // compare<hpx::move_only_function<void()>, 4>(repeat, size);
-    // compare<hpx::move_only_function<void()>, 8>(repeat, size);
-    // compare<hpx::move_only_function<void()>, 16>(repeat, size);
-
-    // int 
-
+    // int
+    
     hpx::util::perftests_report("hpx::small_vector", "<int, 1>", repeat, [&] {
         fill<hpx::detail::small_vector<int, 1>>(size);
     });
@@ -138,6 +115,8 @@ int main(int argc, char* argv[])
             "number of tests to be averaged")
         ;
     // clang-format on
+
+    hpx::util::perftests_cfg(cmdline);
 
     hpx::local::init_params init_args;
     init_args.desc_cmdline = cmdline;
