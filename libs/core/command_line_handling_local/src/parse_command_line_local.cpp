@@ -614,7 +614,7 @@ namespace hpx::local::detail {
             ("hpx:debug-app-log", value<std::string>()->implicit_value("cout"),
                 "enable all messages on the application log channel and send all "
                 "application logs to the target destination")
-            ("hpx:verbose_bench", "For logging benchmarks in detail")
+            // ("hpx:verbose_bench", "For logging benchmarks in detail")
         ;
 
         all_options[options_type::hidden_options].add_options()

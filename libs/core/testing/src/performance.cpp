@@ -22,6 +22,19 @@
 
 namespace hpx::util {
 
+    void perftests_cfg(hpx::program_options::options_description& cmdline) {
+        cmdline.add_options()
+        ("detailed_bench",
+            "Use if detailed benchmarks are required, showing the execution time taken for each epoch")
+        ;
+    }
+
+    void perftests_init(const hpx::program_options::variables_map& vm) {
+        if (vm.count("detailed_bench")) {
+            detailed_ = true;
+        }
+    }
+
     namespace detail {
 
 #if defined(HPX_HAVE_NANOBENCH)
@@ -34,9 +47,9 @@ namespace hpx::util {
 {{#result}}        
 name: {{name}},
 executor: {{context(executor)}},
-average": {{average(elapsed)}} 
-{{/result}}
-)DELIM";
+average: {{average(elapsed)}}{{^-last}}
+{{/-last}}
+{{/result}})DELIM";
         }
 
         char const* nanobench_hpx_template() noexcept
@@ -52,7 +65,8 @@ average": {{average(elapsed)}}
             ]
         }{{^-last}},{{/-last}}
 {{/result}}    ]
-})DELIM";
+}
+)DELIM";
         }
 
         ankerl::nanobench::Bench& bench()
@@ -97,46 +111,62 @@ average": {{average(elapsed)}}
 
         std::ostream& operator<<(std::ostream& strm, json_perf_times const& obj)
         {
-            strm << "{\n";
-            strm << "  \"outputs\" : [";
-            int outputs = 0;
-            for (auto&& item : obj.m_map)
+            
+            if (detailed_) 
             {
-                if (outputs)
-                    strm << ",";
-                strm << "\n    {\n";
-                strm << R"(      "name" : ")" << std::get<0>(item.first)
-                     << "\",\n";
-                strm << R"(      "executor" : ")" << std::get<1>(item.first)
-                     << "\",\n";
-                
-                if (local::detail::verbose_)
-                    strm << R"(      "series" : [)";
-                long double average = 0.0;
-                int series = 0;
-                strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
-                for (long double const val : item.second)
+                strm << "{\n";
+                strm << "  \"outputs\" : [";
+                int outputs = 0;
+                for (auto&& item : obj.m_map)
                 {
-                    if (local::detail::verbose_) 
+                    if (outputs)
+                        strm << ",";
+                    strm << "\n    {\n";
+                    strm << R"(      "name" : ")" << std::get<0>(item.first)
+                        << "\",\n";
+                    strm << R"(      "executor" : ")" << std::get<1>(item.first)
+                        << "\",\n";
+                    strm << R"(      "series" : [)" << "\n";
+                    int series = 0;
+                    strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
+                    for (long double const val : item.second)
                     {
                         if (series)
-                            strm << ", ";
-                        strm << std::scientific << val;
+                        {
+                            strm << ",\n";
+                        }
+                        strm << R"(         )" << std::scientific << val;
+                        ++series;
                     }
-                    ++series;
-                    average += val;
+                    
+                    strm << "\n       ]\n";
+                    
+                    strm << "    }";
+                    ++outputs;
                 }
-                if (local::detail::verbose_)
-                    strm << "]\n";
-                else 
-                    strm << "      \"average\" : " << average / series << "\n";
-                strm << "    }";
-                ++outputs;
+                if (outputs)
+                    strm << "\n";
+                strm << "]\n";
+                strm << "}\n";
             }
-            if (outputs)
-                strm << "\n  ";
-            strm << "]\n";
-            strm << "}\n";
+            else 
+            {
+                strm << "Results:\n\n";
+                for (auto&& item: obj.m_map) 
+                {
+                    long double average = 0.0;
+                    int series = 0;
+                    strm << "name: " << std::get<0>(item.first) << "\n";
+                    strm << "executor: " << std::get<1>(item.first) << "\n";
+                    for (long double const val : item.second)
+                    {
+                        ++series;
+                        average += val;
+                    }
+                    strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
+                    strm << std::scientific << "average: " << average / series << "\n\n";
+                }
+            }
             return strm;
         }
 
@@ -182,7 +212,7 @@ average": {{average(elapsed)}}
     // Overload that uses a default nanobench template and prints to std::cout
     void perftests_print_times()
     {
-        if (local::detail::verbose_)
+        if (detailed_)
             perftests_print_times(detail::nanobench_hpx_template(), std::cout);
         else 
             perftests_print_times(detail::nanobench_hpx_simple_template(), std::cout);
