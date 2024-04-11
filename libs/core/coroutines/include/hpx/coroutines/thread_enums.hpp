@@ -206,7 +206,7 @@ namespace hpx::threads {
         /// local thread number associated with this hint. Local thread numbers
         /// are indexed from zero. It is up to the scheduler to decide how to
         /// interpret thread numbers that are larger than the number of threads
-        /// available to the scheduler. Typically thread numbers will wrap
+        /// available to the scheduler. Typically, thread numbers will wrap
         /// around when too large.
         thread = 1,
 
@@ -214,7 +214,7 @@ namespace hpx::threads {
         /// NUMA domain associated with this hint. NUMA domains are indexed from
         /// zero. It is up to the scheduler to decide how to interpret NUMA
         /// domain indices that are larger than the number of available NUMA
-        /// domains to the scheduler. Typically indices will wrap around when
+        /// domains to the scheduler. Typically, indices will wrap around when
         /// too large.
         numa = 2,
     };
@@ -295,7 +295,7 @@ namespace hpx::threads {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    /// \enum thread_placement_hint
+    /// \enum thread_execution_hint
     ///
     /// The type of hint given to the scheduler related running a thread as a
     /// child directly in the context of the parent thread

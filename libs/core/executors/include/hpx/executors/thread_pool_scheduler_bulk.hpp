@@ -131,7 +131,8 @@ namespace hpx::execution::experimental::detail {
         template <typename Ts>
         void do_work_chunk(Ts& ts, std::uint32_t const index) const
         {
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
             static hpx::util::itt::event notify_event(
                 "set_value_loop_visitor_static::do_work_chunk(chunking)");
 
@@ -145,7 +146,7 @@ namespace hpx::execution::experimental::detail {
                 (std::min)(i_begin + task_f->chunk_size, task_f->size);
 
             auto it = std::next(hpx::util::begin(op_state->shape), i_begin);
-            for (std::uint32_t i = i_begin; i != i_end; (void) ++it, ++i)
+            for (std::size_t i = i_begin; i != i_end; (void) ++it, ++i)
             {
                 bulk_scheduler_invoke_helper(
                     index_pack_type{}, op_state->f, *it, ts);
@@ -274,7 +275,7 @@ namespace hpx::execution::experimental::detail {
         // Finish the work for one worker thread. If this is not the last worker
         // thread to finish, it will only decrement the counter. If it is the
         // last thread it will call set_error if there is an exception.
-        // Otherwise it will call set_value on the connected receiver.
+        // Otherwise, it will call set_value on the connected receiver.
         void finish() const
         {
             if (--(op_state->tasks_remaining.data_) == 0)
