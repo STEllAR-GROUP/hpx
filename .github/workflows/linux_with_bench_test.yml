@@ -39,3 +39,8 @@ jobs:
       run: |
           cd build
           ./bin/minmax_element_performance_test
+    - name: Test with detailed output
+      shell: bash
+      run: |
+          cd build
+          ./bin/minmax_element_performance_test --detailed_bench
