@@ -121,13 +121,15 @@ namespace hpx::parcelset::policies::openshmem {
                 static_cast<std::uint32_t>(buffer_.num_chunks_.second));
             buffer_.transmission_chunks_.resize(
                 num_zero_copy_chunks + num_non_zero_copy_chunks);
+
+            const auto idx = (self_*nthreads_)+sending_thd_id_;
             if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    auto self_ = hpx::util::openshmem_environment::rank();
-                    auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                    auto idx = (self_*nthreads_)+sending_thd_id_;
+                    const auto self_ = hpx::util::openshmem_environment::rank();
+                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                    const auto idx = (self_*nthreads_)+sending_thd_id_;
 
                     hpx::util::openshmem_environment::scoped_lock l;
 
@@ -167,9 +169,9 @@ namespace hpx::parcelset::policies::openshmem {
             }
             else
             {
-                auto self_ = hpx::util::openshmem_environment::rank();
-                auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                auto idx = (self_*nthreads_)+sending_thd_id_;
+                const auto self_ = hpx::util::openshmem_environment::rank();
+                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                const auto idx = (self_*nthreads_)+sending_thd_id_;
 
                 hpx::util::openshmem_environment::scoped_lock l;
                     hpx::util::openshmem_environment::wait_until(
@@ -206,9 +208,9 @@ namespace hpx::parcelset::policies::openshmem {
                 data_type& c = buffer_.chunks_[idx];
                 c.resize(chunk_size);
                 {
-                    auto self_ = hpx::util::openshmem_environment::rank();
-                    auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                    auto idx = (self_*nthreads_)+sending_thd_id_;
+                    const auto self_ = hpx::util::openshmem_environment::rank();
+                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                    const auto idx = (self_*nthreads_)+sending_thd_id_;
 
                     hpx::util::openshmem_environment::scoped_lock l;
 
@@ -244,9 +246,9 @@ namespace hpx::parcelset::policies::openshmem {
             data.time_ = timer_.elapsed_nanoseconds() - data.time_;
 #endif
             {
-                auto self_ = hpx::util::openshmem_environment::rank();
-                auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                auto idx = (self_*nthreads_)+sending_thd_id_;
+                const auto self_ = hpx::util::openshmem_environment::rank();
+                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+                const auto idx = (self_*nthreads_)+sending_thd_id_;
 
                 hpx::util::openshmem_environment::scoped_lock l;
 

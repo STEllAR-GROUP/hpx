@@ -243,6 +243,9 @@ namespace hpx::parcelset::policies::openshmem {
         {
             HPX_ASSERT(state_ == sent_data);
 
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (dst_*nthreads_)+thd_id_;
+
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 serialization::serialization_chunk& c =
@@ -253,9 +256,6 @@ namespace hpx::parcelset::policies::openshmem {
                     {
                         return false;
                     }
-
-                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                    const auto idx = (dst_*nthreads_)+thd_id_;
 
                     hpx::util::openshmem_environment::scoped_lock l;
 

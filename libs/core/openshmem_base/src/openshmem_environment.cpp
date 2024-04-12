@@ -149,13 +149,28 @@ namespace hpx::util {
         //
 
         auto& rp = hpx::resource::get_partitioner();
+
+        // get thread count
+        //
         openshmem_environment::nthreads_ =
             rp.get_num_threads();
-        const std::size_t total_thread_num =
-            openshmem_environment::nthreads_;
+
+        // get system page size
+        //
         const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
-        const std::size_t page_count = size()*total_thread_num;
+
+        // compute number of pages pages
+        //
+        // page_count = num_localities * number of threads
+        //
+        const std::size_t page_count = size()*openshmem_environment::nthreads_;
+
+        // allocate the page cache
+        //
         openshmem_environment::segments = new openshmem_seginfo_t[page_count];
+
+        // allocate a mutex per-page 
+        //
         openshmem_environment::segment_mutex = new hpx::mutex[page_count];
 
         // symmetric allocation for number of pages total + number of signals
@@ -164,20 +179,32 @@ namespace hpx::util {
         // 
         const std::size_t byte_count = (sys_pgsz*page_count)+(sizeof(unsigned int)*page_count*2);
 
+        // allocate symmetric memory
+        //
         hpx::util::openshmem_environment::shmem_buffer =
             static_cast<std::uint8_t*>(shmem_calloc(
                 byte_count, sizeof(std::uint8_t)));
 
+        // compute the base address for signals
+        //
         const std::size_t beg_signal = (sys_pgsz*page_count);
 
+        // initialize the page cache
+        //
         for (std::size_t i = 0; i < page_count; ++i)
         {
             segments[i].beg_addr = hpx::util::openshmem_environment::shmem_buffer +
                 (i * sys_pgsz);
             segments[i].end_addr = static_cast<std::uint8_t*>(segments[i].beg_addr) +
                 sys_pgsz;
+
+            // all of the rcv signals are linearly arranged before the rcv signals
+            //
             segments[i].rcv = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
                 beg_signal + i);
+
+            // all of the xmt signals are linearly arranged after the rcv signals
+            //
             segments[i].xmt = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
                 beg_signal + page_count + i);
         }
