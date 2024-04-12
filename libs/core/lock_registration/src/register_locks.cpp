@@ -123,7 +123,7 @@ namespace hpx::util {
 
             static bool set_ignore_all_locks(bool enable)
             {
-                bool& val= get_held_locks().data_->ignore_all_locks_;
+                bool& val = get_held_locks().data_->ignore_all_locks_;
                 if (val != enable)
                 {
                     val = enable;
