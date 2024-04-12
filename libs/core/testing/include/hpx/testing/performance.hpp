@@ -14,7 +14,7 @@
 #include <string>
 
 namespace hpx::util {
-    HPX_CORE_EXPORT inline bool detailed_ = false;
+    HPX_CORE_EXPORT inline bool detailed_;
     HPX_CORE_EXPORT void perftests_cfg(hpx::program_options::options_description& cmdline);
     HPX_CORE_EXPORT void perftests_init(const hpx::program_options::variables_map& vm);
 #if defined(HPX_HAVE_NANOBENCH)
