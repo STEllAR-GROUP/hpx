@@ -1,4 +1,5 @@
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -33,7 +34,10 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/errors/throw_exception.hpp>
 #include <hpx/type_support/construct_at.hpp>
+#include <hpx/type_support/is_trivially_relocatable.hpp>
+#include <hpx/type_support/uninitialized_relocation_primitives.hpp>
 
 #include <algorithm>
 #include <array>
@@ -218,7 +222,8 @@ namespace hpx::detail {
 
     // note: Allocator is currently unused
     template <typename T, std::size_t MinInlineCapacity,
-        typename Allocator = std::allocator<T>>
+        typename Allocator = std::allocator<T>,
+        bool emulate_inplace_vector = false>
     class small_vector
     {
         static_assert(MinInlineCapacity <= 127,
@@ -243,13 +248,15 @@ namespace hpx::detail {
         //  m_data[0] & 1: lowest bit is 0 for indirect mode
         //  m_data[0..7]:  stores an uintptr_t, which points to the indirect
         //                 data.
-
         alignas(alignment_of_small_vector<T>()) std::array<std::uint8_t,
             size_of_small_vector<T>(MinInlineCapacity)> m_data;
 
         [[nodiscard]] constexpr auto is_direct() const noexcept -> bool
         {
-            return (m_data[0] & 1U) != 0U;
+            if constexpr (emulate_inplace_vector)
+                return true;
+            else
+                return (m_data[0] & 1U) != 0U;
         }
 
         [[nodiscard]] auto indirect() noexcept -> storage<T>*
@@ -294,22 +301,10 @@ namespace hpx::detail {
                 reinterpret_cast<T*>(m_data.data() + std::alignment_of_v<T>));
         }
 
-        static void uninitialized_move_and_destroy(
-            T* source_ptr, T* target_ptr, std::size_t size) noexcept
-        {
-            if constexpr (std::is_trivially_copyable_v<T>)
-            {
-                std::memcpy(target_ptr, source_ptr, size * sizeof(T));
-            }
-            else
-            {
-                std::uninitialized_move_n(source_ptr, size, target_ptr);
-                std::destroy_n(source_ptr, size);
-            }
-        }
-
         void realloc(std::size_t new_capacity)
         {
+            static_assert(!emulate_inplace_vector,
+                "If called in an inplace_vector, it is a bug.");
             if (new_capacity <= N)
             {
                 // put everything into direct storage
@@ -319,8 +314,9 @@ namespace hpx::detail {
                 {
                     // indirect -> direct
                     auto* storage = indirect();
-                    uninitialized_move_and_destroy(
-                        storage->data(), direct_data(), storage->size());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            storage->data(), storage->size(), direct_data());
                     set_direct_and_size(storage->size());
                     detail::storage<T>::dealloc(storage);
                 }
@@ -332,15 +328,19 @@ namespace hpx::detail {
                 if (is_direct())
                 {
                     // direct -> indirect
-                    uninitialized_move_and_destroy(data<direction::direct>(),
-                        storage->data(), size<direction::direct>());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            data<direction::direct>(),
+                            size<direction::direct>(), storage->data());
                     storage->size(size<direction::direct>());
                 }
                 else
                 {
                     // indirect -> indirect
-                    uninitialized_move_and_destroy(data<direction::indirect>(),
-                        storage->data(), size<direction::indirect>());
+                    ::hpx::experimental::util::
+                        uninitialized_relocate_n_primitive(
+                            data<direction::indirect>(),
+                            size<direction::indirect>(), storage->data());
                     storage->size(size<direction::indirect>());
                     detail::storage<T>::dealloc(indirect());
                 }
@@ -501,9 +501,12 @@ namespace hpx::detail {
             auto* const erase_end =
                 (std::min)(const_cast<T*>(to), container_end);
 
-            std::move(erase_end, container_end, erase_begin);
+            // forward relocation
+            ::hpx::experimental::util::uninitialized_relocate_primitive(
+                erase_end, container_end, erase_begin);
+
             auto const num_erased = std::distance(erase_begin, erase_end);
-            std::destroy(container_end - num_erased, container_end);
+
             set_size<D>(size<D>() - num_erased);
             return erase_begin;
         }
@@ -525,9 +528,18 @@ namespace hpx::detail {
         template <typename It>
         void assign(It first, It last, std::forward_iterator_tag /*unused*/)
         {
+            auto s = std::distance(first, last);
+            if constexpr (emulate_inplace_vector)
+            {
+                // Can not have an inplace_vector with a size larger than N
+                if (s <= capacity())
+                {
+                    throw std::bad_alloc();
+                }
+            }
+
             clear();
 
-            auto s = std::distance(first, last);
             reserve(s);
             std::uninitialized_copy(first, last, data());
             set_size(s);
@@ -536,6 +548,8 @@ namespace hpx::detail {
         // precondition: all uninitialized
         void do_move_assign(small_vector&& other) noexcept
         {
+            // We assume that the template parameters of "other" are the same
+            // as "this".
             if (!other.is_direct())
             {
                 // take other's memory, even when empty
@@ -547,9 +561,8 @@ namespace hpx::detail {
                 auto s = other.size<direction::direct>();
                 auto* other_end = other_ptr + s;
 
-                std::uninitialized_move(
+                ::hpx::experimental::util::uninitialized_relocate_primitive(
                     other_ptr, other_end, data<direction::direct>());
-                std::destroy(other_ptr, other_end);
                 set_size(s);
             }
             other.set_direct_and_size(0);
@@ -563,24 +576,48 @@ namespace hpx::detail {
         // * source_begin <= target_begin
         // * source_end onwards is uninitialized memory
         //
-        // Destroys then empty elements in [source_begin, source_end)
+        // Destroys the empty elements in [source_begin, source_end)
         auto shift_right(
             T* source_begin, T* source_end, T* target_begin) noexcept
         {
             // 1. uninitialized moves
             auto const num_moves = std::distance(source_begin, source_end);
             auto const target_end = target_begin + num_moves;
-            auto const num_uninitialized_move =
-                (std::min)(num_moves, std::distance(source_end, target_end));
-            std::uninitialized_move(source_end - num_uninitialized_move,
-                source_end, target_end - num_uninitialized_move);
-            std::move_backward(source_begin,
-                source_end - num_uninitialized_move,
-                target_end - num_uninitialized_move);
-            std::destroy(source_begin, (std::min)(source_end, target_begin));
+
+            ::hpx::experimental::util::
+                uninitialized_relocate_backward_primitive(
+                    source_begin, source_end, target_end);
+
+            /*
+            In the following commented code we split the move into an
+            uninitialized move and a move, using relocation only when it is
+            a memcpy. The thought process was that a move assignment might
+            be faster than a move construction in certain cases, but since
+            this is likely not the usual case we always choose relocation.
+
+            if constexpr (hpx::experimental::is_trivially_relocatable_v<T>)
+            {
+                ::hpx::experimental::util::
+                    uninitialized_relocate_backward_primitive(
+                        source_begin, source_end, target_end);
+            }
+            else
+            {
+                auto const num_uninitialized_move = (std::min)(
+                    num_moves, std::distance(source_end, target_end));
+
+                std::uninitialized_move(source_end - num_uninitialized_move,
+                    source_end, target_end - num_uninitialized_move);
+                std::move_backward(source_begin,
+                    source_end - num_uninitialized_move,
+                    target_end - num_uninitialized_move);
+                std::destroy(
+                    source_begin, (std::min)(source_end, target_begin));
+            }
+            */
         }
 
-        // makes space for uninitialized data of cout elements. Also updates
+        // makes space for uninitialized data of count elements. Also updates
         // size.
         template <direction D>
         [[nodiscard]] auto make_uninitialized_space_new(
@@ -592,14 +629,25 @@ namespace hpx::detail {
             target.reserve(s + count);
 
             // move everything [begin, pos[
-            auto* target_pos = std::uninitialized_move(
-                data<D>(), p, target.template data<direction::indirect>());
+            auto* target_pos = std::get<1>(
+                ::hpx::experimental::util::uninitialized_relocate_primitive(
+                    data<D>(), p, target.template data<direction::indirect>()));
 
             // move everything [pos, end]
-            std::uninitialized_move(p, data<D>() + s, target_pos + count);
+            ::hpx::experimental::util::uninitialized_relocate_primitive(
+                p, data<D>() + s, target_pos + count);
 
             target.template set_size<direction::indirect>(s + count);
-            *this = HPX_MOVE(target);
+
+            // objects are already destroyed from the relocation
+            if (!is_direct())
+            {
+                detail::storage<T>::dealloc(indirect());
+            }
+            set_direct_and_size(0);
+
+            do_move_assign(HPX_MOVE(target));
+
             return target_pos;
         }
 
@@ -657,7 +705,7 @@ namespace hpx::detail {
             set_direct_and_size(0);
         }
 
-        // performs a const_cast so we don't need this implementation twice
+        // performs a const_cast, so we don't need this implementation twice
         template <direction D>
         [[nodiscard]] auto at(std::size_t idx) const -> T&
         {
@@ -696,12 +744,28 @@ namespace hpx::detail {
             std::size_t count, T const& value, Allocator const& = Allocator())
           : small_vector()
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // Can not have an inplace_vector with a size larger than N
+                if (count > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
             resize(count, value);
         }
 
         explicit small_vector(std::size_t count, Allocator const& = Allocator())
           : small_vector()
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // Can not have an inplace_vector with a size larger than N
+                if (count > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
             reserve(count);
             if (is_direct())
             {
@@ -727,7 +791,14 @@ namespace hpx::detail {
           : small_vector()
         {
             auto s = other.size();
-            reserve(s);
+            // If both vectors are direct with the same capacity it will fit
+            // without further allocations needed.
+
+            if constexpr (!emulate_inplace_vector)
+            {
+                reserve(s);
+            }
+
             std::uninitialized_copy(other.begin(), other.end(), begin());
             set_size(s);
         }
@@ -785,7 +856,7 @@ namespace hpx::detail {
             if (&other == this)
             {
                 // It doesn't seem to be required to do self-check, but let's do
-                // it anyways to be safe
+                // it anyway to be safe
                 return *this;
             }
 
@@ -802,6 +873,15 @@ namespace hpx::detail {
 
         void resize(std::size_t count)
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // Static vector cannot be resized beyond capacity
+                if (count > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
+
             if (count > capacity())
             {
                 reserve(count);
@@ -819,6 +899,15 @@ namespace hpx::detail {
 
         void resize(std::size_t count, value_type const& value)
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // Static vector cannot resize beyond capacity
+                if (count > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
+
             if (count > capacity())
             {
                 reserve(count);
@@ -836,6 +925,14 @@ namespace hpx::detail {
 
         auto reserve(std::size_t s)
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // Static vector cannot reserve beyond capacity
+                if (s > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
             auto const old_capacity = capacity();
             auto const new_capacity = calculate_new_capacity(s, old_capacity);
             if (new_capacity > old_capacity)
@@ -846,6 +943,10 @@ namespace hpx::detail {
 
         [[nodiscard]] constexpr auto capacity() const noexcept -> std::size_t
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                return capacity<direction::direct>();
+            }
             if (is_direct())
             {
                 return capacity<direction::direct>();
@@ -884,7 +985,17 @@ namespace hpx::detail {
             if (is_direct())
             {
                 s = direct_size();
-                if (s < N)
+                if constexpr (emulate_inplace_vector)
+                {
+                    // Exceeded static_storage
+                    if (s + 1 > N)
+                    {
+                        throw std::bad_alloc();
+                    }
+                }
+
+                // avoid double-checking for inplace_vector
+                if (emulate_inplace_vector || s < N)
                 {
                     set_direct_and_size(s + 1);
                     return *hpx::construct_at(
@@ -1083,19 +1194,33 @@ namespace hpx::detail {
 
         [[nodiscard]] static constexpr auto max_size() -> std::size_t
         {
+            if constexpr (emulate_inplace_vector)
+                return N;
             return (std::numeric_limits<std::size_t>::max)();
         }
 
         void swap(small_vector& other) noexcept
         {
             // TODO we could try to do the minimum number of moves
-            std::swap(*this, other);
+            alignas(small_vector) std::byte buf[sizeof(small_vector)];
+            hpx::experimental::relocate_at(
+                &other, reinterpret_cast<small_vector*>(buf));
+            hpx::experimental::relocate_at(this, &other);
+            hpx::experimental::relocate_at(
+                reinterpret_cast<small_vector*>(buf), this);
         }
 
         void shrink_to_fit()
         {
             // per the standard we wouldn't need to do anything here. But since
             // we are so nice, let's do the shrink.
+
+            if constexpr (emulate_inplace_vector)
+            {
+                // Can not change the capacity of a static vector so noop
+                return;
+            }
+
             auto const c = capacity();
             auto const s = size();
             if (s >= c)
@@ -1103,7 +1228,7 @@ namespace hpx::detail {
                 return;
             }
 
-            auto new_capacity = calculate_new_capacity(s, N);
+            auto new_capacity = calculate_new_capacity(s, static_capacity);
             if (new_capacity == c)
             {
                 // nothing change!
@@ -1116,6 +1241,14 @@ namespace hpx::detail {
         template <typename... Args>
         auto emplace(const_iterator pos, Args&&... args) -> iterator
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                // it will be expanded by one element
+                if (direct_size() + 1 > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
             auto* p = make_uninitialized_space(pos, 1);
             return hpx::construct_at(
                 static_cast<T*>(p), HPX_FORWARD(Args, args)...);
@@ -1134,6 +1267,13 @@ namespace hpx::detail {
         auto insert(const_iterator pos, std::size_t count, T const& value)
             -> iterator
         {
+            if constexpr (emulate_inplace_vector)
+            {
+                if (direct_size() + count > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
             auto* p = make_uninitialized_space(pos, count);
             std::uninitialized_fill_n(p, count, value);
             return p;
@@ -1156,6 +1296,8 @@ namespace hpx::detail {
                 auto s = size();
                 while (first != last)
                 {
+                    // if we are emulating inplace_vector, the out-of-bounds
+                    // emplacement is caught in emplace_back
                     emplace_back(*first);
                     ++first;
                 }
@@ -1171,7 +1313,15 @@ namespace hpx::detail {
         auto insert(const_iterator pos, It first, It last,
             std::forward_iterator_tag /*unused*/)
         {
-            auto* p = make_uninitialized_space(pos, std::distance(first, last));
+            auto d = std::distance(first, last);
+            if constexpr (emulate_inplace_vector)
+            {
+                if (direct_size() + d > N)
+                {
+                    throw std::bad_alloc();
+                }
+            }
+            auto* p = make_uninitialized_space(pos, d);
             std::uninitialized_copy(first, last, p);
             return p;
         }
@@ -1248,6 +1398,10 @@ namespace hpx::detail {
     {
         return !(a > b);
     }
+
+    template <typename T, std::size_t MinInlineCapacity,
+        typename Allocator = std::allocator<T>>
+    using inplace_vector = small_vector<T, MinInlineCapacity, Allocator, true>;
 }    // namespace hpx::detail
 
 // NOLINTNEXTLINE(cert-dcl58-cpp)
@@ -1273,3 +1427,12 @@ namespace std {    //-V1061
         return num_removed;
     }
 }    // namespace std
+
+namespace hpx::experimental {
+    template <typename T, std::size_t N, typename Alloc, bool emul>
+    struct is_trivially_relocatable<
+        hpx::detail::small_vector<T, N, Alloc, emul>>
+      : is_trivially_relocatable<T>
+    {
+    };
+}    // namespace hpx::experimental
