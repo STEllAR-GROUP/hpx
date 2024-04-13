@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
@@ -18,6 +19,7 @@
 #include <hpx/parcelport_lci/completion_manager/completion_manager_queue.hpp>
 #include <hpx/parcelport_lci/completion_manager/completion_manager_sync.hpp>
 #include <hpx/parcelport_lci/completion_manager/completion_manager_sync_single.hpp>
+#include <hpx/parcelport_lci/completion_manager/completion_manager_sync_single_nolock.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/putva/receiver_putva.hpp>
@@ -197,7 +199,13 @@ namespace hpx::parcelset::policies::lci {
         }
         else
         {
-            has_work = base_type::do_background_work(num_thread, mode);
+            for (int i = 0; i < config_t::bg_work_max_count; ++i)
+            {
+                bool ret = base_type::do_background_work(num_thread, mode);
+                has_work = ret || has_work;
+                if (!ret)
+                    break;
+            }
         }
         return has_work;
     }
@@ -209,13 +217,19 @@ namespace hpx::parcelset::policies::lci {
             return false;
 
         bool has_work = false;
+        if (config_t::progress_type == config_t::progress_type_t::worker ||
+            config_t::progress_type ==
+                config_t::progress_type_t::pthread_worker)
+        {
+            has_work = do_progress_local() || has_work;
+        }
+        if (mode & parcelport_background_mode::receive)
+        {
+            has_work = receiver_p->background_work() || has_work;
+        }
         if (mode & parcelport_background_mode::send)
         {
-            has_work = sender_p->background_work(num_thread);
-            if (config_t::progress_type == config_t::progress_type_t::worker ||
-                config_t::progress_type ==
-                    config_t::progress_type_t::pthread_worker)
-                do_progress_local();
+            has_work = sender_p->background_work(num_thread) || has_work;
             if (config_t::enable_lci_backlog_queue)
                 // try to send pending messages
                 has_work =
@@ -223,14 +237,6 @@ namespace hpx::parcelset::policies::lci {
                         get_tls_device().completion_manager_p->send.get(),
                         num_thread) ||
                     has_work;
-        }
-        if (mode & parcelport_background_mode::receive)
-        {
-            has_work = receiver_p->background_work() || has_work;
-            if (config_t::progress_type == config_t::progress_type_t::worker ||
-                config_t::progress_type ==
-                    config_t::progress_type_t::pthread_worker)
-                do_progress_local();
         }
         return has_work;
     }
@@ -312,39 +318,41 @@ namespace hpx::parcelset::policies::lci {
         completion_managers.resize(config_t::ncomps);
         for (auto& completion_manager : completion_managers)
         {
-            if (config_t::protocol == config_t::protocol_t::sendrecv &&
-                config_t::completion_type == LCI_COMPLETION_SYNC)
+            switch (config_t::completion_type_header)
             {
-                if (config_t::prepost_recv_num == 1 &&
-                    config_t::ndevices == config_t::ncomps)
-                {
-                    completion_manager.recv_new =
-                        std::make_shared<completion_manager_sync_single>();
-                }
-                else
-                {
-                    completion_manager.recv_new =
-                        std::make_shared<completion_manager_sync>();
-                }
-            }
-            else
-            {
+            case config_t::comp_type_t::queue:
                 completion_manager.recv_new =
-                    std::make_shared<completion_manager_queue>();
-            }
-            switch (config_t::completion_type)
-            {
-            case LCI_COMPLETION_QUEUE:
-                completion_manager.send =
-                    std::make_shared<completion_manager_queue>();
-                completion_manager.recv_followup =
-                    std::make_shared<completion_manager_queue>();
+                    std::make_shared<completion_manager_queue>(this);
                 break;
-            case LCI_COMPLETION_SYNC:
+            case config_t::comp_type_t::sync:
+                completion_manager.recv_new =
+                    std::make_shared<completion_manager_sync>(this);
+                break;
+            case config_t::comp_type_t::sync_single:
+                completion_manager.recv_new =
+                    std::make_shared<completion_manager_sync_single>(this);
+                break;
+            case config_t::comp_type_t::sync_single_nolock:
+                completion_manager.recv_new =
+                    std::make_shared<completion_manager_sync_single_nolock>(
+                        this);
+                break;
+            default:
+                throw std::runtime_error("Unknown completion type!");
+            }
+            switch (config_t::completion_type_followup)
+            {
+            case config_t::comp_type_t::queue:
                 completion_manager.send =
-                    std::make_shared<completion_manager_sync>();
+                    std::make_shared<completion_manager_queue>(this);
                 completion_manager.recv_followup =
-                    std::make_shared<completion_manager_sync>();
+                    std::make_shared<completion_manager_queue>(this);
+                break;
+            case config_t::comp_type_t::sync:
+                completion_manager.send =
+                    std::make_shared<completion_manager_sync>(this);
+                completion_manager.recv_followup =
+                    std::make_shared<completion_manager_sync>(this);
                 break;
             default:
                 throw std::runtime_error("Unknown completion type!");
@@ -371,21 +379,40 @@ namespace hpx::parcelset::policies::lci {
             // Create the LCI endpoint
             LCI_plist_t plist_;
             LCI_plist_create(&plist_);
-            LCI_plist_set_comp_type(
-                plist_, LCI_PORT_COMMAND, config_t::completion_type);
-            LCI_plist_set_comp_type(
-                plist_, LCI_PORT_MESSAGE, config_t::completion_type);
+            switch (config_t::completion_type_followup)
+            {
+            case config_t::comp_type_t::queue:
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_COMMAND, LCI_COMPLETION_QUEUE);
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+                break;
+            case config_t::comp_type_t::sync:
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_COMMAND, LCI_COMPLETION_SYNC);
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
+                break;
+            default:
+                throw std::runtime_error("Unknown completion type!");
+            }
             LCI_endpoint_init(&device.endpoint_followup, device.device, plist_);
             LCI_plist_set_default_comp(plist_,
                 device.completion_manager_p->recv_new->get_completion_object());
-            if (config_t::protocol == config_t::protocol_t::sendrecv &&
-                config_t::completion_type == LCI_COMPLETION_SYNC)
-                LCI_plist_set_comp_type(
-                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
-            else
+            switch (config_t::completion_type_header)
             {
+            case config_t::comp_type_t::queue:
                 LCI_plist_set_comp_type(
                     plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_QUEUE);
+                break;
+            case config_t::comp_type_t::sync:
+            case config_t::comp_type_t::sync_single:
+            case config_t::comp_type_t::sync_single_nolock:
+                LCI_plist_set_comp_type(
+                    plist_, LCI_PORT_MESSAGE, LCI_COMPLETION_SYNC);
+                break;
+            default:
+                throw std::runtime_error("Unknown completion type!");
             }
             if (config_t::protocol == config_t::protocol_t::sendrecv)
                 LCI_plist_set_match_type(plist_, LCI_MATCH_TAG);

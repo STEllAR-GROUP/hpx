@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2014-2023 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -261,7 +262,8 @@ namespace hpx::traits {
                 "backlog_queue = 0\n"
                 "prg_thread_num = 1\n"
                 "protocol = putsendrecv\n"
-                "comp_type = queue\n"
+                "comp_type_header = queue\n"
+                "comp_type_followup = queue\n"
                 "progress_type = rp\n"
                 "prepost_recv_num = 1\n"
                 "reg_mem = 1\n"
@@ -269,7 +271,11 @@ namespace hpx::traits {
                 "ncomps = 1\n"
                 "enable_in_buffer_assembly = 1\n"
                 "send_nb_max_retry = 32\n"
-                "mbuffer_alloc_max_retry = 32\n";
+                "mbuffer_alloc_max_retry = 32\n"
+                "bg_work_max_count = 32\n"
+                "bg_work_when_send = 0\n"
+                "enable_sendmc = 0\n"
+                "comp_type = deprecated\n";
         }
     };
 }    // namespace hpx::traits

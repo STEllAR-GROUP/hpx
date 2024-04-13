@@ -11,29 +11,26 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
-#include <hpx/parcelport_lci/config.hpp>
 #include <hpx/parcelport_lci/completion_manager_base.hpp>
 
 namespace hpx::parcelset::policies::lci {
-    struct completion_manager_queue : public completion_manager_base
+    struct completion_manager_sync_single_nolock
+      : public completion_manager_base
     {
-        completion_manager_queue(parcelport* pp)
+        completion_manager_sync_single_nolock(parcelport* pp)
           : completion_manager_base(pp)
         {
-            // LCI_queue_create(LCI_UR_DEVICE, &queue);
-            // Hack for now
-            LCI_queue_createx(LCI_UR_DEVICE,
-                LCI_SERVER_NUM_PKTS * (size_t) config_t::ndevices, &queue);
+            LCI_sync_create(LCI_UR_DEVICE, 1, &sync);
         }
 
-        ~completion_manager_queue()
+        ~completion_manager_sync_single_nolock()
         {
-            LCI_queue_free(&queue);
+            LCI_sync_free(&sync);
         }
 
         LCI_comp_t alloc_completion()
         {
-            return queue;
+            return sync;
         }
 
         void enqueue_completion(LCI_comp_t comp)
@@ -43,13 +40,8 @@ namespace hpx::parcelset::policies::lci {
 
         LCI_request_t poll();
 
-        LCI_comp_t get_completion_object()
-        {
-            return queue;
-        }
-
     private:
-        LCI_comp_t queue;
+        LCI_comp_t sync;
     };
 }    // namespace hpx::parcelset::policies::lci
 
