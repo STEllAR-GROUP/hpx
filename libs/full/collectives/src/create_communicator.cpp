@@ -50,20 +50,21 @@ namespace hpx::collectives {
 
         communicator_server::communicator_server() noexcept    //-V730
           : num_sites_(0)
-          , needs_initialization_(false)
-          , data_available_(false)
         {
             HPX_ASSERT(false);    // shouldn't ever be called
         }
 
-        communicator_server::communicator_server(std::size_t num_sites) noexcept
+        communicator_server::communicator_server(
+            std::size_t num_sites, char const* basename) noexcept
           : gate_(num_sites)
           , num_sites_(num_sites)
-          , needs_initialization_(true)
-          , data_available_(false)
+          , basename_(basename)
         {
-            HPX_ASSERT(num_sites != 0);
+            HPX_ASSERT(
+                num_sites != 0 && num_sites != static_cast<std::size_t>(-1));
         }
+
+        communicator_server::~communicator_server() = default;
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ namespace hpx::collectives {
         if (this_site == root_site)
         {
             // create a new communicator
-            auto c = hpx::local_new<communicator>(num_sites);
+            auto c = hpx::local_new<communicator>(num_sites, basename);
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive
@@ -176,7 +177,7 @@ namespace hpx::collectives {
         if (this_site == root_site)
         {
             // create a new communicator
-            auto c = hpx::local_new<communicator>(num_sites);
+            auto c = hpx::local_new<communicator>(num_sites, basename);
 
             // register the communicator's id using the given basename, this
             // keeps the communicator alive

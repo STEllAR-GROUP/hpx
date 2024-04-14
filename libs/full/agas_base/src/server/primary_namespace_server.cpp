@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,8 +16,8 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/timing/scoped_timer.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 

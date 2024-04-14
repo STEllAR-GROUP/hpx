@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 Hartmut Kaiser
+# Copyright (c) 2019-2024 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,6 +23,7 @@ if(HPX_WITH_NETWORKING)
   set(tests
       ${tests}
       broadcast_direct
+      concurrent_collectives
       exclusive_scan_
       gather
       inclusive_scan_

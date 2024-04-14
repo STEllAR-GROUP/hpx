@@ -128,6 +128,7 @@ namespace hpx {
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
+            il.reset_owns_registration();
         }
     }
 

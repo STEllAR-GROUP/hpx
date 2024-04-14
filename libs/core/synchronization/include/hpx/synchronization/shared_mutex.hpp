@@ -1,6 +1,6 @@
 //  (C) Copyright 2006-2008 Anthony Williams
 //  (C) Copyright      2011 Bryce Lelbach
-//  (C) Copyright 2022-2023 Hartmut Kaiser
+//  (C) Copyright 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <atomic>
 #include <cstdint>
@@ -71,6 +71,7 @@ namespace hpx::detail {
             [[maybe_unused]] util::ignore_while_checking il(&lk);
             exclusive_cond.notify_one_no_unlock(lk);
             shared_cond.notify_all(HPX_MOVE(lk));
+            il.reset_owns_registration();
         }
 
         bool set_state(shared_state& s1, shared_state& s) noexcept

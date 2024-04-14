@@ -1392,15 +1392,9 @@ hpx_option(
   OFF CATEGORY "Debugging"
 )
 
-set(HPX_WITH_VERIFY_LOCKS_DEFAULT OFF)
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  set(HPX_WITH_VERIFY_LOCKS_DEFAULT ON)
-endif()
-
 hpx_option(
   HPX_WITH_VERIFY_LOCKS BOOL
-  "Enable lock verification code (default: OFF, enabled in debug builds)"
-  ${HPX_WITH_VERIFY_LOCKS_DEFAULT}
+  "Enable lock verification code (default: OFF, enabled in debug builds)" OFF
   CATEGORY "Debugging"
   ADVANCED
 )

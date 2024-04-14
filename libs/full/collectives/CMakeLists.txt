@@ -22,9 +22,11 @@ set(collectives_headers
     hpx/collectives/communication_set.hpp
     hpx/collectives/channel_communicator.hpp
     hpx/collectives/create_communicator.hpp
+    hpx/collectives/detail/barrier_node.hpp
     hpx/collectives/detail/channel_communicator.hpp
     hpx/collectives/detail/communication_set_node.hpp
     hpx/collectives/detail/communicator.hpp
+    hpx/collectives/detail/latch.hpp
     hpx/collectives/exclusive_scan.hpp
     hpx/collectives/fold.hpp
     hpx/collectives/gather.hpp
@@ -54,14 +56,23 @@ set(collectives_compat_headers
 
 # Default location is $HPX_ROOT/libs/collectives/src
 set(collectives_sources
+    all_gather.cpp
+    all_reduce.cpp
+    all_to_all.cpp
     barrier.cpp
+    broadcast.cpp
     create_communication_set.cpp
     channel_communicator.cpp
     create_communicator.cpp
-    latch.cpp
     detail/barrier_node.cpp
     detail/channel_communicator_server.cpp
     detail/communication_set_node.cpp
+    exclusive_scan.cpp
+    gather.cpp
+    inclusive_scan.cpp
+    latch.cpp
+    reduce.cpp
+    scatter.cpp
 )
 
 include(HPX_AddModule)

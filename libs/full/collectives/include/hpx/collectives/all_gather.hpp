@@ -1,4 +1,4 @@
-//  Copyright (c) 2019-2023 Hartmut Kaiser
+//  Copyright (c) 2019-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -130,13 +130,14 @@ namespace hpx { namespace collectives {
 namespace hpx::traits {
 
     namespace communication {
+
         struct all_gather_tag;
 
         template <>
-        constexpr char const* communicator_name<all_gather_tag>() noexcept
+        struct communicator_data<all_gather_tag>
         {
-            return "all_gather";
-        }
+            HPX_EXPORT static char const* name() noexcept;
+        };
     }    // namespace communication
 
     ///////////////////////////////////////////////////////////////////////////
@@ -149,11 +150,15 @@ namespace hpx::traits {
             std::size_t generation, T&& t)
         {
             return communicator.template handle_data<std::decay_t<T>>(
+                communication::communicator_data<
+                    communication::all_gather_tag>::name(),
                 which, generation,
                 // step function (invoked for each get)
-                [&](auto& data) { data[which] = HPX_FORWARD(T, t); },
+                [&t](auto& data, std::size_t which) {
+                    data[which] = HPX_FORWARD(T, t);
+                },
                 // finalizer (invoked after all data has been received)
-                [](auto& data, auto&) { return data; });
+                [](auto& data, auto&, std::size_t) { return data; });
         }
     };
 }    // namespace hpx::traits
@@ -199,7 +204,7 @@ namespace hpx::collectives {
             {
                 // make sure id is kept alive as long as the returned future
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
             }
 
             return result;

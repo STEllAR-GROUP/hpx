@@ -18,7 +18,7 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <cstddef>
 #include <mutex>
@@ -170,7 +170,7 @@ namespace hpx::lcos::local {
     protected:
         // Set the data which has to go into the segment \a which.
         template <typename OuterLock, typename F>
-        bool set(std::size_t which, OuterLock outer_lock, F&& f,
+        bool set(std::size_t which, OuterLock& outer_lock, F&& f,
             error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(outer_lock);
@@ -224,15 +224,12 @@ namespace hpx::lcos::local {
                                       std::decay_t<F>>)
                     {
                         // invoke callback with the outer lock being held
-                        HPX_FORWARD(F, f)(outer_lock, *this);
+                        HPX_FORWARD(F, f)(outer_lock, *this, ec);
                     }
 
-                    outer_lock.unlock();
                     return true;
                 }
             }
-
-            outer_lock.unlock();
             return false;
         }
 
@@ -242,7 +239,7 @@ namespace hpx::lcos::local {
         {
             hpx::no_mutex mtx;
             std::unique_lock<hpx::no_mutex> lk(mtx);
-            return set(which, HPX_MOVE(lk), HPX_FORWARD(F, f), ec);
+            return set(which, lk, HPX_FORWARD(F, f), ec);
         }
 
     protected:
@@ -324,7 +321,8 @@ namespace hpx::lcos::local {
 
     public:
         template <typename Lock>
-        std::size_t next_generation(Lock& l, std::size_t new_generation)
+        std::size_t next_generation(
+            Lock& l, std::size_t new_generation, error_code& ec = throws)
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
@@ -335,10 +333,11 @@ namespace hpx::lcos::local {
                 if (new_generation < generation_)
                 {
                     l.unlock();
-                    HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                    HPX_THROWS_IF(ec, hpx::error::invalid_status,
                         "and_gate::next_generation",
                         "sequencing error, new generational counter value too "
                         "small");
+                    return generation_;
                 }
                 generation_ = new_generation;
             }
@@ -351,10 +350,11 @@ namespace hpx::lcos::local {
         }
 
         std::size_t next_generation(
-            std::size_t new_generation = static_cast<std::size_t>(-1))
+            std::size_t new_generation = static_cast<std::size_t>(-1),
+            error_code& ec = throws)
         {
             std::unique_lock<mutex_type> l(mtx_);
-            return next_generation(l, new_generation);
+            return next_generation(l, new_generation, ec);
         }
 
         template <typename Lock>
@@ -408,7 +408,7 @@ namespace hpx::lcos::local {
     // Note: This type is not thread-safe. It has to be protected from
     //       concurrent access by different threads by the code using instances
     //       of this type.
-    struct and_gate : public base_and_gate<hpx::no_mutex>
+    struct and_gate : base_and_gate<hpx::no_mutex>
     {
     private:
         using base_type = base_and_gate<hpx::no_mutex>;
@@ -441,11 +441,10 @@ namespace hpx::lcos::local {
         }
 
         template <typename Lock, typename F = std::nullptr_t>
-        bool set(std::size_t which, Lock l, F&& f = nullptr,
+        bool set(std::size_t which, Lock& l, F&& f = nullptr,
             error_code& ec = hpx::throws)
         {
-            return this->base_type::set(
-                which, HPX_MOVE(l), HPX_FORWARD(F, f), ec);
+            return this->base_type::set(which, l, HPX_FORWARD(F, f), ec);
         }
 
         template <typename Lock>

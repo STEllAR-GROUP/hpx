@@ -12,10 +12,13 @@
 #include <hpx/functional/experimental/scope_exit.hpp>
 #include <hpx/lock_registration/detail/register_locks.hpp>
 #include <hpx/modules/errors.hpp>
+#ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
+#include <hpx/debugging/backtrace.hpp>
+#endif
 
 #include <cstddef>
 #include <memory>
-#include <string>
+#include <tuple>
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,7 +41,7 @@ namespace hpx::util {
           : ignore_(false)
           , user_data_(data)
 #ifdef HPX_HAVE_VERIFY_LOCKS_BACKTRACE
-          , backtrace_(hpx::detail::trace(trace_depth))
+          , backtrace_(hpx::util::trace(trace_depth))
 #endif
         {
         }
@@ -51,20 +54,26 @@ namespace hpx::util {
         struct held_locks_data_ptr
         {
             held_locks_data_ptr()
-              : data_(new held_locks_data)
+              : data_(std::make_unique<held_locks_data>())
             {
             }
 
             void reinitialize()
             {
-                data_.reset(new held_locks_data);
+                data_ = std::make_unique<held_locks_data>();
             }
 
             // note: this invalidates the stored pointer - this is intentional
-            std::unique_ptr<held_locks_data> release() noexcept
+            std::unique_ptr<held_locks_data> release() && noexcept
             {
                 HPX_ASSERT(!!data_);
-                return HPX_MOVE(data_);
+
+                std::unique_ptr<held_locks_data> result;
+
+                using std::swap;
+                swap(result, data_);
+
+                return result;
             }
 
             void set(std::unique_ptr<held_locks_data>&& data) noexcept
@@ -81,7 +90,7 @@ namespace hpx::util {
 
             static held_locks_data_ptr& get_held_locks()
             {
-                static thread_local held_locks_data_ptr held_locks;
+                thread_local held_locks_data_ptr held_locks;
                 if (!held_locks.data_)
                 {
                     held_locks.reinitialize();
@@ -112,9 +121,15 @@ namespace hpx::util {
                 return !get_held_locks().data_->ignore_all_locks_;
             }
 
-            static void set_ignore_all_locks(bool enable)
+            static bool set_ignore_all_locks(bool enable)
             {
-                get_held_locks().data_->ignore_all_locks_ = enable;
+                bool& val = get_held_locks().data_->ignore_all_locks_;
+                if (val != enable)
+                {
+                    val = enable;
+                    return true;
+                }
+                return false;
             }
         };
 
@@ -126,7 +141,7 @@ namespace hpx::util {
     // retrieve the current thread_local data about held locks
     std::unique_ptr<held_locks_data> get_held_locks_data()
     {
-        return detail::register_locks::get_held_locks().release();
+        return HPX_MOVE(detail::register_locks::get_held_locks()).release();
     }
 
     // set the current thread_local data about held locks
@@ -151,7 +166,10 @@ namespace hpx::util {
         detail::register_locks::lock_detection_trace_depth_ = value;
     }
 
-    static registered_locks_error_handler_type registered_locks_error_handler;
+    namespace {
+
+        registered_locks_error_handler_type registered_locks_error_handler;
+    }
 
     void set_registered_locks_error_handler(
         registered_locks_error_handler_type f) noexcept
@@ -159,7 +177,10 @@ namespace hpx::util {
         registered_locks_error_handler = HPX_MOVE(f);
     }
 
-    static register_locks_predicate_type register_locks_predicate;
+    namespace {
+
+        register_locks_predicate_type register_locks_predicate;
+    }
 
     void set_register_locks_predicate(register_locks_predicate_type f) noexcept
     {
@@ -180,23 +201,21 @@ namespace hpx::util {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
 
-                register_locks::held_locks_map::iterator it =
-                    held_locks.find(lock);
-                if (it != held_locks.end())
+                if (held_locks.find(lock) != held_locks.end())
                     return false;    // this lock is already registered
 
                 std::pair<register_locks::held_locks_map::iterator, bool> p;
                 if (!data)
                 {
-                    p = held_locks.insert(std::make_pair(lock,
-                        detail::lock_data(
-                            register_locks::lock_detection_trace_depth_)));
+                    p = held_locks.emplace(
+                        lock, register_locks::lock_detection_trace_depth_);
                 }
                 else
                 {
-                    p = held_locks.insert(std::make_pair(lock,
-                        detail::lock_data(data,
-                            register_locks::lock_detection_trace_depth_)));
+                    p = held_locks.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(lock),
+                        std::forward_as_tuple(
+                            data, register_locks::lock_detection_trace_depth_));
                 }
                 return p.second;
             }
@@ -221,9 +240,7 @@ namespace hpx::util {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
 
-                register_locks::held_locks_map::iterator it =
-                    held_locks.find(lock);
-                if (it == held_locks.end())
+                if (held_locks.find(lock) == held_locks.end())
                     return false;    // this lock is not registered
 
                 held_locks.erase(lock);
@@ -242,10 +259,8 @@ namespace hpx::util {
         inline bool some_locks_are_not_ignored(
             register_locks::held_locks_map const& held_locks) noexcept
         {
-            using iterator = register_locks::held_locks_map::const_iterator;
-
-            iterator end = held_locks.end();
-            for (iterator it = held_locks.begin(); it != end; ++it)
+            auto const end = held_locks.end();
+            for (auto it = held_locks.begin(); it != end; ++it)
             {
                 //lock_data const& data = *(*it).second;
                 if (!it->second.ignore_)
@@ -266,20 +281,19 @@ namespace hpx::util {
         if (enabled && register_locks::lock_detection_enabled_ &&
             (!register_locks_predicate || register_locks_predicate()))
         {
-            register_locks::held_locks_map& held_locks =
-                register_locks::get_lock_map();
-
             // we create a log message if there are still registered locks for
             // this OS-thread
-            if (!held_locks.empty())
+            if (register_locks::held_locks_map const& held_locks =
+                    register_locks::get_lock_map();
+                !held_locks.empty())
             {
                 // Temporarily disable verifying locks in case verify_no_locks
                 // gets called recursively.
-                auto old_value = detail::register_locks::get_lock_enabled();
+                auto old_value = register_locks::get_lock_enabled();
 
-                detail::register_locks::set_lock_enabled(false);
+                register_locks::set_lock_enabled(false);
                 auto on_exit = hpx::experimental::scope_exit([old_value] {
-                    detail::register_locks::set_lock_enabled(old_value);
+                    register_locks::set_lock_enabled(old_value);
                 });
 
                 if (detail::some_locks_are_not_ignored(held_locks))
@@ -324,7 +338,7 @@ namespace hpx::util {
 
     namespace detail {
 
-        void set_ignore_status(void const* lock, bool status)
+        bool set_ignore_status(void const* lock, bool status)
         {
             if (register_locks::lock_detection_enabled_ &&
                 (!register_locks_predicate || register_locks_predicate()))
@@ -332,64 +346,69 @@ namespace hpx::util {
                 register_locks::held_locks_map& held_locks =
                     register_locks::get_lock_map();
 
-                register_locks::held_locks_map::iterator it =
-                    held_locks.find(lock);
+                auto const it = held_locks.find(lock);
                 if (it == held_locks.end())
                 {
                     // this can happen if the lock was registered to be ignored
                     // on a different OS thread
-                    // HPX_THROW_EXCEPTION(
-                    //     hpx::error::invalid_status, "set_ignore_status",
-                    //     "The given lock has not been registered.");
-                    return;
+                    return false;
                 }
 
-                it->second.ignore_ = status;
+                if (it->second.ignore_ != status)
+                {
+                    it->second.ignore_ = status;
+                    return true;
+                }
             }
+            return false;
         }
     }    // namespace detail
 
-    void ignore_lock(void const* lock) noexcept
+    bool ignore_lock(void const* lock) noexcept
     {
         try
         {
-            detail::set_ignore_status(lock, true);
+            return detail::set_ignore_status(lock, true);
         }
         catch (...)
         {
+            return false;
         }
     }
 
-    void reset_ignored(void const* lock) noexcept
+    bool reset_ignored(void const* lock) noexcept
     {
         try
         {
-            detail::set_ignore_status(lock, false);
+            return detail::set_ignore_status(lock, false);
         }
         catch (...)
         {
+            return false;
         }
     }
 
-    void ignore_all_locks() noexcept
+    bool ignore_all_locks() noexcept
     {
         try
         {
-            detail::register_locks::set_ignore_all_locks(true);
+            return detail::register_locks::set_ignore_all_locks(true);
         }
         catch (...)
         {
+            return false;
         }
     }
 
-    void reset_ignored_all() noexcept
+    bool reset_ignored_all() noexcept
     {
         try
         {
-            detail::register_locks::set_ignore_all_locks(false);
+            return detail::register_locks::set_ignore_all_locks(false);
         }
         catch (...)
         {
+            return false;
         }
     }
 }    // namespace hpx::util

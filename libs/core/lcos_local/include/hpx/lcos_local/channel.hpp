@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,9 +18,9 @@
 #include <hpx/modules/memory.hpp>
 #include <hpx/synchronization/no_mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/atomic_count.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/type_support/unused.hpp>
 
 #include <cstddef>
