@@ -744,15 +744,16 @@ html_context = {
     'github_version': 'master/docs/sphinx/',
 }
 
+# In case no commit is found, link to the master
 if "@HPX_WITH_GIT_COMMIT_SHORT@" != "":
     html_context['commit'] = "@HPX_WITH_GIT_COMMIT_SHORT@"
 else:
-    html_context['commit'] = "unknown"
+    html_context['commit'] = "master"
 
 if "@HPX_WITH_GIT_COMMIT@" != "":
     html_context['fullcommit'] = "@HPX_WITH_GIT_COMMIT@"
 else:
-    html_context['fullcommit'] = "unknown"
+    html_context['fullcommit'] = "master"
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

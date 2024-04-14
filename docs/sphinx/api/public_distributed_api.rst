@@ -177,3 +177,31 @@ Functions
    +---------------------------------------------------+
    | :cpp:func:`hpx::distributed::wait`                |
    +---------------------------------------------------+
+
+.. _public_distr_api_header_post:
+
+``hpx/async.hpp``
+===================
+
+The header :hpx-header:`libs/full/async_distributed/include,hpx/async.hpp`
+includes distributed implementations of :cpp:func:`hpx::async`,
+:cpp:func:`hpx::post`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow`.
+For information regarding the C++ standard library header, see :ref:`public_api`.
+
+Functions
+---------
+
+.. table:: Distributed implementation of functions of header ``hpx/async.hpp``
+
+   +-------------------------------------------------------+
+   | Functions                                             |
+   +=======================================================+
+   | :ref:`modules_hpx/async_distributed/async.hpp_api`    |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/sync.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/post.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/dataflow.hpp_api` |
+   +-------------------------------------------------------+
+
