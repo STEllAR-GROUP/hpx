@@ -114,6 +114,10 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_transmission_chunks(std::size_t num_thread = -1)
         {
+            const auto self_ = hpx::util::openshmem_environment::rank();
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (self_*nthreads_)+sending_thd_id_;
+
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
                 static_cast<std::uint32_t>(buffer_.num_chunks_.first));
@@ -122,15 +126,10 @@ namespace hpx::parcelset::policies::openshmem {
             buffer_.transmission_chunks_.resize(
                 num_zero_copy_chunks + num_non_zero_copy_chunks);
 
-            const auto idx = (self_*nthreads_)+sending_thd_id_;
             if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    const auto self_ = hpx::util::openshmem_environment::rank();
-                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                    const auto idx = (self_*nthreads_)+sending_thd_id_;
-
                     hpx::util::openshmem_environment::scoped_lock l;
 
                     hpx::util::openshmem_environment::wait_until(
