@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/resource_partitioner/detail/partitioner.hpp>
+#include <hpx/thread.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/openshmem_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -147,13 +147,10 @@ namespace hpx::util {
         //
         //segments.resize(hpx::threads::hardware_concurrency() * size());
         //
-
-        auto& rp = hpx::resource::get_partitioner();
-
         // get thread count
         //
         openshmem_environment::nthreads_ =
-            rp.get_num_threads();
+            hpx::get_worker_thread_num();
 
         // get system page size
         //
