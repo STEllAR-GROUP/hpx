@@ -157,7 +157,7 @@ namespace hpx::parcelset::policies::openshmem {
                 const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                 const auto idx = (dst_*nthreads_)+thd_id_;
 
-                hpx::util::openshmem_environment::scoped_lock l;
+                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
@@ -195,7 +195,7 @@ namespace hpx::parcelset::policies::openshmem {
                 const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                 const auto idx = (dst_*nthreads_)+thd_id_;
 
-                hpx::util::openshmem_environment::scoped_lock l;
+                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
@@ -225,7 +225,8 @@ namespace hpx::parcelset::policies::openshmem {
                 const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                 const auto idx = (dst_*nthreads_)+thd_id_;
 
-                hpx::util::openshmem_environment::scoped_lock l;
+                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
                     static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
@@ -256,7 +257,7 @@ namespace hpx::parcelset::policies::openshmem {
                         return false;
                     }
 
-                    hpx::util::openshmem_environment::scoped_lock l;
+                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::put_signal(
                         reinterpret_cast<const std::uint8_t*>(c.data_.cpos_),
@@ -304,11 +305,11 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done()
         {
-            hpx::util::openshmem_environment::scoped_try_lock l;
-            if (!l.locked)
-            {
-                return false;
-            }
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (dst_*nthreads_)+thd_id_;
+
+            const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
+            return l;
 
             return true;
         }

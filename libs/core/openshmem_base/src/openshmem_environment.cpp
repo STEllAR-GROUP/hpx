@@ -9,7 +9,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/thread.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/openshmem_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -204,6 +203,8 @@ namespace hpx::util {
             //
             segments[i].xmt = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
                 beg_signal + page_count + i);
+
+            segments[i].mut = &(openshmem_environment::segment_mutex[i]);
         }
 
         shmem_barrier_all();

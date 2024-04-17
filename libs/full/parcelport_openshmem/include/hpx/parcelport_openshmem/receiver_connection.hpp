@@ -130,7 +130,7 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    hpx::util::openshmem_environment::scoped_lock l;
+                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
@@ -172,8 +172,9 @@ namespace hpx::parcelset::policies::openshmem {
                 const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                 const auto idx = (self_*nthreads_)+sending_thd_id_;
 
-                hpx::util::openshmem_environment::scoped_lock l;
-                    hpx::util::openshmem_environment::wait_until(
+                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+
+                hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
                     (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
@@ -211,7 +212,7 @@ namespace hpx::parcelset::policies::openshmem {
                     const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                     const auto idx = (self_*nthreads_)+sending_thd_id_;
 
-                    hpx::util::openshmem_environment::scoped_lock l;
+                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
@@ -249,7 +250,7 @@ namespace hpx::parcelset::policies::openshmem {
                 const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
                 const auto idx = (self_*nthreads_)+sending_thd_id_;
 
-                hpx::util::openshmem_environment::scoped_lock l;
+                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                 hpx::util::openshmem_environment::wait_until(
                     1, hpx::util::openshmem_environment::segments[idx].rcv);
@@ -277,13 +278,12 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done() noexcept
         {
-            hpx::util::openshmem_environment::scoped_try_lock l;
-            if (!l.locked)
-            {
-                return false;
-            }
+            const auto self_ = hpx::util::openshmem_environment::rank();
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (self_*nthreads_)+sending_thd_id_;
 
-            return request_ptr_;
+            const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
+            return l;
         }
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)

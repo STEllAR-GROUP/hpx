@@ -31,6 +31,7 @@ namespace hpx { namespace util {
         std::uint8_t* end_addr;
         unsigned int * rcv;
         unsigned int * xmt;
+        hpx::mutex * mut;
     };
 
     struct HPX_CORE_EXPORT openshmem_environment
