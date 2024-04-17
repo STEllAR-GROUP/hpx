@@ -113,7 +113,7 @@ void test_yield()
     simple_spinlock mutex;
     std::size_t counter = 0;
     std::size_t repetitions = 1000;
-    for (std::size_t i = 0; i != std::thread::hardware_concurrency() * 10; ++i)
+    for (std::size_t i = 0; i != static_cast<std::size_t>(std::thread::hardware_concurrency()) * 10; ++i)
     {
         ts.emplace_back([&mutex, &counter, repetitions]() {
             for (std::size_t repeat = 0; repeat != repetitions; ++repeat)

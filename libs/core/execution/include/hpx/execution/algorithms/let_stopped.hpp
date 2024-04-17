@@ -8,6 +8,9 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#ifdef HPX_HAVE_STDEXEC
+#else
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
@@ -369,3 +372,5 @@ namespace hpx::execution::experimental {
         }
     } let_stopped{};
 }    // namespace hpx::execution::experimental
+
+#endif

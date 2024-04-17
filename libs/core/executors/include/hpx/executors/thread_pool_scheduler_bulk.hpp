@@ -673,7 +673,11 @@ namespace hpx::execution::experimental::detail {
                 Variant<std::exception_ptr>>;
 
             static constexpr bool sends_stopped =
+#ifdef HPX_HAVE_STDEXEC
+                hpx::execution::experimental::sends_stopped<Sender, Env>;
+#else
                 sends_stopped_of_v<Sender, Env>;
+#endif
         };
 
         template <typename Env>

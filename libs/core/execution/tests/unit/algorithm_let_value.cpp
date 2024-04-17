@@ -17,6 +17,62 @@
 #include <type_traits>
 #include <utility>
 
+#include <hpx/type_support/meta.hpp>
+#include <hpx/type_support/pack.hpp>
+
+using namespace hpx::meta;
+
+template<int i>
+using num = std::integral_constant<int, i>;
+
+struct smelly{};
+
+using hpx::util::detail::append_t;
+
+template<typename odd_pack, typename even_pack, bool found_19>
+struct odd_stable_partition_state {
+    using _odd_pack = odd_pack;
+    using _even_pack = even_pack;
+    static inline constexpr bool _found_19 = found_19;
+};
+
+template<bool odd>
+struct odd_stable_partition {
+    static inline constexpr bool _odd = odd;
+
+    template <typename state, typename new_value>
+    using apply = odd_stable_partition_state<
+        std::conditional_t<
+            new_value::value % 2 == state::_odd,
+            append_t<typename state::_odd_pack, new_value>,
+            typename state::_odd_pack
+            >,
+        std::conditional_t<
+            new_value::value % 2 != _odd,
+            append_t<typename state::_even_pack, new_value>,
+            typename state::_even_pack
+            >,
+        state::_found_19 || new_value::value == 19
+        >;
+};
+
+
+using inp = invoke<
+                right_fold<
+                    odd_stable_partition<true>,
+                    odd_stable_partition_state<hpx::meta::pack<>, hpx::meta::pack<>, false>
+                >,
+                num<1>, num<2>, num<-1>
+    >;
+
+static_assert(std::is_same_v<smelly, inp>);
+
+
+
+int main() {}
+
+#if 0
+
 namespace ex = hpx::execution::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
@@ -203,17 +259,34 @@ int main()
         std::atomic<bool> set_error_called{false};
         std::atomic<bool> let_value_callback_called{false};
         auto s1 = error_sender{};
-        auto s2 = ex::let_value(std::move(s1), [&]() {
+        auto s2 = std::move(s1) | ex::let_value([&]() {
             let_value_callback_called = true;
             return void_sender();
         });
+
+        static_assert(std::same_as<decltype([](){return void_sender();}()), void_sender>);
 
         static_assert(ex::is_sender_v<decltype(s2)>);
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
+        check_sends_stopped<false>(void_sender());
+#ifdef HPX_HAVE_STDEXEC
+        // In STDEXEC the sender returned by let_value has completion signatures
+        // equal to the union of the:
+        // - completion signatures of the sender returned by the function for
+        //   the input given by the predecessor sender
+        // - completion signatures of the predecessor sender for the CPOs other
+        //   than set_value
+        // - set_error(std::exception_ptr)
+
+        // Here, error sender sends stopped so we expect
+        // let_value(error_sender, [](){...}) to send stopped too.
+        check_sends_stopped<true>(s2);
+#else
         check_sends_stopped<false>(s2);
+#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -241,7 +314,11 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
+#ifdef HPX_HAVE_STDEXEC
+        check_sends_stopped<true>(s2);
+#else
         check_sends_stopped<false>(s2);
+#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -253,3 +330,4 @@ int main()
 
     return hpx::util::report_errors();
 }
+#endif

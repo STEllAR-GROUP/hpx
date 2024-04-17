@@ -136,6 +136,23 @@ namespace hpx::execution::experimental {
 
             std::decay_t<Future> future_;
 
+#ifdef HPX_HAVE_STDEXEC
+            template <bool IsVoid, typename _result_type>
+            struct _set_value {
+                using type = hpx::execution::experimental::set_value_t(_result_type);
+            };
+
+            template <typename _result_type>
+            struct _set_value<true, _result_type> {
+                using type = hpx::execution::experimental::set_value_t();
+            };
+
+            using completion_signatures =
+                    hpx::execution::experimental::completion_signatures<
+                        typename _set_value<std::is_void_v<result_type>, result_type>::type,
+                        hpx::execution::experimental::set_error_t(std::exception_ptr)
+                    >;
+#else
             // Sender compatibility
             template <typename, typename T>
             struct completion_signatures_base
@@ -161,6 +178,7 @@ namespace hpx::execution::experimental {
 
                 static constexpr bool sends_stopped = false;
             };
+#endif
         };
 
         template <typename Future>
