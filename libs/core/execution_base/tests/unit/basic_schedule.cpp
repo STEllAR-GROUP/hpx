@@ -11,23 +11,12 @@
 #include <cstddef>
 #include <exception>
 #include <type_traits>
+#include "algorithm_test_utils.hpp"
 
 namespace ex = hpx::execution::experimental;
 
 static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_schedule_calls = 0;
-
-#ifdef HPX_HAVE_STDEXEC
-template <typename Scheduler>
-struct default_env {
-    template <typename CPO>
-    friend Scheduler tag_invoke(
-        ex::get_completion_scheduler_t<CPO>, default_env const&) noexcept
-    {
-        return {};
-    }
-};
-#endif
 
 
 #ifdef HPX_HAVE_STDEXEC
@@ -43,7 +32,7 @@ struct example_sender
     using completion_signatures = ex::completion_signatures<
         ex::set_value_t(), ex::set_error_t(std::exception_ptr)>;
 
-    friend default_env<Scheduler> tag_invoke(
+    friend env_with_scheduler<Scheduler> tag_invoke(
         ex::get_env_t, example_sender const&) noexcept
     {
         return {};
@@ -109,12 +98,12 @@ struct scheduler_1
     }
 #endif
 
-    bool operator==(scheduler_1 const&) const noexcept
+    constexpr bool operator==(scheduler_1 const&) const noexcept
     {
         return true;
     }
 
-    bool operator!=(scheduler_1 const&) const noexcept
+    constexpr bool operator!=(scheduler_1 const&) const noexcept
     {
         return false;
     }
@@ -127,12 +116,12 @@ struct scheduler_2
 #endif
 
 
-    bool operator==(scheduler_2 const&) const noexcept
+    constexpr bool operator==(scheduler_2 const&) const noexcept
     {
         return true;
     }
 
-    bool operator!=(scheduler_2 const&) const noexcept
+    constexpr bool operator!=(scheduler_2 const&) const noexcept
     {
         return false;
     }

@@ -235,7 +235,11 @@ int main()
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s2);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
+#endif
         check_sends_stopped<false>(s2);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
@@ -262,7 +266,11 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
             s2);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s2);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
+#endif
         check_sends_stopped<false>(s2);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -291,7 +299,11 @@ int main()
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
             s2);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s2);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
+#endif
         check_sends_stopped<false>(s2);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };

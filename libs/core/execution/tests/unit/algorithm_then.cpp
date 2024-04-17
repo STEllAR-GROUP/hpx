@@ -5,6 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
@@ -22,6 +23,28 @@
 #include <utility>
 
 namespace ex = hpx::execution::experimental;
+#include <hpx/type_support/meta.hpp>
+#if 0
+int main () {
+    using snd = decltype(ex::just(1));
+
+    using value_types = ex::value_types_of_t<
+        std::decay_t<snd>, ex::empty_env,
+        hpx::meta::pack, hpx::meta::pack>;
+
+    using result_type =
+        std::decay_t<ex::detail::single_result_t<value_types>>;
+
+    using operation_state_type = hpx::util::invoke_result_t<
+        ex::connect_t, snd,
+        ex::detail::future_receiver<result_type>>;
+
+
+    hpx::future<int> f2 = ex::make_future(ex::just(1));
+//    static_assert(std::is_same_v<operation_state_type, char>);
+}
+
+#else
 
 struct custom_transformer
 {
@@ -52,9 +75,9 @@ void test_execution_then_return_int()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 = hpx::execution::experimental::make_future(
-        hpx::execution::experimental::then(
-            hpx::execution::experimental::as_sender(std::move(f1)),
+    hpx::future<int> f2 = ex::make_future(
+        ex::then(
+            ex::as_sender(std::move(f1)),
             [](int value) {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 return 2 * value;
@@ -79,9 +102,9 @@ void test_execution_then_return_void()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 = hpx::execution::experimental::make_future(
-        hpx::execution::experimental::then(
-            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+    hpx::future<void> f2 = ex::make_future(
+        ex::then(
+            ex::as_sender(std::move(f1)), [](auto) {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             }));
     HPX_TEST(f2.valid());
@@ -104,9 +127,9 @@ void test_execution_then_return_int_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 = hpx::execution::experimental::make_future(
-        hpx::execution::experimental::then(
-            hpx::execution::experimental::as_sender(std::move(f1)),
+    hpx::future<int> f2 = ex::make_future(
+        ex::then(
+            ex::as_sender(std::move(f1)),
             [](int value) {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
                 return 2 * value;
@@ -131,9 +154,9 @@ void test_execution_then_return_void_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 = hpx::execution::experimental::make_future(
-        hpx::execution::experimental::then(
-            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+    hpx::future<void> f2 = ex::make_future(
+        ex::then(
+            ex::as_sender(std::move(f1)), [](auto) {
                 hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
             }));
     HPX_TEST(f2.valid());
@@ -457,3 +480,4 @@ int main(int argc, char* argv[])
 
     return hpx::util::report_errors();
 }
+#endif

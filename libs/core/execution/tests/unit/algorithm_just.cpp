@@ -5,8 +5,15 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
 #include <hpx/modules/datastructures.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution/algorithms/just.hpp>
+#else
 #include <hpx/modules/execution.hpp>
+#endif
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -29,7 +36,12 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        // the just sender does not produce errors in STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [] {};
@@ -47,7 +59,11 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
@@ -65,8 +81,15 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
+#ifdef HPX_HAVE_STDEXEC
+        // the just sender decay-copies the value in STDEXEC instead of
+        // storing a reference
+        check_value_types<hpx::variant<hpx::tuple<int>>>(s);
+        check_error_types<hpx::variant<>>(s);
+#else
         check_value_types<hpx::variant<hpx::tuple<int&>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](int x) { HPX_TEST_EQ(x, 3); };
@@ -85,7 +108,11 @@ int main()
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -103,10 +130,17 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
+#ifdef HPX_HAVE_STDEXEC
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
+            s);
+        check_error_types<hpx::variant<>>(s);
+#else
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible&>>>(
             s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -126,7 +160,11 @@ int main()
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -146,7 +184,11 @@ int main()
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
@@ -164,7 +206,11 @@ int main()
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
         check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_error_types<hpx::variant<>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](std::string s, int x) {
@@ -186,8 +232,13 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 
+#ifdef HPX_HAVE_STDEXEC
+        check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
+        check_error_types<hpx::variant<>>(s);
+#else
         check_value_types<hpx::variant<hpx::tuple<std::string&, int&>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#endif
         check_sends_stopped<false>(s);
 
         auto f = [](std::string str, int x) {

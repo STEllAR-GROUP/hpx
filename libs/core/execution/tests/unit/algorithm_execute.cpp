@@ -8,6 +8,10 @@
 #include <hpx/execution/algorithms/execute.hpp>
 #include <hpx/modules/testing.hpp>
 
+#ifdef HPX_HAVE_STDEXEC
+#include "algorithm_test_utils.hpp"
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <type_traits>
@@ -17,20 +21,32 @@ namespace ex = hpx::execution::experimental;
 static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_execute_calls = 0;
 
-struct sender
+#ifdef HPX_HAVE_STDEXEC
+template <typename Scheduler>
+#endif
+struct example_sender
 {
+#ifdef HPX_HAVE_STDEXEC
+    using is_sender = void;
+
+    friend env_with_scheduler<Scheduler> tag_invoke(
+        ex::get_env_t, example_sender const&) noexcept
+    {
+        return {};
+    }
+#endif
+
     template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender const&, Env)
+    friend auto tag_invoke(ex::get_completion_signatures_t, example_sender const&, Env)
         -> ex::completion_signatures<ex::set_value_t(),
             ex::set_error_t(std::exception_ptr)>;
-
     struct operation_state
     {
         friend void tag_invoke(ex::start_t, operation_state&) noexcept {};
     };
 
     template <typename R>
-    friend operation_state tag_invoke(ex::connect_t, sender&&, R&&) noexcept
+    friend operation_state tag_invoke(ex::connect_t, example_sender&&, R&&) noexcept
     {
         return {};
     }
@@ -38,7 +54,13 @@ struct sender
 
 struct scheduler_1
 {
-    friend sender tag_invoke(ex::schedule_t, scheduler_1)
+#ifdef HPX_HAVE_STDEXEC
+    using my_sender = example_sender<scheduler_1>;
+#else
+    using my_sender = example_sender;
+#endif
+
+    friend my_sender tag_invoke(ex::schedule_t, scheduler_1)
     {
         ++friend_tag_invoke_schedule_calls;
         return {};
@@ -57,16 +79,28 @@ struct scheduler_1
 
 struct scheduler_2
 {
-    bool operator==(scheduler_1 const&) const noexcept
+#ifdef HPX_HAVE_STDEXEC
+    using my_sender = example_sender<scheduler_2>;
+#else
+    using my_sender = example_sender;
+#endif
+
+    bool operator==(scheduler_2 const&) const noexcept
     {
         return true;
     }
 
-    bool operator!=(scheduler_1 const&) const noexcept
+    bool operator!=(scheduler_2 const&) const noexcept
     {
         return false;
     }
 };
+
+scheduler_2::my_sender tag_invoke(ex::schedule_t, scheduler_2)
+{
+    ++friend_tag_invoke_schedule_calls;
+    return {};
+}
 
 template <typename F>
 void tag_invoke(ex::execute_t, scheduler_2, F&&)
