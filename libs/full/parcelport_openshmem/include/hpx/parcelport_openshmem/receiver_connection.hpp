@@ -194,6 +194,15 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_chunks(std::size_t num_thread = -1)
         {
+            std::size_t cidx = 0;
+            std::size_t chunk_size = 0;
+
+            const auto self_ = hpx::util::openshmem_environment::rank();
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (self_*nthreads_)+sending_thd_id_;
+
+            std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 if (!request_done())
@@ -201,19 +210,13 @@ namespace hpx::parcelset::policies::openshmem {
                     return false;
                 }
 
-                std::size_t idx = chunks_idx_++;
-                std::size_t chunk_size =
-                    buffer_.transmission_chunks_[idx].second;
+                cidx = chunks_idx_++;
+                chunk_size =
+                    buffer_.transmission_chunks_[cidx].second;
 
-                data_type& c = buffer_.chunks_[idx];
+                data_type& c = buffer_.chunks_[cidx];
                 c.resize(chunk_size);
                 {
-                    const auto self_ = hpx::util::openshmem_environment::rank();
-                    const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                    const auto idx = (self_*nthreads_)+sending_thd_id_;
-
-                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
-
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
                     (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;

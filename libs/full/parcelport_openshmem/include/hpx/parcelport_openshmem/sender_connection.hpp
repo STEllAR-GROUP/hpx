@@ -245,18 +245,19 @@ namespace hpx::parcelset::policies::openshmem {
             const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
             const auto idx = (dst_*nthreads_)+thd_id_;
 
+            std::lock_guard<hpx::mutex> l(
+                *(hpx::util::openshmem_environment::segments[idx].mut)
+            );
+
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 serialization::serialization_chunk& c =
                     buffer_.chunks_[chunks_idx_];
                 if (c.type_ == serialization::chunk_type::chunk_type_pointer)
                 {
-                    if (!request_done())
-                    {
+                    if (!request_done()) {
                         return false;
                     }
-
-                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::put_signal(
                         reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
