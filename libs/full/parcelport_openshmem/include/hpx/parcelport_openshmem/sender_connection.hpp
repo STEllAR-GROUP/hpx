@@ -163,8 +163,7 @@ namespace hpx::parcelset::policies::openshmem {
                 // into the remote locality (dst_)'s shared memory segment
                 //
                 hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(header_.data()),
-                    dst_,
+                    reinterpret_cast<std::uint8_t*>(header_.data()), dst_,
                     static_cast<std::uint8_t*>(
                        hpx::util::openshmem_environment::segments[idx].beg_addr
                     ),
@@ -260,8 +259,7 @@ namespace hpx::parcelset::policies::openshmem {
                     std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::put_signal(
-                        reinterpret_cast<const std::uint8_t*>(c.data_.cpos_),
-                        dst_,
+                        reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
                         static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
                         static_cast<int>(c.size_),
                         reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[idx].rcv)

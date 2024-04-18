@@ -295,13 +295,10 @@ namespace hpx::util {
     {
         if (rank() == node)
         {
-            const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
             std::memmove(raddr, addr, size);
         }
         else
         {
-            const std::lock_guard<hpx::mutex> lk(segment_mutex[node]);
-
 #if !defined(SHMEM_SIGNAL_SET)
             shmem_uint8_put(raddr, addr, size, node);
             shmem_uint8_put(reinterpret_cast<std::uint8_t*>(sigaddr),
