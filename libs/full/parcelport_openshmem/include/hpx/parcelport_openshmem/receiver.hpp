@@ -70,8 +70,8 @@ namespace hpx::parcelset::policies::openshmem {
 
         void run() noexcept
         {
-            util::openshmem_environment::scoped_lock l;
-            new_header(-1);
+            //util::openshmem_environment::scoped_lock l;
+            //new_header(-1);
         }
 
         bool background_work() noexcept
@@ -149,6 +149,7 @@ namespace hpx::parcelset::policies::openshmem {
             header h = rcv_header_;
             rcv_header_.reset();
 
+            // waiting for `sender_connection::send_header` invocation
             while (rcv_header_.data() == 0) {
                 hpx::util::openshmem_environment::wait_until(
                     1, hpx::util::openshmem_environment::segments[idx].rcv);

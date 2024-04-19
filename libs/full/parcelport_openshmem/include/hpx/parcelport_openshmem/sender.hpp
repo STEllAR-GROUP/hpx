@@ -109,6 +109,7 @@ namespace hpx::parcelset::policies::openshmem {
         }
 
     private:
+/*
         tag_provider tag_provider_;
 
         void next_free_tag(const auto dst, const auto thd_id) noexcept
@@ -154,7 +155,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             return next_free;
         }
-
+*/
         hpx::spinlock connections_mtx_;
         connection_list connections_;
 
