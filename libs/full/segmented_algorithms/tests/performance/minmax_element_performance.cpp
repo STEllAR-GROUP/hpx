@@ -13,9 +13,9 @@
 #include <hpx/include/parallel_minmax.hpp>
 #include <hpx/include/partitioned_vector.hpp>
 #include <hpx/iostream.hpp>
-#include <hpx/modules/timing.hpp>
 #include <hpx/modules/program_options.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/modules/timing.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -72,15 +72,16 @@ int hpx_main(hpx::program_options::variables_map& vm)
         hpx::util::perftests_init(vm);
 
         // run benchmark
-        hpx::util::perftests_report("hpx::minmax", "par", test_count, [&]{
-            hpx::minmax_element(hpx::execution::par, v.begin(), v.end());});
+        hpx::util::perftests_report("hpx::minmax", "par", test_count, [&] {
+            hpx::minmax_element(hpx::execution::par, v.begin(), v.end());
+        });
 
-        hpx::util::perftests_report("hpx::min", "par", test_count, [&]{hpx::min_element(
-            hpx::execution::par, v.begin(), v.end());});
+        hpx::util::perftests_report("hpx::min", "par", test_count,
+            [&] { hpx::min_element(hpx::execution::par, v.begin(), v.end()); });
 
-        hpx::util::perftests_report("hpx::max", "par", test_count, [&]{hpx::max_element(
-            hpx::execution::par, v.begin(), v.end());});
-            
+        hpx::util::perftests_report("hpx::max", "par", test_count,
+            [&] { hpx::max_element(hpx::execution::par, v.begin(), v.end()); });
+
         hpx::util::perftests_print_times();
 
         return hpx::finalize();

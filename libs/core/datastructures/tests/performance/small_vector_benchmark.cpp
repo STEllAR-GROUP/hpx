@@ -45,52 +45,58 @@ int hpx_main(hpx::program_options::variables_map& vm)
     // pull values from cmd
     std::size_t repeat = vm["test_count"].as<std::size_t>();
     std::size_t size = vm["vector_size"].as<std::size_t>();
- 
+
     hpx::util::perftests_init(vm);
 
     // int
-    
-    hpx::util::perftests_report("hpx::small_vector", "<int, 1>", repeat, [&] {
-        fill<hpx::detail::small_vector<int, 1>>(size);
-    });
 
-    hpx::util::perftests_report("hpx::small_vector", "<int, 2>", repeat, [&] {
-        fill<hpx::detail::small_vector<int, 2>>(size);
-    });
+    hpx::util::perftests_report("hpx::small_vector", "<int, 1>", repeat,
+        [&] { fill<hpx::detail::small_vector<int, 1>>(size); });
 
-    hpx::util::perftests_report("hpx::small_vector", "<int, 4>", repeat, [&] {
-        fill<hpx::detail::small_vector<int, 4>>(size);
-    });
+    hpx::util::perftests_report("hpx::small_vector", "<int, 2>", repeat,
+        [&] { fill<hpx::detail::small_vector<int, 2>>(size); });
 
-    hpx::util::perftests_report("hpx::small_vector", "<int, 8>", repeat, [&] {
-        fill<hpx::detail::small_vector<int, 8>>(size);
-    });
+    hpx::util::perftests_report("hpx::small_vector", "<int, 4>", repeat,
+        [&] { fill<hpx::detail::small_vector<int, 4>>(size); });
 
-    hpx::util::perftests_report("hpx::small_vector", "<int, 16>", repeat, [&] {
-        fill<hpx::detail::small_vector<int, 16>>(size);
-    });
+    hpx::util::perftests_report("hpx::small_vector", "<int, 8>", repeat,
+        [&] { fill<hpx::detail::small_vector<int, 8>>(size); });
+
+    hpx::util::perftests_report("hpx::small_vector", "<int, 16>", repeat,
+        [&] { fill<hpx::detail::small_vector<int, 16>>(size); });
 
     // hpx::move_only_function<void()>
 
-    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 1>", repeat, [&] {
-        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 1>>(size);
-    });
+    hpx::util::perftests_report(
+        "hpx::small_vector", "<fxn<void()>, 1>", repeat, [&] {
+            fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 1>>(
+                size);
+        });
 
-    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 2>", repeat, [&] {
-        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 2>>(size);
-    });
+    hpx::util::perftests_report(
+        "hpx::small_vector", "<fxn<void()>, 2>", repeat, [&] {
+            fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 2>>(
+                size);
+        });
 
-    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 4>", repeat, [&] {
-        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 4>>(size);
-    });
+    hpx::util::perftests_report(
+        "hpx::small_vector", "<fxn<void()>, 4>", repeat, [&] {
+            fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 4>>(
+                size);
+        });
 
-    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 8>", repeat, [&] {
-        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 8>>(size);
-    });
+    hpx::util::perftests_report(
+        "hpx::small_vector", "<fxn<void()>, 8>", repeat, [&] {
+            fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 8>>(
+                size);
+        });
 
-    hpx::util::perftests_report("hpx::small_vector", "<fxn<void()>, 16>", repeat, [&] {
-        fill<hpx::detail::small_vector<hpx::move_only_function<void()>, 16>>(size);
-    });
+    hpx::util::perftests_report(
+        "hpx::small_vector", "<fxn<void()>, 16>", repeat, [&] {
+            fill<
+                hpx::detail::small_vector<hpx::move_only_function<void()>, 16>>(
+                size);
+        });
 
     hpx::util::perftests_print_times();
 
