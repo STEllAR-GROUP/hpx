@@ -151,8 +151,9 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::size() * hpx::util::openshmem_environment::nthreads_;
             const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
+
             // waiting for `sender_connection::send_header` invocation
-            while (rcv_header_.data() == 0) {
+            if (rcv_header_.data() == 0) {
 
                 const auto idx = hpx::util::openshmem_environment::wait_until_any(
                     1,
@@ -160,13 +161,17 @@ namespace hpx::parcelset::policies::openshmem {
                     page_count
                 );
 
-                hpx::util::openshmem_environment::get(
-                    reinterpret_cast<std::uint8_t*>(
-                       rcv_header_.data()),
-                    self_,
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    sizeof(rcv_header_)
-                );
+                {
+                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+
+                    hpx::util::openshmem_environment::get(
+                        reinterpret_cast<std::uint8_t*>(
+                            rcv_header_.data()),
+                        self_,
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        sizeof(rcv_header_)
+                    );
+                }
 
                 (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
             }

@@ -134,7 +134,6 @@ namespace hpx::parcelset::policies::openshmem {
 
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(
@@ -143,6 +142,8 @@ namespace hpx::parcelset::policies::openshmem {
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
                         static_cast<int>(buffer_.transmission_chunks_.size() *
                             sizeof(buffer_type::transmission_chunk_type)));
+
+                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                     request_ptr_ = true;
                 }
@@ -176,13 +177,14 @@ namespace hpx::parcelset::policies::openshmem {
 
                 hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()),
                     self_,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
                     buffer_.data_.size());
+
+                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                 request_ptr_ = true;
             }
@@ -219,12 +221,13 @@ namespace hpx::parcelset::policies::openshmem {
                 {
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(c.data()), self_,
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
                         c.size());
+
+                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                     hpx::util::openshmem_environment::put_signal(nullptr, src_,
                         nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
@@ -258,12 +261,13 @@ namespace hpx::parcelset::policies::openshmem {
 
                 hpx::util::openshmem_environment::wait_until(
                     1, hpx::util::openshmem_environment::segments[idx].rcv);
-                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(&tag_), self_,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
                     sizeof(int));
+
+                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                 request_ptr_ = true;
             }
