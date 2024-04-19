@@ -22,15 +22,17 @@
 
 namespace hpx::util {
 
-    void perftests_cfg(hpx::program_options::options_description& cmdline) {
-        cmdline.add_options()
-        ("detailed_bench",
-            "Use if detailed benchmarks are required, showing the execution time taken for each epoch")
-        ;
+    void perftests_cfg(hpx::program_options::options_description& cmdline)
+    {
+        cmdline.add_options()("detailed_bench",
+            "Use if detailed benchmarks are required, showing the execution "
+            "time taken for each epoch");
     }
 
-    void perftests_init(const hpx::program_options::variables_map& vm) {
-        if (vm.count("detailed_bench")) {
+    void perftests_init(const hpx::program_options::variables_map& vm)
+    {
+        if (vm.count("detailed_bench"))
+        {
             detailed_ = true;
         }
     }
@@ -111,8 +113,7 @@ average: {{average(elapsed)}}{{^-last}}
 
         std::ostream& operator<<(std::ostream& strm, json_perf_times const& obj)
         {
-            
-            if (detailed_) 
+            if (detailed_)
             {
                 strm << "{\n";
                 strm << "  \"outputs\" : [";
@@ -123,12 +124,14 @@ average: {{average(elapsed)}}{{^-last}}
                         strm << ",";
                     strm << "\n    {\n";
                     strm << R"(      "name" : ")" << std::get<0>(item.first)
-                        << "\",\n";
+                         << "\",\n";
                     strm << R"(      "executor" : ")" << std::get<1>(item.first)
-                        << "\",\n";
-                    strm << R"(      "series" : [)" << "\n";
+                         << "\",\n";
+                    strm << R"(      "series" : [)"
+                         << "\n";
                     int series = 0;
-                    strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
+                    strm.precision(
+                        std::numeric_limits<long double>::max_digits10 - 1);
                     for (long double const val : item.second)
                     {
                         if (series)
@@ -138,9 +141,9 @@ average: {{average(elapsed)}}{{^-last}}
                         strm << R"(         )" << std::scientific << val;
                         ++series;
                     }
-                    
+
                     strm << "\n       ]\n";
-                    
+
                     strm << "    }";
                     ++outputs;
                 }
@@ -149,10 +152,10 @@ average: {{average(elapsed)}}{{^-last}}
                 strm << "]\n";
                 strm << "}\n";
             }
-            else 
+            else
             {
                 strm << "Results:\n\n";
-                for (auto&& item: obj.m_map) 
+                for (auto&& item : obj.m_map)
                 {
                     long double average = 0.0;
                     int series = 0;
@@ -163,8 +166,10 @@ average: {{average(elapsed)}}{{^-last}}
                         ++series;
                         average += val;
                     }
-                    strm.precision(std::numeric_limits<long double>::max_digits10 - 1);
-                    strm << std::scientific << "average: " << average / series << "\n\n";
+                    strm.precision(
+                        std::numeric_limits<long double>::max_digits10 - 1);
+                    strm << std::scientific << "average: " << average / series
+                         << "\n\n";
                 }
             }
             return strm;
@@ -186,7 +191,8 @@ average: {{average(elapsed)}}{{^-last}}
         if (steps == 0)
             return;
 
-        std::size_t const steps_per_epoch = steps / detail::nanobench_epochs + 1;
+        std::size_t const steps_per_epoch =
+            steps / detail::nanobench_epochs + 1;
 
         detail::bench()
             .name(name)
@@ -214,8 +220,9 @@ average: {{average(elapsed)}}{{^-last}}
     {
         if (detailed_)
             perftests_print_times(detail::nanobench_hpx_template(), std::cout);
-        else 
-            perftests_print_times(detail::nanobench_hpx_simple_template(), std::cout);
+        else
+            perftests_print_times(
+                detail::nanobench_hpx_simple_template(), std::cout);
     }
 #else
     void perftests_report(std::string const& name, std::string const& exec,

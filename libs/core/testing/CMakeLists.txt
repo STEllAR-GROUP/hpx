@@ -20,14 +20,14 @@ set(testing_compat_headers
 # Default location is $HPX_ROOT/libs/testing/src
 set(testing_sources testing.cpp performance.cpp)
 
-set(module_deps 
-  hpx_assertion 
-  hpx_config 
-  hpx_format 
-  hpx_functional
-  hpx_preprocessor
-  hpx_util
-  hpx_command_line_handling_local
+set(module_deps
+    hpx_assertion
+    hpx_config
+    hpx_format
+    hpx_functional
+    hpx_preprocessor
+    hpx_util
+    hpx_command_line_handling_local
 )
 
 if(HPX_WITH_NANOBENCH)

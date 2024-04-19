@@ -6,10 +6,6 @@
 
 set(benchmarks minmax_element_performance)
 
-# if (HPX_WITH_NANOBENCH_BENCHMARKS)
-#   set(benchmarks ${benchmarks} minmax_nanobench)
-# endif()
-
 foreach(benchmark ${benchmarks})
   set(sources ${benchmark}.cpp)
 
