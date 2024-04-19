@@ -167,6 +167,8 @@ namespace hpx::parcelset::policies::openshmem {
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
                     sizeof(rcv_header_)
                 );
+
+                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
             }
 
             header h = rcv_header_;
