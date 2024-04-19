@@ -154,15 +154,11 @@ namespace hpx::parcelset::policies::openshmem {
             // waiting for `sender_connection::send_header` invocation
             while (rcv_header_.data() == 0) {
 
-                const auto sig_idx = hpx::util::openshmem_environment::wait_until_any(
+                const auto idx = hpx::util::openshmem_environment::wait_until_any(
                     1,
                     reinterpret_cast<unsigned int *>(hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal),
                     page_count
                 );
-
-                const auto base_addr = hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal;
-                const auto sending_thd_id = static_cast<std::size_t>((base_addr + sig_idx) - base_addr);
-                const auto idx = (self_*nthreads_)+sending_thd_id;
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(
