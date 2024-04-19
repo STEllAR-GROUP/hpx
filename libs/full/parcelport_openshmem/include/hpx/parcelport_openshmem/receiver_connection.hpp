@@ -36,8 +36,8 @@ namespace hpx::parcelset::policies::openshmem {
             initialized,
             rcvd_transmission_chunks,
             rcvd_data,
-            rcvd_chunks,
-            sent_release_tag
+            rcvd_chunks
+            //,sent_release_tag
         };
 
         using data_type = std::vector<char>;
@@ -47,7 +47,7 @@ namespace hpx::parcelset::policies::openshmem {
         receiver_connection(int src, header h, Parcelport& pp) noexcept
           : state_(initialized)
           , src_(src)
-          , tag_(h.tag())
+          //, tag_(h.tag())
           , self_(-1)
           , sending_thd_id_(-1)
           , header_(h)
@@ -69,7 +69,7 @@ namespace hpx::parcelset::policies::openshmem {
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
 #endif
-            tag_ = header_.tag();
+            //tag_ = header_.tag();
             // decode data
             buffer_.num_chunks_ = header_.num_chunks();
             buffer_.data_.resize(static_cast<std::size_t>(header_.size()));
@@ -101,9 +101,9 @@ namespace hpx::parcelset::policies::openshmem {
                 return receive_chunks(num_thread);
 
             case rcvd_chunks:
-                return send_release_tag(num_thread);
+                //return send_release_tag(num_thread);
 
-            case sent_release_tag:
+            //case sent_release_tag:
                 return done();
 
             default:
@@ -235,9 +235,10 @@ namespace hpx::parcelset::policies::openshmem {
 
             state_ = rcvd_chunks;
 
-            return send_release_tag(num_thread);
+            return true; //send_release_tag(num_thread);
         }
 
+/*
         bool send_release_tag(std::size_t num_thread = -1)
         {
             if (!request_done())
@@ -273,7 +274,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             return done();
         }
-
+*/
         bool done() noexcept
         {
             return request_done();
@@ -295,7 +296,7 @@ namespace hpx::parcelset::policies::openshmem {
         connection_state state_;
 
         int src_;
-        int tag_;
+        //int tag_;
         int self_;
         int sending_thd_id_;
 

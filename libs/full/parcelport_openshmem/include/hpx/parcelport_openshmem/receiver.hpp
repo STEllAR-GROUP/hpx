@@ -37,6 +37,7 @@ namespace hpx::parcelset::policies::openshmem {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
+/*
         struct exp_backoff
         {
             int numTries;
@@ -59,17 +60,18 @@ namespace hpx::parcelset::policies::openshmem {
                 }
             }
         };
+*/
 
         explicit constexpr receiver(Parcelport& pp) noexcept
           : pp_(pp)
-          , bo()
+          //, bo()
         {
         }
 
         void run() noexcept
         {
             util::openshmem_environment::scoped_lock l;
-            new_header();
+            new_header(-1);
         }
 
         bool background_work() noexcept
@@ -125,7 +127,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             if (l.locked)
             {
-                header h = new_header();
+                header h = new_header(res->sending_thd_id_);
                 l.unlock();
                 header_lock.unlock();
 
@@ -139,18 +141,20 @@ namespace hpx::parcelset::policies::openshmem {
             return res;
         }
 
-        header new_header() noexcept
+        header new_header(const auto sending_thd_id) noexcept
         {
+            const auto self_ = hpx::util::openshmem_environment::rank();
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (self_*nthreads_)+sending_thd_id;
             header h = rcv_header_;
             rcv_header_.reset();
-            auto self_ = hpx::util::openshmem_environment::rank();
 
-            while (rcv_header_.data() == 0)
-            {
-                bo(hpx::util::openshmem_environment::segments[self_].rcv);
+            while (rcv_header_.data() == 0) {
+                hpx::util::openshmem_environment::wait_until(
+                    1, hpx::util::openshmem_environment::segments[idx].rcv);
+                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
             }
 
-            (*(hpx::util::openshmem_environment::segments[self_].rcv)) = 0;
             return h;
         }
 
@@ -164,7 +168,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         hpx::spinlock connections_mtx_;
         connection_list connections_;
-        exp_backoff bo;
+        //exp_backoff bo;
     };
 }    // namespace hpx::parcelset::policies::openshmem
 

@@ -37,7 +37,7 @@ namespace hpx::parcelset::policies::openshmem {
     struct sender;
     struct sender_connection;
 
-    int acquire_tag(sender*) noexcept;
+    //int acquire_tag(sender*) noexcept;
     void add_connection(sender*, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
@@ -67,7 +67,7 @@ namespace hpx::parcelset::policies::openshmem {
         sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
           : state_(initialized)
           , sender_(s)
-          , tag_(-1)
+          //, tag_(-1)
           , dst_(dst)
           , thd_id_(-1)
           , chunks_idx_(0)
@@ -102,8 +102,9 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::chrono::high_resolution_clock::now();
 #endif
             chunks_idx_ = 0;
-            tag_ = acquire_tag(sender_);
-            header_ = header(buffer_, tag_, thd_id_);
+            //tag_ = acquire_tag(sender_);
+            //header_ = header(buffer_, tag_, thd_id_);
+            header_ = header(buffer_, thd_id_);
             header_.assert_valid();
 
             state_ = initialized;
@@ -315,7 +316,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         connection_state state_;
         sender_type* sender_;
-        int tag_;
+        //int tag_;
         int dst_;
         int thd_id_;
 

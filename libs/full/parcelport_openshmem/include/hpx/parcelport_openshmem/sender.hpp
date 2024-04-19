@@ -44,8 +44,8 @@ namespace hpx::parcelset::policies::openshmem {
 
         void run() noexcept
         {
-            hpx::util::openshmem_environment::scoped_lock l;
-            get_next_free_tag();
+            //hpx::util::openshmem_environment::scoped_lock l;
+            //get_next_free_tag();
         }
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)
@@ -59,10 +59,12 @@ namespace hpx::parcelset::policies::openshmem {
             connections_.push_back(ptr);
         }
 
+/*
         int acquire_tag() noexcept
         {
             return tag_provider_.acquire();
         }
+*/
 
         void send_messages(connection_ptr connection)
         {
@@ -102,21 +104,21 @@ namespace hpx::parcelset::policies::openshmem {
                 send_messages(HPX_MOVE(connection));
                 has_work = true;
             }
-            next_free_tag();
+            //next_free_tag(connection->dst_, connection->thd_id_);
             return has_work;
         }
 
     private:
         tag_provider tag_provider_;
 
-        void next_free_tag() noexcept
+        void next_free_tag(const auto dst, const auto thd_id) noexcept
         {
             int next_free = -1;
             {
                 std::unique_lock l(next_free_tag_mtx_, std::try_to_lock);
                 if (l.owns_lock())
                 {
-                    next_free = next_free_tag_locked();
+                    next_free = next_free_tag_locked(dst, thd_id);
                 }
             }
 
@@ -127,24 +129,26 @@ namespace hpx::parcelset::policies::openshmem {
             }
         }
 
-        int next_free_tag_locked() noexcept
+        int next_free_tag_locked(const auto dst, const auto thd_id) noexcept
         {
             hpx::util::openshmem_environment::scoped_try_lock l;
             if (l.locked)
             {
-                return get_next_free_tag();
+                return get_next_free_tag(dst, thd_id);
             }
             return -1;
         }
 
-        int get_next_free_tag() noexcept
+        int get_next_free_tag(const auto dst, const auto thd_id) noexcept
         {
             int next_free = next_free_tag_;
+            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
+            const auto idx = (dst*nthreads_)+thd_id;
 
             hpx::util::openshmem_environment::scoped_lock l;
             std::memcpy(&next_free,
                 hpx::util::openshmem_environment::segments
-                    [hpx::util::openshmem_environment::rank()]
+                    [idx]
                         .beg_addr,
                 sizeof(int));
 
