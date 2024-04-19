@@ -319,6 +319,19 @@ namespace hpx::util {
         shmem_uint_wait_until(sigaddr, SHMEM_CMP_EQ, value);
     }
 
+    std::size_t wait_until_any(const unsigned int value, unsigned int* sigaddr, const std::size_t count) {
+
+        const std::size_t sig_idx = shmem_wait_until_any(
+            sigaddr,
+            count,
+            nullptr,
+            SHMEM_CMP_EQ,
+            value
+        );
+
+        return sig_idx;
+    }
+
     void openshmem_environment::get(std::uint8_t* addr, const int node,
         const std::uint8_t* raddr, const std::size_t size)
     {

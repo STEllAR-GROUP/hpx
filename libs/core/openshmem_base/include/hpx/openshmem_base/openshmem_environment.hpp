@@ -56,6 +56,7 @@ namespace hpx { namespace util {
             std::uint8_t* raddr, const std::size_t size, unsigned int* sigaddr);
 
         static void wait_until(const unsigned int value, unsigned int* sigaddr);
+        static std::size_t wait_until_any(const unsigned int value, unsigned int* sigaddr, const std::size_t count);
 
         static void get(std::uint8_t* addr, const int rank,
             const std::uint8_t* raddr, const std::size_t size);

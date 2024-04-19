@@ -145,17 +145,36 @@ namespace hpx::parcelset::policies::openshmem {
         {
             const auto self_ = hpx::util::openshmem_environment::rank();
             const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (self_*nthreads_)+sending_thd_id;
-            header h = rcv_header_;
-            rcv_header_.reset();
+
+            const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
+            const std::size_t page_count =
+                hpx::util::openshmem_environment::size() * hpx::util::openshmem_environment::nthreads_;
+            const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
             // waiting for `sender_connection::send_header` invocation
             while (rcv_header_.data() == 0) {
-                hpx::util::openshmem_environment::wait_until(
-                    1, hpx::util::openshmem_environment::segments[idx].rcv);
-                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+
+                const auto sig_idx = hpx::util::openshmem_environment::wait_until_any(
+                    1,
+                    reinterpret_cast<unsigned int *>(hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal),
+                    page_count
+                );
+
+                const auto base_addr = hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal;
+                const auto sending_thd_id = static_cast<std::size_t>((base_addr + sig_idx) - base_addr);
+                const auto idx = (self_*nthreads_)+sending_thd_id;
+
+                hpx::util::openshmem_environment::get(
+                    reinterpret_cast<std::uint8_t*>(
+                       rcv_header_.data()),
+                    self_,
+                    hpx::util::openshmem_environment::segments[idx].beg_addr,
+                    sizeof(rcv_header_)
+                );
             }
 
+            header h = rcv_header_;
+            rcv_header_.reset();
             return h;
         }
 
