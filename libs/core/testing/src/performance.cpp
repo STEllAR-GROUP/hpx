@@ -106,7 +106,7 @@ average: {{average(elapsed)}}{{^-last}}
         }
 
         void add_time(std::string const& test_name, std::string const& executor,
-            double time)
+            long double time)
         {
             times().add(test_name, executor, time);
         }
@@ -242,7 +242,7 @@ average: {{average(elapsed)}}{{^-last}}
             test();
             // default is in seconds
             auto time =
-                std::chrono::duration_cast<std::chrono::duration<double>>(
+                std::chrono::duration_cast<std::chrono::duration<long double>>(
                     timer::now() - start);
             detail::add_time(name, exec, time.count());
         }
