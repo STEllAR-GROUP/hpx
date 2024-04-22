@@ -314,7 +314,7 @@ namespace hpx::util {
     void openshmem_environment::wait_until(
         const std::uint8_t value, std::uint8_t * sigaddr)
     {
-        shmem_wait_until(reinterpret_cast<unsigned int*>(sigaddr), SHMEM_CMP_EQ, static_cast<unsigned int>(value));
+        shmem_int_wait_until(reinterpret_cast<unsigned int*>(sigaddr), SHMEM_CMP_EQ, static_cast<unsigned int>(value));
     }
 
     std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
@@ -330,6 +330,7 @@ namespace hpx::util {
            if(rc) { return i; }
         }
 
+        return -1;
 #else
         const std::size_t sig_idx = shmem_wait_until_any(
             reinterpret_cast<unsigned int *>(sigaddr),
@@ -338,9 +339,9 @@ namespace hpx::util {
             SHMEM_CMP_EQ,
             value
         );
-#endif
 
         return sig_idx;
+#endif
     }
 
     void openshmem_environment::get(std::uint8_t* addr, const int node,
