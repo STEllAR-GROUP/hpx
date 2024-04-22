@@ -321,6 +321,13 @@ namespace hpx::util {
 
     std::size_t wait_until_any(const unsigned int value, unsigned int* sigaddr, const std::size_t count) {
 
+#if defined(MPI_VERSION)
+        int rc = 0;
+        for(std::size_t i = 0; i < count; ++i) {
+           rc = shmem_test(sigaddr+i, SHMEM_CMP_EQ, 1); 
+           if(rc) { return i; }
+        }
+#else
         const std::size_t sig_idx = shmem_wait_until_any(
             sigaddr,
             count,
@@ -328,6 +335,7 @@ namespace hpx::util {
             SHMEM_CMP_EQ,
             value
         );
+#endif
 
         return sig_idx;
     }
