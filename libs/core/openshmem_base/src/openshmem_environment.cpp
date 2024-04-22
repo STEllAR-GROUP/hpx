@@ -319,16 +319,10 @@ namespace hpx::util {
 
     std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
 
-
-#define SHMEM_MAJOR_VERSION             1
-#define SHMEM_MINOR_VERSION             4
-#define SHMEM_VENDOR_STRING             "http://www.open-mpi.org/"
-#define SHMEM_MAX_NAME_LEN              256
-
 #if defined(SHMEM_MAJOR_VERSION) && defined(SHMEM_MINOR_VERSION) && \
     defined(SHMEM_VENDOR_STRING) && defined(SHMEM_MAX_NAME_LEN) && \
     SHMEM_MAJOR_VERSION == 1 && SHMEM_MINOR_VERSION == 4 && \
-    SHMEM_MAX_NAME_LEN == 4 && SHMEM_VENDOR_STRING == "http://www.open-mpi.org/"
+    SHMEM_MAX_NAME_LEN == 256
 
         int rc = 0;
         for(std::size_t i = 0; i < count; ++i) {
