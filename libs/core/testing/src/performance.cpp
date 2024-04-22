@@ -96,7 +96,7 @@ average: {{average(elapsed)}}{{^-last}}
 
         public:
             HPX_CORE_EXPORT void add(std::string const& name,
-                std::string const& executor, double time);
+                std::string const& executor, long double time);
         };
 
         json_perf_times& times()
@@ -157,7 +157,7 @@ average: {{average(elapsed)}}{{^-last}}
                 strm << "Results:\n\n";
                 for (auto&& item : obj.m_map)
                 {
-                    long double average = 0.0;
+                    long double average = static_cast<long double>(0.0);
                     int series = 0;
                     strm << "name: " << std::get<0>(item.first) << "\n";
                     strm << "executor: " << std::get<1>(item.first) << "\n";
@@ -175,8 +175,8 @@ average: {{average(elapsed)}}{{^-last}}
             return strm;
         }
 
-        void json_perf_times::add(
-            std::string const& name, std::string const& executor, double time)
+        void json_perf_times::add(std::string const& name,
+            std::string const& executor, long double time)
         {
             m_map[key_t(name, executor)].push_back(time);
         }
@@ -234,7 +234,7 @@ average: {{average(elapsed)}}{{^-last}}
         // First iteration to cache the data
         test();
         using timer = std::chrono::high_resolution_clock;
-        for (size_t i = 0; i != steps; ++i)
+        for (std::size_t i = 0; i != steps; ++i)
         {
             // For now we don't flush the cache
             //flush_cache();
