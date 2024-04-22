@@ -324,7 +324,7 @@ namespace hpx::util {
 #if defined(MPI_VERSION)
         int rc = 0;
         for(std::size_t i = 0; i < count; ++i) {
-           rc = shmem_test(sigaddr+i, SHMEM_CMP_EQ, 1); 
+           rc = shmem_test(sigaddr+i, SHMEM_CMP_EQ, value); 
            if(rc) { return i; }
         }
 #else
