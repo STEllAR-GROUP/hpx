@@ -196,13 +196,11 @@ namespace hpx::util {
 
             // all of the rcv signals are linearly arranged before the rcv signals
             //
-            segments[i].rcv = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
-                beg_signal + i);
+            segments[i].rcv = hpx::util::openshmem_environment::shmem_buffer + beg_signal + i;
 
             // all of the xmt signals are linearly arranged after the rcv signals
             //
-            segments[i].xmt = reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::shmem_buffer +
-                beg_signal + page_count + i);
+            segments[i].xmt = hpx::util::openshmem_environment::shmem_buffer + beg_signal + page_count + i;
 
             segments[i].mut = &(openshmem_environment::segment_mutex[i]);
         }
@@ -291,7 +289,7 @@ namespace hpx::util {
 
     void openshmem_environment::put_signal(const std::uint8_t* addr,
         const int node, std::uint8_t* raddr, const std::size_t size,
-        unsigned int* sigaddr)
+        std::uint8_t * sigaddr)
     {
         if (rank() == node)
         {
@@ -314,22 +312,33 @@ namespace hpx::util {
     }
 
     void openshmem_environment::wait_until(
-        const unsigned int value, unsigned int* sigaddr)
+        const std::uint8_t value, std::uint8_t * sigaddr)
     {
-        shmem_uint_wait_until(sigaddr, SHMEM_CMP_EQ, value);
+        shmem_wait_until(reinterpret_cast<unsigned int*>(sigaddr), SHMEM_CMP_EQ, static_cast<unsigned int>(value));
     }
 
-    std::size_t wait_until_any(const unsigned int value, unsigned int* sigaddr, const std::size_t count) {
+    std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
 
-#if defined(MPI_VERSION)
+
+#define SHMEM_MAJOR_VERSION             1
+#define SHMEM_MINOR_VERSION             4
+#define SHMEM_VENDOR_STRING             "http://www.open-mpi.org/"
+#define SHMEM_MAX_NAME_LEN              256
+
+#if defined(SHMEM_MAJOR_VERSION) && defined(SHMEM_MINOR_VERSION) && \
+    defined(SHMEM_VENDOR_STRING) && defined(SHMEM_MAX_NAME_LEN) && \
+    SHMEM_MAJOR_VERSION == 1 && SHMEM_MINOR_VERSION == 4 && \
+    SHMEM_MAX_NAME_LEN == 4 && SHMEM_VENDOR_STRING == "http://www.open-mpi.org/"
+
         int rc = 0;
         for(std::size_t i = 0; i < count; ++i) {
-           rc = shmem_test(sigaddr+i, SHMEM_CMP_EQ, value); 
+           rc = shmem_test(reinterpret_cast<unsigned int*>(sigaddr+i), SHMEM_CMP_EQ, value); 
            if(rc) { return i; }
         }
+
 #else
         const std::size_t sig_idx = shmem_wait_until_any(
-            sigaddr,
+            reinterpret_cast<unsigned int *>(sigaddr),
             count,
             nullptr,
             SHMEM_CMP_EQ,

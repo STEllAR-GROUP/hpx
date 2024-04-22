@@ -165,13 +165,9 @@ namespace hpx::parcelset::policies::openshmem {
                 //
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(header_.data()), dst_,
-                    static_cast<std::uint8_t*>(
-                       hpx::util::openshmem_environment::segments[idx].beg_addr
-                    ),
+                    hpx::util::openshmem_environment::segments[idx].beg_addr,
                     header_.data_size_,
-                    reinterpret_cast<unsigned int*>(
-                       hpx::util::openshmem_environment::segments[idx].rcv
-                    )
+                    hpx::util::openshmem_environment::segments[idx].rcv
                 );
             }
 
@@ -199,12 +195,10 @@ namespace hpx::parcelset::policies::openshmem {
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
-                    static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments
-                        [idx].beg_addr),
+                    hpx::util::openshmem_environment::segments[idx].beg_addr,
                     static_cast<int>(chunks.size() *
                         sizeof(parcel_buffer_type::transmission_chunk_type)),
-                    reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments
-                        [idx].rcv)
+                    hpx::util::openshmem_environment::segments[idx].rcv
                 );
             }
 
@@ -229,9 +223,9 @@ namespace hpx::parcelset::policies::openshmem {
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
-                    static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
+                    hpx::util::openshmem_environment::segments[idx].beg_addr,
                     buffer_.data_.size(),
-                    reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[idx].rcv)
+                    hpx::util::openshmem_environment::segments[idx].rcv
                 );
             }
             state_ = sent_data;
@@ -262,9 +256,9 @@ namespace hpx::parcelset::policies::openshmem {
 
                     hpx::util::openshmem_environment::put_signal(
                         reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
-                        static_cast<std::uint8_t*>(hpx::util::openshmem_environment::segments[idx].beg_addr),
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
                         static_cast<int>(c.size_),
-                        reinterpret_cast<unsigned int*>(hpx::util::openshmem_environment::segments[idx].rcv)
+                        hpx::util::openshmem_environment::segments[idx].rcv
                     );
 
                     hpx::util::openshmem_environment::wait_until(

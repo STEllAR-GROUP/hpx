@@ -29,8 +29,8 @@ namespace hpx { namespace util {
     {
         std::uint8_t* beg_addr;
         std::uint8_t* end_addr;
-        unsigned int * rcv;
-        unsigned int * xmt;
+        std::uint8_t * rcv;
+        std::uint8_t * xmt;
         hpx::mutex * mut;
     };
 
@@ -53,10 +53,10 @@ namespace hpx { namespace util {
         static std::string get_processor_name();
 
         static void put_signal(const std::uint8_t* addr, const int rank,
-            std::uint8_t* raddr, const std::size_t size, unsigned int* sigaddr);
+            std::uint8_t* raddr, const std::size_t size, std::uint8_t * sigaddr);
 
-        static void wait_until(const unsigned int value, unsigned int* sigaddr);
-        static std::size_t wait_until_any(const unsigned int value, unsigned int* sigaddr, const std::size_t count);
+        static void wait_until(const std::uint8_t value, std::uint8_t * sigaddr);
+        static std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count);
 
         static void get(std::uint8_t* addr, const int rank,
             const std::uint8_t* raddr, const std::size_t size);

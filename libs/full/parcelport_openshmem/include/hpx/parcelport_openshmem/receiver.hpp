@@ -157,7 +157,7 @@ namespace hpx::parcelset::policies::openshmem {
 
                 const auto idx = hpx::util::openshmem_environment::wait_until_any(
                     1,
-                    reinterpret_cast<unsigned int *>(hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal),
+                    hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
                     page_count
                 );
 
