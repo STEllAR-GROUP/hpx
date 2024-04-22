@@ -17,6 +17,10 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
+#ifndef OSHMEM_HAVE_C11
+#define OSHMEM_HAVE_C11
+#endif
+
 #ifndef SHMEM_H
 #include <mpp/shmem.h>
 #endif
