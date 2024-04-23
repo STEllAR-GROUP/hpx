@@ -314,7 +314,13 @@ namespace hpx::util {
     void openshmem_environment::wait_until(
         const std::uint8_t value, std::uint8_t * sigaddr)
     {
-        shmem_int_wait_until(reinterpret_cast<volatile unsigned int*>(sigaddr), SHMEM_CMP_EQ, static_cast<unsigned int>(value));
+        union {
+            std::uint8_t * uaddr;
+            volatile int * iaddr;
+        } tmp;
+        tmp.uaddr = sigaddr;
+        volatile int * ptr = tmp.iaddr;
+        shmem_int_wait_until(ptr, SHMEM_CMP_EQ, static_cast<int>(value));
     }
 
     std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
