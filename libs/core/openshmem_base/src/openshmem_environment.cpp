@@ -311,16 +311,32 @@ namespace hpx::util {
         }
     }
 
+    template<typename Sig>
+    struct signature;
+
+    template<typename R, typename ...Args>
+    struct signature<R(Args...)>
+    {
+        using type = std::tuple<Args...>;
+    };
+
     void openshmem_environment::wait_until(
         const std::uint8_t value, std::uint8_t * sigaddr)
     {
+        using arg_type = std::conditional<
+            std::is_same<typename signature<decltype(shmem_int_wait_until)>::type, 
+                         std::tuple<volatile int*, int, int>>::value,
+                volatile int *,
+                int *
+            >::type;
+
         union {
             std::uint8_t * uaddr;
-            volatile int * iaddr;
+            arg_type iaddr;
         } tmp;
         tmp.uaddr = sigaddr;
-        volatile int * ptr = tmp.iaddr;
-        shmem_int_wait_until(ptr, SHMEM_CMP_EQ, static_cast<int>(value));
+
+        shmem_int_wait_until(tmp.iaddr, SHMEM_CMP_EQ, static_cast<int>(value));
     }
 
     std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
