@@ -17,12 +17,12 @@
 #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
 
-#ifndef OSHMEM_HAVE_C11
-#define OSHMEM_HAVE_C11
-#endif
-
 #ifndef SHMEM_H
 #include <mpp/shmem.h>
+#endif
+
+#ifndef OSHMEM_HAVE_C11
+#define OSHMEM_HAVE_C11 1
 #endif
 
 #if defined(__clang__)
