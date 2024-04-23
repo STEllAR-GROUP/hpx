@@ -25,6 +25,11 @@
 #define OSHMEM_HAVE_C11 1
 #endif
 
+#if defined(OSHMEM_HAVE_C11) && OSHMEM_HAVE_C11 == 0
+#undef OSHMEM_HAVE_C11
+#define OSHMEM_HAVE_C11 1
+#endif
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
