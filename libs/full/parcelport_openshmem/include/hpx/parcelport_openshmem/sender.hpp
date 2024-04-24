@@ -16,7 +16,6 @@
 #include <hpx/modules/synchronization.hpp>
 
 #include <hpx/parcelport_openshmem/sender_connection.hpp>
-#include <hpx/parcelport_openshmem/tag_provider.hpp>
 
 #include <algorithm>
 #include <cstring>
@@ -37,7 +36,7 @@ namespace hpx::parcelset::policies::openshmem {
         // different versions of clang-format disagree
         // clang-format off
         sender() noexcept
-          : next_free_tag_(-1)
+        : connections_mtx_(), connections_(), next_free_tag_mtx_()
         {
         }
         // clang-format on
@@ -107,7 +106,6 @@ namespace hpx::parcelset::policies::openshmem {
         connection_list connections_;
 
         hpx::spinlock next_free_tag_mtx_;
-        int next_free_tag_;
     };
 }    // namespace hpx::parcelset::policies::openshmem
 

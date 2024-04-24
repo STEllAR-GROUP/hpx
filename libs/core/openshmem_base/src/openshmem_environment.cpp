@@ -115,7 +115,7 @@ namespace hpx::util {
     int openshmem_environment::provided_threading_flag_ = 0;
     int openshmem_environment::is_initialized_ = -1;
     int openshmem_environment::init_val_ = 0;
-    std::vector<std::shared_ptr<hpx::mutex>> openshmem_environment::segment_mutex{};
+    std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
     openshmem_seginfo_t* openshmem_environment::segments = nullptr;
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
     std::size_t openshmem_environment::nthreads_ = 0;
@@ -184,7 +184,7 @@ namespace hpx::util {
         //
         openshmem_environment::segment_mutex.reserve(page_count);
         for(std::size_t i = 0; i < page_count; ++i) {
-            openshmem_environment::segment_mutex.emplace_back(std::make_shared<hpx::mutex>());
+            openshmem_environment::segment_mutex.emplace_back(std::make_shared<hpx::spinlock>());
         }
 
         // symmetric allocation for number of pages total + number of signals

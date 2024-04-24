@@ -57,7 +57,7 @@ namespace hpx::parcelset::policies::openshmem {
             // already accepted ones.
             if (!connection)
             {
-                std::unique_lock l(connections_mtx_, std::try_to_lock);
+                std::unique_lock<hpx::spinlock> l(connections_mtx_, std::try_to_lock);
                 if (l.owns_lock() && !connections_.empty())
                 {
                     connection = HPX_MOVE(connections_.front());
@@ -78,14 +78,14 @@ namespace hpx::parcelset::policies::openshmem {
         {
             if (!connection->receive())
             {
-                std::unique_lock l(connections_mtx_);
+                std::unique_lock<hpx::spinlock> l(connections_mtx_);
                 connections_.push_back(HPX_MOVE(connection));
             }
         }
 
         connection_ptr accept() noexcept
         {
-            std::unique_lock l(headers_mtx_, std::try_to_lock);
+            std::unique_lock<hpx::spinlock> l(headers_mtx_, std::try_to_lock);
             if (l.owns_lock())
             {
                 return accept_locked(l);
@@ -135,7 +135,7 @@ namespace hpx::parcelset::policies::openshmem {
                 );
 
                 {
-                    std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                    std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(
