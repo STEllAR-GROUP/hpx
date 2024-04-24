@@ -67,7 +67,6 @@ namespace hpx::parcelset::policies::openshmem {
         sender_connection(sender_type* s, int dst, parcelset::parcelport* pp)
           : state_(initialized)
           , sender_(s)
-          //, tag_(-1)
           , dst_(dst)
           , thd_id_(-1)
           , chunks_idx_(0)
@@ -102,9 +101,7 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::chrono::high_resolution_clock::now();
 #endif
             chunks_idx_ = 0;
-            //tag_ = acquire_tag(sender_);
-            //header_ = header(buffer_, tag_, thd_id_);
-            header_ = header(buffer_, thd_id_);
+            header_ = header(buffer_);
             header_.assert_valid();
 
             state_ = initialized;
@@ -154,9 +151,7 @@ namespace hpx::parcelset::policies::openshmem {
         {
             {
                 HPX_ASSERT(state_ == initialized);
-
-                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                const auto idx = (dst_*nthreads_)+thd_id_;
+                const auto idx = dst_;
 
                 std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
@@ -188,8 +183,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             if (!chunks.empty())
             {
-                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                const auto idx = (dst_*nthreads_)+thd_id_;
+                const auto idx = dst_;
 
                 std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
@@ -216,8 +210,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             if (!header_.piggy_back())
             {   
-                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                const auto idx = (dst_*nthreads_)+thd_id_;
+                const auto idx = dst_;
 
                 std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
@@ -237,8 +230,7 @@ namespace hpx::parcelset::policies::openshmem {
         {
             HPX_ASSERT(state_ == sent_data);
 
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (dst_*nthreads_)+thd_id_;
+            const auto idx = dst_;
 
             std::lock_guard<hpx::mutex> l(
                 *(hpx::util::openshmem_environment::segments[idx].mut)
@@ -299,8 +291,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done()
         {
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (dst_*nthreads_)+thd_id_;
+            const auto idx = dst_;
 
             const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
             return l;

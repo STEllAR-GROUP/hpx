@@ -29,23 +29,18 @@ namespace hpx::parcelset::policies::openshmem {
 
         enum data_pos
         {
-            //pos_tag = 0 * sizeof(value_type),
             pos_size = 0 * sizeof(value_type),
-            pos_sending_thread_id = 1 * sizeof(value_type),
-            pos_numbytes = 2 * sizeof(value_type),
-            pos_numchunks_first = 3 * sizeof(value_type),
-            pos_numchunks_second = 4 * sizeof(value_type),
-            pos_piggy_back_flag = 5 * sizeof(value_type),
-            pos_piggy_back_data = 6 * sizeof(value_type) + 1
+            pos_numbytes = 1 * sizeof(value_type),
+            pos_numchunks_first = 2 * sizeof(value_type),
+            pos_numchunks_second = 3 * sizeof(value_type),
+            pos_piggy_back_flag = 4 * sizeof(value_type),
+            pos_piggy_back_data = 5 * sizeof(value_type) + 1
         };
 
         static constexpr int data_size_ = 512;
 
-        //template <typename Buffer>
-        //header(Buffer const& buffer, int tag, const std::size_t sending_thread_id) noexcept
-
         template <typename Buffer>
-        header(Buffer const& buffer, const std::size_t sending_thread_id) noexcept
+        header(Buffer const& buffer) noexcept
         {
             std::int64_t size = static_cast<std::int64_t>(buffer.size_);
             std::int64_t numbytes =
@@ -56,7 +51,6 @@ namespace hpx::parcelset::policies::openshmem {
 
             //set<pos_tag>(tag);
             set<pos_size>(static_cast<value_type>(size));
-            set<pos_sending_thread_id>(static_cast<value_type>(sending_thread_id));
             set<pos_numbytes>(static_cast<value_type>(numbytes));
             set<pos_numchunks_first>(
                 static_cast<value_type>(buffer.num_chunks_.first));
@@ -114,11 +108,6 @@ namespace hpx::parcelset::policies::openshmem {
         value_type size() const noexcept
         {
             return get<pos_size>();
-        }
-
-        value_type sending_thread_id() const noexcept
-        {
-            return get<pos_sending_thread_id>();
         }
 
         value_type numbytes() const noexcept

@@ -37,34 +37,8 @@ namespace hpx::parcelset::policies::openshmem {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-/*
-        struct exp_backoff
-        {
-            int numTries;
-            const static int maxRetries = 10;
-
-            void operator()(unsigned int* addr)
-            {
-                if (numTries <= maxRetries)
-                {
-                    if (shmem_uint_test(addr, SHMEM_CMP_EQ, 1))
-                    {
-                        return;
-                    }
-                    hpx::this_thread::suspend(
-                        std::chrono::microseconds(1 << numTries));
-                }
-                else
-                {
-                    numTries = 0;
-                }
-            }
-        };
-*/
-
         explicit constexpr receiver(Parcelport& pp) noexcept
           : pp_(pp)
-          //, bo()
         {
         }
 
@@ -127,7 +101,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             if (l.locked)
             {
-                header h = new_header(res->sending_thd_id_);
+                header h = new_header();
                 l.unlock();
                 header_lock.unlock();
 
@@ -141,14 +115,13 @@ namespace hpx::parcelset::policies::openshmem {
             return res;
         }
 
-        header new_header(const auto sending_thd_id) noexcept
+        header new_header() noexcept
         {
             const auto self_ = hpx::util::openshmem_environment::rank();
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
 
             const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
             const std::size_t page_count =
-                hpx::util::openshmem_environment::size() * hpx::util::openshmem_environment::nthreads_;
+                hpx::util::openshmem_environment::size();
             const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
 
@@ -191,7 +164,6 @@ namespace hpx::parcelset::policies::openshmem {
 
         hpx::spinlock connections_mtx_;
         connection_list connections_;
-        //exp_backoff bo;
     };
 }    // namespace hpx::parcelset::policies::openshmem
 

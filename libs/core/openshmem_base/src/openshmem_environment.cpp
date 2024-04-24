@@ -174,7 +174,7 @@ namespace hpx::util {
         //
         // page_count = num_localities * number of threads
         //
-        const std::size_t page_count = size()*openshmem_environment::nthreads_;
+        const std::size_t page_count = size();
 
         // allocate the page cache
         //

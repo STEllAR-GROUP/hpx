@@ -47,9 +47,7 @@ namespace hpx::parcelset::policies::openshmem {
         receiver_connection(int src, header h, Parcelport& pp) noexcept
           : state_(initialized)
           , src_(src)
-          //, tag_(h.tag())
           , self_(-1)
-          , sending_thd_id_(-1)
           , header_(h)
           , request_ptr_(false)
           , num_bytes(0)
@@ -61,7 +59,6 @@ namespace hpx::parcelset::policies::openshmem {
             header_.assert_valid();
 
             self_ = hpx::util::openshmem_environment::rank();
-            sending_thd_id_ = header_.sending_thread_id();
             num_bytes = header_.numbytes();
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -87,23 +84,20 @@ namespace hpx::parcelset::policies::openshmem {
             need_recv_tchunks = false;
         }
 
-        bool receive(std::size_t num_thread = -1)
+        bool receive()
         {
             switch (state_)
             {
             case initialized:
-                return receive_transmission_chunks(num_thread);
+                return receive_transmission_chunks();
 
             case rcvd_transmission_chunks:
-                return receive_data(num_thread);
+                return receive_data();
 
             case rcvd_data:
-                return receive_chunks(num_thread);
+                return receive_chunks();
 
             case rcvd_chunks:
-                //return send_release_tag(num_thread);
-
-            //case sent_release_tag:
                 return done();
 
             default:
@@ -112,11 +106,9 @@ namespace hpx::parcelset::policies::openshmem {
             return false;
         }
 
-        bool receive_transmission_chunks(std::size_t num_thread = -1)
+        bool receive_transmission_chunks()
         {
-            const auto self_ = hpx::util::openshmem_environment::rank();
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (self_*nthreads_)+sending_thd_id_;
+            const auto idx = self_;
 
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
@@ -151,10 +143,10 @@ namespace hpx::parcelset::policies::openshmem {
 
             state_ = rcvd_transmission_chunks;
 
-            return receive_data(num_thread);
+            return receive_data();
         }
 
-        bool receive_data(std::size_t num_thread = -1)
+        bool receive_data()
         {
             if (!request_done())
             {
@@ -169,9 +161,7 @@ namespace hpx::parcelset::policies::openshmem {
             }
             else
             {
-                const auto self_ = hpx::util::openshmem_environment::rank();
-                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                const auto idx = (self_*nthreads_)+sending_thd_id_;
+                const auto idx = self_;
 
                 std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
@@ -191,17 +181,15 @@ namespace hpx::parcelset::policies::openshmem {
 
             state_ = rcvd_data;
 
-            return receive_chunks(num_thread);
+            return receive_chunks();
         }
 
-        bool receive_chunks(std::size_t num_thread = -1)
+        bool receive_chunks()
         {
             std::size_t cidx = 0;
             std::size_t chunk_size = 0;
 
-            const auto self_ = hpx::util::openshmem_environment::rank();
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (self_*nthreads_)+sending_thd_id_;
+            const auto idx = self_;
 
             std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
 
@@ -238,47 +226,9 @@ namespace hpx::parcelset::policies::openshmem {
 
             state_ = rcvd_chunks;
 
-            return true; //send_release_tag(num_thread);
+            return true;
         }
 
-/*
-        bool send_release_tag(std::size_t num_thread = -1)
-        {
-            if (!request_done())
-            {
-                return false;
-            }
-#if defined(HPX_HAVE_PARCELPORT_COUNTERS)
-            parcelset::data_point& data = buffer_.data_point_;
-            data.time_ = timer_.elapsed_nanoseconds() - data.time_;
-#endif
-            {
-                const auto self_ = hpx::util::openshmem_environment::rank();
-                const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-                const auto idx = (self_*nthreads_)+sending_thd_id_;
-
-                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
-
-                hpx::util::openshmem_environment::wait_until(
-                    1, hpx::util::openshmem_environment::segments[idx].rcv);
-
-                hpx::util::openshmem_environment::get(
-                    reinterpret_cast<std::uint8_t*>(&tag_), self_,
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    sizeof(int));
-
-                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
-
-                request_ptr_ = true;
-            }
-
-            decode_parcels(pp_, HPX_MOVE(buffer_), num_thread);
-
-            state_ = sent_release_tag;
-
-            return done();
-        }
-*/
         bool done() noexcept
         {
             return request_done();
@@ -286,9 +236,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done() noexcept
         {
-            const auto self_ = hpx::util::openshmem_environment::rank();
-            const auto nthreads_ = hpx::util::openshmem_environment::nthreads_;
-            const auto idx = (self_*nthreads_)+sending_thd_id_;
+            const auto idx = self_;
 
             const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
             return l;
@@ -300,9 +248,7 @@ namespace hpx::parcelset::policies::openshmem {
         connection_state state_;
 
         int src_;
-        //int tag_;
         int self_;
-        int sending_thd_id_;
 
         header header_;
         buffer_type buffer_;
