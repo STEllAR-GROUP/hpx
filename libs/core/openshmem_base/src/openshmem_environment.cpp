@@ -27,41 +27,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    namespace detail {
-
-        bool detect_openshmem_environment(
-            util::runtime_configuration const& cfg, char const* default_env)
-        {
-            std::string openshmem_environment_strings =
-                cfg.get_entry("hpx.parcel.openshmem.env", default_env);
-
-            hpx::string_util::char_separator<char> sep(";,: ");
-            hpx::string_util::tokenizer tokens(
-                openshmem_environment_strings, sep);
-            for (auto const& tok : tokens)
-            {
-                char* env = std::getenv(tok.c_str());
-                if (env)
-                {
-                    LBT_(debug)
-                        << "Found OPENSHMEM environment variable: " << tok
-                        << "=" << std::string(env)
-                        << ", enabling OPENSHMEM support\n";
-                    return true;
-                }
-            }
-
-            LBT_(info)
-                << "No known OPENSHMEM environment variable found, disabling "
-                   "OPENSHMEM support\n";
-            return false;
-        }
-    }    // namespace detail
-
     bool openshmem_environment::check_openshmem_environment(
-        [[maybe_unused]] util::runtime_configuration const& cfg)
+        util::runtime_configuration const& cfg)
     {
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+#if !defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM)
+        return false;
+#elif defined(HPX_HAVE_MODULE_OPENSHMEM_BASE)
+        const std::string default_env{"SHMEM_VERSION;SHMEM_INFO;SHMEM_SYMMETRIC_SIZE;MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"};
+        std::string openshmem_environment_strings =
+            cfg.get_entry("hpx.parcel.openshmem.env", default_env);
+
+        hpx::string_util::char_separator sep(";,: ");
+        hpx::string_util::tokenizer tokens(openshmem_environment_strings, sep);
+        for (auto const& tok : tokens)
+        {
+            char* env = std::getenv(tok.c_str());
+            if (env)
+            {
+                LBT_(debug)
+                    << "Found OpenSHMEM environment variable: " << tok << "="
+                    << std::string(env) << ", enabling OpenSHMEM support\n";
+                return true;
+            }
+        }
+
+        LBT_(info) << "No known OpenSHMEM environment variable found, disabling "
+                      "OpenSHMEM support\n";
+
+        return false;
+#else
         // We disable the OPENSHMEM parcelport if any of these hold:
         //
         // - The parcelport is explicitly disabled
@@ -78,11 +72,32 @@ namespace hpx::util {
         {
             LBT_(info)
                 << "OpenSHMEM support disabled via configuration settings\n";
+
+            cfg.add_entry("hpx.parcel.openshmem.enable", "0");
             return false;
         }
 
-        return true;
-#else
+        const std::string default_env{"SHMEM_VERSION;SHMEM_INFO;SHMEM_SYMMETRIC_SIZE;MV2_COMM_WORLD_RANK;PMI_RANK;OMPI_COMM_WORLD_SIZE;ALPS_APP_PE;PMIX_RANK;PALS_NODEID"};
+        std::string openshmem_environment_strings =
+            cfg.get_entry("hpx.parcel.openshmem.env", default_env);
+
+        hpx::string_util::char_separator sep(";,: ");
+        hpx::string_util::tokenizer tokens(openshmem_environment_strings, sep);
+        for (auto const& tok : tokens)
+        {
+            char* env = std::getenv(tok.c_str());
+            if (env)
+            {
+                LBT_(debug)
+                    << "Found OpenSHMEM environment variable: " << tok << "="
+                    << std::string(env) << ", enabling OpenSHMEM support\n";
+                return true;
+            }
+        }
+
+        LBT_(info) << "No known OpenSHMEM environment variable found, disabling "
+                      "OpenSHMEM support\n";
+
         return false;
 #endif
     }
@@ -311,6 +326,8 @@ namespace hpx::util {
         }
     }
 
+    // template metaprogramming for `openshmem_environment::wait_until`
+    //
     template<typename Sig>
     struct signature;
 
@@ -323,6 +340,10 @@ namespace hpx::util {
     void openshmem_environment::wait_until(
         const std::uint8_t value, std::uint8_t * sigaddr)
     {
+        // some openshmem implementations place a `volatile` in the argument list
+        // this section compile-time section detects this situation and enables
+        // the right option
+        //
         using arg_type = std::conditional<
             std::is_same<typename signature<decltype(shmem_int_wait_until)>::type, 
                          std::tuple<volatile int*, int, int>>::value,
