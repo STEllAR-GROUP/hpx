@@ -122,7 +122,7 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                    std::lock_guard<hpx::mutex> l(*(*hpx::util::openshmem_environment::segments[idx].mut));
 
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
@@ -163,7 +163,7 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 const auto idx = self_;
 
-                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
@@ -191,7 +191,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             const auto idx = self_;
 
-            std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+            std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
             while (chunks_idx_ < buffer_.chunks_.size())
             {
@@ -238,7 +238,7 @@ namespace hpx::parcelset::policies::openshmem {
         {
             const auto idx = self_;
 
-            const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
+            const bool l = (*hpx::util::openshmem_environment::segments[idx].mut)->try_lock();
             return l;
         }
 

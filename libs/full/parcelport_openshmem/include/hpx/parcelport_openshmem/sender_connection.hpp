@@ -153,7 +153,7 @@ namespace hpx::parcelset::policies::openshmem {
                 HPX_ASSERT(state_ == initialized);
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
@@ -185,7 +185,7 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
@@ -212,7 +212,7 @@ namespace hpx::parcelset::policies::openshmem {
             {   
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
@@ -233,7 +233,7 @@ namespace hpx::parcelset::policies::openshmem {
             const auto idx = dst_;
 
             std::lock_guard<hpx::mutex> l(
-                *(hpx::util::openshmem_environment::segments[idx].mut)
+                *(*(hpx::util::openshmem_environment::segments[idx].mut))
             );
 
             while (chunks_idx_ < buffer_.chunks_.size())
@@ -293,7 +293,7 @@ namespace hpx::parcelset::policies::openshmem {
         {
             const auto idx = dst_;
 
-            const bool l = hpx::util::openshmem_environment::segments[idx].mut->try_lock();
+            const bool l = (*(hpx::util::openshmem_environment::segments[idx].mut))->try_lock();
             return l;
 
             return true;

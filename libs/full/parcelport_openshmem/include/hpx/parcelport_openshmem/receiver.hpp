@@ -135,7 +135,7 @@ namespace hpx::parcelset::policies::openshmem {
                 );
 
                 {
-                    std::lock_guard<hpx::mutex> l(*(hpx::util::openshmem_environment::segments[idx].mut));
+                    std::lock_guard<hpx::mutex> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(

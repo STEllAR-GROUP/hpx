@@ -31,7 +31,7 @@ namespace hpx { namespace util {
         std::uint8_t* end_addr;
         std::uint8_t * rcv;
         std::uint8_t * xmt;
-        hpx::mutex * mut;
+        std::shared_ptr<hpx::mutex> * mut;
     };
 
     struct HPX_CORE_EXPORT openshmem_environment
@@ -97,7 +97,7 @@ namespace hpx { namespace util {
         static hpx::mutex dshm_mut;
         static int init_val_;
         static std::size_t nthreads_;
-        static hpx::mutex* segment_mutex;
+        static std::vector<std::shared_ptr<hpx::mutex>> segment_mutex;
         static openshmem_seginfo_t* segments;
         static std::uint8_t* shmem_buffer;
     };
