@@ -24,6 +24,9 @@ namespace hpx::parcelset::policies::openshmem {
         constexpr locality() noexcept
           : rank_(-1)
         {
+           if(openshmem_environment::enabled()) {
+              rank_ = openshmem_environment::rank();
+           }
         }
 
         explicit constexpr locality(std::int32_t rank) noexcept
