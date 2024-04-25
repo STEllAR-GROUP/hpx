@@ -236,10 +236,10 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done() noexcept
         {
-            const auto idx = self_;
+            //const auto idx = self_;
 
-            const bool l = (*hpx::util::openshmem_environment::segments[idx].mut)->try_lock();
-            return l;
+            //const bool l = (*hpx::util::openshmem_environment::segments[idx].mut)->try_lock();
+            return true;
         }
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
