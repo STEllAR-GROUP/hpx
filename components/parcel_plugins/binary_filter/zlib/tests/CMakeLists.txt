@@ -14,7 +14,9 @@ if(HPX_WITH_TESTS_UNIT)
 endif()
 
 if(HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.components.parcel_plugins.binary_filter.zlib)
+  add_hpx_pseudo_target(
+    tests.regressions.components.parcel_plugins.binary_filter.zlib
+  )
   add_hpx_pseudo_dependencies(
     tests.regressions.components
     tests.regressions.components.parcel_plugins.binary_filter.zlib
@@ -23,7 +25,9 @@ if(HPX_WITH_TESTS_REGRESSIONS)
 endif()
 
 if(HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.components.parcel_plugins.binary_filter.zlib)
+  add_hpx_pseudo_target(
+    tests.performance.components.parcel_plugins.binary_filter.zlib
+  )
   add_hpx_pseudo_dependencies(
     tests.performance.components
     tests.performance.components.parcel_plugins.binary_filter.zlib

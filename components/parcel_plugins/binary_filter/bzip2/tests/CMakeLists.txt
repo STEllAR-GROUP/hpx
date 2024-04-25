@@ -5,7 +5,9 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_TESTS_UNIT)
-  add_hpx_pseudo_target(tests.unit.components.parcel_plugins.binary_filter.bzip2)
+  add_hpx_pseudo_target(
+    tests.unit.components.parcel_plugins.binary_filter.bzip2
+  )
   add_hpx_pseudo_dependencies(
     tests.unit.components
     tests.unit.components.parcel_plugins.binary_filter.bzip2
@@ -14,7 +16,9 @@ if(HPX_WITH_TESTS_UNIT)
 endif()
 
 if(HPX_WITH_TESTS_REGRESSIONS)
-  add_hpx_pseudo_target(tests.regressions.components.parcel_plugins.binary_filter.bzip2)
+  add_hpx_pseudo_target(
+    tests.regressions.components.parcel_plugins.binary_filter.bzip2
+  )
   add_hpx_pseudo_dependencies(
     tests.regressions.components
     tests.regressions.components.parcel_plugins.binary_filter.bzip2
@@ -23,7 +27,9 @@ if(HPX_WITH_TESTS_REGRESSIONS)
 endif()
 
 if(HPX_WITH_TESTS_BENCHMARKS)
-  add_hpx_pseudo_target(tests.performance.components.parcel_plugins.binary_filter.bzip2)
+  add_hpx_pseudo_target(
+    tests.performance.components.parcel_plugins.binary_filter.bzip2
+  )
   add_hpx_pseudo_dependencies(
     tests.performance.components
     tests.performance.components.parcel_plugins.binary_filter.bzip2
