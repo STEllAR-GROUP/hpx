@@ -32,6 +32,8 @@ namespace hpx { namespace util {
         std::uint8_t * rcv;
         std::uint8_t * xmt;
         std::shared_ptr<hpx::spinlock> * mut;
+
+        openshmem_seginfo_t() : beg_addr(nullptr), end_addr(nullptr), rcv(nullptr), xmt(nullptr), mut(nullptr) {}
     };
 
     struct HPX_CORE_EXPORT openshmem_environment
@@ -85,7 +87,6 @@ namespace hpx { namespace util {
         typedef hpx::spinlock mutex_type;
 
     public:
-        static hpx::spinlock pollingLock;
         static hpx::mutex mtx_;
 
         static bool enabled_;
@@ -94,11 +95,9 @@ namespace hpx { namespace util {
 
         static int is_initialized_;
 
-        static hpx::mutex dshm_mut;
         static int init_val_;
-        static std::size_t nthreads_;
         static std::vector<std::shared_ptr<hpx::spinlock>> segment_mutex;
-        static openshmem_seginfo_t* segments;
+        static std::vector<openshmem_seginfo_t> segments;
         static std::uint8_t* shmem_buffer;
     };
 }}    // namespace hpx::util

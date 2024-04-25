@@ -107,8 +107,6 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    hpx::spinlock openshmem_environment::pollingLock{};
-    hpx::mutex openshmem_environment::dshm_mut{};
     hpx::mutex openshmem_environment::mtx_{};
     bool openshmem_environment::enabled_ = false;
     bool openshmem_environment::has_called_init_ = false;
@@ -116,9 +114,8 @@ namespace hpx::util {
     int openshmem_environment::is_initialized_ = -1;
     int openshmem_environment::init_val_ = 0;
     std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
-    openshmem_seginfo_t* openshmem_environment::segments = nullptr;
+    std::vector<openshmem_seginfo_t> openshmem_environment::segments{};
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
-    std::size_t openshmem_environment::nthreads_ = 0;
 
     ///////////////////////////////////////////////////////////////////////////
     int openshmem_environment::init([[maybe_unused]] int* argc,
@@ -156,16 +153,6 @@ namespace hpx::util {
                 "OPENSHMEM not ready error");
         }
 
-        // create a number of segments equal to the number of hardware
-        // threads per machine (locality)
-        //
-        //segments.resize(hpx::threads::hardware_concurrency() * size());
-        //
-        // get thread count
-        //
-        openshmem_environment::nthreads_ =
-            hpx::get_worker_thread_num();
-
         // get system page size
         //
         const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
@@ -175,10 +162,6 @@ namespace hpx::util {
         // page_count = num_localities * number of threads
         //
         const std::size_t page_count = size();
-
-        // allocate the page cache
-        //
-        openshmem_environment::segments = new openshmem_seginfo_t[page_count];
 
         // allocate a mutex per-page 
         //
@@ -202,6 +185,10 @@ namespace hpx::util {
         // compute the base address for signals
         //
         const std::size_t beg_signal = (sys_pgsz*page_count);
+
+        // allocate the page cache
+        //
+        openshmem_environment::segments.resize(page_count);
 
         // initialize the page cache
         //
@@ -413,12 +400,9 @@ namespace hpx::util {
     {
         if (enabled() && has_called_init())
         {
-            shmem_finalize();
-
-            delete segments;
             shmem_free(hpx::util::openshmem_environment::shmem_buffer);
-            segments = nullptr;
             shmem_buffer = nullptr;
+            shmem_finalize();
         }
     }
 
