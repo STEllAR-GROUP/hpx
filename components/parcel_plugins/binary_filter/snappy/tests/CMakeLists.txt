@@ -7,7 +7,8 @@
 if(HPX_WITH_TESTS_UNIT)
   add_hpx_pseudo_target(tests.unit.components.parcel_plugins.binary_filter.snappy)
   add_hpx_pseudo_dependencies(
-    tests.unit.components tests.unit.components.parcel_plugins.binary_filter.snappy
+    tests.unit.components
+    tests.unit.components.parcel_plugins.binary_filter.snappy
   )
   add_subdirectory(unit)
 endif()
