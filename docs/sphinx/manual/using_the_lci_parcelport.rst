@@ -38,7 +38,7 @@ Its message transmission path involves minimum synchronization
 points and is almost lock-free. It is expected to be much faster
 than the MPI parcelport.
 
-.. _`Lightweight Communication Interface`: https://github.com/uiuc-hpc/LC
+.. _`Lightweight Communication Interface`: https://github.com/uiuc-hpc/lci
 
 .. _build_lci_pp:
 
@@ -66,7 +66,7 @@ and frequently used CMake variables.
    If this option is set to ``ON``. |hpx| will fetch and build LCI for you. You can use the following
    |cmake| variables to configure this behavior for your platform.
 
-.. _`LCI README`: https://github.com/uiuc-hpc/LC#readme
+.. _`LCI README`: https://github.com/uiuc-hpc/lci#readme
 
 .. option:: HPX_WITH_LCI_TAG
 
