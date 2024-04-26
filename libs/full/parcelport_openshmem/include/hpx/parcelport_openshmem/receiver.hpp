@@ -131,15 +131,16 @@ namespace hpx::parcelset::policies::openshmem {
 
             // waiting for `sender_connection::send_header` invocation
             if (rcv_header_.data() == 0) {
-
-                const auto idx = hpx::util::openshmem_environment::wait_until_any(
-                    1,
-                    hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
-                    page_count
-                );
-
                 {
-                    std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+
+                    util::openshmem_environment::scoped_lock l;
+                    const auto idx = hpx::util::openshmem_environment::wait_until_any(
+                        1,
+                        hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
+                        page_count
+                    );
+
+                    //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(
@@ -148,9 +149,9 @@ namespace hpx::parcelset::policies::openshmem {
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
                         sizeof(rcv_header_)
                     );
-                }
 
-                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                }
             }
 
             header h = rcv_header_;

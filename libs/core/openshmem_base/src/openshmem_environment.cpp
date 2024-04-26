@@ -165,11 +165,12 @@ namespace hpx::util {
 
         // allocate a mutex per-page 
         //
+/*
         openshmem_environment::segment_mutex.reserve(page_count);
         for(std::size_t i = 0; i < page_count; ++i) {
             openshmem_environment::segment_mutex.emplace_back(std::make_shared<hpx::spinlock>());
         }
-
+*/
         // symmetric allocation for number of pages total + number of signals
         //
         // (allocate page_size * number of PEs * number of threads) + (number of PEs * number of threads * 2 [for signaling])
@@ -207,7 +208,7 @@ namespace hpx::util {
             //
             segments[i].xmt = hpx::util::openshmem_environment::shmem_buffer + beg_signal + page_count + i;
 
-            segments[i].mut = &(openshmem_environment::segment_mutex[i]);
+            //segments[i].mut = &(openshmem_environment::segment_mutex[i]);
         }
 
         shmem_barrier_all();

@@ -153,7 +153,8 @@ namespace hpx::parcelset::policies::openshmem {
                 HPX_ASSERT(state_ == initialized);
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                util::openshmem_environment::scoped_lock l;
+                //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
@@ -185,7 +186,8 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                util::openshmem_environment::scoped_lock l;
+                //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
@@ -212,7 +214,8 @@ namespace hpx::parcelset::policies::openshmem {
             {   
                 const auto idx = dst_;
 
-                std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                util::openshmem_environment::scoped_lock l;
+                //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
@@ -232,10 +235,11 @@ namespace hpx::parcelset::policies::openshmem {
 
             const auto idx = dst_;
 
+/*
             std::lock_guard<hpx::spinlock> l(
                 *(*(hpx::util::openshmem_environment::segments[idx].mut))
             );
-
+*/
             while (chunks_idx_ < buffer_.chunks_.size())
             {
                 serialization::serialization_chunk& c =
@@ -246,16 +250,19 @@ namespace hpx::parcelset::policies::openshmem {
                         return false;
                     }
 
-                    hpx::util::openshmem_environment::put_signal(
-                        reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
-                        hpx::util::openshmem_environment::segments[idx].beg_addr,
-                        static_cast<int>(c.size_),
-                        hpx::util::openshmem_environment::segments[idx].rcv
-                    );
+                    {
+                        util::openshmem_environment::scoped_lock l;
+                        hpx::util::openshmem_environment::put_signal(
+                            reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
+                            hpx::util::openshmem_environment::segments[idx].beg_addr,
+                            static_cast<int>(c.size_),
+                            hpx::util::openshmem_environment::segments[idx].rcv
+                        );
 
-                    hpx::util::openshmem_environment::wait_until(
-                        1, hpx::util::openshmem_environment::segments[idx].xmt);
-                    (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                        hpx::util::openshmem_environment::wait_until(
+                            1, hpx::util::openshmem_environment::segments[idx].xmt);
+                        (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                    }
                 }
 
                 ++chunks_idx_;
