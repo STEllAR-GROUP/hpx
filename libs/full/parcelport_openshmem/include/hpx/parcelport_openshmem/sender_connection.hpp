@@ -252,6 +252,7 @@ namespace hpx::parcelset::policies::openshmem {
 
                     {
                         util::openshmem_environment::scoped_lock l;
+
                         hpx::util::openshmem_environment::put_signal(
                             reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
                             hpx::util::openshmem_environment::segments[idx].beg_addr,
@@ -298,10 +299,10 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done()
         {
-            const auto idx = dst_;
+            util::openshmem_environment::scoped_lock l;
+            if(!l.locked) { return false; }
 
-            const bool l = (*(hpx::util::openshmem_environment::segments[idx].mut))->try_lock();
-            return l;
+            hpx::util::openshmem_environment::quiet();
 
             return true;
         }

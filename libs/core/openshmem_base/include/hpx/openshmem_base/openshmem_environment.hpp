@@ -33,7 +33,7 @@ namespace hpx { namespace util {
         std::uint8_t * xmt;
 //        std::shared_ptr<hpx::spinlock> * mut;
 
-        openshmem_seginfo_t() : beg_addr(nullptr), end_addr(nullptr), rcv(nullptr), xmt(nullptr), mut(nullptr) {}
+        openshmem_seginfo_t() : beg_addr(nullptr), end_addr(nullptr), rcv(nullptr), xmt(nullptr) {} //, mut(nullptr) {}
     };
 
     struct HPX_CORE_EXPORT openshmem_environment
@@ -63,23 +63,48 @@ namespace hpx { namespace util {
         static void get(std::uint8_t* addr, const int rank,
             const std::uint8_t* raddr, const std::size_t size);
 
+        static void quiet() { shmem_quiet(); }
+
         static void global_barrier();
 
         struct HPX_CORE_EXPORT scoped_lock
         {
             scoped_lock();
+
             scoped_lock(scoped_lock const&) = delete;
+            scoped_lock(scoped_lock&&) = delete;
+
             scoped_lock& operator=(scoped_lock const&) = delete;
+            scoped_lock& operator=(scoped_lock&&) = delete;
+
             ~scoped_lock();
+
+            constexpr bool owns_lock() const noexcept
+            {
+                return locked;
+            }
+
             void unlock();
+            bool locked;
         };
 
         struct HPX_CORE_EXPORT scoped_try_lock
         {
             scoped_try_lock();
+
             scoped_try_lock(scoped_try_lock const&) = delete;
+            scoped_try_lock(scoped_try_lock&&) = delete;
+
             scoped_try_lock& operator=(scoped_try_lock const&) = delete;
+            scoped_try_lock& operator=(scoped_try_lock&&) = delete;
+
             ~scoped_try_lock();
+
+            constexpr bool owns_lock() const noexcept
+            {
+                return locked;
+            }
+
             void unlock();
             bool locked;
         };

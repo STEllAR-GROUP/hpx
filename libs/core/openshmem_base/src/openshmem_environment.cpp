@@ -113,7 +113,7 @@ namespace hpx::util {
     int openshmem_environment::provided_threading_flag_ = 0;
     int openshmem_environment::is_initialized_ = -1;
     int openshmem_environment::init_val_ = 0;
-    std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
+    //std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
     std::vector<openshmem_seginfo_t> openshmem_environment::segments{};
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
 
