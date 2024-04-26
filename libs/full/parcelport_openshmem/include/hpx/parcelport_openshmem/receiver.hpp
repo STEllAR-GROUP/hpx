@@ -96,20 +96,25 @@ namespace hpx::parcelset::policies::openshmem {
         template <typename Lock>
         connection_ptr accept_locked(Lock& header_lock) noexcept
         {
-            connection_ptr res;
+            HPX_ASSERT_OWNS_LOCK(header_lock);
+
             util::openshmem_environment::scoped_try_lock l;
+            connection_ptr res;
 
             if (l.locked)
             {
                 header h = new_header();
+
+                const auto rank =
+                    hpx::util::openshmem_environment::rank();
+
                 l.unlock();
                 header_lock.unlock();
 
                 // remote localities 'put' into the openshmem shared
                 // memory segment on this machine
                 //
-                res.reset(new connection_type(
-                    hpx::util::openshmem_environment::rank(), h, pp_));
+                res.reset(new connection_type(rank, h, pp_));
                 return res;
             }
             return res;
@@ -124,7 +129,6 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::size();
             const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
-
             // waiting for `sender_connection::send_header` invocation
             if (rcv_header_.data() == 0) {
 
@@ -135,7 +139,7 @@ namespace hpx::parcelset::policies::openshmem {
                 );
 
                 {
-                    //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                    std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(

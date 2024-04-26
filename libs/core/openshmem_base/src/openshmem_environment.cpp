@@ -279,6 +279,8 @@ namespace hpx::util {
 
     std::string openshmem_environment::get_processor_name()
     {
+        scoped_lock l;
+
         char name[1024 + 1] = {'\0'};
         const std::string rnkstr = std::to_string(rank());
         const int len = rnkstr.size();
@@ -400,8 +402,8 @@ namespace hpx::util {
     {
         if (enabled() && has_called_init())
         {
+            scoped_lock l;
             shmem_free(hpx::util::openshmem_environment::shmem_buffer);
-            shmem_buffer = nullptr;
             shmem_finalize();
         }
     }
@@ -424,16 +426,20 @@ namespace hpx::util {
     int openshmem_environment::size()
     {
         int res(-1);
-        if (enabled())
+        if (enabled()) {
+            scoped_lock l;
             res = static_cast<int>(shmem_n_pes());
+        }
         return res;
     }
 
     int openshmem_environment::rank()
     {
         int res(-1);
-        if (enabled())
+        if (enabled()) {
+            scoped_lock l;
             res = static_cast<int>(shmem_my_pe());
+        }
         return res;
     }
 
