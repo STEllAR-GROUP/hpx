@@ -133,7 +133,7 @@ namespace hpx::parcelset::policies::openshmem {
             if (rcv_header_.data() == 0) {
                 {
 
-                    util::openshmem_environment::scoped_lock l;
+                    //util::openshmem_environment::scoped_lock l;
                     const auto idx = hpx::util::openshmem_environment::wait_until_any(
                         1,
                         hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,

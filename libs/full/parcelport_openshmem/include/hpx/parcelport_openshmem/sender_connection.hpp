@@ -37,7 +37,6 @@ namespace hpx::parcelset::policies::openshmem {
     struct sender;
     struct sender_connection;
 
-    //int acquire_tag(sender*) noexcept;
     void add_connection(sender*, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
@@ -309,7 +308,6 @@ namespace hpx::parcelset::policies::openshmem {
 
         connection_state state_;
         sender_type* sender_;
-        //int tag_;
         int dst_;
         int thd_id_;
 
