@@ -38,14 +38,15 @@ namespace hpx::parcelset::policies::openshmem {
         using connection_list = std::deque<connection_ptr>;
 
         explicit constexpr receiver(Parcelport& pp) noexcept
-          : pp_(pp)
+          : pp_(pp), rcv_header_(hpx::util::openshmem_environment::size()), headers_mtx_{}, handles_header_mtx_{},
+            handles_header_{}, connections_mtx_{}, connections_{}
         {
         }
 
         void run() noexcept
         {
-            //util::openshmem_environment::scoped_lock l;
-            //new_header(-1);
+            util::openshmem_environment::scoped_lock l;
+            post_new_header(l);
         }
 
         bool background_work() noexcept
@@ -94,34 +95,43 @@ namespace hpx::parcelset::policies::openshmem {
         }
 
         template <typename Lock>
-        connection_ptr accept_locked(Lock& header_lock) noexcept
+        connection_ptr accept_locked(Lock& header_lock)
         {
             HPX_ASSERT_OWNS_LOCK(header_lock);
 
             util::openshmem_environment::scoped_try_lock l;
-            connection_ptr res;
+
+            // Caller failing to hold lock 'header_lock' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
 
             if (l.locked)
             {
-                header h = new_header();
-
-                const auto rank =
-                    hpx::util::openshmem_environment::rank();
+                const auto idx = post_new_header(l);
+                header h = rcv_header_[idx];
+                rcv_header_[idx].reset();
 
                 l.unlock();
                 header_lock.unlock();
 
-                // remote localities 'put' into the openshmem shared
-                // memory segment on this machine
-                //
-                res.reset(new connection_type(rank, h, pp_));
-                return res;
+                return std::make_shared<connection_type>(
+                    idx, HPX_MOVE(h), pp_);
             }
-            return res;
+
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
+
+            return {};
         }
 
-        header new_header() noexcept
+        template <typename Lock>
+        std::size_t post_new_header([[maybe_unused]] Lock& l) noexcept
         {
+            HPX_ASSERT_OWNS_LOCK(l);
+
             const auto self_ = hpx::util::openshmem_environment::rank();
 
             const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
@@ -129,40 +139,30 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::size();
             const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
-            // waiting for `sender_connection::send_header` invocation
-            if (rcv_header_.data() == 0) {
-                {
+            const auto idx = hpx::util::openshmem_environment::wait_until_any(
+                1,
+                hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
+                page_count
+            );
 
-                    //util::openshmem_environment::scoped_lock l;
-                    const auto idx = hpx::util::openshmem_environment::wait_until_any(
-                        1,
-                        hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
-                        page_count
-                    );
+            hpx::util::openshmem_environment::get(
+                reinterpret_cast<std::uint8_t*>(
+                rcv_header_[idx].data()),
+                self_,
+                hpx::util::openshmem_environment::segments[idx].beg_addr,
+                sizeof(header)
+            );
 
-                    //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+            (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
-                    hpx::util::openshmem_environment::get(
-                        reinterpret_cast<std::uint8_t*>(
-                            rcv_header_.data()),
-                        self_,
-                        hpx::util::openshmem_environment::segments[idx].beg_addr,
-                        sizeof(rcv_header_)
-                    );
-
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
-                }
-            }
-
-            header h = rcv_header_;
-            rcv_header_.reset();
-            return h;
+            HPX_ASSERT_LOCKED(l, idx < 0);
+            return idx;
         }
 
         Parcelport& pp_;
+        std::vector<header> rcv_header_;
 
         hpx::spinlock headers_mtx_;
-        header rcv_header_;
 
         hpx::spinlock handles_header_mtx_;
         handles_header_type handles_header_;

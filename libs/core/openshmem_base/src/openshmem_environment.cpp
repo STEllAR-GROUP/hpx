@@ -353,7 +353,7 @@ namespace hpx::util {
         shmem_int_wait_until(tmp.iaddr, SHMEM_CMP_EQ, static_cast<int>(value));
     }
 
-    std::size_t wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
+    std::size_t openshmem_environment::wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
 
 #if defined(SHMEM_MAJOR_VERSION) && defined(SHMEM_MINOR_VERSION) && \
     defined(SHMEM_VENDOR_STRING) && defined(SHMEM_MAX_NAME_LEN) && \
