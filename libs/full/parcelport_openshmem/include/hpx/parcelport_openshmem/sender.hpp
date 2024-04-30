@@ -36,7 +36,7 @@ namespace hpx::parcelset::policies::openshmem {
         // different versions of clang-format disagree
         // clang-format off
         sender() noexcept
-        : connections_mtx_(), connections_(), next_free_tag_mtx_()
+        : connections_mtx_(), connections_()
         {
         }
         // clang-format on
@@ -105,7 +105,6 @@ namespace hpx::parcelset::policies::openshmem {
         hpx::spinlock connections_mtx_;
         connection_list connections_;
 
-        hpx::spinlock next_free_tag_mtx_;
     };
 }    // namespace hpx::parcelset::policies::openshmem
 

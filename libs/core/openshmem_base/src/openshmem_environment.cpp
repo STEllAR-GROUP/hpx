@@ -113,6 +113,7 @@ namespace hpx::util {
     int openshmem_environment::provided_threading_flag_ = 0;
     int openshmem_environment::is_initialized_ = -1;
     int openshmem_environment::init_val_ = 0;
+    std::size_t openshmem_environment::this_rank = -1;
     //std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
     std::vector<openshmem_seginfo_t> openshmem_environment::segments{};
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
@@ -163,14 +164,6 @@ namespace hpx::util {
         //
         const std::size_t page_count = size();
 
-        // allocate a mutex per-page 
-        //
-/*
-        openshmem_environment::segment_mutex.reserve(page_count);
-        for(std::size_t i = 0; i < page_count; ++i) {
-            openshmem_environment::segment_mutex.emplace_back(std::make_shared<hpx::spinlock>());
-        }
-*/
         // symmetric allocation for number of pages total + number of signals
         //
         // (allocate page_size * number of PEs * number of threads) + (number of PEs * number of threads * 2 [for signaling])
@@ -224,7 +217,11 @@ namespace hpx::util {
         if (enabled_)
             return;    // don't call twice
 
-        int this_rank = -1;
+        if (enabled()) {
+            scoped_lock l;
+            this_rank = static_cast<int>(shmem_my_pe());
+        }
+
         has_called_init_ = false;
 
         // We assume to use the OpenSHMEM parcelport if it is not explicitly disabled
@@ -255,8 +252,6 @@ namespace hpx::util {
             // explicitly disable openshmem if not run by openshmemrun
             rtcfg.add_entry("hpx.parcel.openshmem.multithreaded", "0");
         }
-
-        this_rank = rank();
 
 #if defined(HPX_HAVE_NETWORKING)
         if (this_rank == 0)
@@ -436,12 +431,7 @@ namespace hpx::util {
 
     int openshmem_environment::rank()
     {
-        int res(-1);
-        if (enabled()) {
-            scoped_lock l;
-            res = static_cast<int>(shmem_my_pe());
-        }
-        return res;
+        return this_rank;
     }
 
     openshmem_environment::scoped_lock::scoped_lock()

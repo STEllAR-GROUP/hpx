@@ -121,9 +121,9 @@ namespace hpx { namespace util {
         static int is_initialized_;
 
         static int init_val_;
-        //static std::vector<std::shared_ptr<hpx::spinlock>> segment_mutex;
         static std::vector<openshmem_seginfo_t> segments;
         static std::uint8_t* shmem_buffer;
+        static std::size_t this_rank;
     };
 }}    // namespace hpx::util
 

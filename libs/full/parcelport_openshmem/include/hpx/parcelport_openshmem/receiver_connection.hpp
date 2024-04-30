@@ -47,7 +47,6 @@ namespace hpx::parcelset::policies::openshmem {
         receiver_connection(int src, header h, Parcelport& pp) noexcept
           : state_(initialized)
           , src_(src)
-          , self_(-1)
           , header_(h)
           , request_ptr_(false)
           , num_bytes(0)
@@ -58,7 +57,6 @@ namespace hpx::parcelset::policies::openshmem {
         {
             header_.assert_valid();
 
-            self_ = hpx::util::openshmem_environment::rank();
             num_bytes = header_.numbytes();
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
@@ -108,7 +106,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_transmission_chunks()
         {
-            const auto idx = self_;
+            const auto idx = hpx::util::openshmem_environment::rank();
 
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
@@ -122,15 +120,13 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 {
-                    //std::lock_guard<hpx::spinlock> l(*(*hpx::util::openshmem_environment::segments[idx].mut));
-
                     hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
 
                     hpx::util::openshmem_environment::get(
                         reinterpret_cast<std::uint8_t*>(
                             buffer_.transmission_chunks_.data()),
-                        self_,
+                        idx,
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
                         static_cast<int>(buffer_.transmission_chunks_.size() *
                             sizeof(buffer_type::transmission_chunk_type)));
@@ -161,16 +157,14 @@ namespace hpx::parcelset::policies::openshmem {
             }
             else
             {
-                const auto idx = self_;
-
-                //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+                const auto idx = hpx::util::openshmem_environment::rank();
 
                 hpx::util::openshmem_environment::wait_until(
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
 
                 hpx::util::openshmem_environment::get(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()),
-                    self_,
+                    idx,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
                     buffer_.data_.size());
 
@@ -189,9 +183,7 @@ namespace hpx::parcelset::policies::openshmem {
             std::size_t cidx = 0;
             std::size_t chunk_size = 0;
 
-            const auto idx = self_;
-
-            //std::lock_guard<hpx::spinlock> l(*(*(hpx::util::openshmem_environment::segments[idx].mut)));
+            const auto idx = hpx::util::openshmem_environment::rank();
 
             while (chunks_idx_ < buffer_.chunks_.size())
             {
@@ -211,7 +203,7 @@ namespace hpx::parcelset::policies::openshmem {
                         1, hpx::util::openshmem_environment::segments[idx].rcv);
 
                     hpx::util::openshmem_environment::get(
-                        reinterpret_cast<std::uint8_t*>(c.data()), self_,
+                        reinterpret_cast<std::uint8_t*>(c.data()), idx,
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
                         c.size());
 
@@ -236,9 +228,11 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done() noexcept
         {
-            //const auto idx = self_;
+            util::openshmem_environment::scoped_try_lock const l;
+            if(!l.locked) { return false; }
 
-            //const bool l = (*hpx::util::openshmem_environment::segments[idx].mut)->try_lock();
+            hpx::util::openshmem_environment::quiet();
+
             return true;
         }
 
