@@ -142,6 +142,7 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_priority_lifo:
             sched = "local_priority_lifo";
             break;
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         case resource::scheduling_policy::local_workrequesting_fifo:
             sched = "local_workrequesting_fifo";
             break;
@@ -151,6 +152,7 @@ namespace hpx::resource::detail {
         case resource::scheduling_policy::local_workrequesting_mc:
             sched = "local_workrequesting_mc";
             break;
+#endif
         case resource::scheduling_policy::static_:
             sched = "static";
             break;
@@ -485,6 +487,7 @@ namespace hpx::resource::detail {
         {
             default_scheduler = scheduling_policy::local_priority_lifo;
         }
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         else if (0 ==
             std::string("local-workrequesting-fifo")
                 .find(default_scheduler_str))
@@ -502,6 +505,7 @@ namespace hpx::resource::detail {
         {
             default_scheduler = scheduling_policy::local_workrequesting_mc;
         }
+#endif
         else if (0 == std::string("static").find(default_scheduler_str))
         {
             default_scheduler = scheduling_policy::static_;
