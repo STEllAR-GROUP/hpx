@@ -92,7 +92,7 @@ Then, in your project directory run the following:
 .. code-block:: shell-session
 
    $ mkdir build && cd build
-   $ cmake -DCMAKE_PREFIX_PATH=</path/to/hpx/installation> ..
+   $ cmake -DHPX_DIR=</path/to/hpx/installation> ..
    $ make all
    $ ./my_hpx_program
 
