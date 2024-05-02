@@ -287,8 +287,8 @@ int main(int argc, char* argv[])
 #endif
         hpx::resource::scheduling_policy::static_,
         hpx::resource::scheduling_policy::static_priority,
-        // The shared_priority scheduler sometimes hangs in this test.
-        //hpx::resource::scheduling_policy::shared_priority,
+    // The shared_priority scheduler sometimes hangs in this test.
+    //hpx::resource::scheduling_policy::shared_priority,
 
 #if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         hpx::resource::scheduling_policy::local_workrequesting_fifo,
