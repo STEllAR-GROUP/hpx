@@ -4,7 +4,7 @@
 # Copyright (c) 2017 Google
 # Copyright (c) 2017 Taeguk Kwon
 # Copyright (c) 2020 Giannis Gonidelis
-# Copyright (c) 2021-2022 Hartmut Kaiser
+# Copyright (c) 2021-2024 Hartmut Kaiser
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -373,7 +373,7 @@ endfunction()
 function(hpx_check_for_cxx14_delete_operator_with_size)
   add_hpx_config_test(
     HPX_WITH_CXX14_DELETE_OPERATOR_WITH_SIZE
-    SOURCE cmake/tests/cxx_14_delete_operator_with_size.cpp
+    SOURCE cmake/tests/cxx14_delete_operator_with_size.cpp
     FILE ${ARGN}
   )
 endfunction()
@@ -665,51 +665,6 @@ function(hpx_check_for_cxx_lambda_capture_decltype)
   add_hpx_config_test(
     HPX_WITH_CXX_LAMBDA_CAPTURE_DECLTYPE
     SOURCE cmake/tests/cxx_lambda_capture_decltype.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_builtin_integer_pack)
-  add_hpx_config_test(
-    HPX_WITH_BUILTIN_INTEGER_PACK
-    SOURCE cmake/tests/builtin_integer_pack.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_builtin_make_integer_seq)
-  add_hpx_config_test(
-    HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ
-    SOURCE cmake/tests/builtin_make_integer_seq.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_builtin_make_integer_seq_cuda)
-  add_hpx_config_test(
-    HPX_WITH_BUILTIN_MAKE_INTEGER_SEQ_CUDA
-    SOURCE cmake/tests/builtin_make_integer_seq.cu CUDA
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_builtin_type_pack_element)
-  add_hpx_config_test(
-    HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT
-    SOURCE cmake/tests/builtin_type_pack_element.cpp
-    FILE ${ARGN}
-  )
-endfunction()
-
-# ##############################################################################
-function(hpx_check_for_builtin_type_pack_element_cuda)
-  add_hpx_config_test(
-    HPX_WITH_BUILTIN_TYPE_PACK_ELEMENT_CUDA
-    SOURCE cmake/tests/builtin_type_pack_element.cu CUDA
     FILE ${ARGN}
   )
 endfunction()
