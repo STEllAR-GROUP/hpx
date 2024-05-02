@@ -27,8 +27,8 @@ else()
   endif()
 
   if(NOT HPX_WITH_HWLOC_VERSION)
-    set(HPX_WITH_HWLOC_VERSION "2.9")
-    set(HPX_WITH_HWLOC_RELEASE "2.9.3")
+    set(HPX_WITH_HWLOC_VERSION "2.10")
+    set(HPX_WITH_HWLOC_RELEASE "2.10.0")
   endif()
 
   hpx_info(
