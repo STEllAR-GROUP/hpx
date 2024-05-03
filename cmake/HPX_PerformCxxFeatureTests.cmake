@@ -169,29 +169,6 @@ function(hpx_perform_cxx_feature_tests)
     DEFINITIONS HPX_HAVE_CXX_LAMBDA_CAPTURE_DECLTYPE
   )
 
-  # Check the availability of certain C++ builtins
-  hpx_check_for_builtin_integer_pack(DEFINITIONS HPX_HAVE_BUILTIN_INTEGER_PACK)
-
-  hpx_check_for_builtin_make_integer_seq(
-    DEFINITIONS HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ
-  )
-
-  if(HPX_WITH_CUDA)
-    hpx_check_for_builtin_make_integer_seq_cuda(
-      DEFINITIONS HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ_CUDA
-    )
-  endif()
-
-  hpx_check_for_builtin_type_pack_element(
-    DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT
-  )
-
-  if(HPX_WITH_CUDA)
-    hpx_check_for_builtin_type_pack_element_cuda(
-      DEFINITIONS HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA
-    )
-  endif()
-
   hpx_check_for_builtin_forward_move(DEFINITIONS HPX_HAVE_BUILTIN_FORWARD_MOVE)
 
 endfunction()
