@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +6,13 @@
 
 if(HPX_WITH_NETWORKING)
   set(tests
-      barrier_3792 barrier_hang broadcast_unwrap_future_2885
-      broadcast_wait_for_2822 collectives_bool_5940 multiple_gather_ops_2001
+      barrier_3792
+      barrier_hang
+      broadcast_unwrap_future_2885
+      broadcast_wait_for_2822
+      collectives_bool_5940
+      multiple_gather_ops_2001
+      trivially_copyable_all_gather
   )
 
   set(broadcast_unwrap_future_2885_PARAMETERS LOCALITIES 2 THREADS_PER_LOCALITY
