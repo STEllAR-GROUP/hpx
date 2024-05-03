@@ -23,7 +23,7 @@ General changes
   C++ library fundamentals TS v3 (see: |cpp26_n4948|).
 - We have added configuration options that allow to build HPX without pre-installing
   any prerequisites. Use ``HPX_WITH_FETCH_HWLOC=On`` to have __hwloc__ installed for
-  you. Similarily, setting ``HPX_WITH_FETCH_BOOST=On`` during configuration time will
+  you. Similarly, setting ``HPX_WITH_FETCH_BOOST=On`` during configuration time will
   install the necessary Boost libraries (currently V1.84.0).
 - We have performed a lot of code cleanup and refactoring to improve the overall
   code quality and decrease compile times.
@@ -66,7 +66,7 @@ Closed issues
 * :hpx-issue:`6443` - PR #6435 (parcel_layer_tweaks) broke Octo-Tiger
 * :hpx-issue:`6440` - HPX does not compile with MSVC of Visual Studio 2022 17.9+
 * :hpx-issue:`6437` - HPX 1.9.1 does not compile on Fedora with '#pragma message:  [Parallel STL message]: "Vectorized algorithm unimplemented, redirected to serial
-* :hpx-issue:`6419` - Enhacement of the macro functionalities within hpx
+* :hpx-issue:`6419` - Enhancement of the macro functionalities within hpx
 * :hpx-issue:`6417` - The current HPX master branch is still not compatible with Kokkos 4.0.1
 * :hpx-issue:`6414` - Current HPX master causes segfaults within Octo-Tiger
 * :hpx-issue:`6407` - Cannot build Kokkos 4.0.01 with current HPX master
@@ -105,7 +105,7 @@ Closed pull requests
 * :hpx-pr:`6453` - Update supported platforms of Manual/Prerequisites page
 * :hpx-pr:`6452` - Fix nvcc crashes in transform_stream.cu and synchronize.cu
 * :hpx-pr:`6450` - Fix git tag name in Getting HPX page
-* :hpx-pr:`6449` - LCI parcelport: add yield to potentially inifinite retry loop
+* :hpx-pr:`6449` - LCI parcelport: add yield to potentially infinite retry loop
 * :hpx-pr:`6447` - Use compressed ptr in schedulers when 128 atomics are not lockfree
 * :hpx-pr:`6445` - Fix agas addressing cache
 * :hpx-pr:`6444` - Update CTestConfig.cmake
@@ -114,7 +114,7 @@ Closed pull requests
 * :hpx-pr:`6439` - Optimizing use of certain #includes
 * :hpx-pr:`6436` - Update docs
 * :hpx-pr:`6435` - Parcel layer tweaks
-* :hpx-pr:`6432` - Module cleanup upto level 30
+* :hpx-pr:`6432` - Module cleanup up to level 30
 * :hpx-pr:`6429` - Making sure HPX_WITH_ASYNC_MPI is reported properly
 * :hpx-pr:`6427` - Modifying CMakeLists to copy libhwloc-15.dll to the binary folder in Windows, independently
 * :hpx-pr:`6425` - Fix macOS failing test
