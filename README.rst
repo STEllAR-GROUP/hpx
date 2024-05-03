@@ -171,6 +171,6 @@ Past and current funding and support for HPX is listed `here
     :target: https://bestpractices.coreinfrastructure.org/projects/6093
     :alt: OpenSSF Best Practices
 
-.. |hpx_logo| image:: http://hpx.stellar-group.org/files/hpx_logo.png
+.. |hpx_logo| image:: http://hpx.stellar-group.org/files/hpx_logo_white.png
     :target: http://hpx.stellar-group.org/
     :alt: HPX Logo
