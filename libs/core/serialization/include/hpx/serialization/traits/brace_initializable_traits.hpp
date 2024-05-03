@@ -41,12 +41,16 @@ namespace hpx::traits {
         static constexpr const wildcard _wildcard{};
 
         ///////////////////////////////////////////////////////////////////////
+        // clang-format off
         template <typename T, std::size_t... I>
-        constexpr auto is_brace_constructible(std::index_sequence<I...>,
-            T*) noexcept -> decltype(T{_wildcard<I>...}, std::true_type{})
+        constexpr auto is_brace_constructible(std::index_sequence<I...>, T*)
+            // older versions of clang get confused by this
+            // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+            noexcept -> decltype(T{_wildcard<I>...}, std::true_type{})
         {
             return {};
         }
+        // clang-format on
 
         template <std::size_t... I>
         constexpr std::false_type is_brace_constructible(
