@@ -1793,13 +1793,16 @@ namespace hpx::threads::policies {
 
         void on_stop_thread(std::size_t num_thread) override
         {
-            auto& d = data_[num_thread].data_;
-
-            d.queue_->on_stop_thread(num_thread);
-            d.bound_queue_->on_stop_thread(num_thread);
-            if (num_thread < num_high_priority_queues_)
+            if (num_thread < data_.size())
             {
-                d.high_priority_queue_->on_stop_thread(num_thread);
+                auto& d = data_[num_thread].data_;
+
+                d.queue_->on_stop_thread(num_thread);
+                d.bound_queue_->on_stop_thread(num_thread);
+                if (num_thread < num_high_priority_queues_)
+                {
+                    d.high_priority_queue_->on_stop_thread(num_thread);
+                }
             }
 
             if (num_thread == num_queues_ - 1)
@@ -1811,13 +1814,17 @@ namespace hpx::threads::policies {
         void on_error(
             std::size_t num_thread, std::exception_ptr const& e) override
         {
-            auto& d = data_[num_thread].data_;
-
-            d.queue_->on_error(num_thread, e);
-            d.bound_queue_->on_error(num_thread, e);
-            if (num_thread < num_high_priority_queues_)
+            if (num_thread < data_.size())
             {
-                d.high_priority_queue_->on_error(num_thread, e);
+                auto& d = data_[num_thread].data_;
+
+                d.queue_->on_error(num_thread, e);
+                d.bound_queue_->on_error(num_thread, e);
+
+                if (num_thread < num_high_priority_queues_)
+                {
+                    d.high_priority_queue_->on_error(num_thread, e);
+                }
             }
 
             if (num_thread == num_queues_ - 1)

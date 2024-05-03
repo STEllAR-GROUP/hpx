@@ -1613,8 +1613,11 @@ namespace hpx::threads::policies {
             if (num_thread == num_queues_ - 1)
                 low_priority_queue_.on_stop_thread(num_thread);
 
-            bound_queues_[num_thread].data_->on_stop_thread(num_thread);
-            queues_[num_thread].data_->on_stop_thread(num_thread);
+            if (num_thread < bound_queues_.size())
+            {
+                bound_queues_[num_thread].data_->on_stop_thread(num_thread);
+                queues_[num_thread].data_->on_stop_thread(num_thread);
+            }
         }
 
         void on_error(
@@ -1628,8 +1631,11 @@ namespace hpx::threads::policies {
             if (num_thread == num_queues_ - 1)
                 low_priority_queue_.on_error(num_thread, e);
 
-            bound_queues_[num_thread].data_->on_error(num_thread, e);
-            queues_[num_thread].data_->on_error(num_thread, e);
+            if (num_thread < bound_queues_.size())
+            {
+                bound_queues_[num_thread].data_->on_error(num_thread, e);
+                queues_[num_thread].data_->on_error(num_thread, e);
+            }
         }
 
         void reset_thread_distribution() noexcept override

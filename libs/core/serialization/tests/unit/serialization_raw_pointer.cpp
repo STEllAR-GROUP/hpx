@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <string>
 #include <tuple>
+#include <type_traits>
 #include <vector>
 
 // non-bitwise copyable type
@@ -38,6 +39,15 @@ struct A
     {
         return true;
     }
+    friend bool operator!=(A const& lhs, A const& rhs)
+    {
+        return !(lhs == rhs);
+    }
+};
+
+template <>
+struct hpx::traits::is_bitwise_serializable<A> : std::false_type
+{
 };
 
 int hpx_main()

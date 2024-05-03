@@ -94,20 +94,20 @@ namespace hpx::serialization {
             else if constexpr (!std::is_empty_v<dT>)
             {
                 // non_intrusive
-                if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
-                {
-                    // bitwise serializable types can be directly dispatched to
-                    // the archive functions
-                    ar.invoke(t);
-                }
-                else if constexpr (hpx::traits::has_serialize_adl_v<dT>)
+                if constexpr (hpx::traits::has_serialize_adl_v<dT>)
                 {
                     // this additional indirection level is needed to force ADL
                     // on the second phase of template lookup. call of serialize
                     // function directly from base_object finds only
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
+                }
+                else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
+                {
+                    // bitwise serializable types can be directly dispatched to
+                    // the archive functions
+                    ar.invoke(t);
                 }
                 else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {

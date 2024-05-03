@@ -45,11 +45,6 @@ template <typename TYPE, Dimension DIM>
 using point = dimensioned_array<TYPE, DIM, 1>;
 
 template <Dimension DIM>
-struct hpx::traits::is_bitwise_serializable<point<double, DIM>> : std::true_type
-{
-};
-
-template <Dimension DIM>
 struct BBox
 {
     point<double, DIM> lower, upper;
@@ -57,6 +52,11 @@ struct BBox
 
 void test_local_use()
 {
+    static_assert(hpx::traits::is_bitwise_serializable_v<point<double, 2>>,
+        "hpx::traits::is_bitwise_serializable_v<point<double, 2>>");
+    static_assert(hpx::traits::is_bitwise_serializable_v<BBox<2>>,
+        "hpx::traits::is_bitwise_serializable_v<point<double, 2>>");
+
     using namespace hpx::collectives;
 
     constexpr char const* all_gather_direct_basename =
