@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -94,7 +94,14 @@ namespace hpx::serialization {
             else if constexpr (!std::is_empty_v<dT>)
             {
                 // non_intrusive
-                if constexpr (hpx::traits::has_serialize_adl_v<dT>)
+                if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
+                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
+                {
+                    // bitwise serializable types can be directly dispatched to
+                    // the archive functions
+                    ar.invoke(t);
+                }
+                else if constexpr (hpx::traits::has_serialize_adl_v<dT>)
                 {
                     // this additional indirection level is needed to force ADL
                     // on the second phase of template lookup. call of serialize
@@ -105,16 +112,9 @@ namespace hpx::serialization {
                 else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
                 {
                     // This is automatic serialization for types that are simple
-                    // (brace-initializable) structs, what that means every
-                    // struct's field has to be serializable and public.
+                    // (brace-initializable) structs, that means every struct's
+                    // field has to be serializable and public.
                     serialize_struct(ar, t, 0);
-                }
-                else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
-                    !hpx::traits::is_not_bitwise_serializable_v<dT>)
-                {
-                    // bitwise serializable types can be directly dispatched to
-                    // the archive functions
-                    ar.invoke(t);
                 }
                 else
                 {
