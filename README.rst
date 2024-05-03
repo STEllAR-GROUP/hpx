@@ -156,7 +156,7 @@ Past and current funding and support for HPX is listed `here
      :alt: HPX Code Quality Assessment
 
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/0b8cd5a874914edaba67ce3bb711e688    
-     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
+     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/coverage/dashboard
      :alt: HPX coverage report
 
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
