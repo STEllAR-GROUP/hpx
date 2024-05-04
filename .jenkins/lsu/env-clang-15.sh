@@ -26,13 +26,9 @@ configure_extra_options+=" -DHPX_WITH_NETWORKING=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_MPI=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_LCI=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
-<<<<<<< HEAD
-=======
-configure_extra_options+=" -DHPX_WITH_PARCELPORT_GASNET=ON"
-configure_extra_options+=" -DHPX_WITH_FETCH_GASNET=ON"
 configure_extra_options+=" -DHPX_WITH_PARCELPORT_OPENSHMEM=ON"
 configure_extra_options+=" -DHPX_WITH_FETCH_OPENSHMEM=ON"
->>>>>>> a9eef08e69 (initial import)
+configure_extra_options+=" -DHPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT=mpi"
 configure_extra_options+=" -DCMAKE_C_COMPILER=clang"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
