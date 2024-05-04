@@ -269,7 +269,16 @@ void test_multiple_assignments_with_different_option_description()
 
     vector<string> input1;
     input1.emplace_back("--help");
+
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
     input1.emplace_back("--includes=a");
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
+#pragma GCC diagnostic pop
+#endif
+
     parsed_options p1 = command_line_parser(input1).options(desc1).run();
 
     vector<string> input2;
