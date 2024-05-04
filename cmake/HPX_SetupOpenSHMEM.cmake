@@ -1120,34 +1120,43 @@ macro(hpx_setup_openshmem)
     message(STATUS "OPENSHMEM_LDFLAGS:\t${OPENSHMEM_LDFLAGS}")
     message(STATUS "OPENSHMEM_LIBRARY_DIRS:\t${OPENSHMEM_LIBRARY_DIRS}")
 
+separate_arguments(OPENSHMEM_CFLAGS UNIX_COMMAND "${OPENSHMEM_CFLAGS}")
+separate_arguments(OPENSHMEM_LDFLAGS UNIX_COMMAND "${OPENSHMEM_LDFLAGS}")
+separate_arguments(OPENSHMEM_LIBRARY_DIRS UNIX_COMMAND "${OPENSHMEM_LIBRARY_DIRS}")
+
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
-                                      "${OPENSHMEM_CFLAGS}"
+                                      ${OPENSHMEM_CFLAGS}
     )
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
-                                      "${OPENSHMEM_LDFLAGS}"
+                                      ${OPENSHMEM_LDFLAGS}
     )
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                      "${OPENSHMEM_LIBRARY_DIRS}"
+                                      ${OPENSHMEM_LIBRARY_DIRS}
     )
   else()
     message(STATUS "OPENSHMEM_CFLAGS:\t${OPENSHMEM_CFLAGS}")
     message(STATUS "OPENSHMEM_LDFLAGS:\t${OPENSHMEM_LDFLAGS}")
     message(STATUS "OPENSHMEM_LIBRARY_DIRS:\t${OPENSHMEM_LIBRARY_DIRS}")
 
+separate_arguments(OPENSHMEM_CFLAGS UNIX_COMMAND "${OPENSHMEM_CFLAGS}")
+separate_arguments(OPENSHMEM_LDFLAGS UNIX_COMMAND "${OPENSHMEM_LDFLAGS}")
+separate_arguments(OPENSHMEM_LIBRARY_DIRS UNIX_COMMAND "${OPENSHMEM_LIBRARY_DIRS}")
+
+
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
-                                      "${OPENSHMEM_CFLAGS}"
+                                      ${OPENSHMEM_CFLAGS}
     )
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_OPTIONS
-                                      "${OPENSHMEM_LDFLAGS}"
+                                      ${OPENSHMEM_LDFLAGS}
     )
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_LINK_DIRECTORIES
-                                      "${OPENSHMEM_LIBRARY_DIRS}"
+                                      ${OPENSHMEM_LIBRARY_DIRS}
     )
   endif()
 endmacro()

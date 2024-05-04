@@ -352,12 +352,11 @@ namespace hpx::util {
 
 #if defined(SHMEM_MAJOR_VERSION) && defined(SHMEM_MINOR_VERSION) && \
     defined(SHMEM_VENDOR_STRING) && defined(SHMEM_MAX_NAME_LEN) && \
-    SHMEM_MAJOR_VERSION == 1 && SHMEM_MINOR_VERSION == 4 && \
     SHMEM_MAX_NAME_LEN == 256
 
         int rc = 0;
         for(std::size_t i = 0; i < count; ++i) {
-           rc = shmem_test(reinterpret_cast<unsigned int*>(sigaddr+i), SHMEM_CMP_EQ, value); 
+           rc = shmem_uint_test(reinterpret_cast<unsigned int*>(sigaddr+i), SHMEM_CMP_EQ, value); 
            if(rc) { return i; }
         }
 
