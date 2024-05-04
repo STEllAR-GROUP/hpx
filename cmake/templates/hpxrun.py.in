@@ -250,7 +250,7 @@ def build_cmd(options, args):
         select_parcelport = (lambda pp:
             ['--hpx:ini=hpx.parcel.mpi.priority=1000', '--hpx:ini=hpx.parcel.mpi.enable=1', '--hpx:ini=hpx.parcel.bootstrap=mpi'] if pp == 'mpi'
             else ['--hpx:ini=hpx.parcel.lci.priority=1000', '--hpx:ini=hpx.parcel.lci.enable=1', '--hpx:ini=hpx.parcel.bootstrap=lci'] if pp == 'lci'
-            else ['--hpx:ini=hpx.parcel.gasnet.priority=1000', '--hpx:ini=hpx.parcel.openshmem.enable=1', '--hpx:ini=hpx.parcel.bootstrap=openshmem'] if pp == 'openshmem'
+            else ['--hpx:ini=hpx.parcel.openshmem.priority=1000', '--hpx:ini=hpx.parcel.openshmem.enable=1', '--hpx:ini=hpx.parcel.bootstrap=openshmem'] if pp == 'openshmem'
             else ['--hpx:ini=hpx.parcel.tcp.priority=1000', '--hpx:ini=hpx.parcel.tcp.enable=1'] if pp == 'tcp'
             else [])
         cmd += select_parcelport(options.parcelport)
