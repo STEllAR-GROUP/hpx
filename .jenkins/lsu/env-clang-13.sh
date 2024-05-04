@@ -30,6 +30,7 @@ configure_extra_options+=" -DHPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT=mpi"
 configure_extra_options+=" -DCMAKE_C_COMPILER=clang"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
+configure_extra_options+=" -DHPX_WITH_TESTS=ON"
 configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:queuing=local-workrequesting-fifo"
 
 
