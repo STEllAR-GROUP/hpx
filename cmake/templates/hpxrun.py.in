@@ -366,7 +366,7 @@ Used by the tcp parcelport only.
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-      , help='Which parcelport to use (Options are: mpi, lci, openshmem, tcp) '
+      , help='Which parcelport to use (Options are: mpi, lci, openshmem, gasnet, tcp) '
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'
