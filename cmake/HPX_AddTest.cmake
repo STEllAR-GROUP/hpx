@@ -188,35 +188,6 @@ function(add_hpx_test category name)
         endif()
       endif()
     endif()
-    if(HPX_WITH_PARCELPORT_GASNET AND NOT ${name}_NO_PARCELPORT_GASNET)
-      set(_add_test FALSE)
-      if(DEFINED ${name}_PARCELPORTS)
-        set(PP_FOUND -1)
-        list(FIND ${name}_PARCELPORTS "gasnet" PP_FOUND)
-        if(NOT PP_FOUND EQUAL -1)
-          set(_add_test TRUE)
-        endif()
-      else()
-        set(_add_test TRUE)
-      endif()
-      if(_add_test)
-        set(_full_name "${category}.distributed.gasnet.${name}")
-        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet-smp" ${args}
-        )
-        set_tests_properties(
-          "${_full_name}"
-          PROPERTIES
-            RUN_SERIAL TRUE ENVIRONMENT
-            "PATH=${PROJECT_BINARY_DIR}/_deps/gasnet-src/install/bin:$ENV{PATH}"
-        )
-        if(${name}_TIMEOUT)
-          set_tests_properties(
-            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
-          )
-        endif()
-      endif()
-    endif()
     if(HPX_WITH_PARCELPORT_OPENSHMEM AND NOT ${name}_NO_PARCELPORT_OPENSHMEM)
       set(_add_test FALSE)
       if(DEFINED ${name}_PARCELPORTS)
