@@ -180,19 +180,6 @@ def run_none(cmd, localities, nodes, verbose):
              subproc(cmd)
 
 
- def run_amudprun(cmd, localities, nodes, verbose):
-     assert len(nodes) == localities, "Number of localities must match number of nodes."
-     os.environ['GASNET_SPAWNFN'] = 'S'
-     os.environ['GASNET_SSH_SERVERS'] = ' '.join([ str(node) for node in nodes ]) 
-     os.environ['SSH_SERVERS'] = os.environ['GASNET_SSH_SERVERS']
-     os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-
-     exec_cmd = ['amudprun', '-np', len(nodes), cmd]
-
-     if verbose:
-         print('Executing command: ' + ' '.join(exec_cmd))
-     subproc(exec_cmd)
-
 # Run with mpiexec
 # This is executing mpiexec with the "-np" option set to the number of localities
 def run_mpi(cmd, localities, verbose):
@@ -209,21 +196,7 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
-def run_amudprun(cmd, localities, nodes, verbose):
-    assert len(nodes) == localities, "Number of localities must match number of nodes."
-    os.environ['GASNET_SPAWNFN'] = 'S'
-    os.environ['GASNET_SSH_SERVERS'] = ' '.join([ str(node) for node in nodes ]) 
-    os.environ['SSH_SERVERS'] = os.environ['GASNET_SSH_SERVERS']
-    os.environ['GASNET_ROUTE_OUTPUT'] = '0'
-
-    exec_cmd = ['amudprun', '-np', len(nodes), cmd]
-
-    if verbose:
-        print('Executing command: ' + ' '.join(exec_cmd))
-    subproc(exec_cmd)
-
 # Run with oshrun
-# This is executing amudprun with the "-np" option set to the number of localities
 def run_oshrun(cmd, localities, verbose):
     exec_cmd = ['oshrun', '-np', str(localities)] + cmd
     if verbose:
@@ -253,17 +226,9 @@ def run(cmd, runwrapper, localities, nodes, verbose):
     if runwrapper == 'mpi':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_mpi(cmd, localities, verbose)
-<<<<<<< HEAD
     if runwrapper == 'openshmem':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_openshmem(cmd, localities, verbose)
-=======
-    if runwrapper == 'amudprun':
-        run_amudprun(cmd, localities, nodes, verbose)
-    if runwrapper == 'oshrun':
-        assert nodes is None, "nodes option only valid with tcp parcelport."
-        run_oshrun(cmd, localities, verbose)
->>>>>>> 8dcd6a445b (added amudprun and oshrun)
     if runwrapper == 'srun':
         assert nodes is None, "nodes option only valid with tcp parcelport."
         run_srun(cmd, localities, verbose)
@@ -408,21 +373,13 @@ Used by the tcp parcelport only.
     parser.add_option('-p', '--parcelport'
       , action='store', type='string'
       , dest='parcelport', default=default_env('HPXRUN_PARCELPORT', 'tcp')
-<<<<<<< HEAD
       , help='Which parcelport to use (Options are: mpi, lci, openshmem, tcp) '
-=======
-      , help='Which parcelport to use (Options are: mpi, lci, openshmem, gasnet, tcp) '
->>>>>>> 8dcd6a445b (added amudprun and oshrun)
              '(environment variable HPXRUN_PARCELPORT')
 
     parser.add_option('-r', '--runwrapper'
       , action='store', type='string'
       , dest='runwrapper', default=default_env('HPXRUN_RUNWRAPPER', 'none')
-<<<<<<< HEAD
       , help='Which runwrapper to use (Options are: none, mpi, openshmem, srun, jsrun) '
-=======
-      , help='Which runwrapper to use (Options are: none, mpi, oshrun, amudprun, srun, jsrun) '
->>>>>>> 8dcd6a445b (added amudprun and oshrun)
              '(environment variable HPXRUN_RUNWRAPPER)')
 
     parser.add_option('-e', '--expected'
