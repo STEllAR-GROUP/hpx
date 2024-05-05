@@ -202,7 +202,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.openshmem.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "openshmem" "-r"
-                                              "openshmem" ${args}
+                                              "oshrun" ${args}
         )
         set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
         if(${name}_TIMEOUT)
