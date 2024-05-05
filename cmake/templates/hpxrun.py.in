@@ -196,13 +196,6 @@ def run_mpi(cmd, localities, verbose):
         print('Executing command: ' + ' '.join(exec_cmd))
     subproc(exec_cmd)
 
-# Run with oshrun
-def run_oshrun(cmd, localities, verbose):
-    exec_cmd = ['oshrun', '-np', str(localities)] + cmd
-    if verbose:
-        print('Executing command: ' + ' '.join(exec_cmd))
-    subproc(exec_cmd)
-
 # Run with srun
 # This is executing srun with the '-n' option set to the number of localities
 def run_srun(cmd, localities, verbose):

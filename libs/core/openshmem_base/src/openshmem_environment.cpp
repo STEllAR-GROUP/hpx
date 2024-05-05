@@ -306,10 +306,10 @@ namespace hpx::util {
 
 #if !defined(SHMEM_SIGNAL_SET)
             shmem_uint8_put(raddr, addr, size, node);
-            shmem_fence();
             shmem_uint8_put(reinterpret_cast<std::uint8_t*>(sigaddr),
                 reinterpret_cast<std::uint8_t*>(sigaddr), sizeof(sigaddr),
                 node);
+            shmem_fence();
 #else
             shmem_uint8_put_signal(raddr, addr, size,
                 reinterpret_cast<std::uint64_t*>(sigaddr), 1, SHMEM_SIGNAL_SET,

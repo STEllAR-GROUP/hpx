@@ -162,7 +162,6 @@ namespace hpx::parcelset::policies::openshmem {
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
-
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(header_.data()),
                     dst_,
