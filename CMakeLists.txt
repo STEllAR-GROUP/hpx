@@ -1233,7 +1233,8 @@ if(HPX_WITH_NETWORKING)
     OFF CATEGORY "Parcelport"
   )
   hpx_option(
-    HPX_WITH_FETCH_OPENSHMEM BOOL
+    HPX_WITH_FETCH_OPENSHMEM
+    BOOL
     "Download an OpenSHMEM if one is not available" OFF
     CATEGORY "Build Targets"
     ADVANCED
