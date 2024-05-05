@@ -909,13 +909,19 @@ namespace hpx::threads::policies {
 
         void on_stop_thread(std::size_t num_thread) override
         {
-            queues_[num_thread]->on_stop_thread(num_thread);
+            if (num_thread < queues_.size())
+            {
+                queues_[num_thread]->on_stop_thread(num_thread);
+            }
         }
 
         void on_error(
             std::size_t num_thread, std::exception_ptr const& e) override
         {
-            queues_[num_thread]->on_error(num_thread, e);
+            if (num_thread < queues_.size())
+            {
+                queues_[num_thread]->on_error(num_thread, e);
+            }
         }
 
     protected:
