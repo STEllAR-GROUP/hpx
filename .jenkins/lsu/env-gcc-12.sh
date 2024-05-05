@@ -31,7 +31,6 @@ configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
 configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
-configure_extra_options+=" -DHPX_WITH_TESTS=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"

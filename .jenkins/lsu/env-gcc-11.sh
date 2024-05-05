@@ -23,7 +23,6 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=ON"
 configure_extra_options+=" -DHPX_WITH_NETWORKING=OFF"
 configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=STD_EXPERIMENTAL_SIMD"
-configure_extra_options+=" -DHPX_WITH_TESTS=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
