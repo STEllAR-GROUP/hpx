@@ -16,164 +16,80 @@ to harness the full potential of distributed computing. Here, you'll find a comp
 list of header files, classes and functions for various distributed computing features
 provided by |hpx|.
 
-.. _public_distr_api_header_barrier:
+.. _public_distr_api_header_all_gather:
 
-``hpx/barrier.hpp``
-===================
+``hpx/collectives/all_gather.hpp``
+==================================
 
-The header :hpx-header:`libs/full/include/include,hpx/barrier.hpp` includes
-a distributed barrier implementation. For information regarding the C++ standard
-library header :cppreference-header:`barrier`, see :ref:`public_api`.
-
-Classes
--------
-
-.. table:: Distributed implementation of classes of header ``hpx/barrier.hpp``
-
-   +----------------------------------------+
-   | Class                                  |
-   +========================================+
-   | :cpp:class:`hpx::distributed::barrier` |
-   +----------------------------------------+
+The header :hpx-header:`libs/full/collectives/include,hpx/collectives/all_gather.hpp`
+contains definitions and implementations related to the `all_gather` operation.
 
 Functions
 ---------
 
-.. table:: `hpx` functions of header ``hpx/barrier.hpp``
+.. table:: `hpx` functions of header ``hpx/collectives/all_gather.hpp``
 
-   +-------------------------------------------+
-   | Function                                  |
-   +===========================================+
-   | :cpp:func:`hpx::distributed::wait`        |
-   +-------------------------------------------+
-   | :cpp:func:`hpx::distributed::synchronize` |
-   +-------------------------------------------+
+   +------------------------------------------+
+   | Function                                 |
+   +==========================================+
+   | :cpp:func:`hpx::collectives::all_gather` |
+   +------------------------------------------+
 
-.. _public_distr_api_header_collectives:
+.. _public_distr_api_header_all_reduce:
 
-``hpx/collectives.hpp``
-=======================
+``hpx/collectives/all_reduce.hpp``
+==================================
 
-The header :hpx-header:`libs/full/include/include,hpx/collectives.hpp`
-contains definitions and implementations related to the collectives operations.
-
-Classes
--------
-
-.. table:: `hpx` classes of header ``hpx/collectives.hpp``
-
-   +-----------------------------------------------------+
-   | Class                                               |
-   +=====================================================+
-   | :cpp:struct:`hpx::collectives::num_sites_arg`       |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::this_site_arg`       |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::that_site_arg`       |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::generation_arg`      |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::root_site_arg`       |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::tag_arg`             |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::arity_arg`           |
-   +-----------------------------------------------------+
-   | :cpp:struct:`hpx::collectives::communicator`        |
-   +-----------------------------------------------------+
-   | :cpp:class:`hpx::collectives::channel_communicator` |
-   +-----------------------------------------------------+
+The header :hpx-header:`libs/full/collectives/include,hpx/collectives/all_reduce.hpp`
+contains definitions and implementations related to the `all_reduce` operation.
 
 Functions
 ---------
 
-.. table:: `hpx` functions of header ``hpx/collectives.hpp``
+.. table:: `hpx` functions of header ``hpx/collectives/all_reduce.hpp``
 
-   +-----------------------------------------------------------+
-   | Function                                                  |
-   +===========================================================+
-   | :cpp:func:`hpx::collectives::all_gather`                  |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::all_reduce`                  |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::all_to_all`                  |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::broadcast_to`                |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::broadcast_from`              |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::create_channel_communicator` |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::set`                         |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::get`                         |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::create_communication_set`    |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::create_communicator`         |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::create_local_communicator`   |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::communicator::set_info`      |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::communicator::get_info`      |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::communicator::is_root`       |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::exclusive_scan`              |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::gather_here`                 |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::gather_there`                |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::inclusive_scan`              |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::reduce_here`                 |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::reduce_there`                |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::scatter_from`                |
-   +-----------------------------------------------------------+
-   | :cpp:func:`hpx::collectives::scatter_to`                  |
-   +-----------------------------------------------------------+
+   +------------------------------------------+
+   | Function                                 |
+   +==========================================+
+   | :cpp:func:`hpx::collectives::all_reduce` |
+   +------------------------------------------+
 
-.. _public_distr_api_header_latch:
+.. _public_distr_api_header_all_to_all:
 
-``hpx/latch.hpp``
-=================
+``hpx/collectives/all_to_all.hpp``
+==================================
 
-The header :hpx-header:`libs/full/include/include,hpx/latch.hpp` includes
-a distributed latch implementation. For information regarding the C++ standard
-library header :cppreference-header:`latch`, see :ref:`public_api`.
-
-Classes
--------
-
-.. table:: Distributed implementation of classes of header ``hpx/latch.hpp``
-
-   +--------------------------------------+
-   | Class                                |
-   +======================================+
-   | :cpp:class:`hpx::distributed::latch` |
-   +--------------------------------------+
+The header :hpx-header:`libs/full/collectives/include,hpx/collectives/all_to_all.hpp`
+contains definitions and implementations related to the `all_to_all` operation.
 
 Functions
 ---------
 
-.. table:: `hpx` functions of header ``hpx/latch.hpp``
+.. table:: `hpx` functions of header ``hpx/collectives/all_to_all.hpp``
 
-   +---------------------------------------------------+
-   | Function                                          |
-   +===================================================+
-   | :cpp:func:`hpx::distributed::count_down_and_wait` |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::arrive_and_wait`     |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::count_down`          |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::is_ready`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::try_wait`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::wait`                |
-   +---------------------------------------------------+
+   +------------------------------------------+
+   | Function                                 |
+   +==========================================+
+   | :cpp:func:`hpx::collectives::all_to_all` |
+   +------------------------------------------+
+
+.. _public_distr_api_header_argument_types:
+
+``hpx/collectives/argument_types.hpp``
+==================================
+
+The header :hpx-header:`libs/full/collectives/include,hpx/collectives/argument_types.hpp`
+contains definitions and implementations related to the `argument_types` operation.
+
+Functions
+---------
+
+.. table:: `hpx` functions of header ``hpx/collectives/argument_types.hpp``
+
+   +----------------------------------------------+
+   | Function                                     |
+   +==============================================+
+   | :cpp:class:`hpx::collectives::argument_type` |
+   +----------------------------------------------+
+   | :cpp:func:`hpx::collectives::argument_type`  |
+   +----------------------------------------------+
