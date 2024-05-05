@@ -163,6 +163,11 @@ namespace hpx::util {
         // page_count = num_localities * number of threads
         //
         const std::size_t page_count = size();
+	if(page_count < 1) {
+            HPX_THROW_EXCEPTION(error::invalid_status,
+                "hpx::util::openshmem_environment::init",
+                "OPENSHMEM not ready error");
+	}
 
         // symmetric allocation for number of pages total + number of signals
         //
@@ -420,7 +425,7 @@ namespace hpx::util {
 
     int openshmem_environment::size()
     {
-        int res(-1);
+        int res(0);
         if (enabled()) {
             scoped_lock l;
             res = static_cast<int>(shmem_n_pes());
