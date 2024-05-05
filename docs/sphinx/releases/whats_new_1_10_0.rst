@@ -62,6 +62,8 @@ Closed issues
 
 * :hpx-issue:`6466` - No access limitations to Wiki
 * :hpx-issue:`6461` - handle_received_parcels may never return
+* :hpx-issue:`6459` - Building HPX
+* :hpx-issue:`6451` - HPX hangs at the very end
 * :hpx-issue:`6446` - Issue on page /manual/getting_hpx.html
 * :hpx-issue:`6443` - PR #6435 (parcel_layer_tweaks) broke Octo-Tiger
 * :hpx-issue:`6440` - HPX does not compile with MSVC of Visual Studio 2022 17.9+
@@ -69,9 +71,11 @@ Closed issues
 * :hpx-issue:`6419` - Enhancement of the macro functionalities within hpx
 * :hpx-issue:`6417` - The current HPX master branch is still not compatible with Kokkos 4.0.1
 * :hpx-issue:`6414` - Current HPX master causes segfaults within Octo-Tiger
+* :hpx-issue:`6412` - Clangd (Language Server) throws error for __integer_pack at pack.hpp
 * :hpx-issue:`6407` - Cannot build Kokkos 4.0.01 with current HPX master
 * :hpx-issue:`6405` - Spack Build Error with ROCm 5.7.0
 * :hpx-issue:`6398` - HPX sets affinity wrong with multiple processes per node and LCI parcelport enabled
+* :hpx-issue:`6392` - [Feature] Install dependencies using CMake
 * :hpx-issue:`6388` - HPX error: "Host not found" when running on Expanse with 128 nodes
 * :hpx-issue:`6366` - serialize_buffer allocator support needs adjustments
 * :hpx-issue:`6361` - HPX 1.9.1 does not compile on Fedora 40
@@ -87,19 +91,28 @@ Closed issues
 * :hpx-issue:`5921` - hpx::info claims that async_mpi was not built, while cmake assures its existence
 * :hpx-issue:`5893` - Tests fail on FreeBSD: Executable copyn_test does not exist
 * :hpx-issue:`5833` - barrier lockup
+* :hpx-issue:`5799` - Investigate CUDA compilation problems
 * :hpx-issue:`5340` - Examples do not run on Mac OSX using the M1 chip
 
 Closed pull requests
 ====================
 
+* :hpx-pr:`6482` - Generalize the notion of bitwise serialization
+* :hpx-pr:`6481` - Fixing use of HPX_WITH_CXX_STANDARD
+* :hpx-pr:`6480` - Remove equal_to from hpx::any
+* :hpx-pr:`6479` - Remove optimizations for certain built-in compiler intrinsics
+* :hpx-pr:`6478` - Fixing issues on MacOS
 * :hpx-pr:`6477` - lci pp: lci's github repo name changed from LC to lci
 * :hpx-pr:`6476` - Fixing binary filter test target names
 * :hpx-pr:`6475` - Fix mac os github actions
+* :hpx-pr:`6472` - Troubleshoot CI hangs
 * :hpx-pr:`6469` - improve(lci pp): more options to control the LCI parcelport
+* :hpx-pr:`6467` - Bump jwlawson/actions-setup-cmake from 1.14 to 2.0
 * :hpx-pr:`6464` - Update docs of "Writing distributed applications" page
 * :hpx-pr:`6463` - Revert "Always return outermost thread id"
 * :hpx-pr:`6458` - Reduce test workload to fix CI/CD time-out
 * :hpx-pr:`6457` - replace boost::array with std::array and update file name
+* :hpx-pr:`6456` - Move APEX CI to rostam
 * :hpx-pr:`6455` - Fixing compilation if HPX_HAVE_THREAD_QUEUE_WAITTIME is defined
 * :hpx-pr:`6454` - Update perftests reference measurements
 * :hpx-pr:`6453` - Update supported platforms of Manual/Prerequisites page
@@ -112,12 +125,16 @@ Closed pull requests
 * :hpx-pr:`6442` - Update CMakeLists.txt
 * :hpx-pr:`6441` - Minor documentation fixes
 * :hpx-pr:`6439` - Optimizing use of certain #includes
+* :hpx-pr:`6438` - Bump jwlawson/actions-setup-cmake from 1.14 to 2.0
 * :hpx-pr:`6436` - Update docs
 * :hpx-pr:`6435` - Parcel layer tweaks
+* :hpx-pr:`6434` - improve termination detection: removing lock from critical path
+* :hpx-pr:`6433` - Use shared mutex for resolve_locality procedure
 * :hpx-pr:`6432` - Module cleanup up to level 30
 * :hpx-pr:`6429` - Making sure HPX_WITH_ASYNC_MPI is reported properly
 * :hpx-pr:`6427` - Modifying CMakeLists to copy libhwloc-15.dll to the binary folder in Windows, independently
 * :hpx-pr:`6425` - Fix macOS failing test
+* :hpx-pr:`6424` - Adding option for downloading Boost using CMake FetchContent
 * :hpx-pr:`6423` - Move adjacent_difference to numeric header file
 * :hpx-pr:`6422` - Adding steal-half functionalities to work-requesting scheduler
 * :hpx-pr:`6421` - Bump actions/checkout from 2 to 4
@@ -165,6 +182,7 @@ Closed pull requests
 * :hpx-pr:`6360` - Fix broken links in docs: PDF, Single HTML page, Dependency report
 * :hpx-pr:`6359` - Fix header file links in Public API page
 * :hpx-pr:`6358` - Fix CMake find_library for HWLOC
+* :hpx-pr:`6357` - Replace Custom Benchmarking Code with Nanobench
 * :hpx-pr:`6356` - Fixed matrix multiplication example output
 * :hpx-pr:`6354` - Fix broken links for header files in Public API page
 * :hpx-pr:`6353` - Enable using std::reference_wrapper with executor parameters
@@ -192,6 +210,7 @@ Closed pull requests
 * :hpx-pr:`6320` - Fixing cyclic dependencies in naming and agas modules
 * :hpx-pr:`6319` - Generate git tag if needed but it is not available
 * :hpx-pr:`6317` - Fixing linker problem on FreeBSD
+* :hpx-pr:`6315` - acknowledge triv-rel and nothrow-rel types
 * :hpx-pr:`6314` - Relocation algorithms Clean
 * :hpx-pr:`6313` - Trivial relocation of c-v-ref-array types
 * :hpx-pr:`6312` - Fixing warning/error
@@ -202,6 +221,7 @@ Closed pull requests
 * :hpx-pr:`6306` - The hpxcxx script was broken such that it could only compile for _release
 * :hpx-pr:`6305` - Adapting build system for CMake V3.27
 * :hpx-pr:`6304` - Fixing an integral type mismatch warning
+* :hpx-pr:`6303` - omp for default vectorization
 * :hpx-pr:`6301` - Add MPI migration guide
 * :hpx-pr:`6294` - Add internal reference counting to semaphores
 * :hpx-pr:`6286` - Simd helpers
@@ -225,7 +245,11 @@ Closed pull requests
 * :hpx-pr:`6220` - Add execution on
 * :hpx-pr:`6212` - Initial trait definition for `relocatable`
 * :hpx-pr:`6199` - added support for unseq, par_unseq for hpx::make_heap algorithm
+* :hpx-pr:`6173` - C++ modules
+* :hpx-pr:`6122` - Add Module support
 * :hpx-pr:`6099` - Futures attempt to execute threads directly if those have not started executing
+* :hpx-pr:`6050` - Investigating partitioned_vector problems
 * :hpx-pr:`5988` - Adding CI configuration for DGX-A100 at LSU
 * :hpx-pr:`5910` - Improve MPI initialization
+* :hpx-pr:`5845` - Adding local work requesting scheduler that is based on message passing internally
 
