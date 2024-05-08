@@ -218,7 +218,7 @@ namespace hpx::parcelset::policies::openshmem {
 
             state_ = rcvd_chunks;
 
-            return true;
+            return done();
         }
 
         bool done() noexcept
@@ -242,7 +242,6 @@ namespace hpx::parcelset::policies::openshmem {
         connection_state state_;
 
         int src_;
-        int self_;
 
         header header_;
         buffer_type buffer_;
