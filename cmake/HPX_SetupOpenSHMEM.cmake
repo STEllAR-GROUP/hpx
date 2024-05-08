@@ -1145,7 +1145,6 @@ separate_arguments(OPENSHMEM_CFLAGS UNIX_COMMAND "${OPENSHMEM_CFLAGS}")
 separate_arguments(OPENSHMEM_LDFLAGS UNIX_COMMAND "${OPENSHMEM_LDFLAGS}")
 separate_arguments(OPENSHMEM_LIBRARY_DIRS UNIX_COMMAND "${OPENSHMEM_LIBRARY_DIRS}")
 
-
     set_target_properties(
       PkgConfig::OPENSHMEM PROPERTIES INTERFACE_COMPILE_OPTIONS
                                       ${OPENSHMEM_CFLAGS}
