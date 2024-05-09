@@ -1696,8 +1696,12 @@ hpx_option(
 include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
 include(TargetArch)
 target_architecture(__target_arch)
+
+include(CacheLineSize)
+cache_line_size(__cache_line_size)
 
 # ##############################################################################
 # Set configuration option to use Boost.Context or not. This depends on the
@@ -2020,6 +2024,7 @@ if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
 endif()
 
 # Diagnostics
+hpx_info("Cacheline size detected: ${__cache_line_size}")
 if(MSVC)
   # Display full paths in diagnostics
   hpx_add_compile_flag(-FC)

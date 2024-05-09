@@ -210,6 +210,7 @@ function(add_hpx_module libname modulename)
       "${global_config_file}" @ONLY
     )
     set(generated_headers ${generated_headers} ${global_config_file})
+
     # Global config defines file (different from the one for each module)
     set(global_config_file
         ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/defines.hpp
@@ -221,6 +222,17 @@ function(add_hpx_module libname modulename)
       FILENAME "${global_config_file}"
     )
     set(generated_headers ${generated_headers} ${global_config_file})
+
+    # Cacheline size definition
+    set(cache_line_size_file
+        ${CMAKE_CURRENT_BINARY_DIR}/include/hpx/config/cache_line_size.hpp
+    )
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/cache_line_size.hpp.in"
+      "${cache_line_size_file}" @ONLY
+    )
+    set(generated_headers ${generated_headers} ${cache_line_size_file})
+
   endif()
 
   # collect zombie generated headers
