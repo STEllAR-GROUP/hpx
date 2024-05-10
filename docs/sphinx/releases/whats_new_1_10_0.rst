@@ -97,6 +97,8 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`6485` - Destructive interference size
+* :hpx-pr:`6484` - Improve performance counter error handling
 * :hpx-pr:`6482` - Generalize the notion of bitwise serialization
 * :hpx-pr:`6481` - Fixing use of HPX_WITH_CXX_STANDARD
 * :hpx-pr:`6480` - Remove equal_to from hpx::any

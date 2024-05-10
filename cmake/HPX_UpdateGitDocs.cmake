@@ -128,7 +128,7 @@ if(HPX_WITH_GIT_TAG)
   # files to the "latest" directory. The regex only matches full version numbers
   # with three numerical components (X.Y.Z). It does not match release
   # candidates or other non-version tag names.
-  if("${HPX_WITH_GIT_TAG}" MATCHES "v^[0-9]+\\.[0-9]+\\.[0-9]+$")
+  if("${HPX_WITH_GIT_TAG}" MATCHES "v[0-9]+\\.[0-9]+\\.[0-9]+$")
     message("Updating latest directory")
     set(DOCS_LATEST_DEST "${HPX_BINARY_DIR}/docs/gh-pages/latest")
     file(REMOVE_RECURSE "${DOCS_LATEST_DEST}")
@@ -198,7 +198,7 @@ if(NOT "${git_diff_index_result}" EQUAL "0")
 
   # push everything up to github
   execute_process(
-    COMMAND "${GIT_EXECUTABLE}" push
+    COMMAND "${GIT_EXECUTABLE}" push --force
     WORKING_DIRECTORY "${HPX_BINARY_DIR}/docs/gh-pages"
     RESULT_VARIABLE git_push_result
     ERROR_VARIABLE git_pull_result_message COMMAND_ECHO STDERR
