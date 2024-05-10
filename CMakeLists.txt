@@ -2024,7 +2024,6 @@ if(HPX_WITH_COMPILER_WARNINGS_AS_ERRORS)
 endif()
 
 # Diagnostics
-hpx_info("Cacheline size detected: ${__cache_line_size}")
 if(MSVC)
   # Display full paths in diagnostics
   hpx_add_compile_flag(-FC)
@@ -2175,6 +2174,7 @@ else()
     )
   endif()
 endif()
+hpx_info("Cacheline size detected: ${__cache_line_size}")
 
 # store target architecture for later use
 set(HPX_WITH_TARGET_ARCHITECTURE

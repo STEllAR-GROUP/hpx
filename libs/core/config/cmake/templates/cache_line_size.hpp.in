@@ -14,4 +14,4 @@ namespace hpx::threads {
     {
         return @HPX_INTERNAL_CACHE_LINE_SIZE_DETECT@;
     }
-}    // namespace threads
+}    // namespace hpx::threads
