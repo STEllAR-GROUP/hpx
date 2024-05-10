@@ -308,7 +308,11 @@ private:
         static hpx::coroutine_handle<> await_suspend(
             hpx::coroutine_handle<_promise> h) noexcept
         {
+#ifdef HPX_HAVE_STDEXEC
+            return h.promise().continuation().handle();
+#else
             return h.promise().continuation();
+#endif
         }
         static void await_resume() noexcept {}
     };
@@ -337,7 +341,7 @@ private:
         using context_t =
             typename Context::template promise_context_t<_promise>;
         friend context_t tag_invoke(
-            hpx::execution::experimental::get_env_t, const _promise& self)
+            hpx::execution::experimental::get_env_t, const _promise& self) noexcept
         {
             return self.context_;
         }

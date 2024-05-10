@@ -108,6 +108,7 @@ struct void_sender
         }
     };
 
+
     template <typename R>
     friend operation_state<R> tag_invoke(
         hpx::execution::experimental::connect_t, void_sender, R&& r)
@@ -115,12 +116,15 @@ struct void_sender
         return {std::forward<R>(r)};
     }
 
+//    using completion_signatures = hpx::execution::experimental::completion_signatures<
+//        hpx::execution::experimental::set_value_t()>;
+
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         void_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
-            hpx::execution::experimental::set_value_t()>;
+            hpx::execution::experimental::set_value_t()> {};
 };
 
 template <typename... Ts>
@@ -697,15 +701,25 @@ struct custom_type_non_default_constructible_non_copyable
         custom_type_non_default_constructible_non_copyable const&) = delete;
 };
 
-struct example_scheduler
+template <typename Derived>
+struct example_scheduler_template
 {
     std::atomic<bool>& schedule_called;
     std::atomic<bool>& execute_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
+    example_scheduler_template(
+        std::atomic<bool>& schedule_called, std::atomic<bool>& execute_called,
+        std::atomic<bool>& tag_invoke_overload_called)
+      : schedule_called(schedule_called),
+        execute_called(execute_called),
+        tag_invoke_overload_called(tag_invoke_overload_called)
+    {
+    }
+
     template <typename F>
     friend void tag_invoke(
-        hpx::execution::experimental::execute_t, example_scheduler s, F&& f)
+        hpx::execution::experimental::execute_t, example_scheduler_template s, F&& f)
     {
         s.execute_called = true;
         HPX_INVOKE(std::forward<F>(f), );
@@ -714,6 +728,17 @@ struct example_scheduler
     struct my_sender
     {
         using is_sender = void;
+
+        friend env_with_scheduler<
+            std::conditional_t<std::is_void_v<Derived>,
+                example_scheduler_template,
+                Derived
+            >
+        > tag_invoke(
+            hpx::execution::experimental::get_env_t, my_sender const&) noexcept
+        {
+            return {};
+        }
 
         template <typename R>
         struct operation_state
@@ -744,22 +769,32 @@ struct example_scheduler
     };
 
     friend my_sender tag_invoke(
-        hpx::execution::experimental::schedule_t, example_scheduler s)
+        hpx::execution::experimental::schedule_t, example_scheduler_template s)
     {
         s.schedule_called = true;
         return {};
     }
 
-    bool operator==(example_scheduler const&) const noexcept
+    bool operator==(example_scheduler_template const&) const noexcept
     {
         return true;
     }
 
-    bool operator!=(example_scheduler const&) const noexcept
+    bool operator!=(example_scheduler_template const&) const noexcept
     {
         return false;
     }
+
+    template<typename D>
+    example_scheduler_template(example_scheduler_template<D> const& other)
+      : schedule_called(other.schedule_called),
+        execute_called(other.execute_called),
+        tag_invoke_overload_called(other.tag_invoke_overload_called)
+    {
+    }
 };
+
+using example_scheduler = example_scheduler_template<void>;
 
 struct scheduler2 : example_scheduler
 {
