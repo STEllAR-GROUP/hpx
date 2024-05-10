@@ -22,21 +22,33 @@ struct awaiter_1
 
 struct awaiter_2
 {
+#ifdef HPX_HAVE_STDEXEC
+    bool await_ready() {return false;}
+#else
     void await_ready() {}
+#endif
     void await_suspend(hpx::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_3
 {
+#ifdef HPX_HAVE_STDEXEC
+    bool await_ready() {return false;}
+#else
     void await_ready() {}
+#endif
     void await_suspend(hpx::coroutine_handle<>) {}
     void await_resume() {}
 };
 
 struct awaiter_4
 {
+#ifdef HPX_HAVE_STDEXEC
+    bool await_ready() {return false;}
+#else
     void await_ready() {}
+#endif
     bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
@@ -46,7 +58,11 @@ struct awaiter_4
 
 struct awaiter_5
 {
+#ifdef HPX_HAVE_STDEXEC
+    bool await_ready() {return false;}
+#else
     void await_ready() {}
+#endif
     bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;

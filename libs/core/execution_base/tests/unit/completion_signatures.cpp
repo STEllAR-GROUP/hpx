@@ -65,22 +65,49 @@ auto signature_all(Error, Values...)
     return {};
 }
 
+#ifdef HPX_HAVE_STDEXEC
+template <typename CompletionSignatures>
+struct test_helper {
+    struct my_sender {
+        using is_sender = void;
+        using completion_signatures = CompletionSignatures;
+    };
+
+    using value_types =
+        typename ex::value_types_of_t<my_sender, ex::empty_env, hpx::tuple, hpx::variant>;
+
+    using error_types =
+        typename ex::error_types_of_t<my_sender, ex::empty_env, hpx::variant>;
+
+    static inline constexpr bool sends_stopped =
+        ex::sends_stopped<my_sender, ex::empty_env>;
+};
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename... Values>
 void test_values(Values...)
 {
     using completion_signatures = decltype(signature_values(Values()...));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(!test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(!completion_signatures::sends_stopped);
+#endif
 
     static_assert(
         std::is_same_v<value_types, hpx::variant<hpx::tuple<Values...>>>);
     static_assert(std::is_same_v<error_types, hpx::variant<>>);
-    static_assert(!completion_signatures::sends_stopped);
 }
 
 template <typename Error>
@@ -88,30 +115,46 @@ void test_error(Error)
 {
     using completion_signatures = decltype(signature_error(Error()));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(!test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(!completion_signatures::sends_stopped);
+#endif
 
     static_assert(std::is_same_v<value_types, hpx::variant<>>);
     static_assert(std::is_same_v<error_types, hpx::variant<Error>>);
-    static_assert(!completion_signatures::sends_stopped);
 }
 
 void test_stopped()
 {
     using completion_signatures = decltype(signature_stopped());
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(completion_signatures::sends_stopped);
+#endif
 
     static_assert(std::is_same_v<value_types, hpx::variant<>>);
     static_assert(std::is_same_v<error_types, hpx::variant<>>);
-    static_assert(completion_signatures::sends_stopped);
 }
 
 template <typename Error, typename... Values>
@@ -120,16 +163,24 @@ void test_error_values(Error, Values...)
     using completion_signatures =
         decltype(signature_error_values(Error(), Values()...));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(!test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(!completion_signatures::sends_stopped);
+#endif
 
     static_assert(
         std::is_same_v<value_types, hpx::variant<hpx::tuple<Values...>>>);
     static_assert(std::is_same_v<error_types, hpx::variant<Error>>);
-    static_assert(!completion_signatures::sends_stopped);
 }
 
 template <typename... Values>
@@ -138,16 +189,24 @@ void test_values_stopped(Values...)
     using completion_signatures =
         decltype(signature_values_stopped(Values()...));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(completion_signatures::sends_stopped);
+#endif
 
     static_assert(
         std::is_same_v<value_types, hpx::variant<hpx::tuple<Values...>>>);
     static_assert(std::is_same_v<error_types, hpx::variant<>>);
-    static_assert(completion_signatures::sends_stopped);
 }
 
 template <typename Error>
@@ -155,15 +214,23 @@ void test_error_stopped(Error)
 {
     using completion_signatures = decltype(signature_error_stopped(Error()));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(completion_signatures::sends_stopped);
+#endif
 
     static_assert(std::is_same_v<value_types, hpx::variant<>>);
     static_assert(std::is_same_v<error_types, hpx::variant<Error>>);
-    static_assert(completion_signatures::sends_stopped);
 }
 
 template <typename Error, typename... Values>
@@ -171,16 +238,24 @@ void test_all(Error, Values...)
 {
     using completion_signatures = decltype(signature_all(Error(), Values()...));
 
+#ifdef HPX_HAVE_STDEXEC
+    using value_types =
+        typename test_helper<completion_signatures>::value_types;
+    using error_types =
+        typename test_helper<completion_signatures>::error_types;
+    static_assert(test_helper<completion_signatures>::sends_stopped);
+#else
     using value_types =
         typename completion_signatures::template value_types<hpx::tuple,
             hpx::variant>;
     using error_types =
         typename completion_signatures::template error_types<hpx::variant>;
+    static_assert(completion_signatures::sends_stopped);
+#endif
 
     static_assert(
         std::is_same_v<value_types, hpx::variant<hpx::tuple<Values...>>>);
     static_assert(std::is_same_v<error_types, hpx::variant<Error>>);
-    static_assert(completion_signatures::sends_stopped);
 }
 
 // clang-format off
@@ -205,6 +280,9 @@ using possibly_empty_variant_t =
 template <typename Signatures>
 struct sender_1
 {
+#ifdef HPX_HAVE_STDEXEC
+    using is_sender = void;
+#endif
     using completion_signatures = Signatures;
 };
 
@@ -216,12 +294,20 @@ void test_sender1(Signatures)
     sender_1<Signatures> s;
     static_assert(hpx::meta::value<
         ex::detail::has_completion_signatures<sender_1<Signatures>>>);
+
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(
+        std::is_same_v<decltype(ex::get_completion_signatures(s, ex::empty_env{})), Signatures>);
+#else
     static_assert(
         std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
+#endif
+
     static_assert(
         std::is_same_v<ex::completion_signatures_of_t<sender_1<Signatures>>,
             Signatures>);
 
+#ifndef HPX_HAVE_STDEXEC
     using value_types_of = ex::value_types_of_t<sender_1<Signatures>>;
     using value_types = possibly_empty_variant_t<
         typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
@@ -233,14 +319,22 @@ void test_sender1(Signatures)
         typename Signatures::template error_types<hpx::variant>>;
 
     static_assert(std::is_same_v<error_types_of, error_types>);
+#endif
 }
 
 template <typename Signatures>
 struct sender_2
 {
+#ifdef HPX_HAVE_STDEXEC
+    using is_sender = void;
+#endif
 };
 
+#ifdef HPX_HAVE_STDEXEC
+template <typename Signatures, typename Env = ex::empty_env>
+#else
 template <typename Signatures, typename Env = ex::no_env>
+#endif
 constexpr auto tag_invoke(ex::get_completion_signatures_t,
     sender_2<Signatures> const&, Env = Env{}) noexcept -> Signatures
 {
@@ -257,13 +351,21 @@ void test_sender2(Signatures)
         static_assert(
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>>);
-        static_assert(
-            std::is_same_v<decltype(ex::get_completion_signatures(s1)),
-                Signatures>);
+#ifdef HPX_HAVE_STDEXEC
+        static_assert(std::is_same_v<
+            decltype(ex::get_completion_signatures(s1, ex::empty_env{})),
+            Signatures>);
+#else
+        static_assert(std::is_same_v<
+            decltype(ex::get_completion_signatures(s1)),
+            Signatures>);
+#endif
+
         static_assert(
             std::is_same_v<ex::completion_signatures_of_t<sender_2<Signatures>>,
                 Signatures>);
 
+#ifndef HPX_HAVE_STDEXEC
         using value_types_of = ex::value_types_of_t<sender_2<Signatures>>;
         using value_types =
             possibly_empty_variant_t<typename Signatures::template value_types<
@@ -276,11 +378,27 @@ void test_sender2(Signatures)
             typename Signatures::template error_types<hpx::variant>>;
 
         static_assert(std::is_same_v<error_types_of, error_types>);
+#endif
     }
     {
+#ifdef HPX_HAVE_STDEXEC
+        static_assert(ex::is_sender_in_v<sender_2<Signatures>, ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<sender_2<Signatures>, ex::no_env>);
+#endif
 
         sender_2<Signatures> s2;
+#ifdef HPX_HAVE_STDEXEC
+        static_assert(
+            hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
+                sender_2<Signatures>, ex::empty_env>);
+        static_assert(
+            std::is_same_v<decltype(ex::get_completion_signatures(s2, ex::empty_env{})),
+                Signatures>);
+        static_assert(std::is_same_v<
+            ex::completion_signatures_of_t<sender_2<Signatures>, ex::empty_env>,
+            Signatures>);
+#else
         static_assert(
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>, ex::no_env>);
@@ -290,7 +408,9 @@ void test_sender2(Signatures)
         static_assert(std::is_same_v<
             ex::completion_signatures_of_t<sender_2<Signatures>, ex::no_env>,
             Signatures>);
+#endif
 
+#ifndef HPX_HAVE_STDEXEC
         using value_types_of =
             ex::value_types_of_t<sender_2<Signatures>, ex::no_env>;
         using value_types =
@@ -305,9 +425,11 @@ void test_sender2(Signatures)
             typename Signatures::template error_types<hpx::variant>>;
 
         static_assert(std::is_same_v<error_types_of, error_types>);
+#endif
     }
 }
 
+#ifndef HPX_HAVE_STDEXEC
 struct sender_3
 {
 };
@@ -318,6 +440,7 @@ void test_sender3()
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(s)),
         ex::detail::no_completion_signatures>);
 }
+#endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
@@ -348,7 +471,11 @@ struct promise
 
 struct awaiter
 {
+#ifdef HPX_HAVE_STDEXEC
+    bool await_ready() {return true;}
+#else
     void await_ready() {}
+#endif
     bool await_suspend(hpx::coroutine_handle<>)
     {
         return false;
@@ -384,22 +511,35 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     awaitable_sender_1<Awaiter> s;
     static_assert(!hpx::meta::value<ex::detail::has_completion_signatures<
                       awaitable_sender_1<Awaiter>>>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(
+        std::is_same_v<decltype(ex::get_completion_signatures(s, ex::empty_env{})), Signatures>);
+#else
     static_assert(
         std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
+#endif
     static_assert(std::is_same_v<
         ex::completion_signatures_of_t<awaitable_sender_1<Awaiter>>,
         Signatures>);
 
     using value_types_of = ex::value_types_of_t<awaitable_sender_1<Awaiter>>;
+    using error_types_of = ex::error_types_of_t<awaitable_sender_1<Awaiter>>;
+
+#ifdef HPX_HAVE_STDEXEC
+    struct sender_with_given_signatures {
+        using sender_concept = ex::sender_t;
+        using completion_signatures = Signatures;
+    };
+    using value_types = ex::value_types_of_t<sender_with_given_signatures>;
+    using error_types = ex::error_types_of_t<sender_with_given_signatures>;
+#else
     using value_types = possibly_empty_variant_t<
         typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
-
-    static_assert(std::is_same_v<value_types_of, value_types>);
-
-    using error_types_of = ex::error_types_of_t<awaitable_sender_1<Awaiter>>;
     using error_types = possibly_empty_variant_t<
         typename Signatures::template error_types<hpx::variant>>;
+#endif
 
+    static_assert(std::is_same_v<value_types_of, value_types>);
     static_assert(std::is_same_v<error_types_of, error_types>);
 }
 
@@ -544,15 +684,34 @@ int main()
         test_sender2(signature_all(std::exception_ptr(), int(), double()));
     }
 
+#ifndef HPX_HAVE_STDEXEC
     test_sender3();
+#endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
     {
+#ifdef HPX_HAVE_STDEXEC
+        test_awaitable_sender1(
+            ex::completion_signatures<
+                ex::set_value_t(),
+                ex::set_error_t(std::exception_ptr),
+                ex::set_stopped_t()>{},
+            hpx::suspend_always{});
+
+        test_awaitable_sender1(
+            ex::completion_signatures<
+                ex::set_value_t(bool),
+                ex::set_error_t(std::exception_ptr),
+                ex::set_stopped_t()>{},
+            awaiter{});
+#else
         test_awaitable_sender1(signature_error_values(std::exception_ptr()),
             hpx::suspend_always{});
+
         test_awaitable_sender1(
             signature_error_values(std::exception_ptr(), bool()), awaiter{});
+#endif
 
         // TODO: handle for awaitables that do not have co_await free/member
         // operator

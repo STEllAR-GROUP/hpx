@@ -7,17 +7,19 @@
 #include <hpx/modules/execution_base.hpp>
 #include <hpx/modules/testing.hpp>
 
+#include "algorithm_test_utils.hpp"
+
 namespace ex = hpx::execution::experimental;
 namespace tt = hpx::this_thread::experimental;
 
-struct example_scheduler
+struct this_test_example_scheduler
 {
 #ifdef HPX_HAVE_STDEXEC
     struct example_sender {
         using is_sender = void;
         using completion_signatures = ex::completion_signatures<>;
 
-        friend env_with_scheduler<example_scheduler> tag_invoke(ex::get_env_t, example_sender const&) noexcept
+        friend env_with_scheduler<this_test_example_scheduler> tag_invoke(ex::get_env_t, example_sender const&) noexcept
         {
             return {};
         }
@@ -25,23 +27,23 @@ struct example_scheduler
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    friend constexpr example_sender tag_invoke(ex::schedule_t, example_scheduler) noexcept { return {}; }
+    friend constexpr example_sender tag_invoke(ex::schedule_t, this_test_example_scheduler) noexcept { return {}; }
 #else
-    friend constexpr voiud tag_invoke(ex::schedule_t, example_scheduler) noexcept {}
+    friend constexpr voiud tag_invoke(ex::schedule_t, this_test_example_scheduler) noexcept {}
 #endif
 
     friend constexpr bool tag_invoke(
-        tt::execute_may_block_caller_t, example_scheduler) noexcept
+        tt::execute_may_block_caller_t, this_test_example_scheduler) noexcept
     {
         return false;
     }
 
-    friend constexpr bool operator==(example_scheduler, example_scheduler) noexcept
+    friend constexpr bool operator==(this_test_example_scheduler, this_test_example_scheduler) noexcept
     {
         return true;
     }
 
-    friend constexpr bool operator!=(example_scheduler, example_scheduler) noexcept
+    friend constexpr bool operator!=(this_test_example_scheduler, this_test_example_scheduler) noexcept
     {
         return false;
     }
@@ -49,10 +51,10 @@ struct example_scheduler
 
 int main()
 {
-    static_assert(ex::is_scheduler_v<example_scheduler>);
+    static_assert(ex::is_scheduler_v<this_test_example_scheduler>);
 
     {
-        constexpr example_scheduler s1{};
+        constexpr this_test_example_scheduler s1{};
         static_assert(
             !tt::execute_may_block_caller(s1), "CPO should return false");
     }

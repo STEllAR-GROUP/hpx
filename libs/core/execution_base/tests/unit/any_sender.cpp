@@ -264,13 +264,21 @@ void test_any_sender(F&& f, Ts&&... ts)
     ex::any_sender<std::decay_t<Ts>...> as1{s};
 
     static_assert(ex::is_sender_v<decltype(as1)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as1), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
+#endif
 
 
     auto as2 = as1;
 
     static_assert(ex::is_sender_v<decltype(as2)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as2), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
     check_error_types<hpx::variant<std::exception_ptr>>(as2);
@@ -360,7 +368,11 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
     ex::unique_any_sender<std::decay_t<Ts>...> as1{std::move(s)};
 
     static_assert(ex::is_sender_v<decltype(as1)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as1), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as1);
     check_error_types<hpx::variant<std::exception_ptr>>(as1);
@@ -369,7 +381,11 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
     auto as2 = std::move(as1);
 
     static_assert(ex::is_sender_v<decltype(as2)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as2), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
     check_error_types<hpx::variant<std::exception_ptr>>(as2);
@@ -566,9 +582,15 @@ void test_globals()
     // ex::unique_any_sender<int> s1{non_copyable_sender<int>{42}};
     // auto s2 = std::move(s1) | ex::then([](int x) {HPX_TEST_EQ(x, 42);});
     // auto s3 = ex::ensure_started(std::move(s2));
-//    global_unique_any_sender =
-//        std::move(global_unique_any_sender) | ex::ensure_started();
-//    global_any_sender = std::move(global_any_sender) | ex::ensure_started();
+    global_unique_any_sender =
+        std::move(global_unique_any_sender) | ex::ensure_started();
+#ifdef HPX_HAVE_STDEXEC
+    // P2300R8's ensure started returns non-copyable senders, so we need to split
+    // to pass it to a global_any_sender.
+    global_any_sender = std::move(global_any_sender) | ex::ensure_started() | ex::split();
+#else
+    global_any_sender = std::move(global_any_sender) | ex::ensure_started();
+#endif
 }
 
 int main()
