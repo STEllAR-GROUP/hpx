@@ -14,6 +14,7 @@
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/auto_vectorization.hpp>
 #include <hpx/config/branch_hints.hpp>
+#include <hpx/config/cache_line_size.hpp>
 #include <hpx/config/compiler_fence.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
