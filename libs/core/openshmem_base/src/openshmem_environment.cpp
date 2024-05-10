@@ -360,6 +360,7 @@ namespace hpx::util {
     }
 
     struct ucx {};
+    struct sos {};
     struct mpi {};
     struct err {};
 
@@ -404,13 +405,35 @@ namespace hpx::util {
             return sig_idx;
         }	    
     };
+
+#endif
+
+#if defined(SHMEM_H)
+    template<>
+    struct wait_until_any_wrapper<sos> {
+        std::size_t operator()(unsigned int * addr, const std::size_t count, const std::uint8_t value) {
+	    const std::size_t sig_idx =
+                shmem_uint_wait_until_any
+            (
+                addr,
+                count,
+                nullptr,
+                SHMEM_CMP_EQ,
+                value
+            );
+
+            return sig_idx;
+        }
+    };
 #endif
 
     std::size_t openshmem_environment::wait_until_any(const std::uint8_t value, std::uint8_t * sigaddr, const std::size_t count) {
 #if defined(SHMEM_VENDOR_STRING)
 	using tag = std::conditional< std::integral_constant<bool, vendor_strings_equal(SHMEM_VENDOR_STRING,"osss-ucx")>::value, ucx, 
-            std::conditional< std::integral_constant<bool, vendor_strings_equal(SHMEM_VENDOR_STRING,"http://www.open-mpi.org/")>::value, mpi, err>::type
-        >::type;
+            std::conditional< std::integral_constant<bool, vendor_strings_equal(SHMEM_VENDOR_STRING,"http://www.open-mpi.org/")>::value, mpi,
+                std::conditional< std::integral_constant<bool, vendor_strings_equal(SHMEM_VENDOR_STRING,"Sandia OpenSHMEM")>::value, sos, err>::type
+            >::type
+	>::type;
 	using wait_until_any_type = wait_until_any_wrapper<tag>;
 #else
         #define SHMEM_VENDOR_STRING "SHMEM_VENDOR_STRING not defined"
