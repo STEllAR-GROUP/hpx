@@ -70,7 +70,7 @@ Hello, World!
 
 To get started with this minimal example you need to create a new project
 directory and a file ``CMakeLists.txt`` with the contents below in order to
-build an executable using |cmake| and |hpx|:
+build an executable using |cmake|_ and |hpx|:
 
 .. code-block:: cmake
 

@@ -18,13 +18,13 @@ General changes
   documenting the public local HPX API, we have added migration guides from widely
   used parallelization platforms to HPX (OpenMP, TBB, and MPI).
 - We have added facilities enabling optimizations for trivially-relocatable types
-  (see |cpp26_p1144| for more details).
+  (see |cpp26_p1144|_ for more details).
 - We have added (and use) the ``scope_xxx`` helper facilities as specified by the
-  C++ library fundamentals TS v3 (see: |cpp26_n4948|).
+  C++ library fundamentals TS v3 (see: |cpp26_n4948|_).
 - We have added configuration options that allow to build HPX without pre-installing
-  any prerequisites. Use ``HPX_WITH_FETCH_HWLOC=On`` to have __hwloc__ installed for
+  any prerequisites. Use ``HPX_WITH_FETCH_HWLOC=On`` to have |hwloc|_ installed for
   you. Similarly, setting ``HPX_WITH_FETCH_BOOST=On`` during configuration time will
-  install the necessary Boost libraries (currently V1.84.0).
+  install the necessary |boost|_ libraries (currently V1.84.0).
 - We have performed a lot of code cleanup and refactoring to improve the overall
   code quality and decrease compile times.
 - The collective operations APIs have seen an unification, we have fixed issues and
@@ -45,16 +45,16 @@ General changes
   ``HPX_COMMAND_LINE_HANDLING_WITH_JSON_CONFIGURATION_FILES=On``. This functionality
   depends on the external `JSon library <https://github.com/nlohmann/json>`_, which
   can be built at configuration time by supplying ``HPX_WITH_FETCH_JSON=On`` to
-  __cmake__.
+  |cmake|_.
 - We have applied many fixes to our CUDA, ROCm, and SYCL build environments.
 
 Breaking changes
 ================
 
-- The |cmake| configuration keys ``SOMELIB_ROOT`` (e.g., ``BOOST_ROOT``) have been
+- The |cmake|_ configuration keys ``SOMELIB_ROOT`` (e.g., ``BOOST_ROOT``) have been
   renamed to ``Somelib_ROOT`` (e.g., ``Boost_ROOT``) to avoid warnings when using
-  newer versions of |cmake|. Please update your scripts accordingly. For now, the
-  old variable names are re-assigned to the new names and unset in the |cmake|
+  newer versions of |cmake|_. Please update your scripts accordingly. For now, the
+  old variable names are re-assigned to the new names and unset in the |cmake|_
   cache.
 
 Closed issues
