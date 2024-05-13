@@ -132,6 +132,11 @@ namespace hpx::agas::server {
     }
 
     // migration of the given object is complete
+    // 26115: Failing to release lock 'this->mutex_' in function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
     bool primary_namespace::end_migration(naming::gid_type const& id)
     {
         util::scoped_timer<std::atomic<std::int64_t>> update(
@@ -160,6 +165,9 @@ namespace hpx::agas::server {
 
         return true;
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     // wait if given object is currently being migrated
     void primary_namespace::wait_for_migration_locked(

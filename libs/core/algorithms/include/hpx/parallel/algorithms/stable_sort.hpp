@@ -1,5 +1,5 @@
 //  Copyright (c) 2015-2017 Francisco Jose Tapia
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //  Copyright (c) 2021 Akhil J Nair
 //
 //  SPDX-License-Identifier: BSL-1.0

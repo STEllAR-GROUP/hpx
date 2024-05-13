@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -60,10 +60,11 @@ namespace hpx::plugins::parcel {
         void register_action(std::string const& name);
 
         void register_action(std::string const& name,
-            get_counter_type num_parcels, get_counter_type num_messages,
-            get_counter_type time_between_parcels,
-            get_counter_type average_time_between_parcels,
-            get_counter_values_creator_type
+            get_counter_type const& num_parcels,
+            get_counter_type const& num_messages,
+            get_counter_type const& time_between_parcels,
+            get_counter_type const& average_time_between_parcels,
+            get_counter_values_creator_type const&
                 time_between_parcels_histogram_creator);
 
         get_counter_type get_parcels_counter(std::string const& name) const;

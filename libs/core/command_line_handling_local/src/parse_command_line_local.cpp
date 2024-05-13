@@ -444,6 +444,42 @@ namespace hpx::local::detail {
         return true;
     }
 
+    // Special type to be able to enforce an argument value if a parameter
+    // that should normally be specified only once has been used with the
+    // --hpx:arg=!value syntax to override any other possibly provided
+    // argument value.
+    struct argument_string : std::string
+    {
+        using std::string::string;
+    };
+
+    void validate(hpx::any_nonser& v, std::vector<std::string> const& xs,
+        argument_string* t, int)
+    {
+        // check whether we should override any existing values
+        if (v.has_value())
+        {
+            // if the previous value has a '!' prepended, then discard the
+            // current argument
+            std::string const& arg = any_cast<std::string>(v);
+            if (!arg.empty() && arg[0] == '!')
+            {
+                return;
+            }
+
+            // if the current argument has a '!' prepended, then we discard the
+            // previous value
+            if (!xs[0].empty() && xs[0][0] == '!')
+            {
+                // discard any existing value
+                v = hpx::any_nonser();
+            }
+        }
+
+        // do normal validation
+        program_options::validate(v, xs, static_cast<std::string*>(t), 0);
+    }
+
     options_map compose_local_options()
     {
         using hpx::program_options::value;
@@ -520,7 +556,7 @@ namespace hpx::local::detail {
                 "the number of cores to utilize for this HPX "
                 "locality (default: 'all', i.e. the number of cores is based "
                 "on the number of total cores in the system)")
-            ("hpx:queuing", value<std::string>(),
+            ("hpx:queuing", value<argument_string>(),
                 "the queue scheduling policy to use, options are "
                 "'local', 'local-priority-fifo','local-priority-lifo', "
                 "'abp-priority-fifo', 'abp-priority-lifo', 'static', "

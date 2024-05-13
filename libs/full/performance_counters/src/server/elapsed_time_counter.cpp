@@ -101,34 +101,30 @@ namespace hpx::performance_counters::detail {
     naming::gid_type uptime_counter_creator(
         counter_info const& info, error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != counter_type::elapsed_time)
         {
-        case counter_type::elapsed_time:
-        {
-            // verify the validity of the counter instance name
-            counter_path_elements paths;
-            get_counter_path_elements(info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            // allowed counter names: /runtime(locality#%d/*)/uptime
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "uptime_counter_creator",
-                    "invalid counter instance parent name: {}",
-                    paths.parentinstancename_);
-                return naming::invalid_gid;
-            }
-
-            // create the counter
-            return create_counter(info, ec);
-        }
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "uptime_counter_creator", "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        // verify the validity of the counter instance name
+        counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        // allowed counter names: /runtime(locality#%d/*)/uptime
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "uptime_counter_creator",
+                "invalid counter instance parent name: {}",
+                paths.parentinstancename_);
+            return naming::invalid_gid;
+        }
+
+        // create the counter
+        return create_counter(info, ec);
     }
 }    // namespace hpx::performance_counters::detail

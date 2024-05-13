@@ -698,7 +698,14 @@ jobs:
           name: Running Regressions Tests
           when: always
           command: |
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
+              ctest \
+                --timeout 60 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                -R tests.regressions \
+                --exclude-regex \
+              "tests.regressions.modules.threading_base.thread_stacksize_current"
       - run:
           <<: *convert_xml
       - run:

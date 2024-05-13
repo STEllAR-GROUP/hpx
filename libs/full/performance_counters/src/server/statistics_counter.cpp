@@ -755,57 +755,50 @@ namespace hpx::performance_counters::detail {
     naming::gid_type statistics_counter_creator(
         counter_info const& info, error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != counter_type::aggregating)
         {
-        case counter_type::aggregating:
-        {
-            counter_path_elements paths;
-            get_counter_path_elements(info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "statistics_counter_creator", "invalid counter type requested");
+            return naming::invalid_gid;
+        }
 
-            if (!paths.parentinstance_is_basename_)
+        counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (!paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "statistics_counter_creator",
+                "invalid aggregate counter "
+                "name (instance name must be valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        std::string base_name;
+        get_counter_name(paths.parentinstancename_, base_name, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        std::vector<std::size_t> parameters;
+        if (!paths.parameters_.empty())
+        {
+            // try to interpret the additional parameters
+            namespace x3 = boost::spirit::x3;
+            if (!x3::parse(paths.parameters_.begin(), paths.parameters_.end(),
+                    x3::uint_ % ',', parameters))
             {
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "statistics_counter_creator",
-                    "invalid aggregate counter "
-                    "name (instance name must be valid base counter name)");
+                    "invalid parameter specification format for "
+                    "this counter: {}",
+                    paths.parameters_);
                 return naming::invalid_gid;
             }
-
-            std::string base_name;
-            get_counter_name(paths.parentinstancename_, base_name, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            std::vector<std::size_t> parameters;
-            if (!paths.parameters_.empty())
+            if (paths.countername_.find("rolling") != std::string::npos)
             {
-                // try to interpret the additional parameters
-                namespace x3 = boost::spirit::x3;
-                if (!x3::parse(paths.parameters_.begin(),
-                        paths.parameters_.end(), x3::uint_ % ',', parameters))
-                {
-                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "statistics_counter_creator",
-                        "invalid parameter specification format for "
-                        "this counter: {}",
-                        paths.parameters_);
-                    return naming::invalid_gid;
-                }
-                if (paths.countername_.find("rolling") != std::string::npos)
-                {
-                    if (parameters.size() > 3)
-                    {
-                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                            "statistics_counter_creator",
-                            "too many parameter specifications for "
-                            "this counter: {}",
-                            paths.parameters_);
-                        return naming::invalid_gid;
-                    }
-                }
-                else if (parameters.size() > 2)
+                if (parameters.size() > 3)
                 {
                     HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                         "statistics_counter_creator",
@@ -815,25 +808,28 @@ namespace hpx::performance_counters::detail {
                     return naming::invalid_gid;
                 }
             }
-            else if (paths.countername_.find("rolling") != std::string::npos)
+            else if (parameters.size() > 2)
             {
-                parameters.push_back(1000);    // sample interval
-                parameters.push_back(10);      // rolling window
-                parameters.push_back(0);       // don't reset underlying counter
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "statistics_counter_creator",
+                    "too many parameter specifications for "
+                    "this counter: {}",
+                    paths.parameters_);
+                return naming::invalid_gid;
             }
-            else
-            {
-                parameters.push_back(1000);    // sample interval
-                parameters.push_back(0);       // don't reset underlying counter
-            }
-            return create_statistics_counter(info, base_name, parameters, ec);
         }
-        break;
+        else if (paths.countername_.find("rolling") != std::string::npos)
+        {
+            parameters.push_back(1000);    // sample interval
+            parameters.push_back(10);      // rolling window
+            parameters.push_back(0);       // don't reset underlying counter
+        }
+        else
+        {
+            parameters.push_back(1000);    // sample interval
+            parameters.push_back(0);       // don't reset underlying counter
+        }
 
-        default:
-            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                "statistics_counter_creator", "invalid counter type requested");
-            return naming::invalid_gid;
-        }
+        return create_statistics_counter(info, base_name, parameters, ec);
     }
 }    // namespace hpx::performance_counters::detail
