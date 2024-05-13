@@ -49,7 +49,7 @@ namespace hpx::plugins::parcel {
             get_counter_type average_time_between_parcels;
             get_counter_values_creator_type
                 time_between_parcels_histogram_creator;
-            std::int64_t min_boundary, max_boundary, num_buckets;
+            std::int64_t min_boundary = 0, max_boundary = 0, num_buckets = 0;
         };
 
         using map_type = std::unordered_map<std::string, counter_functions,

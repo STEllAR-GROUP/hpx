@@ -1270,7 +1270,15 @@ namespace hpx::threads {
                 }
             }
         }
+        // 26819: Unannotated fallthrough between switch labels
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26819)
+#endif
         break;
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         default:
             HPX_ASSERT(false);

@@ -96,6 +96,7 @@ namespace hpx::lockfree {
 
             explicit node_data(handle_type null_handle) noexcept
               : next(tagged_node_handle(null_handle, 0))
+              , data()
             {
             }
 

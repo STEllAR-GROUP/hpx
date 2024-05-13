@@ -425,7 +425,7 @@ namespace hpx {
                 copy_from(rhs);
         }
 
-        partitioned_vector(partitioned_vector&& rhs)
+        partitioned_vector(partitioned_vector&& rhs) noexcept
           : base_type(HPX_MOVE(rhs))
           , size_(rhs.size_)
           , partition_size_(rhs.partition_size_)
@@ -479,7 +479,7 @@ namespace hpx {
             return *this;
         }
 
-        partitioned_vector& operator=(partitioned_vector&& rhs)
+        partitioned_vector& operator=(partitioned_vector&& rhs) noexcept
         {
             if (this != &rhs)
             {

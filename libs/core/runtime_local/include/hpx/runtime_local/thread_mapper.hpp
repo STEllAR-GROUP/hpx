@@ -61,19 +61,19 @@ namespace hpx::util {
             std::thread::id id_;
 
             // the native_handle() of the associated thread
-            std::uint64_t tid_;
+            std::uint64_t tid_ = 0;
 
 #if defined(HPX_HAVE_PAPI) && defined(__linux__) && !defined(__ANDROID) &&     \
     !defined(ANDROID)
             // the Linux thread id (required by PAPI)
-            pid_t linux_tid_;
+            pid_t linux_tid_ = 0;
 #endif
 
             // callback function invoked when unregistering a thread
             thread_mapper_callback_type cleanup_;
 
             // type of this OS thread in the context of the runtime
-            runtime_local::os_thread_type type_;
+            runtime_local::os_thread_type type_ = os_thread_type::unknown;
         };
     }    // namespace detail
 

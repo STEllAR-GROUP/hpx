@@ -751,6 +751,11 @@ namespace hpx::agas::server {
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////////
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void primary_namespace::resolve_free_list(std::unique_lock<mutex_type>& l,
         std::list<refcnt_table_type::iterator> const& free_list,
         free_entry_list_type& free_entry_list,
@@ -839,6 +844,9 @@ namespace hpx::agas::server {
             refcnts_.erase(it);
         }
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     void primary_namespace::decrement_sweep(
@@ -1035,6 +1043,11 @@ namespace hpx::agas::server {
         return resolve_gid_locked_non_local(l, gid, ec);
     }
 
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     primary_namespace::resolved_type
     primary_namespace::resolve_gid_locked_non_local(
         std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
@@ -1125,6 +1138,9 @@ namespace hpx::agas::server {
 
         return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
 #if defined(HPX_HAVE_NETWORKING)
     void (*route)(primary_namespace& server, parcelset::parcel&& p) = nullptr;
