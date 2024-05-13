@@ -79,7 +79,7 @@ jobs:
       with:
         # filter out all files from downloaded dependencies
         patterns: |
-          -**/_deps/*
+          -**/_deps/**
         input: sarif-results/cpp.sarif
         output: sarif-results/cpp.sarif
 
