@@ -15,8 +15,10 @@
 
 namespace hpx::this_thread::experimental {
     using hpx::execution::experimental::sync_wait_t;
+    using hpx::execution::experimental::sync_wait;
 
-    sync_wait_t const sync_wait{};
+    using hpx::execution::experimental::sync_wait_with_variant_t;
+    using hpx::execution::experimental::sync_wait_with_variant;
 }
 #else
 

@@ -33,7 +33,11 @@ int main()
         auto s = ex::just();
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
 #ifdef HPX_HAVE_STDEXEC
@@ -56,7 +60,11 @@ int main()
         auto s = ex::just(3);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
 #ifdef HPX_HAVE_STDEXEC
@@ -79,7 +87,11 @@ int main()
         auto s = ex::just(x);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
 #ifdef HPX_HAVE_STDEXEC
         // the just sender decay-copies the value in STDEXEC instead of
@@ -104,7 +116,11 @@ int main()
         auto s = ex::just(custom_type_non_default_constructible{42});
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
@@ -128,7 +144,11 @@ int main()
         auto s = ex::just(x);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
 #ifdef HPX_HAVE_STDEXEC
         check_value_types<
@@ -156,7 +176,11 @@ int main()
             ex::just(custom_type_non_default_constructible_non_copyable{42});
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
@@ -180,7 +204,11 @@ int main()
         auto s = ex::just(std::move(x));
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
@@ -203,7 +231,11 @@ int main()
         auto s = ex::just(std::string("hello"), 3);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);
 #ifdef HPX_HAVE_STDEXEC
@@ -230,7 +262,11 @@ int main()
         auto s = ex::just(str, x);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
 #ifdef HPX_HAVE_STDEXEC
         check_value_types<hpx::variant<hpx::tuple<std::string, int>>>(s);

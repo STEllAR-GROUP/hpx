@@ -18,15 +18,6 @@
 
 namespace hpx::execution::experimental {
     using namespace exec;
-    using std::execution::no_env;
-
-    template <typename Env>
-    struct is_no_env : std::is_same<std::decay_t<Env>, no_env>
-    {
-    };
-
-    template <typename Env>
-    inline constexpr bool is_no_env_v = is_no_env<Env>::value;
 }
 #else
 

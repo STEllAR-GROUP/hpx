@@ -240,7 +240,11 @@ struct callback_receiver
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
 
+#ifdef HPX_HAVE_STDEXEC
+    using is_receiver = void;
+#else
     struct is_receiver{};
+#endif
 
     template <typename E>
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -795,7 +799,15 @@ struct example_scheduler_template
 };
 
 using example_scheduler = example_scheduler_template<void>;
-
+#ifdef HPX_HAVE_STDEXEC
+struct scheduler2 : example_scheduler_template<scheduler2>
+{
+    explicit scheduler2(example_scheduler s)
+      : example_scheduler_template<scheduler2>(std::move(s))
+    {
+    }
+};
+#else
 struct scheduler2 : example_scheduler
 {
     explicit scheduler2(example_scheduler s)
@@ -803,6 +815,7 @@ struct scheduler2 : example_scheduler
     {
     }
 };
+#endif
 
 namespace tag_namespace {
 
@@ -841,10 +854,14 @@ namespace my_namespace {
         void operator()(std::exception_ptr) const {}
     };
 
-    struct my_scheduler
+    template<int...>
+    struct my_scheduler_template
     {
         struct my_sender
         {
+#ifdef HPX_HAVE_STDEXEC
+            using sender_concept = hpx::execution::experimental::sender_t;
+#endif
             template <typename R>
             struct operation_state
             {
@@ -863,14 +880,22 @@ namespace my_namespace {
             {
                 return operation_state<R>{std::forward<R>(r)};
             }
-
-            friend my_scheduler tag_invoke(
+#ifdef HPX_HAVE_STDEXEC
+            friend env_with_scheduler<my_scheduler_template> tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                my_sender const&) noexcept
+            {
+                return {};
+            }
+#else
+            friend my_scheduler_template tag_invoke(
                 hpx::execution::experimental::get_completion_scheduler_t<
                     hpx::execution::experimental::set_value_t>,
                 my_sender const&) noexcept
             {
                 return {};
             }
+#endif
 
             template <typename Env>
             friend auto tag_invoke(
@@ -881,21 +906,23 @@ namespace my_namespace {
         };
 
         friend my_sender tag_invoke(
-            hpx::execution::experimental::schedule_t, my_scheduler)
+            hpx::execution::experimental::schedule_t, my_scheduler_template)
         {
             return {};
         }
 
-        bool operator==(my_scheduler const&) const noexcept
+        bool operator==(my_scheduler_template const&) const noexcept
         {
             return true;
         }
 
-        bool operator!=(my_scheduler const&) const noexcept
+        bool operator!=(my_scheduler_template const&) const noexcept
         {
             return false;
         }
     };
+
+    using my_scheduler = my_scheduler_template<>;
 
     struct my_sender
     {
