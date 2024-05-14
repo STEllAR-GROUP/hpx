@@ -99,6 +99,7 @@ Closed pull requests
 
 * :hpx-pr:`6491` - More fixes to handling bool arguments for collective operations
 * :hpx-pr:`6490` - Remove the default max cpu count
+* :hpx-pr:`6489` - Ensure TCP parcelport is deactivated if not needed
 * :hpx-pr:`6488` - Fixing handling of bool value type for collective operations
 * :hpx-pr:`6485` - Destructive interference size
 * :hpx-pr:`6484` - Improve performance counter error handling
