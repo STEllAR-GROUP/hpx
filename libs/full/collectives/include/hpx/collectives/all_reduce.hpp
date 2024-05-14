@@ -172,8 +172,11 @@ namespace hpx::traits {
                     {
                         // compute reduction result only once
                         auto it = data.begin();
-                        data[0] = hpx::reduce(
-                            ++it, data.end(), data[0], HPX_FORWARD(F, op));
+                        data[0] = Communicator::template handle_bool<
+                            std::decay_t<T>>(hpx::reduce(++it, data.end(),
+                            Communicator::template handle_bool<std::decay_t<T>>(
+                                data[0]),
+                            HPX_FORWARD(F, op)));
                         data_available = true;
                     }
                     return Communicator::template handle_bool<std::decay_t<T>>(
