@@ -8,10 +8,41 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/async_base/dataflow.hpp>
+
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
+
+namespace hpx::execution::experimental {
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(
+        hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
+    -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
+                              HPX_FORWARD(Senders, senders)...),
+                     HPX_FORWARD(F, f)))
+    {
+        return hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+                    HPX_FORWARD(F, f));
+    }
+
+    template <typename F, typename Sender, typename... Senders>
+    constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
+                                              hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
+    -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
+                              HPX_FORWARD(Senders, senders)...),
+                     HPX_FORWARD(F, f)))
+    {
+        return hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
+                             HPX_FORWARD(Senders, senders)...),
+                    HPX_FORWARD(F, f));
+    }
+}    // namespace hpx::execution::experimental
 #else
-#include <hpx/async_base/dataflow.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>

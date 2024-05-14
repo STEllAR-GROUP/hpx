@@ -32,7 +32,11 @@ int main()
         auto s = ex::just_error(std::runtime_error("error"));
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<>>(s);
 #ifdef HPX_HAVE_STDEXEC

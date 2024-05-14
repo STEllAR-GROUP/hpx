@@ -10,7 +10,7 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
-#endif
+#else
 
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
@@ -166,3 +166,5 @@ namespace hpx::execution::experimental {
         }
     } read{};
 }    // namespace hpx::execution::experimental
+
+#endif

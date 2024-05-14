@@ -87,6 +87,10 @@ namespace hpx::execution_base {
 #include <hpx/execution_base/stdexec_forward.hpp>
 namespace hpx::this_thread::experimental {
     using namespace std::this_thread;
+    using stdexec::execute_may_block_caller_t;
+    using stdexec::execute_may_block_caller;
+
+    // this_thread::sync_wait is loaded in the sync_wait.hpp file.
 }
 #else
 namespace hpx::this_thread::experimental {

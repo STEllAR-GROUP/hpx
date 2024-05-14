@@ -20,59 +20,6 @@
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/pack.hpp>
 
-using namespace hpx::meta;
-
-template<int i>
-using num = std::integral_constant<int, i>;
-
-struct smelly{};
-
-using hpx::util::detail::append_t;
-
-template<typename odd_pack, typename even_pack, bool found_19>
-struct odd_stable_partition_state {
-    using _odd_pack = odd_pack;
-    using _even_pack = even_pack;
-    static inline constexpr bool _found_19 = found_19;
-};
-
-template<bool odd>
-struct odd_stable_partition {
-    static inline constexpr bool _odd = odd;
-
-    template <typename state, typename new_value>
-    using apply = odd_stable_partition_state<
-        std::conditional_t<
-            new_value::value % 2 == state::_odd,
-            append_t<typename state::_odd_pack, new_value>,
-            typename state::_odd_pack
-            >,
-        std::conditional_t<
-            new_value::value % 2 != _odd,
-            append_t<typename state::_even_pack, new_value>,
-            typename state::_even_pack
-            >,
-        state::_found_19 || new_value::value == 19
-        >;
-};
-
-
-using inp = invoke<
-                right_fold<
-                    odd_stable_partition<true>,
-                    odd_stable_partition_state<hpx::meta::pack<>, hpx::meta::pack<>, false>
-                >,
-                num<1>, num<2>, num<-1>
-    >;
-
-static_assert(std::is_same_v<smelly, inp>);
-
-
-
-int main() {}
-
-#if 0
-
 namespace ex = hpx::execution::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
@@ -97,7 +44,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -122,7 +73,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -147,7 +102,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif        
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
@@ -175,7 +134,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
@@ -201,7 +164,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -225,7 +192,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -247,7 +218,11 @@ int main()
         HPX_TEST(tag_invoke_overload_called);
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<>>(s);
@@ -267,7 +242,11 @@ int main()
         static_assert(std::same_as<decltype([](){return void_sender();}()), void_sender>);
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -310,7 +289,11 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
+#ifdef HPX_HAVE_STDEXEC        
+        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
+#endif        
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -330,4 +313,3 @@ int main()
 
     return hpx::util::report_errors();
 }
-#endif

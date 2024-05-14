@@ -42,7 +42,7 @@ namespace mylib {
     inline constexpr struct receiver_env_t final
         : ex::forwarding_query_t {
         template <typename Env>
-            requires std::tag_invocable<receiver_env_t, Env>
+            requires ex::tag_invocable<receiver_env_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::tag_invoke(*this, e);
@@ -112,7 +112,7 @@ namespace mylib {
     inline constexpr struct receiver_env1_t final
         : ex::forwarding_query_t {
         template <typename Env>
-            requires std::tag_invocable<receiver_env1_t, Env>
+            requires ex::tag_invocable<receiver_env1_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::tag_invoke(*this, e);
@@ -158,6 +158,7 @@ namespace mylib {
 int main()
 {
     using ex::empty_env;
+#ifndef HPX_HAVE_STDEXEC
     using ex::is_no_env_v;
     using ex::no_env;
 
@@ -167,6 +168,7 @@ int main()
         "no_env is a (possibly cv-qualified) no_env");
     static_assert(!is_no_env_v<some_env>,
         "some_env is not a (possibly cv-qualified) no_env");
+#endif
 
     {
         mylib::receiver_1 rcv;
