@@ -187,7 +187,9 @@ namespace hpx::traits {
 
                         // first value is not taken into account
                         auto it = data.begin();
-                        hpx::exclusive_scan(it, data.end(), dest.begin(), *it,
+                        hpx::exclusive_scan(it, data.end(), dest.begin(),
+                            Communicator::template handle_bool<std::decay_t<T>>(
+                                *it),
                             HPX_FORWARD(F, op));
 
                         std::swap(data, dest);
