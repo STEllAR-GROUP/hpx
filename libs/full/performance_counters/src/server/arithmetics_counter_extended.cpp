@@ -275,74 +275,67 @@ HPX_DEFINE_GET_COMPONENT_TYPE(count_arithmetics_counter_type::wrapped_type)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::performance_counters::detail {
 
-    /// Creation function for aggregating performance counters to be registered
-    /// with the counter types.
+    // Creation function for aggregating performance counters to be registered
+    // with the counter types.
     naming::gid_type arithmetics_counter_extended_creator(
         counter_info const& info, error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != counter_type::aggregating)
         {
-        case counter_type::aggregating:
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "arithmetics_counter_extended_creator",
+                "invalid counter type requested");
+            return naming::invalid_gid;
+        }
+
+        counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (!paths.parameters_.empty())
         {
-            counter_path_elements paths;
-            get_counter_path_elements(info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
+            // try to interpret the additional parameter as a list of
+            // two performance counter names
+            std::vector<std::string> names;
+            hpx::string_util::split(
+                names, paths.parameters_, hpx::string_util::is_any_of(","));
 
-            if (!paths.parameters_.empty())
-            {
-                // try to interpret the additional parameter as a list of
-                // two performance counter names
-                std::vector<std::string> names;
-                hpx::string_util::split(
-                    names, paths.parameters_, hpx::string_util::is_any_of(","));
-
-                if (names.empty())
-                {
-                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "arithmetics_counter_extended_creator",
-                        "the parameter specification for an arithmetic counter "
-                        "has to expand to at least one counter name: {}",
-                        paths.parameters_);
-                    return naming::invalid_gid;
-                }
-
-                for (std::string const& name : names)
-                {
-                    counter_path_elements paths;
-                    if (counter_status::valid_data !=
-                            get_counter_path_elements(name, paths, ec) ||
-                        ec)
-                    {
-                        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                            "arithmetics_counter_extended_creator",
-                            "the given (expanded) counter name is not "
-                            "a validly formed performance counter name: {}",
-                            name);
-                        return naming::invalid_gid;
-                    }
-                }
-
-                return create_arithmetics_counter_extended(info, names, ec);
-            }
-            else
+            if (names.empty())
             {
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                     "arithmetics_counter_extended_creator",
                     "the parameter specification for an arithmetic counter "
-                    "has to be a comma separated list of performance "
-                    "counter names, none is given: {}",
-                    remove_counter_prefix(info.fullname_));
+                    "has to expand to at least one counter name: {}",
+                    paths.parameters_);
+                return naming::invalid_gid;
             }
-        }
-        break;
 
-        default:
-            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                "arithmetics_counter_extended_creator",
-                "invalid counter type requested");
-            break;
+            for (std::string const& name : names)
+            {
+                counter_path_elements paths;
+                if (counter_status::valid_data !=
+                        get_counter_path_elements(name, paths, ec) ||
+                    ec)
+                {
+                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                        "arithmetics_counter_extended_creator",
+                        "the given (expanded) counter name is not "
+                        "a validly formed performance counter name: {}",
+                        name);
+                    return naming::invalid_gid;
+                }
+            }
+
+            return create_arithmetics_counter_extended(info, names, ec);
         }
+
+        HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+            "arithmetics_counter_extended_creator",
+            "the parameter specification for an arithmetic counter "
+            "has to be a comma separated list of performance "
+            "counter names, none is given: {}",
+            remove_counter_prefix(info.fullname_));
         return naming::invalid_gid;
     }
 }    // namespace hpx::performance_counters::detail

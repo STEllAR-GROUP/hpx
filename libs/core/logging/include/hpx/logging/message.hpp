@@ -49,13 +49,12 @@ namespace hpx::util::logging {
         /**
             @param msg - the message that is originally cached
          */
-        explicit message(std::stringstream msg) noexcept
+        explicit message([[maybe_unused]] std::stringstream msg) noexcept
           : m_full_msg_computed(false)
 #if defined(HPX_COMPUTE_HOST_CODE)
           , m_str(HPX_MOVE(msg))
 #endif
         {
-            HPX_UNUSED(msg);
         }
 
         message(message&& other) noexcept

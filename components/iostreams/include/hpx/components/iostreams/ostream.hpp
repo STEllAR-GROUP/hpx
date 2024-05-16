@@ -239,8 +239,16 @@ namespace hpx { namespace iostreams {
             // Create the next buffer, returns the previous buffer
             buffer next = this->detail::buffer::init_locked();
 
-            // Unlock the mutex before we cleanup.
+            // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+            // Unlock the mutex before we clean up.
             l.unlock();
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
             // Perform the write operation, then destroy the old buffer and
             // stream.

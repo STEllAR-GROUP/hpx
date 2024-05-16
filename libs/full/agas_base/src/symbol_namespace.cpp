@@ -294,7 +294,7 @@ namespace hpx::agas {
                     for (auto& [k, v] : d)
                     {
                         bool const has_credits = naming::detail::has_credits(v);
-                        result[HPX_MOVE(k)] = hpx::id_type(HPX_MOVE(v),
+                        result[k] = hpx::id_type(HPX_MOVE(v),
                             has_credits ?
                                 hpx::id_type::management_type::managed :
                                 hpx::id_type::management_type::unmanaged);

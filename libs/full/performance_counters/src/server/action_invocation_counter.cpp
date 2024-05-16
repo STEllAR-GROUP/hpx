@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@
 #include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters {
+namespace hpx::performance_counters {
 
     ///////////////////////////////////////////////////////////////////////////
     // Discoverer function for action invocation counters
@@ -68,47 +68,42 @@ namespace hpx { namespace performance_counters {
         hpx::actions::detail::invocation_count_registry& registry,
         error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != counter_type::monotonically_increasing)
         {
-        case counter_type::monotonically_increasing:
-        {
-            counter_path_elements paths;
-            get_counter_path_elements(info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "action_invocation_counter_creator",
-                    "invalid action invocation counter name (instance name "
-                    "must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "action_invocation_counter_creator",
-                    "invalid action invocation counter parameter: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // ask registry
-            hpx::function<std::int64_t(bool)> f =
-                registry.get_invocation_counter(paths.parameters_);
-
-            return detail::create_raw_counter(info, HPX_MOVE(f), ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "action_invocation_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        counter_path_elements paths;
+        get_counter_path_elements(info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "action_invocation_counter_creator",
+                "invalid action invocation counter name (instance name "
+                "must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "action_invocation_counter_creator",
+                "invalid action invocation counter parameter: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // ask registry
+        hpx::function<std::int64_t(bool)> f =
+            registry.get_invocation_counter(paths.parameters_);
+
+        return detail::create_raw_counter(info, HPX_MOVE(f), ec);
     }
 
     naming::gid_type local_action_invocation_counter_creator(
@@ -128,4 +123,4 @@ namespace hpx { namespace performance_counters {
             info, invocation_count_registry::remote_instance(), ec);
     }
 #endif
-}}    // namespace hpx::performance_counters
+}    // namespace hpx::performance_counters

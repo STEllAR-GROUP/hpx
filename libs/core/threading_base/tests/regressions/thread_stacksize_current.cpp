@@ -85,12 +85,14 @@ int main(int argc, char** argv)
         "local-workrequesting-mc",
 #endif
     };
+
     // clang-format on
     for (auto const& scheduler : schedulers)
     {
+        std::cout << scheduler << std::endl;
+
         hpx::local::init_params iparams;
-        iparams.cfg = {"--hpx:queuing=" + std::string(scheduler)};
-        std::cout << iparams.cfg[0] << std::endl;
+        iparams.cfg = {"--hpx:queuing=!" + scheduler};
         hpx::local::init(hpx_main, argc, argv, iparams);
     }
 

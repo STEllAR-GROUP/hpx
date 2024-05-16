@@ -17,7 +17,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace performance_counters { namespace server {
+namespace hpx::performance_counters::server {
 
     ///////////////////////////////////////////////////////////////////////////
     // This counter exposes the result of an arithmetic operation The counter
@@ -56,4 +56,4 @@ namespace hpx { namespace performance_counters { namespace server {
         // base counters to be queried
         performance_counter_set counters_;
     };
-}}}    // namespace hpx::performance_counters::server
+}    // namespace hpx::performance_counters::server

@@ -78,7 +78,7 @@ namespace hpx {
         assertion_failure = 25,
         ///<
         null_thread_id = 26,
-        ///< Attempt to invoke a API function from a non-HPX thread
+        ///< Attempt to invoke an API function from a non-HPX thread
         invalid_data = 27,
         ///<
         yield_aborted = 28,
@@ -142,7 +142,7 @@ namespace hpx {
                                        ///< race, retry
 
         /// \cond NOINTERNAL
-        last_error,
+        last_error = 57,
 
         system_error_flag = 0x4000L,
 

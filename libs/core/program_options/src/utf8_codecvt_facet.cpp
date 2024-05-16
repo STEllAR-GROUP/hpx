@@ -16,6 +16,7 @@
 #include <hpx/program_options/detail/utf8_codecvt_facet.hpp>
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>    // for multi-byte conversion routines
 #include <limits>
 
@@ -63,7 +64,7 @@ namespace hpx::program_options::detail {
             // number   of "continuing octets" encoding the character
             int const cont_octet_count =
                 static_cast<int>(get_cont_octet_count(*from));
-            const wchar_t octet1_modifier_table[] = {
+            wchar_t const octet1_modifier_table[] = {
                 0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 
             // The unsigned char conversion is necessary in case char is
@@ -117,14 +118,15 @@ namespace hpx::program_options::detail {
         wchar_t const*& from_next, char* to, char* to_end, char*& to_next) const
     {
         // RG - consider merging this table with the other one
-        const wchar_t octet1_modifier_table[] = {
+        wchar_t const octet1_modifier_table[] = {
             0x00, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc};
 
         constexpr wchar_t max_wchar = (std::numeric_limits<wchar_t>::max)();
         while (from != from_end && to != to_end)
         {
             // Check for invalid UCS-4 character
-            if (*from > max_wchar)
+            if (static_cast<std::uint32_t>(*from) >
+                static_cast<std::uint32_t>(max_wchar))
             {
                 from_next = from;
                 to_next = to;
@@ -134,7 +136,7 @@ namespace hpx::program_options::detail {
             int const cont_octet_count = get_cont_octet_out_count(*from);
 
             // RG  - comment this formula better
-            int shift_exponent = (cont_octet_count) *6;
+            int shift_exponent = cont_octet_count * 6;
 
             // Process the first character
             *to++ = static_cast<char>(octet1_modifier_table[cont_octet_count] +

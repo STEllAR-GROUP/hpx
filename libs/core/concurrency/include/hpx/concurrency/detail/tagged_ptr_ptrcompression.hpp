@@ -72,10 +72,18 @@ namespace hpx::lockfree::detail {
         }
 
     public:
+        // 26495: Always initialize a member variable
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26495)
+#endif
         /** uninitialized constructor */
         constexpr tagged_ptr() noexcept    //-V730 //-V832
         {
         }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         /** copy constructor */
         tagged_ptr(tagged_ptr const& p) = default;
