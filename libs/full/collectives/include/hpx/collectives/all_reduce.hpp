@@ -168,19 +168,36 @@ namespace hpx::traits {
                 [op = HPX_FORWARD(F, op)](
                     auto& data, bool& data_available, std::size_t) mutable {
                     HPX_ASSERT(!data.empty());
-                    if (!data_available && data.size() > 1)
+
+                    if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
                     {
-                        // compute reduction result only once
-                        auto it = data.begin();
-                        data[0] = Communicator::template handle_bool<
-                            std::decay_t<T>>(hpx::reduce(++it, data.end(),
-                            Communicator::template handle_bool<std::decay_t<T>>(
-                                data[0]),
-                            HPX_FORWARD(F, op)));
-                        data_available = true;
+                        if (!data_available && data.size() > 1)
+                        {
+                            // compute reduction result only once
+                            auto it = data.begin();
+                            data[0] = hpx::reduce(
+                                ++it, data.end(), data[0], HPX_FORWARD(F, op));
+                            data_available = true;
+                        }
+                        return data[0];
                     }
-                    return Communicator::template handle_bool<std::decay_t<T>>(
-                        data[0]);
+                    else
+                    {
+                        if (!data_available && data.size() > 1)
+                        {
+                            // compute reduction result only once
+                            auto it = data.begin();
+                            data[0] = hpx::reduce(++it, data.end(),
+                                static_cast<bool>(data[0]),
+                                [&](auto lhs, auto rhs) {
+                                    return HPX_FORWARD(F, op)(
+                                        static_cast<bool>(lhs),
+                                        static_cast<bool>(rhs));
+                                });
+                            data_available = true;
+                        }
+                        return static_cast<bool>(data[0]);
+                    }
                 });
         }
     };

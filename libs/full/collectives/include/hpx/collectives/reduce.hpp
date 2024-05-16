@@ -265,17 +265,31 @@ namespace hpx::traits {
                     auto& data, bool&, std::size_t) mutable {
                     HPX_ASSERT(!data.empty());
 
-                    if (data.size() > 1)
+                    if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
                     {
-                        auto it = data.begin();
-                        return Communicator::template handle_bool<
-                            std::decay_t<T>>(hpx::reduce(++it, data.end(),
-                            Communicator::template handle_bool<std::decay_t<T>>(
-                                HPX_MOVE(data[0])),
-                            HPX_FORWARD(F, op)));
+                        if (data.size() > 1)
+                        {
+                            auto it = data.begin();
+                            return hpx::reduce(++it, data.end(),
+                                HPX_MOVE(data[0]), HPX_FORWARD(F, op));
+                        }
+                        return HPX_MOVE(data[0]);
                     }
-                    return Communicator::template handle_bool<std::decay_t<T>>(
-                        HPX_MOVE(data[0]));
+                    else
+                    {
+                        if (data.size() > 1)
+                        {
+                            auto it = data.begin();
+                            return static_cast<bool>(hpx::reduce(++it,
+                                data.end(), static_cast<bool>(data[0]),
+                                [&](auto lhs, auto rhs) {
+                                    return HPX_FORWARD(F, op)(
+                                        static_cast<bool>(lhs),
+                                        static_cast<bool>(rhs));
+                                }));
+                        }
+                        return static_cast<bool>(data[0]);
+                    }
                 });
         }
 
