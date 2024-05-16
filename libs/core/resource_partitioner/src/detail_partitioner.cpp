@@ -607,7 +607,7 @@ namespace hpx::resource::detail {
             {
                 return true;
             }
-            for (auto const assigned_pus :
+            for (auto const& assigned_pus :
                 initial_thread_pools_[i].assigned_pus_)
             {
                 if (!threads::any(assigned_pus))
