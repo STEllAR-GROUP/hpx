@@ -26,6 +26,15 @@ constexpr int ITERATIONS = 100;
 constexpr int ITERATIONS = 1000;
 #endif
 
+struct plus_bool
+{
+    template <typename T>
+    decltype(auto) operator()(T lhs, T rhs) const
+    {
+        return lhs + rhs;
+    }
+};
+
 void test_multiple_use_with_generation()
 {
     std::uint32_t const this_locality = hpx::get_locality_id();
@@ -41,7 +50,7 @@ void test_multiple_use_with_generation()
     {
         bool value = ((this_locality + i) % 2) ? true : false;
         hpx::future<bool> overall_result = all_reduce(all_reduce_direct_client,
-            value, std::plus<>{}, generation_arg(i + 1));
+            value, plus_bool{}, generation_arg(i + 1));
 
         bool sum = false;
         for (std::uint32_t j = 0; j != num_localities; ++j)
