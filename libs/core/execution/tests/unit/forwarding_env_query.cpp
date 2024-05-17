@@ -18,7 +18,8 @@ namespace mylib {
 
 #ifdef HPX_HAVE_STDEXEC
     struct derived_forwarding_query_t
-      : hpx::execution::experimental::forwarding_query_t {
+      : hpx::execution::experimental::forwarding_query_t
+    {
     } derived_forwarding_query{};
 #endif
 
@@ -63,7 +64,7 @@ int main()
 
 #ifdef HPX_HAVE_STDEXEC
     static_assert(hpx::execution::experimental::forwarding_query(
-                        mylib::derived_forwarding_query) == true,
+                      mylib::derived_forwarding_query) == true,
         "derived_forwarding_query is a forwarding query");
 #endif
 

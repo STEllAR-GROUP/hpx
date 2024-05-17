@@ -6,9 +6,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/execution_base/operation_state.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 #include <hpx/modules/functional.hpp>
 #include <hpx/modules/testing.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 
 #include <exception>
 #include <string>
@@ -95,20 +95,19 @@ int main()
 {
     {
 #ifndef HPX_HAVE_STDEXEC
-//        Normally the operation states should be invalid STDEXEC but the
-//        implementation does not match the proposed standard yet.
-//
-//        The standard requires:
-//            { start(opstate) } noexcept;
-//
-//        The current implentation requires:
-//            { start(opstate) };
-
+        //        Normally the operation states should be invalid STDEXEC but the
+        //        implementation does not match the proposed standard yet.
+        //
+        //        The standard requires:
+        //            { start(opstate) } noexcept;
+        //
+        //        The current implentation requires:
+        //            { start(opstate) };
 
         static_assert(!ex::is_operation_state<mylib::state_2>::value,
-                      "mylib::state_2 is not an operation state");
+            "mylib::state_2 is not an operation state");
         static_assert(!ex::is_operation_state<mylib::state_4>::value,
-                      "mylib::state_4 is not an operation state");
+            "mylib::state_4 is not an operation state");
 #endif
         static_assert(!ex::is_operation_state<mylib::state_1>::value,
             "mylib::state_1 is not an operation state");

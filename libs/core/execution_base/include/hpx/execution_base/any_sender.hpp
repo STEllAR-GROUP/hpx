@@ -351,7 +351,7 @@ namespace hpx::execution::experimental::detail {
         immovable(immovable&&) = delete;
     };
 
-//    class HPX_CORE_EXPORT any_operation_state : immovable
+    //    class HPX_CORE_EXPORT any_operation_state : immovable
     class HPX_CORE_EXPORT any_operation_state : immovable
     {
         using base_type = detail::any_operation_state_base;
@@ -534,7 +534,8 @@ namespace hpx::execution::experimental::detail {
             }
             catch (...)
             {
-                HPX_MOVE(moved_storage.get()).set_error(std::current_exception());
+                HPX_MOVE(moved_storage.get())
+                    .set_error(std::current_exception());
             }
         }
 
@@ -702,7 +703,8 @@ namespace hpx::execution::experimental::detail {
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) && override
         {
-            return any_operation_state{{}, HPX_MOVE(sender), HPX_MOVE(receiver)};
+            return any_operation_state{
+                {}, HPX_MOVE(sender), HPX_MOVE(receiver)};
         }
     };
 }    // namespace hpx::execution::experimental::detail
@@ -784,8 +786,7 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_STDEXEC
         using completion_signatures =
             hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...),
-                set_error_t(std::exception_ptr)>;
+                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
 #else
         template <typename Env>
         friend auto tag_invoke(
@@ -826,7 +827,7 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
-        using is_sender = void; // Indicate that any_sender is a sender
+        using is_sender = void;    // Indicate that any_sender is a sender
 
         any_sender() = default;
 
@@ -869,8 +870,7 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_STDEXEC
         using completion_signatures =
             hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...),
-                set_error_t(std::exception_ptr)>;
+                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
 #else
         template <typename Env>
         friend auto tag_invoke(get_completion_signatures_t, any_sender const&,

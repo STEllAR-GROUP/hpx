@@ -25,20 +25,18 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
         using is_receiver = void;
 #endif
-        friend void tag_invoke(
-            ex::set_stopped_t, receiver_1&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, receiver_1&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            receiver_1&&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, receiver_1&&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(
-            ex::set_value_t, receiver_1&&, int)
+        friend void tag_invoke(ex::set_value_t, receiver_1&&, int)
 #ifdef HPX_HAVE_STDEXEC
             noexcept
 #endif
@@ -52,14 +50,12 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
         using is_receiver = void;
 #endif
-        friend void tag_invoke(
-            ex::set_stopped_t, receiver_2&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, receiver_2&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            receiver_2&&, int) noexcept
+        friend void tag_invoke(ex::set_error_t, receiver_2&&, int) noexcept
         {
             error_called = true;
         }
@@ -70,20 +66,18 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
         using is_receiver = void;
 #endif
-        friend void tag_invoke(
-            ex::set_stopped_t, receiver_3&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, receiver_3&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            receiver_3&&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, receiver_3&&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(
-            ex::set_value_t, receiver_3, int) noexcept
+        friend void tag_invoke(ex::set_value_t, receiver_3, int) noexcept
         {
             value_called = true;
         }
@@ -91,20 +85,18 @@ namespace mylib {
 
     struct non_receiver_1
     {
-        friend void tag_invoke(ex::set_stopped_t,
-            non_receiver_1&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_1&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_1&&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_1&&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t,
-            non_receiver_1, int) noexcept
+        friend void tag_invoke(ex::set_value_t, non_receiver_1, int) noexcept
         {
             value_called = true;
         }
@@ -112,20 +104,18 @@ namespace mylib {
 
     struct non_receiver_2
     {
-        friend void tag_invoke(ex::set_stopped_t,
-            non_receiver_2&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_2&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_2&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_2&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t,
-            non_receiver_2, int) noexcept
+        friend void tag_invoke(ex::set_value_t, non_receiver_2, int) noexcept
         {
             value_called = true;
         }
@@ -133,20 +123,18 @@ namespace mylib {
 
     struct non_receiver_3
     {
-        friend void tag_invoke(ex::set_stopped_t,
-            non_receiver_3&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_3&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_3&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_3&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t,
-            non_receiver_3, int) noexcept
+        friend void tag_invoke(ex::set_value_t, non_receiver_3, int) noexcept
         {
             value_called = true;
         }
@@ -157,20 +145,18 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
         using is_receiver = void;
 #endif
-        friend void tag_invoke(ex::set_stopped_t,
-            non_receiver_4&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_4&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_4&&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_4&&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t,
-            non_receiver_4&, int) noexcept
+        friend void tag_invoke(ex::set_value_t, non_receiver_4&, int) noexcept
         {
             value_called = true;
         }
@@ -178,14 +164,13 @@ namespace mylib {
 
     struct non_receiver_5
     {
-        friend void tag_invoke(
-            ex::set_stopped_t, non_receiver_5&&)
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_5&&)
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_5&&, std::exception_ptr) noexcept
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_5&&, std::exception_ptr) noexcept
         {
             error_called = true;
         }
@@ -193,14 +178,13 @@ namespace mylib {
 
     struct non_receiver_6
     {
-        friend void tag_invoke(ex::set_stopped_t,
-            non_receiver_6&&) noexcept
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_6&&) noexcept
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_6&&, std::exception_ptr)
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_6&&, std::exception_ptr)
         {
             error_called = true;
         }
@@ -208,14 +192,13 @@ namespace mylib {
 
     struct non_receiver_7
     {
-        friend void tag_invoke(
-            ex::set_stopped_t, non_receiver_7&&)
+        friend void tag_invoke(ex::set_stopped_t, non_receiver_7&&)
         {
             done_called = true;
         }
 
-        friend void tag_invoke(ex::set_error_t,
-            non_receiver_7&&, std::exception_ptr)
+        friend void tag_invoke(
+            ex::set_error_t, non_receiver_7&&, std::exception_ptr)
         {
             error_called = true;
         }
@@ -232,29 +215,22 @@ int main()
 #ifndef HPX_HAVE_STDEXEC
     using ex::is_nothrow_receiver_of;
 
-    static_assert(
-        !is_nothrow_receiver_of<mylib::receiver_1,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_nothrow_receiver_of<mylib::receiver_1,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_1 should not be a nothrow receiver of an int");
 
-
-    static_assert(
-        !is_nothrow_receiver_of<mylib::receiver_2,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_nothrow_receiver_of<mylib::receiver_2,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_2 should not be a nothrow receiver of int");
 
-    static_assert(
-        is_nothrow_receiver_of<mylib::receiver_3,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(is_nothrow_receiver_of<mylib::receiver_3,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_3 should be a nothrow receiver of an int");
 
     // set_error is not mandatory
@@ -267,112 +243,86 @@ int main()
 
     static_assert(is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");
-    static_assert(
-        is_receiver_of<mylib::receiver_1,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(is_receiver_of<mylib::receiver_1,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_1 should be a receiver of an int");
 
-    static_assert(
-        !is_receiver_of<mylib::receiver_1,
-            ex::completion_signatures<
-                ex::set_value_t(std::string),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::receiver_1,
+                      ex::completion_signatures<ex::set_value_t(std::string),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_1 should not be a receiver of a std::string");
 
-
-    static_assert(
-        !is_receiver_of<mylib::receiver_2,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::receiver_2,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_2 should not be a receiver of int");
-
 
     static_assert(is_receiver<mylib::receiver_1>::value,
         "mylib::receiver_1 should be a receiver");
-    static_assert(
-        is_receiver_of<mylib::receiver_3,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(is_receiver_of<mylib::receiver_3,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_3 should be a receiver of an int");
 
-    static_assert(
-        !is_receiver_of<mylib::receiver_3,
-            ex::completion_signatures<
-                ex::set_value_t(std::string),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::receiver_3,
+                      ex::completion_signatures<ex::set_value_t(std::string),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::receiver_3 should not be a receiver of a std::string");
 
     static_assert(!is_receiver<mylib::non_receiver_1>::value,
         "mylib::non_receiver_1 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_1,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_1,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_1 should not be a receiver of int");
     static_assert(!is_receiver<mylib::non_receiver_2>::value,
         "mylib::non_receiver_2 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_2,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_2,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_2 should not be a receiver of int");
     static_assert(!is_receiver<mylib::non_receiver_3>::value,
         "mylib::non_receiver_3 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_3,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_3,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_3 should not be a receiver of int");
     static_assert(is_receiver<mylib::non_receiver_4>::value,
         "mylib::non_receiver_4 should be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_4,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_4,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_4 should not be a receiver of int");
     static_assert(!is_receiver<mylib::non_receiver_5>::value,
         "mylib::non_receiver_5 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_5,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_5,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_5 should not be a receiver of int");
     static_assert(!is_receiver<mylib::non_receiver_6>::value,
         "mylib::non_receiver_6 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_6,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_6,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_6 should not be a receiver of int");
     static_assert(!is_receiver<mylib::non_receiver_7>::value,
         "mylib::non_receiver_7 should not be a receiver");
-    static_assert(
-        !is_receiver_of<mylib::non_receiver_7,
-            ex::completion_signatures<
-                ex::set_value_t(int),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>>::value,
+    static_assert(!is_receiver_of<mylib::non_receiver_7,
+                      ex::completion_signatures<ex::set_value_t(int),
+                          ex::set_error_t(std::exception_ptr),
+                          ex::set_stopped_t()>>::value,
         "mylib::non_receiver_7 should not be a receiver of int");
 
     {
@@ -383,8 +333,7 @@ int main()
     }
     {
         mylib::receiver_1 rcv;
-        ex::set_error(
-            std::move(rcv), std::exception_ptr{});
+        ex::set_error(std::move(rcv), std::exception_ptr{});
         HPX_TEST(error_called);
         error_called = false;
     }

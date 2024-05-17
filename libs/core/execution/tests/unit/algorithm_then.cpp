@@ -53,13 +53,11 @@ void test_execution_then_return_int()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 = ex::make_future(
-        ex::then(
-            ex::as_sender(std::move(f1)),
-            [](int value) {
-                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-                return 2 * value;
-            }));
+    hpx::future<int> f2 =
+        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](int value) {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            return 2 * value;
+        }));
     HPX_TEST(f2.valid());
     try
     {
@@ -80,11 +78,10 @@ void test_execution_then_return_void()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 = ex::make_future(
-        ex::then(
-            ex::as_sender(std::move(f1)), [](auto) {
-                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-            }));
+    hpx::future<void> f2 =
+        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](auto) {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }));
     HPX_TEST(f2.valid());
     try
     {
@@ -105,13 +102,11 @@ void test_execution_then_return_int_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 = ex::make_future(
-        ex::then(
-            ex::as_sender(std::move(f1)),
-            [](int value) {
-                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-                return 2 * value;
-            }));
+    hpx::future<int> f2 =
+        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](int value) {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            return 2 * value;
+        }));
     HPX_TEST(f2.valid());
     try
     {
@@ -132,11 +127,10 @@ void test_execution_then_return_void_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 = ex::make_future(
-        ex::then(
-            ex::as_sender(std::move(f1)), [](auto) {
-                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-            }));
+    hpx::future<void> f2 =
+        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](auto) {
+            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }));
     HPX_TEST(f2.valid());
     try
     {

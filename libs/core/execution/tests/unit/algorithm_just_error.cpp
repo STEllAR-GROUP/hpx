@@ -41,8 +41,7 @@ int main()
         check_value_types<hpx::variant<>>(s);
 #ifdef HPX_HAVE_STDEXEC
         // no longer throws exceptions in the form std::exception_ptr in STDEXEC
-        check_error_types<hpx::variant<std::runtime_error>>(
-            s);
+        check_error_types<hpx::variant<std::runtime_error>>(s);
 #else
         check_error_types<hpx::variant<std::exception_ptr, std::runtime_error>>(
             s);

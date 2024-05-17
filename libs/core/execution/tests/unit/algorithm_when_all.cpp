@@ -11,10 +11,10 @@
 #if !defined(HPX_CLANG_VERSION) ||                                             \
     ((HPX_CLANG_VERSION / 10000) != 11 && (HPX_CLANG_VERSION / 10000) != 8)
 
-#include <hpx/modules/execution.hpp>
 #include <hpx/async_base/dataflow.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/execution/algorithms/when_all.hpp>
+#include <hpx/modules/execution.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
 

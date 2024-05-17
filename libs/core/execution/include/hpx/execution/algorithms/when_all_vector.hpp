@@ -97,10 +97,11 @@ namespace hpx::when_all_vector_detail {
         };
 
 #ifdef HPX_HAVE_STDEXEC
-        template<typename T>
+        template <typename T>
         struct set_value_completion_helper
         {
-            using type = hpx::execution::experimental::set_value_t(std::vector<T>);
+            using type = hpx::execution::experimental::set_value_t(
+                std::vector<T>);
         };
 
         template <>
@@ -109,30 +110,29 @@ namespace hpx::when_all_vector_detail {
             using type = hpx::execution::experimental::set_value_t();
         };
 
-        using set_value_transform_to_vector = typename set_value_completion_helper<element_value_type>::type;
+        using set_value_transform_to_vector =
+            typename set_value_completion_helper<element_value_type>::type;
 
-
-        template<typename ...>
-        using transformed_comp_sigs_identity = hpx::execution::experimental::completion_signatures<
+        template <typename...>
+        using transformed_comp_sigs_identity =
+            hpx::execution::experimental::completion_signatures<
                 set_value_transform_to_vector>;
 
-        template<typename Err>
-        using decay_set_error = hpx::execution::experimental::completion_signatures<
-            hpx::execution::experimental::set_error_t(std::decay_t<Err>)>;
+        template <typename Err>
+        using decay_set_error =
+            hpx::execution::experimental::completion_signatures<
+                hpx::execution::experimental::set_error_t(std::decay_t<Err>)>;
 
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
             when_all_vector_sender_type const&, Env const&) noexcept
-        -> hpx::execution::experimental::transform_completion_signatures_of<
-            Sender,
-            Env,
-            hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_error_t(std::exception_ptr)
-            >,
-            transformed_comp_sigs_identity,
-            decay_set_error
-        >;
+            -> hpx::execution::experimental::transform_completion_signatures_of<
+                Sender, Env,
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>,
+                transformed_comp_sigs_identity, decay_set_error>;
 #else
         // This sender sends a single vector of the type sent by the
         // predecessor senders or nothing if the predecessor senders send
@@ -173,7 +173,8 @@ namespace hpx::when_all_vector_detail {
             struct when_all_vector_receiver
             {
 #ifdef HPX_HAVE_STDEXEC
-                using receiver_concept = hpx::execution::experimental::receiver_t;
+                using receiver_concept =
+                    hpx::execution::experimental::receiver_t;
 #endif
                 operation_state& op_state;
                 std::size_t const i;
@@ -248,14 +249,11 @@ namespace hpx::when_all_vector_detail {
                 friend auto tag_invoke(hpx::execution::experimental::get_env_t,
                     when_all_vector_receiver const& r)
 #ifdef HPX_HAVE_STDEXEC
-                    noexcept
-                    -> hpx::execution::experimental::make_env_t<
+                    noexcept -> hpx::execution::experimental::make_env_t<
                         hpx::execution::experimental::env_of_t<receiver_type>,
                         hpx::execution::experimental::with_t<
                             hpx::execution::experimental::get_stop_token_t,
-                            hpx::experimental::in_place_stop_token
-                        >
-                    >
+                            hpx::experimental::in_place_stop_token>>
                 {
                     /* The new calling convention is:
                      * make_env(old_env, with(tag, val))*/
@@ -267,18 +265,18 @@ namespace hpx::when_all_vector_detail {
                             r.op_state.stop_source_.get_token()));
                 }
 #else
-                    ->hpx::execution::experimental::make_env_t<
+                    -> hpx::execution::experimental::make_env_t<
                         hpx::execution::experimental::get_stop_token_t,
                         hpx::experimental::in_place_stop_token,
                         hpx::execution::experimental::env_of_t<receiver_type>>
                 {
                     /* The old calling convention is:
                      * make_env<tag>(val, old_env) */
-                    return hpx::execution::experimental::make_env
-                        <hpx::execution::experimental::get_stop_token_t>(
-                            r.op_state.stop_source_.get_token(),
-                            hpx::execution::experimental::get_env(r.op_state.receiver)
-                        );
+                    return hpx::execution::experimental::make_env<
+                        hpx::execution::experimental::get_stop_token_t>(
+                        r.op_state.stop_source_.get_token(),
+                        hpx::execution::experimental::get_env(
+                            r.op_state.receiver));
                 }
 #endif
             };
@@ -309,8 +307,8 @@ namespace hpx::when_all_vector_detail {
             // The first error sent by any predecessor sender is stored in a
             // optional of a variant of the error_types
 #ifdef HPX_HAVE_STDEXEC
-            using error_types = typename hpx::execution::experimental::
-                error_types_of_t<
+            using error_types =
+                typename hpx::execution::experimental::error_types_of_t<
                     when_all_vector_sender_impl<
                         Sender>::when_all_vector_sender_type,
                     hpx::execution::experimental::empty_env, hpx::variant>;
@@ -422,13 +420,18 @@ namespace hpx::when_all_vector_detail {
                     else
                     {
 #ifdef HPX_HAVE_STDEXEC
-                        if constexpr (hpx::execution::experimental::sends_stopped<Sender>)
+                        if constexpr (hpx::execution::experimental::
+                                          sends_stopped<Sender>)
                         {
 #endif
                             hpx::execution::experimental::set_stopped(
-                                    HPX_MOVE(receiver));
+                                HPX_MOVE(receiver));
 #ifdef HPX_HAVE_STDEXEC
-                        } else { HPX_UNREACHABLE; }
+                        }
+                        else
+                        {
+                            HPX_UNREACHABLE;
+                        }
 #endif
                     }
                 }

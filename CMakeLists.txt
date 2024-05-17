@@ -579,23 +579,17 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
   )
 endif()
 
-# ##
-# HPX STDEXEC configuration
-# ##
+# ## HPX STDEXEC configuration ##
 
 hpx_option(
-  HPX_WITH_STDEXEC
-  BOOL
-  "Use STDEXEC executors instead of native HPX.(default: OFF)"
-  OFF
+  HPX_WITH_STDEXEC BOOL
+  "Use STDEXEC executors instead of native HPX.(default: OFF)" OFF
   CATEGORY "Executor"
   ADVANCED
 )
 
 hpx_option(
-  HPX_WITH_FETCH_STDEXEC
-  BOOL
-  "Use FetchContent to fetch STDEXEC.(default: OFF)"
+  HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: OFF)"
   OFF
   CATEGORY "Executor"
   ADVANCED
@@ -603,9 +597,7 @@ hpx_option(
 
 if(HPX_WITH_FETCH_STDEXEC)
   hpx_option(
-    HPX_WITH_STDEXEC_TAG
-    STRING "STDEXEC repository tag or branch"
-    "main"
+    HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
     CATEGORY "Executor"
   )
 endif()

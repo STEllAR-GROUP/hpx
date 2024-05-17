@@ -10,36 +10,36 @@
 #include <hpx/config.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
 #include <hpx/execution_base/get_env.hpp>
+#include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::execution::experimental {
-    template<typename Scheduler>
+    template <typename Scheduler>
     inline constexpr bool is_scheduler_v = scheduler<Scheduler>;
 
-    template<typename Scheduler>
+    template <typename Scheduler>
     struct is_scheduler : std::bool_constant<is_scheduler_v<Scheduler>>
     {
     };
-// defined in completion signatures instead, to follow the original
-// file structure.
-//
-//    template<typename Sender, typename Env = empty_env>
-//    inline constexpr bool is_sender_v = sender<Sender>;
-//
-//    template<typename Sender, typename Env = empty_env>
-//    struct is_sender : std::bool_constant<is_sender_v<Sender>>
-//    {
-//    };
-//
-//    template<typename Sender, typename Receiver>
-//    inline constexpr bool is_sender_to_v = sender_to<Sender, Receiver>;
-//
-//    template<typename Sender, typename Receiver>
-//    struct is_sender_to : std::bool_constant<is_sender_to_v<Sender, Receiver>>
-//    {
-//    };
-//
+    // defined in completion signatures instead, to follow the original
+    // file structure.
+    //
+    //    template<typename Sender, typename Env = empty_env>
+    //    inline constexpr bool is_sender_v = sender<Sender>;
+    //
+    //    template<typename Sender, typename Env = empty_env>
+    //    struct is_sender : std::bool_constant<is_sender_v<Sender>>
+    //    {
+    //    };
+    //
+    //    template<typename Sender, typename Receiver>
+    //    inline constexpr bool is_sender_to_v = sender_to<Sender, Receiver>;
+    //
+    //    template<typename Sender, typename Receiver>
+    //    struct is_sender_to : std::bool_constant<is_sender_to_v<Sender, Receiver>>
+    //    {
+    //    };
+    //
     namespace detail {
         // Dummy type used in place of a scheduler if none is given
         struct no_scheduler

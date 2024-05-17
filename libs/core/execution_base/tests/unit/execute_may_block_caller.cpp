@@ -15,11 +15,13 @@ namespace tt = hpx::this_thread::experimental;
 struct this_test_example_scheduler
 {
 #ifdef HPX_HAVE_STDEXEC
-    struct example_sender {
+    struct example_sender
+    {
         using is_sender = void;
         using completion_signatures = ex::completion_signatures<>;
 
-        friend env_with_scheduler<this_test_example_scheduler> tag_invoke(ex::get_env_t, example_sender const&) noexcept
+        friend env_with_scheduler<this_test_example_scheduler> tag_invoke(
+            ex::get_env_t, example_sender const&) noexcept
         {
             return {};
         }
@@ -27,9 +29,16 @@ struct this_test_example_scheduler
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    friend constexpr example_sender tag_invoke(ex::schedule_t, this_test_example_scheduler) noexcept { return {}; }
+    friend constexpr example_sender tag_invoke(
+        ex::schedule_t, this_test_example_scheduler) noexcept
+    {
+        return {};
+    }
 #else
-    friend constexpr voiud tag_invoke(ex::schedule_t, this_test_example_scheduler) noexcept {}
+    friend constexpr voiud tag_invoke(
+        ex::schedule_t, this_test_example_scheduler) noexcept
+    {
+    }
 #endif
 
     friend constexpr bool tag_invoke(
@@ -38,12 +47,14 @@ struct this_test_example_scheduler
         return false;
     }
 
-    friend constexpr bool operator==(this_test_example_scheduler, this_test_example_scheduler) noexcept
+    friend constexpr bool operator==(
+        this_test_example_scheduler, this_test_example_scheduler) noexcept
     {
         return true;
     }
 
-    friend constexpr bool operator!=(this_test_example_scheduler, this_test_example_scheduler) noexcept
+    friend constexpr bool operator!=(
+        this_test_example_scheduler, this_test_example_scheduler) noexcept
     {
         return false;
     }

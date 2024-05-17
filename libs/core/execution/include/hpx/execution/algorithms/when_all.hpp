@@ -17,29 +17,29 @@ namespace hpx::execution::experimental {
     template <typename F, typename Sender, typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(
         hpx::detail::dataflow_t, F&& f, Sender&& sender, Senders&&... senders)
-    -> decltype(hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
-                              HPX_FORWARD(Senders, senders)...),
-                     HPX_FORWARD(F, f)))
+        -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
     {
         return hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
-                             HPX_FORWARD(Senders, senders)...),
-                    HPX_FORWARD(F, f));
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
     }
 
     template <typename F, typename Sender, typename... Senders>
     constexpr HPX_FORCEINLINE auto tag_invoke(hpx::detail::dataflow_t,
-                                              hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
-    -> decltype(hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
-                              HPX_FORWARD(Senders, senders)...),
-                     HPX_FORWARD(F, f)))
+        hpx::launch, F&& f, Sender&& sender, Senders&&... senders)
+        -> decltype(hpx::execution::experimental::then(
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f)))
     {
         return hpx::execution::experimental::then(
-            hpx::execution::experimental::when_all(HPX_FORWARD(Sender, sender),
-                             HPX_FORWARD(Senders, senders)...),
-                    HPX_FORWARD(F, f));
+            hpx::execution::experimental::when_all(
+                HPX_FORWARD(Sender, sender), HPX_FORWARD(Senders, senders)...),
+            HPX_FORWARD(F, f));
     }
 }    // namespace hpx::execution::experimental
 #else

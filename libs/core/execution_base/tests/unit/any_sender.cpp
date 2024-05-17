@@ -34,7 +34,8 @@ struct custom_type_non_copyable
         custom_type_non_copyable const&) = delete;
 };
 
-class immovable {
+class immovable
+{
 public:
     immovable() = default;
     immovable(immovable const&) = default;
@@ -96,7 +97,7 @@ struct non_copyable_sender
         hpx::execution::experimental::connect_t, non_copyable_sender&& s,
         R&& r) noexcept
     {
-        return {{},std::forward<R>(r), std::move(s.ts)};
+        return {{}, std::forward<R>(r), std::move(s.ts)};
     }
 };
 
@@ -108,13 +109,15 @@ struct example_sender
     using is_sender = void;
 
     template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, example_sender const&,
-        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
-        ex::set_error_t(std::exception_ptr)>;
+    friend auto tag_invoke(
+        ex::get_completion_signatures_t, example_sender const&, Env) noexcept
+        -> ex::completion_signatures<ex::set_value_t(Ts...),
+            ex::set_error_t(std::exception_ptr)>;
 
     example_sender() = default;
     template <typename T,
-        typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, example_sender>>>
+        typename =
+            std::enable_if_t<!std::is_same_v<std::decay_t<T>, example_sender>>>
     example_sender(T&& t)
       : ts(std::forward<T>(t))
     {
@@ -219,7 +222,9 @@ struct error_receiver
 {
     std::atomic<bool>& set_error_called;
 
-    struct is_receiver{};
+    struct is_receiver
+    {
+    };
 
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
         error_receiver&& r, std::exception_ptr&& e) noexcept
@@ -269,7 +274,6 @@ void test_any_sender(F&& f, Ts&&... ts)
 #else
     static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
 #endif
-
 
     auto as2 = as1;
 
@@ -553,14 +557,15 @@ void test_unique_any_sender_set_error()
 ex::unique_any_sender<> global_unique_any_sender{ex::just()};
 ex::any_sender<> global_any_sender{ex::just()};
 
-
 // This helper only makes sure that the sender returned from split is actually
 // started before being destructed.
 struct wait_globals
 {
-    ~wait_globals() { hpx::this_thread::experimental::sync_wait(std::move(global_any_sender)); }
+    ~wait_globals()
+    {
+        hpx::this_thread::experimental::sync_wait(std::move(global_any_sender));
+    }
 } waiter{};
-
 
 void test_globals()
 {
@@ -587,7 +592,8 @@ void test_globals()
 #ifdef HPX_HAVE_STDEXEC
     // P2300R8's ensure started returns non-copyable senders, so we need to split
     // to pass it to a global_any_sender.
-    global_any_sender = std::move(global_any_sender) | ex::ensure_started() | ex::split();
+    global_any_sender =
+        std::move(global_any_sender) | ex::ensure_started() | ex::split();
 #else
     global_any_sender = std::move(global_any_sender) | ex::ensure_started();
 #endif
@@ -616,7 +622,8 @@ int main()
 
     // We can wrap both copyable and non-copyable senders in unique_any_sender
     test_unique_any_sender<example_sender>([] {});
-    test_unique_any_sender<example_sender, int>([](int x) { HPX_TEST_EQ(x, 42); }, 42);
+    test_unique_any_sender<example_sender, int>(
+        [](int x) { HPX_TEST_EQ(x, 42); }, 42);
     test_unique_any_sender<example_sender, int, double>(
         [](int x, double y) {
             HPX_TEST_EQ(x, 42);

@@ -71,7 +71,7 @@ namespace hpx::execution::experimental::detail {
 #else
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
-            hpx::execution::experimental::set_value_t>(u);
+                    hpx::execution::experimental::set_value_t>(u);
 #endif
 
             return HPX_MOVE(p).invoke(HPX_MOVE(scheduler), HPX_FORWARD(U, u));

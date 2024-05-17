@@ -45,7 +45,8 @@ int main()
             "transfer_when_all must return a sender");
 
 #ifdef HPX_HAVE_STDEXEC
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
+        auto csch =
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
         auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
 #endif
@@ -75,7 +76,8 @@ int main()
             "transfer_when_all must return a sender");
 
 #ifdef HPX_HAVE_STDEXEC
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
+        auto csch =
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
         auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
 #endif
@@ -109,7 +111,8 @@ int main()
             "transfer_when_all must return a sender");
 
 #ifdef HPX_HAVE_STDEXEC
-        auto csch = ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
+        auto csch =
+            ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
         auto csch = ex::get_completion_scheduler<ex::set_value_t>(s);
 #endif

@@ -267,49 +267,52 @@ namespace hpx::parallel {
             detail::reverse<FwdIter> r;
 
             auto&& func = [=](auto&& f1, auto&& f2) mutable {
-                    // propagate exceptions, if appropriate
-                    constexpr bool handle_futures =
-                        hpx::traits::is_future_v<decltype((f1))> &&
-                        hpx::traits::is_future_v<decltype((f2))>;
+                // propagate exceptions, if appropriate
+                constexpr bool handle_futures =
+                    hpx::traits::is_future_v<decltype((f1))> &&
+                    hpx::traits::is_future_v<decltype((f2))>;
 
-                    if constexpr (handle_futures)
-                    {
-                        f1.get();
-                        f2.get();
-                    }
+                if constexpr (handle_futures)
+                {
+                    f1.get();
+                    f2.get();
+                }
 
-                    r.call(p(hpx::execution::non_task), first, last);
+                r.call(p(hpx::execution::non_task), first, last);
 
-                    std::advance(first, size_right);
-                    return util::in_out_result<FwdIter, Sent>{first, last};
+                std::advance(first, size_right);
+                return util::in_out_result<FwdIter, Sent>{first, last};
             };
 
-            using rcall_left_t = decltype(r.call(left_policy, first, new_first));
-            using rcall_right_t = decltype(r.call(left_policy, new_first, last));
+            using rcall_left_t =
+                decltype(r.call(left_policy, first, new_first));
+            using rcall_right_t =
+                decltype(r.call(left_policy, new_first, last));
 
-            constexpr bool rcall_are_senders = (
-                hpx::execution::experimental::sender<rcall_left_t> &&
-                hpx::execution::experimental::sender<rcall_right_t>);
+            constexpr bool rcall_are_senders =
+                (hpx::execution::experimental::sender<rcall_left_t> &&
+                    hpx::execution::experimental::sender<rcall_right_t>);
 
-            constexpr bool rcall_are_futures = (
-                hpx::traits::is_future_v<rcall_left_t> &&
-                hpx::traits::is_future_v<rcall_right_t>);
+            constexpr bool rcall_are_futures =
+                (hpx::traits::is_future_v<rcall_left_t> &&
+                    hpx::traits::is_future_v<rcall_right_t>);
 
             static_assert(rcall_are_senders || rcall_are_futures,
-                "the reverse operation must return either a sender or a future");
+                "the reverse operation must return either a sender or a "
+                "future");
 
-            if constexpr (rcall_are_senders) {
+            if constexpr (rcall_are_senders)
+            {
                 return hpx::execution::experimental::when_all(
-                        r.call(left_policy, first, new_first),
-                        r.call(right_policy, new_first, last))
-                    | hpx::execution::experimental::then(std::move(func));
-            } else if constexpr (rcall_are_futures) {
-                return hpx::dataflow(
-                    hpx::launch::sync,
-                    std::move(func),
+                           r.call(left_policy, first, new_first),
+                           r.call(right_policy, new_first, last)) |
+                    hpx::execution::experimental::then(std::move(func));
+            }
+            else if constexpr (rcall_are_futures)
+            {
+                return hpx::dataflow(hpx::launch::sync, std::move(func),
                     r.call(left_policy, first, new_first),
-                    r.call(right_policy, new_first, last)
-                );
+                    r.call(right_policy, new_first, last));
             }
         }
 

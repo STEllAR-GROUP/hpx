@@ -96,16 +96,9 @@ void test_rotate(Policy l, ExPolicy&& policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    tt::sync_wait(
-        ex::just(
-            iterator(std::begin(c)),
-            iterator(mid),
-            iterator(std::end(c))
-        ) |
-        hpx::rotate(
-            policy.on(exec)
-        )
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(mid),
+                      iterator(std::end(c))) |
+        hpx::rotate(policy.on(exec)));
 #else
     ex::just(iterator(std::begin(c)), iterator(mid), iterator(std::end(c))) |
         hpx::rotate(policy.on(exec)) | tt::sync_wait();
@@ -149,8 +142,8 @@ void test_rotate_async_direct(Policy l, ExPolicy&& p, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    tt::sync_wait(hpx::rotate(p.on(exec), iterator(std::begin(c)), iterator(mid),
-                iterator(std::end(c))));
+    tt::sync_wait(hpx::rotate(p.on(exec), iterator(std::begin(c)),
+        iterator(mid), iterator(std::end(c))));
 #else
     hpx::rotate(p.on(exec), iterator(std::begin(c)), iterator(mid),
         iterator(std::end(c))) |
@@ -200,7 +193,7 @@ void test_rotate()
 
 void rotate_test()
 {
-    test_rotate_direct<std::random_access_iterator_tag>(); // only this fails
+    test_rotate_direct<std::random_access_iterator_tag>();    // only this fails
     test_rotate_direct<std::forward_iterator_tag>();
 
     test_rotate<std::random_access_iterator_tag>();

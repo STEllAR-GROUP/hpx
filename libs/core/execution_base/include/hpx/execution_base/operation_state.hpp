@@ -14,10 +14,12 @@
 
 namespace hpx::execution::experimental {
     template <typename OperationState>
-    inline constexpr bool is_operation_state_v = operation_state<OperationState>;
+    inline constexpr bool is_operation_state_v =
+        operation_state<OperationState>;
 
     template <typename OperationState>
-    struct is_operation_state : std::bool_constant<operation_state<OperationState>>
+    struct is_operation_state
+      : std::bool_constant<operation_state<OperationState>>
     {
     };
 }    // namespace hpx::execution::experimental
