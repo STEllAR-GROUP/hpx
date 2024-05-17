@@ -41,7 +41,7 @@ namespace hpx::meta {
     using identity = T;
 
     template <typename T>
-    inline constexpr bool value = T::value;
+    inline constexpr auto value = T::value;
 
     template <typename T, typename U>
     inline constexpr bool value<std::is_same<T, U>> = false;

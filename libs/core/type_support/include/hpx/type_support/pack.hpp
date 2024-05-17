@@ -328,7 +328,7 @@ namespace hpx::util {
 
         /// Append a given type to the given pack.
         template <typename Pack, typename T>
-        using append_t = typename prepend<Pack, T>::type;
+        using append_t = typename append<Pack, T>::type;
 
         template <template <typename...> class NewPack, typename OldPack>
         struct change_pack;
