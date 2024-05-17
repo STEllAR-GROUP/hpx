@@ -266,9 +266,7 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
 
-            return hpx::dataflow(
-                hpx::launch::sync,
-                [=](auto&& f1, auto&& f2) mutable {
+            auto&& func = [=](auto&& f1, auto&& f2) mutable {
                     // propagate exceptions, if appropriate
                     constexpr bool handle_futures =
                         hpx::traits::is_future_v<decltype((f1))> &&
@@ -284,9 +282,35 @@ namespace hpx::parallel {
 
                     std::advance(first, size_right);
                     return util::in_out_result<FwdIter, Sent>{first, last};
-                },
-                r.call(left_policy, first, new_first),
-                r.call(right_policy, new_first, last));
+            };
+
+            using rcall_left_t = decltype(r.call(left_policy, first, new_first));
+            using rcall_right_t = decltype(r.call(left_policy, new_first, last));
+
+            constexpr bool rcall_are_senders = (
+                hpx::execution::experimental::sender<rcall_left_t> &&
+                hpx::execution::experimental::sender<rcall_right_t>);
+
+            constexpr bool rcall_are_futures = (
+                hpx::traits::is_future_v<rcall_left_t> &&
+                hpx::traits::is_future_v<rcall_right_t>);
+
+            static_assert(rcall_are_senders || rcall_are_futures,
+                "the reverse operation must return either a sender or a future");
+
+            if constexpr (rcall_are_senders) {
+                return hpx::execution::experimental::when_all(
+                        r.call(left_policy, first, new_first),
+                        r.call(right_policy, new_first, last))
+                    | hpx::execution::experimental::then(std::move(func));
+            } else if constexpr (rcall_are_futures) {
+                return hpx::dataflow(
+                    hpx::launch::sync,
+                    std::move(func),
+                    r.call(left_policy, first, new_first),
+                    r.call(right_policy, new_first, last)
+                );
+            }
         }
 
         template <typename IterPair>
