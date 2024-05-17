@@ -112,7 +112,7 @@ namespace hpx { namespace util {
         typedef hpx::spinlock mutex_type;
 
     public:
-        static hpx::mutex mtx_;
+        static hpx::spinlock mtx_;
 
         static bool enabled_;
         static bool has_called_init_;
@@ -123,7 +123,6 @@ namespace hpx { namespace util {
         static int init_val_;
         static std::vector<openshmem_seginfo_t> segments;
         static std::uint8_t* shmem_buffer;
-        static std::size_t this_rank;
     };
 }}    // namespace hpx::util
 

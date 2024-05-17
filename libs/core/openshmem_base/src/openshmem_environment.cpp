@@ -109,13 +109,12 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    hpx::mutex openshmem_environment::mtx_{};
+    hpx::spinlock openshmem_environment::mtx_;
     bool openshmem_environment::enabled_ = false;
     bool openshmem_environment::has_called_init_ = false;
     int openshmem_environment::provided_threading_flag_ = 0;
     int openshmem_environment::is_initialized_ = -1;
     int openshmem_environment::init_val_ = 0;
-    std::size_t openshmem_environment::this_rank = -1;
     //std::vector<std::shared_ptr<hpx::spinlock>> openshmem_environment::segment_mutex{};
     std::vector<openshmem_seginfo_t> openshmem_environment::segments{};
     std::uint8_t* hpx::util::openshmem_environment::shmem_buffer = nullptr;
@@ -224,11 +223,6 @@ namespace hpx::util {
         if (enabled_)
             return;    // don't call twice
 
-        if (enabled()) {
-            scoped_lock l;
-            this_rank = static_cast<int>(shmem_my_pe());
-        }
-
         has_called_init_ = false;
 
         // We assume to use the OpenSHMEM parcelport if it is not explicitly disabled
@@ -261,7 +255,7 @@ namespace hpx::util {
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (this_rank == 0)
+        if (rank() == 0)
         {
             rtcfg.mode_ = hpx::runtime_mode::console;
         }
@@ -275,7 +269,7 @@ namespace hpx::util {
         rtcfg.mode_ = hpx::runtime_mode::local;
 #endif
 
-        rtcfg.add_entry("hpx.parcel.openshmem.rank", std::to_string(this_rank));
+        rtcfg.add_entry("hpx.parcel.openshmem.rank", std::to_string(rank()));
         rtcfg.add_entry(
             "hpx.parcel.openshmem.processorname", get_processor_name());
     }
@@ -500,7 +494,7 @@ namespace hpx::util {
 
     int openshmem_environment::rank()
     {
-        return this_rank;
+        return shmem_my_pe();
     }
 
     openshmem_environment::scoped_lock::scoped_lock()
