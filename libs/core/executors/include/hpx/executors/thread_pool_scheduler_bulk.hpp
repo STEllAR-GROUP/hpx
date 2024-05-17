@@ -339,6 +339,9 @@ namespace hpx::execution::experimental::detail {
     template <typename OperationState, typename F, typename Shape>
     struct bulk_receiver
     {
+#ifdef HPX_HAVE_STDEXEC
+        using receiver_concept = hpx::execution::experimental::receiver_t;
+#endif
         OperationState* op_state;
 
         template <typename E>
@@ -660,6 +663,60 @@ namespace hpx::execution::experimental::detail {
         thread_pool_bulk_sender& operator=(
             thread_pool_bulk_sender const&) = default;
 
+#ifdef HPX_HAVE_STDEXEC
+        using sender_concept = hpx::execution::experimental::sender_t;
+
+        template <typename Env>
+        friend auto tag_invoke(
+            hpx::execution::experimental::get_completion_signatures_t,
+            thread_pool_bulk_sender const&, Env const&)
+            -> hpx::execution::experimental::transform_completion_signatures_of<
+                Sender,
+                Env,
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_error_t(std::exception_ptr)
+                >
+            >;
+
+        struct env {
+            thread_pool_bulk_sender const& snd;
+
+            // clang-format off
+            template <typename CPO,
+                HPX_CONCEPT_REQUIRES_(
+                    meta::value<meta::one_of<CPO,
+                        hpx::execution::experimental::set_error_t,
+                        hpx::execution::experimental::set_stopped_t>> &&
+                    hpx::execution::experimental::detail::has_completion_scheduler_v<
+                        CPO, std::decay_t<Sender>>
+                )>
+            // clang-format on
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
+                env const& e) noexcept
+            {
+                return tag(hpx::execution::experimental::get_env(e.snd.sender));
+            }
+
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_completion_scheduler_t<
+                    hpx::execution::experimental::set_value_t>,
+                env const& e) noexcept
+            {
+                return e.snd.scheduler;
+            }
+        };
+
+        friend struct env;
+        // It may be also be correct to forward the entire env of the
+        // pred. sender.
+        friend constexpr auto tag_invoke(
+            hpx::execution::experimental::get_env_t,
+            thread_pool_bulk_sender const& s
+            ) noexcept {
+            return env{s};
+        }
+#else
         template <typename Env>
         struct generate_completion_signatures
         {
@@ -673,11 +730,7 @@ namespace hpx::execution::experimental::detail {
                 Variant<std::exception_ptr>>;
 
             static constexpr bool sends_stopped =
-#ifdef HPX_HAVE_STDEXEC
-                hpx::execution::experimental::sends_stopped<Sender, Env>;
-#else
                 sends_stopped_of_v<Sender, Env>;
-#endif
         };
 
         template <typename Env>
@@ -700,7 +753,7 @@ namespace hpx::execution::experimental::detail {
             hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
             thread_pool_bulk_sender const& s)
         {
-            return tag(s);
+            return tag(s.sender);
         }
 
         friend constexpr auto tag_invoke(
@@ -710,6 +763,7 @@ namespace hpx::execution::experimental::detail {
         {
             return s.scheduler;
         }
+#endif
 
     private:
         template <typename Receiver>

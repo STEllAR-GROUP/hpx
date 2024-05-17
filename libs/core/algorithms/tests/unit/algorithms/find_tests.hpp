@@ -117,9 +117,15 @@ void test_find_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+#ifdef HPX_HAVE_STDEXEC
+    auto result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
+        hpx::find(policy.on(exec)));
+#else
     auto result =
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
         hpx::find(policy.on(exec)) | tt::sync_wait();
+#endif
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
@@ -170,10 +176,14 @@ void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
+#ifdef HPX_HAVE_STDEXEC
+    auto result = tt::sync_wait(hpx::find(p.on(exec), iterator(std::begin(c)),
+                            iterator(std::end(c)), int(1)));
+#else
     auto result = hpx::find(p.on(exec), iterator(std::begin(c)),
                       iterator(std::end(c)), int(1)) |
         tt::sync_wait();
-
+#endif
     // create iterator at position of value to be found
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
