@@ -31,18 +31,17 @@ namespace mylib {
     {
         using is_receiver = void;
 
-        friend some_env tag_invoke(
-            ex::get_env_t, receiver_2 const&) noexcept
+        friend some_env tag_invoke(ex::get_env_t, receiver_2 const&) noexcept
         {
             return some_env{};
         }
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    inline constexpr struct receiver_env_t final
-        : ex::forwarding_query_t {
+    inline constexpr struct receiver_env_t final : ex::forwarding_query_t
+    {
         template <typename Env>
-            requires ex::tag_invocable<receiver_env_t, Env>
+        requires ex::tag_invocable<receiver_env_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::tag_invoke(*this, e);
@@ -59,8 +58,7 @@ namespace mylib {
     auto env3 = ex::make_env(ex::with(receiver_env, 42));
     using env3_t = decltype(env3);
 #else
-    using env3_t =
-        ex::make_env_t<receiver_env_t, int>;
+    using env3_t = ex::make_env_t<receiver_env_t, int>;
 #endif
 
     struct receiver_3
@@ -79,40 +77,36 @@ namespace mylib {
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    auto env4 = ex::make_env(std::move(env3), ex::with(receiver_env, std::string("42")));
+    auto env4 = ex::make_env(
+        std::move(env3), ex::with(receiver_env, std::string("42")));
     using env4_t = decltype(env4);
 #else
-    using env4_t = ex::make_env_t<receiver_env_t,
-        std::string, env3_t>;
+    using env4_t = ex::make_env_t<receiver_env_t, std::string, env3_t>;
 #endif
 
     struct receiver_4
     {
         using is_receiver = void;
 
-        friend auto tag_invoke(
-            ex::get_env_t, receiver_4 const&) noexcept
+        friend auto tag_invoke(ex::get_env_t, receiver_4 const&) noexcept
         {
             receiver_3 rcv;
 
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv),
-                ex::with(receiver_env, std::string("42"))
-                );
+                ex::get_env(rcv), ex::with(receiver_env, std::string("42")));
 #else
             return ex::make_env<receiver_env_t>(
-                std::string("42"),
-                ex::get_env(std::move(rcv)));
+                std::string("42"), ex::get_env(std::move(rcv)));
 #endif
         }
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    inline constexpr struct receiver_env1_t final
-        : ex::forwarding_query_t {
+    inline constexpr struct receiver_env1_t final : ex::forwarding_query_t
+    {
         template <typename Env>
-            requires ex::tag_invocable<receiver_env1_t, Env>
+        requires ex::tag_invocable<receiver_env1_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::tag_invoke(*this, e);
@@ -126,30 +120,26 @@ namespace mylib {
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    auto env5 = ex::make_env(std::move(env3), ex::with(receiver_env1, std::string("42")));
+    auto env5 = ex::make_env(
+        std::move(env3), ex::with(receiver_env1, std::string("42")));
     using env5_t = decltype(env5);
 #else
-    using env5_t = ex::make_env_t<receiver_env1_t,
-        std::string, env3_t>;
+    using env5_t = ex::make_env_t<receiver_env1_t, std::string, env3_t>;
 #endif
 
     struct receiver_5
     {
         using is_receiver = void;
 
-        friend auto tag_invoke(
-            ex::get_env_t, receiver_5 const&) noexcept
+        friend auto tag_invoke(ex::get_env_t, receiver_5 const&) noexcept
         {
             receiver_3 rcv;
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv),
-                ex::with(receiver_env1, std::string("42"))
-                );
+                ex::get_env(rcv), ex::with(receiver_env1, std::string("42")));
 #else
             return ex::make_env<receiver_env1_t>(
-                std::string("42"),
-                ex::get_env(std::move(rcv)));
+                std::string("42"), ex::get_env(std::move(rcv)));
 #endif
         }
     };

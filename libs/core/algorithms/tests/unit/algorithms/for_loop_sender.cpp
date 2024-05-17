@@ -71,8 +71,9 @@ void test_for_loop_sender_direct_async(Policy l, ExPolicy&& policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    tt::sync_wait(hpx::experimental::for_loop(policy.on(exec), iterator(std::begin(c)),
-                                iterator(std::end(c)), [](iterator it) { *it = 42; }));
+    tt::sync_wait(
+        hpx::experimental::for_loop(policy.on(exec), iterator(std::begin(c)),
+            iterator(std::end(c)), [](iterator it) { *it = 42; }));
 #else
     hpx::experimental::for_loop(policy.on(exec), iterator(std::begin(c)),
         iterator(std::end(c)), [](iterator it) { *it = 42; }) |
@@ -136,7 +137,7 @@ void test_for_loop_sender(Policy l, ExPolicy&& policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
     tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
-    hpx::experimental::for_loop(policy.on(exec)));
+        hpx::experimental::for_loop(policy.on(exec)));
 #else
     ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::experimental::for_loop(policy.on(exec)) | tt::sync_wait();

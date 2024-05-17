@@ -81,7 +81,7 @@ void test_reverse(Policy l, ExPolicy&& policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
     tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
-    hpx::reverse(policy.on(exec)));
+        hpx::reverse(policy.on(exec)));
 #else
     ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
         hpx::reverse(policy.on(exec)) | tt::sync_wait();
@@ -118,7 +118,8 @@ void test_reverse_async_direct(Policy l, ExPolicy&& p, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-     tt::sync_wait(hpx::reverse(p.on(exec), iterator(std::begin(c)), iterator(std::end(c))));
+    tt::sync_wait(hpx::reverse(
+        p.on(exec), iterator(std::begin(c)), iterator(std::end(c))));
 #else
     hpx::reverse(p.on(exec), iterator(std::begin(c)), iterator(std::end(c))) |
         tt::sync_wait();

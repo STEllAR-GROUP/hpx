@@ -51,7 +51,7 @@ set(execution_base_sources agent_ref.cpp any_sender.cpp
 set(optional_dependencies)
 
 if(TARGET STDEXEC::stdexec)
-    set(execution_base_optional_dependencies STDEXEC::stdexec)
+  set(execution_base_optional_dependencies STDEXEC::stdexec)
 endif()
 
 include(HPX_AddModule)

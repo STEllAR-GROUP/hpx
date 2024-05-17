@@ -114,17 +114,18 @@ namespace hpx::execution::experimental {
         struct has_completion_scheduler_impl<true, CPO, Sender>
           : hpx::execution::experimental::is_scheduler<hpx::functional::
                     tag_invoke_result_t<get_completion_scheduler_t<CPO>,
-                        hpx::execution::experimental::env_of_t<std::decay_t<Sender> const&>>>
+                        hpx::execution::experimental::env_of_t<
+                            std::decay_t<Sender> const&>>>
         {
         };
 
         template <typename CPO, typename Sender>
         struct has_completion_scheduler
-          : has_completion_scheduler_impl<hpx::functional::is_tag_invocable_v<
-                                              get_completion_scheduler_t<CPO>,
-                                              hpx::execution::experimental::env_of_t<
-                                                  std::decay_t<Sender> const&>
-                                              >,
+          : has_completion_scheduler_impl<
+                hpx::functional::is_tag_invocable_v<
+                    get_completion_scheduler_t<CPO>,
+                    hpx::execution::experimental::env_of_t<
+                        std::decay_t<Sender> const&>>,
                 CPO, Sender>
         {
         };

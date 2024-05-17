@@ -88,8 +88,8 @@ void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    auto result =
-        tt::sync_wait(hpx::ranges::adjacent_difference(p.on(exec), c, std::begin(d)));
+    auto result = tt::sync_wait(
+        hpx::ranges::adjacent_difference(p.on(exec), c, std::begin(d)));
 #else
     auto result =
         hpx::ranges::adjacent_difference(p.on(exec), c, std::begin(d)) |

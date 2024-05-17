@@ -33,7 +33,6 @@
 #include <type_traits>
 #include <utility>
 
-
 namespace hpx::execution::experimental {
 
     ///////////////////////////////////////////////////////////////////////////
@@ -48,33 +47,32 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
 #ifdef HPX_HAVE_STDEXEC
-            template<typename... Args>
-            using default_set_value = hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_value_t(Args...)
-            >;
+            template <typename... Args>
+            using default_set_value =
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t(Args...)>;
 
-            template<typename Arg>
-            using default_set_error = hpx::execution::experimental::completion_signatures<
-                hpx::execution::experimental::set_error_t(Arg)
-            >;
+            template <typename Arg>
+            using default_set_error =
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_error_t(Arg)>;
 
-            using disable_set_stopped = hpx::execution::experimental::completion_signatures<>;
+            using disable_set_stopped =
+                hpx::execution::experimental::completion_signatures<>;
 
             template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, bulk_sender const&, Env) noexcept
-                -> hpx::execution::experimental::transform_completion_signatures_of<
-                    Sender,
-                    Env,
+            friend auto tag_invoke(get_completion_signatures_t,
+                bulk_sender const&, Env) noexcept -> hpx::execution::
+                experimental::transform_completion_signatures_of<Sender, Env,
                     hpx::execution::experimental::completion_signatures<
-                        hpx::execution::experimental::set_error_t(std::exception_ptr)
-                    >,
-                    default_set_value,
-                    default_set_error,
-                    disable_set_stopped
-                >;
+                        hpx::execution::experimental::set_error_t(
+                            std::exception_ptr)>,
+                    default_set_value, default_set_error, disable_set_stopped>;
 
-            friend constexpr auto tag_invoke(hpx::execution::experimental::get_env_t, bulk_sender const& s) noexcept {
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                bulk_sender const& s) noexcept
+            {
                 return hpx::execution::experimental::get_env(s.sender);
             }
 #else
@@ -119,7 +117,8 @@ namespace hpx::execution::experimental {
             struct bulk_receiver
             {
 #ifdef HPX_HAVE_STDEXEC
-                using receiver_concept = hpx::execution::experimental::receiver_t;
+                using receiver_concept =
+                    hpx::execution::experimental::receiver_t;
 #endif
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
                 HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;

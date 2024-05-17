@@ -20,10 +20,11 @@
 namespace ex = hpx::execution::experimental;
 
 // schedule_from customization
-struct scheduler_schedule_from : example_scheduler_template<scheduler_schedule_from>
+struct scheduler_schedule_from
+  : example_scheduler_template<scheduler_schedule_from>
 {
     using base = example_scheduler_template<scheduler_schedule_from>;
-    template<typename... Args>
+    template <typename... Args>
     explicit scheduler_schedule_from(Args&&... ags)
       : base(std::forward<Args>(ags)...)
     {
@@ -68,18 +69,20 @@ struct sender_with_completion_scheduler : void_sender
     }
 
 #ifdef HPX_HAVE_STDEXEC
-    struct my_env {
+    struct my_env
+    {
         scheduler_transfer const& sched;
 
         friend scheduler_transfer const& tag_invoke(
-            ex::get_completion_scheduler_t<ex::set_value_t>, my_env env) noexcept
+            ex::get_completion_scheduler_t<ex::set_value_t>,
+            my_env env) noexcept
         {
             return env.sched;
         }
     };
 
-    friend my_env tag_invoke(
-        hpx::execution::experimental::get_env_t, sender_with_completion_scheduler const& s) noexcept
+    friend my_env tag_invoke(hpx::execution::experimental::get_env_t,
+        sender_with_completion_scheduler const& s) noexcept
     {
         return {s.sched};
     }
@@ -109,8 +112,8 @@ int main()
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::transfer(ex::just(),
-            example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                tag_invoke_overload_called});
+            example_scheduler{scheduler_schedule_called,
+                scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
@@ -134,12 +137,12 @@ int main()
 
     {
         std::atomic<bool> set_value_called{false};
-        std::atomic<bool> scheduler_schedule_called{false}  ;
+        std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::transfer(ex::just(3),
-            example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                tag_invoke_overload_called});
+            example_scheduler{scheduler_schedule_called,
+                scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
@@ -168,8 +171,8 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s =
             ex::transfer(ex::just(custom_type_non_default_constructible{42}),
-                example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                    tag_invoke_overload_called});
+                example_scheduler{scheduler_schedule_called,
+                    scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
@@ -199,8 +202,8 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::transfer(
             ex::just(custom_type_non_default_constructible_non_copyable{42}),
-            example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                tag_invoke_overload_called});
+            example_scheduler{scheduler_schedule_called,
+                scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
@@ -228,8 +231,8 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
         auto s = ex::transfer(ex::just(std::string("hello"), 3),
-            example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                tag_invoke_overload_called});
+            example_scheduler{scheduler_schedule_called,
+                scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
@@ -413,8 +416,8 @@ int main()
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
         auto s = ex::transfer(error_sender{},
-            example_scheduler{scheduler_schedule_called, scheduler_execute_called,
-                tag_invoke_overload_called});
+            example_scheduler{scheduler_schedule_called,
+                scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 

@@ -67,14 +67,16 @@ auto signature_all(Error, Values...)
 
 #ifdef HPX_HAVE_STDEXEC
 template <typename CompletionSignatures>
-struct test_helper {
-    struct my_sender {
+struct test_helper
+{
+    struct my_sender
+    {
         using is_sender = void;
         using completion_signatures = CompletionSignatures;
     };
 
-    using value_types =
-        typename ex::value_types_of_t<my_sender, ex::empty_env, hpx::tuple, hpx::variant>;
+    using value_types = typename ex::value_types_of_t<my_sender, ex::empty_env,
+        hpx::tuple, hpx::variant>;
 
     using error_types =
         typename ex::error_types_of_t<my_sender, ex::empty_env, hpx::variant>;
@@ -296,8 +298,9 @@ void test_sender1(Signatures)
         ex::detail::has_completion_signatures<sender_1<Signatures>>>);
 
 #ifdef HPX_HAVE_STDEXEC
-    static_assert(
-        std::is_same_v<decltype(ex::get_completion_signatures(s, ex::empty_env{})), Signatures>);
+    static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
+                                     s, ex::empty_env{})),
+        Signatures>);
 #else
     static_assert(
         std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
@@ -352,13 +355,13 @@ void test_sender2(Signatures)
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>>);
 #ifdef HPX_HAVE_STDEXEC
-        static_assert(std::is_same_v<
-            decltype(ex::get_completion_signatures(s1, ex::empty_env{})),
+        static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
+                                         s1, ex::empty_env{})),
             Signatures>);
 #else
-        static_assert(std::is_same_v<
-            decltype(ex::get_completion_signatures(s1)),
-            Signatures>);
+        static_assert(
+            std::is_same_v<decltype(ex::get_completion_signatures(s1)),
+                Signatures>);
 #endif
 
         static_assert(
@@ -392,9 +395,9 @@ void test_sender2(Signatures)
         static_assert(
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>, ex::empty_env>);
-        static_assert(
-            std::is_same_v<decltype(ex::get_completion_signatures(s2, ex::empty_env{})),
-                Signatures>);
+        static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
+                                         s2, ex::empty_env{})),
+            Signatures>);
         static_assert(std::is_same_v<
             ex::completion_signatures_of_t<sender_2<Signatures>, ex::empty_env>,
             Signatures>);
@@ -472,7 +475,10 @@ struct promise
 struct awaiter
 {
 #ifdef HPX_HAVE_STDEXEC
-    bool await_ready() {return true;}
+    bool await_ready()
+    {
+        return true;
+    }
 #else
     void await_ready() {}
 #endif
@@ -512,8 +518,9 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     static_assert(!hpx::meta::value<ex::detail::has_completion_signatures<
                       awaitable_sender_1<Awaiter>>>);
 #ifdef HPX_HAVE_STDEXEC
-    static_assert(
-        std::is_same_v<decltype(ex::get_completion_signatures(s, ex::empty_env{})), Signatures>);
+    static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
+                                     s, ex::empty_env{})),
+        Signatures>);
 #else
     static_assert(
         std::is_same_v<decltype(ex::get_completion_signatures(s)), Signatures>);
@@ -526,7 +533,8 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     using error_types_of = ex::error_types_of_t<awaitable_sender_1<Awaiter>>;
 
 #ifdef HPX_HAVE_STDEXEC
-    struct sender_with_given_signatures {
+    struct sender_with_given_signatures
+    {
         using sender_concept = ex::sender_t;
         using completion_signatures = Signatures;
     };
@@ -693,17 +701,13 @@ int main()
     {
 #ifdef HPX_HAVE_STDEXEC
         test_awaitable_sender1(
-            ex::completion_signatures<
-                ex::set_value_t(),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>{},
+            ex::completion_signatures<ex::set_value_t(),
+                ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>{},
             hpx::suspend_always{});
 
         test_awaitable_sender1(
-            ex::completion_signatures<
-                ex::set_value_t(bool),
-                ex::set_error_t(std::exception_ptr),
-                ex::set_stopped_t()>{},
+            ex::completion_signatures<ex::set_value_t(bool),
+                ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>{},
             awaiter{});
 #else
         test_awaitable_sender1(signature_error_values(std::exception_ptr()),

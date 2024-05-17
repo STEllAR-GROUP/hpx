@@ -157,9 +157,8 @@ namespace hpx::execution::experimental {
             future_data_with_run_loop(init_no_addref no_addref,
                 other_allocator const& alloc,
 #ifdef HPX_HAVE_STDEXEC
-                decltype(std::declval<
-                    hpx::execution::experimental::run_loop>().get_scheduler()
-                ) const& sched,
+                decltype(std::declval<hpx::execution::experimental::run_loop>()
+                             .get_scheduler()) const& sched,
 #else
                 hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -167,10 +166,10 @@ namespace hpx::execution::experimental {
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
 #ifdef HPX_HAVE_STDEXEC
               //TODO: IS THIS A GOOD IDEA?
-                , loop(*hpx::execution::experimental::get_env(
-                        schedule(sched)).__loop_)
+              , loop(*hpx::execution::experimental::get_env(schedule(sched))
+                          .__loop_)
 #else
-                , loop(sched.get_run_loop())
+              , loop(sched.get_run_loop())
 #endif
             {
                 this->set_on_completed([this]() { loop.finish(); });
@@ -232,9 +231,8 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Allocator>
         auto make_future_with_run_loop(
 #ifdef HPX_HAVE_STDEXEC
-            decltype(std::declval<
-                    hpx::execution::experimental::run_loop>().get_scheduler()
-            ) const& sched,
+            decltype(std::declval<hpx::execution::experimental::run_loop>()
+                         .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif
@@ -341,7 +339,8 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_STDEXEC
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
-                    hpx::execution::experimental::set_value_t>(hpx::execution::experimental::get_env(sender));
+                    hpx::execution::experimental::set_value_t>(
+                    hpx::execution::experimental::get_env(sender));
 #else
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
@@ -361,9 +360,8 @@ namespace hpx::execution::experimental {
         // clang-format on
         friend auto tag_invoke(make_future_t,
 #ifdef HPX_HAVE_STDEXEC
-            decltype(std::declval<
-                    hpx::execution::experimental::run_loop>().get_scheduler()
-            ) const& sched,
+            decltype(std::declval<hpx::execution::experimental::run_loop>()
+                         .get_scheduler()) const& sched,
 #else
             hpx::execution::experimental::run_loop_scheduler const& sched,
 #endif

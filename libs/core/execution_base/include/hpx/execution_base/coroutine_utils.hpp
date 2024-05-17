@@ -61,8 +61,8 @@ namespace hpx::execution::experimental {
     // await-expression. In practice, the coroutine is never resumed, and the
     // unhandled_stopped of the coroutine caller's promise type is called.
     //
-//    template <typename Promise>
-//    struct with_awaitable_senders;
+    //    template <typename Promise>
+    //    struct with_awaitable_senders;
 
     struct promise_base;
 

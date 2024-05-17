@@ -83,7 +83,8 @@ struct check_context_receiver
     }
 
     template <typename... Ts>
-    friend void tag_invoke(ex::set_value_t, check_context_receiver&& r, Ts&&...) noexcept
+    friend void tag_invoke(
+        ex::set_value_t, check_context_receiver&& r, Ts&&...) noexcept
     {
         HPX_TEST_NEQ(r.parent_id, hpx::this_thread::get_id());
         HPX_TEST_NEQ(hpx::thread::id(hpx::threads::invalid_thread_id),
@@ -583,7 +584,8 @@ void test_when_all()
 
         bool executed{false};
 #ifdef HPX_HAVE_STDEXEC
-            tt::sync_wait(std::move(when1) | ex::then([parent_id, &executed](int x, std::string y, double z) {
+        tt::sync_wait(std::move(when1) |
+            ex::then([parent_id, &executed](int x, std::string y, double z) {
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
                 HPX_TEST_EQ(x, 42);
                 HPX_TEST_EQ(y, std::string("hello"));
@@ -712,9 +714,9 @@ void test_future_sender()
         static_assert(std::is_same_v<
                           std::decay_t<decltype(*tt::sync_wait(std::move(fs)))>,
 #ifdef HPX_HAVE_STDEXEC
-                        std::tuple<>>,
+                          std::tuple<>>,
 #else
-                        hpx::tuple<>>,
+                          hpx::tuple<>>,
 #endif
             "sync_wait should return hpx::tuple<>");
 
@@ -952,9 +954,9 @@ void test_ensure_started()
     {
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started()
 #ifdef HPX_HAVE_STDEXEC
-        | ex::split()
+            | ex::split()
 #endif
-        ;
+            ;
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
@@ -997,11 +999,10 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
-                ex::then([](int const& x, int const& y) { return x + y; })
-            )),
-        3);
+                ex::then([](int const& x, int const& y) { return x + y; }))),
+            3);
 #else
-    HPX_TEST_EQ(
+        HPX_TEST_EQ(
             hpx::get<0>(*(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }) |
                 tt::sync_wait())),
@@ -1025,9 +1026,9 @@ void test_ensure_started_when_all()
             return 3;
         }) | ex::ensure_started()
 #ifdef HPX_HAVE_STDEXEC
-        | ex::split()
+            | ex::split()
 #endif
-        ;
+            ;
         {
             std::unique_lock l{mtx};
             cond.wait(l, [&]() { return started; });
@@ -1042,13 +1043,12 @@ void test_ensure_started_when_all()
             return x + 2;
         });
 #ifdef HPX_HAVE_STDEXEC
-            HPX_TEST_EQ(
+        HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
-            ex::then([](int const& x, int const& y) { return x + y; })
-            )),
+                ex::then([](int const& x, int const& y) { return x + y; }))),
             9);
 #else
-            HPX_TEST_EQ(
+        HPX_TEST_EQ(
             hpx::get<0>(*(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }) |
                 tt::sync_wait())),
@@ -1074,7 +1074,7 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
             | ex::split()
 #endif
-        ;
+            ;
         {
             std::unique_lock l{mtx};
             cond.wait(l, [&]() { return started; });
@@ -1090,7 +1090,7 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
-                          ex::then([](int const& x, int const& y) { return x + y; }))),
+                ex::then([](int const& x, int const& y) { return x + y; }))),
             9);
 #else
         HPX_TEST_EQ(
@@ -1156,7 +1156,7 @@ void test_split_when_all()
 #ifdef HPX_HAVE_STDEXEC
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
-                          ex::then([](int const& x, int const& y) { return x + y; }))),
+                ex::then([](int const& x, int const& y) { return x + y; }))),
             3);
 #else
         HPX_TEST_EQ(
@@ -1185,9 +1185,10 @@ void test_split_when_all()
             return x + 2;
         });
 #ifdef HPX_HAVE_STDEXEC
-HPX_TEST_EQ(
-    hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
-                  ex::then([](int const& x, int const& y) { return x + y; }))), 9);
+        HPX_TEST_EQ(
+            hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
+                ex::then([](int const& x, int const& y) { return x + y; }))),
+            9);
 #else
 
         HPX_TEST_EQ(
@@ -1216,10 +1217,9 @@ HPX_TEST_EQ(
             return x + 2;
         });
 #ifdef HPX_HAVE_STDEXEC
-       HPX_TEST_EQ(
+        HPX_TEST_EQ(
             hpx::get<0>(*(tt::sync_wait(ex::when_all(succ1, succ2) |
-                ex::then([](int const& x, int const& y) { return x + y; })
-                ))),
+                ex::then([](int const& x, int const& y) { return x + y; })))),
             9);
 #else
         HPX_TEST_EQ(
@@ -1241,7 +1241,7 @@ void test_let_value()
     {
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) |
-                                    ex::let_value([]() { return ex::just(42); }))));
+            ex::let_value([]() { return ex::just(42); }))));
 #else
         auto result = hpx::get<0>(*(ex::schedule(sched) |
             ex::let_value([]() { return ex::just(42); }) | tt::sync_wait()));
@@ -1251,9 +1251,8 @@ void test_let_value()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::let_value([=]() {
-          return ex::transfer_just(sched, 42);
-        }))));
+        auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) |
+            ex::let_value([=]() { return ex::transfer_just(sched, 42); }))));
 #else
         auto result = hpx::get<0>(*(ex::schedule(sched) | ex::let_value([=]() {
             return ex::transfer_just(sched, 42);
@@ -1264,9 +1263,8 @@ void test_let_value()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*tt::sync_wait((ex::just() | ex::let_value([=]() {
-          return ex::transfer_just(sched, 42);
-        }))));
+        auto result = hpx::get<0>(*tt::sync_wait((ex::just() |
+            ex::let_value([=]() { return ex::transfer_just(sched, 42); }))));
 #else
         auto result = hpx::get<0>(*(ex::just() | ex::let_value([=]() {
             return ex::transfer_just(sched, 42);
@@ -1279,8 +1277,7 @@ void test_let_value()
     {
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
-                                    ex::let_value([](int&) { return ex::just(42); })
-                                    )));
+            ex::let_value([](int&) { return ex::just(42); }))));
 #else
         auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
             ex::let_value([](int&) { return ex::just(42); }) |
@@ -1292,8 +1289,8 @@ void test_let_value()
     {
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
-                                    ex::let_value([=](int&) { return ex::transfer_just(sched, 42); })
-                                    )));
+            ex::let_value(
+                [=](int&) { return ex::transfer_just(sched, 42); }))));
 #else
         auto result = hpx::get<0>(*(ex::transfer_just(sched, 43) |
             ex::let_value([=](int&) { return ex::transfer_just(sched, 42); }) |
@@ -1304,9 +1301,10 @@ void test_let_value()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int&) {
-          return ex::transfer_just(sched, 42);
-        }))));
+        auto result =
+            hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int&) {
+                return ex::transfer_just(sched, 42);
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int&) {
             return ex::transfer_just(sched, 42);
@@ -1318,8 +1316,8 @@ void test_let_value()
     // int predecessor, value used
     {
 #ifdef HPX_HAVE_STDEXEC
-    auto result = hpx::get<0>(
-            *(tt::sync_wait(ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
+        auto result = hpx::get<0>(*(tt::sync_wait(
+            ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
                 return ex::just(42) | ex::then([&](int y) { return x + y; });
             }))));
 
@@ -1329,15 +1327,15 @@ void test_let_value()
                 return ex::just(42) | ex::then([&](int y) { return x + y; });
             }) | tt::sync_wait()));
 #endif
-       HPX_TEST_EQ(result, 85);
+        HPX_TEST_EQ(result, 85);
     }
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(
-            *(tt::sync_wait(ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
-              return ex::transfer_just(sched, 42) |
-                     ex::then([&](int y) { return x + y; });
+        auto result = hpx::get<0>(*(tt::sync_wait(
+            ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
+                return ex::transfer_just(sched, 42) |
+                    ex::then([&](int y) { return x + y; });
             }))));
 #else
         auto result = hpx::get<0>(
@@ -1351,10 +1349,11 @@ void test_let_value()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int& x) {
-          return ex::transfer_just(sched, 42) |
-                 ex::then([&](int y) { return x + y; });
-        }))));
+        auto result = hpx::get<0>(
+            *(tt::sync_wait(ex::just(43) | ex::let_value([=](int& x) {
+                return ex::transfer_just(sched, 42) |
+                    ex::then([&](int y) { return x + y; });
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::just(43) | ex::let_value([=](int& x) {
             return ex::transfer_just(sched, 42) |
@@ -1371,7 +1370,7 @@ void test_let_value()
         try
         {
 #ifdef HPX_HAVE_STDEXEC
-        tt::sync_wait(ex::transfer_just(sched, 43) | ex::then([](int x) {
+            tt::sync_wait(ex::transfer_just(sched, 43) | ex::then([](int x) {
                 throw std::runtime_error("error");
                 return x;
             }) | ex::let_value([](int&) {
@@ -1423,7 +1422,7 @@ void test_let_error()
     {
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
-    tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+        tt::sync_wait(ex::schedule(sched) | ex::then([]() {
             throw std::runtime_error("error");
         }) | ex::let_error([&called](std::exception_ptr& ep) {
             called = true;
@@ -1445,12 +1444,12 @@ void test_let_error()
     {
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
-       tt::sync_wait(ex::schedule(sched) | ex::then([]() {
-          throw std::runtime_error("error");
+        tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+            throw std::runtime_error("error");
         }) | ex::let_error([=, &called](std::exception_ptr& ep) {
-          called = true;
-          check_exception_ptr_message(ep, "error");
-          return ex::transfer_just(sched);
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched);
         }));
 #else
         ex::schedule(sched) | ex::then([]() {
@@ -1467,11 +1466,12 @@ void test_let_error()
     {
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
-        tt::sync_wait(ex::just() | ex::then([]() { throw std::runtime_error("error"); }) |
-        ex::let_error([=, &called](std::exception_ptr& ep) {
-          called = true;
-          check_exception_ptr_message(ep, "error");
-          return ex::transfer_just(sched);
+        tt::sync_wait(ex::just() | ex::then([]() {
+            throw std::runtime_error("error");
+        }) | ex::let_error([=, &called](std::exception_ptr& ep) {
+            called = true;
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched);
         }));
 #else
         ex::just() | ex::then([]() { throw std::runtime_error("error"); }) |
@@ -1488,13 +1488,14 @@ void test_let_error()
     // int predecessor
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
-          throw std::runtime_error("error");
-          return 43;
-        }) | ex::let_error([](std::exception_ptr& ep) {
-          check_exception_ptr_message(ep, "error");
-          return ex::just(42);
-        }))));
+        auto result =
+            hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+                throw std::runtime_error("error");
+                return 43;
+            }) | ex::let_error([](std::exception_ptr& ep) {
+                check_exception_ptr_message(ep, "error");
+                return ex::just(42);
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
             throw std::runtime_error("error");
@@ -1509,13 +1510,14 @@ void test_let_error()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
-          throw std::runtime_error("error");
-          return 43;
-        }) | ex::let_error([=](std::exception_ptr& ep) {
-          check_exception_ptr_message(ep, "error");
-          return ex::transfer_just(sched, 42);
-        }))));
+        auto result =
+            hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
+                throw std::runtime_error("error");
+                return 43;
+            }) | ex::let_error([=](std::exception_ptr& ep) {
+                check_exception_ptr_message(ep, "error");
+                return ex::transfer_just(sched, 42);
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::schedule(sched) | ex::then([]() {
             throw std::runtime_error("error");
@@ -1531,11 +1533,11 @@ void test_let_error()
     {
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::just() | ex::then([]() {
-          throw std::runtime_error("error");
-          return 43;
+            throw std::runtime_error("error");
+            return 43;
         }) | ex::let_error([=](std::exception_ptr& ep) {
-          check_exception_ptr_message(ep, "error");
-          return ex::transfer_just(sched, 42);
+            check_exception_ptr_message(ep, "error");
+            return ex::transfer_just(sched, 42);
         }))));
 #else
         auto result = hpx::get<0>(*(ex::just() | ex::then([]() {
@@ -1554,9 +1556,9 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 42) |
             ex::let_error([](std::exception_ptr) {
-              HPX_TEST(false);
-              return ex::just(43);
-            }) )));
+                HPX_TEST(false);
+                return ex::just(43);
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
             ex::let_error([](std::exception_ptr) {
@@ -1571,10 +1573,10 @@ void test_let_error()
     {
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 42) |
-                    ex::let_error([=](std::exception_ptr) {
-                      HPX_TEST(false);
-                      return ex::transfer_just(sched, 43);
-                    }) )));
+            ex::let_error([=](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::transfer_just(sched, 43);
+            }))));
 #else
         auto result = hpx::get<0>(*(ex::transfer_just(sched, 42) |
             ex::let_error([=](std::exception_ptr) {
@@ -1588,10 +1590,10 @@ void test_let_error()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result =
-            hpx::get<0>(*( tt::sync_wait(ex::just(42) | ex::let_error([=](std::exception_ptr) {
-              HPX_TEST(false);
-              return ex::transfer_just(sched, 43);
+        auto result = hpx::get<0>(*(
+            tt::sync_wait(ex::just(42) | ex::let_error([=](std::exception_ptr) {
+                HPX_TEST(false);
+                return ex::transfer_just(sched, 43);
             }))));
 #else
         auto result =
@@ -1641,10 +1643,10 @@ void test_detach()
         hpx::condition_variable cond;
 #ifdef HPX_HAVE_STDEXEC
         ex::start_detached(ex::schedule(sched) | ex::then([&]() {
-          std::lock_guard l{mtx};
-          called = true;
-          cond.notify_one();
-          return 42;
+            std::lock_guard l{mtx};
+            called = true;
+            cond.notify_one();
+            return 42;
         }));
 #else
         ex::schedule(sched) | ex::then([&]() {
@@ -1670,8 +1672,7 @@ void test_keep_future_sender()
     {
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>()) |
-        ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); })
-        );
+            ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }));
 #else
         ex::keep_future(hpx::make_ready_future<void>()) |
             ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }) |
@@ -1683,8 +1684,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>().share()) |
             ex::then(
-            [](hpx::shared_future<void>&& f) { HPX_TEST(f.is_ready()); })
-        );
+                [](hpx::shared_future<void>&& f) { HPX_TEST(f.is_ready()); }));
 #else
         ex::keep_future(hpx::make_ready_future<void>().share()) |
             ex::then(
@@ -1696,10 +1696,10 @@ void test_keep_future_sender()
     {
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42)) |
-        ex::then([](hpx::future<int>&& f) {
-          HPX_TEST(f.is_ready());
-          HPX_TEST_EQ(f.get(), 42);
-        }) );
+            ex::then([](hpx::future<int>&& f) {
+                HPX_TEST(f.is_ready());
+                HPX_TEST_EQ(f.get(), 42);
+            }));
 #else
         ex::keep_future(hpx::make_ready_future<int>(42)) |
             ex::then([](hpx::future<int>&& f) {
@@ -1713,10 +1713,10 @@ void test_keep_future_sender()
     {
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42).share()) |
-        ex::then([](hpx::shared_future<int>&& f) {
-          HPX_TEST(f.is_ready());
-          HPX_TEST_EQ(f.get(), 42);
-        }));
+            ex::then([](hpx::shared_future<int>&& f) {
+                HPX_TEST(f.is_ready());
+                HPX_TEST_EQ(f.get(), 42);
+            }));
 #else
         ex::keep_future(hpx::make_ready_future<int>(42).share()) |
             ex::then([](hpx::shared_future<int>&& f) {
@@ -1887,7 +1887,7 @@ void test_keep_future_sender()
         // reference may outlive the value.
 #ifdef HPX_HAVE_STDEXEC
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(sf)) |
-                               ex::transfer(ex::thread_pool_scheduler{}))));
+            ex::transfer(ex::thread_pool_scheduler{}))));
 #else
         auto r = hpx::get<0>(*(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait()));
@@ -1904,9 +1904,10 @@ void test_keep_future_sender()
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
 #ifdef HPX_HAVE_STDEXEC
-    HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(ex::when_all(ex::keep_future(std::move(f)),
-                                       ex::keep_future(sf)) |
-                          ex::then(fun)))),
+        HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(
+                        ex::when_all(ex::keep_future(std::move(f)),
+                            ex::keep_future(sf)) |
+                        ex::then(fun)))),
             85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
@@ -1923,11 +1924,12 @@ void test_keep_future_sender()
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
 #ifdef HPX_HAVE_STDEXEC
-                HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(ex::when_all(ex::keep_future(std::move(f)),
-                                                       ex::keep_future(sf)) |
-                                          ex::transfer(ex::thread_pool_scheduler{}) |
-                                          ex::then(fun)))),
-                            85);
+        HPX_TEST_EQ(
+            hpx::get<0>(*(tt::sync_wait(
+                ex::when_all(
+                    ex::keep_future(std::move(f)), ex::keep_future(sf)) |
+                ex::transfer(ex::thread_pool_scheduler{}) | ex::then(fun)))),
+            85);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::when_all(ex::keep_future(std::move(f)),
                                       ex::keep_future(sf)) |
@@ -1948,10 +1950,11 @@ void test_bulk()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
 #ifdef HPX_HAVE_STDEXEC
-        tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
-          ++v[i];
-          HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-        }));
+        tt::sync_wait(
+            ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
+                ++v[i];
+                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+            }));
 #else
         ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
             ++v[i];
@@ -1971,13 +1974,12 @@ void test_bulk()
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
 #ifdef HPX_HAVE_STDEXEC
-        auto v_out = hpx::get<0>(
-            *(tt::sync_wait(ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
-              ex::bulk(n,
-                       [&parent_id](int i, std::vector<int>& v) {
-                         v[i] = i;
-                         HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
-                       }))));
+        auto v_out = hpx::get<0>(*(tt::sync_wait(
+            ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
+            ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
+                v[i] = i;
+                HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
+            }))));
 #else
         auto v_out = hpx::get<0>(
             *(ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
@@ -2003,11 +2005,10 @@ void test_bulk()
         hpx::mutex mtx;
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
-        ex::bulk(std::move(v),
-                 [&](std::string const& s) {
-                   std::lock_guard lk(mtx);
-                   string_map.insert(s);
-                 }));
+            ex::bulk(std::move(v), [&](std::string const& s) {
+                std::lock_guard lk(mtx);
+                string_map.insert(s);
+            }));
 #else
         ex::schedule(ex::thread_pool_scheduler{}) |
             ex::bulk(std::move(v),
@@ -2035,14 +2036,13 @@ void test_bulk()
         {
 #ifdef HPX_HAVE_STDEXEC
             tt::sync_wait(ex::transfer_just(ex::thread_pool_scheduler{}) |
-            ex::bulk(n,
-                     [&v, i_fail](int i) {
-                       if (i == i_fail)
-                       {
-                           throw std::runtime_error("error");
-                       }
-                       v[i] = i;
-                     }));
+                ex::bulk(n, [&v, i_fail](int i) {
+                    if (i == i_fail)
+                    {
+                        throw std::runtime_error("error");
+                    }
+                    v[i] = i;
+                }));
 #else
             ex::transfer_just(ex::thread_pool_scheduler{}) |
                 ex::bulk(n,

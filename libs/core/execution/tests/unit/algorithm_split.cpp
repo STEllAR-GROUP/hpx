@@ -343,7 +343,6 @@ int main()
 #endif
         check_sends_stopped<true>(s3);
 
-
 #ifndef HPX_HAVE_STDEXEC
         HPX_TEST_EQ(s1.state, s3.state);
 #endif

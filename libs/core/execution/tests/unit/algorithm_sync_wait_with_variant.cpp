@@ -5,8 +5,8 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/init.hpp>
 #include <hpx/config.hpp>
+#include <hpx/init.hpp>
 #include <hpx/modules/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -24,7 +24,8 @@ namespace tt = hpx::this_thread::experimental;
 
 // NOTE: This is not a conforming sync_wait_with_variant implementation.
 // It only exists to check that the tag_invoke overload is called.
-std::optional<std::tuple<>> tag_invoke(tt::sync_wait_with_variant_t, custom_sender2 s)
+std::optional<std::tuple<>> tag_invoke(
+    tt::sync_wait_with_variant_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;
     return {};
@@ -56,9 +57,8 @@ int hpx_main()
         auto result = tt::sync_wait_with_variant(ex::just(42));
 
         auto v = *result;
-        static_assert(
-            std::is_same_v<decltype(v), variant<tuple<int>>>);
-        
+        static_assert(std::is_same_v<decltype(v), variant<tuple<int>>>);
+
         HPX_TEST(hpx::holds_alternative<tuple<int>>(v));
 
         auto t = hpx::get<tuple<int>>(v);
@@ -78,8 +78,7 @@ int hpx_main()
 #endif
 
         auto v = *result;
-        static_assert(
-            std::is_same_v<decltype(v), variant<tuple<int, double>>>);
+        static_assert(std::is_same_v<decltype(v), variant<tuple<int, double>>>);
 
         auto t = hpx::get<tuple<int, double>>(v);
         static_assert(std::is_same_v<decltype(t), tuple<int, double>>);
@@ -146,11 +145,12 @@ int hpx_main()
             ex::just(custom_type_non_default_constructible_non_copyable{42}));
         auto const& v = *result;
         static_assert(std::is_same_v<std::decay_t<decltype(v)>,
-            variant<tuple<
-                custom_type_non_default_constructible_non_copyable>>>);
+            variant<
+                tuple<custom_type_non_default_constructible_non_copyable>>>);
 
-        auto const& t = hpx::get<
-            tuple<custom_type_non_default_constructible_non_copyable>>(v);
+        auto const& t =
+            hpx::get<tuple<custom_type_non_default_constructible_non_copyable>>(
+                v);
         auto const& p = hpx::get<0>(t);
         static_assert(std::is_same_v<std::decay_t<decltype(p)>,
             custom_type_non_default_constructible_non_copyable>);
@@ -198,8 +198,7 @@ int hpx_main()
         // just(3) does not have a set_error_r(std::exception_ptr) completion
         // so the just(std::string) completion is never materialized into the
         // let_error's completions
-        static_assert(std::is_same_v<decltype(v),
-            variant<tuple<int>>>);
+        static_assert(std::is_same_v<decltype(v), variant<tuple<int>>>);
 #else
         static_assert(std::is_same_v<decltype(v),
             variant<tuple<std::string>, tuple<int>>>);
@@ -234,8 +233,7 @@ int hpx_main()
 
         // variant
         auto v = *result;
-        static_assert(
-            std::is_same_v<decltype(v), variant<tuple<std::string>>>);
+        static_assert(std::is_same_v<decltype(v), variant<tuple<std::string>>>);
 
         // tuple
         auto t = hpx::get<0>(v);
@@ -253,9 +251,8 @@ int hpx_main()
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
 #ifdef HPX_HAVE_STDEXEC
-        tt::sync_wait_with_variant(
-            custom_sender{
-                start_called, connect_called, tag_invoke_overload_called});
+        tt::sync_wait_with_variant(custom_sender{
+            start_called, connect_called, tag_invoke_overload_called});
 #else
         custom_sender{
             start_called, connect_called, tag_invoke_overload_called} |
@@ -274,8 +271,7 @@ int hpx_main()
 #endif
 
         auto v = *result;
-        static_assert(
-            std::is_same_v<decltype(v), variant<tuple<int>>>);
+        static_assert(std::is_same_v<decltype(v), variant<tuple<int>>>);
         HPX_TEST(hpx::holds_alternative<tuple<int>>(v));
 
         auto t = hpx::get<tuple<int>>(v);
@@ -318,8 +314,8 @@ int hpx_main()
     // cancellation path
     {
 #ifdef HPX_HAVE_STDEXEC
-        auto result = tt::sync_wait_with_variant(
-                            stopped_sender_with_value_type{});
+        auto result =
+            tt::sync_wait_with_variant(stopped_sender_with_value_type{});
 #else
         auto result =
             (stopped_sender_with_value_type{} | tt::sync_wait_with_variant());

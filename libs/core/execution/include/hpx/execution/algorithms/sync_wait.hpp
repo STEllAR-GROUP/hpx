@@ -14,12 +14,12 @@
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::this_thread::experimental {
-    using hpx::execution::experimental::sync_wait_t;
     using hpx::execution::experimental::sync_wait;
+    using hpx::execution::experimental::sync_wait_t;
 
-    using hpx::execution::experimental::sync_wait_with_variant_t;
     using hpx::execution::experimental::sync_wait_with_variant;
-}
+    using hpx::execution::experimental::sync_wait_with_variant_t;
+}    // namespace hpx::this_thread::experimental
 #else
 
 #include <hpx/assert.hpp>

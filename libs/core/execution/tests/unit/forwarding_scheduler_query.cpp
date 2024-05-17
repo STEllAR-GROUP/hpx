@@ -44,8 +44,8 @@ int main()
 
 #ifndef HPX_HAVE_STDEXEC
     static_assert(hpx::execution::experimental::forwarding_query(
-                  hpx::execution::experimental::get_scheduler) == false,
-              "invokes tag_fallback which returns false by default");
+                      hpx::execution::experimental::get_scheduler) == false,
+        "invokes tag_fallback which returns false by default");
 #endif
 
     return hpx::util::report_errors();

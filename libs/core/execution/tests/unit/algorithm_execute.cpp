@@ -37,7 +37,8 @@ struct example_sender
 #endif
 
     template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, example_sender const&, Env)
+    friend auto tag_invoke(
+        ex::get_completion_signatures_t, example_sender const&, Env)
         -> ex::completion_signatures<ex::set_value_t(),
             ex::set_error_t(std::exception_ptr)>;
     struct operation_state
@@ -46,7 +47,8 @@ struct example_sender
     };
 
     template <typename R>
-    friend operation_state tag_invoke(ex::connect_t, example_sender&&, R&&) noexcept
+    friend operation_state tag_invoke(
+        ex::connect_t, example_sender&&, R&&) noexcept
     {
         return {};
     }

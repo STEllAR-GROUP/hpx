@@ -107,7 +107,7 @@ int hpx_main()
 
     {
 #ifdef HPX_HAVE_STDEXEC
-        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::just(3))),3);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(ex::just(3))), 3);
 #else
         HPX_TEST_EQ(hpx::get<0>(*(ex::just(3) | tt::sync_wait())), 3);
 #endif

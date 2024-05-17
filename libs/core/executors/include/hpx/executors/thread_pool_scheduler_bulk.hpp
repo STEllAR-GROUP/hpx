@@ -671,14 +671,13 @@ namespace hpx::execution::experimental::detail {
             hpx::execution::experimental::get_completion_signatures_t,
             thread_pool_bulk_sender const&, Env const&)
             -> hpx::execution::experimental::transform_completion_signatures_of<
-                Sender,
-                Env,
+                Sender, Env,
                 hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(std::exception_ptr)
-                >
-            >;
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>>;
 
-        struct env {
+        struct env
+        {
             thread_pool_bulk_sender const& snd;
 
             // clang-format off
@@ -692,7 +691,8 @@ namespace hpx::execution::experimental::detail {
                 )>
             // clang-format on
             friend constexpr auto tag_invoke(
-                hpx::execution::experimental::get_completion_scheduler_t<CPO> tag,
+                hpx::execution::experimental::get_completion_scheduler_t<CPO>
+                    tag,
                 env const& e) noexcept
             {
                 return tag(hpx::execution::experimental::get_env(e.snd.sender));
@@ -712,8 +712,8 @@ namespace hpx::execution::experimental::detail {
         // pred. sender.
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_env_t,
-            thread_pool_bulk_sender const& s
-            ) noexcept {
+            thread_pool_bulk_sender const& s) noexcept
+        {
             return env{s};
         }
 #else
@@ -892,8 +892,9 @@ namespace hpx::execution::experimental {
         {
             // fall back to non-bulk scheduling if sync execution was requested
 #ifdef HPX_HAVE_STDEXEC
-            return hpx::execution::experimental::bulk(HPX_FORWARD(Sender, sender),
-                   hpx::util::counting_shape(count), HPX_FORWARD(F, f));
+            return hpx::execution::experimental::bulk(
+                HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
+                HPX_FORWARD(F, f));
 #else
             return detail::bulk_sender<Sender, hpx::util::counting_shape<Count>,
                 F>{HPX_FORWARD(Sender, sender),

@@ -31,13 +31,13 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
     using sched = my_namespace::my_scheduler;
 #else
-    struct sched{};
+    struct sched
+    {
+    };
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    using sched_env_t = ex::make_env_t<
-        ex::with_t<ex::get_scheduler_t, sched>
-    >;
+    using sched_env_t = ex::make_env_t<ex::with_t<ex::get_scheduler_t, sched>>;
 #else
     using sched_env_t = ex::make_env_t<ex::get_scheduler_t, sched>;
 #endif
@@ -45,17 +45,14 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
     using delegatee_sched = my_namespace::my_scheduler_template<0>;
 #else
-    struct delegatee_sched{};
+    struct delegatee_sched
+    {
+    };
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    using delegatee_sched_env_t = ex::make_env_t<
-        sched_env_t,
-        ex::with_t<
-            ex::get_delegatee_scheduler_t,
-            delegatee_sched
-        >
-    >;
+    using delegatee_sched_env_t = ex::make_env_t<sched_env_t,
+        ex::with_t<ex::get_delegatee_scheduler_t, delegatee_sched>>;
 #else
     using delegatee_sched_env_t = ex::make_env_t<ex::get_delegatee_scheduler_t,
         delegatee_sched, sched_env_t>;
@@ -66,9 +63,8 @@ namespace mylib {
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    using allocator_env_t =
-        ex::make_env_t<delegatee_sched_env_t,
-          ex::with_t<ex::get_allocator_t, allocator>>;
+    using allocator_env_t = ex::make_env_t<delegatee_sched_env_t,
+        ex::with_t<ex::get_allocator_t, allocator>>;
 #else
     using allocator_env_t =
         ex::make_env_t<ex::get_allocator_t, allocator, delegatee_sched_env_t>;
@@ -77,19 +73,25 @@ namespace mylib {
     struct stop_token
     {
 #ifdef HPX_HAVE_STDEXEC
-        bool stop_requested() const noexcept {return false;};
-        bool stop_possible() const noexcept {return true;};
+        bool stop_requested() const noexcept
+        {
+            return false;
+        };
+        bool stop_possible() const noexcept
+        {
+            return true;
+        };
 
-        friend bool operator==(stop_token const& a, stop_token const& b) {
+        friend bool operator==(stop_token const& a, stop_token const& b)
+        {
             return false;
         }
 #endif
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    using stop_token_env_t =
-        ex::make_env_t<allocator_env_t,
-          ex::with_t<ex::get_stop_token_t, stop_token>>;
+    using stop_token_env_t = ex::make_env_t<allocator_env_t,
+        ex::with_t<ex::get_stop_token_t, stop_token>>;
 #else
     using stop_token_env_t =
         ex::make_env_t<ex::get_stop_token_t, stop_token, allocator_env_t>;
@@ -107,26 +109,25 @@ namespace mylib {
         {
         }
 
-        friend void tag_invoke(ex::set_value_t, receiver_1&&, sched)
-        noexcept
+        friend void tag_invoke(ex::set_value_t, receiver_1&&, sched) noexcept
         {
             set_value_sched_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t, receiver_1&&, delegatee_sched)
-        noexcept
+        friend void tag_invoke(
+            ex::set_value_t, receiver_1&&, delegatee_sched) noexcept
         {
             set_value_delegatee_sched_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t, receiver_1&&, allocator)
-        noexcept
+        friend void tag_invoke(
+            ex::set_value_t, receiver_1&&, allocator) noexcept
         {
             set_value_allocator_called = true;
         }
 
-        friend void tag_invoke(ex::set_value_t, receiver_1&&, stop_token)
-        noexcept
+        friend void tag_invoke(
+            ex::set_value_t, receiver_1&&, stop_token) noexcept
         {
             set_value_stop_token_called = true;
         }
@@ -141,23 +142,20 @@ namespace mylib {
             static_assert(std::is_same_v<decltype(sched_env), sched_env_t>,
                 "must return sched_env");
 #ifdef HPX_HAVE_STDEXEC
-            auto delegatee_sched_env =
-                ex::make_env(std::move(sched_env), ex::with(
-                    ex::get_delegatee_scheduler_t{}, delegatee_sched()
-                )
-            );
+            auto delegatee_sched_env = ex::make_env(std::move(sched_env),
+                ex::with(ex::get_delegatee_scheduler_t{}, delegatee_sched()));
 #else
             auto delegatee_sched_env =
                 ex::make_env<ex::get_delegatee_scheduler_t>(
                     delegatee_sched(), sched_env);
 
 #endif
-           static_assert(std::is_same_v<decltype(delegatee_sched_env),
+            static_assert(std::is_same_v<decltype(delegatee_sched_env),
                               delegatee_sched_env_t>,
                 "must return delegatee_sched_env");
 #ifdef HPX_HAVE_STDEXEC
-           auto allocator_env = ex::make_env(std::move(delegatee_sched_env),
-               ex::with(ex::get_allocator_t{}, allocator()));
+            auto allocator_env = ex::make_env(std::move(delegatee_sched_env),
+                ex::with(ex::get_allocator_t{}, allocator()));
 #else
             auto allocator_env = ex::make_env<ex::get_allocator_t>(
                 allocator(), delegatee_sched_env);

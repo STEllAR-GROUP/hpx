@@ -340,8 +340,8 @@ private:
         }
         using context_t =
             typename Context::template promise_context_t<_promise>;
-        friend context_t tag_invoke(
-            hpx::execution::experimental::get_env_t, const _promise& self) noexcept
+        friend context_t tag_invoke(hpx::execution::experimental::get_env_t,
+            const _promise& self) noexcept
         {
             return self.context_;
         }

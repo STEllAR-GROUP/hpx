@@ -304,7 +304,8 @@ namespace hpx::execution::experimental {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
 #ifdef HPX_HAVE_STDEXEC
-            struct env {
+            struct env
+            {
                 std::decay_t<Scheduler> const& sched;
                 // clang-format off
                 template <typename CPO,
@@ -312,16 +313,20 @@ namespace hpx::execution::experimental {
                         meta::value<meta::one_of<
                             CPO, set_value_t, set_stopped_t>>
                     )>
-                    // clang-format on
+                // clang-format on
                 friend constexpr auto tag_invoke(
-                    hpx::execution::experimental::get_completion_scheduler_t<CPO>,
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        CPO>,
                     env const& e) noexcept
                 {
                     return e.sched;
                 }
             };
 
-            friend constexpr env tag_invoke(hpx::execution::experimental::get_env_t, sender const& s) noexcept {
+            friend constexpr env tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                sender const& s) noexcept
+            {
                 return {s.scheduler};
             };
 #else

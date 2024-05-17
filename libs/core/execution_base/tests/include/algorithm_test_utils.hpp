@@ -34,11 +34,9 @@ struct env_with_scheduler
 };
 #endif
 
-
 // Check that the value_types of a sender matches the expected type
 template <typename ExpectedValType,
-    typename Env = hpx::execution::experimental::empty_env,
-    typename Sender>
+    typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_value_types(Sender&&)
 {
     // STDEXEC R7:
@@ -55,7 +53,7 @@ inline void check_value_types(Sender&&)
 
     using UnderlyingSender = std::remove_reference_t<Sender>;
     namespace ex = hpx::execution::experimental;
-    using value_types = ex::value_types_of_t<UnderlyingSender , Env, hpx::tuple,
+    using value_types = ex::value_types_of_t<UnderlyingSender, Env, hpx::tuple,
         ex::detail::unique_variant<hpx::variant>::template apply>;
     static_assert(std::is_same_v<value_types, ExpectedValType>);
 }
@@ -65,7 +63,6 @@ template <typename ExpectedErrorType,
     typename Env = hpx::execution::experimental::empty_env, typename Sender>
 inline void check_error_types(Sender&&)
 {
-
     // See check_value_types
     using UnderlyingSender = std::remove_reference_t<Sender>;
 
@@ -108,7 +105,6 @@ struct void_sender
         }
     };
 
-
     template <typename R>
     friend operation_state<R> tag_invoke(
         hpx::execution::experimental::connect_t, void_sender, R&& r)
@@ -116,15 +112,15 @@ struct void_sender
         return {std::forward<R>(r)};
     }
 
-//    using completion_signatures = hpx::execution::experimental::completion_signatures<
-//        hpx::execution::experimental::set_value_t()>;
+    //    using completion_signatures = hpx::execution::experimental::completion_signatures<
+    //        hpx::execution::experimental::set_value_t()>;
 
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         void_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
-            hpx::execution::experimental::set_value_t()> {};
+            hpx::execution::experimental::set_value_t()>{};
 };
 
 template <typename... Ts>
@@ -155,12 +151,12 @@ struct error_sender
         return {std::forward<R>(r)};
     }
 
-//    friend hpx::execution::experimental::empty_env tag_invoke(
-//        hpx::execution::experimental::get_env_t, error_sender const&)
-//    {
-//        return {};
-//    }
-//
+    //    friend hpx::execution::experimental::empty_env tag_invoke(
+    //        hpx::execution::experimental::get_env_t, error_sender const&)
+    //    {
+    //        return {};
+    //    }
+    //
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -168,14 +164,17 @@ struct error_sender
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(Ts...),
             hpx::execution::experimental::set_stopped_t(),
-            hpx::execution::experimental::set_error_t(std::exception_ptr)> {
-            return {};
-        };
+            hpx::execution::experimental::set_error_t(std::exception_ptr)>
+    {
+        return {};
+    };
 };
 
 struct stopped_sender
 {
-    struct is_sender{};
+    struct is_sender
+    {
+    };
     template <typename R>
     struct operation_state
     {
@@ -243,7 +242,9 @@ struct callback_receiver
 #ifdef HPX_HAVE_STDEXEC
     using is_receiver = void;
 #else
-    struct is_receiver{};
+    struct is_receiver
+    {
+    };
 #endif
 
     template <typename E>
@@ -350,7 +351,9 @@ struct void_callback_helper
 template <typename T>
 struct error_typed_sender
 {
-    struct is_sender{};
+    struct is_sender
+    {
+    };
     template <typename R>
     struct operation_state
     {
@@ -387,7 +390,9 @@ struct error_typed_sender
 template <typename T>
 struct const_reference_sender
 {
-    struct is_sender{};
+    struct is_sender
+    {
+    };
     std::reference_wrapper<std::decay_t<T>> x;
 
     template <typename R>
@@ -422,7 +427,9 @@ struct const_reference_sender
 
 struct const_reference_error_sender
 {
-    struct is_sender{};
+    struct is_sender
+    {
+    };
     template <typename R>
     struct operation_state
     {
@@ -712,18 +719,18 @@ struct example_scheduler_template
     std::atomic<bool>& execute_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
-    example_scheduler_template(
-        std::atomic<bool>& schedule_called, std::atomic<bool>& execute_called,
+    example_scheduler_template(std::atomic<bool>& schedule_called,
+        std::atomic<bool>& execute_called,
         std::atomic<bool>& tag_invoke_overload_called)
-      : schedule_called(schedule_called),
-        execute_called(execute_called),
-        tag_invoke_overload_called(tag_invoke_overload_called)
+      : schedule_called(schedule_called)
+      , execute_called(execute_called)
+      , tag_invoke_overload_called(tag_invoke_overload_called)
     {
     }
 
     template <typename F>
-    friend void tag_invoke(
-        hpx::execution::experimental::execute_t, example_scheduler_template s, F&& f)
+    friend void tag_invoke(hpx::execution::experimental::execute_t,
+        example_scheduler_template s, F&& f)
     {
         s.execute_called = true;
         HPX_INVOKE(std::forward<F>(f), );
@@ -733,12 +740,9 @@ struct example_scheduler_template
     {
         using is_sender = void;
 
-        friend env_with_scheduler<
-            std::conditional_t<std::is_void_v<Derived>,
-                example_scheduler_template,
-                Derived
-            >
-        > tag_invoke(
+        friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
+            example_scheduler_template, Derived>>
+        tag_invoke(
             hpx::execution::experimental::get_env_t, my_sender const&) noexcept
         {
             return {};
@@ -789,11 +793,11 @@ struct example_scheduler_template
         return false;
     }
 
-    template<typename D>
+    template <typename D>
     example_scheduler_template(example_scheduler_template<D> const& other)
-      : schedule_called(other.schedule_called),
-        execute_called(other.execute_called),
-        tag_invoke_overload_called(other.tag_invoke_overload_called)
+      : schedule_called(other.schedule_called)
+      , execute_called(other.execute_called)
+      , tag_invoke_overload_called(other.tag_invoke_overload_called)
     {
     }
 };
@@ -854,7 +858,7 @@ namespace my_namespace {
         void operator()(std::exception_ptr) const {}
     };
 
-    template<int...>
+    template <int...>
     struct my_scheduler_template
     {
         struct my_sender

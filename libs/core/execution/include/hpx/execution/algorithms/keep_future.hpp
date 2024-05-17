@@ -69,9 +69,10 @@ namespace hpx::execution::experimental {
 #ifdef HPX_HAVE_STDEXEC
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_value_t(std::decay_t<Future>),
-                    hpx::execution::experimental::set_error_t(std::exception_ptr)
-                >;
+                    hpx::execution::experimental::set_value_t(
+                        std::decay_t<Future>),
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>;
 #else
             struct completion_signatures
             {

@@ -74,8 +74,8 @@ void test_for_each_explicit_sender_direct_async(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    auto result = tt::sync_wait(hpx::for_each(policy.on(exec), iterator(std::begin(c)),
-                      iterator(std::end(c)), f));
+    auto result = tt::sync_wait(hpx::for_each(
+        policy.on(exec), iterator(std::begin(c)), iterator(std::end(c)), f));
 #else
     auto result = hpx::for_each(policy.on(exec), iterator(std::begin(c)),
                       iterator(std::end(c)), f) |
@@ -114,7 +114,8 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 #ifdef HPX_HAVE_STDEXEC
-    auto result = tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
+    auto result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(policy.on(exec)));
 #else
     auto result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
