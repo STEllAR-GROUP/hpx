@@ -57,7 +57,7 @@ namespace hpx::execution::experimental {
         template <typename Receiver>
         struct error_visitor
         {
-            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
 
             template <typename Error>
             void operator()(Error const& error) noexcept
@@ -71,7 +71,7 @@ namespace hpx::execution::experimental {
         template <typename Receiver>
         struct value_visitor
         {
-            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
 
             template <typename Ts>
             void operator()(Ts const& ts) noexcept
@@ -286,15 +286,13 @@ namespace hpx::execution::experimental {
 
                     void operator()(error_type const& error)
                     {
-                        hpx::visit(error_visitor<Receiver>{HPX_FORWARD(
-                                       Receiver, receiver)},
+                        hpx::visit(error_visitor<Receiver>{receiver},
                             error);
                     }
 
                     void operator()(value_type const& ts)
                     {
-                        hpx::visit(value_visitor<Receiver>{HPX_FORWARD(
-                                       Receiver, receiver)},
+                        hpx::visit(value_visitor<Receiver>{receiver},
                             ts);
                     }
                 };
