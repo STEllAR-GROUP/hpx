@@ -97,6 +97,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`6492` - Fix kokkos hpx nvcc compilation
 * :hpx-pr:`6491` - More fixes to handling bool arguments for collective operations
 * :hpx-pr:`6490` - Remove the default max cpu count
 * :hpx-pr:`6489` - Ensure TCP parcelport is deactivated if not needed

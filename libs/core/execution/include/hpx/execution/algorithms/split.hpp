@@ -286,14 +286,12 @@ namespace hpx::execution::experimental {
 
                     void operator()(error_type const& error)
                     {
-                        hpx::visit(error_visitor<Receiver>{receiver},
-                            error);
+                        hpx::visit(error_visitor<Receiver>{receiver}, error);
                     }
 
                     void operator()(value_type const& ts)
                     {
-                        hpx::visit(value_visitor<Receiver>{receiver},
-                            ts);
+                        hpx::visit(value_visitor<Receiver>{receiver}, ts);
                     }
                 };
 
