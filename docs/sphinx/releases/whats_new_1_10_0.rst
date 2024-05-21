@@ -97,6 +97,7 @@ Closed issues
 Closed pull requests
 ====================
 
+* :hpx-pr:`6493` - Fix distributed latch documentation
 * :hpx-pr:`6492` - Fix kokkos hpx nvcc compilation
 * :hpx-pr:`6491` - More fixes to handling bool arguments for collective operations
 * :hpx-pr:`6490` - Remove the default max cpu count
