@@ -157,23 +157,23 @@ Classes
    | :cpp:class:`hpx::distributed::latch` |
    +--------------------------------------+
 
-Functions
----------
+Member functions
+^^^^^^^^^^^^^^^^
 
-.. table:: `hpx` functions of header ``hpx/latch.hpp``
+.. table:: `hpx` functions of class :cpp:class:`hpx::distributed::latch` from header ``hpx/latch.hpp``
 
-   +---------------------------------------------------+
-   | Function                                          |
-   +===================================================+
-   | :cpp:func:`hpx::distributed::count_down_and_wait` |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::arrive_and_wait`     |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::count_down`          |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::is_ready`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::try_wait`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::wait`                |
-   +---------------------------------------------------+
+   +----------------------------------------------------------+
+   | Function                                                 |
+   +==========================================================+
+   | :cpp:func:`hpx::distributed::latch::count_down_and_wait` |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::arrive_and_wait`     |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::count_down`          |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::is_ready`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::try_wait`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::wait`                |
+   +----------------------------------------------------------+
