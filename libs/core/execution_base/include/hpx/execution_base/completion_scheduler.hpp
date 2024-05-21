@@ -8,25 +8,21 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/functional/tag_invoke.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/sender.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 #else
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 
 #include <type_traits>
-#endif
 
 namespace hpx::execution::experimental {
 
-#ifndef HPX_HAVE_STDEXEC
     // 1. execution::forwarding_sender_query is used to ask a customization
     //    point object whether it is a sender query that should be forwarded
     //    through sender adaptors.
@@ -101,7 +97,6 @@ namespace hpx::execution::experimental {
 
     template <typename CPO>
     inline constexpr get_completion_scheduler_t<CPO> get_completion_scheduler{};
-#endif
 
     namespace detail {
 
@@ -166,10 +161,52 @@ namespace hpx::execution::experimental {
         {
         };
 
+         /* This metafunction checks if the given algorithm is tag invocable with
+         * the completion scheduler of the given sender for the given
+         * completion. The call that has to be valid is the following:
+         *
+         *      tag_invoke(algorithm, sched, sender, Ts...)
+         *
+         * If this expression is not valid (i.e. the sender has no scheduler for
+         * that cpo, or the algorithm is not callable with those arguments) this
+         * returns false. Otherwise it returns true.
+         */
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
         inline constexpr bool is_completion_scheduler_tag_invocable_v =
             is_completion_scheduler_tag_invocable<ReceiverCPO, Sender,
                 AlgorithmCPO, Ts...>::value;
+#endif
+
+#ifdef HPX_HAVE_STDEXEC
+
+namespace hpx::execution::experimental {
+    namespace detail {
+        template <typename CPO, typename Sender>
+        concept has_completion_scheduler_v =
+            requires (Sender&& s) {
+                {
+                    hpx::execution::experimental::get_completion_scheduler<CPO>(
+                        hpx::execution::experimental::get_env(
+                            std::forward<Sender>(s)
+                        )
+                    )
+                } -> hpx::execution::experimental::scheduler;
+            };
+
+        template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
+            typename... Ts>
+        concept is_completion_scheduler_tag_invocable_v =
+            requires (AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
+                tag_invoke(
+                    alg,
+                    hpx::execution::experimental::get_completion_scheduler<
+                        ReceiverCPO
+                    >(hpx::execution::experimental::get_env(snd)),
+                    std::forward<Sender>(snd),
+                    std::forward<Ts>(ts)...
+                );
+            };
+#endif
     }    // namespace detail
 }    // namespace hpx::execution::experimental
