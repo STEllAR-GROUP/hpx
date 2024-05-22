@@ -475,6 +475,53 @@ void test_inplace_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
     HPX_TEST(returned_from_algorithm);
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    int rand_base = _gen();
+    std::less<std::size_t> comp{};
+
+    std::size_t const left_size = 300007, right_size = 123456;
+    std::vector<std::size_t> res(left_size + right_size), sol;
+
+    base_iterator res_first = std::begin(res);
+    base_iterator res_middle = res_first + left_size;
+    base_iterator res_last = std::end(res);
+
+    std::generate(res_first, res_middle, random_fill(rand_base, 6));
+    std::generate(res_middle, res_last, random_fill(rand_base, 8));
+    std::sort(res_first, res_middle, comp);
+    std::sort(res_middle, res_last, comp);
+
+    sol = res;
+    base_iterator sol_first = std::begin(sol);
+    base_iterator sol_middle = sol_first + left_size;
+    base_iterator sol_last = std::end(sol);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    ex::just(iterator(res_first), iterator(res_middle), iterator(res_last), 
+            comp)
+        | hpx::inplace_merge(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    std::inplace_merge(sol_first, sol_middle, sol_last, comp);
+
+    bool equality = test::equal(res_first, res_last, sol_first, sol_last);
+
+    HPX_TEST(equality);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
 void test_inplace_merge_etc(IteratorTag, DataType, int rand_base)

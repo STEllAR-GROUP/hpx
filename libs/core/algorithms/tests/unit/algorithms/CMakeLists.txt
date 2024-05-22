@@ -21,35 +21,52 @@ set(tests
     adjacentdifference_sender
     adjacentfind
     adjacentfind_binary
+    adjacentfind_sender
     all_of
+    all_of_sender
     any_of
+    any_of_sender
     copy
+    copy_sender
     copyif_random
     copyif_forward
     copyif_exception
     copyif_bad_alloc
+    copyif_sender
     copyn
+    copyn_sender
     count
+    count_sender
     countif
+    countif_sender
     destroy
+    destroy_sender
     destroyn
+    destroyn_sender
     ends_with
     equal
     equal_binary
+    equal_sender
     exclusive_scan
     exclusive_scan2
     exclusive_scan_exception
     exclusive_scan_bad_alloc
     exclusive_scan_validate
     fill
+    fill_sender
     filln
+    filln_sender
     find
     find_sender
     findend
+    findend_sender
     findfirstof
     findfirstof_binary
+    findfirstof_sender
     findif
+    findif_sender
     findifnot
+    findifnot_sender
     foreach
     foreach_executors
     foreach_prefetching
@@ -58,38 +75,58 @@ set(tests
     foreachn
     foreachn_exception
     foreachn_bad_alloc
+    foreachn_sender
     for_loop
     for_loop_exception
     for_loop_induction
     for_loop_induction_async
     for_loop_n
+    for_loop_n_sender
     for_loop_n_strided
+    for_loop_n_strided_sender
     for_loop_reduction
     for_loop_reduction_async
     for_loop_sender
     for_loop_strided
+    for_loop_strided_sender
     generate
+    generate_sender
     generaten
+    generaten_sender
     is_heap
+    is_heap_sender
     is_heap_until
+    is_heap_until_sender
     includes
+    includes_sender
     inclusive_scan
     inclusive_scan_exception
     inplace_merge
+    inplace_merge_sender
     is_partitioned
+    is_partitioned_sender
     is_sorted
+    is_sorted_sender
     is_sorted_until
+    is_sorted_until_sender
     lexicographical_compare
+    lexicographical_compare_sender
     make_heap
+    make_heap_sender
     max_element
+    max_element_sender
     merge
+    merge_sender
     min_element
+    min_element_sender
     minmax_element
+    minmax_element_sender
     mismatch
     mismatch_binary
     move
     nth_element
     none_of
+    none_of_sender
     parallel_sort
     partial_sort
     partial_sort_copy

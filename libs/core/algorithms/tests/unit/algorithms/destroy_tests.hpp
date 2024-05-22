@@ -96,6 +96,41 @@ void test_destroy(ExPolicy&& policy, IteratorTag)
     std::free(p);
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_destroy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = destructable*;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    destructable* p =
+        (destructable*) std::malloc(data_size * sizeof(destructable));
+
+    // value-initialize data in array
+    std::for_each(p, p + data_size, [](destructable& d) {
+        ::new (static_cast<void*>(std::addressof(d))) destructable;
+    });
+
+    destruct_count.store(0);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    ex::just(iterator(p), iterator(p + data_size))
+        | hpx::destroy(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    HPX_TEST_EQ(destruct_count.load(), data_size);
+
+    std::free(p);
+
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_destroy_async(ExPolicy&& policy, IteratorTag)
 {

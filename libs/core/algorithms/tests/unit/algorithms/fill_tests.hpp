@@ -68,6 +68,37 @@ void test_fill(ExPolicy policy, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_fill_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    ex::just(iterator(std::begin(c)), iterator(std::end(c)), 10)
+        | hpx::fill(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    // verify values
+    std::size_t count = 0;
+    std::for_each(std::begin(c), std::end(c), [&count](int v) -> void {
+        HPX_TEST_EQ(v, int(10));
+        ++count;
+    });
+    HPX_TEST_EQ(count, c.size());
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_fill_async(ExPolicy p, IteratorTag)
 {

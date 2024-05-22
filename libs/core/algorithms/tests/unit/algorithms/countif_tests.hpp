@@ -80,6 +80,36 @@ void test_count_if(ExPolicy&& policy, IteratorTag)
     HPX_TEST_EQ(num_items, 50u);
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_count_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using diff_type = std::vector<int>::difference_type;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(100007);
+    std::iota(std::begin(c), std::begin(c) + 50, 0);
+    std::iota(std::begin(c) + 50, std::end(c), dis(gen) + 50);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+            smaller_than_50())
+        | hpx::count_if(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    diff_type num_items = hpx::get<0>(*snd_result);
+
+    HPX_TEST_EQ(num_items, 50u);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_count_if_async(ExPolicy&& p, IteratorTag)
 {

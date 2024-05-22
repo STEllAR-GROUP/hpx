@@ -102,6 +102,64 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     }
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c1(10007);
+    std::vector<int> c2(c1.size());
+
+    int first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+        
+        auto snd_result = ex::just(std::begin(c1), std::end(c1), std::begin(c2))
+            | hpx::equal(ex_policy.on(exec))
+            | tt::sync_wait();
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        ++c1[dis(gen)];    //-V104
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+        
+        auto snd_result = ex::just(iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2))
+            | hpx::equal(ex_policy.on(exec))
+            | tt::sync_wait();
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_equal1_async(ExPolicy&& p, IteratorTag)
 {
@@ -221,6 +279,65 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
         // verify values
         HPX_TEST_EQ(result, expected);
     }
+}
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c1(10007);
+    std::vector<int> c2(c1.size());
+
+    int first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+        
+        auto snd_result = ex::just(iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2), std::equal_to<>())
+            | hpx::equal(ex_policy.on(exec))
+            | tt::sync_wait();
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        std::uniform_int_distribution<> dis(0, c1.size() - 1);
+        ++c1[dis(gen)];    //-V104
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+        
+        auto snd_result = ex::just(iterator(std::begin(c1)),
+                iterator(std::end(c1)), std::begin(c2), std::equal_to<>())
+            | hpx::equal(ex_policy.on(exec))
+            | tt::sync_wait();
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected =
+            std::equal(std::begin(c1), std::end(c1), std::begin(c2));
+
+        // verify values
+        HPX_TEST_EQ(result, expected);
+    }
+
 }
 
 template <typename ExPolicy, typename IteratorTag>

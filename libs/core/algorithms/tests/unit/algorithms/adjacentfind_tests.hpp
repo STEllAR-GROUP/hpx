@@ -52,6 +52,41 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_adjacent_find_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator =  std::vector<int>::iterator;
+    using iterator =  test::test_iterator<base_iterator, IteratorTag>;
+
+    // fill vector with random values about 1
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), dis(gen));
+
+    std::size_t random_pos = dist(gen);    //-V101
+
+    c[random_pos] = 1;
+    c[random_pos + 1] = 1;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+        | hpx::adjacent_find(ex_policy.on(exec)) 
+        | tt::sync_wait();
+    iterator index = hpx::get<0>(*result);
+
+    base_iterator test_index = std::begin(c) + random_pos;
+
+    HPX_TEST(index == iterator(test_index));
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_async(ExPolicy p, IteratorTag)
 {

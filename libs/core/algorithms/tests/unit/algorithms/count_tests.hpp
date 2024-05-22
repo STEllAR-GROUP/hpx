@@ -70,6 +70,41 @@ void test_count(ExPolicy&& policy, IteratorTag)
     HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+    
+    std::vector<int> c(10007);
+    // assure gen() does not evalulate to zero
+    std::iota(std::begin(c), std::end(c), gen() + 1);
+    std::size_t find_count = dis(gen);    //-V101
+    for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
+    {
+        c[i] = 0;
+    }
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+            int(0))
+        | hpx::count(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    std::int64_t num_items = hpx::get<0>(*snd_result);
+
+    HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
+
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_count_async(ExPolicy&& p, IteratorTag)
 {

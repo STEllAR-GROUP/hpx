@@ -140,6 +140,71 @@ void test_is_heap(
     }
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::size_t(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+        | hpx::is_heap(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    bool result = hpx::get<0>(*snd_result);
+
+    bool solution = std::is_heap(std::begin(c), std::end(c));
+
+    HPX_TEST_EQ(result, solution);
+}
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_is_heap_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::size_t(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+        | hpx::is_heap_until(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    iterator result = hpx::get<0>(*snd_result);
+
+    auto solution = std::is_heap_until(std::begin(c), std::end(c));
+
+    HPX_TEST(result.base() == solution);
+}
+
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_is_heap_with_pred(
     IteratorTag, DataType, Pred pred, bool test_for_is_heap = true)

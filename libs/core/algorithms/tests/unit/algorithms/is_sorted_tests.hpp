@@ -420,3 +420,33 @@ void test_sorted_bad_alloc_seq(IteratorTag)
 
     HPX_TEST(caught_bad_alloc);
 }
+
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_is_sorted_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<std::size_t> c(10007);
+    //Fill with sorted values from 0 to 10006
+    std::iota(std::begin(c), std::end(c), 0);
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+        | hpx::is_sorted(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    bool is_ordered = hpx::get<0>(*snd_result);
+
+    HPX_TEST(is_ordered);
+}

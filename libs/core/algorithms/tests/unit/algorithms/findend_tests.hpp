@@ -78,6 +78,44 @@ void test_find_end1(ExPolicy&& policy, IteratorTag)
     HPX_TEST(index == test_index);
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_find_end1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(10007);
+    // fill vector with random values above 2
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    // create subsequence in middle of vector
+    c[c.size() / 2] = 1;
+    c[c.size() / 2 + 1] = 2;
+
+    int h[] = {1, 2};
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(h), std::end(h))
+        | hpx::find_end(ex_policy.on(exec))
+        | tt::sync_wait();
+
+    iterator index = hpx::get<0>(*snd_result);
+
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
+
+    HPX_TEST(index == test_index);
+}
+
 template <typename ExPolicy, typename IteratorTag>
 void test_find_end1_async(ExPolicy&& p, IteratorTag)
 {
@@ -151,6 +189,46 @@ void test_find_end2(ExPolicy&& policy, IteratorTag)
 
     iterator index = hpx::find_end(policy, iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
+
+    iterator test_index = std::find_end(iterator(std::begin(c)),
+        iterator(std::end(c)), std::begin(h), std::end(h));
+
+    HPX_TEST(index == test_index);
+}
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_find_end2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(10007);
+    // fill vector with random values about 2
+    std::fill(std::begin(c), std::end(c), dis(gen));
+    // create subsequence at start and end
+    c[0] = 1;
+    c[1] = 2;
+    c[c.size() - 1] = 2;
+    c[c.size() - 2] = 1;
+
+    int h[] = {1, 2};
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    
+    auto snd_result = ex::just(iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(h), std::end(h))
+        | hpx::find_end(ex_policy.on(exec))
+        | tt::sync_wait();    
+
+    iterator index = hpx::get<0>(*snd_result);
 
     iterator test_index = std::find_end(iterator(std::begin(c)),
         iterator(std::end(c)), std::begin(h), std::end(h));
