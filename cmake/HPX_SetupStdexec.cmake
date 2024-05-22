@@ -44,18 +44,59 @@ if(HPX_WITH_STDEXEC AND NOT TARGET STDEXEC::stdexec)
     if(UNIX)
       include(FetchContent)
       message("FETCHING STDEXEC")
+
       fetchcontent_declare(
         Stdexec
         GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
         GIT_TAG ${HPX_WITH_STDEXEC_TAG}
       )
-      fetchcontent_makeavailable(Stdexec)
+
+      fetchcontent_getproperties(Stdexec)
+      if(NOT stdexec_POPULATED)
+        fetchcontent_populate(Stdexec)
+      endif()
+      set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
+
+      message("FETCHED STDEXEC ${stdexec_SOURCE_DIR}")
+
+      add_library(Stdexec INTERFACE)
+      target_include_directories(
+        Stdexec INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
+                          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+      )
+
+      install(
+        TARGETS Stdexec
+        EXPORT HPXStdexecTarget
+        COMPONENT core
+      )
+
+      install(
+        DIRECTORY ${Stdexec_ROOT}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT core
+        FILES_MATCHING
+        PATTERN "*.hpp"
+      )
+
+      export(
+        TARGETS Stdexec
+        NAMESPACE Stdexec::
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXStdexecTarget.cmake"
+      )
+
+      install(
+        EXPORT HPXStdexecTarget
+        NAMESPACE Stdexec::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+        COMPONENT cmake
+      )
+
+      add_library(STDEXEC::stdexec ALIAS Stdexec)
+
+      # fetchcontent_makeavailable(Stdexec)
     endif()
 
-    # add_library(STDEXEC::stdexec INTERFACE IMPORTED)
-    # target_include_directories(STDEXEC::stdexec INTERFACE
-    # ${stdexec_SOURCE_DIR}) target_link_libraries(STDEXEC::stdexec INTERFACE
-    # ${Stdexec_LIBRARY})
   else()
     find_package(Stdexec REQUIRED)
 
