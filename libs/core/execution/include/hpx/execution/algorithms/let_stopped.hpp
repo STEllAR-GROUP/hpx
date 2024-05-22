@@ -9,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
 #else
 
 #include <hpx/assert.hpp>

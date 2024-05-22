@@ -92,7 +92,7 @@ namespace hpx::execution::experimental {
             template <typename Tag1>
             friend auto tag_invoke(
                 get_completion_signatures_t, read_sender<Tag1>, no_env)
-                -> std::execution::dependent_completion_signatures<no_env>;
+                -> dependent_completion_signatures<no_env>;
 
             // clang-format off
             template <typename Env>
@@ -115,7 +115,7 @@ namespace hpx::execution::experimental {
                 }
                 else
                 {
-                    return std::execution::dependent_completion_signatures<Env>{};
+                    return dependent_completion_signatures<Env>{};
                 }
             }
             // clang-format on

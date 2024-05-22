@@ -165,7 +165,9 @@ namespace hpx::execution::experimental {
                 Sender&& sender)
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
 #ifdef HPX_HAVE_STDEXEC
-              //TODO: IS THIS A GOOD IDEA?
+              //TODO: Keep an eye on this, it is based on the internal impl of
+              // stdexec, so it is subect to change. This is currently relying
+              // on the env struct to expose __loop_ as a public member.
               , loop(*hpx::execution::experimental::get_env(schedule(sched))
                           .__loop_)
 #else
