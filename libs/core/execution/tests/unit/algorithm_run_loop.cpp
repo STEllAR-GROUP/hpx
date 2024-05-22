@@ -929,16 +929,22 @@ void test_ensure_started()
     }
 
     {
-        // TODO: REVISIT AFTER FIXING ENSURE_STARTED
-        // its fixed we need to split first
-        //        ex::run_loop loop;
-        //        auto sched = loop.get_scheduler();
-        //
-        //        auto s = ex::transfer_just(sched, 42) | ex::ensure_started();
-        //        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
-        //        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
-        //        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
-        //        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
+        ex::run_loop loop;
+        auto sched = loop.get_scheduler();
+#ifdef HPX_HAVE_STDEXEC
+        auto t = hpx::thread([&] { loop.run(); });
+        auto s = ex::transfer_just(sched, 42) | ex::ensure_started() | ex::split();
+#else
+        auto s = ex::transfer_just(sched, 42) | ex::ensure_started();
+#endif
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
+        HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
+#ifdef HPX_HAVE_STDEXEC
+        loop.finish();
+        t.join();
+#endif
     }
 }
 

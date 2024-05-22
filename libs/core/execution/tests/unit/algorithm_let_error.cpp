@@ -83,7 +83,8 @@ int main()
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-        /*TODO: https://rentry.org/asdfasdfsadfasdfasdfasdfasdfewr5u6547*/
+        /*TODO: the following is unclear: https://rentry.org/4rzhctgx
+         * So this may be volatile to internal stdexec changes. */
         check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s2);
 #else
         check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s2);

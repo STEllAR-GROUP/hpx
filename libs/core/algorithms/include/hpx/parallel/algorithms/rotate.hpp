@@ -290,8 +290,8 @@ namespace hpx::parallel {
                 decltype(r.call(left_policy, new_first, last));
 
             constexpr bool rcall_are_senders =
-                (hpx::execution::experimental::sender<rcall_left_t> &&
-                    hpx::execution::experimental::sender<rcall_right_t>);
+                (hpx::execution::experimental::is_sender_v<rcall_left_t> &&
+                    hpx::execution::experimental::is_sender_v<rcall_right_t>);
 
             constexpr bool rcall_are_futures =
                 (hpx::traits::is_future_v<rcall_left_t> &&
@@ -303,10 +303,12 @@ namespace hpx::parallel {
 
             if constexpr (rcall_are_senders)
             {
-                return hpx::execution::experimental::when_all(
-                           r.call(left_policy, first, new_first),
-                           r.call(right_policy, new_first, last)) |
-                    hpx::execution::experimental::then(std::move(func));
+                return hpx::execution::experimental::then(
+                            hpx::execution::experimental::when_all(
+                                   r.call(left_policy, first, new_first),
+                                   r.call(right_policy, new_first, last)
+                            ),
+                            std::move(func));
             }
             else if constexpr (rcall_are_futures)
             {
