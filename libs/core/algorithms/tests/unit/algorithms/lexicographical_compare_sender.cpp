@@ -23,7 +23,7 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_lexicographical_compare_sender(LnPolicy ln_policy, 
+void test_lexicographical_compare_sender(LnPolicy ln_policy,
     ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -44,8 +44,8 @@ void test_lexicographical_compare_sender(LnPolicy ln_policy,
     std::iota(std::begin(d), std::end(d), 0);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)),
             std::begin(d), std::end(d))
         | hpx::lexicographical_compare(ex_policy.on(exec))
         | tt::sync_wait();
@@ -59,14 +59,14 @@ template<typename IteratorTag>
 void lexicographical_compare_sender_test()
 {
     using namespace hpx::execution;
-    test_lexicographical_compare_sender(hpx::launch::sync, seq(task), 
+    test_lexicographical_compare_sender(hpx::launch::sync, seq(task),
         IteratorTag());
-    test_lexicographical_compare_sender(hpx::launch::sync, unseq(task), 
+    test_lexicographical_compare_sender(hpx::launch::sync, unseq(task),
         IteratorTag());
 
-    test_lexicographical_compare_sender(hpx::launch::async, par(task), 
+    test_lexicographical_compare_sender(hpx::launch::async, par(task),
         IteratorTag());
-    test_lexicographical_compare_sender(hpx::launch::async, par_unseq(task), 
+    test_lexicographical_compare_sender(hpx::launch::async, par_unseq(task),
         IteratorTag());
 }
 

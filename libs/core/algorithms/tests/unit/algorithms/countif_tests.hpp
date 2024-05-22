@@ -99,8 +99,8 @@ void test_count_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::iota(std::begin(c) + 50, std::end(c), dis(gen) + 50);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)),
             smaller_than_50())
         | hpx::count_if(ex_policy.on(exec))
         | tt::sync_wait();

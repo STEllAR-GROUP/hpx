@@ -82,7 +82,7 @@ void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
-    
+
     std::vector<int> c(10007);
     // assure gen() does not evalulate to zero
     std::iota(std::begin(c), std::end(c), gen() + 1);
@@ -94,7 +94,7 @@ void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)),
             int(0))
         | hpx::count(ex_policy.on(exec))
         | tt::sync_wait();

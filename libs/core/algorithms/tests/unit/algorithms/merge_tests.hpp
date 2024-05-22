@@ -478,10 +478,10 @@ void test_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::sort(std::begin(src2), std::end(src2), comp);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    auto snd_result = ex::just(iterator(std::begin(src1)), 
+
+    auto snd_result = ex::just(iterator(std::begin(src1)),
             iterator(std::end(src1)), iterator(std::begin(src2)),
-            iterator(std::end(src2)), iterator(std::begin(dest_res)), 
+            iterator(std::end(src2)), iterator(std::begin(dest_res)),
             comp)
         | hpx::merge(ex_policy.on(exec))
         | tt::sync_wait();
@@ -489,7 +489,7 @@ void test_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     auto result = hpx::get<0>(*snd_result);
 
     auto solution = std::merge(std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2), std::begin(dest_sol), 
+        std::begin(src2), std::end(src2), std::begin(dest_sol),
         comp);
 
     bool equality = test::equal(

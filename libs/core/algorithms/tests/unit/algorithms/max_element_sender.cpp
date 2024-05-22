@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -38,7 +38,7 @@ void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     base_iterator ref_end(std::end(c));
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)),
             iterator(end), std::less<std::size_t>())
         | hpx::max_element(ex_policy.on(exec))

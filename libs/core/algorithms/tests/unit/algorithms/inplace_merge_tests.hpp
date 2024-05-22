@@ -509,8 +509,8 @@ void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, Iterato
     base_iterator sol_last = std::end(sol);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    ex::just(iterator(res_first), iterator(res_middle), iterator(res_last), 
+
+    ex::just(iterator(res_first), iterator(res_middle), iterator(res_last),
             comp)
         | hpx::inplace_merge(ex_policy.on(exec))
         | tt::sync_wait();

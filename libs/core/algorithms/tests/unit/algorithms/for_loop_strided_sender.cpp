@@ -48,8 +48,8 @@ void test_for_loop_strided_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, Iter
     int stride = dis(gen);    //-V103
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    ex::just(iterator(std::begin(c)), iterator(std::end(c)), 
+
+    ex::just(iterator(std::begin(c)), iterator(std::end(c)),
             stride, [](iterator it) { *it = 42; })
         | hpx::experimental::for_loop_strided(ex_policy.on(exec))
         | tt::sync_wait();

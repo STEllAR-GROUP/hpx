@@ -120,7 +120,7 @@ void test_destroy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     destruct_count.store(0);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     ex::just(iterator(p), iterator(p + data_size))
         | hpx::destroy(ex_policy.on(exec))
         | tt::sync_wait();

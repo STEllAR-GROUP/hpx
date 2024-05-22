@@ -21,7 +21,7 @@ void inplace_merge_sender_test()
     test_inplace_merge_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_inplace_merge_sender(hpx::launch::async, par(task), IteratorTag());
-    test_inplace_merge_sender(hpx::launch::async, par_unseq(task), 
+    test_inplace_merge_sender(hpx::launch::async, par_unseq(task),
         IteratorTag());
 }
 

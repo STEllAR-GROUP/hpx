@@ -74,7 +74,7 @@ void test_find_first_of(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_find_first_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_find_first_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -96,7 +96,7 @@ void test_find_first_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     c[find_first_of_pos] = h[random_sub_seq_pos];    //-V108
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::end(h))
         | hpx::find_first_of(ex_policy.on(exec))

@@ -124,7 +124,7 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
+
         auto snd_result = ex::just(std::begin(c1), std::end(c1), std::begin(c2))
             | hpx::equal(ex_policy.on(exec))
             | tt::sync_wait();
@@ -143,7 +143,7 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         ++c1[dis(gen)];    //-V104
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
+
         auto snd_result = ex::just(iterator(std::begin(c1)),
                 iterator(std::end(c1)), std::begin(c2))
             | hpx::equal(ex_policy.on(exec))
@@ -303,7 +303,7 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
+
         auto snd_result = ex::just(iterator(std::begin(c1)),
                 iterator(std::end(c1)), std::begin(c2), std::equal_to<>())
             | hpx::equal(ex_policy.on(exec))
@@ -323,7 +323,7 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         ++c1[dis(gen)];    //-V104
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
+
         auto snd_result = ex::just(iterator(std::begin(c1)),
                 iterator(std::end(c1)), std::begin(c2), std::equal_to<>())
             | hpx::equal(ex_policy.on(exec))

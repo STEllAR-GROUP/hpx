@@ -372,7 +372,7 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_each_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_for_each_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -389,7 +389,7 @@ void test_for_each_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     std::iota(std::begin(c), std::end(c), gen());
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)), c.size(), set_42())
         | hpx::for_each_n(ex_policy.on(exec))
         | tt::sync_wait();

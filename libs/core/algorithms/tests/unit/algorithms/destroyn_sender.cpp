@@ -46,7 +46,7 @@ std::size_t const data_size = 10007;
 
 ////////////////////////////////////////////////////////////////////////////
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_destroy_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_destroy_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -70,7 +70,7 @@ void test_destroy_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     destruct_count.store(0);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     ex::just(iterator(p), data_size)
         | hpx::destroy_n(ex_policy.on(exec))
         | tt::sync_wait();

@@ -52,7 +52,7 @@ void test_min_element(ExPolicy policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_min_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_min_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -71,8 +71,8 @@ void test_min_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     base_iterator ref_end(std::end(c));
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
-    auto snd_result = ex::just(iterator(std::begin(c)), iterator(end), 
+
+    auto snd_result = ex::just(iterator(std::begin(c)), iterator(end),
             std::less<std::size_t>())
         | hpx::min_element(ex_policy.on(exec))
         | tt::sync_wait();
@@ -84,7 +84,7 @@ void test_min_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
         std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
-    
+
     snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
         | hpx::min_element(ex_policy.on(exec))
         | tt::sync_wait();

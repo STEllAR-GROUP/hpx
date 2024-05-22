@@ -22,7 +22,7 @@ void adjacent_find_sender_test()
     test_adjacent_find_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_adjacent_find_sender(hpx::launch::async, par(task), IteratorTag());
-    test_adjacent_find_sender(hpx::launch::async, par_unseq(task), 
+    test_adjacent_find_sender(hpx::launch::async, par_unseq(task),
         IteratorTag());
 }
 

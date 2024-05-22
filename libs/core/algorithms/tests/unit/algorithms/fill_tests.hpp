@@ -85,7 +85,7 @@ void test_fill_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::iota(std::begin(c), std::end(c), gen());
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     ex::just(iterator(std::begin(c)), iterator(std::end(c)), 10)
         | hpx::fill(ex_policy.on(exec))
         | tt::sync_wait();

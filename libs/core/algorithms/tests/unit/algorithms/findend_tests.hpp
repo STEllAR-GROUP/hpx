@@ -79,7 +79,7 @@ void test_find_end1(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_find_end1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_find_end1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -102,7 +102,7 @@ void test_find_end1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     int h[] = {1, 2};
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::end(h))
         | hpx::find_end(ex_policy.on(exec))
@@ -197,7 +197,7 @@ void test_find_end2(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_find_end2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_find_end2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -222,11 +222,11 @@ void test_find_end2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     int h[] = {1, 2};
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::end(h))
         | hpx::find_end(ex_policy.on(exec))
-        | tt::sync_wait();    
+        | tt::sync_wait();
 
     iterator index = hpx::get<0>(*snd_result);
 

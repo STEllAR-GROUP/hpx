@@ -160,7 +160,7 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::make_heap(std::begin(c), heap_end_iter);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
         | hpx::is_heap(ex_policy.on(exec))
         | tt::sync_wait();
@@ -173,7 +173,7 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_is_heap_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_is_heap_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -193,7 +193,7 @@ void test_is_heap_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     std::make_heap(std::begin(c), heap_end_iter);
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-    
+
     auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
         | hpx::is_heap_until(ex_policy.on(exec))
         | tt::sync_wait();

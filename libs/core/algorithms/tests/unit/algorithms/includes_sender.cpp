@@ -24,7 +24,7 @@ std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, 
+void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -53,7 +53,7 @@ void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
+
         auto snd_result = ex::just(iterator(std::begin(c1)),
                 iterator(std::end(c1)), start_it, end_it)
             | hpx::includes(ex_policy.on(exec))
@@ -83,7 +83,7 @@ void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
             ++c2[dis(gen)];    //-V104
 
             auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-            
+
             auto snd_result = ex::just(iterator(std::begin(c1)),
                     iterator(std::end(c1)), std::begin(c2), std::end(c2))
                 | hpx::includes(ex_policy.on(exec))
@@ -129,9 +129,9 @@ void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag
 
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-        
-        auto snd_result = ex::just(iterator(std::begin(c1)), 
-                iterator(std::end(c1)), start_it, end_it, 
+
+        auto snd_result = ex::just(iterator(std::begin(c1)),
+                iterator(std::end(c1)), start_it, end_it,
                 std::less<std::size_t>())
             | hpx::includes(ex_policy.on(exec))
             | tt::sync_wait();
@@ -160,7 +160,7 @@ void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag
             ++c2[dis(gen)];    //-V104
 
             auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-            
+
             auto snd_result = ex::just(iterator(std::begin(c1)),
                     iterator(std::end(c1)), std::begin(c2), std::end(c2),
                     std::less<std::size_t>())

@@ -85,7 +85,7 @@ void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     {
         std::vector<int> c = test::fill_all_any_none<int>(3, i);    //-V106
 
-        
+
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
         auto snd_result = ex::just(iterator(std::begin(c)),
