@@ -32,9 +32,6 @@ namespace hpx::execution::experimental {
     using stdexec::empty_env;
     using stdexec::env_of_t;
 
-//    template <class EnvProvider>
-//    using env_of_t = stdexec::env_of_t<EnvProvider>;
-
     // Queries
     using stdexec::forward_progress_guarantee;
 
@@ -103,7 +100,7 @@ namespace hpx::execution::experimental {
     using stdexec::transfer_just_t;
     using stdexec::transfer_just;
 
-    // Bulk
+    // Bulk (NOT FORWARDED)
 //    using stdexec::bulk_t;
 //    using stdexec::bulk;
 
