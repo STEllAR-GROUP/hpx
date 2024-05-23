@@ -161,7 +161,7 @@ namespace hpx::execution::experimental {
         {
         };
 
-         /* This metafunction checks if the given algorithm is tag invocable with
+        /* This metafunction checks if the given algorithm is tag invocable with
          * the completion scheduler of the given sender for the given
          * completion. The call that has to be valid is the following:
          *
@@ -183,30 +183,25 @@ namespace hpx::execution::experimental {
 namespace hpx::execution::experimental {
     namespace detail {
         template <typename CPO, typename Sender>
-        concept has_completion_scheduler_v =
-            requires (Sender&& s) {
-                {
-                    hpx::execution::experimental::get_completion_scheduler<CPO>(
-                        hpx::execution::experimental::get_env(
-                            std::forward<Sender>(s)
-                        )
-                    )
+        concept has_completion_scheduler_v = requires(Sender&& s)
+        {
+            {
+                hpx::execution::experimental::get_completion_scheduler<CPO>(
+                    hpx::execution::experimental::get_env(
+                        std::forward<Sender>(s)))
                 } -> hpx::execution::experimental::scheduler;
-            };
+        };
 
         template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
             typename... Ts>
-        concept is_completion_scheduler_tag_invocable_v =
-            requires (AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
-                tag_invoke(
-                    alg,
-                    hpx::execution::experimental::get_completion_scheduler<
-                        ReceiverCPO
-                    >(hpx::execution::experimental::get_env(snd)),
-                    std::forward<Sender>(snd),
-                    std::forward<Ts>(ts)...
-                );
-            };
+        concept is_completion_scheduler_tag_invocable_v = requires(
+            AlgorithmCPO alg, Sender&& snd, Ts&&... ts)
+        {
+            tag_invoke(alg,
+                hpx::execution::experimental::get_completion_scheduler<
+                    ReceiverCPO>(hpx::execution::experimental::get_env(snd)),
+                std::forward<Sender>(snd), std::forward<Ts>(ts)...);
+        };
 #endif
     }    // namespace detail
 }    // namespace hpx::execution::experimental

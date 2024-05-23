@@ -933,7 +933,8 @@ void test_ensure_started()
         auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
-        auto s = ex::transfer_just(sched, 42) | ex::ensure_started() | ex::split();
+        auto s =
+            ex::transfer_just(sched, 42) | ex::ensure_started() | ex::split();
 #else
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started();
 #endif

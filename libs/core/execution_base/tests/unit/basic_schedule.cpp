@@ -163,7 +163,7 @@ int main()
 #ifdef HPX_HAVE_STDEXEC
                       example_sender<scheduler_1>
 #else
-                       exmple_sender
+                      exmple_sender
 #endif
                       >,
         "Result of scheduler is a example_sender");
@@ -171,7 +171,7 @@ int main()
 #ifdef HPX_HAVE_STDEXEC
                       example_sender<scheduler_2>
 #else
-                       example_sender
+                      example_sender
 #endif
                       >,
         "Result of scheduler is a example_sender");
