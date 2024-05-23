@@ -95,13 +95,14 @@ int main()
 {
     {
 #ifndef HPX_HAVE_STDEXEC
-        //        Normally the operation states should be invalid STDEXEC but the
-        //        implementation does not match the proposed standard yet.
+        //        Normally the operation states should be invalid but the
+        //        STDEXEC implementation does not match the proposed standard
+        //        yet.
         //
         //        The standard requires:
         //            { start(opstate) } noexcept;
         //
-        //        The current implentation requires:
+        //        The current implementation requires:
         //            { start(opstate) };
 
         static_assert(!ex::is_operation_state<mylib::state_2>::value,

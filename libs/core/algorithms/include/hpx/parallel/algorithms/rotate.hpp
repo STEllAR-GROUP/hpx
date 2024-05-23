@@ -265,7 +265,7 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
 
-            auto&& proccess = [=](auto&& f1, auto&& f2) mutable {
+            auto&& process = [=](auto&& f1, auto&& f2) mutable {
                 // propagate exceptions, if appropriate
                 constexpr bool handle_futures =
                     hpx::traits::is_future_v<decltype((f1))> &&
@@ -305,7 +305,7 @@ namespace hpx::parallel {
             // both a future and a sender we treat it as a future.
             if constexpr (handle_futures || handle_both)
             {
-                return hpx::dataflow(hpx::launch::sync, std::move(proccess),
+                return hpx::dataflow(hpx::launch::sync, std::move(process),
                     r.call(left_policy, first, new_first),
                     r.call(right_policy, new_first, last));
             }
@@ -315,7 +315,7 @@ namespace hpx::parallel {
                     hpx::execution::experimental::when_all(
                         r.call(left_policy, first, new_first),
                         r.call(right_policy, new_first, last)),
-                    std::move(proccess));
+                    std::move(process));
             }
         }
 
