@@ -595,7 +595,7 @@ hpx_option(
   ADVANCED
 )
 
-if(HPX_WITH_FETCH_STDEXEC)
+if(HPX_WITH_FETCH_STDEXEC OR HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
   hpx_option(
     HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
     CATEGORY "Executor"

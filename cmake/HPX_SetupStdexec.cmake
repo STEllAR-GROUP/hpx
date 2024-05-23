@@ -23,6 +23,11 @@ if(Stdexec_ROOT
     hpx_warn(
       "Both Stdexec_ROOT and HPX_WITH_FETCH_STDEXEC are provided. HPX_WITH_FETCH_STDEXEC is set to OFF."
     )
+  elseif(NOT Stdexec_ROOT AND NOT HPX_WITH_FETCH_STDEXEC)
+    hpx_warn(
+      "Neither Stdexec_ROOT nor HPX_WITH_FETCH_STDEXEC are provided. HPX_WITH_FETCH_STDEXEC is defaulted to ON."
+    )
+    set(HPX_WITH_FETCH_STDEXEC ON)
   endif()
 elseif(HPX_WITH_STDEXEC)
   hpx_error(
@@ -46,7 +51,7 @@ if(HPX_WITH_STDEXEC AND NOT TARGET STDEXEC::stdexec)
     )
     if(UNIX)
       include(FetchContent)
-      message("FETCHING STDEXEC")
+      message("FETCHING STDEXEC TAG: ${HPX_WITH_STDEXEC_TAG}")
 
       fetchcontent_declare(
         Stdexec
