@@ -6,8 +6,6 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file hpx/parallel/algorithms/rotate.hpp
-/// \page hpx::rotate, hpx::rotate_copy
-/// \headerfile hpx/algorithm.hpp
 
 #pragma once
 
@@ -266,7 +264,7 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
 
-            auto&& func = [=](auto&& f1, auto&& f2) mutable {
+            auto&& proccess = [=](auto&& f1, auto&& f2) mutable {
                 // propagate exceptions, if appropriate
                 constexpr bool handle_futures =
                     hpx::traits::is_future_v<decltype((f1))> &&
@@ -287,34 +285,36 @@ namespace hpx::parallel {
             using rcall_left_t =
                 decltype(r.call(left_policy, first, new_first));
             using rcall_right_t =
-                decltype(r.call(left_policy, new_first, last));
+                decltype(r.call(right_policy, new_first, last));
 
-            constexpr bool rcall_are_senders =
-                (hpx::execution::experimental::is_sender_v<rcall_left_t> &&
-                    hpx::execution::experimental::is_sender_v<rcall_right_t>);
+            // Sanity check
+            static_assert(std::is_same_v<rcall_left_t, rcall_right_t>);
 
-            constexpr bool rcall_are_futures =
-                (hpx::traits::is_future_v<rcall_left_t> &&
-                    hpx::traits::is_future_v<rcall_right_t>);
+            constexpr bool handle_senders =
+                hpx::execution::experimental::is_sender_v<rcall_left_t>;
+            constexpr bool handle_futures =
+                hpx::traits::is_future_v<rcall_left_t>;
+            constexpr bool handle_both = handle_senders && handle_futures;
 
-            static_assert(rcall_are_senders || rcall_are_futures,
+            static_assert(handle_senders || handle_futures,
                 "the reverse operation must return either a sender or a "
                 "future");
 
-            if constexpr (rcall_are_senders)
+            // Futures pass the concept check for senders, so if something is
+            // both a future and a sender we treat it as a future.
+            if constexpr (handle_futures || handle_both)
             {
-                return hpx::execution::experimental::then(
-                            hpx::execution::experimental::when_all(
-                                   r.call(left_policy, first, new_first),
-                                   r.call(right_policy, new_first, last)
-                            ),
-                            std::move(func));
-            }
-            else if constexpr (rcall_are_futures)
-            {
-                return hpx::dataflow(hpx::launch::sync, std::move(func),
+                return hpx::dataflow(hpx::launch::sync, std::move(proccess),
                     r.call(left_policy, first, new_first),
                     r.call(right_policy, new_first, last));
+            }
+            else if constexpr (handle_senders && !handle_both)
+            {
+                return hpx::execution::experimental::then(
+                    hpx::execution::experimental::when_all(
+                        r.call(left_policy, first, new_first),
+                        r.call(right_policy, new_first, last)),
+                    std::move(proccess));
             }
         }
 
