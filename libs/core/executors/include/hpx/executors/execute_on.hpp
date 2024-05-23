@@ -72,13 +72,15 @@ namespace hpx::execution::experimental {
         }
 
         // Needed for this to be a scheduler under the p2300 definition
-        friend constexpr typename Scheduler::template sender<scheduler_and_policy>
+        friend constexpr
+            typename Scheduler::template sender<scheduler_and_policy>
             tag_invoke(schedule_t, scheduler_and_policy const& sp)
         {
             return {sp};
         }
 
-        friend constexpr typename Scheduler::template sender<scheduler_and_policy>
+        friend constexpr
+            typename Scheduler::template sender<scheduler_and_policy>
             tag_invoke(schedule_t, scheduler_and_policy&& sp)
         {
             return {HPX_MOVE(sp)};

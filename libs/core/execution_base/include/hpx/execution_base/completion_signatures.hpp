@@ -536,7 +536,8 @@ namespace hpx::execution::experimental {
     template <typename Sender,
         typename Env = hpx::execution::experimental::empty_env>
     using single_sender_value_t =
-        hpx::execution::experimental::stdexec_internal::__single_sender_value_t<Sender, Env>;
+        hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
+            Sender, Env>;
 
     template <typename A, typename B>
     inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
@@ -546,22 +547,20 @@ namespace hpx::execution::experimental {
     //    using with_awaitable_senders = hpx::execution::experimental::with_awaitable_senders<Promise>;
 
     template <typename ReceiverID>
-    using operation =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_::__operation<
-            ReceiverID>;
+    using operation = hpx::execution::experimental::stdexec_internal::
+        __connect_awaitable_::__operation<ReceiverID>;
 
     template <typename ReceiverID>
-    using promise =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_::__promise<
-            ReceiverID>;
+    using promise = hpx::execution::experimental::stdexec_internal::
+        __connect_awaitable_::__promise<ReceiverID>;
 
     template <typename Rec>
-    using promise_t =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_::__promise_t<Rec>;
+    using promise_t = hpx::execution::experimental::stdexec_internal::
+        __connect_awaitable_::__promise_t<Rec>;
 
     template <typename Rec>
-    using operation_t =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_::__operation_t<Rec>;
+    using operation_t = hpx::execution::experimental::stdexec_internal::
+        __connect_awaitable_::__operation_t<Rec>;
 
     using connect_awaitable_t =
         hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
