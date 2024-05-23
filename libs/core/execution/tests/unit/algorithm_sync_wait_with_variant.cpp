@@ -127,7 +127,7 @@ int hpx_main()
         auto result = tt::sync_wait_with_variant(s1);
         auto v = *result;
         // STDEXEC: using hpx::variant, hpx::tuple here works because they are
-        // provided as the prefered variant, tuple in check_value_types too
+        // provided as the preferred variant, tuple in check_value_types too
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
             s1);
