@@ -862,13 +862,8 @@ namespace hpx::execution::experimental {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // fall back to non-bulk scheduling if sync execution was requested
-#ifdef HPX_HAVE_STDEXEC
-            return hpx::execution::experimental::bulk(
-                HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f));
-#else
             return detail::bulk_sender<Sender, Shape, F>{
                 HPX_FORWARD(Sender, sender), shape, HPX_FORWARD(F, f)};
-#endif
         }
         else
         {
