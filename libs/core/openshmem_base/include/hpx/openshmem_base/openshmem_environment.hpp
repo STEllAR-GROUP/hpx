@@ -54,6 +54,9 @@ namespace hpx { namespace util {
 
         static std::string get_processor_name();
 
+	static void fence();
+	static void quiet();
+
         static void put_signal(const std::uint8_t* addr, const int rank,
             std::uint8_t* raddr, const std::size_t size, std::uint8_t * sigaddr);
 

@@ -291,6 +291,14 @@ namespace hpx::util {
         return name;
     }
 
+    void openshmem_environment::quiet() {
+        shmem_quiet();
+    }
+
+    void openshmem_environment::fence() {
+        shmem_fence();
+    }
+
     void openshmem_environment::put_signal(const std::uint8_t* addr,
         const int node, std::uint8_t* raddr, const std::size_t size,
         std::uint8_t * sigaddr)
@@ -303,14 +311,10 @@ namespace hpx::util {
         {
 #if !defined(SHMEM_SIGNAL_SET)
             shmem_uint8_put(raddr, addr, size, node);
-            shmem_uint8_put(reinterpret_cast<std::uint8_t*>(sigaddr),
-                reinterpret_cast<std::uint8_t*>(sigaddr), sizeof(sigaddr),
-                node);
             shmem_fence();
+            shmem_uint8_put(sigaddr, sigaddr, 1, node);
 #else
-            shmem_uint8_put_signal(raddr, addr, size,
-                reinterpret_cast<std::uint64_t*>(sigaddr), 1, SHMEM_SIGNAL_SET,
-                node);
+            shmem_uint8_put_signal(raddr, addr, size, sigaddr, 1, SHMEM_SIGNAL_SET, node);
 #endif
         }
     }
@@ -346,7 +350,11 @@ namespace hpx::util {
         } tmp;
         tmp.uaddr = sigaddr;
 
+#if defined(OSHMEM_SHMEMX_H)
+        while(shmem_uint_test(tmp.iaddr, SHMEM_CMP_EQ, value)) {}
+#else
 	shmem_uint_wait_until(tmp.iaddr, SHMEM_CMP_EQ, static_cast<int>(value));
+#endif
     }
 
     constexpr bool vendor_strings_equal(char const * a, char const * b) {

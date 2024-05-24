@@ -160,7 +160,7 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(header_.data()), dst_,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    header_.data_size_,
+                    header_.data_size_*sizeof(decltype(header_.data)),
                     hpx::util::openshmem_environment::segments[idx].rcv
                 );
             }
@@ -216,7 +216,7 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::put_signal(
                     reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    buffer_.data_.size(),
+                    buffer_.data_.size() * sizeof(decltype(buffer_.data_.data)),
                     hpx::util::openshmem_environment::segments[idx].rcv
                 );
             }
@@ -251,8 +251,7 @@ namespace hpx::parcelset::policies::openshmem {
                             hpx::util::openshmem_environment::segments[idx].rcv
                         );
 
-                        hpx::util::openshmem_environment::wait_until(
-                            1, hpx::util::openshmem_environment::segments[idx].xmt);
+                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].xmt, SHMEM_CMP_EQ, 1)) {}
                         (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
                     }
                 }

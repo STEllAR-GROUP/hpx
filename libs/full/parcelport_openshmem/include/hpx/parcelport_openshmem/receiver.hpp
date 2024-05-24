@@ -139,21 +139,17 @@ namespace hpx::parcelset::policies::openshmem {
                 hpx::util::openshmem_environment::size();
             const std::size_t beg_rcv_signal = (sys_pgsz*page_count);
 
-            const auto idx = hpx::util::openshmem_environment::wait_until_any(
-                1,
-                hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal,
-                page_count
-            );
+	    int idx = 0;
+            for(idx = 0; i < page_count; ++i) {
+                if(shmem_test(hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal + i, SHMEM_CMP_EQ, 1)) {
+                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+		}
+            }
 
-            hpx::util::openshmem_environment::get(
-                reinterpret_cast<std::uint8_t*>(
-                rcv_header_[idx].data()),
-                self_,
+            std::memcpy(reinterpret_cast<std::uint8_t*>(rcv_header_[idx].data()),
                 hpx::util::openshmem_environment::segments[idx].beg_addr,
                 sizeof(header)
-            );
-
-            (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+            );		
 
             HPX_ASSERT_LOCKED(l, idx < 0);
             return idx;
