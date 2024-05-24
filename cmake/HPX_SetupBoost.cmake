@@ -149,6 +149,10 @@ if(NOT TARGET hpx_dependencies_boost)
     string(REPLACE "/include" "" Boost_ROOT "${Boost_INCLUDE_DIRS}")
   endif()
 
+  if(Boost_ROOT)
+    file(TO_CMAKE_PATH ${Boost_ROOT} Boost_ROOT)
+  endif()
+
   add_library(hpx_dependencies_boost INTERFACE IMPORTED)
 
   target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)

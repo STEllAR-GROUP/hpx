@@ -20,6 +20,10 @@ find_program(
   DOC "Path to breathe-apidoc executable"
 )
 
+if(Breathe_APIDOC_ROOT)
+  file(TO_CMAKE_PATH ${Breathe_APIDOC_ROOT} Breathe_APIDOC_ROOT)
+endif()
+
 if(Breathe_APIDOC_EXECUTABLE)
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(
