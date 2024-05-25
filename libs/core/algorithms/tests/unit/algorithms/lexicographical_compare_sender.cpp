@@ -45,10 +45,11 @@ void test_lexicographical_compare_sender(LnPolicy ln_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(d), std::end(d))
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
+            std::end(d))
         | hpx::lexicographical_compare(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
     bool res = hpx::get<0>(*snd_result);
 

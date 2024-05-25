@@ -390,9 +390,10 @@ void test_for_each_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = ex::just(iterator(std::begin(c)), c.size(), set_42())
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), c.size(), set_42())
         | hpx::for_each_n(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
     iterator result = hpx::get<0>(*snd_result);
 

@@ -42,9 +42,10 @@ void test_make_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+    tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
         | hpx::make_heap(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
 
     HPX_TEST_EQ(std::is_heap(std::begin(c), std::end(c)), true);

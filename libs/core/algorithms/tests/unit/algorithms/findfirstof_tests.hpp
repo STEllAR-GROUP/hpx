@@ -97,10 +97,11 @@ void test_find_first_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = ex::just(iterator(std::begin(c)),
-            iterator(std::end(c)), std::begin(h), std::end(h))
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(h),
+            std::end(h))
         | hpx::find_first_of(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
     iterator index = hpx::get<0>(*snd_result);
 

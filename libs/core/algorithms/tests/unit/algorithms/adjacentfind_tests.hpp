@@ -77,10 +77,12 @@ void test_adjacent_find_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto result = ex::just(iterator(std::begin(c)), iterator(std::end(c)))
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
         | hpx::adjacent_find(ex_policy.on(exec))
-        | tt::sync_wait();
-    iterator index = hpx::get<0>(*result);
+    );
+
+    iterator index = hpx::get<0>(*snd_result);
 
     base_iterator test_index = std::begin(c) + random_pos;
 

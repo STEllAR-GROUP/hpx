@@ -88,10 +88,10 @@ void test_generate_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-            gen)
+    tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), gen)
         | hpx::generate(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
     // verify values
     std::size_t count = 0;

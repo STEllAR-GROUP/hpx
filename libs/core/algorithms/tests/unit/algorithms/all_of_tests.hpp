@@ -87,10 +87,11 @@ void test_all_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = ex::just(iterator(std::begin(c)),
-                iterator(std::end(c)), [](auto v) { return v != 0; })
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                [](auto v) { return v != 0; })
             | hpx::all_of(ex_policy.on(exec))
-            | tt::sync_wait();
+        );
 
         bool result = hpx::get<0>(*snd_result);
 

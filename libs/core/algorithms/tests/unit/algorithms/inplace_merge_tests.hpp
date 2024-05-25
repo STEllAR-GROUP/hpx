@@ -510,10 +510,11 @@ void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, Iterato
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    ex::just(iterator(res_first), iterator(res_middle), iterator(res_last),
+    tt::sync_wait(
+        ex::just(iterator(res_first), iterator(res_middle), iterator(res_last),
             comp)
         | hpx::inplace_merge(ex_policy.on(exec))
-        | tt::sync_wait();
+    );
 
     std::inplace_merge(sol_first, sol_middle, sol_last, comp);
 
