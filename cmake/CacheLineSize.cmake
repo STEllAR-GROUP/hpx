@@ -37,13 +37,16 @@ function(cache_line_size output_var)
       )
     endif()
 
-    try_run(
-      run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}" SOURCES
-      "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
-      COMPILE_DEFINITIONS ${compile_definitions}
-      CMAKE_FLAGS CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS FALSE
-      RUN_OUTPUT_VARIABLE CACHE_LINE_SIZE
-    )
+    if(NOT CMAKE_CROSSCOMPILING)
+      try_run(
+        run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}" SOURCES
+        "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
+        COMPILE_DEFINITIONS ${compile_definitions}
+        CMAKE_FLAGS CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS
+                    FALSE
+        RUN_OUTPUT_VARIABLE CACHE_LINE_SIZE
+      )
+    endif()
 
     if(NOT CACHE_LINE_SIZE)
       set(CACHE_LINE_SIZE "64")
