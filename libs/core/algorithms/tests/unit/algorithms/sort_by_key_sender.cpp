@@ -9,6 +9,7 @@
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/sort_by_key.hpp>
 
+#include <cstddef>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
