@@ -476,7 +476,8 @@ void test_inplace_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+    IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");

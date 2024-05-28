@@ -25,7 +25,8 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(1, 10006);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_n_strided_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+void test_for_loop_n_strided_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+    IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -77,10 +78,13 @@ void for_loop_n_strided_sender_test()
 {
     using namespace hpx::execution;
     test_for_loop_n_strided_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_for_loop_n_strided_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_for_loop_n_strided_sender(hpx::launch::sync, unseq(task),
+        IteratorTag());
 
-    test_for_loop_n_strided_sender(hpx::launch::async, par(task), IteratorTag());
-    test_for_loop_n_strided_sender(hpx::launch::async, par_unseq(task), IteratorTag());
+    test_for_loop_n_strided_sender(hpx::launch::async, par(task),
+        IteratorTag());
+    test_for_loop_n_strided_sender(hpx::launch::async, par_unseq(task),
+        IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

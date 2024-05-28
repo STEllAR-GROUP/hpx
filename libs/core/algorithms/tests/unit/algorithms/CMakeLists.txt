@@ -123,59 +123,90 @@ set(tests
     minmax_element_sender
     mismatch
     mismatch_binary
+    mismatch_sender
     move
+    move_sender
     nth_element
+    nth_element_sender
     none_of
     none_of_sender
     parallel_sort
     partial_sort
+    partial_sort_sender
     partial_sort_copy
+    partial_sort_copy_sender
     partition
+    partition_sender
     partition_copy
     reduce_
+    reduce_sender
     reduce_by_key
     remove
+    remove_sender
     remove1
     remove2
     remove_if
+    remove_if_sender
     remove_if1
     remove_copy
     remove_copy_if
     replace
+    replace_sender
     replace_if
+    replace_if_sender
     replace_copy
+    replace_copy_sender
     replace_copy_if
+    replace_copy_if_sender
     reverse
     reverse_copy
     reverse_sender
+    reverse_copy_sender
     rotate
     rotate_copy
     rotate_sender
+    rotate_copy_sender
     search
+    search_sender
     searchn
+    searchn_sender
     set_difference
+    set_difference_sender
     set_intersection
+    set_intersection_sender
     set_symmetric_difference
+    set_symmetric_difference_sender
     set_union
+    set_union_sender
     shift_left
+    shift_left_sender
     shift_right
+    shift_right_sender
     sort
+    sort_sender
     sort_by_key
+    sort_by_key_sender
     sort_exceptions
     stable_partition
+    stable_partition_sender
     stable_sort
     stable_sort_exceptions
+    stable_sort_sender
     starts_with
+    starts_with_sender
     swapranges
+    swapranges_sender
     transform
     transform_binary
     transform_binary2
+    transform_sender
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
     transform_reduce_binary
     transform_reduce_binary_exception
     transform_reduce_binary_bad_alloc
+    transform_reduce_sender
     uninitialized_copy
     uninitialized_copyn
     uninitialized_default_construct
@@ -190,6 +221,7 @@ set(tests
     uninitialized_value_construct
     uninitialized_value_constructn
     unique
+    unique_sender
     unique_copy
 )
 

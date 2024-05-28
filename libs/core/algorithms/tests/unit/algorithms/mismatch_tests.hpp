@@ -475,3 +475,66 @@ void test_mismatch_bad_alloc_async(ExPolicy&& p, IteratorTag)
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c1(10007);
+    std::vector<int> c2(c1.size());
+
+    int first_value = gen();    //-V101
+    std::iota(std::begin(c1), std::end(c1), first_value);
+    std::iota(std::begin(c2), std::end(c2), first_value);
+
+    iterator begin1 = iterator(std::begin(c1));
+    iterator end1 = iterator(std::end(c1));
+
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        auto snd_result = tt::sync_wait(
+            ex::just(begin1, end1, std::begin(c2))
+            | hpx::mismatch(ex_policy.on(exec))
+        );
+
+        auto result = hpx::get<0>(*snd_result);
+
+        // verify values
+        HPX_TEST_EQ(
+            std::size_t(std::distance(begin1, result.first)), c1.size());
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            c2.size());
+    }
+
+    {
+        std::size_t changed_idx = dis(gen);    //-V104
+        ++c1[changed_idx];
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        auto snd_result = tt::sync_wait(
+            ex::just(begin1, end1, std::begin(c2))
+            | hpx::mismatch(ex_policy.on(exec))
+        );
+
+        auto result = hpx::get<0>(*snd_result);
+
+        // verify values
+        HPX_TEST_EQ(
+            std::size_t(std::distance(begin1, result.first)), changed_idx);
+        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            changed_idx);
+    }
+}

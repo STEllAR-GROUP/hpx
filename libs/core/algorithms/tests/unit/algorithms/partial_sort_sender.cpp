@@ -5,67 +5,79 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
 #include <algorithm>
-#include <cstddef>
+#include <cstdint>
 #include <iostream>
-#include <numeric>
 #include <random>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+////////////////////////////////////////////////////////////////////////////
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
+constexpr std::uint64_t  SIZE { 1007 };
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+void test_partial_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
 
-    using base_iterator = std::vector<std::size_t>::iterator;
+    using compare_t = std::less<std::uint64_t>;
+    using base_iterator = std::vector<std::uint64_t>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::vector<std::uint64_t> A, B;
+    A.reserve(SIZE);
+    B.reserve(SIZE);
 
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    for (std::uint64_t i = 0; i < SIZE; ++i)
+    {
+        A.emplace_back(i);
+    }
+    std::shuffle(A.begin(), A.end(), gen);
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), c.size(),
-            [](iterator it) { *it = 42; })
-        | hpx::experimental::for_loop_n(ex_policy.on(exec))
-    );
+    for (std::uint64_t i = 1; i < SIZE; ++i)
+    {
+        B = A;
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
-        ++count;
-    });
-    HPX_TEST_EQ(count, c.size());
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        tt::sync_wait(
+            ex::just(iterator(std::begin(B)), iterator(std::begin(B) + i),
+                iterator(std::end(B)), compare_t{})
+            | hpx::partial_sort(ex_policy.on(exec))
+        );
+
+        for (std::uint64_t j = 0; j < i; ++j)
+        {
+            HPX_TEST(B[j] == j);
+        }
+    }
 }
 
+
 template<typename IteratorTag>
-void for_loop_n_sender_test()
+void partial_sort_sender_test()
 {
     using namespace hpx::execution;
-    test_for_loop_n_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_partial_sort_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_partial_sort_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_for_loop_n_sender(hpx::launch::async, par(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::async, par_unseq(task), IteratorTag());
+    test_partial_sort_sender(hpx::launch::async, par(task), IteratorTag());
+    test_partial_sort_sender(hpx::launch::async, par_unseq(task),
+        IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -77,8 +89,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_loop_n_sender_test<std::forward_iterator_tag>();
-    for_loop_n_sender_test<std::random_access_iterator_tag>();
+    partial_sort_sender_test<std::forward_iterator_tag>();
+    partial_sort_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

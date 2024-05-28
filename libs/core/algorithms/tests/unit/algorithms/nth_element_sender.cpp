@@ -11,20 +11,22 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include <numeric>
+#include <iterator>
 #include <random>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
+constexpr std::size_t SIZE {10007};
+
+
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+void test_nth_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -37,35 +39,45 @@ void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::vector<std::size_t> c(SIZE);
+    std::generate(std::begin(c), std::end(c),
+        []() { return std::rand() % SIZE; });
+    std::vector<std::size_t> d = c;
+
+    auto rand_index = std::rand() % SIZE;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     tt::sync_wait(
-        ex::just(iterator(std::begin(c)), c.size(),
-            [](iterator it) { *it = 42; })
-        | hpx::experimental::for_loop_n(ex_policy.on(exec))
+        ex::just(iterator(std::begin(c)), iterator(std::begin(c) + rand_index),
+            iterator(std::end(c)))
+        | hpx::nth_element(ex_policy.on(exec))
     );
 
-    // verify values
-    std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
-        ++count;
-    });
-    HPX_TEST_EQ(count, c.size());
+    std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
+
+    HPX_TEST(*(std::begin(c) + rand_index) == *(std::begin(d) + rand_index));
+
+    for (int k = 0; k < rand_index; k++)
+    {
+        HPX_TEST(c[k] <= c[rand_index]);
+    }
+
+    for (int k = rand_index + 1; k < SIZE; k++)
+    {
+        HPX_TEST(c[k] >= c[rand_index]);
+    }
 }
 
 template<typename IteratorTag>
-void for_loop_n_sender_test()
+void nth_element_sender_test()
 {
     using namespace hpx::execution;
-    test_for_loop_n_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_nth_element_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_nth_element_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_for_loop_n_sender(hpx::launch::async, par(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::async, par_unseq(task), IteratorTag());
+    test_nth_element_sender(hpx::launch::async, par(task), IteratorTag());
+    test_nth_element_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -77,8 +89,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_loop_n_sender_test<std::forward_iterator_tag>();
-    for_loop_n_sender_test<std::random_access_iterator_tag>();
+    nth_element_sender_test<std::forward_iterator_tag>();
+    nth_element_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

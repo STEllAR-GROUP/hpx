@@ -66,7 +66,8 @@ void test_find_if_not(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_find_if_not_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+void test_find_if_not_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+    IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");

@@ -298,3 +298,47 @@ void test_transform_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(caught_bad_alloc);
     HPX_TEST(returned_from_algorithm);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_transform_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+    IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(10007);
+    std::vector<int> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d),
+            add_one())
+        | hpx::transform(ex_policy.on(exec))
+    );
+
+    auto result = hpx::get<0>(*snd_result);
+
+    HPX_TEST(result == std::end(d));
+
+    // verify values
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1 + 1, v2);
+            ++count;
+            return v1 + 1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+

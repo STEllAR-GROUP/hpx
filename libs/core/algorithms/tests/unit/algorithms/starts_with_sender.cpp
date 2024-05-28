@@ -8,81 +8,85 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
 #include <random>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
+unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-std::uniform_int_distribution<> dis(1, 10006);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_strided_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+void test_starts_with_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
 
-    using base_iterator = std::vector<std::size_t>::iterator;
+    using base_iterator = std::vector<int>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::uniform_int_distribution<int> dis1(1, 10007);
+    auto end1 = dis1(gen);
+    std::uniform_int_distribution<int> dis2(1, end1);
+    auto end2 = dis2(gen);
+    auto some_ints = std::vector<int>(end1);
+    std::iota(some_ints.begin(), some_ints.end(), 1);
+    auto some_more_ints = std::vector<int>(end2);
+    std::iota(some_more_ints.begin(), some_more_ints.end(), 1);
+    auto some_wrong_ints = std::vector<int>(end2);
+    std::iota(
+        some_wrong_ints.begin(), some_wrong_ints.end(), std::rand() % end2 + 2);
 
-    std::for_each(std::begin(c), std::end(c), [](std::size_t& v) -> void {
-        if (v == 42)
-            v = 43;
-    });
-
-    int stride = dis(gen);    //-V103
-
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), stride,
-            [](iterator it) { *it = 42; })
-        | hpx::experimental::for_loop_strided(ex_policy.on(exec))
-    );
-
-    // verify values
-    std::size_t count = 0;
-    for (std::size_t i = 0; i != c.size(); ++i)
     {
-        if (i % stride == 0)    //-V104
-        {
-            HPX_TEST_EQ(c[i], std::size_t(42));
-        }
-        else
-        {
-            HPX_TEST_NEQ(c[i], std::size_t(42));
-        }
-        ++count;
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(some_ints)),
+                iterator(std::end(some_ints)),
+                iterator(std::begin(some_more_ints)),
+                iterator(std::end(some_more_ints)))
+            | hpx::starts_with(ex_policy.on(exec))
+        );
+
+        auto result = hpx::get<0>(*snd_result);
+        HPX_TEST_EQ(result, true);
     }
-    HPX_TEST_EQ(count, c.size());
+
+    {
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(some_ints)),
+                iterator(std::end(some_ints)),
+                iterator(std::begin(some_wrong_ints)),
+                iterator(std::end(some_wrong_ints)))
+            | hpx::starts_with(ex_policy.on(exec))
+        );
+
+        auto result = hpx::get<0>(*snd_result);
+        HPX_TEST_EQ(result, false);
+    }
 }
 
 template<typename IteratorTag>
-void for_loop_strided_sender_test()
+void starts_with_sender_test()
 {
     using namespace hpx::execution;
-    test_for_loop_strided_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_for_loop_strided_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_starts_with_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_starts_with_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_for_loop_strided_sender(hpx::launch::async, par(task), IteratorTag());
-    test_for_loop_strided_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_starts_with_sender(hpx::launch::async, par(task), IteratorTag());
+    test_starts_with_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -94,8 +98,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_loop_strided_sender_test<std::forward_iterator_tag>();
-    for_loop_strided_sender_test<std::random_access_iterator_tag>();
+    starts_with_sender_test<std::forward_iterator_tag>();
+    starts_with_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

@@ -339,3 +339,39 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(caught_exception);
     HPX_TEST(returned_from_algorithm);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<int> c(10007);
+    std::iota(std::begin(c), std::end(c), gen());
+
+    int val(42);
+    auto op = [](auto v1, auto v2) { return v1 * v2; };
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op)
+        | hpx::reduce(ex_policy.on(exec))
+    );
+
+    int r1 = hpx::get<0>(*snd_result);
+
+    // verify values
+    int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
+    HPX_TEST_EQ(r1, r2);
+}

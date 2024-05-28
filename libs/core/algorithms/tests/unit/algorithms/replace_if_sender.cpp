@@ -8,23 +8,33 @@
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
-#include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <numeric>
-#include <random>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "test_utils.hpp"
 
-///////////////////////////////////////////////////////////////////////////////
-int seed = std::random_device{}();
-std::mt19937 gen(seed);
+////////////////////////////////////////////////////////////////////////////
+struct equal_f
+{
+    equal_f(std::size_t val)
+      : val_(val)
+    {
+    }
+
+    bool operator()(std::size_t lhs) const
+    {
+        return lhs == val_;
+    }
+
+    std::size_t val_;
+};
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
+void test_replace_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
@@ -38,34 +48,42 @@ void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     std::vector<std::size_t> c(10007);
-    std::iota(std::begin(c), std::end(c), gen());
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), std::rand());
+    std::copy(std::begin(c), std::end(c), std::begin(d));
+
+    std::size_t idx = std::rand() % c.size();    //-V104
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     tt::sync_wait(
-        ex::just(iterator(std::begin(c)), c.size(),
-            [](iterator it) { *it = 42; })
-        | hpx::experimental::for_loop_n(ex_policy.on(exec))
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+            equal_f(c[idx]), c[idx] + 1)
+        | hpx::replace_if(ex_policy.on(exec))
     );
 
-    // verify values
+    std::replace_if(std::begin(d), std::end(d), equal_f(d[idx]), d[idx] + 1);
+
     std::size_t count = 0;
-    std::for_each(std::begin(c), std::end(c), [&count](std::size_t v) -> void {
-        HPX_TEST_EQ(v, std::size_t(42));
-        ++count;
-    });
-    HPX_TEST_EQ(count, c.size());
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
 }
 
+
 template<typename IteratorTag>
-void for_loop_n_sender_test()
+void replace_if_sender_test()
 {
     using namespace hpx::execution;
-    test_for_loop_n_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_replace_if_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_replace_if_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_for_loop_n_sender(hpx::launch::async, par(task), IteratorTag());
-    test_for_loop_n_sender(hpx::launch::async, par_unseq(task), IteratorTag());
+    test_replace_if_sender(hpx::launch::async, par(task), IteratorTag());
+    test_replace_if_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -77,8 +95,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    for_loop_n_sender_test<std::forward_iterator_tag>();
-    for_loop_n_sender_test<std::random_access_iterator_tag>();
+    replace_if_sender_test<std::forward_iterator_tag>();
+    replace_if_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

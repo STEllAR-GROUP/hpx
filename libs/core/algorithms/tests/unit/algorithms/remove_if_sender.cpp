@@ -11,18 +11,17 @@
 #include <vector>
 #include <iterator>
 
-#include "findfirstof_tests.hpp"
+#include "remove_tests.hpp"
 
 template<typename IteratorTag>
-void find_first_of_sender_test()
+void remove_if_sender_test()
 {
     using namespace hpx::execution;
-    test_find_first_of_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_find_first_of_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_remove_if_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_remove_if_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_find_first_of_sender(hpx::launch::async, par(task), IteratorTag());
-    test_find_first_of_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_remove_if_sender(hpx::launch::async, par(task), IteratorTag());
+    test_remove_if_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)
@@ -34,8 +33,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    find_first_of_sender_test<std::forward_iterator_tag>();
-    find_first_of_sender_test<std::random_access_iterator_tag>();
+    remove_if_sender_test<std::forward_iterator_tag>();
+    remove_if_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

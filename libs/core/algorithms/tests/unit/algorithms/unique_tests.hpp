@@ -501,3 +501,41 @@ void test_unique_bad_alloc()
     test_unique_bad_alloc_async(seq(task), IteratorTag());
     test_unique_bad_alloc_async(par(task), IteratorTag());
 }
+
+////////////////////////////////////////////////////////////////////////////////
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    const int rand_base = std::rand();
+    auto pred = [](const std::size_t a, const std::size_t b)
+        -> bool { return a == b; };
+    std::size_t const size = 10007;
+    std::vector<std::size_t> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred)
+        | hpx::unique(ex_policy.on(exec))
+    );
+
+    auto result = hpx::get<0>(*snd_result);
+    auto solution = std::unique(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
