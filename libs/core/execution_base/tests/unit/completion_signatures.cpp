@@ -17,8 +17,8 @@ namespace ex = hpx::execution::experimental;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename... Values>
-auto signature_values(Values...)
-    -> ex::completion_signatures<ex::set_value_t(Values...)>
+auto signature_values(
+    Values...) -> ex::completion_signatures<ex::set_value_t(Values...)>
 {
     return {};
 }
@@ -35,17 +35,17 @@ auto signature_stopped() -> ex::completion_signatures<ex::set_stopped_t()>
 }
 
 template <typename Error, typename... Values>
-auto signature_error_values(Error, Values...)
-    -> ex::completion_signatures<ex::set_value_t(Values...),
-        ex::set_error_t(Error)>
+auto signature_error_values(
+    Error, Values...) -> ex::completion_signatures<ex::set_value_t(Values...),
+                          ex::set_error_t(Error)>
 {
     return {};
 }
 
 template <typename... Values>
-auto signature_values_stopped(Values...)
-    -> ex::completion_signatures<ex::set_value_t(Values...),
-        ex::set_stopped_t()>
+auto signature_values_stopped(
+    Values...) -> ex::completion_signatures<ex::set_value_t(Values...),
+                   ex::set_stopped_t()>
 {
     return {};
 }
@@ -58,9 +58,9 @@ auto signature_error_stopped(Error)
 }
 
 template <typename Error, typename... Values>
-auto signature_all(Error, Values...)
-    -> ex::completion_signatures<ex::set_value_t(Values...),
-        ex::set_error_t(Error), ex::set_stopped_t()>
+auto signature_all(
+    Error, Values...) -> ex::completion_signatures<ex::set_value_t(Values...),
+                          ex::set_error_t(Error), ex::set_stopped_t()>
 {
     return {};
 }

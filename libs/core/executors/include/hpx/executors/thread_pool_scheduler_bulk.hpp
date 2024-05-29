@@ -736,8 +736,8 @@ namespace hpx::execution::experimental::detail {
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
-            thread_pool_bulk_sender const&, Env)
-            -> generate_completion_signatures<Env>;
+            thread_pool_bulk_sender const&,
+            Env) -> generate_completion_signatures<Env>;
 
         // clang-format off
         template <typename CPO,

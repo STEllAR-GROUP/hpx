@@ -247,8 +247,8 @@ namespace hpx::execution::experimental {
 
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
-                when_all_sender const&, Env) noexcept
-                -> generate_completion_signatures<Env>;
+                when_all_sender const&,
+                Env) noexcept -> generate_completion_signatures<Env>;
 
             static constexpr std::size_t num_predecessors = sizeof...(Senders);
             static_assert(num_predecessors > 0,

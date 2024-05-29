@@ -247,8 +247,8 @@ namespace hpx::execution::experimental {
                 template <typename Env>
                 friend auto tag_invoke(
                     hpx::execution::experimental::get_completion_signatures_t,
-                    run_loop_sender const&, Env) noexcept
-                    -> completion_signatures;
+                    run_loop_sender const&,
+                    Env) noexcept -> completion_signatures;
 
                 run_loop& loop;
             };

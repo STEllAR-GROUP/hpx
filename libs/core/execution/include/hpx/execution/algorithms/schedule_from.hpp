@@ -74,9 +74,9 @@ namespace hpx::execution::experimental {
             };
 
             template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, schedule_from_sender const&, Env)
-                -> generate_completion_signatures<Env>;
+            friend auto tag_invoke(get_completion_signatures_t,
+                schedule_from_sender const&,
+                Env) -> generate_completion_signatures<Env>;
 
             // clang-format off
             template <typename CPO,

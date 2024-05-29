@@ -55,12 +55,12 @@ struct scope_guard
 {
     Fn fn_;
     scope_guard(Fn fn) noexcept
-      : fn_((Fn &&) fn)
+      : fn_((Fn&&) fn)
     {
     }
     ~scope_guard()
     {
-        ((Fn &&) fn_)();
+        ((Fn&&) fn_)();
     }
 };
 
@@ -405,7 +405,7 @@ private:
     }
 
     // Make this task generally awaitable:
-    friend task_awaitable<> operator co_await(basic_task&& self) noexcept
+    friend task_awaitable<> operator co_await(basic_task && self) noexcept
     {
         static_assert(well_formed<awaiter_context_t, _promise>);
         return task_awaitable<>{std::exchange(self.coro_, {})};
@@ -423,7 +423,7 @@ private:
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
-        task_traits_t<>, task_traits_t<T>>;
+                                     task_traits_t<>, task_traits_t<T>>;
 
     explicit basic_task(hpx::coroutine_handle<promise_type> hcoro) noexcept
       : coro_(hcoro)

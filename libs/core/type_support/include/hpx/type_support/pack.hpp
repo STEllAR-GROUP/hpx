@@ -98,8 +98,8 @@ namespace hpx::util {
         static constexpr std::false_type all_of(...);
 
         template <typename... Ts>
-        static constexpr auto all_of(int)
-            -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
+        static constexpr auto all_of(
+            int) -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>
@@ -122,8 +122,8 @@ namespace hpx::util {
         static constexpr std::true_type any_of(...);
 
         template <typename... Ts>
-        static constexpr auto any_of(int)
-            -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
+        static constexpr auto any_of(
+            int) -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
     }    // namespace detail
 
     template <typename... Ts>
