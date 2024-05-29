@@ -97,7 +97,11 @@ struct non_sender_7
 
 struct example_receiver
 {
+#ifdef HPX_HAVE_STDEXEC
     using receiver_concept = ex::receiver_t;
+#else
+    using is_receiver = void;
+#endif
     friend void tag_invoke(
         ex::set_error_t, example_receiver&&, std::exception_ptr) noexcept
     {
@@ -117,7 +121,11 @@ struct example_receiver
 template <typename... T>
 struct receiver_2
 {
+#ifdef HPX_HAVE_STDEXEC
     using receiver_concept = ex::receiver_t;
+#else
+    using is_receiver = void;
+#endif
     friend void tag_invoke(
         ex::set_error_t, receiver_2&&, std::exception_ptr) noexcept
     {
@@ -345,7 +353,7 @@ int main()
     static_assert(!is_sender_to_v<sender_2, sender_2>,
         "sender_2 is not a sender to sender_2");
 
-    static_assert(ex::receiver_of<receiver_2<int>,
+    static_assert(ex::is_receiver_of_v<receiver_2<int>,
                       ex::completion_signatures_of_t<sender_4<true, int>,
                           ex::env_of_t<receiver_2<int>>>>,
         "receiver_2<int> supports completion signatures of  "

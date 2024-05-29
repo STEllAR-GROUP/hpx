@@ -43,7 +43,7 @@ int main()
         "non_query CPO is user implemented to return true");
 
 #ifndef HPX_HAVE_STDEXEC
-    static_assert(hpx::execution::experimental::forwarding_query(
+    static_assert(hpx::execution::experimental::forwarding_scheduler_query(
                       hpx::execution::experimental::get_scheduler) == false,
         "invokes tag_fallback which returns false by default");
 #endif

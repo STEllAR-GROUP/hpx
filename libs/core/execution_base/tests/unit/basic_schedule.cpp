@@ -19,13 +19,9 @@ static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_schedule_calls = 0;
 
 #ifdef HPX_HAVE_STDEXEC
-struct dummy_scheduler
-{
-};
-
-template <typename Scheduler = dummy_scheduler>
+template <typename Scheduler>
 #endif
-struct example_sender
+struct basic_schedule_sender_template
 {
 #ifdef HPX_HAVE_STDEXEC
     using is_sender = void;
@@ -34,7 +30,7 @@ struct example_sender
         ex::set_error_t(std::exception_ptr)>;
 
     friend env_with_scheduler<Scheduler> tag_invoke(
-        ex::get_env_t, example_sender const&) noexcept
+        ex::get_env_t, basic_schedule_sender_template const&) noexcept
     {
         return {};
     }
@@ -61,6 +57,15 @@ struct example_sender
     }
 };
 
+#ifdef HPX_HAVE_STDEXEc
+struct dummy_scheduler
+{
+};
+using basic_schedule_sender = basic_schedule_sender_template;
+#else
+using basic_schedule_sender = basic_schedule_sender_template;
+#endif
+
 struct non_scheduler_1
 {
 };
@@ -72,7 +77,7 @@ struct non_scheduler_2
 
 struct non_scheduler_3
 {
-    friend example_sender<> tag_invoke(ex::schedule_t, non_scheduler_3)
+    friend basic_schedule_sender tag_invoke(ex::schedule_t, non_scheduler_3)
     {
         return {};
     }
@@ -81,7 +86,7 @@ struct non_scheduler_3
 struct scheduler_1
 {
 #ifdef HPX_HAVE_STDEXEC
-    using sender_1 = example_sender<scheduler_1>;
+    using sender_1 = basic_schedule_sender_template<scheduler_1>;
 
     friend sender_1 tag_invoke(ex::schedule_t, scheduler_1)
     {
@@ -89,7 +94,7 @@ struct scheduler_1
         return {};
     }
 #else
-    friend example_sender tag_invoke(ex::schedule_t, scheduler_1)
+    friend basic_schedule_sender tag_invoke(ex::schedule_t, scheduler_1)
     {
         ++friend_tag_invoke_schedule_calls;
         return {};
@@ -110,7 +115,7 @@ struct scheduler_1
 struct scheduler_2
 {
 #ifdef HPX_HAVE_STDEXEC
-    using sender_2 = example_sender<scheduler_2>;
+    using sender_2 = basic_schedule_sender_template<scheduler_2>;
 #endif
 
     constexpr bool operator==(scheduler_2 const&) const noexcept
@@ -125,9 +130,10 @@ struct scheduler_2
 };
 
 #ifdef HPX_HAVE_STDEXEC
-example_sender<scheduler_2> tag_invoke(ex::schedule_t, scheduler_2)
+basic_schedule_sender_template<scheduler_2> tag_invoke(
+    ex::schedule_t, scheduler_2)
 #else
-example_sender tag_invoke(ex::schedule_t, scheduler_2)
+basic_schedule_sender tag_invoke(ex::schedule_t, scheduler_2)
 #endif
 {
     ++tag_invoke_schedule_calls;
@@ -148,33 +154,33 @@ int main()
     static_assert(is_scheduler_v<scheduler_2>, "scheduler_2 is a scheduler");
 
     scheduler_1 s1;
-    example_sender snd1 = ex::schedule(s1);
+    basic_schedule_sender snd1 = ex::schedule(s1);
     HPX_UNUSED(snd1);
     HPX_TEST_EQ(friend_tag_invoke_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(0));
 
     scheduler_2 s2;
-    example_sender snd2 = ex::schedule(s2);
+    basic_schedule_sender snd2 = ex::schedule(s2);
     HPX_UNUSED(snd2);
     HPX_TEST_EQ(friend_tag_invoke_schedule_calls, std::size_t(1));
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
 
     static_assert(std::is_same_v<ex::schedule_result_t<scheduler_1>,
 #ifdef HPX_HAVE_STDEXEC
-                      example_sender<scheduler_1>
+                      basic_schedule_sender_template<scheduler_1>
 #else
-                      exmple_sender
+                      basic_schedule_sender
 #endif
                       >,
-        "Result of scheduler is a example_sender");
+        "Result of scheduler is a basic_schedule_sender");
     static_assert(std::is_same_v<ex::schedule_result_t<scheduler_2>,
 #ifdef HPX_HAVE_STDEXEC
-                      example_sender<scheduler_2>
+                      basic_schedule_sender_template<scheduler_2>
 #else
-                      example_sender
+                      basic_schedule_sender
 #endif
                       >,
-        "Result of scheduler is a example_sender");
+        "Result of scheduler is a basic_schedule_sender");
 
     return hpx::util::report_errors();
 }

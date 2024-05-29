@@ -239,9 +239,6 @@ int main()
             return void_sender();
         });
 
-        static_assert(std::same_as<decltype([]() { return void_sender(); }()),
-            void_sender>);
-
         static_assert(ex::is_sender_v<decltype(s2)>);
 #ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);

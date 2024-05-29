@@ -5,6 +5,7 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/execution/algorithms/execute.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/execution_base.hpp>
@@ -77,10 +78,9 @@ template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
     typename Sender>
 inline void check_sends_stopped(Sender&&)
 {
+#ifdef HPX_HAVE_STDEXEC
     // See check_value_types
     using UnderlyingSender = std::remove_reference_t<Sender>;
-
-#ifdef HPX_HAVE_STDEXEC
     constexpr bool sends_stopped =
         hpx::execution::experimental::sends_stopped<UnderlyingSender, Env>;
 #else
@@ -120,13 +120,15 @@ struct void_sender
         hpx::execution::experimental::get_completion_signatures_t,
         void_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
-            hpx::execution::experimental::set_value_t()>{};
+            hpx::execution::experimental::set_value_t()> {};
 };
 
 template <typename... Ts>
 struct error_sender
 {
-    using is_sender = void;
+#ifdef HPX_HAVE_STDEXEC
+    using sender_concept = ex::sender_t;
+#endif
 
     template <typename R>
     struct operation_state
@@ -151,19 +153,12 @@ struct error_sender
         return {std::forward<R>(r)};
     }
 
-    //    friend hpx::execution::experimental::empty_env tag_invoke(
-    //        hpx::execution::experimental::get_env_t, error_sender const&)
-    //    {
-    //        return {};
-    //    }
-    //
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         error_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(Ts...),
-            hpx::execution::experimental::set_stopped_t(),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>
     {
         return {};
@@ -262,8 +257,9 @@ struct callback_receiver
 
     template <typename... Ts>
     friend auto tag_invoke(hpx::execution::experimental::set_value_t,
-        callback_receiver&& r, Ts&&... ts) noexcept
-        -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...), void())
+        callback_receiver&& r,
+        Ts&&... ts) noexcept -> decltype(HPX_INVOKE(f, std::forward<Ts>(ts)...),
+                                 void())
     {
         HPX_INVOKE(r.f, std::forward<Ts>(ts)...);
         r.set_value_called = true;
@@ -739,7 +735,7 @@ struct example_scheduler_template
     struct my_sender
     {
         using is_sender = void;
-
+#ifdef HPX_HAVE_STDEXEC
         friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
             example_scheduler_template, Derived>>
         tag_invoke(
@@ -747,6 +743,7 @@ struct example_scheduler_template
         {
             return {};
         }
+#endif
 
         template <typename R>
         struct operation_state

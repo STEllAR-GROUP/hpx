@@ -47,16 +47,19 @@ public:
 template <typename... Ts>
 struct non_copyable_sender
 {
+#ifdef HPX_HAVE_STDEXEC
     using sender_concept = ex::sender_t;
+#else
     using is_sender = void;
+#endif
 
     hpx::tuple<std::decay_t<Ts>...> ts;
 
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t,
-        non_copyable_sender const&, Env) noexcept
-        -> ex::completion_signatures<ex::set_value_t(Ts...),
-            ex::set_error_t(std::exception_ptr)>;
+        non_copyable_sender const&,
+        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
+                          ex::set_error_t(std::exception_ptr)>;
 
     non_copyable_sender() = default;
     template <typename T,
@@ -109,10 +112,10 @@ struct example_sender
     using is_sender = void;
 
     template <typename Env>
-    friend auto tag_invoke(
-        ex::get_completion_signatures_t, example_sender const&, Env) noexcept
-        -> ex::completion_signatures<ex::set_value_t(Ts...),
-            ex::set_error_t(std::exception_ptr)>;
+    friend auto tag_invoke(ex::get_completion_signatures_t,
+        example_sender const&,
+        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
+                          ex::set_error_t(std::exception_ptr)>;
 
     example_sender() = default;
     template <typename T,

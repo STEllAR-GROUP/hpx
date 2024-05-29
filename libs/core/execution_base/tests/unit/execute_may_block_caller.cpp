@@ -35,7 +35,7 @@ struct this_test_example_scheduler
         return {};
     }
 #else
-    friend constexpr voiud tag_invoke(
+    friend constexpr void tag_invoke(
         ex::schedule_t, this_test_example_scheduler) noexcept
     {
     }
