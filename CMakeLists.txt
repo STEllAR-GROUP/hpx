@@ -60,12 +60,16 @@ endif()
 set(HPX_VERSION_MAJOR 1)
 set(HPX_VERSION_MINOR 10)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20230804)
-set(HPX_VERSION_TAG "-trunk")
+set(HPX_VERSION_DATE 20240529)
+set(HPX_VERSION_TAG "")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
 )
+set(HPX_VERSION_FULL
+    "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}${HPX_VERSION_TAG}"
+)
+
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
@@ -149,6 +153,12 @@ if(MSVC)
 endif()
 
 # ##############################################################################
+# Disable check for compiler compatibility by default
+hpx_option(
+  HPX_WITH_IGNORE_COMPILER_COMPATIBILITY BOOL
+  "Ignore compiler incompatibility in dependent projects (default: ON)." ON
+  ADVANCED
+)
 
 # ##############################################################################
 # Set our build options cache variables which are customizable by users
@@ -156,7 +166,7 @@ endif()
 
 hpx_option(
   HPX_WITH_DEPRECATION_WARNINGS BOOL
-  "Enable warnings for deprecated facilities. (default: ON)" ON ADVANCED
+  "Enable warnings for deprecated facilities (default: ON)." ON ADVANCED
 )
 
 if(HPX_WITH_DEPRECATION_WARNINGS)
@@ -179,7 +189,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   hpx_option(
     HPX_WITH_STACKOVERFLOW_DETECTION
     BOOL
-    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    "Enable stackoverflow detection for HPX threads/coroutines (default: OFF, debug: ON)."
     ${HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT}
     ADVANCED
   )
@@ -2321,7 +2331,7 @@ if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
 )
   string(REGEX MATCH "^release-[0-9]+.[0-9]+.X$" matched ${HPX_WITH_GIT_BRANCH})
   if(matched)
-    set(HPX_WITH_GIT_TAG "v${HPX_VERSION}")
+    set(HPX_WITH_GIT_TAG "v${HPX_VERSION_FULL}")
     hpx_info("Setting HPX_WITH_GIT_TAG to: " "${HPX_WITH_GIT_TAG}")
   endif()
 endif()

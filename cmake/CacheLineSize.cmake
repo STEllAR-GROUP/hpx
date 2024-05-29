@@ -27,23 +27,27 @@ set(cache_line_size_detect_cpp_code
 
 function(cache_line_size output_var)
   if(NOT HPX_INTERNAL_CACHE_LINE_SIZE_DETECT)
-    file(WRITE "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
-         "${cache_line_size_detect_cpp_code}"
-    )
 
-    if(HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
-      set(compile_definitions
-          "-DHPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE"
+    if(NOT CMAKE_CROSSCOMPILING)
+      file(WRITE "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
+           "${cache_line_size_detect_cpp_code}"
+      )
+
+      if(HPX_WITH_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE)
+        set(compile_definitions
+            "-DHPX_HAVE_CXX17_HARDWARE_DESTRUCTIVE_INTERFERENCE_SIZE"
+        )
+      endif()
+
+      try_run(
+        run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}" SOURCES
+        "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
+        COMPILE_DEFINITIONS ${compile_definitions}
+        CMAKE_FLAGS CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS
+                    FALSE
+        RUN_OUTPUT_VARIABLE CACHE_LINE_SIZE
       )
     endif()
-
-    try_run(
-      run_result_unused compile_result_unused "${PROJECT_BINARY_DIR}" SOURCES
-      "${PROJECT_BINARY_DIR}/cache_line_size.cpp"
-      COMPILE_DEFINITIONS ${compile_definitions}
-      CMAKE_FLAGS CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS FALSE
-      RUN_OUTPUT_VARIABLE CACHE_LINE_SIZE
-    )
 
     if(NOT CACHE_LINE_SIZE)
       set(CACHE_LINE_SIZE "64")

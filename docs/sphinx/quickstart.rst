@@ -70,7 +70,7 @@ Hello, World!
 
 To get started with this minimal example you need to create a new project
 directory and a file ``CMakeLists.txt`` with the contents below in order to
-build an executable using |cmake| and |hpx|:
+build an executable using |cmake|_ and |hpx|:
 
 .. code-block:: cmake
 
@@ -92,7 +92,7 @@ Then, in your project directory run the following:
 .. code-block:: shell-session
 
    $ mkdir build && cd build
-   $ cmake -DCMAKE_PREFIX_PATH=</path/to/hpx/installation> ..
+   $ cmake -DHPX_DIR=</path/to/hpx/installation> ..
    $ make all
    $ ./my_hpx_program
 
@@ -156,7 +156,7 @@ distributed applications similarly to how you would write applications for a
 single node (see :ref:`why_hpx` and
 :ref:`writing_distributed_hpx_applications`).
 
-If you are already familiar with ``async`` and ``future``\ s from the C++ standard
+If you are already familiar with ``async`` and ``future`` from the C++ standard
 library, the same functionality is available in |hpx|.
 
 The following terminology is essential when talking about task-based C++
