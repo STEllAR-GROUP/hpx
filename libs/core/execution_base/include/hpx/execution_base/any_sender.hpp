@@ -789,10 +789,10 @@ namespace hpx::execution::experimental {
                 set_value_t(Ts...), set_error_t(std::exception_ptr)>;
 #else
         template <typename Env>
-        friend auto tag_invoke(
-            get_completion_signatures_t, unique_any_sender const&, Env) noexcept
-            -> completion_signatures<set_value_t(Ts...),
-                set_error_t(std::exception_ptr)>;
+        friend auto tag_invoke(get_completion_signatures_t,
+            unique_any_sender const&,
+            Env) noexcept -> completion_signatures<set_value_t(Ts...),
+                              set_error_t(std::exception_ptr)>;
 #endif
 
         template <typename R>
@@ -875,7 +875,7 @@ namespace hpx::execution::experimental {
         template <typename Env>
         friend auto tag_invoke(get_completion_signatures_t, any_sender const&,
             Env) noexcept -> completion_signatures<set_value_t(Ts...),
-            set_error_t(std::exception_ptr)>;
+                              set_error_t(std::exception_ptr)>;
 #endif
 
         template <typename R>

@@ -161,8 +161,8 @@ namespace hpx::when_all_vector_detail {
         template <typename Env>
         friend auto tag_invoke(
             hpx::execution::experimental::get_completion_signatures_t,
-            when_all_vector_sender_type const&, Env) noexcept
-            -> generate_completion_signatures<Env>;
+            when_all_vector_sender_type const&,
+            Env) noexcept -> generate_completion_signatures<Env>;
 #endif
 
         template <typename Receiver>
@@ -249,7 +249,8 @@ namespace hpx::when_all_vector_detail {
                 friend auto tag_invoke(hpx::execution::experimental::get_env_t,
                     when_all_vector_receiver const& r)
 #ifdef HPX_HAVE_STDEXEC
-                    noexcept -> hpx::execution::experimental::make_env_t<
+                    noexcept
+                    -> hpx::execution::experimental::make_env_t<
                         hpx::execution::experimental::env_of_t<receiver_type>,
                         hpx::execution::experimental::with_t<
                             hpx::execution::experimental::get_stop_token_t,

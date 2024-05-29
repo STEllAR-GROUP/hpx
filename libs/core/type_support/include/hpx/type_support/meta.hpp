@@ -509,11 +509,11 @@ namespace hpx::meta {
 
     template <typename T, typename... As>
     inline constexpr bool is_constructible_from_v =
-        std::is_destructible_v<T>&& std::is_constructible_v<T, As...>;
+        std::is_destructible_v<T> && std::is_constructible_v<T, As...>;
 
     template <typename T, typename... As>
     inline constexpr bool is_nothrow_constructible_from_v =
-        is_constructible_from_v<T, As...>&&
-            std::is_nothrow_constructible_v<T, As...>;
+        is_constructible_from_v<T, As...> &&
+        std::is_nothrow_constructible_v<T, As...>;
 
 }    // namespace hpx::meta
