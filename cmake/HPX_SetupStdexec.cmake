@@ -47,12 +47,10 @@ if(HPX_WITH_STDEXEC AND NOT TARGET STDEXEC::stdexec)
 
   if(HPX_WITH_FETCH_STDEXEC)
     hpx_info(
-      "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent."
+      "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
     )
     if(UNIX)
       include(FetchContent)
-      message("FETCHING STDEXEC TAG: ${HPX_WITH_STDEXEC_TAG}")
-
       fetchcontent_declare(
         Stdexec
         GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
@@ -64,8 +62,6 @@ if(HPX_WITH_STDEXEC AND NOT TARGET STDEXEC::stdexec)
         fetchcontent_populate(Stdexec)
       endif()
       set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
-
-      message("FETCHED STDEXEC ${stdexec_SOURCE_DIR}")
 
       add_library(Stdexec INTERFACE)
       target_include_directories(

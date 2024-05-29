@@ -38,7 +38,7 @@ int hpx_main()
     using std::variant;
 #else
     using hpx::tuple;
-    using hpx::variant
+    using hpx::variant;
 #endif
     // Success path
     {
@@ -100,7 +100,7 @@ int hpx_main()
         auto v = *result;
 
         static_assert(std::is_same_v<decltype(v),
-            variant<std::tuple<int, double, std::string>>>);
+            variant<tuple<int, double, std::string>>>);
 
         auto t = hpx::get<tuple<int, double, std::string>>(v);
         static_assert(

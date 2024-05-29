@@ -111,7 +111,12 @@ void test_execute()
 
 struct check_context_receiver
 {
+#ifdef HPX_HAVE_STDEXEC
     using receiver_concept = ex::receiver_t;
+#else
+    using is_receiver = void;
+#endif
+
     hpx::thread::id parent_id;
     ex::run_loop& loop;
     bool& executed;

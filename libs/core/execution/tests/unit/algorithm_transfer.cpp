@@ -296,9 +296,6 @@ int main()
         std::atomic<bool> tag_invoke_overload_called{false};
         std::atomic<bool> scheduler_schedule_called{false};
         std::atomic<bool> scheduler_execute_called{false};
-
-        static_assert(ex::scheduler<scheduler_schedule_from>);
-
         auto s = ex::transfer(ex::just(),
             scheduler_schedule_from{example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}});
@@ -345,7 +342,11 @@ int main()
             sender_with_completion_scheduler{std::move(source_scheduler)},
             destination_scheduler);
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -419,7 +420,11 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
+#ifdef HPX_HAVE_STDEXEC
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
+        static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);

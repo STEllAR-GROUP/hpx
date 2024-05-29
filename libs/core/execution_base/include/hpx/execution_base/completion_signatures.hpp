@@ -321,7 +321,7 @@ namespace hpx::execution::experimental {
     template <typename Env>
     using dependent_completion_signatures =
         detail::dependent_completion_signatures<Env>;
-#endif
+#endif    // NOT HPX_HAVE_STDEXEC
 
     namespace detail {
 
@@ -1156,7 +1156,6 @@ namespace hpx::execution::experimental {
         // clang-format on
     }    // namespace detail
 
-#endif    // HPX_HAVE_CXX20_COROUTINES
     inline constexpr struct as_awaitable_t
       : hpx::functional::detail::tag_fallback<as_awaitable_t>
     {
@@ -1247,8 +1246,8 @@ namespace hpx::execution::experimental {
             }
 
             template <typename T>
-            friend auto tag_invoke(get_env_t, env_promise<T> const&) noexcept
-                -> T const&;
+            friend auto tag_invoke(
+                get_env_t, env_promise<T> const&) noexcept -> T const&;
         };
 
         struct with_awaitable_senders_base
@@ -1468,8 +1467,8 @@ namespace hpx::execution::experimental {
             }
 
             // Pass through the get_env receiver query
-            friend auto tag_invoke(get_env_t, type const& self)
-                -> env_of_t<Receiver>
+            friend auto tag_invoke(
+                get_env_t, type const& self) -> env_of_t<Receiver>
             {
                 return get_env(self.rcvr);
             }
@@ -1570,6 +1569,7 @@ namespace hpx::execution::experimental {
                 HPX_FORWARD(Awaitable, await), HPX_FORWARD(Receiver, rcvr));
         }
     } connect_awaitable{};
+#endif    // HPX_HAVE_CXX20_COROUTINES
 
     HPX_HOST_DEVICE_INLINE_CONSTEXPR_VARIABLE struct connect_t
       : hpx::functional::detail::tag_fallback<connect_t>
@@ -1639,7 +1639,7 @@ namespace hpx::execution::experimental {
                 connect_result_t<sender_type, receiver> op_state_;
             };
         };
-    }     // namespace detail
+    }    // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender

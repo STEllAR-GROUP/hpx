@@ -24,7 +24,7 @@ static std::size_t tag_invoke_execute_calls = 0;
 #ifdef HPX_HAVE_STDEXEC
 template <typename Scheduler>
 #endif
-struct example_sender
+struct execute_example_sender
 {
 #ifdef HPX_HAVE_STDEXEC
     using is_sender = void;
@@ -37,10 +37,10 @@ struct example_sender
 #endif
 
     template <typename Env>
-    friend auto tag_invoke(
-        ex::get_completion_signatures_t, example_sender const&, Env)
-        -> ex::completion_signatures<ex::set_value_t(),
-            ex::set_error_t(std::exception_ptr)>;
+    friend auto tag_invoke(ex::get_completion_signatures_t,
+        execute_example_sender const&,
+        Env) -> ex::completion_signatures<ex::set_value_t(),
+                 ex::set_error_t(std::exception_ptr)>;
     struct operation_state
     {
         friend void tag_invoke(ex::start_t, operation_state&) noexcept {};
@@ -48,7 +48,7 @@ struct example_sender
 
     template <typename R>
     friend operation_state tag_invoke(
-        ex::connect_t, example_sender&&, R&&) noexcept
+        ex::connect_t, execute_example_sender&&, R&&) noexcept
     {
         return {};
     }
@@ -59,7 +59,7 @@ struct scheduler_1
 #ifdef HPX_HAVE_STDEXEC
     using my_sender = example_sender<scheduler_1>;
 #else
-    using my_sender = example_sender;
+    using my_sender = execute_example_sender;
 #endif
 
     friend my_sender tag_invoke(ex::schedule_t, scheduler_1)
@@ -84,7 +84,7 @@ struct scheduler_2
 #ifdef HPX_HAVE_STDEXEC
     using my_sender = example_sender<scheduler_2>;
 #else
-    using my_sender = example_sender;
+    using my_sender = execute_example_sender;
 #endif
 
     bool operator==(scheduler_2 const&) const noexcept
@@ -97,12 +97,13 @@ struct scheduler_2
         return false;
     }
 };
-
+#ifdef HPX_HAVE_STDEXEC
 scheduler_2::my_sender tag_invoke(ex::schedule_t, scheduler_2)
 {
     ++friend_tag_invoke_schedule_calls;
     return {};
 }
+#endif
 
 template <typename F>
 void tag_invoke(ex::execute_t, scheduler_2, F&&)
@@ -112,17 +113,17 @@ void tag_invoke(ex::execute_t, scheduler_2, F&&)
 
 struct f_struct_1
 {
-    void operator()(){};
+    void operator()() {};
 };
 
 struct f_struct_2
 {
-    void operator()(int){};
+    void operator()(int) {};
 };
 
 struct f_struct_3
 {
-    void operator()(int = 42){};
+    void operator()(int = 42) {};
 };
 
 void f_fun_1() {}
