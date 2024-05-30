@@ -249,7 +249,6 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
         check_sends_stopped<false>(void_sender());
-#ifdef HPX_HAVE_STDEXEC
         // In STDEXEC the sender returned by let_value has completion signatures
         // equal to the union of the:
         // - completion signatures of the sender returned by the function for
@@ -258,12 +257,9 @@ int main()
         //   than set_value
         // - set_error(std::exception_ptr)
 
-        // Here, error sender sends stopped so we expect
-        // let_value(error_sender, [](){...}) to send stopped too.
-        check_sends_stopped<true>(s2);
-#else
+        // Here, error sender does not send stopped so we expect
+        // let_value(error_sender, [](){...}) not to send stopped either.
         check_sends_stopped<false>(s2);
-#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
@@ -295,11 +291,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-#ifdef HPX_HAVE_STDEXEC
-        check_sends_stopped<true>(s2);
-#else
         check_sends_stopped<false>(s2);
-#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};

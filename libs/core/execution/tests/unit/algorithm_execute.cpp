@@ -30,7 +30,7 @@ struct execute_example_sender
     using is_sender = void;
 
     friend env_with_scheduler<Scheduler> tag_invoke(
-        ex::get_env_t, example_sender const&) noexcept
+        ex::get_env_t, execute_example_sender const&) noexcept
     {
         return {};
     }
@@ -57,7 +57,7 @@ struct execute_example_sender
 struct scheduler_1
 {
 #ifdef HPX_HAVE_STDEXEC
-    using my_sender = example_sender<scheduler_1>;
+    using my_sender = execute_example_sender<scheduler_1>;
 #else
     using my_sender = execute_example_sender;
 #endif
@@ -82,7 +82,7 @@ struct scheduler_1
 struct scheduler_2
 {
 #ifdef HPX_HAVE_STDEXEC
-    using my_sender = example_sender<scheduler_2>;
+    using my_sender = execute_example_sender<scheduler_2>;
 #else
     using my_sender = execute_example_sender;
 #endif
