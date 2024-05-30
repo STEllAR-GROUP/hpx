@@ -50,12 +50,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-#ifdef HPX_HAVE_STDEXEC
-        // Error sender sends stopped and this is propagated
-        check_sends_stopped<true>(s2);
-#else
         check_sends_stopped<false>(s2);
-#endif
 
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -90,12 +85,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s2);
 #endif
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-#ifdef HPX_HAVE_STDEXEC
-        // Propagated from error sender
-        check_sends_stopped<true>(s2);
-#else
         check_sends_stopped<false>(s2);
-#endif
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<void_callback_helper<decltype(f)>>{
@@ -133,11 +123,7 @@ int main()
             s2);
 #endif
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-#ifdef HPX_HAVE_STDEXEC
-        check_sends_stopped<true>(s2);
-#else
         check_sends_stopped<false>(s2);
-#endif
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<void_callback_helper<decltype(f)>>{
@@ -176,11 +162,7 @@ int main()
             hpx::tuple<>>>(s2);
 #endif
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-#ifdef HPX_HAVE_STDEXEC
-        check_sends_stopped<true>(s2);
-#else
         check_sends_stopped<false>(s2);
-#endif
 
         auto f = [](auto x) { HPX_TEST_EQ(x.x, 42); };
         auto r = callback_receiver<void_callback_helper<decltype(f)>>{
@@ -210,11 +192,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-#ifdef HPX_HAVE_STDEXEC
-        check_sends_stopped<true>(s);
-#else
         check_sends_stopped<false>(s);
-#endif
 
         auto f = [] {};
         auto r = callback_receiver<decltype(f)>{f, set_value_called};
@@ -246,11 +224,7 @@ int main()
         check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s);
 #endif
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-#ifdef HPX_HAVE_STDEXEC
-        check_sends_stopped<true>(s);
-#else
         check_sends_stopped<false>(s);
-#endif
 
         auto f = [](int x) { HPX_TEST_EQ(x, 42); };
         auto r = callback_receiver<void_callback_helper<decltype(f)>>{

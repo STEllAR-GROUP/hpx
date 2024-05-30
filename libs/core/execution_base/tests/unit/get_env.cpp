@@ -41,10 +41,10 @@ namespace mylib {
     inline constexpr struct receiver_env_t final : ex::forwarding_query_t
     {
         template <typename Env>
-            requires ex::tag_invocable<receiver_env_t, Env>
+            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<receiver_env_t, Env>
         auto operator()(Env const& e) const
         {
-            return ex::tag_invoke(*this, e);
+            return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
         }
     } receiver_env{};
 #else
@@ -106,10 +106,10 @@ namespace mylib {
     inline constexpr struct receiver_env1_t final : ex::forwarding_query_t
     {
         template <typename Env>
-            requires ex::tag_invocable<receiver_env1_t, Env>
+            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<receiver_env1_t, Env>
         auto operator()(Env const& e) const
         {
-            return ex::tag_invoke(*this, e);
+            return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
         }
     } receiver_env1{};
 #else

@@ -127,7 +127,7 @@ template <typename... Ts>
 struct error_sender
 {
 #ifdef HPX_HAVE_STDEXEC
-    using sender_concept = ex::sender_t;
+    using sender_concept = hpx::execution::experimental::sender_t;
 #endif
 
     template <typename R>

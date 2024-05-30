@@ -428,12 +428,7 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
-#ifdef HPX_HAVE_STDEXEC
-        // P2300 transfer propagates the set_stopped signature
-        check_sends_stopped<true>(s);
-#else
         check_sends_stopped<false>(s);
-#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};

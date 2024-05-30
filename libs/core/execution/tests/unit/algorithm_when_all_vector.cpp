@@ -510,7 +510,11 @@ int main()
 
         check_value_types<hpx::variant<hpx::tuple<std::vector<double>>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
+#ifdef HPX_HAVE_STDEXEC
+        check_sends_stopped<false>(s);
+#else
         check_sends_stopped<true>(s);
+#endif
 
         auto r = error_callback_receiver<check_exception_ptr>{
             check_exception_ptr{}, set_error_called};
