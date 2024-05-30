@@ -17,7 +17,18 @@
 #include <exec/env.hpp>
 
 namespace hpx::execution::experimental {
-    using namespace exec;
+    using exec::with_t;
+
+    using exec::with;
+    using exec::without;
+
+    using exec::make_env_t;
+    using exec::make_env;
+
+    using exec::write;
+    using exec::write_env;
+
+    using exec::read_with_default;
 }
 #else
 
