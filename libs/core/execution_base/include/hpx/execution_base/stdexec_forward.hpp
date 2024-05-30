@@ -1,12 +1,13 @@
-//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
+//  Copyright (c) 2024 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #pragma once
+#include <hpx/config.hpp>
 
-#if defined(HPX_HAVE_STDEXEC)
+#ifdef HPX_HAVE_STDEXEC
 #include <stdexec/execution.hpp>
 
 namespace hpx::execution::experimental {
@@ -61,6 +62,7 @@ namespace hpx::execution::experimental {
     using stdexec::stop_token_of_t;
 
     using stdexec::completion_signatures;
+    using stdexec::get_completion_signatures;
     using stdexec::get_completion_signatures_t;
 
     // Sender
@@ -248,6 +250,18 @@ namespace hpx::execution::experimental {
 
     using stdexec::operation_state;
 
+    namespace stdexec_non_standard_tag_invoke {
+        // Presently, the stdexec repository implements tag invoke,
+        // however it includes a non-standard (in the sense of unexpected) extension.
+        // tag invoke first checks for the existence of a .query member function or a ::query static function.
+        // in order to write
+        using stdexec::tag_invoke;
+        using stdexec::tag_invoke_result;
+
+        using stdexec::tag_invocable;
+        using stdexec::nothrow_tag_invocable;
+    }
+
     namespace stdexec_internal {
         using stdexec::__single_sender_value_t;
 
@@ -259,7 +273,6 @@ namespace hpx::execution::experimental {
     }    // namespace stdexec_internal
 }    // namespace hpx::execution::experimental
 
-namespace hpx::this_thread {
-
-}
+// Leaving this as a placeholder
+namespace hpx::this_thread {}
 #endif
