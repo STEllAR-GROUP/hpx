@@ -14,7 +14,7 @@
 
 namespace hpx::execution::experimental {
     template <typename Scheduler>
-    inline constexpr bool is_scheduler_v =scheduler<Scheduler>;
+    inline constexpr bool is_scheduler_v = scheduler<Scheduler>;
 
     template <typename Scheduler>
     struct is_scheduler : std::bool_constant<is_scheduler_v<Scheduler>>

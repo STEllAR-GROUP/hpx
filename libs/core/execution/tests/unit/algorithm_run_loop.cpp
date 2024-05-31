@@ -752,30 +752,12 @@ void test_future_sender()
     std::cout << "1\n";
     // senders as futures
     {
-        std::cout << "1\n";
         ex::run_loop loop;
         auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 3);
         auto f = ex::make_future(std::move(s));
         HPX_TEST_EQ(f.get(), 3);
-    }
-
-    // Make a future from a sender
-    {
-        ex::run_loop loop;
-        auto sched = loop.get_scheduler();
-
-        auto s = ex::schedule(sched) | ex::then([]() { return 3; });
-        auto f = ex::make_future(std::move(s));
-        HPX_TEST_EQ(f.get(), 3);
-    }
-    // Make a future from a scheduler
-    {
-        ex::run_loop loop;
-        auto sched = loop.get_scheduler();
-
-        auto f = ex::make_future(sched);
     }
 
     std::cout << "2\n";

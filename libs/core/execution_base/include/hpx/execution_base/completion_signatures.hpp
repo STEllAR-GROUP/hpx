@@ -544,7 +544,8 @@ namespace hpx::execution::experimental {
 
     // Does not exist in P2300
     //    template<typename Promise>
-    //    using with_awaitable_senders = hpx::execution::experimental::with_awaitable_senders<Promise>;
+    //    using with_awaitable_senders =
+    //    hpx::execution::experimental::with_awaitable_senders<Promise>;
 
     template <typename ReceiverID>
     using operation = hpx::execution::experimental::stdexec_internal::

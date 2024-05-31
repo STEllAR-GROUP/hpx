@@ -572,24 +572,6 @@ struct wait_globals
 
 void test_globals()
 {
-    /*TODO: fix ensure_started*/
-    // It does not work with any of our senders
-    // ex::sender auto s = ex::any_sender<>{ex::just()};
-    // ex::sender auto s = example_sender<>{};
-    // High level call fails
-    //    ex::sender auto k = ex::ensure_started.operator()<true>(std::move(s1))
-    // ensure_started calls transform sender. This call compiles, but the result
-    // does not pass the __well_formed_sender concept
-    // As seen:
-    //    auto d = ex::default_domain{};
-    //    ex::sender auto ts = ex::transform_sender.operator()<true>(d,  ex::__make_sexpr<ex::ensure_started_t>(
-    //            static_cast<ex::empty_env&&>(ex::empty_env{}),
-    //            static_cast<decltype(s2)&&>(std::move(s2))));
-    //    static_assert(ex::__well_formed_sender<decltype(ts)>);
-    // This works too:
-    // ex::unique_any_sender<int> s1{non_copyable_sender<int>{42}};
-    // auto s2 = std::move(s1) | ex::then([](int x) {HPX_TEST_EQ(x, 42);});
-    // auto s3 = ex::ensure_started(std::move(s2));
     global_unique_any_sender =
         std::move(global_unique_any_sender) | ex::ensure_started();
 #ifdef HPX_HAVE_STDEXEC
