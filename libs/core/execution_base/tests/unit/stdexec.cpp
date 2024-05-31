@@ -1,24 +1,23 @@
-//  Copyright (c) 2023 Isidoros Tsaousis-Seiras
+//  Copyright (c) 2024 Isidoros Tsaousis-Seiras
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/execution_base/stdexec_forward.hpp>
-#include <hpx/init.hpp>
 
 #include <hpx/modules/testing.hpp>
 
 #include <utility>
+#include <hpx/config.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
-using namespace hpx::execution::experimental;
+#include <hpx/execution_base/stdexec_forward.hpp>
 
 int main()
 {
-    auto x = just(42);
+    auto x = hpx::execution::experimental::just(42);
 
-    auto [a] = sync_wait(std::move(x)).value();
+    auto [a] = hpx::execution::experimental::sync_wait(std::move(x)).value();
 
     HPX_TEST(a == 42);
 

@@ -95,8 +95,7 @@ namespace mylib {
 
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv),
-                ex::with(receiver_env, std::string("42")));
+                ex::get_env(rcv), ex::with(receiver_env, std::string("42")));
 #else
             return ex::make_env<receiver_env_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
@@ -139,8 +138,7 @@ namespace mylib {
             receiver_3 rcv;
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv),
-                ex::with(receiver_env1, std::string("42")));
+                ex::get_env(rcv), ex::with(receiver_env1, std::string("42")));
 #else
             return ex::make_env<receiver_env1_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
