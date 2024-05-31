@@ -2117,10 +2117,11 @@ void test_keep_future_sender()
         try
         {
             // The move is intentional. sync_wait should throw.
-            // NOLINTNEXTLINE(bugprone-use-after-move)
 #ifdef HPX_HAVE_STDEXEC
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(ex::keep_future(std::move(f)));
 #else
+            // NOLINTNEXTLINE(bugprone-use-after-move)
             tt::sync_wait(sched, ex::keep_future(std::move(f)));
 #endif
             HPX_TEST(false);
