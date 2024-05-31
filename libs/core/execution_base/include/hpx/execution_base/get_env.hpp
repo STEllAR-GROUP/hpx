@@ -22,14 +22,14 @@ namespace hpx::execution::experimental {
     using exec::with;
     using exec::without;
 
-    using exec::make_env_t;
     using exec::make_env;
+    using exec::make_env_t;
 
     using exec::write;
     using exec::write_env;
 
     using exec::read_with_default;
-}
+}    // namespace hpx::execution::experimental
 #else
 
 #include <type_traits>
@@ -259,5 +259,4 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_environment_provider_v =
         std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental
-
 #endif

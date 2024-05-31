@@ -253,14 +253,14 @@ namespace hpx::execution::experimental {
     namespace stdexec_non_standard_tag_invoke {
         // Presently, the stdexec repository implements tag invoke,
         // however it includes a non-standard (in the sense of unexpected) extension.
-        // tag invoke first checks for the existence of a .query member function or a ::query static function.
-        // in order to write
+        // tag invoke first checks for the existence of a .query member function or
+        // a ::query static function.
         using stdexec::tag_invoke;
         using stdexec::tag_invoke_result;
 
-        using stdexec::tag_invocable;
         using stdexec::nothrow_tag_invocable;
-    }
+        using stdexec::tag_invocable;
+    }    // namespace stdexec_non_standard_tag_invoke
 
     namespace stdexec_internal {
         using stdexec::__single_sender_value_t;
@@ -274,5 +274,6 @@ namespace hpx::execution::experimental {
 }    // namespace hpx::execution::experimental
 
 // Leaving this as a placeholder
-namespace hpx::this_thread {}
+namespace hpx::this_thread {
+}
 #endif

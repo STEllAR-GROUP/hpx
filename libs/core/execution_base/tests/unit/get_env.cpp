@@ -41,7 +41,8 @@ namespace mylib {
     inline constexpr struct receiver_env_t final : ex::forwarding_query_t
     {
         template <typename Env>
-            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<receiver_env_t, Env>
+            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
+                receiver_env_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
@@ -94,7 +95,8 @@ namespace mylib {
 
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv), ex::with(receiver_env, std::string("42")));
+                ex::get_env(rcv),
+                ex::with(receiver_env, std::string("42")));
 #else
             return ex::make_env<receiver_env_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
@@ -106,7 +108,8 @@ namespace mylib {
     inline constexpr struct receiver_env1_t final : ex::forwarding_query_t
     {
         template <typename Env>
-            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<receiver_env1_t, Env>
+            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
+                receiver_env1_t, Env>
         auto operator()(Env const& e) const
         {
             return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
@@ -136,7 +139,8 @@ namespace mylib {
             receiver_3 rcv;
 #ifdef HPX_HAVE_STDEXEC
             return ex::make_env(
-                ex::get_env(rcv), ex::with(receiver_env1, std::string("42")));
+                ex::get_env(rcv),
+                ex::with(receiver_env1, std::string("42")));
 #else
             return ex::make_env<receiver_env1_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));

@@ -105,8 +105,9 @@ int main()
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-        check_value_types<hpx::variant<
-                hpx::tuple<custom_type_non_default_constructible>>>(s2);
+        check_value_types<
+            hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
+            s2);
 #else
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible const&>>>(s2);
@@ -141,8 +142,9 @@ int main()
 
 #ifdef HPX_HAVE_STDEXEC
         // custom_type_non_default_constructible_non_copyable Will be move constructed
-        check_value_types<hpx::variant<hpx::tuple<
-                custom_type_non_default_constructible_non_copyable>>>(s2);
+        check_value_types<hpx::variant<
+            hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
+            s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
 #else
         check_value_types<hpx::variant<hpx::tuple<

@@ -27,6 +27,7 @@ if(Stdexec_ROOT
     hpx_warn(
       "Neither Stdexec_ROOT nor HPX_WITH_FETCH_STDEXEC are provided. HPX_WITH_FETCH_STDEXEC is defaulted to ON."
     )
+#    if (NOT DEFINED HPX_WITH_FETCH_STDEXEC)
     set(HPX_WITH_FETCH_STDEXEC ON)
   endif()
 elseif(HPX_WITH_STDEXEC)

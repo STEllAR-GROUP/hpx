@@ -112,15 +112,18 @@ struct void_sender
         return {std::forward<R>(r)};
     }
 
-    //    using completion_signatures = hpx::execution::experimental::completion_signatures<
-    //        hpx::execution::experimental::set_value_t()>;
+    //    using completion_signatures = hpx::execution::experimental::
+    //    completion_signatures<hpx::execution::experimental::set_value_t()>;
 
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         void_sender const&, Env)
         -> hpx::execution::experimental::completion_signatures<
-            hpx::execution::experimental::set_value_t()> {};
+            hpx::execution::experimental::set_value_t()>
+    {
+        return {};
+    };
 };
 
 template <typename... Ts>

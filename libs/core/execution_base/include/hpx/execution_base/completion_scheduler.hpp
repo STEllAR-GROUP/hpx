@@ -12,6 +12,7 @@
 
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
+#include <utility>
 
 namespace hpx::execution::experimental { namespace detail {
     template <typename CPO, typename Sender>
