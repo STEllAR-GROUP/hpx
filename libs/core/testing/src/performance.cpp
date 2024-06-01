@@ -29,12 +29,13 @@ namespace hpx::util {
             "time taken for each epoch");
     }
 
-    void perftests_init(const hpx::program_options::variables_map& vm)
+    void perftests_init(const hpx::program_options::variables_map& vm, const std::string test_name)
     {
         if (vm.count("detailed_bench"))
         {
             detailed_ = true;
         }
+        test_name_ = test_name;
     }
 
     namespace detail {
@@ -173,6 +174,9 @@ average: {{average(elapsed)}}{{^-last}}
                     strm << std::scientific << "average: " << average / series
                          << "\n\n";
                 }
+                strm <<
+                    "<CTestMeasurementFile type=\"image/jpg\" name=\"perftests\">" <<
+                    "./" << test_name_ << ".jpg</CTestMeasurementFile>\n";
             }
             return strm;
         }
