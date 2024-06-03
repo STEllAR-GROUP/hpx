@@ -8,7 +8,15 @@
 #include <hpx/config.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
+
+#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #include <stdexec/execution.hpp>
+#pragma GCC diagnostic pop
+#else
+#include <stdexec/execution.hpp>
+#endif
 
 namespace hpx::execution::experimental {
     // Domain
