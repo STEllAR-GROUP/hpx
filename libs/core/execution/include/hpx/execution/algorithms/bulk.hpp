@@ -60,16 +60,16 @@ namespace hpx::execution::experimental {
             using disable_set_stopped =
                 hpx::execution::experimental::completion_signatures<>;
 
+            // clang-format off
             template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, bulk_sender const&, Env) noexcept
-                -> hpx::execution::experimental::
-                    transform_completion_signatures_of<Sender, Env,
-                        hpx::execution::experimental::completion_signatures<
-                            hpx::execution::experimental::set_error_t(
-                                std::exception_ptr)>,
-                        default_set_value, default_set_error,
-                        disable_set_stopped>;
+            friend auto tag_invoke(get_completion_signatures_t,
+                bulk_sender const&, Env) noexcept -> hpx::execution::
+                experimental::transform_completion_signatures_of<Sender, Env,
+                    hpx::execution::experimental::completion_signatures<
+                        hpx::execution::experimental::set_error_t(
+                            std::exception_ptr)>,
+                    default_set_value, default_set_error, disable_set_stopped>;
+            // clang-format on
 
             friend constexpr auto tag_invoke(
                 hpx::execution::experimental::get_env_t,
@@ -94,10 +94,13 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = false;
             };
 
+
+            // clang-format off
             template <typename Env>
-            friend auto tag_invoke(get_completion_signatures_t,
-                bulk_sender const&,
-                Env) noexcept -> generate_completion_signatures<Env>;
+            friend auto tag_invoke(
+                get_completion_signatures_t, bulk_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
+            // clang-format on
 
             // clang-format off
             template <typename CPO,
