@@ -141,10 +141,12 @@ namespace hpx::execution::experimental {
                 // clang-format on
             };
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
-                let_error_sender const&,
-                Env) noexcept -> generate_completion_signatures<Env>;
+                let_error_sender const&, Env) noexcept
+                -> generate_completion_signatures<Env>;
+            // clang-format on
 
             // clang-format off
             template <typename CPO, typename Scheduler_ = Scheduler,
