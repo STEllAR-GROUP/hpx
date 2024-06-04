@@ -13,7 +13,7 @@ module load openmpi
 module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
-export CXX_STD="20"
+export CXX_STD="17"
 export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
 
 configure_extra_options+=" -DCMAKE_BUILD_TYPE=${build_type}"
