@@ -678,7 +678,8 @@ namespace hpx::execution::experimental::detail {
 
         struct env
         {
-            thread_pool_bulk_sender const& snd;
+            std::decay_t<Sender> const& pred_snd;
+            thread_pool_policy_scheduler<Policy> const& sch;
 
             // clang-format off
             template <typename CPO,
@@ -695,7 +696,7 @@ namespace hpx::execution::experimental::detail {
                     tag,
                 env const& e) noexcept
             {
-                return tag(hpx::execution::experimental::get_env(e.snd.sender));
+                return tag(hpx::execution::experimental::get_env(e.pred_snd));
             }
 
             friend constexpr auto tag_invoke(
@@ -703,18 +704,17 @@ namespace hpx::execution::experimental::detail {
                     hpx::execution::experimental::set_value_t>,
                 env const& e) noexcept
             {
-                return e.snd.scheduler;
+                return e.sch;
             }
         };
 
-        friend struct env;
         // It may be also be correct to forward the entire env of the
         // pred. sender.
         friend constexpr auto tag_invoke(
             hpx::execution::experimental::get_env_t,
             thread_pool_bulk_sender const& s) noexcept
         {
-            return env{s};
+            return env{s.sender, s.scheduler};
         }
 #else
         template <typename Env>
