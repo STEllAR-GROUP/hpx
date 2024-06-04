@@ -15,7 +15,8 @@
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
 
-#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
+//#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
+#if defined(HPX_CLANG_VERSION)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #include <exec/env.hpp>
