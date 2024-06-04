@@ -97,15 +97,18 @@ namespace hpx::when_all_vector_detail {
         };
 
 #ifdef HPX_HAVE_STDEXEC
-        template <typename T>
+        // Dummy parameter introduced to please GCC11 which enforces
+        // explicit specialization in non-namespace scope as an error.
+        // Reference: https://cplusplus.com/forum/general/58906/#msg318049
+        template <typename T, typename Dummy = void>
         struct set_value_completion_helper
         {
             using type = hpx::execution::experimental::set_value_t(
                 std::vector<T>);
         };
 
-        template <>
-        struct set_value_completion_helper<void>
+        template <typename Dummy>
+        struct set_value_completion_helper<void, Dummy>
         {
             using type = hpx::execution::experimental::set_value_t();
         };
