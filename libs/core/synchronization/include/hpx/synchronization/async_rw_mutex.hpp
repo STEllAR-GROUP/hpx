@@ -634,6 +634,9 @@ namespace hpx::experimental {
         template <detail::async_rw_mutex_access_type AccessType>
         struct sender
         {
+#ifdef HPX_HAVE_STDEXEC
+            using is_sender = void;
+#endif
             shared_state_ptr_type prev_state;
             shared_state_ptr_type state;
 
