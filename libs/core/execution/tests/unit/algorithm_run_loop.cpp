@@ -1228,8 +1228,10 @@ void test_split_when_all()
             ++successor_task_calls;
             return 2;
         });
-#ifdef HPX_HAVE_STDEXEC    // I am not sure how the order is determined in this \
-                           // case so I have removed the order checks. TODO
+#ifdef HPX_HAVE_STDEXEC    /* I cannot decipher the standard enough
+                            * to figure out if it specifies the expected order
+                            * of execution within a when_all call, so I have
+                            * removed the order checks.*/
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
