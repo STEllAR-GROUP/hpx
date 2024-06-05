@@ -123,7 +123,7 @@ struct void_sender
             hpx::execution::experimental::set_value_t()>
     {
         return {};
-    };
+    }
 };
 
 template <typename... Ts>
@@ -165,7 +165,7 @@ struct error_sender
             hpx::execution::experimental::set_error_t(std::exception_ptr)>
     {
         return {};
-    };
+    }
 };
 
 struct stopped_sender
