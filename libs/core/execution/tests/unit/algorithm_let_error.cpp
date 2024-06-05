@@ -79,8 +79,8 @@ int main()
 
 #ifdef HPX_HAVE_STDEXEC
         /*TODO: the following is unclear: https://rentry.org/4rzhctgx
-         * So this may be volatile to internal stdexec changes. */
-        check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s2);
+         * So this is volatile to internal stdexec changes, and is thus disabled
+         * check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s2);*/
 #else
         check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s2);
 #endif
@@ -113,10 +113,10 @@ int main()
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 #endif
 
-        // TODO:
 #ifdef HPX_HAVE_STDEXEC
-        check_value_types<hpx::variant<hpx::tuple<>,
-            hpx::tuple<custom_type_non_default_constructible>>>(s2);
+        /* Disabled due to ambiguous order
+         * check_value_types<hpx::variant<hpx::tuple<>,
+         *   hpx::tuple<custom_type_non_default_constructible>>>(s2); */
 #else
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible>, hpx::tuple<>>>(
@@ -153,9 +153,10 @@ int main()
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-        check_value_types<hpx::variant<hpx::tuple<>,
-            hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
-            s2);
+        /* Disabled due to ambiguous order
+         * check_value_types<hpx::variant<hpx::tuple<>,
+         *   hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
+         *   s2); */
 #else
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>,
@@ -219,7 +220,8 @@ int main()
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-        check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s);
+        /* Disabled due to ambiguous order
+         * check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s); */
 #else
         check_value_types<hpx::variant<hpx::tuple<int>, hpx::tuple<>>>(s);
 #endif
