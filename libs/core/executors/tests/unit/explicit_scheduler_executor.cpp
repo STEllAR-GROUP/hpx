@@ -71,8 +71,7 @@ void test_async(Executor&& exec)
 {
     executed = false;
 
-    hpx::parallel::execution::async_execute(exec, &test, 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::async_execute(exec, &test, 42));
 
     HPX_TEST(executed);
 }
@@ -96,8 +95,7 @@ void test_then(Executor&& exec)
 
     executed = false;
 
-    hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::then_execute(exec, &test_f, std::move(f), 42));
 
     HPX_TEST(executed);
 }
@@ -141,17 +139,15 @@ void test_bulk_async_void(Executor&& exec)
 
     executed = false;
 
-    hpx::parallel::execution::bulk_async_execute(
-        exec, hpx::bind(&bulk_test_void, _1, _2), 107, 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::bulk_async_execute(
+        exec, hpx::bind(&bulk_test_void, _1, _2), 107, 42));
 
     HPX_TEST(executed);
 
     executed = false;
 
-    hpx::parallel::execution::bulk_async_execute(
-        exec, &bulk_test_void, 107, 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::bulk_async_execute(
+        exec, &bulk_test_void, 107, 42));
 
     HPX_TEST(executed);
 }
@@ -183,17 +179,15 @@ void test_bulk_then_void(Executor&& exec)
 
     executed = false;
 
-    hpx::parallel::execution::bulk_then_execute(
-        exec, hpx::bind(&bulk_test_f_void, _1, _2, _3), 107, f, 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::bulk_then_execute(
+        exec, hpx::bind(&bulk_test_f_void, _1, _2, _3), 107, f, 42));
 
     HPX_TEST(executed);
 
     executed = false;
 
-    hpx::parallel::execution::bulk_then_execute(
-        exec, &bulk_test_f_void, 107, f, 42) |
-        hpx::this_thread::experimental::sync_wait();
+    hpx::this_thread::experimental::sync_wait(hpx::parallel::execution::bulk_then_execute(
+        exec, &bulk_test_f_void, 107, f, 42));
 
     HPX_TEST(executed);
 }
