@@ -94,7 +94,6 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = false;
             };
 
-
             // clang-format off
             template <typename Env>
             friend auto tag_invoke(
