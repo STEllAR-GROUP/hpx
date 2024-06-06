@@ -1228,7 +1228,7 @@ void test_split_when_all()
             ++successor_task_calls;
             return 2;
         });
-#ifdef HPX_HAVE_STDEXEC    /* I cannot decipher the standard enough
+#ifdef HPX_HAVE_STDEXEC /* I cannot decipher the standard enough
                             * to figure out if it specifies the expected order
                             * of execution within a when_all call, so I have
                             * removed the order checks.*/

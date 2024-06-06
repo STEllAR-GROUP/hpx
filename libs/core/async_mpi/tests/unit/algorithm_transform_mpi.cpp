@@ -141,8 +141,8 @@ int hpx_main()
                 {
                     data = 42;
                 }
-                auto result =
-                    hpx::get<0>(*tt::sync_wait(ex::just(&data, count, datatype, 0, comm) |
+                auto result = hpx::get<0>(
+                    *tt::sync_wait(ex::just(&data, count, datatype, 0, comm) |
                         mpi::transform_mpi(MPI_Ibcast)));
                 if (rank != 0)
                 {
