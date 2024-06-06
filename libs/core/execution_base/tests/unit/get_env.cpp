@@ -40,6 +40,7 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
     inline constexpr struct receiver_env_t final : ex::forwarding_query_t
     {
+        // clang-format off
         template <typename Env>
             requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
                 receiver_env_t, Env>
@@ -47,6 +48,7 @@ namespace mylib {
         {
             return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
         }
+        // clang-format on
     } receiver_env{};
 #else
     inline constexpr struct receiver_env_t final
@@ -106,6 +108,7 @@ namespace mylib {
 #ifdef HPX_HAVE_STDEXEC
     inline constexpr struct receiver_env1_t final : ex::forwarding_query_t
     {
+        // clang-format off
         template <typename Env>
             requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
                 receiver_env1_t, Env>
@@ -113,6 +116,7 @@ namespace mylib {
         {
             return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
         }
+        // clang-format on
     } receiver_env1{};
 #else
     inline constexpr struct receiver_env1_t final

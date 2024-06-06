@@ -258,6 +258,7 @@ struct callback_receiver
         HPX_TEST(false);
     };
 
+    // clang-format off
     template <typename... Ts>
     friend auto tag_invoke(hpx::execution::experimental::set_value_t,
         callback_receiver&& r,
@@ -267,6 +268,7 @@ struct callback_receiver
         HPX_INVOKE(r.f, std::forward<Ts>(ts)...);
         r.set_value_called = true;
     }
+    // clang-format on
 };
 
 template <typename F>

@@ -1246,9 +1246,11 @@ namespace hpx::execution::experimental {
                 return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
             }
 
+            // clang-format off
             template <typename T>
             friend auto tag_invoke(
                 get_env_t, env_promise<T> const&) noexcept -> T const&;
+            // clang-format on
         };
 
         struct with_awaitable_senders_base
@@ -1468,11 +1470,13 @@ namespace hpx::execution::experimental {
             }
 
             // Pass through the get_env receiver query
+            // clang-format off
             friend auto tag_invoke(
                 get_env_t, type const& self) -> env_of_t<Receiver>
             {
                 return get_env(self.rcvr);
             }
+            // clang-format on
 
             Receiver& rcvr;
         };
@@ -1640,7 +1644,7 @@ namespace hpx::execution::experimental {
                 connect_result_t<sender_type, receiver> op_state_;
             };
         };
-    }    // namespace detail
+    }     // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender

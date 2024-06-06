@@ -55,11 +55,13 @@ struct non_copyable_sender
 
     hpx::tuple<std::decay_t<Ts>...> ts;
 
+    // clang-format off
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t,
         non_copyable_sender const&,
         Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
                           ex::set_error_t(std::exception_ptr)>;
+    // clang-format on
 
     non_copyable_sender() = default;
     template <typename T,
@@ -111,11 +113,13 @@ struct example_sender
 
     using is_sender = void;
 
+    // clang-format off
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t,
         example_sender const&,
         Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
                           ex::set_error_t(std::exception_ptr)>;
+    // clang-format on
 
     example_sender() = default;
     template <typename T,

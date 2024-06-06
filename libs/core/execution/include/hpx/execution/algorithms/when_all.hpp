@@ -245,10 +245,12 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = true;
             };
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
                 when_all_sender const&,
                 Env) noexcept -> generate_completion_signatures<Env>;
+            // clang-format on
 
             static constexpr std::size_t num_predecessors = sizeof...(Senders);
             static_assert(num_predecessors > 0,

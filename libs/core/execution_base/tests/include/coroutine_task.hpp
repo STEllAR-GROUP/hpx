@@ -51,6 +51,8 @@ inline constexpr bool indirect_stop_token_provider<void> =
 template <typename Fn, typename = std::enable_if_t<std::is_invocable_v<Fn>>,
     typename = std::enable_if_t<std::is_nothrow_move_constructible_v<Fn> &&
         std::is_nothrow_invocable_v<Fn>>>
+
+// clang-format off
 struct scope_guard
 {
     Fn fn_;
@@ -63,6 +65,7 @@ struct scope_guard
         ((Fn&&) fn_)();
     }
 };
+// clang-format on
 
 struct forward_stop_request
 {
@@ -405,7 +408,7 @@ private:
     }
 
     // Make this task generally awaitable:
-    friend task_awaitable<> operator co_await(basic_task && self) noexcept
+    friend task_awaitable<> operator co_await(basic_task&& self) noexcept
     {
         static_assert(well_formed<awaiter_context_t, _promise>);
         return task_awaitable<>{std::exchange(self.coro_, {})};
@@ -420,10 +423,12 @@ private:
         hpx::execution::experimental::set_error_t(std::exception_ptr),
         hpx::execution::experimental::set_stopped_t()>;
 
+    // clang-format off
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
                                      task_traits_t<>, task_traits_t<T>>;
+    // clang-format on
 
     explicit basic_task(hpx::coroutine_handle<promise_type> hcoro) noexcept
       : coro_(hcoro)

@@ -89,12 +89,12 @@ namespace hpx::execution::experimental {
                     HPX_FORWARD(Receiver, receiver)};
             }
 
+            // clang-format off
             template <typename Tag1>
             friend auto tag_invoke(get_completion_signatures_t,
                 read_sender<Tag1>,
                 no_env) -> dependent_completion_signatures<no_env>;
 
-            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t, read_sender, Env)
             {
