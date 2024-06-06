@@ -97,9 +97,11 @@ namespace hpx::util {
         template <typename... Ts>
         static constexpr std::false_type all_of(...);
 
+        // clang-format off
         template <typename... Ts>
         static constexpr auto all_of(
             int) -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
+        // clang-format on
     }    // namespace detail
 
     template <typename... Ts>
@@ -120,10 +122,11 @@ namespace hpx::util {
 
         template <typename... Ts>
         static constexpr std::true_type any_of(...);
-
+        // clang-format off
         template <typename... Ts>
         static constexpr auto any_of(
             int) -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
+        // clang-format on
     }    // namespace detail
 
     template <typename... Ts>

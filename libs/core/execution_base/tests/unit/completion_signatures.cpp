@@ -16,6 +16,7 @@
 namespace ex = hpx::execution::experimental;
 
 ///////////////////////////////////////////////////////////////////////////////
+// clang-format off
 template <typename... Values>
 auto signature_values(
     Values...) -> ex::completion_signatures<ex::set_value_t(Values...)>
@@ -64,6 +65,7 @@ auto signature_all(
 {
     return {};
 }
+// clang-format on
 
 #ifdef HPX_HAVE_STDEXEC
 template <typename CompletionSignatures>

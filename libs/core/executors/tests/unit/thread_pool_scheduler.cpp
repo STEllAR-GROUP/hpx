@@ -2103,7 +2103,9 @@ void test_completion_scheduler()
             std::is_same_v<std::decay_t<decltype(completion_scheduler)>,
                 ex::thread_pool_scheduler>,
             "the completion scheduler should be a thread_pool_scheduler");
-    }
+        // clang-format off
+    } // Clang format bug: thinks this '}' is the end of a namespace.
+    // clang-format on
 
     {
         auto sender =

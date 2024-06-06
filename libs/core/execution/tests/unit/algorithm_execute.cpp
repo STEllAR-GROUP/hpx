@@ -36,6 +36,7 @@ struct execute_example_sender
     }
 #endif
 
+    // clang-format off
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t,
         execute_example_sender const&,
@@ -45,6 +46,7 @@ struct execute_example_sender
     {
         friend void tag_invoke(ex::start_t, operation_state&) noexcept {};
     };
+    // clang-format on
 
     template <typename R>
     friend operation_state tag_invoke(
@@ -113,17 +115,23 @@ void tag_invoke(ex::execute_t, scheduler_2, F&&)
 
 struct f_struct_1
 {
+    // clang-format off
     void operator()() {};
+    // clang-format on
 };
 
 struct f_struct_2
 {
+    // clang-format off
     void operator()(int) {};
+    // clang-format on
 };
 
 struct f_struct_3
 {
+    // clang-format off
     void operator()(int = 42) {};
+    // clang-format on
 };
 
 void f_fun_1() {}

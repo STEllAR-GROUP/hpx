@@ -244,11 +244,13 @@ namespace hpx::execution::experimental {
                             std::exception_ptr),
                         hpx::execution::experimental::set_stopped_t()>;
 
+                // clang-format off
                 template <typename Env>
                 friend auto tag_invoke(
                     hpx::execution::experimental::get_completion_signatures_t,
                     run_loop_sender const&,
                     Env) noexcept -> completion_signatures;
+                // clang-format on
 
                 run_loop& loop;
             };

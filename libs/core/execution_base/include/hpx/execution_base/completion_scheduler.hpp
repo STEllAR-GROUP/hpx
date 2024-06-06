@@ -15,6 +15,7 @@
 #include <utility>
 
 namespace hpx::execution::experimental { namespace detail {
+    // clang-format off
     template <typename CPO, typename Sender>
     concept has_completion_scheduler_v = requires(Sender&& s) {
         {
@@ -32,6 +33,7 @@ namespace hpx::execution::experimental { namespace detail {
                 hpx::execution::experimental::get_env(snd)),
             std::forward<Sender>(snd), std::forward<Ts>(ts)...);
     };
+    // clang-format on
 }}    // namespace hpx::execution::experimental::detail
 
 #else

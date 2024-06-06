@@ -73,12 +73,12 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = false;
             };
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
                 schedule_from_sender const&,
                 Env) -> generate_completion_signatures<Env>;
 
-            // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
                     meta::value<meta::one_of<

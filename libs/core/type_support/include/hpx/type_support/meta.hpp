@@ -507,13 +507,17 @@ namespace hpx::meta {
     using get_id_t = hpx::type_identity_t<
         hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>>;
 
+    // clang-format off
     template <typename T, typename... As>
     inline constexpr bool is_constructible_from_v =
         std::is_destructible_v<T> && std::is_constructible_v<T, As...>;
+    // Clang format bug: thinks   ^^this is a double reference
 
     template <typename T, typename... As>
     inline constexpr bool is_nothrow_constructible_from_v =
         is_constructible_from_v<T, As...> &&
+    // Clang format bug: thinks       this^^ is a double reference
         std::is_nothrow_constructible_v<T, As...>;
+    // clang-format on
 
 }    // namespace hpx::meta
