@@ -120,14 +120,15 @@ average: {{average(elapsed)}}{{^-last}}
                 int outputs = 0;
                 for (auto&& item : obj.m_map)
                 {
+                    long double average = static_cast<long double>(0.0);
                     if (outputs)
                         strm << ",";
                     strm << "\n    {\n";
-                    strm << R"(      "name" : ")" << std::get<0>(item.first)
+                    strm << R"(      "name": ")" << std::get<0>(item.first)
                          << "\",\n";
-                    strm << R"(      "executor" : ")" << std::get<1>(item.first)
+                    strm << R"(      "executor": ")" << std::get<1>(item.first)
                          << "\",\n";
-                    strm << R"(      "series" : [)"
+                    strm << R"(      "series": [)"
                          << "\n";
                     int series = 0;
                     strm.precision(
@@ -140,10 +141,11 @@ average: {{average(elapsed)}}{{^-last}}
                         }
                         strm << R"(         )" << std::scientific << val;
                         ++series;
+                        average += val;
                     }
-
-                    strm << "\n       ]\n";
-
+                    strm << "\n       ],\n";
+                    strm << std::scientific << R"(      "average": )"<< average / series
+                         << "\n";
                     strm << "    }";
                     ++outputs;
                 }
