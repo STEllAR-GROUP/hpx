@@ -210,6 +210,7 @@ namespace hpx::execution::experimental {
     using stdexec::value_types_of_t;
 
     using stdexec::make_completion_signatures;
+    using stdexec::transform_completion_signatures;
     using stdexec::transform_completion_signatures_of;
 
     // Transform sender
