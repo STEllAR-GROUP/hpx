@@ -38,7 +38,7 @@ namespace hpx { namespace iostreams { namespace detail {
         {
         }
 
-        buffer(buffer&& rhs)
+        buffer(buffer&& rhs) noexcept
           : data_(HPX_MOVE(rhs.data_))
           , mtx_(HPX_MOVE(rhs.mtx_))
         {
@@ -54,7 +54,7 @@ namespace hpx { namespace iostreams { namespace detail {
             return *this;
         }
 
-        buffer& operator=(buffer&& rhs)
+        buffer& operator=(buffer&& rhs) noexcept
         {
             if (this != &rhs)
             {

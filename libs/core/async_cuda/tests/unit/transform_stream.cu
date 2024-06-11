@@ -6,8 +6,9 @@
 
 #include <hpx/config.hpp>
 
-// NVCC fails unceremoniously with this test at least until V12.1
-#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1201)
+// NVCC fails unceremoniously with this test until 12.2
+// Fixed in CUDA 12.3
+#if !defined(HPX_CUDA_VERSION) || (HPX_CUDA_VERSION > 1202)
 
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
@@ -16,6 +17,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <iostream>
 #include <utility>
 
 __global__ void dummy_kernel() {}
@@ -292,6 +294,7 @@ int hpx_main()
         cu::check_cuda_error(cudaFree(p));
     }
 
+    std::cout << "Test finished!" << std::endl;
     return hpx::local::finalize();
 }
 

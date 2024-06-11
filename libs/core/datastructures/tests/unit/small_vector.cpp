@@ -1,4 +1,4 @@
-//  Copyright (c) 2021-2022 Hartmut Kaiser
+//  Copyright (c) 2021-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,18 +36,20 @@ namespace test {
         simple_allocator() noexcept = default;
 
         template <typename U>
-        simple_allocator(simple_allocator<U> const&) noexcept
+        explicit simple_allocator(simple_allocator<U> const&) noexcept
         {
         }
 
-        T* allocate(std::size_t n)
+        static T* allocate(std::size_t n)
         {
             return reinterpret_cast<T*>(::new char[sizeof(T) * n]);
         }
 
-        void deallocate(T* p, std::size_t) noexcept
+        static void deallocate(T* p, std::size_t) noexcept
         {
-            delete[](reinterpret_cast<char*>(p));
+            // clang-format off
+            delete[] (reinterpret_cast<char*>(p));
+            // clang-format on
         }
 
         friend bool operator==(
@@ -204,7 +206,7 @@ namespace test {
 
     void small_vector_test()
     {
-        // basic test with less elements than static size
+        // basic test with fewer elements than static size
         {
             using sm5_t = hpx::detail::small_vector<int, 5>;
             static_assert(
@@ -214,7 +216,7 @@ namespace test {
             sm5.push_back(1);
             HPX_TEST_EQ(sm5[0], 1);
 
-            sm5_t sm5_copy(sm5);
+            sm5_t const sm5_copy(sm5);
             HPX_TEST(sm5 == sm5_copy);
         }
         {
@@ -226,7 +228,7 @@ namespace test {
             sm7.push_back(1);
             HPX_TEST_EQ(sm7[0], 1);
 
-            sm7_t sm7_copy(sm7);
+            sm7_t const sm7_copy(sm7);
             HPX_TEST(sm7 == sm7_copy);
         }
         {
@@ -240,7 +242,7 @@ namespace test {
 
             sm5.push_back(2);
             HPX_TEST_EQ(sm5[1], 2);
-            HPX_TEST_EQ(sm5.size(), std::size_t(2));
+            HPX_TEST_EQ(sm5.size(), static_cast<std::size_t>(2));
 
             sm5_copy = sm5;
             HPX_TEST(sm5 == sm5_copy);
@@ -274,7 +276,7 @@ namespace test {
             sm2.push_back(3);
             HPX_TEST_EQ(sm2[1], 2);
             HPX_TEST_EQ(sm2[2], 3);
-            HPX_TEST_EQ(sm2.size(), std::size_t(3));
+            HPX_TEST_EQ(sm2.size(), static_cast<std::size_t>(3));
 
             sm2_copy = sm2;
             HPX_TEST(sm2 == sm2_copy);
@@ -307,13 +309,13 @@ namespace test {
 
             for (std::size_t i = 0, max = v.capacity() + 1; i != max; ++i)
             {
-                v.push_back(int(i));
+                v.push_back(static_cast<int>(i));
             }
 
             vec w;
 
-            vec v_copy(v);
-            vec w_copy(w);
+            vec const v_copy(v);
+            vec const w_copy(w);
 
             v.swap(w);
             HPX_TEST(v == w_copy);
@@ -324,13 +326,13 @@ namespace test {
             vec v;
             for (std::size_t i = 0, max = v.capacity() - 1; i != max; ++i)
             {
-                v.push_back(int(i));
+                v.push_back(static_cast<int>(i));
             }
 
             vec w;
 
-            vec v_copy(v);
-            vec w_copy(w);
+            vec const v_copy(v);
+            vec const w_copy(w);
 
             v.swap(w);
             HPX_TEST(v == w_copy);
@@ -341,17 +343,17 @@ namespace test {
             vec v;
             for (std::size_t i = 0, max = v.capacity() - 1; i != max; ++i)
             {
-                v.push_back(int(i));
+                v.push_back(static_cast<int>(i));
             }
 
             vec w;
             for (std::size_t i = 0, max = v.capacity() / 2; i != max; ++i)
             {
-                w.push_back(int(i));
+                w.push_back(static_cast<int>(i));
             }
 
-            vec v_copy(v);
-            vec w_copy(w);
+            vec const v_copy(v);
+            vec const w_copy(w);
 
             v.swap(w);
             HPX_TEST(v == w_copy);
@@ -362,17 +364,17 @@ namespace test {
             vec v;
             for (std::size_t i = 0, max = v.capacity() + 1; i != max; ++i)
             {
-                v.push_back(int(i));
+                v.push_back(static_cast<int>(i));
             }
 
             vec w;
             for (std::size_t i = 0, max = v.capacity() * 2; i != max; ++i)
             {
-                w.push_back(int(i));
+                w.push_back(static_cast<int>(i));
             }
 
-            vec v_copy(v);
-            vec w_copy(w);
+            vec const v_copy(v);
+            vec const w_copy(w);
 
             v.swap(w);
             HPX_TEST(v == w_copy);
@@ -448,7 +450,6 @@ namespace test {
     void vector_test()
     {
         using value_type = typename Vector::value_type;
-        constexpr int max = 100;
 
         test_range_insertion<Vector>();
 
@@ -480,6 +481,7 @@ namespace test {
             test::check_equal_containers(vector2, v);
         }
         {
+            constexpr int max = 100;
             Vector vector;
             std::vector<int> v;
 
@@ -534,8 +536,9 @@ namespace test {
 
                 auto insert_it =
                     vector.insert(vector.end(), &aux_vect[0], aux_vect + 50);
-                HPX_TEST_EQ(std::size_t(std::distance(insert_it, vector.end())),
-                    std::size_t(50));
+                HPX_TEST_EQ(static_cast<std::size_t>(
+                                std::distance(insert_it, vector.end())),
+                    static_cast<std::size_t>(50));
 
                 v.insert(v.end(), aux_vect2, aux_vect2 + 50);
                 test::check_equal_containers(vector, v);
@@ -581,9 +584,9 @@ namespace test {
             {    //push_back with not enough capacity
                 value_type push_back_this(1);
                 vector.push_back(std::move(push_back_this));
-                v.push_back(int(1));
+                v.push_back(static_cast<int>(1));
                 vector.push_back(value_type(1));
-                v.push_back(int(1));
+                v.push_back(static_cast<int>(1));
                 test::check_equal_containers(vector, v);
             }
 
@@ -601,9 +604,9 @@ namespace test {
 
                 value_type push_back_this(1);
                 vector.push_back(std::move(push_back_this));
-                v.push_back(int(1));
+                v.push_back(static_cast<int>(1));
                 vector.push_back(value_type(1));
-                v.push_back(int(1));
+                v.push_back(static_cast<int>(1));
                 test::check_equal_containers(vector, v);
             }
 
@@ -617,7 +620,7 @@ namespace test {
                 vector.insert(vector.begin(), std::move(insert_this));
                 v.insert(v.begin(), i);
                 vector.insert(vector.begin(), value_type(i));
-                v.insert(v.begin(), int(i));
+                v.insert(v.begin(), static_cast<int>(i));
             }
             test::check_equal_containers(vector, v);
 
@@ -631,7 +634,7 @@ namespace test {
 
             // Test insertion from list
             {
-                std::list<int> l(50, int(1));
+                std::list<int> l(50, static_cast<int>(1));
                 auto it_insert =
                     vector.insert(vector.begin(), l.begin(), l.end());
                 HPX_TEST(vector.begin() == it_insert);
@@ -643,7 +646,7 @@ namespace test {
                 v.assign(l.begin(), l.end());
                 test::check_equal_containers(vector, v);
 
-                std::forward_list<int> fl(50, int(1));
+                std::forward_list<int> fl(50, static_cast<int>(1));
                 vector.clear();
                 v.clear();
                 vector.assign(fl.begin(), fl.end());
@@ -663,7 +666,7 @@ namespace test {
     class emplace_int
     {
     public:
-        emplace_int(
+        explicit emplace_int(
             int a = 0, int b = 0, int c = 0, int d = 0, int e = 0) noexcept
           : a_(a)
           , b_(b)
@@ -726,7 +729,7 @@ namespace test {
         }
 
         int a_, b_, c_, d_, e_;
-        int padding[6];
+        int padding[6] = {};
     };
 
     static emplace_int expected[10];

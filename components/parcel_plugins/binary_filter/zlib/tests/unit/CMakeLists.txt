@@ -24,6 +24,7 @@ foreach(test ${tests})
   )
 
   add_hpx_unit_test(
-    "components.parcel_plugins.coalescing" ${test} ${${test}_PARAMETERS}
+    "components.parcel_plugins.binary_filter.zlib" ${test}
+    ${${test}_PARAMETERS}
   )
 endforeach()

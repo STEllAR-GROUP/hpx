@@ -76,18 +76,23 @@ int main(int argc, char** argv)
         "abp-priority-lifo",
 #endif
         "shared-priority",
+
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         "local-workrequesting-fifo",
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         "local-workrequesting-lifo",
 #endif
         "local-workrequesting-mc",
+#endif
     };
+
     // clang-format on
     for (auto const& scheduler : schedulers)
     {
+        std::cout << scheduler << std::endl;
+
         hpx::local::init_params iparams;
-        iparams.cfg = {"--hpx:queuing=" + std::string(scheduler)};
-        std::cout << iparams.cfg[0] << std::endl;
+        iparams.cfg = {"--hpx:queuing=!" + scheduler};
         hpx::local::init(hpx_main, argc, argv, iparams);
     }
 

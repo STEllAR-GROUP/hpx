@@ -117,13 +117,14 @@ namespace hpx {
         {
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
-            // Failing to release lock 'no_mtx' in function
+            // Failing to release lock 'this->mtx' in function
 #if defined(HPX_MSVC)
 #pragma warning(push)
 #pragma warning(disable : 26115)
 #endif
 
             cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost, ec);
+            il.reset_owns_registration();
 
 #if defined(HPX_MSVC)
 #pragma warning(pop)

@@ -38,14 +38,14 @@ Its message transmission path involves minimum synchronization
 points and is almost lock-free. It is expected to be much faster
 than the MPI parcelport.
 
-.. _`Lightweight Communication Interface`: https://github.com/uiuc-hpc/LC
+.. _`Lightweight Communication Interface`: https://github.com/uiuc-hpc/lci
 
 .. _build_lci_pp:
 
 Build |hpx| with the LCI parcelport
 ===================================
 
-While building |hpx|, you can specify a set of |cmake| variables to enable
+While building |hpx|, you can specify a set of |cmake|_ variables to enable
 and configure the LCI parcelport. Below, there is a set of the most important
 and frequently used CMake variables.
 
@@ -61,12 +61,12 @@ and frequently used CMake variables.
 
    Use FetchContent to fetch LCI. The default value is ``OFF``.
    If this option is set to ``OFF``. You need to install your own LCI library and |hpx| will try
-   to find it using |cmake| ``find_package``. You can specify the location of the LCI installation
+   to find it using |cmake|_ ``find_package``. You can specify the location of the LCI installation
    by the environmental variable ``LCI_ROOT``. Refer to the `LCI README`_ for how to install LCI.
    If this option is set to ``ON``. |hpx| will fetch and build LCI for you. You can use the following
-   |cmake| variables to configure this behavior for your platform.
+   |cmake|_ variables to configure this behavior for your platform.
 
-.. _`LCI README`: https://github.com/uiuc-hpc/LC#readme
+.. _`LCI README`: https://github.com/uiuc-hpc/lci#readme
 
 .. option:: HPX_WITH_LCI_TAG
 

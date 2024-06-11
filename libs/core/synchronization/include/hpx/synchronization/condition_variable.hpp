@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2022 Bhumit Attarde
 //  Copyright (c) 2013 Agustin Berge
 //
@@ -21,9 +21,9 @@
 #include <hpx/synchronization/mutex.hpp>
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/synchronization/stop_token.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/timing/steady_clock.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #include <mutex>
 #include <utility>

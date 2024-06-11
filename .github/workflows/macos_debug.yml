@@ -1,4 +1,5 @@
 # Copyright (c) 2020 Mikael Simberg
+# Copyright (c) 2024 The STE||AR Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,16 +17,9 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        # Workaround for https://github.com/actions/virtual-environments/issues/2322
-        rm -rf /usr/local/bin/2to3*
-        rm -rf /usr/local/bin/idle3*
-        rm -rf /usr/local/bin/pydoc3*
-        rm -rf /usr/local/bin/python3*
-        brew upgrade
-        brew update && \
-            brew install --overwrite python-tk && \
-            brew install --overwrite boost hwloc gperftools ninja && \
-            brew upgrade cmake
+          brew install --overwrite python-tk && \
+          brew install --overwrite boost hwloc gperftools ninja && \
+          brew upgrade cmake
     - name: Configure
       shell: bash
       run: |
@@ -38,6 +32,8 @@ jobs:
               -DHPX_WITH_EXAMPLES=ON \
               -DHPX_WITH_TESTS=ON \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=3 \
+              -DHPX_WITH_VERIFY_LOCKS=ON \
+              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON
     - name: Build
       shell: bash
@@ -74,6 +70,7 @@ jobs:
           tests.unit.modules.compute_local.numa_allocator|\
           tests.unit.modules.execution.standalone_thread_pool_executor|\
           tests.unit.modules.resource_partitioner.used_pus|\
+          tests.unit.modules.runtime_components.launch_process|\
           tests.unit.modules.segmented_algorithms.distributed.tcp.partitioned_vector|\
           tests.unit.threads.distributed.tcp.thread_stacksize|\
           tests.unit.topology.numa_allocator|\

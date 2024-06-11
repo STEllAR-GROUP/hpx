@@ -1322,7 +1322,7 @@ namespace hpx {
                 for (std::size_t i = 0; i != num_threads; ++i)
                 {
                     // print the mask for the current PU
-                    threads::mask_cref_type const pu_mask = rp.get_pu_mask(i);
+                    threads::mask_cref_type pu_mask = rp.get_pu_mask(i);
 
                     if (!threads::any(pu_mask))
                     {
@@ -1945,7 +1945,7 @@ namespace hpx {
             // FIXME: We don't set the affinity of the service threads on BG/Q,
             // as this is causing a hang (needs to be investigated)
 #if !defined(__bgq__)
-            threads::mask_cref_type const used_processing_units =
+            threads::mask_cref_type used_processing_units =
                 thread_manager_->get_used_processing_units();
 
             // --hpx:bind=none  should disable all affinity definitions

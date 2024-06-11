@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2014-2023 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,7 +16,8 @@
 namespace hpx::parcelset::policies::lci {
     struct completion_manager_sync_single : public completion_manager_base
     {
-        completion_manager_sync_single()
+        completion_manager_sync_single(parcelport* pp)
+          : completion_manager_base(pp)
         {
             LCI_sync_create(LCI_UR_DEVICE, 1, &sync);
         }
@@ -36,20 +38,7 @@ namespace hpx::parcelset::policies::lci {
             lock.unlock();
         }
 
-        LCI_request_t poll()
-        {
-            LCI_request_t request;
-            request.flag = LCI_ERR_RETRY;
-
-            bool succeed = lock.try_lock();
-            if (succeed)
-            {
-                LCI_error_t ret = LCI_sync_test(sync, &request);
-                if (ret == LCI_ERR_RETRY)
-                    lock.unlock();
-            }
-            return request;
-        }
+        LCI_request_t poll();
 
     private:
         hpx::spinlock lock;

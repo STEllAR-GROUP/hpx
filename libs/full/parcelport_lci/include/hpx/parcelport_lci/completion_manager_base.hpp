@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2014-2023 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -13,8 +14,11 @@
 #include <hpx/modules/lci_base.hpp>
 
 namespace hpx::parcelset::policies::lci {
+    class HPX_EXPORT parcelport;
     struct completion_manager_base
     {
+        completion_manager_base(parcelport* pp) noexcept
+          : pp_(pp){};
         virtual ~completion_manager_base() {}
         virtual LCI_comp_t alloc_completion() = 0;
         virtual void enqueue_completion(LCI_comp_t comp) = 0;
@@ -23,6 +27,7 @@ namespace hpx::parcelset::policies::lci {
         {
             return nullptr;
         }
+        parcelport* pp_;
     };
 }    // namespace hpx::parcelset::policies::lci
 

@@ -26,6 +26,8 @@ work, but we do not test |hpx| with other platforms, so please be warned.
    BlueGeneQ V1R2M0             PowerPC A2
    Windows   Any Windows system x86-32, x86-64
    Mac OSX   Any OSX system     x86-64
+   ARM       Any ARM system     Any architecture
+   RISC-V    Any RISC-V system  Any architecture
    ========= ================== ====================
 
 Supported compilers

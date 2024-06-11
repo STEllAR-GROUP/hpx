@@ -1,6 +1,6 @@
 //  Copyright (c) 2014 Thomas Heller
 //  Copyright (c) 2014-2015 Anton Bikineev
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -102,19 +102,19 @@ namespace hpx::serialization {
                     // serialize-member function and doesn't perform ADL
                     detail::serialize_force_adl(ar, t, 0);
                 }
-                else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
-                {
-                    // This is automatic serialization for types that are simple
-                    // (brace-initializable) structs, what that means every
-                    // struct's field has to be serializable and public.
-                    serialize_struct(ar, t, 0);
-                }
                 else if constexpr (hpx::traits::is_bitwise_serializable_v<dT> ||
                     !hpx::traits::is_not_bitwise_serializable_v<dT>)
                 {
                     // bitwise serializable types can be directly dispatched to
                     // the archive functions
                     ar.invoke(t);
+                }
+                else if constexpr (hpx::traits::has_struct_serialization_v<dT>)
+                {
+                    // This is automatic serialization for types that are simple
+                    // (brace-initializable) structs, that means every struct's
+                    // field has to be serializable and public.
+                    serialize_struct(ar, t, 0);
                 }
                 else
                 {

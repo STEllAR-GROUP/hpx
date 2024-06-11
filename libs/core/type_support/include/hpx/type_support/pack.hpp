@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Agustin Berge
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -45,17 +46,8 @@ namespace hpx::util {
 
     template <std::size_t N>
     struct make_index_pack
-#if defined(HPX_HAVE_BUILTIN_INTEGER_PACK)
-      : index_pack<__integer_pack(N)...>
-#elif (defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ) &&                           \
-    !defined(HPX_COMPUTE_DEVICE_CODE)) ||                                      \
-    (defined(HPX_HAVE_BUILTIN_MAKE_INTEGER_SEQ_CUDA) &&                        \
-        defined(HPX_COMPUTE_DEVICE_CODE))
-      : __make_integer_seq<pack_c, std::size_t, N>
-#else
       : detail::make_index_pack_join<typename make_index_pack<N / 2>::type,
             typename make_index_pack<N - N / 2>::type>
-#endif
     {
     };
 
@@ -168,21 +160,6 @@ namespace hpx::util {
         {
         };
 
-#if (defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT) &&                            \
-    !defined(HPX_COMPUTE_DEVICE_CODE)) ||                                      \
-    (defined(HPX_HAVE_BUILTIN_TYPE_PACK_ELEMENT_CUDA) &&                       \
-        defined(HPX_COMPUTE_DEVICE_CODE))
-        template <std::size_t I, typename Ts, bool InBounds = (I < Ts::size)>
-        struct at_index_impl : empty_helper
-        {
-        };
-
-        template <std::size_t I, typename... Ts>
-        struct at_index_impl<I, pack<Ts...>, /*InBounds*/ true>
-        {
-            using type = __type_pack_element<I, Ts...>;
-        };
-#else
         template <std::size_t I, typename T>
         struct indexed
         {
@@ -210,7 +187,6 @@ namespace hpx::util {
                 indexer<Ts, make_index_pack_t<Ts::size>>()))
         {
         };
-#endif
     }    // namespace detail
 
     template <std::size_t I, typename... Ts>

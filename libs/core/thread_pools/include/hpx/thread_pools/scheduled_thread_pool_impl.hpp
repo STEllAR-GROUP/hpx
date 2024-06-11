@@ -317,7 +317,7 @@ namespace hpx::threads::detail {
             {
                 std::size_t global_thread_num =
                     this->thread_offset_ + thread_num;
-                threads::mask_cref_type const mask =
+                threads::mask_cref_type mask =
                     affinity_data_.get_pu_mask(topo, global_thread_num);
 
                 // thread_num ordering: 1. threads of default pool
@@ -436,7 +436,7 @@ namespace hpx::threads::detail {
         topology const& topo = create_topology();
 
         // Set the affinity for the current thread.
-        threads::mask_cref_type const mask =
+        threads::mask_cref_type mask =
             affinity_data_.get_pu_mask(topo, global_thread_num);
 
         if (LHPX_ENABLED(debug))

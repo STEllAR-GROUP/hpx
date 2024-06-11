@@ -315,7 +315,6 @@ namespace hpx::parcelset {
                     {
                         enqueue_parcels(
                             dest, HPX_MOVE(parcels), HPX_MOVE(handlers));
-
                         get_connection_and_send_parcels(dest);
                     }
                 });
@@ -712,9 +711,6 @@ namespace hpx::parcelset {
 
             std::unique_lock const l(mtx_);
 
-            // We ignore the lock here. It might happen that while enqueuing,
-            // we need to acquire a lock. This should not cause any problems
-            // (famous last words)
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
             mapped_type& e = pending_parcels_[locality_id];
@@ -736,9 +732,6 @@ namespace hpx::parcelset {
 
             std::unique_lock const l(mtx_);
 
-            // We ignore the lock here. It might happen that while enqueuing,
-            // we need to acquire a lock. This should not cause any problems
-            // (famous last words)
             [[maybe_unused]] util::ignore_while_checking il(&l);
 
             HPX_ASSERT(parcels.size() == handlers.size());

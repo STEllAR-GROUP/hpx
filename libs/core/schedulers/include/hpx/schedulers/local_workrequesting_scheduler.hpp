@@ -749,7 +749,16 @@ namespace hpx::threads::policies {
             scheduler_data& d, steal_request& req) noexcept
         {
             bool ret = d.requests_->get(&req);
+
+            // 26813: Use 'bitwise and' to check if a flag is set.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26813)
+#endif
             while (ret && req.state_ == steal_request::state::failed)
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             {
                 // forget the received steal request
                 --data_[req.num_thread_].data_.requested_;
@@ -780,10 +789,19 @@ namespace hpx::threads::policies {
                 // Steal request was either returned by another worker or
                 // picked up by us.
 
+                // 26813: Use 'bitwise and' to check if a flag is set.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26813)
+#endif
                 if (req.state_ == steal_request::state::idle ||
                     d.queue_->get_pending_queue_length(
                         std::memory_order_relaxed) != 0)
                 {
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
+
 #if defined(HPX_HAVE_WORKREQUESTING_STEAL_STATISTICS)
                     ++d.steal_requests_discarded_;
 #endif
@@ -1793,13 +1811,16 @@ namespace hpx::threads::policies {
 
         void on_stop_thread(std::size_t num_thread) override
         {
-            auto& d = data_[num_thread].data_;
-
-            d.queue_->on_stop_thread(num_thread);
-            d.bound_queue_->on_stop_thread(num_thread);
-            if (num_thread < num_high_priority_queues_)
+            if (num_thread < data_.size())
             {
-                d.high_priority_queue_->on_stop_thread(num_thread);
+                auto& d = data_[num_thread].data_;
+
+                d.queue_->on_stop_thread(num_thread);
+                d.bound_queue_->on_stop_thread(num_thread);
+                if (num_thread < num_high_priority_queues_)
+                {
+                    d.high_priority_queue_->on_stop_thread(num_thread);
+                }
             }
 
             if (num_thread == num_queues_ - 1)
@@ -1811,13 +1832,17 @@ namespace hpx::threads::policies {
         void on_error(
             std::size_t num_thread, std::exception_ptr const& e) override
         {
-            auto& d = data_[num_thread].data_;
-
-            d.queue_->on_error(num_thread, e);
-            d.bound_queue_->on_error(num_thread, e);
-            if (num_thread < num_high_priority_queues_)
+            if (num_thread < data_.size())
             {
-                d.high_priority_queue_->on_error(num_thread, e);
+                auto& d = data_[num_thread].data_;
+
+                d.queue_->on_error(num_thread, e);
+                d.bound_queue_->on_error(num_thread, e);
+
+                if (num_thread < num_high_priority_queues_)
+                {
+                    d.high_priority_queue_->on_error(num_thread, e);
+                }
             }
 
             if (num_thread == num_queues_ - 1)

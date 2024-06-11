@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Jiakun Yan
+//  Copyright (c) 2023-2024 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,9 @@ namespace hpx::parcelset::policies::lci {
         {
             k = 0;
             if (hpx::threads::get_self_id() != hpx::threads::invalid_thread_id)
+            {
                 hpx::this_thread::yield();
+            }
         }
     }
 }    // namespace hpx::parcelset::policies::lci

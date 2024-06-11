@@ -242,7 +242,7 @@ Using |cmake| targets
 ---------------------
 
 The recommended way of setting up your targets to use |hpx| is to link to the
-``HPX::hpx`` |cmake| target:
+``HPX::hpx`` |cmake|_ target:
 
 .. code-block:: cmake
 
@@ -255,7 +255,7 @@ This requires that you have already created the target like this:
    add_library(hello_world_component SHARED hello_world_component.cpp)
    target_include_directories(hello_world_component PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-When you link your library to the ``HPX::hpx`` |cmake| target, you will be able
+When you link your library to the ``HPX::hpx`` |cmake|_ target, you will be able
 use |hpx| functionality in your library. To use ``main()`` as the implicit entry
 point in your application you must additionally link your application to the
 |cmake| target ``HPX::wrap_main``. This target is automatically linked to

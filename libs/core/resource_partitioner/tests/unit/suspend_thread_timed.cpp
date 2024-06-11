@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Thomas Heller
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -147,11 +148,14 @@ int main(int argc, char* argv[])
             hpx::resource::scheduling_policy::abp_priority_fifo,
             hpx::resource::scheduling_policy::abp_priority_lifo,
 #endif
+
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
             hpx::resource::scheduling_policy::local_workrequesting_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
             hpx::resource::scheduling_policy::local_workrequesting_lifo,
 #endif
             hpx::resource::scheduling_policy::local_workrequesting_mc,
+#endif
         };
 
         for (auto const scheduler : schedulers)

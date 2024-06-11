@@ -119,7 +119,7 @@ namespace hpx::traits {
                 l);
 
             which = communicator.which_++;
-            communicator.gate_.set(which, std::move(l));
+            communicator.gate_.set(which, l);
 
             return f;
         }

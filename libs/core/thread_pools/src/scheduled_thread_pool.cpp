@@ -1,4 +1,5 @@
 //  Copyright (c) 2017 Shoshana Jakobovits
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +9,9 @@
 #include <hpx/schedulers/background_scheduler.hpp>
 #include <hpx/schedulers/local_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/local_queue_scheduler.hpp>
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
 #include <hpx/schedulers/local_workrequesting_scheduler.hpp>
+#endif
 #include <hpx/schedulers/shared_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/static_priority_queue_scheduler.hpp>
 #include <hpx/schedulers/static_queue_scheduler.hpp>
@@ -50,6 +53,7 @@ template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::shared_priority_queue_scheduler<>>;
 
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workrequesting_scheduler<>>;
 
@@ -62,3 +66,4 @@ template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
 template class HPX_CORE_EXPORT hpx::threads::detail::scheduled_thread_pool<
     hpx::threads::policies::local_workrequesting_scheduler<std::mutex,
         hpx::threads::policies::concurrentqueue_fifo>>;
+#endif

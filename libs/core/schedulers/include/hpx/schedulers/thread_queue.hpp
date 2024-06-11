@@ -15,13 +15,13 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/format.hpp>
 #include <hpx/schedulers/queue_helpers.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/scheduler_base.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #include <hpx/threading_base/thread_data_stackful.hpp>
 #include <hpx/threading_base/thread_data_stackless.hpp>
 #include <hpx/threading_base/thread_queue_init_parameters.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 
 #if defined(HPX_HAVE_THREAD_MINIMAL_DEADLOCK_DETECTION)
 #include <hpx/schedulers/deadlock_detection.hpp>

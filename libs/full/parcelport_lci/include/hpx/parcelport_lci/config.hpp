@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Jiakun Yan
+//  Copyright (c) 2023-2024 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,8 +29,19 @@ namespace hpx::parcelset::policies::lci {
             putsendrecv,
         };
         static protocol_t protocol;
-        // which completion mechanism to use
-        static LCI_comp_type_t completion_type;
+        // Whether sending header requires completion
+        static bool enable_sendmc;
+        // which completion mechanism to use for header messages
+        enum class comp_type_t
+        {
+            queue,
+            sync,
+            sync_single,
+            sync_single_nolock,
+        };
+        static comp_type_t completion_type_header;
+        // which completion mechanism to use for followup messages
+        static comp_type_t completion_type_followup;
         // how to run LCI_progress
         enum class progress_type_t
         {
@@ -38,6 +49,7 @@ namespace hpx::parcelset::policies::lci {
             pthread,           // Normal progress pthread
             worker,            // HPX worker thread
             pthread_worker,    // Normal progress pthread + worker thread
+            poll,              // progress when polling completion
         };
         static progress_type_t progress_type;
         // How many progress threads to create
@@ -57,6 +69,10 @@ namespace hpx::parcelset::policies::lci {
         static int send_nb_max_retry;
         // The max retry count of mbuffer_alloc before yield.
         static int mbuffer_alloc_max_retry;
+        // The max count of background_work to invoke in a row
+        static int bg_work_max_count;
+        // Whether to do background work when sending
+        static bool bg_work_when_send;
 
         static void init_config(util::runtime_configuration const& rtcfg);
     };

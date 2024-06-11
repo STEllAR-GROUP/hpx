@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2014-2015 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -73,7 +74,7 @@ namespace hpx::parcelset::policies::lci {
             postprocess_handler_type&& parcel_postprocess);
         virtual void load(handler_type&& handler,
             postprocess_handler_type&& parcel_postprocess) = 0;
-        return_t send();
+        return_t send(bool in_bg_work);
         virtual return_t send_nb() = 0;
         virtual void done() = 0;
         virtual bool tryMerge(

@@ -33,8 +33,8 @@
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
 
@@ -1836,6 +1836,11 @@ namespace hpx::agas {
             return;
         }
 
+        // 26115: Failing to release lock 'this->gva_cache_mtx_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
         try
         {
             LAGAS_(warning).format(
@@ -1853,6 +1858,9 @@ namespace hpx::agas {
             HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
         }
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     void addressing_service::remove_cache_entry(
         naming::gid_type const& id, error_code& ec) const
@@ -2078,6 +2086,11 @@ namespace hpx::agas {
     }
 #endif
 
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void addressing_service::send_refcnt_requests_non_blocking(
         [[maybe_unused]] std::unique_lock<addressing_service::mutex_type>& l,
         [[maybe_unused]] error_code& ec)
@@ -2216,6 +2229,9 @@ namespace hpx::agas {
         return lazy_results;
 #endif
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     void addressing_service::send_refcnt_requests_sync(
         std::unique_lock<addressing_service::mutex_type>& l, error_code& ec)

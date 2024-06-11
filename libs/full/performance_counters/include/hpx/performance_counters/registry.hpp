@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -56,7 +56,7 @@ namespace hpx { namespace performance_counters {
         /// \brief Call the supplied function for all registered counter types.
         counter_status discover_counter_types(
             discover_counter_func discover_counter, discover_counters_mode mode,
-            error_code& ec = throws);
+            error_code& ec = throws) const;
 
         /// \brief Call the supplied function for the given registered counter type.
         counter_status discover_counter_type(std::string const& fullname,

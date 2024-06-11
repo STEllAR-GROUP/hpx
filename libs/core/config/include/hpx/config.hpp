@@ -14,6 +14,7 @@
 #include <hpx/config/attributes.hpp>
 #include <hpx/config/auto_vectorization.hpp>
 #include <hpx/config/branch_hints.hpp>
+#include <hpx/config/cache_line_size.hpp>
 #include <hpx/config/compiler_fence.hpp>
 #include <hpx/config/compiler_specific.hpp>
 #include <hpx/config/constexpr.hpp>
@@ -438,7 +439,7 @@
 #  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
-#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+#if !defined(HPX_HAVE_MAX_CPU_COUNT) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #define HPX_HAVE_MAX_CPU_COUNT 64
 #endif
 

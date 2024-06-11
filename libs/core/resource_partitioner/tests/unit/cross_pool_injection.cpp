@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 John Biddiscombe
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -286,13 +287,16 @@ int main(int argc, char* argv[])
 #endif
         hpx::resource::scheduling_policy::static_,
         hpx::resource::scheduling_policy::static_priority,
-        // The shared_priority scheduler sometimes hangs in this test.
-        //hpx::resource::scheduling_policy::shared_priority,
+    // The shared_priority scheduler sometimes hangs in this test.
+    //hpx::resource::scheduling_policy::shared_priority,
+
+#if defined(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
         hpx::resource::scheduling_policy::local_workrequesting_fifo,
 #if defined(HPX_HAVE_CXX11_STD_ATOMIC_128BIT)
         hpx::resource::scheduling_policy::local_workrequesting_lifo,
 #endif
         hpx::resource::scheduling_policy::local_workrequesting_mc,
+#endif
     };
 
     for (auto const scheduler : schedulers)

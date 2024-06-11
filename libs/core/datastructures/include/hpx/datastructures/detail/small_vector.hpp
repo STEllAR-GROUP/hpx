@@ -175,7 +175,7 @@ namespace hpx::detail {
             }
 
             // only void* is allowed to be converted to uintptr_t
-            void* ptr = ::operator new(offset_to_data + sizeof(T) * capacity);
+            void* ptr = ::operator new(mem);
             if (nullptr == ptr)
             {
                 throw std::bad_alloc();
@@ -319,9 +319,13 @@ namespace hpx::detail {
                 {
                     // indirect -> direct
                     auto* storage = indirect();
-                    uninitialized_move_and_destroy(
-                        storage->data(), direct_data(), storage->size());
-                    set_direct_and_size(storage->size());
+                    auto const data_size = storage->size();
+                    if (data_size != 0)
+                    {
+                        uninitialized_move_and_destroy(
+                            storage->data(), direct_data(), data_size);
+                    }
+                    set_direct_and_size(data_size);
                     detail::storage<T>::dealloc(storage);
                 }
             }
@@ -332,16 +336,26 @@ namespace hpx::detail {
                 if (is_direct())
                 {
                     // direct -> indirect
-                    uninitialized_move_and_destroy(data<direction::direct>(),
-                        storage->data(), size<direction::direct>());
-                    storage->size(size<direction::direct>());
+                    auto const data_size = size<direction::direct>();
+                    if (data_size != 0)
+                    {
+                        uninitialized_move_and_destroy(
+                            data<direction::direct>(), storage->data(),
+                            data_size);
+                    }
+                    storage->size(data_size);
                 }
                 else
                 {
                     // indirect -> indirect
-                    uninitialized_move_and_destroy(data<direction::indirect>(),
-                        storage->data(), size<direction::indirect>());
-                    storage->size(size<direction::indirect>());
+                    auto const data_size = size<direction::indirect>();
+                    if (data_size != 0)
+                    {
+                        uninitialized_move_and_destroy(
+                            data<direction::indirect>(), storage->data(),
+                            data_size);
+                    }
+                    storage->size(data_size);
                     detail::storage<T>::dealloc(indirect());
                 }
                 set_indirect(storage);
@@ -657,7 +671,7 @@ namespace hpx::detail {
             set_direct_and_size(0);
         }
 
-        // performs a const_cast so we don't need this implementation twice
+        // performs a const_cast, so we don't need this implementation twice
         template <direction D>
         [[nodiscard]] auto at(std::size_t idx) const -> T&
         {
@@ -785,7 +799,7 @@ namespace hpx::detail {
             if (&other == this)
             {
                 // It doesn't seem to be required to do self-check, but let's do
-                // it anyways to be safe
+                // it anyway to be safe
                 return *this;
             }
 

@@ -239,8 +239,16 @@ namespace hpx { namespace iostreams {
             // Create the next buffer, returns the previous buffer
             buffer next = this->detail::buffer::init_locked();
 
-            // Unlock the mutex before we cleanup.
+            // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
+            // Unlock the mutex before we clean up.
             l.unlock();
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
             // Perform the write operation, then destroy the old buffer and
             // stream.
@@ -269,14 +277,13 @@ namespace hpx { namespace iostreams {
                 // Create the next buffer, returns the previous buffer
                 buffer next = this->detail::buffer::init_locked();
 
-                // Unlock the mutex before we cleanup.
+                // Unlock the mutex before we clean up.
                 l.unlock();
 
                 // since mtx_ is recursive and apply will do an AGAS lookup,
                 // we need to ignore the lock here in case we are called
                 // recursively
-                hpx::util::ignore_while_checking il(&l);
-                HPX_UNUSED(il);
+                [[maybe_unused]] hpx::util::ignore_while_checking il(&l);
 
                 // Perform the write operation, then destroy the old buffer and
                 // stream.
@@ -367,8 +374,7 @@ namespace hpx { namespace iostreams {
         ostream& operator<<(std_stream_type& (*manip_fun)(std_stream_type&) )
         {
             std::unique_lock l(*mtx_);
-            util::ignore_while_checking ignore(&l);
-            HPX_UNUSED(ignore);
+            [[maybe_unused]] util::ignore_while_checking ignore(&l);
 
             return streaming_operator_lazy(manip_fun);
         }

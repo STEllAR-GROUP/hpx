@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2023 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,8 +16,8 @@
 #include <hpx/modules/async_distributed.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
 #include <hpx/timing/scoped_timer.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_and_reset_value.hpp>
 #include <hpx/util/insert_checked.hpp>
 
@@ -132,6 +132,11 @@ namespace hpx::agas::server {
     }
 
     // migration of the given object is complete
+    // 26115: Failing to release lock 'this->mutex_' in function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
     bool primary_namespace::end_migration(naming::gid_type const& id)
     {
         util::scoped_timer<std::atomic<std::int64_t>> update(
@@ -160,6 +165,9 @@ namespace hpx::agas::server {
 
         return true;
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     // wait if given object is currently being migrated
     void primary_namespace::wait_for_migration_locked(
@@ -751,6 +759,11 @@ namespace hpx::agas::server {
     }    // }}}
 
     ///////////////////////////////////////////////////////////////////////////////
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void primary_namespace::resolve_free_list(std::unique_lock<mutex_type>& l,
         std::list<refcnt_table_type::iterator> const& free_list,
         free_entry_list_type& free_entry_list,
@@ -839,6 +852,9 @@ namespace hpx::agas::server {
             refcnts_.erase(it);
         }
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     ///////////////////////////////////////////////////////////////////////////////
     void primary_namespace::decrement_sweep(
@@ -1035,6 +1051,11 @@ namespace hpx::agas::server {
         return resolve_gid_locked_non_local(l, gid, ec);
     }
 
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     primary_namespace::resolved_type
     primary_namespace::resolve_gid_locked_non_local(
         std::unique_lock<mutex_type>& l, naming::gid_type const& gid,
@@ -1125,6 +1146,9 @@ namespace hpx::agas::server {
 
         return resolved_type(naming::invalid_gid, gva(), naming::invalid_gid);
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
 #if defined(HPX_HAVE_NETWORKING)
     void (*route)(primary_namespace& server, parcelset::parcel&& p) = nullptr;

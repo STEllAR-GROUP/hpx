@@ -27,7 +27,8 @@ namespace hpx::execution::experimental::detail {
     struct partial_algorithm_base<Tag, hpx::util::index_pack<Is...>, Ts...>
     {
     private:
-        HPX_NO_UNIQUE_ADDRESS hpx::util::member_pack_for<Ts...> ts;
+        HPX_NO_UNIQUE_ADDRESS hpx::util::member_pack_for<std::decay_t<Ts>...>
+            ts;
 
     public:
         template <typename... Us>
