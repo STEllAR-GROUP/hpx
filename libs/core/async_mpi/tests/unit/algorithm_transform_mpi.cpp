@@ -9,6 +9,7 @@
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/string_util/case_conv.hpp>
 #include <hpx/tuple.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -213,8 +214,7 @@ int hpx_main()
                 catch (std::runtime_error const& e)
                 {
                     auto error_msg = std::string(e.what());
-                    for (auto& c : error_msg)
-                        c = std::tolower(c);
+                    hpx::string_util::to_lower(error_msg);
                     HPX_TEST(error_msg.find(std::string("invalid root")) !=
                         std::string::npos);
                     exception_thrown = true;
