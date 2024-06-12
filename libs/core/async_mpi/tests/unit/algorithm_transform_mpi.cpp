@@ -212,8 +212,11 @@ int hpx_main()
                 }
                 catch (std::runtime_error const& e)
                 {
-                    HPX_TEST(std::string(e.what()).find(std::string(
-                                 "invalid root")) != std::string::npos);
+                    auto error_msg = std::string(e.what());
+                    for (auto& c : error_msg)
+                        c = std::tolower(c);
+                    HPX_TEST(error_msg.find(std::string("invalid root")) !=
+                        std::string::npos);
                     exception_thrown = true;
                 }
                 HPX_TEST(exception_thrown);

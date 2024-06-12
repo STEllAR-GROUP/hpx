@@ -205,7 +205,7 @@ namespace hpx { namespace mpi { namespace experimental {
                 invoke_function_transformation,
                 default_set_error,
                 no_set_stopped_signature
-            >{};
+            >;
             // clang-format on
 #else
             template <typename Env>
