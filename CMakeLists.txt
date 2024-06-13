@@ -589,18 +589,16 @@ hpx_option(
 )
 
 hpx_option(
-  HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: OFF)"
-  OFF
+  HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: ON)"
+  ON
   CATEGORY "Executor"
   ADVANCED
 )
 
-if(HPX_WITH_FETCH_STDEXEC OR HPX_WITH_CXX_STANDARD GREATER_EQUAL 20)
-  hpx_option(
-    HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
-    CATEGORY "Executor"
-  )
-endif()
+hpx_option(
+        HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
+        CATEGORY "Executor"
+)
 
 # ##############################################################################
 # HPX SYCL configuration
