@@ -1,4 +1,5 @@
 # Copyright (c) 2022-2023 Hartmut Kaiser
+# Copyright (c) 2024 Alireza Kheirkhahan
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,9 +7,9 @@
 
 module purge
 module load cmake
-module load gcc/13
+module load gcc/14
 module load cuda/12
-module load boost/1.83.0-${build_type,,}
+module load boost/1.85.0-${build_type,,}
 module load hwloc
 
 export CXX_STD="17"
