@@ -202,8 +202,8 @@ namespace tests {
         }
     };
 
-    // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
+    // gcc V11 and on are complaining about mismatched-new-delete
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 150000
     hpx::generator<int, void, std::allocator<std::byte>> stateless_example()
     {
         co_yield 42;
@@ -313,8 +313,8 @@ int main()
         HPX_TEST_EQ(i, expected.size());
     }
 
-    // gcc V11/V12 are complaining about mismatched-new-delete
-#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 140000
+    // gcc V11 and on are complaining about mismatched-new-delete
+#if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 150000
     {
         std::vector const expected = {42};
         std::size_t i = 0;

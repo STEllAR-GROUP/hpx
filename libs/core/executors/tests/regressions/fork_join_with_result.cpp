@@ -8,6 +8,7 @@
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/numeric.hpp>
 
 #include <functional>
 

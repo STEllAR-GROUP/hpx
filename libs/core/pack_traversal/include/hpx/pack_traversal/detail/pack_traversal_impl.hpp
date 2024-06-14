@@ -515,8 +515,13 @@ namespace hpx::util::detail {
             // I didn't want to pull a whole header for it in.
             for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
+#if defined(__NVCC__)
+                remapped.push_back(
+                    spreading::unpack(HPX_FORWARD(M, mapper)(val)));
+#else
                 remapped.push_back(spreading::unpack(
                     HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val))));
+#endif
             }
 
             return remapped;    // RVO
@@ -530,8 +535,12 @@ namespace hpx::util::detail {
         {
             for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
+#if defined(__NVCC__)
+                val = spreading::unpack(HPX_FORWARD(M, mapper)(val));
+#else
                 val = spreading::unpack(
                     HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val)));
+#endif
             }
             return HPX_FORWARD(T, container);
         }
@@ -545,7 +554,11 @@ namespace hpx::util::detail {
             {
                 // Don't save the empty mapping for each invocation
                 // of the mapper.
+#if defined(__NVCC__)
+                HPX_FORWARD(M, mapper)(val);
+#else
                 HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val));
+#endif
             }
             // Return one instance of an empty mapping for the container
             return spreading::empty_spread();
@@ -571,7 +584,11 @@ namespace hpx::util::detail {
             // CUDA needs std::forward here
             for (auto&& element : std::forward<T>(container))
             {
+#if defined(__NVCC__)
+                HPX_FORWARD(M, mapper)(element);
+#else
                 HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(element), element));
+#endif
             }
         }
     }    // end namespace container_remapping
