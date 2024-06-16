@@ -41,12 +41,15 @@ namespace examples { namespace server {
     /// a simple component is created.
     ///
     /// This component exposes 3 different actions: reset, add and query.
+    //[template_accumulator_server_inherit
     template <typename T>
     class template_accumulator
       : public hpx::components::locking_hook<
             hpx::components::component_base<template_accumulator<T>>>
+    //]
     {
     public:
+        //[template_accumulator_server_body_class
         typedef T argument_type;
 
         template_accumulator()
@@ -85,11 +88,14 @@ namespace examples { namespace server {
         HPX_DEFINE_COMPONENT_ACTION(template_accumulator, reset)
         HPX_DEFINE_COMPONENT_ACTION(template_accumulator, add)
         HPX_DEFINE_COMPONENT_ACTION(template_accumulator, query)
+        //]
 
     private:
         argument_type value_;
     };
 }}    // namespace examples::server
+
+//[template_accumulator_registration_declarations
 
 #define REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)                        \
     HPX_REGISTER_ACTION_DECLARATION(                                           \
@@ -123,5 +129,6 @@ namespace examples { namespace server {
         HPX_PP_CAT(__template_accumulator_, type);                             \
     HPX_REGISTER_COMPONENT(HPX_PP_CAT(__template_accumulator_, type))          \
     /**/
+//]
 
 #endif

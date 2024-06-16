@@ -5,6 +5,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file new.hpp
+/// \page hpx::new_
+/// \headerfile hpx/components.hpp
 
 #pragma once
 
@@ -66,7 +68,7 @@ namespace hpx {
     ///          component instance.
     ///
     template <typename Component, typename... Ts>
-    <unspecified> new_(id_type const& locality, Ts&&... vs);
+    auto new_(id_type const& locality, Ts&&... vs);
 
     /// \brief Create one new instance of the given Component type on the
     /// current locality.
@@ -110,7 +112,7 @@ namespace hpx {
     ///          only.
     ///
     template <typename Component, typename... Ts>
-    <unspecified> local_new(Ts&&... vs);
+    auto local_new(Ts&&... vs);
 
     /// \brief Create multiple new instances of the given Component type on the
     /// specified locality.
@@ -155,7 +157,7 @@ namespace hpx {
     ///          components.
     ///
     template <typename Component, typename... Ts>
-    <unspecified> new_(id_type const& locality, std::size_t count, Ts&&... vs);
+    auto new_(id_type const& locality, std::size_t count, Ts&&... vs);
 
     /// \brief Create one or more new instances of the given Component type
     /// based on the given distribution policy.
@@ -194,7 +196,7 @@ namespace hpx {
     ///          component instance.
     ///
     template <typename Component, typename DistPolicy, typename... Ts>
-    <unspecified> new_(DistPolicy const& policy, Ts&&... vs);
+    auto new_(DistPolicy const& policy, Ts&&... vs);
 
     /// \brief Create multiple new instances of the given Component type on the
     /// localities as defined by the given distribution policy.
@@ -239,7 +241,7 @@ namespace hpx {
     ///          components.
     ///
     template <typename Component, typename DistPolicy, typename... Ts>
-    <unspecified> new_(DistPolicy const& policy, std::size_t count, Ts&&... vs);
+    auto new_(DistPolicy const& policy, std::size_t count, Ts&&... vs);
 }    // namespace hpx
 
 #else

@@ -13,9 +13,12 @@
 Components and actions
 ======================
 
-The accumulator example demonstrates the use of components. Components are C++
+The accumulator examples demonstrate the use of components. Components are C++
 classes that expose methods as a type of |hpx| action. These actions are called
-component actions.
+component actions. There are three examples:
+- accumulator
+- template accumulator
+- template function accumulator
 
 Components are globally named, meaning that a component action can be called
 remotely (e.g.,  from another machine). There are two accumulator examples in
@@ -31,18 +34,21 @@ Component actions, however, do not target machines. Instead, they target
 component instances. The instance may live on the machine that we've invoked the
 component action from, or it may live on another machine.
 
-The component in this example exposes three different functions:
+The components in these examples expose three different functions:
 
 * ``reset()`` - Resets the accumulator value to 0.
 * ``add(arg)`` - Adds ``arg`` to the accumulators value.
 * ``query()`` - Queries the value of the accumulator.
 
-This example creates an instance of the accumulator, and then allows the user to
-enter commands at a prompt, which subsequently invoke actions on the accumulator
-instance.
+These examples create an instance of the (template or template function) accumulator,
+and then allow the user to enter commands at a prompt, which subsequently invoke actions
+on the accumulator instance.
+
+Accumulator
+===========
 
 Setup
-=====
+-----
 
 The source code for this example can be found here:
 :download:`accumulator_client.cpp
@@ -82,7 +88,7 @@ wait for input. An example session is given below:
    > quit
 
 Walkthrough
-===========
+-----------
 
 Now, let's take a look at the source code of the accumulator example. This
 example consists of two parts: an |hpx| component library (a library that
@@ -105,10 +111,10 @@ names of the two classes in accumulator are:
 * ``examples::accumulator`` (client class)
 
 The server class
-----------------
+^^^^^^^^^^^^^^^^
 
-The following code is from: :download:`accumulator.hpp
-<../../examples/accumulators/server/accumulator.hpp>`.
+The following code is from
+:hpx-header:`examples/accumulators,server/accumulator.hpp`.
 
 All |hpx| component server classes must inherit publicly from the |hpx|
 component base class: :cpp:class:`hpx::components::component_base`
@@ -173,23 +179,22 @@ action type registration code:
    The code above must be placed in the global namespace.
 
 The rest of the registration code is in
-:download:`accumulator.cpp <../../examples/accumulators/accumulator.cpp>`
+:hpx-header:`examples/accumulators,accumulator.cpp`
 
 .. literalinclude:: ../../examples/accumulators/accumulator.cpp
    :language: c++
    :start-after: //[accumulator_registration_definitions
    :end-before: //]
 
-
 .. note::
 
    The code above must be placed in the global namespace.
 
 The client class
-----------------
+^^^^^^^^^^^^^^^^
 
-The following code is from :download:`accumulator.hpp
-<../../examples/accumulators/accumulator.hpp>`.
+The following code is from
+:hpx-header:`examples/accumulators,accumulator.hpp`
 
 The client class is the primary interface to a component instance. Client classes
 are used to create components::
@@ -242,8 +247,9 @@ There are a few different ways of invoking actions:
    :end-before: //]
 
 * **Synchronous**: To invoke an action in a fully synchronous manner, we can
-  simply call :cpp:func:`hpx::async`\ ``().get()`` (i.e., create a future and
-  immediately wait on it to be ready). Here's an example from the accumulator
+  simply call :cpp:func:`hpx::sync` which is semantically equivalent to
+  :cpp:func:`hpx::async`\ ``().get()`` (i.e., create a future and immediately
+  wait on it to be ready). Here's an example from the accumulator
   client class:
 
 .. literalinclude:: ../../examples/accumulators/accumulator.hpp
@@ -259,3 +265,132 @@ accumulator instance.
 in |hpx|. This type specifies the target of an action. This is the type that is
 returned by :cpp:func:`hpx::find_here` in which case it represents the
 :term:`locality` the code is running on.
+
+
+Template accumulator
+====================
+
+Walkthrough
+-----------
+
+The server class
+^^^^^^^^^^^^^^^^
+
+The following code is from
+:hpx-header:`examples/accumulators,server/template_accumulator.hpp`.
+
+Similarly to the accumulator example, the component server class
+inherits publicly from :cpp:class:`hpx::components::component_base` and from
+:cpp:class:`hpx::components::locking_hook` ensuring thread-safe method invocations.
+
+.. literalinclude:: ../../examples/accumulators/server/template_accumulator.hpp
+   :language: c++
+   :start-after: //[template_accumulator_server_inherit
+   :end-before: //]
+
+The body of the template accumulator class remains mainly the same as the accumulator with
+the difference that it uses templates in the data types.
+
+.. literalinclude:: ../../examples/accumulators/server/template_accumulator.hpp
+   :language: c++
+   :start-after: //[template_accumulator_server_body_class
+   :end-before: //]
+
+The last piece of code in the server class header is the declaration of the
+action type registration code. `REGISTER_TEMPLATE_ACCUMULATOR_DECLARATION(type)` declares
+actions for the specified type, while `REGISTER_TEMPLATE_ACCUMULATOR(type)` registers the
+actions and the component for the specified type, using macros to handle boilerplate code.
+
+.. literalinclude:: ../../examples/accumulators/server/template_accumulator.hpp
+   :language: c++
+   :start-after: //[template_accumulator_registration_declarations
+   :end-before: //]
+
+.. note::
+
+   The code above must be placed in the global namespace.
+
+Finally, `HPX_REGISTER_COMPONENT_MODULE()` in file
+:hpx-header:`examples/accumulators,server/template_accumulator.cpp`
+adds the factory registration functionality.
+
+The client class
+^^^^^^^^^^^^^^^^
+
+The client class of the template accumulator can be found in
+:hpx-header:`examples/accumulators,template_accumulator.hpp` and is very similar to
+the client class of the accumulator with the only difference that it uses templates
+and hence can work with different types.
+
+Template function accumulator
+=============================
+
+Walkthrough
+-----------
+
+The server class
+^^^^^^^^^^^^^^^^
+
+The following code is from
+:hpx-header:`examples/accumulators,server/template_function_accumulator.hpp`.
+
+The component server class inherits publicly from :cpp:class:`hpx::components::component_base`.
+
+.. literalinclude:: ../../examples/accumulators/server/template_function_accumulator.hpp
+   :language: c++
+   :start-after: //[template_func_accumulator_server_inherit
+   :end-before: //]
+
+`typedef hpx::spinlock mutex_type` defines a `mutex_type` as `hpx::spinlock` for thread safety,
+while the code that follows exposes the functionality of this component.
+
+.. literalinclude:: ../../examples/accumulators/server/template_function_accumulator.hpp
+   :language: c++
+   :start-after: //[template_func_accumulator_server_exposed_func
+   :end-before: //]
+
+
+- `reset()`: Resets the accumulator value to `0` in a thread-safe manner using
+  `std::lock_guard`.
+- `add()`: Adds a value to the accumulator, allowing any type `T` that can be cast to double.
+- `query()`: Returns the current value of the accumulator in a thread-safe manner.
+
+To define the actions for `reset()` and `query()` we can use the macro `HPX_DEFINE_COMPONENT_ACTION`.
+However, actions with template arguments require special type definitions. Therefore, we use
+`make_action()` to define `add()`.
+
+.. literalinclude:: ../../examples/accumulators/server/template_function_accumulator.hpp
+   :language: c++
+   :start-after: //[template_func_accumulator_server_actions
+   :end-before: //]
+
+The last piece of code in the server class header is the action registration:
+
+.. literalinclude:: ../../examples/accumulators/server/template_function_accumulator.hpp
+   :language: c++
+   :start-after: //[template_func_accumulator_registration_declarations
+   :end-before: //]
+
+.. note::
+
+   The code above must be placed in the global namespace.
+
+The rest of the registration code is in
+:hpx-header:`examples/accumulators,accumulator.cpp`
+
+.. literalinclude:: ../../examples/accumulators/template_function_accumulator.cpp
+   :language: c++
+   :start-after: //[template_func_accumulator_registration_definitions
+   :end-before: //]
+
+.. note::
+
+   The code above must be placed in the global namespace.
+
+The client class
+^^^^^^^^^^^^^^^^
+
+The client class of the template accumulator can be found in
+:hpx-header:`examples/accumulators,template_function_accumulator.hpp` and is very similar
+to the client class of the accumulator with the only difference that it uses templates
+and hence can work with different types.

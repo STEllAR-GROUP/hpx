@@ -5,6 +5,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file components_base_fwd.hpp
+/// \page hpx::components::component, hpx::components::component_base
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -19,6 +23,9 @@ namespace hpx::components {
     template <typename Component>
     class fixed_component;
 
+    /// The \a component class wraps around a given component type, adding
+    /// additional type aliases and constructors. It inherits from the
+    /// specified component type.
     template <typename Component>
     class component;
 
@@ -26,6 +33,10 @@ namespace hpx::components {
     class managed_component;
 
     ///////////////////////////////////////////////////////////////////////
+    /// \a component_base serves as a base class for components. It provides
+    /// common functionality needed by components, such as address and ID
+    /// retrieval. The template parameter \a Component specifies the
+    /// derived component type.
     template <typename Component = void>
     class component_base;
 

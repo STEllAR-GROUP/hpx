@@ -158,8 +158,8 @@ The ``system`` configuration section
      * This is initialized to the base directory the current executable has been
        loaded from.
 
-The `|hpx| configuration section
-.................................
+The |hpx| configuration section
+...............................
 
 .. code-block:: ini
 
