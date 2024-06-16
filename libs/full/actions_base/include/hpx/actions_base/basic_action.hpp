@@ -7,6 +7,8 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 /// \file hpx/actions_base/basic_action.hpp
+/// \page HPX_REGISTER_ACTION_DECLARATION, HPX_REGISTER_ACTION
+/// \headerfile hpx/components.hpp
 
 #pragma once
 

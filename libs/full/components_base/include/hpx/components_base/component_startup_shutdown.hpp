@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file component_commandline.hpp
+/// \page HPX_REGISTER_STARTUP_MODULE
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -119,6 +123,15 @@ namespace hpx::components {
         startup_shutdown)                                                      \
     /**/
 
+/**
+ * @brief Macro to register a startup module with the HPX runtime.
+ *
+ * This macro facilitates the registration of a startup module with the HPX
+ * runtime system. A startup module typically contains initialization code
+ * that should be executed when the HPX runtime starts.
+ *
+ * @param startup The name of the startup function to be registered.
+ */
 #define HPX_REGISTER_STARTUP_MODULE(startup)                                   \
     HPX_REGISTER_STARTUP_SHUTDOWN_FUNCTIONS()                                  \
     HPX_REGISTER_STARTUP_SHUTDOWN_MODULE_(startup, 0)                          \

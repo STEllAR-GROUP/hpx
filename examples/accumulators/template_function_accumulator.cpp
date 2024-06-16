@@ -13,6 +13,7 @@
 
 #include "server/template_function_accumulator.hpp"
 
+//[template_func_accumulator_registration_definitions
 ///////////////////////////////////////////////////////////////////////////////
 // Add factory registration functionality.
 HPX_REGISTER_COMPONENT_MODULE()
@@ -30,5 +31,6 @@ HPX_REGISTER_ACTION(accumulator_type::wrapped_type::reset_action,
     managed_accumulator_reset_action)
 HPX_REGISTER_ACTION(accumulator_type::wrapped_type::query_action,
     managed_accumulator_query_action)
+//]
 
 #endif

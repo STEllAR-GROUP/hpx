@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file component_commandline_base.hpp
+/// \page hpx::components::component_commandline_base
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
