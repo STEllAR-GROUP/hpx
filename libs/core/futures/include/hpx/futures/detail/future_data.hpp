@@ -220,6 +220,12 @@ namespace hpx::lcos::detail {
     template <typename Result>
     struct future_data_base;
 
+    // make sure continuation invocation does not recurse deeper than allowed
+    HPX_CORE_EXPORT void handle_on_completed(
+        future_data_refcnt_base::completed_callback_type&& on_completed);
+    HPX_CORE_EXPORT void handle_on_completed(
+        future_data_refcnt_base::completed_callback_vector_type&& on_completed);
+
     template <>
     struct HPX_CORE_EXPORT future_data_base<traits::detail::future_data_void>
       : future_data_refcnt_base
@@ -305,11 +311,6 @@ namespace hpx::lcos::detail {
         static void run_on_completed(
             completed_callback_vector_type&& on_completed) noexcept;
 
-        // make sure continuation invocation does not recurse deeper than
-        // allowed
-        template <typename Callback>
-        static void handle_on_completed(Callback&& on_completed);
-
         // Set the callback which needs to be invoked when the future becomes
         // ready. If the future is ready the function will be invoked
         // immediately.
@@ -361,14 +362,13 @@ namespace hpx::lcos::detail {
     public:
         using result_type = future_data_result_t<Result>;
         using base_type = future_data_base<traits::detail::future_data_void>;
-        using init_no_addref = typename base_type::init_no_addref;
-        using completed_callback_type =
-            typename base_type::completed_callback_type;
+        using init_no_addref = base_type::init_no_addref;
+        using completed_callback_type = base_type::completed_callback_type;
         using completed_callback_vector_type =
-            typename base_type::completed_callback_vector_type;
+            base_type::completed_callback_vector_type;
 
     protected:
-        using mutex_type = typename base_type::mutex_type;
+        using mutex_type = base_type::mutex_type;
 
     public:
         // Variable 'hpx::lcos::detail::future_data_base<void>::storage_' is
@@ -501,12 +501,15 @@ namespace hpx::lcos::detail {
 #endif
 
             // Note: we use notify_one repeatedly instead of notify_all as we
-            //       know: a) that most of the time we have at most one thread
-            //       waiting on the future (most futures are not shared), and
-            //       b) our implementation of condition_variable::notify_one
-            //       relinquishes the lock before resuming the waiting thread
-            //       that avoids suspension of this thread when it tries to
-            //       re-lock the mutex while exiting from condition_variable::wait
+            //       know:
+            //
+            //       a. that most of the time we have at most one thread
+            //          waiting on the future (most futures are not shared), and
+            //       b. our implementation of condition_variable::notify_one
+            //          relinquishes the lock before resuming the waiting thread
+            //          that avoids suspension of this thread when it tries to
+            //          re-lock the mutex while exiting from
+            //          condition_variable::wait
             while (
                 cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
@@ -580,12 +583,15 @@ namespace hpx::lcos::detail {
 #endif
 
             // Note: we use notify_one repeatedly instead of notify_all as we
-            //       know: a) that most of the time we have at most one thread
-            //       waiting on the future (most futures are not shared), and
-            //       b) our implementation of condition_variable::notify_one
-            //       relinquishes the lock before resuming the waiting thread
-            //       that avoids suspension of this thread when it tries to
-            //       re-lock the mutex while exiting from condition_variable::wait
+            //       know:
+            //
+            //       a. that most of the time we have at most one thread
+            //          waiting on the future (most futures are not shared), and
+            //       b. our implementation of condition_variable::notify_one
+            //          relinquishes the lock before resuming the waiting thread
+            //          that avoids suspension of this thread when it tries to
+            //          re-lock the mutex while exiting from
+            //          condition_variable::wait
             while (
                 cond_.notify_one(HPX_MOVE(l), threads::thread_priority::boost))
             {
