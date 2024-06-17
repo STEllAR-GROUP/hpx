@@ -1,3 +1,4 @@
+# Copyright (c) 2024 Panos Syskakis
 # Copyright (c) 2018 Christopher Hinz
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2007-2024 The STE||AR-Group
@@ -5,70 +6,6 @@
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
-if(HPX_WITH_FETCH_BOOST)
-  set(HPX_WITH_BOOST_VERSION "1.84.0")
-  hpx_info(
-    "HPX_WITH_FETCH_BOOST=${HPX_WITH_FETCH_BOOST}, Boost v${HPX_WITH_BOOST_VERSION} will be fetched using CMake's FetchContent"
-  )
-  include(FetchContent)
-  fetchcontent_declare(
-    Boost
-    URL https://github.com/boostorg/boost/releases/download/boost-${HPX_WITH_BOOST_VERSION}/boost-${HPX_WITH_BOOST_VERSION}.tar.gz
-    TLS_VERIFY true
-    DOWNLOAD_EXTRACT_TIMESTAMP true
-  )
-  fetchcontent_populate(Boost)
-  set(HPX_WITH_BUILD_FETCHED_BOOST
-      "Execute process"
-      CACHE STRING "Used by command line tool to build fetched Boost"
-  )
-  set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
-      ""
-      CACHE
-        STRING
-        "for internal use only, do not modify. Checks if fetched Boost is built"
-  )
-
-  if(NOT HPX_WITH_BUILD_FETCHED_BOOST STREQUAL
-     HPX_WITH_BUILD_FETCHED_BOOST_CHECK
-  )
-    if(WIN32)
-      execute_process(
-        COMMAND
-          cmd /C
-          "cd ${CMAKE_BINARY_DIR}\\_deps\\boost-src && .\\bootstrap.bat && .\\b2 headers cxxflags=/std:c++${HPX_CXX_STANDARD}"
-      )
-    elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      execute_process(
-        COMMAND
-          sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed && ./b2 && ./b2 install --prefix=${CMAKE_BINARY_DIR}/_deps/boost-installed cxxflags=--std=c++${HPX_CXX_STANDARD}"
-      )
-    else()
-      execute_process(
-        COMMAND
-          sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/boost-src && ./bootstrap.sh && ./b2 headers cxxflags=--std=c++${HPX_CXX_STANDARD}"
-      )
-    endif()
-    set(HPX_WITH_BUILD_FETCHED_BOOST_CHECK
-        ${HPX_WITH_BUILD_FETCHED_BOOST}
-        CACHE
-          INTERNAL
-          "for internal use only, do not modify. Checks if fetched Boost is built"
-    )
-  endif()
-
-  set(Boost_DIR
-      "${CMAKE_BINARY_DIR}/_deps/boost-src"
-      CACHE INTERNAL ""
-  )
-  set(Boost_INCLUDE_DIR
-      "${CMAKE_BINARY_DIR}/_deps/boost-src"
-      CACHE INTERNAL ""
-  )
-endif()
 
 # In case find_package(HPX) is called multiple times
 if(NOT TARGET hpx_dependencies_boost)
@@ -78,6 +15,7 @@ if(NOT TARGET hpx_dependencies_boost)
     set(Boost_USE_STATIC_LIBS ON)
   endif()
 
+<<<<<<< HEAD
   # Add additional version to recognize
   # cmake-format: off
   set(Boost_ADDITIONAL_VERSIONS
@@ -117,6 +55,16 @@ if(NOT TARGET hpx_dependencies_boost)
   endif()
 
   set(__boost_libraries "")
+=======
+  # set(__boost_libraries disable_autolinking)
+>>>>>>> 8d8b4e6456 (Fetch Boost as a CMake subproject)
+  if(HPX_PARCELPORT_LIBFABRIC_WITH_LOGGING
+     OR HPX_PARCELPORT_LIBFABRIC_WITH_DEV_MODE
+  )
+    set(__boost_libraries ${__boost_libraries} log log_setup date_time chrono
+                          thread
+    )
+  endif()
 
   if(HPX_WITH_GENERIC_CONTEXT_COROUTINES)
     # if context is needed, we should still link with boost thread and chrono
@@ -134,15 +82,98 @@ if(NOT TARGET hpx_dependencies_boost)
     unset(BOOST_ROOT CACHE)
   endif()
 
-  find_package(
-    Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED
-    COMPONENTS ${__boost_libraries}
-  )
-
-  if(NOT Boost_FOUND)
-    hpx_error(
-      "Could not find Boost. Please set Boost_ROOT to point to your Boost installation."
+  if(NOT HPX_WITH_FETCH_BOOST)
+    set(Boost_MINIMUM_VERSION
+        "1.71"
+        CACHE INTERNAL "1.71" FORCE
     )
+
+    find_package(
+      Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED
+      COMPONENTS ${__boost_libraries}
+    )
+
+    add_library(hpx_dependencies_boost INTERFACE IMPORTED)
+
+    target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
+
+    foreach(__boost_library ${__boost_libraries})
+      target_link_libraries(
+        hpx_dependencies_boost INTERFACE Boost::${__boost_library}
+      )
+    endforeach()
+
+  elseif(NOT TARGET Boost::boost AND NOT HPX_FIND_PACKAGE)
+    # set(HPX_WITH_BOOST_VERSION "1.84.0")
+    # hpx_info(
+    #   "HPX_WITH_FETCH_BOOST=${HPX_WITH_FETCH_BOOST}, Boost v${HPX_WITH_BOOST_VERSION} will be fetched using CMake's FetchContent"
+    # )
+    include(FetchContent)
+    fetchcontent_declare(
+      Boost
+      URL https://github.com/boostorg/boost/releases/download/boost-1.85.0/boost-1.85.0-cmake.tar.gz
+      TLS_VERIFY true
+      DOWNLOAD_EXTRACT_TIMESTAMP true
+    )
+
+    set(BOOST_INCLUDE_LIBRARIES ${__boost_libraries})
+    set(BOOST_SKIP_INSTALL_RULES OFF)
+
+    # Use Populate + add_subdirectory instead of MakeAvailable, as we need
+    # EXCLUDE_FROM_ALL so that we only configure the boost libraries we need
+    fetchcontent_getproperties(Boost)
+    if(NOT boost_POPULATED)
+      fetchcontent_populate(Boost)
+      add_subdirectory(${boost_SOURCE_DIR} ${boost_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
+
+    set(__boost_libraries
+        ${__boost_libraries}
+        accumulators
+        bind
+        config
+        exception
+        filesystem
+        functional
+        fusion
+        iostreams
+        log
+        optional
+        parameter
+        phoenix
+        regex
+        spirit
+        variant
+    )
+    list(TRANSFORM __boost_libraries
+         PREPEND "boost_" OUTPUT_VARIABLE __boost_libraries_prefixed
+    )
+
+    add_library(hpx_dependencies_boost INTERFACE)
+
+    target_link_libraries(
+      hpx_dependencies_boost INTERFACE ${__boost_libraries_prefixed}
+    )
+
+    install(
+      TARGETS hpx_dependencies_boost
+      EXPORT HPXBoostTarget
+      COMPONENT core
+    )
+
+    install(
+      EXPORT HPXBoostTarget
+      FILE HPXBoostTarget.cmake
+      NAMESPACE Boost::
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+    )
+
+    export(
+        TARGETS hpx_dependencies_boost
+        NAMESPACE Boost::
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXBoostTarget.cmake"
+      )
+
   endif()
 
   # We are assuming that there is only one Boost Root
@@ -155,15 +186,6 @@ if(NOT TARGET hpx_dependencies_boost)
   if(Boost_ROOT)
     file(TO_CMAKE_PATH ${Boost_ROOT} Boost_ROOT)
   endif()
-
-  add_library(hpx_dependencies_boost INTERFACE IMPORTED)
-
-  target_link_libraries(hpx_dependencies_boost INTERFACE Boost::boost)
-  foreach(__boost_library ${__boost_libraries})
-    target_link_libraries(
-      hpx_dependencies_boost INTERFACE Boost::${__boost_library}
-    )
-  endforeach()
 
   if(HPX_WITH_HIP AND Boost_VERSION VERSION_LESS 1.78)
     target_compile_definitions(
@@ -178,11 +200,10 @@ if(NOT TARGET hpx_dependencies_boost)
   if(NOT Boost_USE_STATIC_LIBS)
     hpx_add_config_cond_define(BOOST_ALL_DYN_LINK)
   endif()
+
   if(NOT MSVC)
     hpx_add_config_define(HPX_COROUTINE_NO_SEPARATE_CALL_SITES)
   endif()
+
   hpx_add_config_cond_define(BOOST_BIGINT_HAS_NATIVE_INT64)
-  target_link_libraries(
-    hpx_dependencies_boost INTERFACE Boost::disable_autolinking
-  )
 endif()
