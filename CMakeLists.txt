@@ -2221,6 +2221,10 @@ endif()
 include(HPX_SetupThreads)
 
 # Setup our required Boost libraries.
+if(HPX_WITH_FETCH_BOOST)
+  include(HPX_FetchBoost)
+  include(${CMAKE_BINARY_DIR}/hpx_boost_root.cmake)
+endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
 include(HPX_SetupBoostIostreams)
