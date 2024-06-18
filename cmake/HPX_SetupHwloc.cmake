@@ -47,10 +47,10 @@ else()
       execute_process(
         COMMAND
           sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/hwloc-src && ./configure --prefix=${CMAKE_BINARY_DIR}/_deps/hwloc-installed && make -j && make install"
+          "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
       )
     endif()
-    set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-installed")
+    set(HWLOC_ROOT "${FETCHCONTENT_BASE_DIR}/hwloc-installed")
     set(Hwloc_INCLUDE_DIR
         ${HWLOC_ROOT}/include
         CACHE INTERNAL ""
@@ -84,7 +84,7 @@ else()
       fetchcontent_populate(HWLoc)
     endif()
     set(HWLOC_ROOT
-        "${CMAKE_BINARY_DIR}/_deps/hwloc-src"
+        "${FETCHCONTENT_BASE_DIR}/hwloc-src"
         CACHE INTERNAL ""
     )
     include_directories(${HWLOC_ROOT}/include)
