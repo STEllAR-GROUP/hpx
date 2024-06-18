@@ -111,11 +111,11 @@ else()
     add_custom_target(
       HwlocDLL ALL
       COMMAND ${CMAKE_COMMAND} -E make_directory
-              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+              ${RUNTIME_OUTPUT_DIRECTORY}
       COMMAND
         ${CMAKE_COMMAND} -E copy_if_different
         "${HWLOC_ROOT}/bin/libhwloc-15.dll"
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+        ${RUNTIME_OUTPUT_DIRECTORY}
     )
     add_hpx_pseudo_target(HwlocDLL)
   endif()
