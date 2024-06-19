@@ -9,6 +9,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/numeric.hpp>
 
 #include <cstddef>
 #include <iostream>
