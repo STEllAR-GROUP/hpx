@@ -8,7 +8,7 @@
 module purge
 module load cmake
 module load gcc/14
-module load boost/1.84.0-${build_type,,}
+module load boost/1.85.0-${build_type,,}
 module load hwloc
 module load openmpi
 
