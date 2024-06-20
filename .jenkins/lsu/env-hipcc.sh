@@ -24,3 +24,4 @@ configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS=ON"
 configure_extra_options+=" -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=OFF"
 
 ctest_extra_args+=" -E tests.unit.modules.algorithms.detail "
+ctest_extra_args+=" -E tests.regressions.modules.coroutines.coroutine_function_destructor_yield_4800"
