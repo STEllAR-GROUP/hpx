@@ -5,11 +5,12 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20 AND HPX_HAVE_CXX20_STD_IDENTITY)
-  set(HPX_WITH_STDEXEC ON CACHE BOOL "Enabled by default for C++20" FORCE)
-elseif(HPX_WITH_STDEXEC)
-  hpx_error(
-          "HPX_WITH_STDEXEC Requires C++20 or later and std::identity."
+  set(HPX_WITH_STDEXEC
+      ON
+      CACHE BOOL "Enabled by default for C++20" FORCE
   )
+elseif(HPX_WITH_STDEXEC)
+  hpx_error("HPX_WITH_STDEXEC Requires C++20 or later and std::identity.")
 endif()
 
 if(STDEXEC_ROOT AND NOT Stdexec_ROOT)
@@ -26,73 +27,73 @@ if(HPX_WITH_STDEXEC)
     )
   endif()
 
-    hpx_add_config_define(HPX_HAVE_STDEXEC)
+  hpx_add_config_define(HPX_HAVE_STDEXEC)
 
-    if(HPX_WITH_FETCH_STDEXEC)
-      hpx_info(
-        "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
+  if(HPX_WITH_FETCH_STDEXEC)
+    hpx_info(
+      "HPX_WITH_FETCH_STDEXEC=${HPX_WITH_FETCH_STDEXEC}, Stdexec will be fetched using CMake's FetchContent and installed alongside HPX (HPX_WITH_STDEXEC_TAG=${HPX_WITH_STDEXEC_TAG})"
+    )
+    if(UNIX)
+      include(FetchContent)
+      fetchcontent_declare(
+        Stdexec
+        GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
+        GIT_TAG ${HPX_WITH_STDEXEC_TAG}
       )
-      if(UNIX)
-        include(FetchContent)
-        fetchcontent_declare(
-          Stdexec
-          GIT_REPOSITORY https://github.com/NVIDIA/stdexec.git
-          GIT_TAG ${HPX_WITH_STDEXEC_TAG}
-        )
 
-        fetchcontent_getproperties(Stdexec)
-        if(NOT stdexec_POPULATED)
-          fetchcontent_populate(Stdexec)
-        endif()
-        set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
-
-        add_library(Stdexec INTERFACE)
-        target_include_directories(
-          Stdexec INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
-                            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-        )
-
-        install(
-          TARGETS Stdexec
-          EXPORT HPXStdexecTarget
-          COMPONENT core
-        )
-
-        install(
-          DIRECTORY ${Stdexec_ROOT}/include/
-          DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-          COMPONENT core
-          FILES_MATCHING
-          PATTERN "*.hpp"
-        )
-
-        export(
-          TARGETS Stdexec
-          NAMESPACE Stdexec::
-          FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXStdexecTarget.cmake"
-        )
-
-        install(
-          EXPORT HPXStdexecTarget
-          NAMESPACE Stdexec::
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
-          COMPONENT cmake
-        )
-
-        add_library(STDEXEC::stdexec ALIAS Stdexec)
-
-        # fetchcontent_makeavailable(Stdexec)
+      fetchcontent_getproperties(Stdexec)
+      if(NOT stdexec_POPULATED)
+        fetchcontent_populate(Stdexec)
       endif()
+      set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
 
-    else()
-      find_package(Stdexec REQUIRED)
+      add_library(Stdexec INTERFACE)
+      target_include_directories(
+        Stdexec INTERFACE $<BUILD_INTERFACE:${stdexec_SOURCE_DIR}/include>
+                          $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+      )
 
-      if(Stdexec_FOUND)
-        hpx_add_config_define(HPX_HAVE_STDEXEC)
-      else()
-        hpx_error(
-          "Stdexec could not be found, please specify Stdexec_ROOT to point to the correct location or enable HPX_WITH_FETCH_STDEXEC"
-        )
-      endif()
+      install(
+        TARGETS Stdexec
+        EXPORT HPXStdexecTarget
+        COMPONENT core
+      )
+
+      install(
+        DIRECTORY ${Stdexec_ROOT}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT core
+        FILES_MATCHING
+        PATTERN "*.hpp"
+      )
+
+      export(
+        TARGETS Stdexec
+        NAMESPACE Stdexec::
+        FILE "${CMAKE_CURRENT_BINARY_DIR}/lib/cmake/${HPX_PACKAGE_NAME}/HPXStdexecTarget.cmake"
+      )
+
+      install(
+        EXPORT HPXStdexecTarget
+        NAMESPACE Stdexec::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
+        COMPONENT cmake
+      )
+
+      add_library(STDEXEC::stdexec ALIAS Stdexec)
+
+      # fetchcontent_makeavailable(Stdexec)
     endif()
+
+  else()
+    find_package(Stdexec REQUIRED)
+
+    if(Stdexec_FOUND)
+      hpx_add_config_define(HPX_HAVE_STDEXEC)
+    else()
+      hpx_error(
+        "Stdexec could not be found, please specify Stdexec_ROOT to point to the correct location or enable HPX_WITH_FETCH_STDEXEC"
+      )
+    endif()
+  endif()
 endif()
