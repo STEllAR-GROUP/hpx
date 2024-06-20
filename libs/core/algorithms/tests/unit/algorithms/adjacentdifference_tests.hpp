@@ -10,6 +10,7 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/numeric.hpp>
 
 #include <cstddef>
 #include <iostream>
