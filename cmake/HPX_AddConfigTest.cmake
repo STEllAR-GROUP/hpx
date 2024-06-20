@@ -636,9 +636,9 @@ endfunction()
 # ##############################################################################
 function(hpx_check_for_cxx20_std_identity)
   add_hpx_config_test(
-          HPX_WITH_CXX20_STD_IDENTITY
-          SOURCE cmake/tests/cxx20_std_identity.cpp
-          FILE ${ARGN}
+    HPX_WITH_CXX20_STD_IDENTITY
+    SOURCE cmake/tests/cxx20_std_identity.cpp
+    FILE ${ARGN}
   )
 endfunction()
 
