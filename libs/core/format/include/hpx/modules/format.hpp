@@ -317,11 +317,7 @@ namespace hpx::util {
                         os << value.delim;
                     first = false;
 
-#if defined(HPX_CUDA_VERSION)
-                    using value_type = typename std::decay_t<Range>::value_type;
-#else
                     using value_type = std::decay_t<decltype(elem)>;
-#endif
                     detail::formatter<value_type>::call(os, spec, &elem);
                 }
             }

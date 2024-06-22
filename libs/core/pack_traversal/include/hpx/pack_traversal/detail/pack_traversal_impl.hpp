@@ -515,13 +515,8 @@ namespace hpx::util::detail {
             // I didn't want to pull a whole header for it in.
             for (auto&& val : container_accessor_of(HPX_FORWARD(T, container)))
             {
-#if defined(HPX_CUDA_VERSION)
-                remapped.push_back(
-                    spreading::unpack(HPX_FORWARD(M, mapper)(HPX_MOVE(val))));
-#else
                 remapped.push_back(spreading::unpack(
                     HPX_FORWARD(M, mapper)(HPX_FORWARD(decltype(val), val))));
-#endif
             }
 
             return remapped;    // RVO
