@@ -114,12 +114,16 @@ else()
       set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
     endif()
 
+    set(DLL_PATH "${HWLOC_ROOT}/bin/libhwloc-15.dll")
     add_custom_target(
       HwlocDLL ALL
       COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
-              "${HWLOC_ROOT}/bin/libhwloc-15.dll" ${EXE_DIRECTORY_PATH}
+              ${DLL_PATH} ${EXE_DIRECTORY_PATH}
     )
+    install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
     add_hpx_pseudo_target(HwlocDLL)
   endif()
+
+
 endif()
