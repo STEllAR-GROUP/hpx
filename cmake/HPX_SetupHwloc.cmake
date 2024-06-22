@@ -120,6 +120,9 @@ else()
       COMMAND ${CMAKE_COMMAND} -E copy_if_different
               "${HWLOC_ROOT}/bin/libhwloc-15.dll" ${EXE_DIRECTORY_PATH}
     )
+    install(FILES "${HWLOC_ROOT}/bin/libhwloc-15.dll" DESTINATION ${CMAKE_INSTALL_BINDIR})
     add_hpx_pseudo_target(HwlocDLL)
   endif()
+
+
 endif()
