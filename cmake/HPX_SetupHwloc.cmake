@@ -47,10 +47,10 @@ else()
       execute_process(
         COMMAND
           sh -c
-          "cd ${CMAKE_BINARY_DIR}/_deps/hwloc-src && ./configure --prefix=${CMAKE_BINARY_DIR}/_deps/hwloc-installed && make -j && make install"
+          "cd ${FETCHCONTENT_BASE_DIR}/hwloc-src && ./configure --prefix=${FETCHCONTENT_BASE_DIR}/hwloc-installed && make -j && make install"
       )
     endif()
-    set(HWLOC_ROOT "${CMAKE_BINARY_DIR}/_deps/hwloc-installed")
+    set(HWLOC_ROOT "${FETCHCONTENT_BASE_DIR}/hwloc-installed")
     set(Hwloc_INCLUDE_DIR
         ${HWLOC_ROOT}/include
         CACHE INTERNAL ""
@@ -84,7 +84,7 @@ else()
       fetchcontent_populate(HWLoc)
     endif()
     set(HWLOC_ROOT
-        "${CMAKE_BINARY_DIR}/_deps/hwloc-src"
+        "${FETCHCONTENT_BASE_DIR}/hwloc-src"
         CACHE INTERNAL ""
     )
     include_directories(${HWLOC_ROOT}/include)
@@ -108,15 +108,21 @@ else()
   target_link_libraries(Hwloc::hwloc INTERFACE ${Hwloc_LIBRARY})
 
   if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
+    if(RUNTIME_OUTPUT_DIRECTORY)
+      set(EXE_DIRECTORY_PATH "${RUNTIME_OUTPUT_DIRECTORY}")
+    else()
+      set(EXE_DIRECTORY_PATH "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/")
+    endif()
+
+    set(DLL_PATH "${HWLOC_ROOT}/bin/libhwloc-15.dll")
     add_custom_target(
       HwlocDLL ALL
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
-      COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-        "${HWLOC_ROOT}/bin/libhwloc-15.dll"
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${EXE_DIRECTORY_PATH}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${DLL_PATH}
+              ${EXE_DIRECTORY_PATH}
     )
+    install(FILES ${DLL_PATH} DESTINATION ${CMAKE_INSTALL_BINDIR})
     add_hpx_pseudo_target(HwlocDLL)
   endif()
+
 endif()
