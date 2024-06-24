@@ -119,7 +119,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-udp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-udp --disable-mpi --disable-smp --disable-ofi --disable-ucx && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -129,7 +129,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC --enable-smp && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" --enable-smp --disable-udp --disable-ofi --disable-mpi --disable-ucx && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -139,7 +139,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ofi --with-ofi-home=${OFI_DIR} --disable-smp --disable-mpi --disable-ucx --disable-udp --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -149,7 +149,7 @@ macro(hpx_setup_gasnet)
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-ucx --with-ucx-home=${UCX_DIR} --disable-smp --disable-mpi --disable-ofi --disable-udp --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
           RESULT_VARIABLE GASNET_BUILD_STATUS
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
@@ -157,40 +157,175 @@ macro(hpx_setup_gasnet)
         )
       elseif("${HPX_WITH_PARCELPORT_GASNET_CONDUIT}" STREQUAL "mpi")
         if(NOT MPI_FOUND)
-          message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
+          pkg_check_modules(
+            MPI
+            REQUIRED
+            GLOBAL
+            ompi
+            ompi-c
+            ompi_c
+            openmpi
+            mpi
+          )
+          if(NOT MPI_FOUND)
+            message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
+          endif()
         endif()
 
-        if(NOT TARGET Mpi::mpi)
-          message(FATAL_ERROR "GASNet MPI Conduit selected; MPI not found!")
-        endif()
-
-        if(${MPI_C_COMPILER})
-          set(MPI_C_COMPILER ${CMAKE_C_COMPILER})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        elseif(${MPI_CC})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
-        elseif($ENV{MPI_CC})
-          set(MPI_CC ${CMAKE_C_COMPILER})
-          set(ENV{MPI_CC} ${CMAKE_C_COMPILER})
+        if(NOT MPI_CFLAGS)
+          set(MPI_CFLAGS_STR "-fPIC")
         else()
-          message(FATAL_ERROR "GASNet MPI Conduit selected; $MPI_CC not found!")
+          list(LENGTH MPI_CFLAGS MPI_CFLAGS_COUNT)
+          if(MPI_CFLAGS_COUNT LESS "1")
+            set(MPI_CFLAGS_STR "-fPIC")
+          else()
+            set(MPI_CFLAGS_STR "")
+            list(JOIN MPI_CFLAGS " " MPI_CFLAGS_STR)
+          endif()
         endif()
 
-        if(NOT "$CMAKE_C_COMPILER" STREQUAL "${MPI_CC}")
-          message(FATAL_ERROR "GASNet MPI: $MPI_CC != $CMAKE_C_COMPILER!")
+        if(NOT MPI_CFLAGS_OTHER)
+          set(MPI_CFLAGS_OTHER_STR "")
+        else()
+          list(LENGTH MPI_CFLAGS_OTHER MPI_CFLAGS_OTHER_COUNT)
+          if(MPI_CFLAGS_OTHER_COUNT LESS "1")
+            set(MPI_CFLAGS_OTHER_STR "")
+          else()
+            set(MPI_CFLAGS_OTHER_STR "")
+            list(JOIN MPI_CFLAGS_OTHER " " MPI_CFLAGS_OTHER_STR)
+          endif()
         endif()
+
+        if(NOT MPI_LDFLAGS)
+          set(MPI_LDFLAGS_STR "")
+        else()
+          list(LENGTH MPI_LDFLAGS MPI_LDFLAGS_COUNT)
+          if(MPI_LDFLAGS_COUNT LESS "1")
+            set(MPI_LDFLAGS_STR "")
+          else()
+            set(MPI_LDFLAGS_STR "")
+            list(JOIN MPI_LDFLAGS " " MPI_LDFLAGS_STR)
+          endif()
+        endif()
+
+        if(NOT MPI_LIBRARIES)
+          set(MPI_LIBRARIES_STR "-lmpi")
+        else()
+          list(LENGTH MPI_LIBRARIES MPI_LIBRARIES_COUNT)
+          if(MPI_LIBRARIES_COUNT LESS "1")
+            set(MPI_LIBRARIES_STR "-lmpi")
+          else()
+            set(MPI_LIBRARIES_STR "")
+            list(JOIN MPI_LIBRARIES " -l" MPI_LIBRARIES_STR)
+            set(MPI_LIBRARIES_STR "-l${MPI_LIBRARIES_STR}")
+          endif()
+        endif()
+
+        if(NOT MPI_LIBRARY_DIRS)
+          set(MPI_LIBRARY_DIRS_STR "")
+        else()
+          list(LENGTH MPI_LIBRARY_DIRS MPI_LIBRARY_DIRS_COUNT)
+          if(MPI_LIBRARIES_DIRS_COUNT LESS "1")
+            set(MPI_LIBRARY_DIRS_STR "")
+          else()
+            set(MPI_LIBRARY_DIRS_STR "")
+            list(JOIN MPI_LIBRARY_DIRS " -l" MPI_LIBRARY_DIRS_STR)
+            set(MPI_LIBRARY_DIRS_STR "-l${MPI_LIBRARY_DIRS_STR}")
+          endif()
+        endif()
+
+        if(NOT MPI_INCLUDE_DIRS)
+          set(MPI_INCLUDE_DIRS_STR "")
+        else()
+          list(LENGTH MPI_INCLUDE_DIRS MPI_INCLUDE_DIRS_COUNT)
+          if(MPI_INCLUDE_DIRS_COUNT LESS "1")
+            set(MPI_INCLUDE_DIRS_STR "")
+          else()
+            set(MPI_INCLUDE_DIRS_STR "")
+            list(JOIN MPI_INCLUDE_DIRS " -I" MPI_INCLUDE_DIRS_STR)
+            set(MPI_INCLUDE_DIRS_STR "-I${MPI_INCLUDE_DIRS_STR}")
+          endif()
+        endif()
+
+        hpx_info("MPI version: " ${MPI_CXX_VERSION})
+
+        if(NOT MPI_FOUND)
+          message(
+            FATAL_ERROR
+              "GASNet MPI: MPI not found!"
+          )
+        endif()
+
+        message(
+          STATUS
+          "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+        )
 
         execute_process(
           COMMAND
             bash -c
-            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --with-mpi-libs=${MPI_C_LIBRARIES} --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
           WORKING_DIRECTORY ${GASNET_DIR}
-          RESULT_VARIABLE GASNET_BUILD_STATUS
+          RESULT_VARIABLE GASNET_BUILD_STATUS_A
           OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
           ERROR_FILE ${GASNET_ERROR_FILE}
         )
+
+        if(GASNET_BUILD_STATUS_A)
+          execute_process(
+            COMMAND
+              bash -c
+              "pkg-config --cflags ompi"
+            WORKING_DIRECTORY ${GASNET_DIR}
+            RESULT_VARIABLE PKGCONFIG_CFLAGS_STATUS
+            OUTPUT_VARIABLE PKGCONFIG_CFLAGS_FLAGS
+            OUTPUT_FILE PKGCONFIG_CFLAGS_OUTPUT
+            ERROR_FILE PKGCONFIG_CFLAGS_ERROR_FILE
+          )
+
+          execute_process(
+            COMMAND
+              bash -c
+              "pkg-config --libs ompi"
+            WORKING_DIRECTORY ${GASNET_DIR}
+            RESULT_VARIABLE PKGCONFIG_LIBS_STATUS
+            OUTPUT_VARIABLE PKGCONFIG_LIBS_FLAGS
+            OUTPUT_FILE PKGCONFIG_LIBS_OUTPUT
+            ERROR_FILE PKGCONFIG_LIBS_ERROR_FILE
+          )
+
+          if(NOT (PKGCONFIG_LIBS_STATUS AND PKGCONFIG_CFLAGS_STATUS))
+            message(
+              STATUS
+              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            )
+
+            execute_process(
+              COMMAND
+                bash -c
+                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CCFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" CXXFLAGS=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" --with-cxxflags=\"-fPIC ${PKGCONFIG_CFLAGS_FLAGS} ${PKGCONFIG_LIBS_FLAGS}\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+              WORKING_DIRECTORY ${GASNET_DIR}
+              RESULT_VARIABLE GASNET_BUILD_STATUS
+              OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+              ERROR_FILE ${GASNET_ERROR_FILE}
+            )
+          else()
+            message(
+              STATUS
+              "GASNet Build Command\nCC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=-fPIC CCFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=-fPIC --with-cxxflags=-fPIC && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+            )
+
+            execute_process(
+              COMMAND
+                bash -c
+                "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=\"-fPIC\" CCFLAGS=\"-fPIC\" CXXFLAGS=\"-fPIC\" ./configure --enable-mpi --with-mpi-cc=${CMAKE_C_COMPILER} --disable-udp --disable-smp --disable-ucx --disable-ofi --prefix=${GASNET_DIR}/install --with-cflags=\"-fPIC\" --with-cxxflags=\"-fPIC\" && make -j ${GASNET_BUILD_PARALLEL_LEVEL} && make install"
+              WORKING_DIRECTORY ${GASNET_DIR}
+              RESULT_VARIABLE GASNET_BUILD_STATUS
+              OUTPUT_FILE ${GASNET_BUILD_OUTPUT}
+              ERROR_FILE ${GASNET_ERROR_FILE}
+            )
+          endif()
+        endif()
       endif()
 
       if(GASNET_BUILD_STATUS)
@@ -199,6 +334,51 @@ macro(hpx_setup_gasnet)
             "GASNet build result = ${GASNET_BUILD_STATUS} - see ${GASNET_BUILD_OUTPUT} for more details"
         )
       else()
+
+        find_file(GASNET_TOOLS_PKGCONFIG_FILE_FOUND
+                  gasnet_tools-par.pc
+                  ${GASNET_DIR}/install/lib/pkgconfig
+        )
+
+        if(NOT GASNET_TOOLS_PKGCONFIG_FILE_FOUND)
+          message(
+            FATAL_ERROR
+              "PKG-CONFIG ERROR (${GASNET_TOOLS_PKGCONFIG_FILE_FOUND}) -> CANNOT FIND COMPILED GASNET_TOOLS: ${GASNET_DIR}/install/lib/pkgconfig"
+          )
+        endif()
+
+        install(CODE "set(GASNET_PATH \"${GASNET_DIR}\")")
+
+        install(
+          CODE [[
+          file(
+            READ
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet_tools-par.pc
+            GASNET_TOOLS_PKGCONFIG_FILE_CONTENT
+          )
+
+          if(NOT GASNET_TOOLS_PKGCONFIG_FILE_CONTENT)
+            message(FATAL_ERROR "ERROR INSTALLING GASNET_TOOLS")
+          endif()
+
+          string(REPLACE "${GASNET_PATH}/install" "${CMAKE_INSTALL_PREFIX}"
+                         GASNET_TOOLS_PKGCONFIG_FILE_CONTENT
+                         ${GASNET_TOOLS_PKGCONFIG_FILE_CONTENT}
+          )
+
+          file(
+            WRITE
+            ${GASNET_PATH}/install/lib/pkgconfig/gasnet_tools-par.pc
+            ${GASNET_TOOLS_PKGCONFIG_FILE_CONTENT}
+          )
+
+          file(GLOB_RECURSE GASNET_FILES ${GASNET_PATH}/install/*)
+
+          if(NOT GASNET_FILES)
+            message(STATUS "ERROR INSTALLING GASNET")
+          endif()
+        ]]
+        )
 
         find_file(GASNET_PKGCONFIG_FILE_FOUND
                   gasnet-${HPX_WITH_PARCELPORT_GASNET_CONDUIT}-par.pc

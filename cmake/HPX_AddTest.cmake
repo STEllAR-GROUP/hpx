@@ -91,6 +91,8 @@ function(add_hpx_test category name)
     set(Python_EXECUTABLE ${PYTHON_EXECUTABLE})
   endif()
 
+  set(ENV_VAR "")
+
   # cmake-format: off
   set(cmd
       "${Python_EXECUTABLE}"
@@ -196,7 +198,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet-smp" ${args}
+                                              "srun" ${args}
         )
         set_tests_properties(
           "${_full_name}"

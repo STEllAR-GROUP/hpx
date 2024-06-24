@@ -251,7 +251,7 @@ namespace hpx::util {
     bool gasnet_environment::check_gasnet_environment(
         util::runtime_configuration const& cfg)
     {
-#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE)
+#if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET)
         // We disable the GASNET parcelport if any of these hold:
         //
         // - The parcelport is explicitly disabled
@@ -278,7 +278,7 @@ namespace hpx::util {
     }
 }    // namespace hpx::util
 
-#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_MODULE_GASNET_BASE))
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_GASNET))
 
 namespace hpx::util {
 
