@@ -167,7 +167,8 @@ namespace hpx::threads {
                 id.noref(), threads::thread_description(desc));
 #endif
 #if defined(HPX_HAVE_THREAD_BACKTRACE_ON_SUSPENSION)
-            [[maybe_unused]] threads::detail::reset_backtrace reset_bt(id);
+            [[maybe_unused]] threads::detail::reset_backtrace reset_bt(
+                id.noref());
 #endif
 #if defined(HPX_HAVE_VERIFY_LOCKS)
             [[maybe_unused]] auto held_locks = hpx::experimental::scope_exit(
