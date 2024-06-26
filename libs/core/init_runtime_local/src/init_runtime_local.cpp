@@ -444,7 +444,7 @@ namespace hpx {
                     hpx::program_options::variables_map& vm)> const& f,
                 int argc, char** argv, init_params const& params, bool blocking)
             {
-                int result;
+                int result = 0;
                 try
                 {
                     if ((result = ensure_no_runtime_is_up()) != 0)

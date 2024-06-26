@@ -5,8 +5,14 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 function(add_hpx_test category name)
-  set(options FAILURE_EXPECTED RUN_SERIAL NO_PARCELPORT_TCP NO_PARCELPORT_MPI
-              NO_PARCELPORT_LCI NO_PARCELPORT_GASNET
+  set(options
+      FAILURE_EXPECTED
+      RUN_SERIAL
+      NO_PARCELPORT_TCP
+      NO_PARCELPORT_MPI
+      NO_PARCELPORT_LCI
+      NO_PARCELPORT_GASNET
+      NO_PARCELPORT_OPENSHMEM
   )
   set(one_value_args EXECUTABLE LOCALITIES THREADS_PER_LOCALITY TIMEOUT
                      RUNWRAPPER
@@ -196,7 +202,7 @@ function(add_hpx_test category name)
       if(_add_test)
         set(_full_name "${category}.distributed.gasnet.${name}")
         add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "gasnet" "-r"
-                                              "gasnet-smp" ${args}
+                                              "srun" ${args}
         )
         set_tests_properties(
           "${_full_name}"
@@ -204,6 +210,30 @@ function(add_hpx_test category name)
             RUN_SERIAL TRUE ENVIRONMENT
             "PATH=${PROJECT_BINARY_DIR}/_deps/gasnet-src/install/bin:$ENV{PATH}"
         )
+        if(${name}_TIMEOUT)
+          set_tests_properties(
+            "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}
+          )
+        endif()
+      endif()
+    endif()
+    if(HPX_WITH_PARCELPORT_OPENSHMEM AND NOT ${name}_NO_PARCELPORT_OPENSHMEM)
+      set(_add_test FALSE)
+      if(DEFINED ${name}_PARCELPORTS)
+        set(PP_FOUND -1)
+        list(FIND ${name}_PARCELPORTS "openshmem" PP_FOUND)
+        if(NOT PP_FOUND EQUAL -1)
+          set(_add_test TRUE)
+        endif()
+      else()
+        set(_add_test TRUE)
+      endif()
+      if(_add_test)
+        set(_full_name "${category}.distributed.openshmem.${name}")
+        add_test(NAME "${_full_name}" COMMAND ${cmd} "-p" "openshmem" "-r"
+                                              "srun" ${args}
+        )
+        set_tests_properties("${_full_name}" PROPERTIES RUN_SERIAL TRUE)
         if(${name}_TIMEOUT)
           set_tests_properties(
             "${_full_name}" PROPERTIES TIMEOUT ${${name}_TIMEOUT}

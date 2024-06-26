@@ -1239,6 +1239,25 @@ if(HPX_WITH_NETWORKING)
   endif()
 
   hpx_option(
+    HPX_WITH_PARCELPORT_OPENSHMEM BOOL "Enable the OPENSHMEM based parcelport."
+    OFF CATEGORY "Parcelport"
+  )
+  hpx_option(
+    HPX_WITH_FETCH_OPENSHMEM BOOL
+    "Download an OpenSHMEM if one is not available" OFF
+    CATEGORY "Build Targets"
+    ADVANCED
+  )
+  if(HPX_WITH_PARCELPORT_OPENSHMEM)
+    hpx_add_config_define(HPX_HAVE_PARCELPORT_OPENSHMEM)
+    hpx_option(
+      HPX_WITH_PARCELPORT_OPENSHMEM_CONDUIT STRING
+      "Define which conduit to use for the OpenSHMEM parcelport" "sos"
+      STRINGS "sos;ucx;mpi"
+    )
+  endif()
+
+  hpx_option(
     HPX_WITH_PARCELPORT_TCP BOOL "Enable the TCP based parcelport." ON
     CATEGORY "Parcelport"
   )
@@ -2252,6 +2271,10 @@ endif()
 if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_GASNET)
   include(HPX_SetupGasnet)
   hpx_setup_gasnet()
+endif()
+if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_OPENSHMEM)
+  include(HPX_SetupOpenSHMEM)
+  hpx_setup_openshmem()
 endif()
 
 # Setup packages and subprojects

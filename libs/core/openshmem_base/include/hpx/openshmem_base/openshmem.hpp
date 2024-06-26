@@ -1,0 +1,39 @@
+//  Copyright (c) 2023 Christoper Taylor
+//  Copyright (c) 2017 Mikael Simberg
+//
+//  SPDX-License-Identifier: BSL-1.0
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
+//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#pragma once
+
+#if (defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_OPENSHMEM))
+
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#endif
+
+#ifndef SHMEM_H
+#include <mpp/shmem.h>
+#endif
+
+#ifndef OSHMEM_HAVE_C11
+#define OSHMEM_HAVE_C11 1
+#endif
+
+#if defined(OSHMEM_HAVE_C11) && OSHMEM_HAVE_C11 == 0
+#undef OSHMEM_HAVE_C11
+#define OSHMEM_HAVE_C11 1
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+#endif
