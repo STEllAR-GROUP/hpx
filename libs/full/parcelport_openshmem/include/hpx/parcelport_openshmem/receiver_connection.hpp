@@ -72,7 +72,7 @@ namespace hpx::parcelset::policies::openshmem {
             if (piggy_back_data)
             {
                 need_recv_data = false;
-                memcpy(buffer_.data_.data(), piggy_back_data,
+                std::memcpy(buffer_.data_.data(), piggy_back_data,
                     buffer_.data_.size());
             }
             else
@@ -108,6 +108,9 @@ namespace hpx::parcelset::policies::openshmem {
         {
             const auto idx = hpx::util::openshmem_environment::rank();
 
+            const std::size_t sys_pgsz =
+                sysconf(_SC_PAGESIZE);
+
             // determine the size of the chunk buffer
             std::size_t num_zero_copy_chunks = static_cast<std::size_t>(
                 static_cast<std::uint32_t>(buffer_.num_chunks_.first));
@@ -119,14 +122,32 @@ namespace hpx::parcelset::policies::openshmem {
             if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
-                {
-                    while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                const std::size_t num_bytes =
+                    buffer_.transmission_chunks_.size() * sizeof(buffer_type::transmission_chunk_type);
+                const std::size_t rcv_numitrs =
+                    (num_bytes + sys_pgsz - 1) / sys_pgsz;
 
-		    std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data()),
-                        hpx::util::openshmem_environment::segments[idx].beg_addr,
-			buffer_.transmission_chunks_.size() * sizeof(buffer_type::transmission_chunk_type)
-		    );
+                const std::size_t rcv_numitrs_term = rcv_numitrs - 1;
+
+                {
+                    std::size_t data_seg [2] = { sys_pgsz, num_bytes % sys_pgsz };
+
+                    auto chunk_beg = 0;
+                    for(std::size_t i = 0; i < rcv_numitrs; ++i) {
+                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+
+    		        std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data())+chunk_beg,
+                            hpx::util::openshmem_environment::segments[idx].beg_addr,
+    			    data_seg[(i == rcv_numitrs_term)]
+    		        );
+
+                       if(i != rcv_numitrs_term) {
+                            (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                            chunk_beg = i * sys_pgsz;
+                            hpx::util::openshmem_environment::put_signal(nullptr, src_,
+                                nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
+                        }
+                    }
 
                     request_ptr_ = true;
                 }
@@ -154,13 +175,36 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 const auto idx = hpx::util::openshmem_environment::rank();
 
-                while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
-                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                const std::size_t sys_pgsz =
+                   sysconf(_SC_PAGESIZE);
 
-		std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data()),
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
-		    buffer_.data_.size() * sizeof(decltype(buffer_.data_))
-		);
+                const std::size_t num_bytes =
+                    buffer_.data_.size() * sizeof(decltype(buffer_.data_);
+
+                const std::size_t rcv_numitrs =
+                    (num_bytes + sys_pgsz - 1) / sys_pgsz;
+
+                const std::size_t rcv_numitrs_term = rcv_numitrs - 1;
+
+                std::size_t data_seg [2] = { sys_pgsz, num_bytes % sys_pgsz };
+
+                auto chunk_beg = 0;
+
+                for(std::size_t i = 0; i < rcv_numitrs; ++i) {
+                    while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+
+	    	    std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data())+chunk_beg,
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+    			data_seg[(i == rcv_numitrs_term)]
+		    );
+
+                    if(i != rcv_numitrs_term) {
+                       (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                       chunk_beg = i * sys_pgsz;
+                       hpx::util::openshmem_environment::put_signal(nullptr, src_,
+                          nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
+                    }
+                }
 
                 request_ptr_ = true;
             }
@@ -172,40 +216,47 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_chunks()
         {
-            std::size_t cidx = 0;
-            std::size_t chunk_size = 0;
+            const std::size_t sys_pgsz =
+                sysconf(_SC_PAGESIZE);
 
             const auto idx = hpx::util::openshmem_environment::rank();
 
-            while (chunks_idx_ < buffer_.chunks_.size())
-            {
-                if (!request_done())
-                {
-                    return false;
-                }
+            for(auto i = 0; i < buffer_.chunks_.size(); ++i) {
+                buffer_.chunks_[i].resize(buffer_.transmission_chunks_[i].second);
+            }
 
-                cidx = chunks_idx_++;
-                chunk_size =
-                    buffer_.transmission_chunks_[cidx].second;
+            for(auto i = 0; i < buffer_.chunks_.size(); ++i) {
+                data_type& c = buffer_.chunks_[i];
 
-                data_type& c = buffer_.chunks_[cidx];
-                c.resize(chunk_size);
-                {
+                const std::size_t num_bytes = c.size() * sizeof(decltype(c.data()));
+                std::size_t data_seg [2] = { sys_pgsz, num_bytes % sys_pgsz };
 
+                const std::size_t rcv_numitrs =
+                    (num_bytes + sys_pgsz - 1) / sys_pgsz;
+
+                const std::size_t rcv_numitrs_term = rcv_numitrs - 1;
+
+                auto chunk_beg = 0;
+
+                for(std::size_t i = 0; i < rcv_numitrs; ++i) {
                     while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
                     (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
-                    std::memcpy(reinterpret_cast<std::uint8_t*>(c.data()),
+                    std::memcpy(reinterpret_cast<std::uint8_t*>(c.data())+chunk_beg,
                         hpx::util::openshmem_environment::segments[idx].beg_addr,
-                        c.size() * sizeof(decltype(c.data()))
+                        data_seg[(i == rcv_numitrs_term)]
                     );
 
-                    hpx::util::openshmem_environment::put_signal(nullptr, src_,
-                        nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
-
-                    request_ptr_ = true;
+                    if(i != rcv_numitrs_term) {
+                        (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                        chunk_beg = i * sys_pgsz;
+                        hpx::util::openshmem_environment::put_signal(nullptr, src_,
+                            nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
+                    }
                 }
             }
+
+            request_ptr_ = true;
 
             state_ = rcvd_chunks;
 

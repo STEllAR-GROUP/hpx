@@ -150,6 +150,23 @@ namespace hpx::parcelset::policies::openshmem {
         {
             {
                 HPX_ASSERT(state_ == initialized);
+
+                const std::size_t sys_pgsz =
+                    sysconf(_SC_PAGESIZE);
+                const std::size_t page_count =
+                    hpx::util::openshmem_environment::size();
+                const std::size_t beg_rcv_signal =
+                    (sys_pgsz*page_count);
+
+                // header_.data_size_*sizeof(decltype(header_.data)),
+                const std::size_t data_amt = sizeof(header);
+                std::size_t data_seg [2] = { sys_pgsz, data_amt % sys_pgsz };
+
+                const std::size_t header_numitrs =
+                    (sizeof(header) + sys_pgsz - 1) / sys_pgsz;
+
+                const std::size_t header_numitrs_term = header_numitrs - 1;
+
                 const auto idx = dst_;
 
                 util::openshmem_environment::scoped_lock l;
@@ -157,12 +174,20 @@ namespace hpx::parcelset::policies::openshmem {
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
                 //
-                hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(header_.data()), dst_,
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    header_.data_size_*sizeof(decltype(header_.data)),
-                    hpx::util::openshmem_environment::segments[idx].rcv
-                );
+
+                for(std::size_t itr = 0; itr < header_numitrs; ++i) {
+                    hpx::util::openshmem_environment::put_signal(
+                        reinterpret_cast<std::uint8_t*>(header_.data()) + (itr * sys_pgsz), dst_,
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        data_seg[(itr == header_numitrs_term)],
+                        hpx::util::openshmem_environment::segments[idx].rcv
+                    );
+
+                    if(itr != header_numitrs_term) { 
+                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                        (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                    }
+                }
             }
 
             state_ = sent_header;
@@ -186,13 +211,45 @@ namespace hpx::parcelset::policies::openshmem {
 
                 util::openshmem_environment::scoped_lock l;
 
-                hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(chunks.data()), dst_,
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
+                const std::size_t sys_pgsz =
+                    sysconf(_SC_PAGESIZE);
+                const std::size_t page_count =
+                    hpx::util::openshmem_environment::size();
+                const std::size_t beg_rcv_signal =
+                    (sys_pgsz*page_count);
+
+                const std::size_t data_amt =
                     static_cast<int>(chunks.size() *
-                        sizeof(parcel_buffer_type::transmission_chunk_type)),
-                    hpx::util::openshmem_environment::segments[idx].rcv
-                );
+                        sizeof(parcel_buffer_type::transmission_chunk_type));
+
+                std::size_t data_seg [2] = { sys_pgsz, data_amt % sys_pgsz };
+
+                const std::size_t header_numitrs =
+                    ((data_amt + sys_pgsz - 1) / sys_pgsz) + data_seg[1] ? 0 : - 1;
+
+                const std::size_t header_numitrs_term = header_numitrs - 1;
+
+                const auto idx = dst_;
+
+                util::openshmem_environment::scoped_lock l;
+
+                // put from this localities openshmem shared memory segment
+                // into the remote locality (dst_)'s shared memory segment
+                //
+
+                for(std::size_t itr = 0; itr < header_numitrs; ++i) {
+                    hpx::util::openshmem_environment::put_signal(
+                        reinterpret_cast<std::uint8_t*>(chunks.data()) + (itr * sys_pgsz), dst_,
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        data_seg[(itr == header_numitrs_term)],
+                        hpx::util::openshmem_environment::segments[idx].rcv
+                    );
+
+                    if(itr != header_numitrs_term) { 
+                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                        (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                    }
+                }
             }
 
             state_ = sent_transmission_chunks;
@@ -213,12 +270,44 @@ namespace hpx::parcelset::policies::openshmem {
 
                 util::openshmem_environment::scoped_lock l;
 
-                hpx::util::openshmem_environment::put_signal(
-                    reinterpret_cast<std::uint8_t*>(buffer_.data_.data()), dst_,
-                    hpx::util::openshmem_environment::segments[idx].beg_addr,
-                    buffer_.data_.size() * sizeof(decltype(buffer_.data_.data)),
-                    hpx::util::openshmem_environment::segments[idx].rcv
-                );
+                const std::size_t sys_pgsz =
+                    sysconf(_SC_PAGESIZE);
+                const std::size_t page_count =
+                    hpx::util::openshmem_environment::size();
+                const std::size_t beg_rcv_signal =
+                    (sys_pgsz*page_count);
+
+                const std::size_t data_amt =
+                    buffer_.data_.size() * sizeof(decltype(buffer_.data_.data));
+
+                std::size_t data_seg [2] = { sys_pgsz, data_amt % sys_pgsz };
+
+                const std::size_t header_numitrs =
+                    ((data_amt + sys_pgsz - 1) / sys_pgsz) + data_seg[1] ? 0 : - 1;
+
+                const std::size_t header_numitrs_term = header_numitrs - 1;
+
+                const auto idx = dst_;
+
+                util::openshmem_environment::scoped_lock l;
+
+                // put from this localities openshmem shared memory segment
+                // into the remote locality (dst_)'s shared memory segment
+                //
+
+                for(std::size_t itr = 0; itr < header_numitrs; ++i) {
+                    hpx::util::openshmem_environment::put_signal(
+                        reinterpret_cast<std::uint8_t*>(buffer_.data_.data() + (itr * sys_pgsz)), dst_,
+                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        data_seg[(itr == header_numitrs_term)],
+                        hpx::util::openshmem_environment::segments[idx].rcv
+                    );
+
+                    if(itr != header_numitrs_term) {
+                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                        (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                    }
+                }
             }
             state_ = sent_data;
 
@@ -244,15 +333,42 @@ namespace hpx::parcelset::policies::openshmem {
                     {
                         util::openshmem_environment::scoped_lock l;
 
-                        hpx::util::openshmem_environment::put_signal(
-                            reinterpret_cast<const std::uint8_t*>(c.data_.cpos_), dst_,
-                            hpx::util::openshmem_environment::segments[idx].beg_addr,
-                            static_cast<int>(c.size_),
-                            hpx::util::openshmem_environment::segments[idx].rcv
-                        );
+                        const std::size_t sys_pgsz =
+                            sysconf(_SC_PAGESIZE);
+                        const std::size_t page_count =
+                            hpx::util::openshmem_environment::size();
+                        const std::size_t beg_rcv_signal =
+                            (sys_pgsz*page_count);
 
-                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].xmt, SHMEM_CMP_EQ, 1)) {}
-                        (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                        const std::size_t data_amt =
+                            static_cast<int>(c.size_);
+
+                        std::size_t data_seg [2] = { sys_pgsz, data_amt % sys_pgsz };
+
+                        const std::size_t header_numitrs =
+                            ((data_amt + sys_pgsz - 1) / sys_pgsz) + data_seg[1] ? 0 : - 1;
+
+                        const std::size_t header_numitrs_term = header_numitrs - 1;
+
+                        const auto idx = dst_;
+
+                        // put from this localities openshmem shared memory segment
+                        // into the remote locality (dst_)'s shared memory segment
+                        //
+
+                        for(std::size_t itr = 0; itr < header_numitrs; ++i) {
+                            hpx::util::openshmem_environment::put_signal(
+                                    reinterpret_cast<const std::uint8_t*>(c.data_.cpos_ + (itr * sys_pgsz)), dst_,
+                                hpx::util::openshmem_environment::segments[idx].beg_addr,
+                                data_seg[(itr == header_numitrs_term)],
+                                hpx::util::openshmem_environment::segments[idx].rcv
+                            );
+
+                            if(itr != header_numitrs_term) {
+                                while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                                (*(hpx::util::openshmem_environment::segments[idx].xmt)) = 0;
+                            }
+                        }
                     }
                 }
 
