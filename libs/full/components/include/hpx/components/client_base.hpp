@@ -335,9 +335,8 @@ namespace hpx::components {
         {
         }
         explicit client_base(hpx::future<hpx::id_type>&& f) noexcept
-          : shared_state_(
-                hpx::traits::future_access<future_type>::get_shared_state(
-                    HPX_MOVE(f)))
+          : shared_state_(hpx::traits::future_access<
+                hpx::future<hpx::id_type>>::get_shared_state(HPX_MOVE(f)))
         {
         }
 
