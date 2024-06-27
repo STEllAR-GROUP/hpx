@@ -99,7 +99,7 @@ namespace hpx::lcos::detail {
 
         virtual ~future_data_refcnt_base();
 
-        virtual void set_on_completed(completed_callback_type) = 0;
+        virtual void set_on_completed(completed_callback_type&&) = 0;
 
         HPX_FORCEINLINE bool requires_delete() noexcept
         {
@@ -313,7 +313,7 @@ namespace hpx::lcos::detail {
         // Set the callback which needs to be invoked when the future becomes
         // ready. If the future is ready the function will be invoked
         // immediately.
-        void set_on_completed(completed_callback_type data_sink) override;
+        void set_on_completed(completed_callback_type&& data_sink) override;
 
         virtual state wait(error_code& ec = throws);
 
