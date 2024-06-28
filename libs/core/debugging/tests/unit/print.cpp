@@ -9,6 +9,7 @@
 // are completely elided
 
 #include <hpx/debugging/print.hpp>
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/modules/timing.hpp>
 #include <hpx/threading_base/print.hpp>
@@ -32,6 +33,10 @@ int increment(std::atomic<int>& counter)
 
 int main()
 {
+#if defined(__FreeBSD__)
+    freebsd_environ = environ;
+#endif
+
     // some counters we will use for checking if anything happens or not
     std::atomic<int> enabled_counter(0);
     std::atomic<int> disabled_counter(0);

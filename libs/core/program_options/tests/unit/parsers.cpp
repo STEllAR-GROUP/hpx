@@ -5,6 +5,7 @@
 //  (See accompanying file LICENSE_1_0.txt
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/init_runtime_local/init_runtime_local.hpp>
 #include <hpx/modules/filesystem.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/program_options/option.hpp>
@@ -347,6 +348,10 @@ v3 = 3
 
 int main()
 {
+#if defined(__FreeBSD__)
+    freebsd_environ = environ;
+#endif
+
     test_command_line();
     test_environment();
     test_unregistered();

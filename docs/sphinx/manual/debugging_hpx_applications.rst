@@ -53,7 +53,7 @@ Using sanitizers with |hpx| applications
    applications.
 
 To use sanitizers with |hpx|, turn on ``HPX_WITH_SANITIZERS`` and turn
-off ``HPX_WITH_STACKOVERFLOW_DETECTION`` during |cmake| configuration. It's
+off ``HPX_WITH_STACKOVERFLOW_DETECTION`` during |cmake|_ configuration. It's
 recommended to also build |boost| with the same sanitizers that will be
 used for |hpx|. The appropriate sanitizers can then be enabled using |cmake| by
 appending ``-fsanitize=address -fno-omit-frame-pointer`` to ``CMAKE_CXX_FLAGS``

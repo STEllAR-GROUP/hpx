@@ -1,3 +1,6 @@
+* Wed Apr 17 2024 STE||AR Group <contact@stellar-group.org> 1.10.0
+- HPX Release 1.10.0 (https://hpx-docs.stellar-group.org/tags/1.10.0/html/releases/whats_new_1_10_0.html)
+
 * Fri Aug 04 2023 STE||AR Group <contact@stellar-group.org> 1.9.1
 - HPX Release 1.9.1 (https://hpx-docs.stellar-group.org/tags/1.9.1/html/releases/whats_new_1_9_1.html)
 
