@@ -183,6 +183,10 @@ namespace hpx {
             {
             }
 
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
             template <typename SharedState>
             void operator()(SharedState const& shared_state) const
             {
@@ -224,6 +228,9 @@ namespace hpx {
                     wait_.on_future_ready(shared_state->has_exception());
                 }
             }
+#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 140000
+#pragma GCC diagnostic pop
+#endif
 
             template <typename Tuple, std::size_t... Is>
             HPX_FORCEINLINE void apply(
