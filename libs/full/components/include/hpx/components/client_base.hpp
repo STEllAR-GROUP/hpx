@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file client_base.hpp
+/// \page hpx::components::client_base
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -279,6 +283,13 @@ namespace hpx::components {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    /// This class template serves as a base class for client components,
+    /// providing common functionality such as managing shared state, ID
+    /// retrieval, and asynchronous operations.
+    ///
+    /// @tparam Derived The derived client component type.
+    /// @tparam Stub The stub type used for communication.
+    /// @tparam Data The extra data type used for additional information.
     template <typename Derived, typename Stub, typename Data>
     class client_base : public detail::make_stub<Stub>::type
     {
