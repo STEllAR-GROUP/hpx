@@ -1,5 +1,5 @@
 //  Copyright (c) 2017-2021 Agustin Berge
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -317,7 +317,11 @@ namespace hpx::util {
                         os << value.delim;
                     first = false;
 
+#if defined(__NVCC__)
+                    using value_type = typename Range::value_type;
+#else
                     using value_type = std::decay_t<decltype(elem)>;
+#endif
                     detail::formatter<value_type>::call(os, spec, &elem);
                 }
             }

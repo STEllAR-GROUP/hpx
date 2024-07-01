@@ -268,12 +268,21 @@ namespace hpx::when_all_vector_detail {
                 for (auto&& sender : senders)
                 {
 #if defined(HPX_HAVE_CXX17_COPY_ELISION)
+#if defined(__NVCC__)
+                    op_states[i].emplace(
+                        hpx::util::detail::with_result_of([&]() {
+                            return hpx::execution::experimental::connect(
+                                std::move(sender),
+                                when_all_vector_receiver{*this, i});
+                        }));
+#else
                     op_states[i].emplace(
                         hpx::util::detail::with_result_of([&]() {
                             return hpx::execution::experimental::connect(
                                 HPX_MOVE(sender),
                                 when_all_vector_receiver{*this, i});
                         }));
+#endif
 #else
                     // MSVC doesn't get copy elision quite right, the operation
                     // state must be constructed explicitly directly in place
@@ -312,7 +321,11 @@ namespace hpx::when_all_vector_detail {
                             values.reserve(num_predecessors);
                             for (auto&& t : ts)
                             {
+#if defined(__NVCC__)
+                                values.push_back(std::move(t.value()));
+#else
                                 values.push_back(HPX_MOVE(t.value()));
+#endif
                             }
                             hpx::execution::experimental::set_value(
                                 HPX_MOVE(receiver), HPX_MOVE(values));
