@@ -22,6 +22,7 @@ set(benchmarks
     benchmark_unique
     benchmark_unique_copy
     foreach_report
+    unseq_first_n_report
     foreach_scaling
     transform_reduce_scaling
 )
