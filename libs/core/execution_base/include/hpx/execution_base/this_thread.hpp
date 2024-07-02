@@ -83,6 +83,16 @@ namespace hpx::execution_base {
     }    // namespace this_thread
 }    // namespace hpx::execution_base
 
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+namespace hpx::this_thread::experimental {
+    using namespace std::this_thread;
+    using stdexec::execute_may_block_caller;
+    using stdexec::execute_may_block_caller_t;
+
+    // this_thread::sync_wait is loaded in the sync_wait.hpp file.
+}    // namespace hpx::this_thread::experimental
+#else
 namespace hpx::this_thread::experimental {
 
     // [exec.sched_queries.execute_may_block_caller]
@@ -132,6 +142,7 @@ namespace hpx::this_thread::experimental {
         }
     } execute_may_block_caller{};
 }    // namespace hpx::this_thread::experimental
+#endif
 
 namespace hpx::util {
 
