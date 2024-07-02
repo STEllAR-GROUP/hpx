@@ -10,93 +10,6 @@
 
 #pragma once
 
-#if defined(DOXYGEN)
-// clang-format off
-namespace hpx { namespace distributed {
-
-    /// Latch is an implementation of a synchronization primitive that allows
-    /// multiple threads to wait for a shared event to occur before proceeding.
-    /// This latch can be invoked in a distributed application.
-    ///
-    /// For a local only latch \see hpx::latch.
-    class HPX_EXPORT latch;
-
-    /// Initialize the latch
-    ///
-    /// Requires: count >= 0.
-    /// Synchronization: None
-    /// Postconditions: counter_ == count.
-    ///
-    explicit latch(std::ptrdiff_t count);
-
-    /// Extension: Create a client side representation for the existing
-    /// \a server#latch instance with the given global id \a id.
-    latch(hpx::id_type const& id);
-
-    /// Extension: Create a client side representation for the existing
-    /// \a server#latch instance with the given global id \a id.
-    latch(hpx::future<hpx::id_type>&& f);
-
-    /// Extension: Create a client side representation for the existing
-    /// \a server#latch instance with the given global id \a id.
-    latch(hpx::shared_future<hpx::id_type> const& id);
-
-    /// Decrements counter_ by 1 . Blocks at the synchronization point
-    /// until counter_ reaches 0.
-    ///
-    /// Requires: counter_ > 0.
-    ///
-    /// Synchronization: Synchronizes with all calls that block on this
-    /// latch and with all is_ready calls on this latch that return true.
-    ///
-    /// \throws Nothing.
-    void count_down_and_wait();
-
-    /// Decrements counter_ by update . Blocks at the synchronization point
-    /// until counter_ reaches 0.
-    ///
-    /// Requires: counter_ > 0.
-    ///
-    /// Synchronization: Synchronizes with all calls that block on this
-    /// latch and with all is_ready calls on this latch that return true.
-    ///
-    /// \throws Nothing.
-    void arrive_and_wait();
-
-    /// Decrements counter_ by n. Does not block.
-    ///
-    /// Requires: counter_ >= n and n >= 0.
-    ///
-    /// Synchronization: Synchronizes with all calls that block on this
-    /// latch and with all is_ready calls on this latch that return true .
-    ///
-    /// \throws Nothing.
-    void count_down(std::ptrdiff_t n);
-
-    /// Returns: counter_ == 0. Does not block.
-    ///
-    /// \throws Nothing.
-    bool is_ready() const noexcept;
-
-    /// Returns: counter_ == 0. Does not block.
-    ///
-    /// \throws Nothing.
-    ///
-    bool try_wait() const noexcept;
-
-    /// If counter_ is 0, returns immediately. Otherwise, blocks the
-    /// calling thread at the synchronization point until counter_
-    /// reaches 0.
-    ///
-    /// \throws Nothing.
-    ///
-    void wait() const;
-
-}}    // namespace hpx::distributed
-
-// clang-format on
-#else
-
 #include <hpx/config.hpp>
 #include <hpx/collectives/detail/latch.hpp>
 #include <hpx/components/client_base.hpp>
@@ -257,5 +170,3 @@ namespace hpx::lcos {
 }    // namespace hpx::lcos
 
 #include <hpx/config/warnings_suffix.hpp>
-
-#endif    // DOXYGEN

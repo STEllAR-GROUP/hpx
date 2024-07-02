@@ -383,7 +383,7 @@ namespace hpx::util {
             node != static_cast<std::size_t>(-1) && vm.count("hpx:debug-clp");
 
         // create host name mapping
-        [[maybe_unused]] bool const have_tcp =
+        [[maybe_unused]] bool have_tcp =
             rtcfg_.get_entry("hpx.parcel.tcp.enable", "1") != "0";
         util::map_hostnames mapnames(debug_clp);
 
@@ -550,9 +550,14 @@ namespace hpx::util {
         run_agas_server = vm.count("hpx:run-agas-server") != 0;
         if (node == static_cast<std::size_t>(-1))
             node = env.retrieve_node_number();
+
+        // make sure that TCP parcelport will only be enabled if necessary
+        if (num_localities_ == 1 && !expect_connections)
+            have_tcp = false;
 #else
         num_localities_ = 1;
         node = 0;
+        have_tcp = false;
 #endif
 
         // If the user has not specified an explicit runtime mode we retrieve it

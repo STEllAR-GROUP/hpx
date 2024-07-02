@@ -59,14 +59,18 @@ endif()
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 10)
+set(HPX_VERSION_MINOR 11)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20230804)
+set(HPX_VERSION_DATE 20240529)
 set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
 )
+set(HPX_VERSION_FULL
+    "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}${HPX_VERSION_TAG}"
+)
+
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
@@ -150,6 +154,12 @@ if(MSVC)
 endif()
 
 # ##############################################################################
+# Disable check for compiler compatibility by default
+hpx_option(
+  HPX_WITH_IGNORE_COMPILER_COMPATIBILITY BOOL
+  "Ignore compiler incompatibility in dependent projects (default: ON)." ON
+  ADVANCED
+)
 
 # ##############################################################################
 # Set our build options cache variables which are customizable by users
@@ -157,7 +167,7 @@ endif()
 
 hpx_option(
   HPX_WITH_DEPRECATION_WARNINGS BOOL
-  "Enable warnings for deprecated facilities. (default: ON)" ON ADVANCED
+  "Enable warnings for deprecated facilities (default: ON)." ON ADVANCED
 )
 
 if(HPX_WITH_DEPRECATION_WARNINGS)
@@ -180,7 +190,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   hpx_option(
     HPX_WITH_STACKOVERFLOW_DETECTION
     BOOL
-    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    "Enable stackoverflow detection for HPX threads/coroutines (default: OFF, debug: ON)."
     ${HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT}
     ADVANCED
   )
@@ -933,6 +943,24 @@ if(HPX_WITH_SCHEDULER_LOCAL_STORAGE)
   hpx_add_config_define(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)
 endif()
 
+set(HPX_WITH_WORK_REQUESTING_SCHEDULERS_DEFAULT ON)
+if(APPLE)
+  set(HPX_WITH_WORK_REQUESTING_SCHEDULERS_DEFAULT OFF)
+endif()
+
+hpx_option(
+  HPX_WITH_WORK_REQUESTING_SCHEDULERS
+  BOOL
+  "Enable work requesting scheduler (default: ${HPX_WITH_WORK_REQUESTING_SCHEDULERS_DEFAULT})"
+  ${HPX_WITH_WORK_REQUESTING_SCHEDULERS_DEFAULT}
+  CATEGORY "Thread Manager"
+  ADVANCED
+)
+
+if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
+  hpx_add_config_define(HPX_HAVE_WORK_REQUESTING_SCHEDULERS)
+endif()
+
 hpx_option(
   HPX_WITH_SPINLOCK_POOL_NUM STRING
   "Number of elements a spinlock pool manages (default: 128)" 128
@@ -975,10 +1003,19 @@ if(HPX_WITH_APEX)
     "Do not update code from remote APEX repository." OFF CATEGORY "Profiling"
   )
   hpx_option(
-    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.3"
+    HPX_WITH_APEX_TAG STRING "APEX repository tag or branch" "v2.6.5"
     CATEGORY "Profiling"
   )
 endif()
+
+hpx_option(
+  HPX_WITH_FETCH_BOOST
+  BOOL
+  "Use FetchContent to fetch Boost. By default an installed Boost will be used. (default: OFF)"
+  OFF
+  CATEGORY "Build Targets"
+  ADVANCED
+)
 
 # Options for automatically fetching Asio
 hpx_option(
@@ -1179,7 +1216,7 @@ if(HPX_WITH_NETWORKING)
     ADVANCED
   )
   hpx_option(
-    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.6"
+    HPX_WITH_LCI_TAG STRING "LCI repository tag or branch" "v1.7.7"
     CATEGORY "Build Targets"
     ADVANCED
   )
@@ -1405,15 +1442,9 @@ hpx_option(
   OFF CATEGORY "Debugging"
 )
 
-set(HPX_WITH_VERIFY_LOCKS_DEFAULT OFF)
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  set(HPX_WITH_VERIFY_LOCKS_DEFAULT ON)
-endif()
-
 hpx_option(
   HPX_WITH_VERIFY_LOCKS BOOL
-  "Enable lock verification code (default: OFF, enabled in debug builds)"
-  ${HPX_WITH_VERIFY_LOCKS_DEFAULT}
+  "Enable lock verification code (default: OFF, enabled in debug builds)" OFF
   CATEGORY "Debugging"
   ADVANCED
 )
@@ -1691,8 +1722,12 @@ hpx_option(
 include(HPX_SetupCUDA)
 include(HPX_PerformCxxFeatureTests)
 hpx_perform_cxx_feature_tests()
+
 include(TargetArch)
 target_architecture(__target_arch)
+
+include(CacheLineSize)
+cache_line_size(__cache_line_size)
 
 # ##############################################################################
 # Set configuration option to use Boost.Context or not. This depends on the
@@ -2165,6 +2200,7 @@ else()
     )
   endif()
 endif()
+hpx_info("Cacheline size detected: ${__cache_line_size}")
 
 # store target architecture for later use
 set(HPX_WITH_TARGET_ARCHITECTURE
@@ -2320,7 +2356,7 @@ if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
 )
   string(REGEX MATCH "^release-[0-9]+.[0-9]+.X$" matched ${HPX_WITH_GIT_BRANCH})
   if(matched)
-    set(HPX_WITH_GIT_TAG "v${HPX_VERSION}")
+    set(HPX_WITH_GIT_TAG "v${HPX_VERSION_FULL}")
     hpx_info("Setting HPX_WITH_GIT_TAG to: " "${HPX_WITH_GIT_TAG}")
   endif()
 endif()
@@ -2357,18 +2393,6 @@ endif()
 
 if(HPX_WITH_EXAMPLES)
   add_hpx_pseudo_target(examples)
-  if(HPX_WITH_FETCH_HWLOC AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-    add_custom_target(
-      HwlocDLL ALL
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-              "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
-      COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-        "${HWLOC_ROOT}/bin/libhwloc-15.dll"
-        "${CMAKE_BINARY_DIR}/$<CONFIG>/bin/"
-    )
-    add_hpx_pseudo_dependencies(examples HwlocDLL)
-  endif()
 endif()
 
 # ##############################################################################

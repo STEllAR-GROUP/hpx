@@ -8,6 +8,7 @@
 
 #if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
 
+#include <hpx/serialization/boost_variant.hpp>
 #include <hpx/serialization/input_archive.hpp>
 #include <hpx/serialization/output_archive.hpp>
 #include <hpx/serialization/serialize.hpp>
@@ -52,7 +53,9 @@ struct A
     template <typename Archive>
     void serialize(Archive& ar, unsigned)
     {
-        ar& t_;
+        // clang-format off
+        ar & t_;
+        // clang-format on
     }
 };
 

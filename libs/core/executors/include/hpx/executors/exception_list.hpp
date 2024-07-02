@@ -58,7 +58,6 @@ namespace hpx::parallel {
             static Result call(hpx::future<Result> f)
             {
                 HPX_ASSERT(f.has_exception());
-
                 return f.get();
             }
 

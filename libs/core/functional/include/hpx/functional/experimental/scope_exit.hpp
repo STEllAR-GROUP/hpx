@@ -7,6 +7,9 @@
 //  Copyright (c) 2020 Martin Moene
 //  This is inspired by https://github.com/martinmoene/scope-lite
 
+/// \page hpx::experimental::scope_exit
+/// \headerfile hpx/experimental/scope.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -67,6 +70,12 @@ namespace hpx::experimental {
         };
     }    // namespace detail
 
+    /// \brief The class template scope_exit is a general-purpose scope guard
+    ///        intended to call its exit function when a scope is exited.
+    ///
+    /// \tparam F type of stored exit function
+    ///
+    /// \param f stored exit function
     template <typename F>
     auto scope_exit(F&& f)
     {

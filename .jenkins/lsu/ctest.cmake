@@ -44,30 +44,60 @@ set(CTEST_CONFIGURE_COMMAND
 ctest_start(Experimental TRACK "${CTEST_TRACK}")
 
 ctest_update()
-ctest_submit(PARTS Update BUILD_ID __ctest_build_id)
+ctest_submit(
+  PARTS Update
+  BUILD_ID __ctest_build_id
+  RETURN_VALUE __update_result
+)
 if(__ctest_build_id)
   set(CTEST_BUILD_ID ${__ctest_build_id})
 endif()
 
+set(ctest_submission_result "CTest submission results:\n")
+
 ctest_configure()
-ctest_submit(PARTS Configure BUILD_ID __ctest_build_id)
+ctest_submit(
+  PARTS Configure
+  BUILD_ID __ctest_build_id
+  RETURN_VALUE __configure_result
+)
 if(NOT CTEST_BUILD_ID AND __ctest_build_id)
   set(CTEST_BUILD_ID ${__ctest_build_id})
 endif()
+set(ctest_submission_result ${ctest_submission_result} "Configure: "
+                            ${__configure_result} "\n"
+)
 
 ctest_build(TARGET all FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
 ctest_build(TARGET tests FLAGS "-k0 -j ${CTEST_BUILD_PARALLELISM}")
-ctest_submit(PARTS Build BUILD_ID __ctest_build_id)
+ctest_submit(
+  PARTS Build
+  BUILD_ID __ctest_build_id
+  RETURN_VALUE __build_result
+)
 if(NOT CTEST_BUILD_ID AND __ctest_build_id)
   set(CTEST_BUILD_ID ${__ctest_build_id})
 endif()
+set(ctest_submission_result ${ctest_submission_result} "Build: "
+                            ${__build_result} "\n"
+)
 
 ctest_test(PARALLEL_LEVEL "${CTEST_TEST_PARALLELISM}")
-ctest_submit(PARTS Test BUILD_ID __ctest_build_id)
+ctest_submit(
+  PARTS Test
+  BUILD_ID __ctest_build_id
+  RETURN_VALUE __test_result
+)
 if(NOT CTEST_BUILD_ID AND __ctest_build_id)
   set(CTEST_BUILD_ID ${__ctest_build_id})
 endif()
+set(ctest_submission_result ${ctest_submission_result} "Tests: "
+                            ${__test_result} "\n"
+)
 
 file(WRITE "jenkins-hpx-${CTEST_BUILD_CONFIGURATION_NAME}-cdash-build-id.txt"
      "${CTEST_BUILD_ID}"
+)
+file(WRITE "jenkins-hpx-${CTEST_BUILD_CONFIGURATION_NAME}-cdash-submission.txt"
+     ${ctest_submission_result}
 )

@@ -54,7 +54,7 @@ namespace hpx::plugins::parcel::detail {
         {
         }
 
-        message_buffer& operator=(message_buffer&& rhs)
+        message_buffer& operator=(message_buffer&& rhs) noexcept
         {
             if (&rhs != this)
             {

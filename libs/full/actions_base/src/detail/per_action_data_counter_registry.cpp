@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <string>
 #include <utility>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     per_action_data_counter_registry&
@@ -37,7 +37,7 @@ namespace hpx { namespace actions { namespace detail {
                 "Cannot register an action with an empty name");
         }
 
-        auto it = map_.find(name);
+        auto const it = map_.find(name);
         if (it == map_.end())
         {
             map_.emplace(HPX_MOVE(name));
@@ -48,16 +48,15 @@ namespace hpx { namespace actions { namespace detail {
     per_action_data_counter_registry::get_counter(std::string const& name,
         hpx::function<std::int64_t(std::string const&, bool)> const& f) const
     {
-        map_type::const_iterator it = map_.find(name);
+        map_type::const_iterator const it = map_.find(name);
         if (it == map_.end())
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "per_action_data_counter_registry::get_receive_counter",
                 "unknown action type");
-            return nullptr;
         }
         return hpx::bind_front(f, name);
     }
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #endif

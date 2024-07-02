@@ -362,7 +362,7 @@ namespace hpx::parcelset {
 
         // flush all parcel buffers
         if (0 == num_thread &&
-            (mode & parcelport_background_mode_flush_buffers))
+            (mode & parcelport_background_mode::flush_buffers))
         {
             std::unique_lock<mutex_type> l(handlers_mtx_, std::try_to_lock);
 

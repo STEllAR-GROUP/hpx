@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2023 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -217,10 +217,10 @@ namespace hpx::traits {
         struct broadcast_tag;
 
         template <>
-        constexpr char const* communicator_name<broadcast_tag>() noexcept
+        struct communicator_data<broadcast_tag>
         {
-            return "broadcast";
-        }
+            HPX_EXPORT static char const* name() noexcept;
+        };
     }    // namespace communication
 
     template <typename Communicator>
@@ -233,11 +233,13 @@ namespace hpx::traits {
             using data_type = typename Result::result_type;
 
             return communicator.template handle_data<data_type>(
+                communication::communicator_data<
+                    communication::broadcast_tag>::name(),
                 which, generation,
                 // no step function
                 nullptr,
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, auto&) {
+                [](auto& data, auto&, std::size_t) {
                     return Communicator::template handle_bool<data_type>(
                         data[0]);
                 },
@@ -249,11 +251,13 @@ namespace hpx::traits {
             std::size_t generation, T&& t)
         {
             return communicator.template handle_data<std::decay_t<T>>(
+                communication::communicator_data<
+                    communication::broadcast_tag>::name(),
                 which, generation,
                 // step function (invoked once for set)
-                [&](auto& data) { data[0] = HPX_FORWARD(T, t); },
+                [&t](auto& data, std::size_t) { data[0] = HPX_FORWARD(T, t); },
                 // finalizer (invoked after all sites have checked in)
-                [](auto& data, auto&) {
+                [](auto& data, auto&, std::size_t) {
                     return Communicator::template handle_bool<std::decay_t<T>>(
                         data[0]);
                 },
@@ -298,7 +302,7 @@ namespace hpx::collectives {
             {
                 // make sure id is kept alive as long as the returned future
                 traits::detail::get_shared_state(result)->set_on_completed(
-                    [client = HPX_MOVE(c)]() { HPX_UNUSED(client); });
+                    [client = HPX_MOVE(c)] { HPX_UNUSED(client); });
             }
 
             return result;

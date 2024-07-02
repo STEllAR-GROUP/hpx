@@ -1,4 +1,5 @@
 # Copyright (c) 2021 ETH Zurich
+# Copyright (c) 2024 The STE||AR Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,6 +10,8 @@ configure_extra_options+=" -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=ON"
 if [ "${build_type}" = "Debug" ]; then
     configure_extra_options+=" -DHPX_WITH_PARCELPORT_COUNTERS=ON"
     configure_extra_options+=" -DLCI_DEBUG=ON"
+    configure_extra_options+=" -DHPX_WITH_VERIFY_LOCKS=ON"
+#    configure_extra_options+=" -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON"
 fi
 
 ctest_extra_args+=" --verbose "

@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -16,6 +16,7 @@
 #include <string>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Return the name of the calling thread.
     ///

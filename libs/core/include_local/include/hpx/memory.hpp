@@ -10,3 +10,6 @@
 #include <hpx/parallel/container_memory.hpp>
 #include <hpx/parallel/memory.hpp>
 #include <hpx/type_support/construct_at.hpp>
+#include <hpx/type_support/is_relocatable.hpp>
+#include <hpx/type_support/is_trivially_relocatable.hpp>
+#include <hpx/type_support/relocate_at.hpp>

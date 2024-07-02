@@ -4,7 +4,37 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file async.hpp
+/// \page hpx::async (distributed)
+/// \headerfile hpx/async.hpp
+
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    /// \brief The distributed implementation of \c hpx::async can be used by
+    ///        giving an action instance as argument instead of a function,
+    ///        and also by providing another argument with the locality ID or
+    ///        the target ID. The action executes asynchronously.
+    ///
+    /// \tparam Action The type of action instance
+    /// \tparam Target The type of target where the action should be executed
+    /// \tparam Ts     The type of any additional arguments
+    ///
+    /// \param action  The action instance to be executed
+    /// \param target  The target where the action should be executed
+    /// \param ts      Additional arguments
+    ///
+    /// \returns \c hpx::future referring to the shared state created by this call to \c hpx::async
+    template <typename Action, typename Target, typename... Ts>
+    HPX_FORCEINLINE auto async(Action&& action, Target&& target, Ts&&... ts);
+    // clang-format on
+}    // namespace hpx
+
+#else
 
 #include <hpx/config.hpp>
 #include <hpx/actions_base/traits/extract_action.hpp>
@@ -315,3 +345,5 @@ struct hpx::detail::async_dispatch<Bound,
         return bound.async(HPX_FORWARD(Us, vs)...);
     }
 };
+
+#endif

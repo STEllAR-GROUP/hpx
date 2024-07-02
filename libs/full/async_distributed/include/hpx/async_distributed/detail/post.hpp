@@ -50,7 +50,8 @@ namespace hpx {
         template <typename Action>
         inline naming::address&& complement_addr(naming::address& addr)
         {
-            if (components::component_invalid == addr.type_)
+            if (to_int(hpx::components::component_enum_type::invalid) ==
+                addr.type_)
             {
                 addr.type_ = components::get_component_type<
                     typename Action::component_type>();

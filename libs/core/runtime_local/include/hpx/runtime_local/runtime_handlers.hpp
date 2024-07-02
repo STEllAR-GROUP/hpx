@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -16,7 +16,8 @@
 #include <cstddef>
 #include <string>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
+
     [[noreturn]] HPX_CORE_EXPORT void assertion_handler(
         hpx::source_location const& loc, const char* expr,
         std::string const& msg);
@@ -32,4 +33,4 @@ namespace hpx { namespace detail {
     HPX_CORE_EXPORT threads::mask_type get_pu_mask(
         threads::topology& topo, std::size_t thread_num);
     HPX_CORE_EXPORT asio::io_context& get_default_timer_service();
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

@@ -968,15 +968,12 @@ namespace hpx {
 
                 // Command line handling should have updated this by now.
                 HPX_ASSERT(cmdline.rtcfg_.mode_ != runtime_mode::default_);
-                switch (cmdline.rtcfg_.mode_)
-                {
-                case runtime_mode::local:
+                if (cmdline.rtcfg_.mode_ == runtime_mode::local)
                 {
                     LPROGRESS_ << "creating local runtime";
                     rt.reset(new hpx::runtime(cmdline.rtcfg_, true));
-                    break;
                 }
-                default:
+                else
                 {
 #if defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
                     for (auto const& registry : component_registries)
@@ -989,7 +986,6 @@ namespace hpx {
                     LPROGRESS_ << "creating distributed runtime";
                     rt.reset(new hpx::runtime_distributed(cmdline.rtcfg_,
                         &hpx::detail::pre_main, &hpx::detail::post_main));
-                    break;
 #else
                     HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                         "run_or_start",
@@ -1000,9 +996,7 @@ namespace hpx {
                         "Recompile HPX with HPX_WITH_DISTRIBUTED_RUNTIME=ON or "
                         "change the runtime mode.",
                         get_runtime_mode_name(cmdline.rtcfg_.mode_));
-                    break;
 #endif
-                }
                 }
 
                 // Store application defined command line options

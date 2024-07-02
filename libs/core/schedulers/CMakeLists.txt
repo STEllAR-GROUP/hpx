@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,6 @@ set(schedulers_headers
     hpx/schedulers/deadlock_detection.hpp
     hpx/schedulers/local_priority_queue_scheduler.hpp
     hpx/schedulers/local_queue_scheduler.hpp
-    hpx/schedulers/local_workrequesting_scheduler.hpp
     hpx/schedulers/lockfree_queue_backends.hpp
     hpx/schedulers/maintain_queue_wait_times.hpp
     hpx/schedulers/queue_helpers.hpp
@@ -24,6 +23,12 @@ set(schedulers_headers
     hpx/schedulers/thread_queue_mc.hpp
     hpx/modules/schedulers.hpp
 )
+
+if(HPX_WITH_WORK_REQUESTING_SCHEDULERS)
+  set(schedulers_headers ${schedulers_headers}
+                         hpx/schedulers/local_workrequesting_scheduler.hpp
+  )
+endif()
 
 # cmake-format: off
 set(schedulers_compat_headers
@@ -63,5 +68,6 @@ add_hpx_module(
     hpx_logging
     hpx_synchronization
     hpx_threading_base
+    hpx_type_support
   CMAKE_SUBDIRS examples tests
 )

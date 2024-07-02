@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2022 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -103,17 +103,18 @@ namespace hpx::actions {
     }
 
     // saving ...
-    void base_action_data::save_base(hpx::serialization::output_archive& ar)
+    void base_action_data::save_base(
+        hpx::serialization::output_archive& ar) const
     {
         // Always serialize the parent information to maintain binary
         // compatibility on the wire.
 
 #if !defined(HPX_HAVE_THREAD_PARENT_REFERENCE)
-        std::uint32_t parent_locality_ = naming::invalid_locality_id;
-        threads::thread_id_type parent_id_;
-        std::uint64_t parent_phase_ = 0;
+        constexpr std::uint32_t parent_locality_ = naming::invalid_locality_id;
+        threads::thread_id_type const parent_id_;
+        constexpr std::uint64_t parent_phase_ = 0;
 #endif
-        detail::action_serialization_data data(
+        detail::action_serialization_data const data(
             parent_locality_, parent_id_, parent_phase_, priority_, stacksize_);
         ar << data;
     }

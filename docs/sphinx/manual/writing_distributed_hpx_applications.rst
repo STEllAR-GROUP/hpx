@@ -9,9 +9,9 @@
 
 .. _writing_distributed_hpx_applications:
 
-======================================
-Writing distributed |hpx| applications
-======================================
+================================
+Writing distributed applications
+================================
 
 This section focuses on the features of |hpx| needed to write distributed
 applications, namely the :term:`Active Global Address Space` (:term:`AGAS`),
@@ -234,7 +234,7 @@ extensions added by |hpx| (light gray) where:
 * ``R``: return type of ``f``,
 * ``action``: action type defined by, :c:macro:`HPX_DEFINE_PLAIN_ACTION` or
   :c:macro:`HPX_DEFINE_COMPONENT_ACTION` encapsulating ``f``,
-* ``a``: an instance of the type ```action``,
+* ``a``: an instance of the type ``action``,
 * ``id``: the global address the action is applied to.
 
 .. _figure_hpx_the_api:
@@ -243,9 +243,9 @@ extensions added by |hpx| (light gray) where:
 
    Overview of the main API exposed by |hpx|.
 
-This figure shows that |hpx| allows the user to ``post` actions with a syntax
+This figure shows that |hpx| allows the user to ``post`` actions with a syntax
 similar to the C++ standard. In fact, all action types have an overloaded
-function operator allowing to synchronously ``post the action. Further, |hpx|
+function operator allowing to synchronously ``post`` the action. Further, |hpx|
 implements ``hpx::async`` which semantically works similar to the
 way ``std::async`` works for plain C++ function.
 
@@ -800,6 +800,52 @@ calls of the server side implementation objects corresponding to the
 Using component instances
 -------------------------
 
+After having created the component instances as described above, we can simply
+use them as indicated below::
+
+    #include <hpx/include/components.hpp>
+    #include <iostream>
+    #include <vector>
+
+    // Define a simple component
+    struct some_component : hpx::components::component_base<some_component>
+    {
+        void print() const
+        {
+            std::cout << "Hello from component instance!" << std::endl;
+        }
+        HPX_DEFINE_COMPONENT_ACTION(some_component, print, print_action);
+    };
+
+    typedef some_component::print_action print_action;
+
+    // Create one instance on the given locality
+    hpx::id_type here = hpx::find_here();
+    hpx::future<hpx::id_type> f1 =
+        hpx::new_<some_component>(here);
+
+    // Get the future value
+    hpx::id_type instance_id = f1.get();
+
+    // Invoke action on the instance
+    hpx::async<print_action>(instance_id).get();
+
+    // Create multiple instances on the given locality
+    int num = 3;
+    hpx::future<std::vector<hpx::id_type>> f2 =
+        hpx::new_<some_component[]>(here, num);
+
+    // Get the future value
+    std::vector<hpx::id_type> instance_ids = f2.get();
+
+    // Invoke action on each instance
+    for (const auto& id : instance_ids)
+    {
+        hpx::async<print_action>(id).get();
+    }
+
+We can use the component instances with distribution policies the same way.
+
 .. _containers:
 
 Segmented containers
@@ -918,7 +964,7 @@ Segmented containers
    * * Name
      * Description
      * In header
-     * Class page at cppreference.com
+     * C++ standard
    * * ``hpx::partitioned_vector``
      * Dynamic segmented contiguous array.
      * ``<hpx/include/partitioned_vector.hpp>``
@@ -929,7 +975,7 @@ Segmented containers
    * * Name
      * Description
      * In header
-     * Class page at cppreference.com
+     * C++ standard
    * * ``hpx::unordered_map``
      * Segmented collection of key-value pairs, hashed by keys, keys are unique.
      * ``<hpx/include/unordered_map.hpp>``
@@ -1015,7 +1061,7 @@ Using views
 The use of multidimensional arrays is quite common in the numerical field
 whether to perform dense matrix operations or to process images. It exist many
 libraries which implement such object classes overloading their basic operators
-(e.g.``+``, ``-``, ``*``, ``()``, etc.). However, such operation becomes more
+(e.g. ``+``, ``-``, ``*``, ``()``, etc.). However, such operation becomes more
 delicate when the underlying data layout is segmented or when it is mandatory to
 use optimized linear algebra subroutines (i.e. BLAS subroutines).
 
@@ -1057,8 +1103,8 @@ variable as a first parameter::
 
 The ``spmd_block`` class contains the following methods:
 
-* [def Team information] ``get_num_images``, ``this_image``, ``images_per_locality``
-* [def Control statements] ``sync_all``, ``sync_images``
+* Team information: ``get_num_images``, ``this_image``, ``images_per_locality``
+* Control statements: ``sync_all``, ``sync_images``
 
 Here is a sample code summarizing the features offered by the ``spmd_block``
 class::

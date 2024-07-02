@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,7 +21,6 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/runtime_components/create_component_helpers.hpp>
 #include <hpx/serialization/base_object.hpp>
-#include <hpx/type_support/unused.hpp>
 
 #include <algorithm>
 #include <cstddef>
@@ -30,15 +29,14 @@
 #include <utility>
 #include <vector>
 
-namespace hpx { namespace compute { namespace host {
+namespace hpx::compute::host {
 
     /// A target_distribution_policy used for CPU bound localities.
     struct target_distribution_policy
       : compute::detail::target_distribution_policy<host::distributed::target>
     {
-        typedef compute::detail::target_distribution_policy<
-            host::distributed::target>
-            base_type;
+        using base_type = compute::detail::target_distribution_policy<
+            host::distributed::target>;
 
         /// Default-construct a new instance of a \a target_distribution_policy.
         /// This policy will represent all devices on the current locality.
@@ -49,57 +47,58 @@ namespace hpx { namespace compute { namespace host {
         /// set of targets
         ///
         /// \param targets [in] The targets the new instances should represent
+        /// \param num_partitions
         ///
         target_distribution_policy operator()(
             std::vector<target_type> const& targets,
-            std::size_t num_partitions = std::size_t(-1)) const
+            std::size_t num_partitions = static_cast<std::size_t>(-1)) const
         {
-            if (num_partitions == std::size_t(-1))
+            if (num_partitions == static_cast<std::size_t>(-1))
                 num_partitions = targets.size();
-            return target_distribution_policy(targets, num_partitions);
+            return {targets, num_partitions};
         }
 
         /// Create a new \a target_distribution_policy representing the given
         /// set of targets
         ///
         /// \param targets [in] The targets the new instances should represent
+        /// \param num_partitions
         ///
         target_distribution_policy operator()(
             std::vector<target_type>&& targets,
-            std::size_t num_partitions = std::size_t(-1)) const
+            std::size_t num_partitions = static_cast<std::size_t>(-1)) const
         {
-            if (num_partitions == std::size_t(-1))
+            if (num_partitions == static_cast<std::size_t>(-1))
                 num_partitions = targets.size();
-            return target_distribution_policy(
-                HPX_MOVE(targets), num_partitions);
+            return {HPX_MOVE(targets), num_partitions};
         }
 
         /// Create a new \a target_distribution_policy representing the given
         /// target
         ///
         /// \param target [in] The target the new instances should represent
+        /// \param num_partitions
         ///
         target_distribution_policy operator()(
             target_type const& target, std::size_t num_partitions = 1) const
         {
             std::vector<target_type> targets;
             targets.push_back(target);
-            return target_distribution_policy(
-                HPX_MOVE(targets), num_partitions);
+            return {HPX_MOVE(targets), num_partitions};
         }
 
         /// Create a new \a target_distribution_policy representing the given
         /// target
         ///
         /// \param target [in] The target the new instances should represent
+        /// \param num_partitions
         ///
         target_distribution_policy operator()(
             target_type&& target, std::size_t num_partitions = 1) const
         {
             std::vector<target_type> targets;
             targets.push_back(HPX_MOVE(target));
-            return target_distribution_policy(
-                HPX_MOVE(targets), num_partitions);
+            return {HPX_MOVE(targets), num_partitions};
         }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
@@ -126,15 +125,15 @@ namespace hpx { namespace compute { namespace host {
 #endif
 
         /// \cond NOINTERNAL
-        typedef std::pair<hpx::id_type, std::vector<hpx::id_type>>
-            bulk_locality_result;
+        using bulk_locality_result =
+            std::pair<hpx::id_type, std::vector<hpx::id_type>>;
         /// \endcond
 
         /// Create multiple objects on the localities associated by
         /// this policy instance
         ///
         /// \param count [in] The number of objects to create
-        /// \param vs   [in] The arguments which will be forwarded to the
+        /// \param ts   [in] The arguments which will be forwarded to the
         ///             constructors of the new objects.
         ///
         /// \note This function is part of the placement policy implemented by
@@ -145,15 +144,10 @@ namespace hpx { namespace compute { namespace host {
         ///
         template <typename Component, typename... Ts>
         hpx::future<std::vector<bulk_locality_result>> bulk_create(
-            std::size_t count,
-            Ts&&...
-#if !defined(HPX_COMPUTE_DEVICE_CODE)
-            ts
-#endif
-        ) const
+            [[maybe_unused]] std::size_t count,
+            [[maybe_unused]] Ts&&... ts) const
         {
 #if defined(HPX_COMPUTE_DEVICE_CODE)
-            HPX_UNUSED(count);
             HPX_ASSERT(false);
             return hpx::future<std::vector<bulk_locality_result>>();
 #else
@@ -170,7 +164,7 @@ namespace hpx { namespace compute { namespace host {
             std::vector<hpx::future<std::vector<hpx::id_type>>> objs;
             objs.reserve(m.size());
 
-            auto end = m.end();
+            auto const end = m.end();
             for (auto it = m.begin(); it != end; ++it)
             {
                 localities.push_back(HPX_MOVE(it->first));
@@ -185,8 +179,7 @@ namespace hpx { namespace compute { namespace host {
                 local_targets.reserve(it->second.size());
                 for (auto&& dt : HPX_MOVE(it->second))
                 {
-                    local_targets.push_back(
-                        hpx::compute::host::target(HPX_MOVE(dt)));
+                    local_targets.emplace_back(HPX_MOVE(dt));
                 }
 
                 objs.push_back(
@@ -244,26 +237,25 @@ namespace hpx { namespace compute { namespace host {
     /// localities. It will represent all NUMA domains of the given locality
     /// and will place all items to create here.
     static target_distribution_policy const target_layout;
-}}}    // namespace hpx::compute::host
+}    // namespace hpx::compute::host
 
 /// \cond NOINTERNAL
-namespace hpx { namespace traits {
-    template <>
-    struct is_distribution_policy<compute::host::target_distribution_policy>
-      : std::true_type
-    {
-    };
+template <>
+struct hpx::traits::is_distribution_policy<
+    hpx::compute::host::target_distribution_policy> : std::true_type
+{
+};
 
-    template <>
-    struct num_container_partitions<compute::host::target_distribution_policy>
+template <>
+struct hpx::traits::num_container_partitions<
+    hpx::compute::host::target_distribution_policy>
+{
+    static std::size_t call(
+        hpx::compute::host::target_distribution_policy const& policy)
     {
-        static std::size_t call(
-            compute::host::target_distribution_policy const& policy)
-        {
-            return policy.get_num_partitions();
-        }
-    };
-}}    // namespace hpx::traits
+        return policy.get_num_partitions();
+    }
+};
 /// \endcond
 
 #endif

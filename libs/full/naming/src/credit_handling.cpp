@@ -10,7 +10,6 @@
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/components_base/agas_interface.hpp>
 #include <hpx/components_base/detail/agas_interface_functions.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/lcos_local/detail/preprocess_future.hpp>
 #include <hpx/memory/serialization/intrusive_ptr.hpp>
 #include <hpx/modules/checkpoint_base.hpp>
@@ -25,13 +24,11 @@
 #include <hpx/naming_base/address.hpp>
 #include <hpx/naming_base/id_type.hpp>
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
-#include <hpx/runtime_local/state.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 #include <hpx/serialization/traits/is_bitwise_serializable.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
 
 #include <cstdint>
-#include <functional>
 #include <mutex>
 #include <utility>
 
@@ -41,7 +38,7 @@
 //
 // Each id_type instance - while always referring to some (possibly remote)
 // entity - can either be 'managed' or 'unmanaged'. If an id_type instance is
-// 'unmanaged' it does not perform any garbage collection. Otherwise (if it's
+// 'unmanaged' it does not perform any garbage collection. Otherwise, (if it's
 // 'managed'), all of its copies are globally tracked, which allows to
 // automatically delete the entity a particular id_type instance is referring to
 // after the last reference to it goes out of scope.
@@ -560,7 +557,7 @@ namespace hpx::naming {
 
             if (split_gids.has_gid(id_impl))
             {
-                // the gid has been split already and we don't need to do
+                // the gid has been split already, and we don't need to do
                 // anything further
                 return;
             }

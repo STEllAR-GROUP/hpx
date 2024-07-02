@@ -12,12 +12,13 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace agas { namespace detail {
+namespace hpx::agas::detail {
 
     naming::address bootstrap_component_namespace::addr() const
     {
         return naming::address(agas::get_locality(),
-            components::component_agas_component_namespace, this->ptr());
+            to_int(components::component_enum_type::agas_component_namespace),
+            this->ptr());
     }
 
     hpx::id_type bootstrap_component_namespace::gid() const
@@ -83,4 +84,4 @@ namespace hpx { namespace agas { namespace detail {
     {
         server_.unregister_server_instance(ec);
     }
-}}}    // namespace hpx::agas::detail
+}    // namespace hpx::agas::detail

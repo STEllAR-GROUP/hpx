@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c)      2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2007-2020 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <iosfwd>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     struct gva
     {
@@ -28,7 +28,7 @@ namespace hpx { namespace agas {
         constexpr gva() noexcept = default;
 
         constexpr explicit gva(naming::gid_type const& p,
-            component_type t = components::component_invalid,
+            component_type t = to_int(components::component_enum_type::invalid),
             std::uint64_t c = 1, lva_type a = nullptr,
             std::uint64_t o = 0) noexcept
           : prefix(p)
@@ -50,7 +50,7 @@ namespace hpx { namespace agas {
         }
 
         constexpr explicit gva(lva_type a) noexcept
-          : type(components::component_invalid)
+          : type(to_int(hpx::components::component_enum_type::invalid))
           , lva_(a)
         {
         }
@@ -58,7 +58,7 @@ namespace hpx { namespace agas {
         gva& operator=(lva_type a)
         {
             prefix = naming::gid_type();
-            type = components::component_invalid;
+            type = to_int(hpx::components::component_enum_type::invalid);
             count = 0;
             lva_ = a;
             offset = 0;
@@ -107,7 +107,8 @@ namespace hpx { namespace agas {
         }
 
         naming::gid_type prefix;
-        component_type type = components::component_invalid;
+        component_type type =
+            to_int(hpx::components::component_enum_type::invalid);
         std::uint64_t count = 0;
 
     private:
@@ -129,4 +130,4 @@ namespace hpx { namespace agas {
     };
 
     HPX_EXPORT std::ostream& operator<<(std::ostream& os, gva const& addr);
-}}    // namespace hpx::agas
+}    // namespace hpx::agas

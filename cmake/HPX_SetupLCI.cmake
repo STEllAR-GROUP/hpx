@@ -44,7 +44,7 @@ macro(hpx_setup_lci)
       include(FetchContent)
       fetchcontent_declare(
         lci
-        GIT_REPOSITORY https://github.com/uiuc-hpc/LC.git
+        GIT_REPOSITORY https://github.com/uiuc-hpc/lci.git
         GIT_TAG ${HPX_WITH_LCI_TAG}
       )
 

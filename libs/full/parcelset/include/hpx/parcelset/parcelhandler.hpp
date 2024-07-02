@@ -93,7 +93,7 @@ namespace hpx::parcelset {
         /// \returns Whether any work has been performed
         bool do_background_work(std::size_t num_thread = 0,
             bool stop_buffering = false,
-            parcelport_background_mode mode = parcelport_background_mode_all);
+            parcelport_background_mode mode = parcelport_background_mode::all);
 
         /// Return the list of all remote localities supporting the given
         /// component type
@@ -109,7 +109,8 @@ namespace hpx::parcelset {
         ///          (!prefixes.empty()).
         bool get_raw_remote_localities(
             std::vector<naming::gid_type>& locality_ids,
-            components::component_type type = components::component_invalid,
+            components::component_type type = to_int(
+                hpx::components::component_enum_type::invalid),
             error_code& ec = throws) const;
 
         /// Return the list of all localities supporting the given

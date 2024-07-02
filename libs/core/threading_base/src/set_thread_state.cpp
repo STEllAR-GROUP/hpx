@@ -61,6 +61,36 @@ namespace hpx::threads::detail {
         return {thread_schedule_state::terminated, invalid_thread_id};
     }
 
+    namespace {
+
+        thread_state reschedule_active(thread_id_type const& thrd,
+            thread_schedule_state new_state, thread_restart_state new_state_ex,
+            thread_priority priority, thread_state previous_state,
+            error_code& ec)
+        {
+            // schedule a new thread to set the state
+            LTM_(warning).format(
+                "set_thread_state: thread is currently active, "
+                "scheduling new thread, thread({}), description({}), "
+                "new state({})",
+                thrd, get_thread_id_data(thrd)->get_description(),
+                get_thread_state_name(new_state));
+
+            thread_init_data data(
+                hpx::bind(&set_active_state, thread_id_ref_type(thrd),
+                    new_state, new_state_ex, priority, previous_state),
+                "set state for active thread", priority);
+
+            create_work(
+                get_thread_id_data(thrd)->get_scheduler_base(), data, ec);
+
+            if (&ec != &throws)
+                ec = make_success_code();
+
+            return previous_state;    // done
+        }
+    }    // namespace
+
     ///////////////////////////////////////////////////////////////////////////
     thread_state set_thread_state(thread_id_type const& thrd,
         thread_schedule_state new_state, thread_restart_state new_state_ex,
@@ -118,45 +148,22 @@ namespace hpx::threads::detail {
             {
                 if (retry_on_active)
                 {
-                    // schedule a new thread to set the state
-                    LTM_(warning).format(
-                        "set_thread_state: thread is currently active, "
-                        "scheduling new thread, thread({}), description({}), "
-                        "new state({})",
-                        thrd, get_thread_id_data(thrd)->get_description(),
-                        get_thread_state_name(new_state));
-
-                    thread_init_data data(
-                        hpx::bind(&set_active_state, thread_id_ref_type(thrd),
-                            new_state, new_state_ex, priority, previous_state),
-                        "set state for active thread", priority);
-
-                    create_work(get_thread_id_data(thrd)->get_scheduler_base(),
-                        data, ec);
-
-                    if (&ec != &throws)
-                        ec = make_success_code();
-                }
-                else
-                {
-                    hpx::execution_base::this_thread::yield_k(
-                        k, "hpx::threads::detail::set_thread_state");
-                    ++k;
-
-                    LTM_(warning).format(
-                        "set_thread_state: thread is currently active, but not "
-                        "scheduling new thread because retry_on_active = "
-                        "false, thread({}), description({}), new state({})",
-                        thrd, get_thread_id_data(thrd)->get_description(),
-                        get_thread_state_name(new_state));
-
-                    continue;
+                    return reschedule_active(thrd, new_state, new_state_ex,
+                        priority, previous_state, ec);
                 }
 
-                if (&ec != &throws)
-                    ec = make_success_code();
+                hpx::execution_base::this_thread::yield_k(
+                    k, "hpx::threads::detail::set_thread_state");
+                ++k;
 
-                return previous_state;    // done
+                LTM_(warning).format(
+                    "set_thread_state: thread is currently active, but not "
+                    "scheduling new thread because retry_on_active = "
+                    "false, thread({}), description({}), new state({})",
+                    thrd, get_thread_id_data(thrd)->get_description(),
+                    get_thread_state_name(new_state));
+
+                continue;
             }
             case thread_schedule_state::deleted:
                 [[fallthrough]];

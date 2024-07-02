@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
@@ -15,6 +16,7 @@
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/backlog_queue.hpp>
 #include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/helper.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/receiver_base.hpp>
@@ -35,7 +37,7 @@ namespace hpx::parcelset::policies::lci {
         device_p = &pp_->get_tls_device();
         load(HPX_FORWARD(handler_type, handler),
             HPX_FORWARD(postprocess_handler_type, parcel_postprocess));
-        return_t ret = send();
+        return_t ret = send(false);
         if (ret.status == return_status_t::done)
         {
             done();
@@ -50,39 +52,41 @@ namespace hpx::parcelset::policies::lci {
             util::lci_environment::pcounter_since(async_write_start_time));
     }
 
-    sender_connection_base::return_t sender_connection_base::send()
+    sender_connection_base::return_t sender_connection_base::send(
+        bool in_bg_work)
     {
+        //         FIXME: set it properly in the future
+        //        if (HPX_LIKELY(pp_->is_initialized))
+        //            in_bg_work = false;
         auto start_time = util::lci_environment::pcounter_now();
         return_t ret;
-        // const int retry_max_spin = 32;
         if (!config_t::enable_lci_backlog_queue ||
             HPX_UNLIKELY(!pp_->is_initialized))
         {
-            // If we are sending early parcels, we should not expect the
-            // thread make progress on the backlog queue
-            //            int retry_count = 0;
+            // If we are sending early parcels, we should not expect the thread
+            // make progress on the backlog queue.
+            int retry_count = 0;
             do
             {
                 ret = send_nb();
                 if (ret.status == return_status_t::retry)
                 {
-                    //                    ++retry_count;
-                    //                    if (retry_count > retry_max_spin)
-                    //                    {
-                    //                        retry_count = 0;
-                    //                        while (pp_->background_work(
-                    //                            -1, parcelport_background_mode_all))
-                    //                            continue;
-                    //                        if (hpx::threads::get_self_id() !=
-                    //                            hpx::threads::invalid_thread_id)
-                    //                            hpx::this_thread::yield();
-                    //                    }
-                    if (config_t::progress_type ==
+                    if (config_t::bg_work_when_send)
+                    {
+                        pp_->do_background_work(0,
+                            in_bg_work ? parcelport_background_mode::receive :
+                                         parcelport_background_mode::all);
+                    }
+                    else if (config_t::progress_type ==
                             config_t::progress_type_t::worker ||
                         config_t::progress_type ==
-                            config_t::progress_type_t::pthread_worker)
-                        while (pp_->do_progress_local())
-                            continue;
+                            config_t::progress_type_t::pthread_worker ||
+                        config_t::progress_type ==
+                            config_t::progress_type_t::poll)
+                    {
+                        pp_->do_progress_local();
+                    }
+                    yield_k(retry_count, config_t::send_nb_max_retry);
                 }
             } while (ret.status == return_status_t::retry);
         }
@@ -102,6 +106,10 @@ namespace hpx::parcelset::policies::lci {
                 }
             }
         }
+        if (config_t::bg_work_when_send)
+            pp_->do_background_work(0,
+                in_bg_work ? parcelport_background_mode::receive :
+                             parcelport_background_mode::all);
         util::lci_environment::pcounter_add(util::lci_environment::send_timer,
             util::lci_environment::pcounter_since(start_time));
         return ret;

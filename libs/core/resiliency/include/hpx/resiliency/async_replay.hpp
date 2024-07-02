@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2023 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -22,7 +22,6 @@
 #include <cstddef>
 #include <exception>
 #include <memory>
-#include <stdexcept>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -56,8 +55,8 @@ namespace hpx::resiliency::experimental {
             hpx::future<Result> call(std::size_t n)
             {
                 // launch given function asynchronously
-                hpx::future<Result> f = invoke(hpx::util::make_index_pack<
-                    std::tuple_size<Tuple>::value>{});
+                hpx::future<Result> f = invoke(
+                    hpx::util::make_index_pack<std::tuple_size_v<Tuple>>{});
 
                 // attach a continuation that will relaunch the task, if
                 // necessary
@@ -128,9 +127,9 @@ namespace hpx::resiliency::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Verify the result of those
-    // invocations using the given predicate \a pred. Repeat launching on error
-    // exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function f. Verify the result of those
+    // invocations using the given predicate pred. Repeat launching on error
+    // exactly n times (except if abort_replay_exception is thrown).
     template <typename Pred, typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(
@@ -146,8 +145,8 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f. Repeat launching on error
-    // exactly \a n times (except if abort_replay_exception is thrown).
+    // Asynchronously launch given function f. Repeat launching on error exactly
+    // n times (except if abort_replay_exception is thrown).
     template <typename F, typename... Ts>
     hpx::future<hpx::util::detail::invoke_deferred_result_t<F, Ts...>>
     tag_invoke(async_replay_t, std::size_t n, F&& f, Ts&&... ts)

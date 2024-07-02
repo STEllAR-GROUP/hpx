@@ -13,9 +13,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING)
+#include <hpx/io_service/io_service_pool_fwd.hpp>
 #include <hpx/modules/datastructures.hpp>
 #include <hpx/modules/functional.hpp>
-#include <hpx/modules/io_service.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
 #include <hpx/modules/synchronization.hpp>
 
@@ -325,22 +325,22 @@ namespace hpx::parcelset {
         bool async_serialization() const noexcept;
 
         // callback while bootstrap the parcel layer
-        void early_pending_parcel_handler(
-            std::error_code const& ec, parcel const& p) const;
+        static void early_pending_parcel_handler(
+            std::error_code const& ec, parcel const& p);
 
     protected:
-        // mutex for all of the member data
+        // mutex for all the member data
         mutable hpx::spinlock mtx_;
+
+        using pending_parcels_destinations = std::set<locality>;
+        std::atomic<std::uint32_t> num_parcel_destinations_;
+        pending_parcels_destinations parcel_destinations_;
 
         // The cache for pending parcels
         using map_second_type =
             hpx::tuple<std::vector<parcel>, std::vector<write_handler_type>>;
         using pending_parcels_map = std::map<locality, map_second_type>;
         pending_parcels_map pending_parcels_;
-
-        using pending_parcels_destinations = std::set<locality>;
-        pending_parcels_destinations parcel_destinations_;
-        std::atomic<std::uint32_t> num_parcel_destinations_;
 
         // The local locality
         locality here_;

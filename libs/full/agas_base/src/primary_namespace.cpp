@@ -27,13 +27,11 @@
 #include <utility>
 #include <vector>
 
-using hpx::components::component_agas_primary_namespace;
-
 using hpx::agas::server::primary_namespace;
 
 HPX_DEFINE_COMPONENT_NAME(primary_namespace, hpx_primary_namespace)
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    primary_namespace, component_agas_primary_namespace)
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(primary_namespace,
+    to_int(components::component_enum_type::agas_primary_namespace))
 
 HPX_REGISTER_ACTION_ID(primary_namespace::allocate_action,
     primary_namespace_allocate_action,
@@ -143,7 +141,8 @@ namespace hpx { namespace agas {
     naming::address primary_namespace::addr() const
     {
         return naming::address(agas::get_locality(),
-            hpx::components::component_agas_primary_namespace, this->ptr());
+            to_int(components::component_enum_type::agas_primary_namespace),
+            this->ptr());
     }
 
     hpx::id_type primary_namespace::gid() const

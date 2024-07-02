@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,11 +9,12 @@
 
 #include <string>
 
-namespace hpx { namespace runtime_local {
+namespace hpx::runtime_local {
 
     namespace detail {
+
         // clang-format off
-        static char const* const thread_type_names[] = {
+        constexpr char const* const thread_type_names[] = {
             "unknown",
             "main-thread",
             "worker-thread",
@@ -34,4 +35,4 @@ namespace hpx { namespace runtime_local {
         }
         return detail::thread_type_names[idx + 1];
     }
-}}    // namespace hpx::runtime_local
+}    // namespace hpx::runtime_local

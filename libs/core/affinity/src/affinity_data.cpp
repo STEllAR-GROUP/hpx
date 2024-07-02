@@ -24,7 +24,7 @@ namespace hpx::threads::policies::detail {
         std::vector<mask_type> const& masks) noexcept
     {
         std::size_t count = 0;
-        for (mask_cref_type const m : masks)
+        for (mask_cref_type m : masks)
         {
             if (threads::any(m))
                 ++count;
@@ -268,8 +268,7 @@ namespace hpx::threads::policies::detail {
             for (std::size_t num_thread = 0; num_thread != num_threads_;
                  ++num_thread)
             {
-                mask_cref_type const affinity_mask =
-                    get_pu_mask(topo, num_thread);
+                mask_cref_type affinity_mask = get_pu_mask(topo, num_thread);
                 if (threads::any(pu_mask & affinity_mask))
                     ++count;
             }

@@ -3404,13 +3404,13 @@ APEX integration
 |hpx| provides integration with |apex|_, which is a framework for application
 profiling using task timers and various performance counters :footcite:t:`2015:apex`.
 It can be added as a ``git`` submodule by turning on the option :option:`HPX_WITH_APEX:BOOL`
-during |cmake| configuration. |tau|_ is an optional dependency when using |apex|.
+during |cmake|_ configuration. |tau|_ is an optional dependency when using |apex|.
 
-To build |hpx| with |apex|, add :option:`HPX_WITH_APEX`\ ``=ON``, and,
-optionally, ``Tau_ROOT=$PATH_TO_TAU`` to your |cmake| configuration. In
-addition, you can override the tag used for |apex| with the
+To build |hpx| with |apex|_, add :option:`HPX_WITH_APEX`\ ``=ON``, and,
+optionally, ``Tau_ROOT=$PATH_TO_TAU`` to your |cmake|_ configuration. In
+addition, you can override the tag used for |apex|_ with the
 :option:`HPX_WITH_APEX_TAG` option. Please see the |apex_hpx_doc|_ for detailed
-instructions on using |apex| with |hpx|.
+instructions on using |apex|_ with |hpx|.
 
 References
 ==========

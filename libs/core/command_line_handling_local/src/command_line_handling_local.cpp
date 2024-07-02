@@ -118,9 +118,14 @@ namespace hpx::local::detail {
         hpx::program_options::variables_map const& vm,
         std::string const& default_)
     {
-        // command line options is used preferred
+        // command line option is used preferred
         if (vm.count("hpx:queuing"))
-            return vm["hpx:queuing"].as<std::string>();
+        {
+            std::string queuing = vm["hpx:queuing"].as<std::string>();
+            if (!queuing.empty() && queuing[0] == '!')
+                queuing.erase(0);
+            return queuing;
+        }
 
         // use either cfgmap value or default
         return cfgmap.get_value<std::string>("hpx.scheduler", default_);

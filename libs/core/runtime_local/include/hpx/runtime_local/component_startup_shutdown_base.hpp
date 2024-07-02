@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,7 @@
 #include <hpx/runtime_local/startup_function.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     /// The \a component_startup_shutdown_base has to be used as a base class
@@ -27,6 +27,9 @@ namespace hpx { namespace components {
         ///                 function object with a reference to a startup
         ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
+        /// \param pre_startup [in, out] Will be set to true if the returned
+        ///                 startup function is executed during the first round
+        ///                 of calls.
         ///
         /// \return Returns \a true if the parameter \a startup has been
         ///         successfully initialized with the startup function.
@@ -39,13 +42,16 @@ namespace hpx { namespace components {
         ///                 function object with a reference to a startup
         ///                 function. This function will be executed by the
         ///                 runtime system during system startup.
+        /// \param pre_shutdown [in, out] Will be set to true if the returned
+        ///                 shutdown function is executed during the first round
+        ///                 of calls.
         ///
         /// \return Returns \a true if the parameter \a shutdown has been
         ///         successfully initialized with the shutdown function.
         virtual bool get_shutdown_function(
             shutdown_function_type& shutdown, bool& pre_shutdown) = 0;
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used to register the given component factory with

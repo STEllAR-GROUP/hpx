@@ -1,4 +1,4 @@
-//  Copyright (c) 2018-2023 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/async_base/launch_policy.hpp>
 #include <hpx/naming_base/naming_base.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>

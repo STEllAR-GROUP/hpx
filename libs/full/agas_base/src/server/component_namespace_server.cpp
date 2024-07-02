@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2017 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -99,7 +99,6 @@ namespace hpx::agas::server {
                     "component_namespace::bind_prefix",
                     "component id table insertion failed due to a locking "
                     "error or memory corruption");
-                return components::component_invalid;
             }
 
             // If the insertion succeeded, we need to increment the type
@@ -125,7 +124,6 @@ namespace hpx::agas::server {
                     "component id is already registered for the given "
                     "locality, key({1}), prefix({2}), ctype({3})",
                     key, prefix, cit->second);
-                return components::component_invalid;
             }
 
             fit->second.insert(prefix);
@@ -154,7 +152,6 @@ namespace hpx::agas::server {
                 "component_namespace::bind_prefix",
                 "factory table insertion failed due to a locking "
                 "error or memory corruption");
-            return components::component_invalid;
         }
 
         fit->second.insert(prefix);
@@ -192,7 +189,6 @@ namespace hpx::agas::server {
                     "component_namespace::bind_name",
                     "component id table insertion failed due to a locking "
                     "error or memory corruption");
-                return components::component_invalid;
             }
 
             // If the insertion succeeded, we need to increment the type
@@ -312,7 +308,7 @@ namespace hpx::agas::server {
         component_namespace::component_id_table_type const& m,
         components::component_type t)
     {
-        if (t < components::component_last)
+        if (t < to_int(components::component_enum_type::last))
             return components::get_component_type_name(t);
 
         for (auto const& c : m)
@@ -335,7 +331,7 @@ namespace hpx::agas::server {
 
         std::string result;
 
-        if (t == components::component_invalid)
+        if (t == to_int(hpx::components::component_enum_type::invalid))
         {
             result = "component_invalid";
         }

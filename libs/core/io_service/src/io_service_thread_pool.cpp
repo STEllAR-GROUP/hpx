@@ -78,10 +78,10 @@ namespace hpx::threads::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     bool io_service_thread_pool::run(
-        std::unique_lock<std::mutex>& l, std::size_t num_threads)
+        [[maybe_unused]] std::unique_lock<std::mutex>& l,
+        std::size_t num_threads)
     {
         HPX_ASSERT(l.owns_lock());
-        HPX_UNUSED(l);
         util::barrier startup(1);
         return threads_->run(num_threads, false, &startup);
     }

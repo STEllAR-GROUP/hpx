@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2016 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -123,7 +123,7 @@ HPX_REGISTER_ACTION_ID(
 HPX_DEFINE_COMPONENT_NAME(
     hpx::components::server::runtime_support, hpx_runtime_support)
 HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::components::server::runtime_support,
-    hpx::components::component_runtime_support)
+    to_int(hpx::components::component_enum_type::runtime_support))
 
 namespace hpx {
     // helper function to stop evaluating counters during shutdown
@@ -227,8 +227,10 @@ namespace hpx { namespace components { namespace server {
     void runtime_support::dijkstra_make_black()
     {
         // Rule 1: A machine sending a message makes itself black.
-        std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
-        dijkstra_color_ = true;
+        if (!dijkstra_color_)
+        {
+            dijkstra_color_ = true;
+        }
     }
 
     void runtime_support::send_dijkstra_termination_token(
@@ -257,7 +259,6 @@ namespace hpx { namespace components { namespace server {
         // black token to machine nr.i if it is black itself, whereas while
         // being white it leaves the color of the token unchanged.
         {
-            std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
             if (!passive || dijkstra_color_)
                 dijkstra_token = true;
 
@@ -302,10 +303,12 @@ namespace hpx { namespace components { namespace server {
             // we received the token after a full circle
             if (dijkstra_token)
             {
-                std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
                 dijkstra_color_ = true;    // unsuccessful termination
             }
 
+            // We need the lock here to ensure the mutual exclusion of
+            // hpx::latch::count_down and and hpx::latch::~latch
+            std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
             dijkstra_cond_->count_down(1);
             return;
         }
@@ -353,11 +356,6 @@ namespace hpx { namespace components { namespace server {
         std::size_t count = 0;    // keep track of number of trials
 
         {
-            // Note: we protect the entire loop here since the stopping condition
-            // depends on the shared variable "dijkstra_color_"
-            // Proper unlocking for possible remote actions needs to be taken care of
-            typedef std::unique_lock<dijkstra_mtx_type> dijkstra_scoped_lock;
-            dijkstra_scoped_lock l(dijkstra_mtx_);
             do
             {
                 LRT_(info).format(
@@ -371,7 +369,6 @@ namespace hpx { namespace components { namespace server {
                 dijkstra_cond_ = std::make_unique<hpx::latch>(2);
 
                 {
-                    unlock_guard<dijkstra_scoped_lock> ul(l);
                     send_dijkstra_termination_token(target_id - 1,
                         initiating_locality_id, num_localities,
                         dijkstra_color_);
@@ -399,6 +396,9 @@ namespace hpx { namespace components { namespace server {
 
             } while (dijkstra_color_);
 
+            // We need the lock here to ensure the mutual exclusion of
+            // hpx::latch::count_down and and hpx::latch::~latch
+            std::lock_guard<dijkstra_mtx_type> l(dijkstra_mtx_);
             dijkstra_cond_.reset();
         }
 

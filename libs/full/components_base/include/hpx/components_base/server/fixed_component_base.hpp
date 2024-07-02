@@ -1,5 +1,5 @@
 //  Copyright (c) 2011      Bryce Lelbach
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,10 +28,9 @@ namespace hpx::components {
     template <typename Component>
     class fixed_component_base : public traits::detail::fixed_component_tag
     {
-    private:
         using this_component_type =
-            std::conditional_t<std::is_same_v<Component, detail::this_type>,
-                fixed_component_base, Component>;
+            std::conditional_t<std::is_void_v<Component>, fixed_component_base,
+                Component>;
 
         constexpr Component& derived() noexcept
         {
@@ -72,7 +71,6 @@ namespace hpx::components {
             }
         }
 
-    public:
         // Return the component's fixed GID.
         naming::gid_type get_base_gid(
             naming::gid_type const& assign_gid = naming::invalid_gid) const
@@ -108,7 +106,6 @@ namespace hpx::components {
             return gid_;
         }
 
-    public:
         hpx::id_type get_id() const
         {
             // fixed_address components are created without any credits

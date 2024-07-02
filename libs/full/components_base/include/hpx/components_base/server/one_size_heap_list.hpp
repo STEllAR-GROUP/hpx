@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2023 Hartmut Kaiser
+//  Copyright (c) 1998-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -8,28 +8,25 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/components_base/server/wrapper_heap_base.hpp>
 #include <hpx/synchronization/shared_mutex.hpp>
-#include <hpx/synchronization/spinlock.hpp>
 
 #include <cstddef>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace util {
+namespace hpx::util {
 
     class HPX_EXPORT one_size_heap_list
     {
     public:
         using list_type = std::list<std::shared_ptr<util::wrapper_heap_base>>;
-        using iterator = typename list_type::iterator;
-        using const_iterator = typename list_type::const_iterator;
+        using iterator = list_type::iterator;
+        using const_iterator = list_type::const_iterator;
 
         using mutex_type = hpx::shared_mutex;
 
@@ -38,41 +35,23 @@ namespace hpx { namespace util {
     private:
         template <typename Heap>
         static std::shared_ptr<util::wrapper_heap_base> create_heap(
-            char const* name, std::size_t counter, heap_parameters parameters)
+            char const* name, [[maybe_unused]] std::size_t counter,
+            heap_parameters parameters)
         {
 #if defined(HPX_DEBUG)
             return std::make_shared<Heap>(name, counter, parameters);
 #else
-            (void) counter;
             return std::make_shared<Heap>(name, 0, parameters);
 #endif
         }
 
     public:
-        one_size_heap_list()
-          : class_name_()
-#if defined(HPX_DEBUG)
-          , alloc_count_(0)
-          , free_count_(0)
-          , heap_count_(0)
-          , max_alloc_count_(0)
-#endif
-          , create_heap_(nullptr)
-          , parameters_({0, 0, 0})
-        {
-            HPX_ASSERT(false);    // shouldn't ever be called
-        }
+        one_size_heap_list();
 
         template <typename Heap>
         explicit one_size_heap_list(
             char const* class_name, heap_parameters parameters, Heap* = nullptr)
           : class_name_(class_name)
-#if defined(HPX_DEBUG)
-          , alloc_count_(0L)
-          , free_count_(0L)
-          , heap_count_(0L)
-          , max_alloc_count_(0L)
-#endif
           , create_heap_(&one_size_heap_list::create_heap<Heap>)
           , parameters_(parameters)
         {
@@ -82,12 +61,6 @@ namespace hpx { namespace util {
         explicit one_size_heap_list(std::string const& class_name,
             heap_parameters parameters, Heap* = nullptr)
           : class_name_(class_name)
-#if defined(HPX_DEBUG)
-          , alloc_count_(0L)
-          , free_count_(0L)
-          , heap_count_(0L)
-          , max_alloc_count_(0L)
-#endif
           , create_heap_(&one_size_heap_list::create_heap<Heap>)
           , parameters_(parameters)
         {
@@ -116,16 +89,16 @@ namespace hpx { namespace util {
 
     public:
 #if defined(HPX_DEBUG)
-        std::size_t alloc_count_;
-        std::size_t free_count_;
-        std::size_t heap_count_;
-        std::size_t max_alloc_count_;
+        std::size_t alloc_count_ = 0;
+        std::size_t free_count_ = 0;
+        std::size_t heap_count_ = 0;
+        std::size_t max_alloc_count_ = 0;
 #endif
         std::shared_ptr<util::wrapper_heap_base> (*create_heap_)(
-            char const*, std::size_t, heap_parameters);
+            char const*, std::size_t, heap_parameters) = nullptr;
 
         heap_parameters const parameters_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

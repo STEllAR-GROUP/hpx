@@ -9,7 +9,6 @@
 #include <hpx/resource_partitioner/detail/partitioner.hpp>
 #include <hpx/runtime_local/get_os_thread_count.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
-#include <hpx/topology/topology.hpp>
 
 #include <cstddef>
 #include <vector>
@@ -18,12 +17,12 @@ namespace hpx::compute::host {
 
     std::vector<target> get_local_targets()
     {
-        std::size_t num_os_threads = hpx::get_os_thread_count();
+        std::size_t const num_os_threads = hpx::get_os_thread_count();
 
         std::vector<target> targets;
         targets.reserve(num_os_threads);
 
-        auto& rp = hpx::resource::get_partitioner();
+        auto const& rp = hpx::resource::get_partitioner();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
              ++num_thread)
         {

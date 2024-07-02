@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,7 +11,7 @@
 #include <hpx/runtime_configuration/component_commandline_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace commandline_options_provider {
@@ -40,18 +40,14 @@ namespace hpx { namespace components {
             return commandline_options_provider::add_commandline_options();
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components
 
 ///////////////////////////////////////////////////////////////////////////////
 #define HPX_DEFINE_COMPONENT_COMMANDLINE_OPTIONS(add_options_function)         \
-    namespace hpx { namespace components {                                     \
-            namespace commandline_options_provider {                           \
-                hpx::program_options::options_description                      \
-                add_commandline_options()                                      \
-                {                                                              \
-                    return add_options_function();                             \
-                }                                                              \
-            }                                                                  \
+    namespace hpx::components::commandline_options_provider {                  \
+        hpx::program_options::options_description add_commandline_options()    \
+        {                                                                      \
+            return add_options_function();                                     \
         }                                                                      \
     }                                                                          \
     /***/

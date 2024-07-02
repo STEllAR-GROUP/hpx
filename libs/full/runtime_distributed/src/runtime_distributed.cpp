@@ -131,7 +131,7 @@ namespace hpx {
                     bg_send_duration);
 
                 if (rt->get_parcel_handler().do_background_work(num_thread,
-                        false, parcelset::parcelport_background_mode_send))
+                        false, parcelset::parcelport_background_mode::send))
                 {
                     result = true;
                 }
@@ -144,7 +144,7 @@ namespace hpx {
                     bg_receive_duration);
 
                 if (rt->get_parcel_handler().do_background_work(num_thread,
-                        false, parcelset::parcelport_background_mode_receive))
+                        false, parcelset::parcelport_background_mode::receive))
                 {
                     result = true;
                 }
@@ -165,7 +165,7 @@ namespace hpx {
 
 #if defined(HPX_HAVE_NETWORKING)
             if (rt->get_parcel_handler().do_background_work(num_thread, false,
-                    parcelset::parcelport_background_mode_all))
+                    parcelset::parcelport_background_mode::all))
             {
                 result = true;
             }
@@ -607,7 +607,7 @@ namespace hpx {
         LRT_(warning).format("runtime_distributed: about to stop services");
 
         // flush all parcel buffers, stop buffering parcels at this point
-        //parcel_handler_.do_background_work(true, parcelport_background_mode_all);
+        //parcel_handler_.do_background_work(true, parcelport_background_mode::all);
 
         // execute all on_exit functions whenever the first thread calls this
         this->runtime::stopping();
@@ -1819,8 +1819,8 @@ namespace hpx {
             return locality_ids;
         }
 
-        hpx::applier::get_applier().get_remote_localities(
-            locality_ids, components::component_invalid, ec);
+        hpx::applier::get_applier().get_remote_localities(locality_ids,
+            to_int(hpx::components::component_enum_type::invalid), ec);
 
         return locality_ids;
     }

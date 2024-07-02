@@ -15,17 +15,17 @@
 #include <string>
 #include <vector>
 
-namespace hpx { namespace util { namespace debug {
+namespace hpx::util::debug {
 
-    // ------------------------------------------------------------------------
     // return a vector of suspended/other task Ids
     std::vector<hpx::threads::thread_id_type> get_task_ids(
         hpx::threads::thread_schedule_state state)
     {
         std::vector<hpx::threads::thread_id_type> thread_ids_vector;
-        //
+
         hpx::threads::enumerate_threads(
-            [&thread_ids_vector](hpx::threads::thread_id_type id) -> bool {
+            [&thread_ids_vector](
+                hpx::threads::thread_id_type const& id) -> bool {
                 thread_ids_vector.push_back(id);
                 return true;    // always continue enumeration
             },
@@ -33,15 +33,15 @@ namespace hpx { namespace util { namespace debug {
         return thread_ids_vector;
     }
 
-    // ------------------------------------------------------------------------
     // return a vector of thread data structure pointers for suspended tasks
     std::vector<hpx::threads::thread_data*> get_task_data(
         hpx::threads::thread_schedule_state state)
     {
         std::vector<hpx::threads::thread_data*> thread_data_vector;
-        //
+
         hpx::threads::enumerate_threads(
-            [&thread_data_vector](hpx::threads::thread_id_type id) -> bool {
+            [&thread_data_vector](
+                hpx::threads::thread_id_type const& id) -> bool {
                 hpx::threads::thread_data* data = get_thread_id_data(id);
                 thread_data_vector.push_back(data);
                 return true;    // always continue enumeration
@@ -50,17 +50,16 @@ namespace hpx { namespace util { namespace debug {
         return thread_data_vector;
     }
 
-    // ------------------------------------------------------------------------
     // return string containing the stack backtrace for suspended tasks
     std::string suspended_task_backtraces()
     {
-        std::vector<hpx::threads::thread_data*> tlist =
+        std::vector<hpx::threads::thread_data*> const tlist =
             get_task_data(hpx::threads::thread_schedule_state::suspended);
-        //
+
         std::stringstream tmp;
-        //
+
         int count = 0;
-        for (const auto& data : tlist)
+        for (auto const& data : tlist)
         {
             hpx::util::format_to(tmp, "Stack trace {} : {:#012x} : \n{}\n\n\n",
                 count, reinterpret_cast<uintptr_t>(data),
@@ -75,4 +74,4 @@ namespace hpx { namespace util { namespace debug {
         }
         return tmp.str();
     }
-}}}    // namespace hpx::util::debug
+}    // namespace hpx::util::debug

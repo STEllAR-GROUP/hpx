@@ -1,4 +1,4 @@
-//  Copyright (c) 2018 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,11 +10,12 @@
 #include <hpx/threading_base/callback_notifier.hpp>
 
 namespace hpx {
+
     /// Retrieve the currently installed start handler function. This is a
     /// function that will be called by HPX for each newly created thread that
     /// is made known to the runtime. HPX stores exactly one such function
-    /// reference, thus the caller needs to make sure any newly registered
-    /// start function chains into the previous one (see
+    /// reference, thus the caller needs to make sure any newly registered start
+    /// function chains into the previous one (see
     /// \a register_thread_on_start_func).
     ///
     /// \returns The currently installed error handler function.

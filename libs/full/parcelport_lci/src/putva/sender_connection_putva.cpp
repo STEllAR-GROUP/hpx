@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2007-2013 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
@@ -14,6 +15,7 @@
 
 #include <hpx/modules/lci_base.hpp>
 #include <hpx/parcelport_lci/header.hpp>
+#include <hpx/parcelport_lci/helper.hpp>
 #include <hpx/parcelport_lci/locality.hpp>
 #include <hpx/parcelport_lci/parcelport_lci.hpp>
 #include <hpx/parcelport_lci/receiver_base.hpp>
@@ -62,8 +64,9 @@ namespace hpx::parcelset::policies::lci {
         int num_zero_copy_chunks = static_cast<int>(buffer_.num_chunks_.first);
         if (is_eager)
         {
+            int retry_count = 0;
             while (LCI_mbuffer_alloc(device_p->device, &mbuffer) != LCI_OK)
-                continue;
+                yield_k(retry_count, config_t::mbuffer_alloc_max_retry);
             HPX_ASSERT(mbuffer.length == (size_t) LCI_MEDIUM_SIZE);
             header_ = header(buffer_, (char*) mbuffer.address, mbuffer.length);
             mbuffer.length = header_.size();

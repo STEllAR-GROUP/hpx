@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2023 Hartmut Kaiser
+//  Copyright (c) 1998-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,20 +6,19 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/components_base/component_type.hpp>
 
 #include <cstddef>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     struct wrapper_heap_base
     {
         struct heap_parameters
         {
-            std::size_t capacity;
-            std::size_t element_alignment;
-            std::size_t element_size;
+            std::size_t capacity = 0;
+            std::size_t element_alignment = 0;
+            std::size_t element_size = 0;
         };
 
         virtual ~wrapper_heap_base() = default;
@@ -35,4 +34,4 @@ namespace hpx { namespace util {
         virtual std::size_t size() const = 0;
         virtual std::size_t free_size() const = 0;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util

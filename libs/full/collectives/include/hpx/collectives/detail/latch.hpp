@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,7 +46,7 @@ namespace hpx { namespace lcos { namespace server {
 
         static components::component_type get_component_type()
         {
-            return components::component_latch;
+            return to_int(hpx::components::component_enum_type::latch);
         }
         static void set_component_type(components::component_type) {}
 
@@ -64,7 +64,7 @@ namespace hpx { namespace lcos { namespace server {
         // implementation to associate this component with a given action.
         enum
         {
-            value = components::component_latch
+            value = to_int(hpx::components::component_enum_type::latch)
         };
 
         latch()
@@ -72,7 +72,7 @@ namespace hpx { namespace lcos { namespace server {
         {
         }
 
-        latch(std::ptrdiff_t number_of_threads)
+        explicit latch(std::ptrdiff_t number_of_threads)
           : latch_(number_of_threads)
         {
         }

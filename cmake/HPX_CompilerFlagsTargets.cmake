@@ -14,14 +14,23 @@ target_compile_features(hpx_private_flags INTERFACE cxx_std_${HPX_CXX_STANDARD})
 target_compile_features(hpx_public_flags INTERFACE cxx_std_${HPX_CXX_STANDARD})
 
 # Set other flags that should always be set
-
-# HPX_DEBUG must be set without a generator expression as it determines ABI
-# compatibility. Projects in Release mode using HPX in Debug mode must have
-# HPX_DEBUG set, and projects in Debug mode using HPX in Release mode must not
-# have HPX_DEBUG set. HPX_DEBUG must also not be set by projects using HPX.
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-  target_compile_definitions(hpx_private_flags INTERFACE HPX_DEBUG)
-  target_compile_definitions(hpx_public_flags INTERFACE HPX_DEBUG)
+get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(is_multi_config)
+  target_compile_definitions(
+    hpx_private_flags INTERFACE $<$<CONFIG:Debug>:HPX_DEBUG>
+  )
+  target_compile_definitions(
+    hpx_public_flags INTERFACE $<$<CONFIG:Debug>:HPX_DEBUG>
+  )
+else()
+  # HPX_DEBUG must be set without a generator expression as it determines ABI
+  # compatibility. Projects in Release mode using HPX in Debug mode must have
+  # HPX_DEBUG set, and projects in Debug mode using HPX in Release mode must not
+  # have HPX_DEBUG set. HPX_DEBUG must also not be set by projects using HPX.
+  if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_definitions(hpx_private_flags INTERFACE HPX_DEBUG)
+    target_compile_definitions(hpx_public_flags INTERFACE HPX_DEBUG)
+  endif()
 endif()
 
 target_compile_definitions(

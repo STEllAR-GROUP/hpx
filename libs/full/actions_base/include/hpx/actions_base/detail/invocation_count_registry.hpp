@@ -1,4 +1,4 @@
-//  Copyright (c) 2015 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -16,19 +16,25 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     class HPX_EXPORT invocation_count_registry
     {
-    public:
-        HPX_NON_COPYABLE(invocation_count_registry);
-
     public:
         using get_invocation_count_type = std::int64_t (*)(bool);
         using map_type = std::unordered_map<std::string,
             get_invocation_count_type, hpx::util::jenkins_hash>;
 
         invocation_count_registry() = default;
+
+        invocation_count_registry(invocation_count_registry const&) = delete;
+        invocation_count_registry(invocation_count_registry&&) = delete;
+        invocation_count_registry& operator=(
+            invocation_count_registry const&) = delete;
+        invocation_count_registry& operator=(
+            invocation_count_registry&&) = delete;
+
+        ~invocation_count_registry() = default;
 
         static invocation_count_registry& local_instance();
 #if defined(HPX_HAVE_NETWORKING)
@@ -47,15 +53,11 @@ namespace hpx { namespace actions { namespace detail {
         }
 
     private:
-        struct local_tag
-        {
-        };
+        struct local_tag;
         friend struct hpx::util::static_<invocation_count_registry, local_tag>;
 
 #if defined(HPX_HAVE_NETWORKING)
-        struct remote_tag
-        {
-        };
+        struct remote_tag;
         friend struct hpx::util::static_<invocation_count_registry, remote_tag>;
 #endif
         map_type map_;
@@ -91,14 +93,12 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action>
     register_action_invocation_count<Action>
         register_action_invocation_count<Action>::instance;
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #define HPX_REGISTER_ACTION_INVOCATION_COUNT(Action)                           \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template register_action_invocation_count<Action>              \
-                    register_action_invocation_count<Action>::instance;        \
-            }                                                                  \
-        }                                                                      \
+    namespace hpx::actions::detail {                                           \
+        template register_action_invocation_count<Action>                      \
+            register_action_invocation_count<Action>::instance;                \
     }                                                                          \
     /**/
 

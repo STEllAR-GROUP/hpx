@@ -15,10 +15,6 @@
 #include <hpx/modules/errors.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
-#if defined(HPX_SERIALIZATION_HAVE_BOOST_TYPES)
-#include <hpx/serialization/boost_variant.hpp>    // for backwards compatibility
-#endif
-
 #include <cstddef>
 #include <cstdint>
 #include <utility>

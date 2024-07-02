@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Bibek Ghimire
-//  Copyright (c) 2014-2021 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,12 +7,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <cstddef>
 #include <type_traits>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     template <typename T, typename Enable = void>
     struct is_distribution_policy : std::false_type
@@ -23,8 +21,8 @@ namespace hpx { namespace traits {
     inline constexpr bool is_distribution_policy_v =
         is_distribution_policy<T>::value;
 
-    // By default the number of partitions is the same as the number of
-    // localities represented by the given distribution policy
+    // By default, the number of partitions is the same as the number of
+    // localities represented by the given distribution policy.
     template <typename Policy, typename Enable = void>
     struct num_container_partitions
     {
@@ -33,4 +31,4 @@ namespace hpx { namespace traits {
             return policy.get_num_localities();
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

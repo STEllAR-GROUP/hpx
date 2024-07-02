@@ -1,4 +1,4 @@
-//  Copyright (c) 1998-2023 Hartmut Kaiser
+//  Copyright (c) 1998-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,6 @@
 #include <hpx/modules/format.hpp>
 #include <hpx/modules/synchronization.hpp>
 #include <hpx/runtime_local/state.hpp>
-#include <hpx/thread_support/unlock_guard.hpp>
 #include <hpx/threading_base/register_thread.hpp>
 #include <hpx/threading_base/thread_data.hpp>
 #if defined(HPX_DEBUG)
@@ -22,13 +21,17 @@
 #endif
 
 #include <cstddef>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <string>
 
-namespace hpx { namespace util {
+namespace hpx::util {
+
+    one_size_heap_list::one_size_heap_list()
+    {
+        HPX_ASSERT(false);    // shouldn't ever be called
+    }
 
     one_size_heap_list::~one_size_heap_list() noexcept
     {
@@ -190,4 +193,4 @@ namespace hpx { namespace util {
         }
         return std::string("one_size_heap_list(") + class_name_ + ")";
     }
-}}    // namespace hpx::util
+}    // namespace hpx::util

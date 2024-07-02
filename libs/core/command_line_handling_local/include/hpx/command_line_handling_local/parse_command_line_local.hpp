@@ -20,9 +20,9 @@ namespace hpx::util {
 
     enum class commandline_error_mode : std::uint8_t
     {
-        return_on_error,
-        rethrow_on_error,
-        allow_unregistered,
+        return_on_error = 1,
+        rethrow_on_error = 2,
+        allow_unregistered = 3,
         ignore_aliases = 0x40,
         report_missing_config_file = 0x80
     };

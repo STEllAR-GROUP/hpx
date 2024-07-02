@@ -69,7 +69,6 @@ namespace hpx::util {
 
         HPX_CORE_EXPORT void init_logging_local(runtime_configuration&);
     }    // namespace detail
-
     /// \endcond
 
     //////////////////////////////////////////////////////////////////////////
@@ -85,6 +84,7 @@ namespace hpx::util {
 #else    // HPX_HAVE_LOGGING
 
 namespace hpx::util {
+
     namespace detail {
 
         HPX_CORE_EXPORT void warn_if_logging_requested(runtime_configuration&);

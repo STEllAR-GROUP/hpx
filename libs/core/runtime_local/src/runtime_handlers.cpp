@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2017 Shoshana Jakobovits
 //  Copyright (c) 2010-2011 Phillip LeBlanc, Dylan Stark
 //  Copyright (c)      2011 Bryce Lelbach
@@ -9,17 +9,19 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
-#include <hpx/debugging/backtrace.hpp>
 #include <hpx/io_service/io_service_pool.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/threadmanager.hpp>
-#include <hpx/runtime_local/config_entry.hpp>
 #include <hpx/runtime_local/custom_exception_info.hpp>
 #include <hpx/runtime_local/debugging.hpp>
 #include <hpx/runtime_local/runtime_handlers.hpp>
 #include <hpx/runtime_local/runtime_local.hpp>
 #include <hpx/threading_base/thread_pool_base.hpp>
+#if defined(HPX_HAVE_VERIFY_LOCKS)
+#include <hpx/debugging/backtrace.hpp>
+#include <hpx/runtime_local/config_entry.hpp>
+#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #include <winsock2.h>
@@ -31,31 +33,30 @@
 #include <sstream>
 #include <string>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     [[noreturn]] void assertion_handler(hpx::source_location const& loc,
-        const char* expr, std::string const& msg)
+        char const* expr, std::string const& msg)
     {
-        static thread_local bool handling_assertion = false;
+        thread_local bool handling_assertion = false;
 
         if (handling_assertion)
         {
             std::ostringstream strm;
             strm << "Trying to handle failed assertion while handling another "
-                    "failed assertion!"
-                 << std::endl;
+                    "failed assertion!\n";
             strm << "Assertion '" << expr << "' failed";
             if (!msg.empty())
             {
                 strm << " (" << msg << ")";
             }
 
-            strm << std::endl;
-            strm << "{file}: " << loc.file_name() << std::endl;
-            strm << "{line}: " << loc.line() << std::endl;
-            strm << "{function}: " << loc.function_name() << std::endl;
+            strm << "\n";
+            strm << "{file}: " << loc.file_name() << "\n";
+            strm << "{line}: " << loc.line() << "\n";
+            strm << "{function}: " << loc.function_name() << "\n";
 
-            std::cerr << strm.str();
+            std::cerr << strm.str() << std::flush;
 
             std::abort();
         }
@@ -71,10 +72,11 @@ namespace hpx { namespace detail {
             strm << " (" << msg << ")";
         }
 
-        hpx::exception e(hpx::error::assertion_failure, strm.str());
+        hpx::exception const e(hpx::error::assertion_failure, strm.str());
         std::cerr << hpx::diagnostic_information(hpx::detail::get_exception(
                          e, loc.function_name(), loc.file_name(), loc.line()))
-                  << std::endl;
+                  << "\n"
+                  << std::flush;
         std::abort();
     }
 
@@ -147,27 +149,25 @@ namespace hpx { namespace detail {
                 "hpx::detail::get_default_pool",
                 "The runtime system is not active");
         }
-
         return &rt->get_thread_manager().default_pool();
     }
 
     asio::io_context& get_default_timer_service()
     {
-        hpx::runtime* rt = get_runtime_ptr();
+        hpx::runtime const* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::detail::get_default_timer_service",
                 "The runtime system is not active");
         }
-
         return get_thread_pool("timer-pool")->get_io_service();
     }
 
     threads::mask_type get_pu_mask(
         threads::topology& /* topo */, std::size_t thread_num)
     {
-        auto& rp = hpx::resource::get_partitioner();
+        auto const& rp = hpx::resource::get_partitioner();
         return rp.get_pu_mask(thread_num);
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail

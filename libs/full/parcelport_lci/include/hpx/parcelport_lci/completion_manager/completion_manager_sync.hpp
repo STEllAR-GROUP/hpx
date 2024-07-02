@@ -1,3 +1,4 @@
+//  Copyright (c) 2023-2024 Jiakun Yan
 //  Copyright (c) 2014-2023 Thomas Heller
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -10,14 +11,17 @@
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_LCI)
 
-#include <hpx/parcelport_lci/completion_manager_base.hpp>
-
 #include <hpx/assert.hpp>
+#include <hpx/parcelport_lci/completion_manager_base.hpp>
+#include <deque>
 
 namespace hpx::parcelset::policies::lci {
     struct completion_manager_sync : public completion_manager_base
     {
-        completion_manager_sync() {}
+        completion_manager_sync(parcelport* pp)
+          : completion_manager_base(pp)
+        {
+        }
 
         ~completion_manager_sync() {}
 
@@ -34,34 +38,7 @@ namespace hpx::parcelset::policies::lci {
             sync_list.push_back(comp);
         }
 
-        LCI_request_t poll()
-        {
-            LCI_request_t request;
-            request.flag = LCI_ERR_RETRY;
-            if (sync_list.empty())
-            {
-                return request;
-            }
-            {
-                std::unique_lock l(lock, std::try_to_lock);
-                if (l.owns_lock() && !sync_list.empty())
-                {
-                    LCI_comp_t sync = sync_list.front();
-                    sync_list.pop_front();
-                    LCI_error_t ret = LCI_sync_test(sync, &request);
-                    if (ret == LCI_OK)
-                    {
-                        HPX_ASSERT(request.flag == LCI_OK);
-                        LCI_sync_free(&sync);
-                    }
-                    else
-                    {
-                        sync_list.push_back(sync);
-                    }
-                }
-            }
-            return request;
-        }
+        LCI_request_t poll();
 
     private:
         hpx::spinlock lock;

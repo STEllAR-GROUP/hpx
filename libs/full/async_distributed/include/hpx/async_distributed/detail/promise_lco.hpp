@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2016      Thomas Heller
 //  Copyright (c) 2011      Bryce Adelstein-Lelbach
 //
@@ -31,15 +31,12 @@ namespace hpx::lcos::detail {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx::traits {
-
-    template <typename Result, typename RemoteResult>
-    struct managed_component_dtor_policy<
-        lcos::detail::promise_lco<Result, RemoteResult>>
-    {
-        typedef managed_object_is_lifetime_controlled type;
-    };
-}    // namespace hpx::traits
+template <typename Result, typename RemoteResult>
+struct hpx::traits::managed_component_dtor_policy<
+    hpx::lcos::detail::promise_lco<Result, RemoteResult>>
+{
+    using type = managed_object_is_lifetime_controlled;
+};    // namespace hpx::traits
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::lcos::detail {
@@ -79,7 +76,7 @@ namespace hpx::lcos::detail {
         // implementation to associate this component with a given action.
         enum
         {
-            value = components::component_promise
+            value = to_int(hpx::components::component_enum_type::promise)
         };
 
     protected:
@@ -190,10 +187,13 @@ namespace hpx {
                 // Promises are never created remotely, their factories are not
                 // registered with AGAS, so we can assign the component types
                 // locally.
-                if (value == components::component_invalid)
+                if (value ==
+                    to_int(hpx::components::component_enum_type::invalid))
                 {
-                    value = derived_component_type(++detail::unique_type,
-                        components::component_base_lco_with_value);
+                    value = components::derived_component_type(
+                        ++detail::unique_type,
+                        to_int(hpx::components::component_enum_type::
+                                base_lco_with_value));
                 }
                 return value;
             }
@@ -207,7 +207,7 @@ namespace hpx {
         template <typename Result, typename RemoteResult>
         components::component_type component_type_database<
             lcos::detail::promise_lco<Result, RemoteResult>>::value =
-            components::component_invalid;
+            to_int(hpx::components::component_enum_type::invalid);
     }    // namespace traits
 
     namespace components::detail {

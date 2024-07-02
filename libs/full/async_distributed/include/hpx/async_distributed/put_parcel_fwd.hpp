@@ -47,7 +47,7 @@ namespace hpx::parcelset {
         };
 
         template <typename PutParcel>
-        void put_parcel_impl(PutParcel&& pp, hpx::id_type dest,
+        void put_parcel_impl(PutParcel&& pp, hpx::id_type const& dest,
             naming::address&& addr,
             std::unique_ptr<actions::base_action>&& action);
     }    // namespace detail

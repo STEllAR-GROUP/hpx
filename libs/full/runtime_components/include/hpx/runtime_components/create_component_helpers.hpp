@@ -1,4 +1,4 @@
-//  Copyright (c) 2020-2021 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -20,7 +20,7 @@
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace components {
+namespace hpx::components {
 
     namespace server {
 
@@ -40,13 +40,12 @@ namespace hpx { namespace components {
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "stubs::runtime_support::create_component_async",
-                "The id passed as the first argument is not representing"
-                " a locality");
-            return make_ready_future(hpx::invalid_id);
+                "The id passed as the first argument is not representing "
+                "a locality");
         }
 
-        using action_type = server::create_component_action<Component,
-            typename std::decay<Ts>::type...>;
+        using action_type =
+            server::create_component_action<Component, std::decay_t<Ts>...>;
 
         return hpx::async<action_type>(gid, HPX_FORWARD(Ts, vs)...);
     }
@@ -59,13 +58,12 @@ namespace hpx { namespace components {
         {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "stubs::runtime_support::bulk_create_component_async",
-                "The id passed as the first argument is not representing"
-                " a locality");
-            return make_ready_future(std::vector<hpx::id_type>());
+                "The id passed as the first argument is not representing "
+                "a locality");
         }
 
         using action_type = server::bulk_create_component_action<Component,
-            typename std::decay<Ts>::type...>;
+            std::decay_t<Ts>...>;
 
         return hpx::async<action_type>(gid, count, HPX_FORWARD(Ts, vs)...);
     }
@@ -88,8 +86,8 @@ namespace hpx { namespace components {
     future<hpx::id_type> create_colocated_async(
         hpx::id_type const& gid, Ts&&... vs)
     {
-        using action_type = server::create_component_action<Component,
-            typename std::decay<Ts>::type...>;
+        using action_type =
+            server::create_component_action<Component, std::decay_t<Ts>...>;
 
         return hpx::detail::async_colocated<action_type>(
             gid, HPX_FORWARD(Ts, vs)...);
@@ -106,7 +104,7 @@ namespace hpx { namespace components {
         hpx::id_type const& gid, std::size_t count, Ts&&... vs)
     {
         using action_type = server::bulk_create_component_action<Component,
-            typename std::decay<Ts>::type...>;
+            std::decay_t<Ts>...>;
 
         return hpx::detail::async_colocated<action_type>(
             gid, count, HPX_FORWARD(Ts, vs)...);
@@ -120,4 +118,4 @@ namespace hpx { namespace components {
             id, count, HPX_FORWARD(Ts, vs)...)
             .get();
     }
-}}    // namespace hpx::components
+}    // namespace hpx::components

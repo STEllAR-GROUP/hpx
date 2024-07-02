@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -90,57 +90,53 @@ namespace hpx::plugins::parcel {
         hpx::performance_counters::counter_info const& info,
         hpx::error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ !=
+            performance_counters::counter_type::monotonically_increasing)
         {
-        case performance_counters::counter_type::monotonically_increasing:
-        {
-            performance_counters::counter_path_elements paths;
-            performance_counters::get_counter_path_elements(
-                info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_parcels_counter_creator",
-                    "invalid counter name for number of parcels (instance "
-                    "name must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_parcels_counter_creator",
-                    "invalid counter parameter for number of parcels: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // ask registry
-            hpx::function<std::int64_t(bool)> f =
-                coalescing_counter_registry::instance().get_parcels_counter(
-                    paths.parameters_);
-
-            if (!f.empty())
-            {
-                return performance_counters::detail::create_raw_counter(
-                    info, HPX_MOVE(f), ec);
-            }
-
-            // the counter is not available yet, create surrogate function
-            return performance_counters::detail::create_raw_counter(
-                info, num_parcels_counter_surrogate(paths.parameters_), ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "num_parcels_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(
+            info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_parcels_counter_creator",
+                "invalid counter name for number of parcels (instance "
+                "name must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_parcels_counter_creator",
+                "invalid counter parameter for number of parcels: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // ask registry
+        hpx::function<std::int64_t(bool)> f =
+            coalescing_counter_registry::instance().get_parcels_counter(
+                paths.parameters_);
+
+        if (!f.empty())
+        {
+            return performance_counters::detail::create_raw_counter(
+                info, HPX_MOVE(f), ec);
+        }
+
+        // the counter is not available yet, create surrogate function
+        return performance_counters::detail::create_raw_counter(
+            info, num_parcels_counter_surrogate(paths.parameters_), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -173,57 +169,53 @@ namespace hpx::plugins::parcel {
         hpx::performance_counters::counter_info const& info,
         hpx::error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ !=
+            performance_counters::counter_type::monotonically_increasing)
         {
-        case performance_counters::counter_type::monotonically_increasing:
-        {
-            performance_counters::counter_path_elements paths;
-            performance_counters::get_counter_path_elements(
-                info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_messages_counter_creator",
-                    "invalid counter name for number of parcels (instance "
-                    "name must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_messages_counter_creator",
-                    "invalid counter parameter for number of parcels: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // ask registry
-            hpx::function<std::int64_t(bool)> f =
-                coalescing_counter_registry::instance().get_messages_counter(
-                    paths.parameters_);
-
-            if (!f.empty())
-            {
-                return performance_counters::detail::create_raw_counter(
-                    info, HPX_MOVE(f), ec);
-            }
-
-            // the counter is not available yet, create surrogate function
-            return performance_counters::detail::create_raw_counter(
-                info, num_messages_counter_surrogate(paths.parameters_), ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "num_messages_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(
+            info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_messages_counter_creator",
+                "invalid counter name for number of parcels (instance "
+                "name must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_messages_counter_creator",
+                "invalid counter parameter for number of parcels: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // ask registry
+        hpx::function<std::int64_t(bool)> f =
+            coalescing_counter_registry::instance().get_messages_counter(
+                paths.parameters_);
+
+        if (!f.empty())
+        {
+            return performance_counters::detail::create_raw_counter(
+                info, HPX_MOVE(f), ec);
+        }
+
+        // the counter is not available yet, create surrogate function
+        return performance_counters::detail::create_raw_counter(
+            info, num_messages_counter_surrogate(paths.parameters_), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -257,58 +249,52 @@ namespace hpx::plugins::parcel {
         hpx::performance_counters::counter_info const& info,
         hpx::error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != performance_counters::counter_type::average_count)
         {
-        case performance_counters::counter_type::average_count:
-        {
-            performance_counters::counter_path_elements paths;
-            performance_counters::get_counter_path_elements(
-                info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_parcels_per_message_counter_creator",
-                    "invalid counter name for number of parcels (instance "
-                    "name must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "num_parcels_per_message_counter_creator",
-                    "invalid counter parameter for number of parcels: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // ask registry
-            hpx::function<std::int64_t(bool)> f =
-                coalescing_counter_registry::instance()
-                    .get_parcels_per_message_counter(paths.parameters_);
-
-            if (!f.empty())
-            {
-                return performance_counters::detail::create_raw_counter(
-                    info, HPX_MOVE(f), ec);
-            }
-
-            // the counter is not available yet, create surrogate function
-            return performance_counters::detail::create_raw_counter(info,
-                num_parcels_per_message_counter_surrogate(paths.parameters_),
-                ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "num_parcels_per_message_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(
+            info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_parcels_per_message_counter_creator",
+                "invalid counter name for number of parcels (instance "
+                "name must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "num_parcels_per_message_counter_creator",
+                "invalid counter parameter for number of parcels: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // ask registry
+        hpx::function<std::int64_t(bool)> f =
+            coalescing_counter_registry::instance()
+                .get_parcels_per_message_counter(paths.parameters_);
+
+        if (!f.empty())
+        {
+            return performance_counters::detail::create_raw_counter(
+                info, HPX_MOVE(f), ec);
+        }
+
+        // the counter is not available yet, create surrogate function
+        return performance_counters::detail::create_raw_counter(info,
+            num_parcels_per_message_counter_surrogate(paths.parameters_), ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -343,60 +329,53 @@ namespace hpx::plugins::parcel {
         hpx::performance_counters::counter_info const& info,
         hpx::error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != performance_counters::counter_type::average_timer)
         {
-        case performance_counters::counter_type::average_timer:
-        {
-            performance_counters::counter_path_elements paths;
-            performance_counters::get_counter_path_elements(
-                info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "average_time_between_parcels_counter_creator",
-                    "invalid counter name for number of parcels (instance "
-                    "name must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "average_time_between_parcels_counter_creator",
-                    "invalid counter parameter for number of parcels: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // ask registry
-            hpx::function<std::int64_t(bool)> f =
-                coalescing_counter_registry::instance()
-                    .get_average_time_between_parcels_counter(
-                        paths.parameters_);
-
-            if (!f.empty())
-            {
-                return performance_counters::detail::create_raw_counter(
-                    info, HPX_MOVE(f), ec);
-            }
-
-            // the counter is not available yet, create surrogate function
-            return performance_counters::detail::create_raw_counter(info,
-                average_time_between_parcels_counter_surrogate(
-                    paths.parameters_),
-                ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "average_time_between_parcels_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(
+            info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "average_time_between_parcels_counter_creator",
+                "invalid counter name for number of parcels (instance "
+                "name must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "average_time_between_parcels_counter_creator",
+                "invalid counter parameter for number of parcels: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // ask registry
+        hpx::function<std::int64_t(bool)> f =
+            coalescing_counter_registry::instance()
+                .get_average_time_between_parcels_counter(paths.parameters_);
+
+        if (!f.empty())
+        {
+            return performance_counters::detail::create_raw_counter(
+                info, HPX_MOVE(f), ec);
+        }
+
+        // the counter is not available yet, create surrogate function
+        return performance_counters::detail::create_raw_counter(info,
+            average_time_between_parcels_counter_surrogate(paths.parameters_),
+            ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -467,89 +446,84 @@ namespace hpx::plugins::parcel {
         hpx::performance_counters::counter_info const& info,
         hpx::error_code& ec)
     {
-        switch (info.type_)
+        if (info.type_ != performance_counters::counter_type::histogram)
         {
-        case performance_counters::counter_type::histogram:
-        {
-            performance_counters::counter_path_elements paths;
-            performance_counters::get_counter_path_elements(
-                info.fullname_, paths, ec);
-            if (ec)
-                return naming::invalid_gid;
-
-            if (paths.parentinstance_is_basename_)
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "time_between_parcels_histogram_counter_creator",
-                    "invalid counter name for "
-                    "time-between-parcels histogram (instance "
-                    "name must not be a valid base counter name)");
-                return naming::invalid_gid;
-            }
-
-            if (paths.parameters_.empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "time_between_parcels_histogram_counter_creator",
-                    "invalid counter parameter for "
-                    "time-between-parcels histogram: must "
-                    "specify an action type");
-                return naming::invalid_gid;
-            }
-
-            // split parameters, extract separate values
-            std::vector<std::string> params;
-            hpx::string_util::split(params, paths.parameters_,
-                hpx::string_util::is_any_of(","),
-                hpx::string_util::token_compress_mode::off);
-
-            std::int64_t min_boundary = 0;
-            std::int64_t max_boundary = 1000000;    // 1ms
-            std::int64_t num_buckets = 20;
-
-            if (params.empty() || params[0].empty())
-            {
-                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                    "time_between_parcels_histogram_counter_creator",
-                    "invalid counter parameter for "
-                    "time-between-parcels histogram: "
-                    "must specify an action type");
-                return naming::invalid_gid;
-            }
-
-            if (params.size() > 1 && !params[1].empty())
-                min_boundary = util::from_string<std::int64_t>(params[1]);
-            if (params.size() > 2 && !params[2].empty())
-                max_boundary = util::from_string<std::int64_t>(params[2]);
-            if (params.size() > 3 && !params[3].empty())
-                num_buckets = util::from_string<std::int64_t>(params[3]);
-
-            // ask registry
-            hpx::function<std::vector<std::int64_t>(bool)> f =
-                coalescing_counter_registry::instance()
-                    .get_time_between_parcels_histogram_counter(
-                        params[0], min_boundary, max_boundary, num_buckets);
-
-            if (!f.empty())
-            {
-                return performance_counters::detail::create_raw_counter(
-                    info, HPX_MOVE(f), ec);
-            }
-
-            // the counter is not available yet, create surrogate function
-            return performance_counters::detail::create_raw_counter(info,
-                time_between_parcels_histogram_counter_surrogate(
-                    params[0], min_boundary, max_boundary, num_buckets),
-                ec);
-        }
-        break;
-
-        default:
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "time_between_parcels_histogram_counter_creator",
                 "invalid counter type requested");
             return naming::invalid_gid;
         }
+
+        performance_counters::counter_path_elements paths;
+        performance_counters::get_counter_path_elements(
+            info.fullname_, paths, ec);
+        if (ec)
+            return naming::invalid_gid;
+
+        if (paths.parentinstance_is_basename_)
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "time_between_parcels_histogram_counter_creator",
+                "invalid counter name for "
+                "time-between-parcels histogram (instance "
+                "name must not be a valid base counter name)");
+            return naming::invalid_gid;
+        }
+
+        if (paths.parameters_.empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "time_between_parcels_histogram_counter_creator",
+                "invalid counter parameter for "
+                "time-between-parcels histogram: must "
+                "specify an action type");
+            return naming::invalid_gid;
+        }
+
+        // split parameters, extract separate values
+        std::vector<std::string> params;
+        hpx::string_util::split(params, paths.parameters_,
+            hpx::string_util::is_any_of(","),
+            hpx::string_util::token_compress_mode::off);
+
+        std::int64_t min_boundary = 0;
+        std::int64_t max_boundary = 1000000;    // 1ms
+        std::int64_t num_buckets = 20;
+
+        if (params.empty() || params[0].empty())
+        {
+            HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                "time_between_parcels_histogram_counter_creator",
+                "invalid counter parameter for "
+                "time-between-parcels histogram: "
+                "must specify an action type");
+            return naming::invalid_gid;
+        }
+
+        if (params.size() > 1 && !params[1].empty())
+            min_boundary = util::from_string<std::int64_t>(params[1]);
+        if (params.size() > 2 && !params[2].empty())
+            max_boundary = util::from_string<std::int64_t>(params[2]);
+        if (params.size() > 3 && !params[3].empty())
+            num_buckets = util::from_string<std::int64_t>(params[3]);
+
+        // ask registry
+        hpx::function<std::vector<std::int64_t>(bool)> f =
+            coalescing_counter_registry::instance()
+                .get_time_between_parcels_histogram_counter(
+                    params[0], min_boundary, max_boundary, num_buckets);
+
+        if (!f.empty())
+        {
+            return performance_counters::detail::create_raw_counter(
+                info, HPX_MOVE(f), ec);
+        }
+
+        // the counter is not available yet, create surrogate function
+        return performance_counters::detail::create_raw_counter(info,
+            time_between_parcels_histogram_counter_surrogate(
+                params[0], min_boundary, max_boundary, num_buckets),
+            ec);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -608,8 +582,7 @@ namespace hpx::plugins::parcel {
 
         // Install the counter types, un-installation of the types is handled
         // automatically.
-        install_counter_types(
-            counter_types, sizeof(counter_types) / sizeof(counter_types[0]));
+        install_counter_types(counter_types, std::size(counter_types));
     }
 
     ///////////////////////////////////////////////////////////////////////////

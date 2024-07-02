@@ -48,7 +48,7 @@ namespace hpx::threads::detail {
 
         // allow to change the state the thread will be switched to after
         // execution
-        thread_state operator=(thread_result_type&& new_state) noexcept
+        switch_status& operator=(thread_result_type&& new_state) noexcept
         {
             prev_state_ = thread_state(
                 new_state.first, prev_state_.state_ex(), prev_state_.tag() + 1);
@@ -56,7 +56,7 @@ namespace hpx::threads::detail {
             {
                 next_thread_id_ = HPX_MOVE(new_state.second);
             }
-            return prev_state_;
+            return *this;
         }
 
         // Get the state this thread was in before execution (usually pending),

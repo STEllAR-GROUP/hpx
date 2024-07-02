@@ -1,4 +1,4 @@
-//  Copyright (c) 2017-2023 Hartmut Kaiser
+//  Copyright (c) 2017-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -9,16 +9,13 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/async_base/traits/is_launch_policy.hpp>
 #include <hpx/execution/traits/executor_traits.hpp>
 #include <hpx/executors/execution_policy.hpp>
 #include <hpx/executors/parallel_executor.hpp>
 #include <hpx/executors/sequenced_executor.hpp>
-#include <hpx/functional/bind.hpp>
 #include <hpx/futures/future.hpp>
 #include <hpx/modules/concepts.hpp>
 #include <hpx/modules/threading.hpp>
-#include <hpx/modules/topology.hpp>
 #include <hpx/timed_execution/timed_execution.hpp>
 #include <hpx/timing/steady_clock.hpp>
 #include <hpx/type_support/detail/wrap_int.hpp>
@@ -37,7 +34,6 @@ namespace hpx::parallel::execution {
         template <typename Tag, typename Executor, typename F>
         struct then_execute_helper
         {
-        public:
             template <typename Executor_, typename F_>
             then_execute_helper(Executor_&& exec, F_&& call)
               : exec_(HPX_FORWARD(Executor_, exec))
@@ -439,7 +435,7 @@ namespace hpx::parallel::execution {
                 Ts&&... ts) -> decltype(exec.post_at(abs_time,
                 HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...))
             {
-                exec.post_at(
+                return exec.post_at(
                     abs_time, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...);
             }
         };
