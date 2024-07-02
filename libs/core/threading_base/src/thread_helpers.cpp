@@ -98,6 +98,9 @@ namespace hpx::threads {
 
     void interrupt_thread(thread_id_type const& id, bool flag, error_code& ec)
     {
+        // Copy id as the original `id` may get reset by the caller
+        // asynchronously.
+        auto const keep_alive = id;
         if (HPX_UNLIKELY(!id))
         {
             HPX_THROWS_IF(ec, hpx::error::null_thread_id,
@@ -112,7 +115,7 @@ namespace hpx::threads {
 
         // Set thread state to pending. If the thread is currently active we do
         // not retry. The thread will either exit or hit an interruption_point.
-        set_thread_state(id, thread_schedule_state::pending,
+        set_thread_state(keep_alive, thread_schedule_state::pending,
             thread_restart_state::abort, thread_priority::normal, false, ec);
     }
 
@@ -628,6 +631,7 @@ namespace hpx::this_thread {
             HPX_THROW_EXCEPTION(hpx::error::out_of_memory,
                 "has_sufficient_stack_space", "Stack overflow");
         }
+
         bool const sufficient_stack_space =
             static_cast<std::size_t>(remaining_stack) >= space_needed;
 

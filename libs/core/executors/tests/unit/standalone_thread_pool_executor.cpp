@@ -1,5 +1,5 @@
 //  Copyright (c)      2019 Mikael Simberg
-//  Copyright (c) 2007-2017 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -72,7 +72,17 @@ void test_then(Executor& exec)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
+template <typename Executor>
+decltype(auto) disable_run_as_child(Executor&& exec)
+{
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+    return hpx::experimental::prefer(hpx::execution::experimental::with_hint,
+        HPX_FORWARD(Executor, exec), hint);
+}
+
+void bulk_test(int, hpx::thread::id const& tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -90,8 +100,9 @@ void test_bulk_sync(Executor& exec)
     using hpx::placeholders::_2;
 
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
+        disable_run_as_child(exec), hpx::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        disable_run_as_child(exec), &bulk_test, v, tid, 42);
 }
 
 template <typename Executor>
@@ -105,16 +116,18 @@ void test_bulk_async(Executor& exec)
     using hpx::placeholders::_1;
     using hpx::placeholders::_2;
 
-    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42))
+    hpx::when_all(
+        hpx::parallel::execution::bulk_async_execute(disable_run_as_child(exec),
+            hpx::bind(&bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, &bulk_test, v, tid, 42))
+                      disable_run_as_child(exec), &bulk_test, v, tid, 42))
         .get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void bulk_test_f(int, hpx::shared_future<void> f, hpx::thread::id tid,
+void bulk_test_f(int, hpx::shared_future<void> const& f,
+    hpx::thread::id const& tid,
     int passed_through)    //-V813
 {
     HPX_TEST(f.is_ready());    // make sure, future is ready
@@ -166,8 +179,8 @@ int main()
             hpx::threads::policies::local_priority_queue_scheduler<>;
 
         // Choose all the parameters for the thread pool and scheduler.
-        std::size_t const num_threads = (std::min)(
-            std::size_t(4), std::size_t(hpx::threads::hardware_concurrency()));
+        std::size_t const num_threads = (std::min)(static_cast<std::size_t>(4),
+            static_cast<std::size_t>(hpx::threads::hardware_concurrency()));
         std::size_t const max_cores = num_threads;
         hpx::threads::policies::detail::affinity_data ad{};
         ad.init(num_threads, max_cores, 0, 1, 0, "core", "balanced", true);
