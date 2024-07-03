@@ -438,7 +438,18 @@ namespace hpx::experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
+#ifdef HPX_HAVE_STDEXEC
+            using sender_concept = hpx::execution::experimental::sender_t;
 
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env)
+                -> hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t(access_type),
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>;
+#else
             template <typename Env>
             struct generate_completion_signatures
             {
@@ -456,6 +467,7 @@ namespace hpx::experimental {
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 sender const&, Env) -> generate_completion_signatures<Env>;
+#endif
 
             template <typename R>
             struct operation_state
@@ -634,9 +646,6 @@ namespace hpx::experimental {
         template <detail::async_rw_mutex_access_type AccessType>
         struct sender
         {
-#ifdef HPX_HAVE_STDEXEC
-            using is_sender = void;
-#endif
             shared_state_ptr_type prev_state;
             shared_state_ptr_type state;
 
@@ -644,6 +653,18 @@ namespace hpx::experimental {
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
 
+#ifdef HPX_HAVE_STDEXEC
+            using sender_concept = hpx::execution::experimental::sender_t;
+
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                sender const&, Env)
+                -> hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_value_t(access_type),
+                    hpx::execution::experimental::set_error_t(
+                        std::exception_ptr)>;
+#else
             template <typename Env>
             struct generate_completion_signatures
             {
@@ -661,6 +682,7 @@ namespace hpx::experimental {
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 sender const&, Env) -> generate_completion_signatures<Env>;
+#endif
 
             template <typename R>
             struct operation_state
