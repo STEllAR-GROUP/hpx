@@ -41,12 +41,13 @@ namespace hpx::execution::experimental {
         template <typename Sender, typename Shape, typename F>
         struct bulk_sender
         {
-            using is_sender = void;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> sender;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
 #ifdef HPX_HAVE_STDEXEC
+            using sender_concept = hpx::execution::experimental::sender_t;
+
             template <typename... Args>
             using default_set_value =
                 hpx::execution::experimental::completion_signatures<
@@ -78,6 +79,8 @@ namespace hpx::execution::experimental {
                 return hpx::execution::experimental::get_env(s.sender);
             }
 #else
+            using is_sender = void;
+
             template <typename Env>
             struct generate_completion_signatures
             {

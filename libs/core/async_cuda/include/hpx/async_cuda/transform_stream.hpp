@@ -133,7 +133,7 @@ namespace hpx { namespace cuda { namespace experimental {
         struct transform_stream_receiver
         {
 #ifdef HPX_HAVE_STDEXEC
-            using is_receiver = void;
+            using receiver_concept = hpx::execution::experimental::receiver_t;
 #endif
             std::decay_t<R> r;
             std::decay_t<F> f;
@@ -324,10 +324,13 @@ namespace hpx { namespace cuda { namespace experimental {
             >;
             // clang-format on
 #else
+            template <typename Tuple>
+            struct invoke_result_helper;
+
             template <template <typename...> class Tuple, typename... Ts>
             struct invoke_result_helper<Tuple<Ts...>>
             {
-                static_assert(hpx::is_invocable_v<F, Args..., cudaStream_t>,
+                static_assert(hpx::is_invocable_v<F, Ts..., cudaStream_t>,
                     "F not invocable with the value_types specified.");
 
                 using result_type =
