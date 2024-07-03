@@ -23,7 +23,7 @@ set(tests
     countif_range
     destroy_range
     destroyn_range
-    distance
+    distance_range
     ends_with_range
     equal_range
     equal_binary_range
