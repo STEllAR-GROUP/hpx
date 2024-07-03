@@ -9,14 +9,34 @@
 
 #ifdef HPX_HAVE_STDEXEC
 
-//#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
-#if defined(HPX_CLANG_VERSION)
+/* TODO: Find out what diagnostics should be disabled for stdexec to compile.
+ * currently it seems to need at least "-Wgnu-zero-variadic-macro-arguments"
+ * and "-Wmissing-braces" even though they are explicitly disabled inside
+ * stdexec.
+ *
+ * Clang needs "-Wgnu-zero-variadic-macro-arguments", but this option does not
+ * exist in GCC. Will leave this commented out for now.
+ *
+ * #if defined(HPX_CLANG_VERSION)
+ * #pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+ * #endif
+ */
+
+#if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wextra"
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#endif
+
 #include <stdexec/execution.hpp>
+
+#if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
-#else
-#include <stdexec/execution.hpp>
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
 #endif
 
 namespace hpx::execution::experimental {
