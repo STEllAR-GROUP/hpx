@@ -144,8 +144,8 @@ average: {{average(elapsed)}}{{^-last}}
                         average += val;
                     }
                     strm << "\n       ],\n";
-                    strm << std::scientific << R"(      "average": )"<< average / series
-                         << "\n";
+                    strm << std::scientific << R"(      "average": )"
+                         << average / series << "\n";
                     strm << "    }";
                     ++outputs;
                 }

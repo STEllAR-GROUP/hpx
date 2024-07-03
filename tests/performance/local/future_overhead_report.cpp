@@ -167,7 +167,7 @@ int hpx_main(variables_map& vm)
         const std::uint64_t count = vm["futures"].as<std::uint64_t>();
 
         hpx::util::perftests_init(vm);
-        
+
         if (HPX_UNLIKELY(0 == count))
             throw std::logic_error("error: count of 0 futures specified\n");
 
