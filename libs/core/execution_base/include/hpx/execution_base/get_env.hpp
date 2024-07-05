@@ -15,14 +15,21 @@
 #ifdef HPX_HAVE_STDEXEC
 #include <hpx/execution_base/stdexec_forward.hpp>
 
-//#if defined(HPX_GCC_VERSION) || defined(HPX_CLANG_VERSION)
-#if defined(HPX_CLANG_VERSION)
+#if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wextra"
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#endif
+
 #include <exec/env.hpp>
+
+#if defined(HPX_GCC_VERSION)
 #pragma GCC diagnostic pop
-#else
-#include <exec/env.hpp>
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
 #endif
 
 namespace hpx::execution::experimental {
