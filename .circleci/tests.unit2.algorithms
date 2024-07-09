@@ -7,6 +7,7 @@
 tests.unit.modules.algorithms.algorithms.move
 tests.unit.modules.algorithms.algorithms.nth_element
 tests.unit.modules.algorithms.algorithms.none_of
+tests.unit.modules.algorithms.algorithms.none_of_sender
 tests.unit.modules.algorithms.algorithms.parallel_sort
 tests.unit.modules.algorithms.algorithms.partial_sort
 tests.unit.modules.algorithms.algorithms.partial_sort_copy

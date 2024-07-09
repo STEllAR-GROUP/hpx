@@ -58,7 +58,7 @@ set(tests
     filln
     # filln_sender
     find
-    # find_sender
+    find_sender
     findend
     # findend_sender
     findfirstof
@@ -71,7 +71,7 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    # foreach_sender
+    foreach_sender
     foreach_scheduler
     foreachn
     foreachn_exception
@@ -87,7 +87,7 @@ set(tests
     # for_loop_n_strided_sender
     for_loop_reduction
     for_loop_reduction_async
-    # for_loop_sender
+    for_loop_sender
     for_loop_strided
     # for_loop_strided_sender
     generate
@@ -161,10 +161,12 @@ set(tests
     # replace_copy_if_sender
     reverse
     reverse_copy
-    # reverse_sender reverse_copy_sender
+    reverse_sender
+    # reverse_copy_sender
     rotate
     rotate_copy
-    # rotate_sender rotate_copy_sender
+    rotate_sender
+    # rotate_copy_sender
     search
     # search_sender
     searchn
