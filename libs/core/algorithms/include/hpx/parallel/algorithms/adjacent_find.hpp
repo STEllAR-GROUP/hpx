@@ -181,7 +181,7 @@ namespace hpx::parallel {
                 using difference_type =
                     typename std::iterator_traits<FwdIter>::difference_type;
                 using result =
-                    util::detail::algorithm_result_t<ExPolicy, FwdIter>;
+                    util::detail::algorithm_result<ExPolicy, FwdIter>;
 
                 constexpr bool is_scheduler_policy =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
