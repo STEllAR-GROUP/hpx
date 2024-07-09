@@ -48,10 +48,8 @@ namespace hpx::parallel {
         // parallel version
         template <typename Algo, typename ExPolicy, typename FwdIter1,
             typename Sent1, typename FwdIter2>
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest,
-            std::false_type)
+        decltype(auto) transfer_(ExPolicy&& policy, FwdIter1 first, Sent1 last,
+            FwdIter2 dest, std::false_type)
         {
             return Algo().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, dest);
@@ -115,9 +113,8 @@ namespace hpx::parallel {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        typename util::detail::algorithm_result<ExPolicy,
-            util::in_out_result<FwdIter1, FwdIter2>>::type
-        transfer(ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
+        decltype(auto) transfer(ExPolicy&& policy, FwdIter1 first, Sent1 last,
+            FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");

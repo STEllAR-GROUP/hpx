@@ -163,18 +163,25 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
                 typename FwdIter2, typename Sent2, typename Pred,
                 typename Proj1, typename Proj2>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& policy, FwdIter1 first1, Sent1 last1,
-                FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
-                Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1 first1,
+                Sent1 last1, FwdIter2 first2, Sent2 last2, Pred&& pred,
+                Proj1&& proj1, Proj2&& proj2)
             {
                 auto const drop = detail::distance(first1, last1) -
                     detail::distance(first2, last2);
 
                 if (drop < 0)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if constexpr (
+                        hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
+                    {
+                        return hpx::execution::experimental::transfer_just(
+                            policy.executor().sched(), false);
+                    } else
+                    {
+                        return util::detail::algorithm_result<
+                            ExPolicy, bool>::get(false);
+                    }
                 }
 
                 return hpx::parallel::detail::equal_binary().call(
@@ -193,7 +200,7 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     // CPO for hpx::ends_with
     inline constexpr struct ends_with_t final
-      : hpx::functional::detail::tag_fallback<ends_with_t>
+      : hpx::detail::tag_parallel_algorithm<ends_with_t>
     {
     private:
         // clang-format off
@@ -235,11 +242,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(hpx::ends_with_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred pred = Pred())
+        friend decltype(auto) tag_fallback_invoke(hpx::ends_with_t,
+            ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            FwdIter2 last2, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");

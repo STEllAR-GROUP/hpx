@@ -16,6 +16,7 @@
 #include <hpx/execution/algorithms/sync_wait.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/algorithms/transfer.hpp>
+#include <hpx/execution/algorithms/transfer_just.hpp>
 #include <hpx/execution/executors/default_parameters.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution/executors/execution_parameters.hpp>
@@ -181,7 +182,7 @@ namespace hpx::execution::experimental {
                !std::is_integral_v<S>
             )>
         // clang-format on
-        friend auto tag_invoke(hpx::parallel::execution::bulk_async_execute_t,
+        friend decltype(auto) tag_invoke(hpx::parallel::execution::bulk_async_execute_t,
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
@@ -190,11 +191,37 @@ namespace hpx::execution::experimental {
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 shape_element, Ts...>;
 
-            static_assert(
-                std::is_void_v<result_type>, "std::is_void_v<result_type>");
+            if constexpr (std::is_void_v<result_type>)
+            {
+                return bulk(schedule(exec.sched_), shape,
+                    hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+            }
+            else
+            {
+                using size_type = decltype(util::size(shape));
+                const size_type shape_size = util::size(shape);
 
-            return bulk(schedule(exec.sched_), shape,
-                hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
+                using result_vector_type = std::vector<result_type>;
+                result_vector_type result_vector(shape_size);
+
+                auto f_wrapper = [](const size_type i,
+                    result_vector_type& result_vector, const S& shape,
+                    F& f, Ts&... ts) {
+                    auto it = util::begin(shape);
+                    std::advance(it, i);
+                    result_vector[i] = HPX_INVOKE(f, *it, ts...);
+                };
+
+                auto get_result = [](result_vector_type&& result_vector,
+                    const S&, F&&, Ts&&...) {
+                    return HPX_MOVE(result_vector);
+                };
+
+                return transfer_just(exec.sched_, HPX_MOVE(result_vector),
+                    shape, HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...)
+                    | bulk(shape_size, HPX_MOVE(f_wrapper))
+                    | then(HPX_MOVE(get_result));
+            }
         }
 
         // clang-format off

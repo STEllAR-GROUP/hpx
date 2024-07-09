@@ -373,14 +373,20 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& op,
                 Proj&& proj)
             {
-                if (first == last)
+                using result = util::detail::algorithm_result<ExPolicy, bool>;
+                constexpr bool is_scheduler_policy =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!is_scheduler_policy)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        true);
+                    if (first == last)
+                    {
+                        return result::get(true);
+                    }
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
@@ -397,18 +403,18 @@ namespace hpx::parallel {
                     return !tok.was_cancelled();
                 };
 
+                auto f2 = [](auto&& results) {
+                    return detail::sequential_find_if_not<
+                               hpx::execution::sequenced_policy>(
+                               hpx::util::begin(results),
+                               hpx::util::end(results),
+                               hpx::functional::unwrap{})
+                            == hpx::util::end(results);
+                };
+
                 return util::partitioner<policy_type, bool>::call(
                     HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1),
-                    [](auto&& results) {
-                        return detail::sequential_find_if_not<
-                                   hpx::execution::sequenced_policy>(
-                                   hpx::util::begin(results),
-                                   hpx::util::end(results),
-                                   [](hpx::future<bool>& val) {
-                                       return val.get();
-                                   }) == hpx::util::end(results);
-                    });
+                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -438,14 +444,20 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& op,
                 Proj&& proj)
             {
-                if (first == last)
+                using result = util::detail::algorithm_result<ExPolicy, bool>;
+                constexpr bool is_scheduler_policy =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!is_scheduler_policy)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if (first == last)
+                    {
+                        return result::get(true);
+                    }
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
@@ -462,18 +474,18 @@ namespace hpx::parallel {
                     return tok.was_cancelled();
                 };
 
+                auto f2 = [](auto&& results) {
+                    return detail::sequential_find_if<
+                               hpx::execution::sequenced_policy>(
+                               hpx::util::begin(results),
+                               hpx::util::end(results),
+                               hpx::functional::unwrap{})
+                            != hpx::util::end(results);
+                };
+
                 return util::partitioner<policy_type, bool>::call(
                     HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1),
-                    [](auto&& results) {
-                        return detail::sequential_find_if<
-                                   hpx::execution::sequenced_policy>(
-                                   hpx::util::begin(results),
-                                   hpx::util::end(results),
-                                   [](hpx::future<bool>& val) {
-                                       return val.get();
-                                   }) != hpx::util::end(results);
-                    });
+                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -502,14 +514,20 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& op,
                 Proj&& proj)
             {
-                if (first == last)
+                using result = util::detail::algorithm_result<ExPolicy, bool>;
+                constexpr bool is_scheduler_policy =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!is_scheduler_policy)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        true);
+                    if (first == last)
+                    {
+                        return result::get(true);
+                    }
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
@@ -526,18 +544,18 @@ namespace hpx::parallel {
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1),
-                    [](auto&& results) {
+                auto f2 = [](auto&& results) {
                         return detail::sequential_find_if_not<
                                    hpx::execution::sequenced_policy>(
                                    hpx::util::begin(results),
                                    hpx::util::end(results),
-                                   [](hpx::future<bool>& val) {
-                                       return val.get();
-                                   }) == hpx::util::end(results);
-                    });
+                                   hpx::functional::unwrap{})
+                                == hpx::util::end(results);
+                };
+
+                return util::partitioner<policy_type, bool>::call(
+                    HPX_FORWARD(decltype(policy), policy), first,
+                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -559,8 +577,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             none_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -584,7 +601,8 @@ namespace hpx {
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(
-                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f),
+                hpx::identity_v);
         }
     } none_of{};
 
@@ -601,8 +619,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             any_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -643,8 +660,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             all_of_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
