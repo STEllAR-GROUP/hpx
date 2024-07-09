@@ -340,7 +340,6 @@ void test_reduce_bad_alloc_async(ExPolicy p, IteratorTag)
     HPX_TEST(returned_from_algorithm);
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
@@ -365,9 +364,8 @@ void test_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op)
-        | hpx::reduce(ex_policy.on(exec))
-    );
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op) |
+        hpx::reduce(ex_policy.on(exec)));
 
     int r1 = hpx::get<0>(*snd_result);
 

@@ -90,10 +90,9 @@ void test_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d))
-        | hpx::copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d)) |
+        hpx::copy(ex_policy.on(exec)));
 
     std::size_t count = 0;
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),

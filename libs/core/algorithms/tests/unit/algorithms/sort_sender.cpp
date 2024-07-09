@@ -7,9 +7,9 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "sort_tests.hpp"
 

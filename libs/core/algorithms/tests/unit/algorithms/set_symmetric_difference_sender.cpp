@@ -17,8 +17,8 @@
 #include "test_utils.hpp"
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_set_symmetric_difference_sender(LnPolicy ln_policy,
-    ExPolicy&& ex_policy, IteratorTag)
+void test_set_symmetric_difference_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -42,11 +42,9 @@ void test_set_symmetric_difference_sender(LnPolicy ln_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-            std::begin(c2), std::end(c2), std::begin(c3), comp)
-        | hpx::set_symmetric_difference(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
+                      std::begin(c2), std::end(c2), std::begin(c3), comp) |
+        hpx::set_symmetric_difference(ex_policy.on(exec)));
 
     std::set_symmetric_difference(std::begin(c1), std::end(c1), std::begin(c2),
         std::end(c2), std::begin(c4), comp);
@@ -55,20 +53,19 @@ void test_set_symmetric_difference_sender(LnPolicy ln_policy,
     HPX_TEST(std::equal(std::begin(c3), std::end(c3), std::begin(c4)));
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void set_symmetric_difference_sender_test()
 {
     using namespace hpx::execution;
-    test_set_symmetric_difference_sender(hpx::launch::sync, seq(task),
-        IteratorTag());
-    test_set_symmetric_difference_sender(hpx::launch::sync, unseq(task),
-        IteratorTag());
+    test_set_symmetric_difference_sender(
+        hpx::launch::sync, seq(task), IteratorTag());
+    test_set_symmetric_difference_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_set_symmetric_difference_sender(hpx::launch::async, par(task),
-        IteratorTag());
-    test_set_symmetric_difference_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_set_symmetric_difference_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_set_symmetric_difference_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

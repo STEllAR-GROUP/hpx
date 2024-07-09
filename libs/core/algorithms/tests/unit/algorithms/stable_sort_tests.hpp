@@ -736,10 +736,8 @@ void test_stable_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy)
         (std::numeric_limits<T>::max)(), T(std::rand()));
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
-    tt::sync_wait(
-        ex::just(c.begin(), c.end(), comp)
-        | hpx::stable_sort(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(c.begin(), c.end(), comp) |
+        hpx::stable_sort(ex_policy.on(exec)));
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);

@@ -20,9 +20,9 @@
 #include "test_utils.hpp"
 
 #if defined(HPX_DEBUG)
-constexpr std::uint64_t NELEM {111};
+constexpr std::uint64_t NELEM{111};
 #else
-constexpr std::uint64_t NELEM {1007};
+constexpr std::uint64_t NELEM{1007};
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
@@ -30,8 +30,8 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_partial_sort_copy_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -44,7 +44,7 @@ void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
-    std::vector<std::uint64_t> l {9, 7, 6, 8, 5, 4, 1, 2, 3};
+    std::vector<std::uint64_t> l{9, 7, 6, 8, 5, 4, 1, 2, 3};
     std::uint64_t v1[20], v2[20];
 
     //------------------------------------------------------------------------
@@ -55,10 +55,9 @@ void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(l)), iterator(std::end(l)), &v1[0], &v1[4])
-        | hpx::partial_sort_copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(l)), iterator(std::end(l)),
+                      &v1[0], &v1[4]) |
+        hpx::partial_sort_copy(ex_policy.on(exec)));
 
     std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[4]);
 
@@ -77,10 +76,9 @@ void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     for (int i = 0; i < 20; ++i)
         v1[i] = v2[i] = 999;
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(l)), iterator(std::end(l)), &v1[0], &v1[9])
-        | hpx::partial_sort_copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(l)), iterator(std::end(l)),
+                      &v1[0], &v1[9]) |
+        hpx::partial_sort_copy(ex_policy.on(exec)));
 
     std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[9]);
 
@@ -99,11 +97,9 @@ void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     for (int i = 0; i < 20; ++i)
         v1[i] = v2[i] = 999;
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(l)), iterator(std::end(l)), &v1[0],
-            &v1[20])
-        | hpx::partial_sort_copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(l)), iterator(std::end(l)),
+                      &v1[0], &v1[20]) |
+        hpx::partial_sort_copy(ex_policy.on(exec)));
 
     std::partial_sort_copy(l.begin(), l.end(), &v2[0], &v2[20]);
 
@@ -117,18 +113,17 @@ void test_partial_sort_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     };
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void partial_sort_copy_sender_test()
 {
     using namespace hpx::execution;
     test_partial_sort_copy_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_partial_sort_copy_sender(hpx::launch::sync, unseq(task),
-        IteratorTag());
+    test_partial_sort_copy_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
 
     test_partial_sort_copy_sender(hpx::launch::async, par(task), IteratorTag());
-    test_partial_sort_copy_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_partial_sort_copy_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

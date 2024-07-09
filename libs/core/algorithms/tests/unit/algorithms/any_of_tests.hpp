@@ -90,9 +90,8 @@ void test_any_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                [](auto v) { return v != 0; })
-            | hpx::any_of(ex_policy.on(exec))
-        );
+                [](auto v) { return v != 0; }) |
+            hpx::any_of(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 

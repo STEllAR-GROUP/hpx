@@ -22,8 +22,8 @@ unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_starts_with_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_starts_with_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -50,13 +50,12 @@ void test_starts_with_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(iterator(std::begin(some_ints)),
-                iterator(std::end(some_ints)),
-                iterator(std::begin(some_more_ints)),
-                iterator(std::end(some_more_ints)))
-            | hpx::starts_with(ex_policy.on(exec))
-        );
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(some_ints)),
+                              iterator(std::end(some_ints)),
+                              iterator(std::begin(some_more_ints)),
+                              iterator(std::end(some_more_ints))) |
+                hpx::starts_with(ex_policy.on(exec)));
 
         auto result = hpx::get<0>(*snd_result);
         HPX_TEST_EQ(result, true);
@@ -65,20 +64,19 @@ void test_starts_with_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(iterator(std::begin(some_ints)),
-                iterator(std::end(some_ints)),
-                iterator(std::begin(some_wrong_ints)),
-                iterator(std::end(some_wrong_ints)))
-            | hpx::starts_with(ex_policy.on(exec))
-        );
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(some_ints)),
+                              iterator(std::end(some_ints)),
+                              iterator(std::begin(some_wrong_ints)),
+                              iterator(std::end(some_wrong_ints))) |
+                hpx::starts_with(ex_policy.on(exec)));
 
         auto result = hpx::get<0>(*snd_result);
         HPX_TEST_EQ(result, false);
     }
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void starts_with_sender_test()
 {
     using namespace hpx::execution;

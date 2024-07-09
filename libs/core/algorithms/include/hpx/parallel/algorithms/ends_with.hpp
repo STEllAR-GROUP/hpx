@@ -172,15 +172,17 @@ namespace hpx::parallel {
 
                 if (drop < 0)
                 {
-                    if constexpr (
-                        hpx::execution_policy_has_scheduler_executor_v<ExPolicy>)
+                    if constexpr (hpx::
+                                      execution_policy_has_scheduler_executor_v<
+                                          ExPolicy>)
                     {
                         return hpx::execution::experimental::transfer_just(
                             policy.executor().sched(), false);
-                    } else
+                    }
+                    else
                     {
-                        return util::detail::algorithm_result<
-                            ExPolicy, bool>::get(false);
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(false);
                     }
                 }
 

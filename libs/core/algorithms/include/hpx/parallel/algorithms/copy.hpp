@@ -722,14 +722,15 @@ namespace hpx {
                 "Requires at least forward iterator or sequential execution.");
 
             constexpr bool is_scheduler_policy =
-                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if (hpx::parallel::detail::is_negative(count))
             {
                 if constexpr (is_scheduler_policy)
                 {
                     count = static_cast<Size>(0);
-                } else
+                }
+                else
                 {
                     // if count is representing a negative value, we do nothing
                     return hpx::parallel::util::detail::algorithm_result<

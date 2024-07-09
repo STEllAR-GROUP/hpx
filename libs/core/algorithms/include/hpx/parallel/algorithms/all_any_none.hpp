@@ -373,9 +373,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, FwdIter first, Sent last, F&& op,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool is_scheduler_policy =
@@ -408,8 +407,8 @@ namespace hpx::parallel {
                                hpx::execution::sequenced_policy>(
                                hpx::util::begin(results),
                                hpx::util::end(results),
-                               hpx::functional::unwrap{})
-                            == hpx::util::end(results);
+                               hpx::functional::unwrap{}) ==
+                        hpx::util::end(results);
                 };
 
                 return util::partitioner<policy_type, bool>::call(
@@ -444,9 +443,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, FwdIter first, Sent last, F&& op,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool is_scheduler_policy =
@@ -479,8 +477,8 @@ namespace hpx::parallel {
                                hpx::execution::sequenced_policy>(
                                hpx::util::begin(results),
                                hpx::util::end(results),
-                               hpx::functional::unwrap{})
-                            != hpx::util::end(results);
+                               hpx::functional::unwrap{}) !=
+                        hpx::util::end(results);
                 };
 
                 return util::partitioner<policy_type, bool>::call(
@@ -514,9 +512,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, FwdIter first, Sent last, F&& op,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 constexpr bool is_scheduler_policy =
@@ -545,12 +542,12 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [](auto&& results) {
-                        return detail::sequential_find_if_not<
-                                   hpx::execution::sequenced_policy>(
-                                   hpx::util::begin(results),
-                                   hpx::util::end(results),
-                                   hpx::functional::unwrap{})
-                                == hpx::util::end(results);
+                    return detail::sequential_find_if_not<
+                               hpx::execution::sequenced_policy>(
+                               hpx::util::begin(results),
+                               hpx::util::end(results),
+                               hpx::functional::unwrap{}) ==
+                        hpx::util::end(results);
                 };
 
                 return util::partitioner<policy_type, bool>::call(
@@ -601,8 +598,7 @@ namespace hpx {
                 "Required at least input iterator.");
 
             return hpx::parallel::detail::none_of().call(
-                hpx::execution::seq, first, last, HPX_MOVE(f),
-                hpx::identity_v);
+                hpx::execution::seq, first, last, HPX_MOVE(f), hpx::identity_v);
         }
     } none_of{};
 

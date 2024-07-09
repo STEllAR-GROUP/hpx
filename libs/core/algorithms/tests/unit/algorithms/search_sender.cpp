@@ -17,7 +17,6 @@
 
 #include "test_utils.hpp"
 
-
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -42,11 +41,10 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-            std::begin(h), std::end(h))
-        | hpx::search(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                          std::begin(h), std::end(h)) |
+            hpx::search(ex_policy.on(exec)));
 
     iterator index = hpx::get<0>(*snd_result);
 
@@ -55,7 +53,7 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void search_sender_test()
 {
     using namespace hpx::execution;

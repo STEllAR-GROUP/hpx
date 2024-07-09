@@ -74,7 +74,7 @@ void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         "hpx::is_async_execution_policy_v<ExPolicy>");
 
     using base_iterator = std::vector<int>::iterator;
-    using iterator =  test::test_iterator<base_iterator, IteratorTag>;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -85,14 +85,12 @@ void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     {
         std::vector<int> c = test::fill_all_any_none<int>(3, i);    //-V106
 
-
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                [](auto v) { return v != 0; })
-            | hpx::none_of(ex_policy.on(exec))
-        );
+                [](auto v) { return v != 0; }) |
+            hpx::none_of(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -103,7 +101,6 @@ void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         HPX_TEST_EQ(result, expected);
     }
 }
-
 
 template <typename IteratorTag, typename Proj = hpx::identity>
 void test_none_of_ranges_seq(IteratorTag, Proj proj = Proj())

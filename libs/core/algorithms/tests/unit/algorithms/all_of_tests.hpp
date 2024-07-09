@@ -73,7 +73,7 @@ void test_all_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
 
-    using base_iterator =  std::vector<int>::iterator;
+    using base_iterator = std::vector<int>::iterator;
     using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     namespace ex = hpx::execution::experimental;
@@ -89,9 +89,8 @@ void test_all_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                [](auto v) { return v != 0; })
-            | hpx::all_of(ex_policy.on(exec))
-        );
+                [](auto v) { return v != 0; }) |
+            hpx::all_of(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 

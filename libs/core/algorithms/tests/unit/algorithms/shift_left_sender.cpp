@@ -19,11 +19,11 @@
 
 #include "test_utils.hpp"
 
-constexpr std::size_t ARR_SIZE {100007};
+constexpr std::size_t ARR_SIZE{100007};
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_shift_left_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_shift_left_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -42,41 +42,33 @@ void test_shift_left_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     // shift by zero should have no effect
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), 0)
-        | hpx::shift_left(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), 0) |
+        hpx::shift_left(ex_policy.on(exec)));
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
     // shift by a negative number should have no effect
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), -4)
-        | hpx::shift_left(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), -4) |
+        hpx::shift_left(ex_policy.on(exec)));
     HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d)));
 
     std::size_t n = (std::rand() % ARR_SIZE) + 1;
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), n)
-        | hpx::shift_left(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)), n) |
+        hpx::shift_left(ex_policy.on(exec)));
 
     std::move(std::begin(d) + n, std::end(d), std::begin(d));
 
     // verify values
-    HPX_TEST(std::equal(std::begin(c),
-        std::begin(c) + (ARR_SIZE - n), std::begin(d)));
+    HPX_TEST(std::equal(
+        std::begin(c), std::begin(c) + (ARR_SIZE - n), std::begin(d)));
 
     // ensure shift by more than n does not crash
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), (ARR_SIZE + 1))
-        | hpx::shift_left(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      (ARR_SIZE + 1)) |
+        hpx::shift_left(ex_policy.on(exec)));
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void shift_left_sender_test()
 {
     using namespace hpx::execution;

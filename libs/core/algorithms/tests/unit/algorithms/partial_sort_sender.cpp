@@ -21,11 +21,11 @@
 ////////////////////////////////////////////////////////////////////////////
 unsigned int seed = std::random_device{}();
 std::mt19937 gen(seed);
-constexpr std::uint64_t  SIZE { 1007 };
+constexpr std::uint64_t SIZE{1007};
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_partial_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_partial_sort_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -56,9 +56,8 @@ void test_partial_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
         tt::sync_wait(
             ex::just(iterator(std::begin(B)), iterator(std::begin(B) + i),
-                iterator(std::end(B)), compare_t{})
-            | hpx::partial_sort(ex_policy.on(exec))
-        );
+                iterator(std::end(B)), compare_t{}) |
+            hpx::partial_sort(ex_policy.on(exec)));
 
         for (std::uint64_t j = 0; j < i; ++j)
         {
@@ -67,8 +66,7 @@ void test_partial_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     }
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void partial_sort_sender_test()
 {
     using namespace hpx::execution;
@@ -76,8 +74,8 @@ void partial_sort_sender_test()
     test_partial_sort_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_partial_sort_sender(hpx::launch::async, par(task), IteratorTag());
-    test_partial_sort_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_partial_sort_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

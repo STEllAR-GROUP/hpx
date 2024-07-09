@@ -113,8 +113,8 @@ namespace hpx::parallel {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        decltype(auto) transfer(ExPolicy&& policy, FwdIter1 first, Sent1 last,
-            FwdIter2 dest)
+        decltype(auto) transfer(
+            ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Required at least forward iterator.");

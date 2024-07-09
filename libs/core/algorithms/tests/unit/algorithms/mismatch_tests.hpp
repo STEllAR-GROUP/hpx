@@ -504,10 +504,8 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(begin1, end1, std::begin(c2))
-            | hpx::mismatch(ex_policy.on(exec))
-        );
+        auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2)) |
+            hpx::mismatch(ex_policy.on(exec)));
 
         auto result = hpx::get<0>(*snd_result);
 
@@ -524,10 +522,8 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(begin1, end1, std::begin(c2))
-            | hpx::mismatch(ex_policy.on(exec))
-        );
+        auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2)) |
+            hpx::mismatch(ex_policy.on(exec)));
 
         auto result = hpx::get<0>(*snd_result);
 

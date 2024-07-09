@@ -34,8 +34,8 @@ struct equal_f
 };
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_replace_copy_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_replace_copy_if_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -57,11 +57,9 @@ void test_replace_copy_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d1),
-            equal_f(c[idx]), c[idx] + 1)
-        | hpx::replace_copy_if(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d1), equal_f(c[idx]), c[idx] + 1) |
+        hpx::replace_copy_if(ex_policy.on(exec)));
 
     std::replace_copy_if(std::begin(c), std::end(c), std::begin(d2),
         equal_f(c[idx]), c[idx] + 1);
@@ -76,8 +74,7 @@ void test_replace_copy_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(count, d1.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void replace_copy_if_sender_test()
 {
     using namespace hpx::execution;
@@ -85,8 +82,8 @@ void replace_copy_if_sender_test()
     test_replace_copy_if_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_replace_copy_if_sender(hpx::launch::async, par(task), IteratorTag());
-    test_replace_copy_if_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_replace_copy_if_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

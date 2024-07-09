@@ -173,9 +173,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent_,
                 typename Pred, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& orgpolicy, FwdIter first, Sent_ last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& orgpolicy, FwdIter first,
+                Sent_ last, Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, FwdIter>;
                 using difference_type =
@@ -217,7 +216,7 @@ namespace hpx::parallel {
 
                 auto f2 = [tok, count, first, last](
                               auto&&... data) mutable -> FwdIter {
-                    static_assert(sizeof...(data) < 2 );
+                    static_assert(sizeof...(data) < 2);
                     if constexpr (sizeof...(data) == 1)
                     {
                         // make sure iterators embedded in function object that
@@ -281,9 +280,8 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(hpx::adjacent_find_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred pred = Pred())
+        friend decltype(auto) tag_fallback_invoke(hpx::adjacent_find_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least a forward iterator");

@@ -18,8 +18,8 @@
 #include "test_utils.hpp"
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_swap_ranges_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_swap_ranges_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -38,10 +38,9 @@ void test_swap_ranges_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d))
-        | hpx::swap_ranges(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d)) |
+        hpx::swap_ranges(ex_policy.on(exec)));
 
     //equal begins at one, therefore counter is started at 1
     std::size_t count = 1;
@@ -63,8 +62,7 @@ void test_swap_ranges_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(count, d.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void swap_ranges_sender_test()
 {
     using namespace hpx::execution;

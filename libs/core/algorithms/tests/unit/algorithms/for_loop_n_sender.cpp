@@ -24,8 +24,8 @@ int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_for_loop_n_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -42,11 +42,9 @@ void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), c.size(),
-            [](iterator it) { *it = 42; })
-        | hpx::experimental::for_loop_n(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), [](iterator it) {
+        *it = 42;
+    }) | hpx::experimental::for_loop_n(ex_policy.on(exec)));
 
     // verify values
     std::size_t count = 0;
@@ -57,7 +55,7 @@ void test_for_loop_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(count, c.size());
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void for_loop_n_sender_test()
 {
     using namespace hpx::execution;

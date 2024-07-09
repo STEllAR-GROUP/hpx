@@ -486,8 +486,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend decltype(auto) tag_fallback_invoke(count_if_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F f)
+        friend decltype(auto) tag_fallback_invoke(
+            count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");

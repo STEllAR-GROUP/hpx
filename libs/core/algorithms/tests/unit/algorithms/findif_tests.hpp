@@ -86,11 +86,10 @@ void test_find_if_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-            [](auto v) { return v == int(1); })
-        | hpx::find_if(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                          [](auto v) { return v == int(1); }) |
+            hpx::find_if(ex_policy.on(exec)));
 
     iterator index = hpx::get<0>(*snd_result);
 

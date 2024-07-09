@@ -19,8 +19,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_max_element_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -39,11 +39,10 @@ void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(end),
-            std::less<std::size_t>())
-        | hpx::max_element(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
+                          std::less<std::size_t>()) |
+            hpx::max_element(ex_policy.on(exec)));
 
     iterator r = hpx::get<0>(*snd_result);
     HPX_TEST(r != end);
@@ -53,10 +52,9 @@ void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
 
-    snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
-        | hpx::max_element(ex_policy.on(exec))
-    );
+    snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::max_element(ex_policy.on(exec)));
 
     r = hpx::get<0>(*snd_result);
     HPX_TEST(r != end);
@@ -66,7 +64,7 @@ void test_max_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(*ref, *r);
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void max_element_sender_test()
 {
     using namespace hpx::execution;

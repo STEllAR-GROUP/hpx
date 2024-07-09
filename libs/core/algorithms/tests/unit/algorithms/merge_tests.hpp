@@ -482,15 +482,13 @@ void test_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     auto snd_result = tt::sync_wait(
         ex::just(iterator(std::begin(src1)), iterator(std::end(src1)),
             iterator(std::begin(src2)), iterator(std::end(src2)),
-            iterator(std::begin(dest_res)), comp)
-        | hpx::merge(ex_policy.on(exec))
-    );
+            iterator(std::begin(dest_res)), comp) |
+        hpx::merge(ex_policy.on(exec)));
 
     auto result = hpx::get<0>(*snd_result);
 
     auto solution = std::merge(std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2), std::begin(dest_sol),
-        comp);
+        std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
 
     bool equality = test::equal(
         std::begin(dest_res), result.base(), std::begin(dest_sol), solution);

@@ -716,7 +716,7 @@ void test_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy)
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
     msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
-    random);
+        random);
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
@@ -732,9 +732,7 @@ void test_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy)
 
     std::uint64_t t = hpx::chrono::high_resolution_clock::now();
     tt::sync_wait(
-        ex::just(c.begin(), c.end(), comp)
-        | hpx::sort(ex_policy.on(exec))
-    );
+        ex::just(c.begin(), c.end(), comp) | hpx::sort(ex_policy.on(exec)));
     std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
 
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);

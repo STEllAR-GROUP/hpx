@@ -6,25 +6,21 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "none_of_tests.hpp"
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void none_of_sender_test()
 {
     using namespace hpx::execution;
-    test_none_of_sender(hpx::launch::sync, seq(task),
-        IteratorTag());
-    test_none_of_sender(hpx::launch::sync, unseq(task),
-        IteratorTag());
+    test_none_of_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_none_of_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_none_of_sender(hpx::launch::async, par(task),
-        IteratorTag());
-    test_none_of_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_none_of_sender(hpx::launch::async, par(task), IteratorTag());
+    test_none_of_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

@@ -121,15 +121,12 @@ void test_destroy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(p), iterator(p + data_size))
-        | hpx::destroy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(p), iterator(p + data_size)) |
+        hpx::destroy(ex_policy.on(exec)));
 
     HPX_TEST_EQ(destruct_count.load(), data_size);
 
     std::free(p);
-
 }
 
 template <typename ExPolicy, typename IteratorTag>

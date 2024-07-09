@@ -53,14 +53,14 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_adjacent_find_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_adjacent_find_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
 
-    using base_iterator =  std::vector<int>::iterator;
-    using iterator =  test::test_iterator<base_iterator, IteratorTag>;
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
 
     // fill vector with random values about 1
     std::vector<int> c(10007);
@@ -77,10 +77,9 @@ void test_adjacent_find_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
-        | hpx::adjacent_find(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::adjacent_find(ex_policy.on(exec)));
 
     iterator index = hpx::get<0>(*snd_result);
 

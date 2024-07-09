@@ -476,8 +476,8 @@ void test_inplace_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_inplace_merge_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -511,11 +511,9 @@ void test_inplace_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(res_first), iterator(res_middle), iterator(res_last),
-            comp)
-        | hpx::inplace_merge(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(res_first), iterator(res_middle),
+                      iterator(res_last), comp) |
+        hpx::inplace_merge(ex_policy.on(exec)));
 
     std::inplace_merge(sol_first, sol_middle, sol_last, comp);
 

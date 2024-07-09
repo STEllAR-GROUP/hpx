@@ -7,13 +7,13 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "reduce_tests.hpp"
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void reduce_sender_test()
 {
     using namespace hpx::execution;

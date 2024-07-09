@@ -22,12 +22,11 @@
 int seed = std::random_device{}();
 std::mt19937 gen(seed);
 
-constexpr std::size_t SIZE {10007};
-
+constexpr std::size_t SIZE{10007};
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_nth_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_nth_element_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -40,8 +39,8 @@ void test_nth_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     std::vector<std::size_t> c(SIZE);
-    std::generate(std::begin(c), std::end(c),
-        []() { return std::rand() % SIZE; });
+    std::generate(
+        std::begin(c), std::end(c), []() { return std::rand() % SIZE; });
     std::vector<std::size_t> d = c;
 
     auto rand_index = std::rand() % SIZE;
@@ -50,9 +49,8 @@ void test_nth_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     tt::sync_wait(
         ex::just(iterator(std::begin(c)), iterator(std::begin(c) + rand_index),
-            iterator(std::end(c)))
-        | hpx::nth_element(ex_policy.on(exec))
-    );
+            iterator(std::end(c))) |
+        hpx::nth_element(ex_policy.on(exec)));
 
     std::nth_element(std::begin(d), std::begin(d) + rand_index, std::end(d));
 
@@ -69,7 +67,7 @@ void test_nth_element_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     }
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void nth_element_sender_test()
 {
     using namespace hpx::execution;

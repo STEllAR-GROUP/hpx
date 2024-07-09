@@ -7,13 +7,13 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "equal_tests.hpp"
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void equal_sender_test1()
 {
     using namespace hpx::execution;
@@ -24,7 +24,7 @@ void equal_sender_test1()
     test_equal1_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void equal_sender_test2()
 {
     using namespace hpx::execution;

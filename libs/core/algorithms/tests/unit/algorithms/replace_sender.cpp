@@ -39,11 +39,9 @@ void test_replace_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), c[idx],
-            c[idx] + 1)
-        | hpx::replace(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      c[idx], c[idx] + 1) |
+        hpx::replace(ex_policy.on(exec)));
 
     std::replace(std::begin(d), std::end(d), d[idx], d[idx] + 1);
 
@@ -57,8 +55,7 @@ void test_replace_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void replace_sender_test()
 {
     using namespace hpx::execution;

@@ -12,7 +12,7 @@
 
 #include "all_of_tests.hpp"
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void all_of_sender_test()
 {
     using namespace hpx::execution;

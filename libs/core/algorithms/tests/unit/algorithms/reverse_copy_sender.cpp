@@ -18,8 +18,8 @@
 #include "test_utils.hpp"
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_reverse_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_reverse_copy_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -39,10 +39,9 @@ void test_reverse_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d1))
-        | hpx::reverse_copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d1)) |
+        hpx::reverse_copy(ex_policy.on(exec)));
 
     std::reverse_copy(std::begin(c), std::end(c), std::begin(d2));
 
@@ -56,8 +55,7 @@ void test_reverse_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(count, d1.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void reverse_copy_sender_test()
 {
     using namespace hpx::execution;
@@ -65,8 +63,8 @@ void reverse_copy_sender_test()
     test_reverse_copy_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_reverse_copy_sender(hpx::launch::async, par(task), IteratorTag());
-    test_reverse_copy_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_reverse_copy_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

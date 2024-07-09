@@ -20,8 +20,8 @@
 #include "test_utils.hpp"
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_transform_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_transform_reduce_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -36,7 +36,7 @@ void test_transform_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     std::vector<std::size_t> c(10007);
     std::iota(std::begin(c), std::end(c), std::rand());
 
-    using result_type =  hpx::tuple<std::size_t, std::size_t>;
+    using result_type = hpx::tuple<std::size_t, std::size_t>;
 
     using hpx::get;
     using hpx::make_tuple;
@@ -53,11 +53,10 @@ void test_transform_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), init,
-            reduce_op, convert_op)
-        | hpx::transform_reduce(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                          init, reduce_op, convert_op) |
+            hpx::transform_reduce(ex_policy.on(exec)));
 
     result_type r1 = hpx::get<0>(*snd_result);
 
@@ -71,7 +70,7 @@ void test_transform_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(get<1>(r1), get<1>(r2));
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void transform_reduce_sender_test()
 {
     using namespace hpx::execution;
@@ -79,8 +78,8 @@ void transform_reduce_sender_test()
     test_transform_reduce_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_transform_reduce_sender(hpx::launch::async, par(task), IteratorTag());
-    test_transform_reduce_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_transform_reduce_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

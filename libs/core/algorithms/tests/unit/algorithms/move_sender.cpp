@@ -41,10 +41,9 @@ void test_move_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), std::begin(d))
-        | hpx::move(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d)) |
+        hpx::move(ex_policy.on(exec)));
 
     //copy contents of d back into c for testing
     std::copy(std::begin(d), std::end(d), std::begin(d));
@@ -59,8 +58,7 @@ void test_move_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     HPX_TEST_EQ(count, d.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void move_sender_test()
 {
     using namespace hpx::execution;

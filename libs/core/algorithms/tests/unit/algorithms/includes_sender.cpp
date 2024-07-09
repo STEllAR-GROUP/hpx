@@ -24,8 +24,8 @@ std::mt19937 gen(seed);
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_includes1_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -54,11 +54,10 @@ void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     {
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(iterator(std::begin(c1)), iterator(std::end(c1)), start_it,
-                end_it)
-            | hpx::includes(ex_policy.on(exec))
-        );
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c1)),
+                              iterator(std::end(c1)), start_it, end_it) |
+                hpx::includes(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -87,9 +86,8 @@ void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
             auto snd_result = tt::sync_wait(
                 ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                    std::begin(c2), std::end(c2))
-                | hpx::includes(ex_policy.on(exec))
-            );
+                    std::begin(c2), std::end(c2)) |
+                hpx::includes(ex_policy.on(exec)));
 
             bool result = hpx::get<0>(*snd_result);
 
@@ -103,8 +101,8 @@ void test_includes1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 }
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_includes2_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -134,10 +132,9 @@ void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
         auto snd_result = tt::sync_wait(
-            ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                start_it, end_it, std::less<std::size_t>())
-            | hpx::includes(ex_policy.on(exec))
-        );
+            ex::just(iterator(std::begin(c1)), iterator(std::end(c1)), start_it,
+                end_it, std::less<std::size_t>()) |
+            hpx::includes(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -166,9 +163,8 @@ void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
             auto snd_result = tt::sync_wait(
                 ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                    std::begin(c2), std::end(c2), std::less<std::size_t>())
-                | hpx::includes(ex_policy.on(exec))
-            );
+                    std::begin(c2), std::end(c2), std::less<std::size_t>()) |
+                hpx::includes(ex_policy.on(exec)));
 
             bool result = hpx::get<0>(*snd_result);
 
@@ -181,7 +177,7 @@ void test_includes2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     }
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void includes_sender_test1()
 {
     using namespace hpx::execution;
@@ -192,7 +188,7 @@ void includes_sender_test1()
     test_includes1_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void includes_sender_test2()
 {
     using namespace hpx::execution;

@@ -19,8 +19,8 @@
 #include "test_utils.hpp"
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_rotate_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_rotate_copy_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -43,11 +43,9 @@ void test_rotate_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(mid), iterator(std::end(c)),
-            std::begin(d1))
-        | hpx::rotate_copy(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(mid),
+                      iterator(std::end(c)), std::begin(d1)) |
+        hpx::rotate_copy(ex_policy.on(exec)));
 
     std::rotate_copy(std::begin(c), mid, std::end(c), std::begin(d2));
 
@@ -61,8 +59,7 @@ void test_rotate_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST_EQ(count, d1.size());
 }
 
-
-template<typename IteratorTag>
+template <typename IteratorTag>
 void rotate_copy_sender_test()
 {
     using namespace hpx::execution;

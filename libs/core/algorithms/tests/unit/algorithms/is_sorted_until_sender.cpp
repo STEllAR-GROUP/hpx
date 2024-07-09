@@ -24,8 +24,8 @@ std::mt19937 gen(seed);
 std::uniform_int_distribution<> dis(0, 99);
 
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_is_sorted_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_is_sorted_until_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -42,10 +42,9 @@ void test_is_sorted_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
-        | hpx::is_sorted_until(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::is_sorted_until(ex_policy.on(exec)));
 
     iterator until = hpx::get<0>(*snd_result);
 
@@ -54,7 +53,7 @@ void test_is_sorted_until_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
     HPX_TEST(until == iterator(test_index));
 }
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void is_sorted_until_sender_test()
 {
     using namespace hpx::execution;
@@ -62,8 +61,8 @@ void is_sorted_until_sender_test()
     test_is_sorted_until_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_is_sorted_until_sender(hpx::launch::async, par(task), IteratorTag());
-    test_is_sorted_until_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_is_sorted_until_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

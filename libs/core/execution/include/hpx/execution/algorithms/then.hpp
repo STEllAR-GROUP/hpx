@@ -98,7 +98,6 @@ namespace hpx::execution::experimental {
                 // body is in a helper function.
                 HPX_MOVE(r).set_value_helper(HPX_FORWARD(Ts, ts)...);
             }
-
         };
 #if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION >= 110000
 #pragma GCC diagnostic pop

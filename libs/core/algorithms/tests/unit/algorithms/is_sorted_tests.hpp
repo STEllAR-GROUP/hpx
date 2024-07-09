@@ -421,10 +421,9 @@ void test_sorted_bad_alloc_seq(IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
-
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_is_sorted_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
-    IteratorTag)
+void test_is_sorted_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
     static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
         "hpx::is_async_execution_policy_v<ExPolicy>");
@@ -442,10 +441,9 @@ void test_is_sorted_sender(LnPolicy ln_policy, ExPolicy&& ex_policy,
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)))
-        | hpx::is_sorted(ex_policy.on(exec))
-    );
+    auto snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::is_sorted(ex_policy.on(exec)));
 
     bool is_ordered = hpx::get<0>(*snd_result);
 

@@ -517,8 +517,9 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     const int rand_base = std::rand();
-    auto pred = [](const std::size_t a, const std::size_t b)
-        -> bool { return a == b; };
+    auto pred = [](const std::size_t a, const std::size_t b) -> bool {
+        return a == b;
+    };
     std::size_t const size = 10007;
     std::vector<std::size_t> c(size), d;
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
@@ -527,9 +528,8 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred)
-        | hpx::unique(ex_policy.on(exec))
-    );
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
+        hpx::unique(ex_policy.on(exec)));
 
     auto result = hpx::get<0>(*snd_result);
     auto solution = std::unique(std::begin(d), std::end(d), pred);

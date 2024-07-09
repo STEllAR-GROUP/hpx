@@ -7,13 +7,13 @@
 #include <hpx/init.hpp>
 
 #include <iostream>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "adjacentfind_tests.hpp"
 
-template<typename IteratorTag>
+template <typename IteratorTag>
 void adjacent_find_sender_test()
 {
     using namespace hpx::execution;
@@ -22,8 +22,8 @@ void adjacent_find_sender_test()
     test_adjacent_find_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
     test_adjacent_find_sender(hpx::launch::async, par(task), IteratorTag());
-    test_adjacent_find_sender(hpx::launch::async, par_unseq(task),
-        IteratorTag());
+    test_adjacent_find_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
 int hpx_main(hpx::program_options::variables_map& vm)

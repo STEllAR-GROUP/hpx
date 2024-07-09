@@ -85,10 +85,8 @@ void test_fill_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(iterator(std::begin(c)), c.size(), 10)
-        | hpx::fill_n(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(iterator(std::begin(c)), c.size(), 10) |
+        hpx::fill_n(ex_policy.on(exec)));
 
     // verify values
     std::size_t count = 0;
@@ -97,7 +95,6 @@ void test_fill_n_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         ++count;
     });
     HPX_TEST_EQ(count, c.size());
-
 }
 
 template <typename ExPolicy, typename IteratorTag>

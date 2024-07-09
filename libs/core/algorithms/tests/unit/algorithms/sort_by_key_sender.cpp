@@ -70,9 +70,9 @@ namespace debug {
 }    // namespace debug
 
 #undef msg
-#define msg(a, b, d)                                      \
-    std::cout << std::setw(60) << a << std::setw(12) << b \
-              << std::setw(8) << #d << "\t";
+#define msg(a, b, d)                                                           \
+    std::cout << std::setw(60) << a << std::setw(12) << b << std::setw(8)      \
+              << #d << "\t";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -114,10 +114,8 @@ void test_sort_by_key_sender(LnPolicy ln_policy, ExPolicy&& ex_policy)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    tt::sync_wait(
-        ex::just(keys.begin(), keys.end(), values.begin())
-        | hpx::experimental::sort_by_key(ex_policy.on(exec))
-    );
+    tt::sync_wait(ex::just(keys.begin(), keys.end(), values.begin()) |
+        hpx::experimental::sort_by_key(ex_policy.on(exec)));
 
     // after sorting by key, the values should be equal to the original keys
     bool is_equal = std::equal(keys.begin(), keys.end(), o_values.begin());

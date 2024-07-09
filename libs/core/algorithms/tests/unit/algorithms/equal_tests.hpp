@@ -126,9 +126,8 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
         auto snd_result = tt::sync_wait(
-            ex::just(std::begin(c1), std::end(c1), std::begin(c2))
-            | hpx::equal(ex_policy.on(exec))
-        );
+            ex::just(std::begin(c1), std::end(c1), std::begin(c2)) |
+            hpx::equal(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -145,11 +144,10 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-        auto snd_result = tt::sync_wait(
-            ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2))
-            | hpx::equal(ex_policy.on(exec))
-        );
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c1)),
+                              iterator(std::end(c1)), std::begin(c2)) |
+                hpx::equal(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -159,7 +157,6 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         // verify values
         HPX_TEST_EQ(result, expected);
     }
-
 }
 
 template <typename ExPolicy, typename IteratorTag>
@@ -308,9 +305,8 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<>())
-            | hpx::equal(ex_policy.on(exec))
-        );
+                std::begin(c2), std::equal_to<>()) |
+            hpx::equal(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -329,9 +325,8 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
-                std::begin(c2), std::equal_to<>())
-            | hpx::equal(ex_policy.on(exec))
-        );
+                std::begin(c2), std::equal_to<>()) |
+            hpx::equal(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
 
@@ -341,7 +336,6 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         // verify values
         HPX_TEST_EQ(result, expected);
     }
-
 }
 
 template <typename ExPolicy, typename IteratorTag>
