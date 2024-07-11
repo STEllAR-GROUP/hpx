@@ -1,4 +1,4 @@
-//  Copyright (c) 2014-2017 Hartmut Kaiser
+//  Copyright (c) 2014-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -41,8 +41,7 @@ struct data_get_action_base
 {
 };
 
-template <typename T, T Data,
-    typename Derived = hpx::actions::detail::this_type>
+template <typename T, T Data, typename Derived = void>
 struct data_get_action
   : public data_get_action_base<typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<
@@ -67,8 +66,7 @@ struct data_set_action_base
 {
 };
 
-template <typename T, T Data,
-    typename Derived = hpx::actions::detail::this_type>
+template <typename T, T Data, typename Derived = void>
 struct data_set_action
   : public data_set_action_base<typename std::remove_pointer<T>::type,
         typename hpx::actions::detail::action_type<

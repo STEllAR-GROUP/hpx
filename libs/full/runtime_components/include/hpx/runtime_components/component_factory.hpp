@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -30,9 +30,9 @@
 ///             If this parameter is not given, the first parameter is used.
 ///
 /// \param mode The \a mode parameter has to be one of the defined enumeration
-///             values of the enumeration \a hpx::components::factory_state_enum.
+///             values of the enumeration \a hpx::components::factory_state.
 ///             The default for this parameter is
-///             \a hpx::components::factory_enabled.
+///             \a hpx::components::factory_state::enabled.
 ///
 #define HPX_REGISTER_COMPONENT(type, name, mode)
 
@@ -59,14 +59,14 @@
     /**/
 
 #define HPX_REGISTER_ENABLED_COMPONENT_FACTORY(ComponentType, componentname)   \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                  \
-        ComponentType, componentname, ::hpx::components::factory_enabled)      \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(ComponentType, componentname,     \
+        ::hpx::components::factory_state::enabled)                             \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
     /**/
 
 #define HPX_REGISTER_DISABLED_COMPONENT_FACTORY(ComponentType, componentname)  \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                  \
-        ComponentType, componentname, ::hpx::components::factory_disabled)     \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(ComponentType, componentname,     \
+        ::hpx::components::factory_state::disabled)                            \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
 /**/
 
@@ -77,12 +77,12 @@
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_1(ComponentType)                \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                  \
-        ComponentType, ComponentType, ::hpx::components::factory_check)        \
+        ComponentType, ComponentType, ::hpx::components::factory_state::check) \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_2(ComponentType, componentname) \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                                  \
-        ComponentType, componentname, ::hpx::components::factory_check)        \
+        ComponentType, componentname, ::hpx::components::factory_state::check) \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_3(                              \
@@ -111,15 +111,15 @@
 
 #define HPX_REGISTER_ENABLED_COMPONENT_FACTORY_DYNAMIC(                        \
     ComponentType, componentname)                                              \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                          \
-        ComponentType, componentname, ::hpx::components::factory_enabled)      \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(ComponentType,            \
+        componentname, ::hpx::components::factory_state::enabled)              \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
     /**/
 
 #define HPX_REGISTER_DISABLED_COMPONENT_FACTORY_DYNAMIC(                       \
     ComponentType, componentname)                                              \
-    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                          \
-        ComponentType, componentname, ::hpx::components::factory_disabled)     \
+    HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(ComponentType,            \
+        componentname, ::hpx::components::factory_state::disabled)             \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
     /**/
 
@@ -129,13 +129,13 @@
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_1(ComponentType)        \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                          \
-        ComponentType, ComponentType, ::hpx::components::factory_check)        \
+        ComponentType, ComponentType, ::hpx::components::factory_state::check) \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_2(                      \
     ComponentType, componentname)                                              \
     HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                          \
-        ComponentType, componentname, ::hpx::components::factory_check)        \
+        ComponentType, componentname, ::hpx::components::factory_state::check) \
     HPX_DEFINE_GET_COMPONENT_TYPE(ComponentType::wrapped_type)                 \
 /**/
 #define HPX_REGISTER_MINIMAL_COMPONENT_FACTORY_DYNAMIC_3(                      \

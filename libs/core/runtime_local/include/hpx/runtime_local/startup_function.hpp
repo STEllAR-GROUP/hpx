@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,10 +15,11 @@
 #include <hpx/functional/move_only_function.hpp>
 
 namespace hpx {
+
     ///////////////////////////////////////////////////////////////////////////
-    /// The type of a function which is registered to be executed as a
+    /// The type of the function which is registered to be executed as a
     /// startup or pre-startup function.
-    typedef hpx::move_only_function<void()> startup_function_type;
+    using startup_function_type = hpx::move_only_function<void()>;
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief Add a function to be executed by a HPX thread before hpx_main
@@ -33,7 +34,7 @@ namespace hpx {
     ///           a pre-startup function.
     ///
     /// \note If this function is called while the pre-startup functions are
-    ///       being executed or after that point, it will raise a invalid_status
+    ///       being executed or after that point, it will raise aninvalid_status
     ///       exception.
     ///
     ///       This function is one of the few API functions which can be called
@@ -58,7 +59,7 @@ namespace hpx {
     ///           a startup function.
     ///
     /// \note If this function is called while the startup functions are
-    ///       being executed or after that point, it will raise a invalid_status
+    ///       being executed or after that point, it will raise an invalid_status
     ///       exception.
     ///
     ///       This function is one of the few API functions which can be called

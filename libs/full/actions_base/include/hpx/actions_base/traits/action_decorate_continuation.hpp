@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,7 @@
 
 #include <hpx/actions_base/traits/action_continuation.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
@@ -20,8 +20,8 @@ namespace hpx { namespace traits {
 
         static constexpr bool call(continuation_type&) noexcept
         {
-            // by default we do nothing
+            // by default, we do nothing
             return false;    // continuation has not been modified
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

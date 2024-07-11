@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -106,7 +106,7 @@ namespace hpx {
     /// \param id           [in] The id to register using the given base name.
     /// \param sequence_nr  [in, optional] The sequential number to use for the
     ///                     registration of the id. This number has to be
-    ///                     unique system wide for each registration using the
+    ///                     unique system-wide  for each registration using the
     ///                     same base name. The default is the current locality
     ///                     identifier. Also, the sequence numbers have to be
     ///                     consecutive starting from zero.
@@ -118,11 +118,11 @@ namespace hpx {
     ///          unique.
     ///
     HPX_EXPORT hpx::future<bool> register_with_basename(std::string base_name,
-        hpx::id_type id,
+        hpx::id_type const& id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0));
 
     HPX_EXPORT bool register_with_basename(hpx::launch::sync_policy,
-        std::string base_name, hpx::id_type id,
+        std::string base_name, hpx::id_type const& id,
         std::size_t sequence_nr = ~static_cast<std::size_t>(0),
         error_code& ec = throws);
 
@@ -137,7 +137,7 @@ namespace hpx {
     ///                     the given base name.
     /// \param sequence_nr  [in, optional] The sequential number to use for the
     ///                     registration of the id. This number has to be
-    ///                     unique system wide for each registration using the
+    ///                     unique system-wide  for each registration using the
     ///                     same base name. The default is the current locality
     ///                     identifier. Also, the sequence numbers have to be
     ///                     consecutive starting from zero.
@@ -259,7 +259,7 @@ namespace hpx {
     ///                     the given base name.
     /// \param sequence_nr  [in, optional] The sequential number to use for the
     ///                     registration of the id. This number has to be
-    ///                     unique system wide for each registration using the
+    ///                     unique system-wide  for each registration using the
     ///                     same base name. The default is the current locality
     ///                     identifier. Also, the sequence numbers have to be
     ///                     consecutive starting from zero.

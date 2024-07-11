@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,19 +12,19 @@
 #include <string>
 #include <thread>
 
-namespace hpx { namespace runtime_local {
+namespace hpx::runtime_local {
 
     ///////////////////////////////////////////////////////////////////////////
     /// Types of kernel threads registered with the runtime
     enum class os_thread_type
     {
         unknown = -1,
-        main_thread = 0,    ///< kernel thread represents main thread
-        worker_thread,      ///< kernel thread is used to schedule HPX threads
-        io_thread,          ///< kernel thread can be used for IO operations
-        timer_thread,       ///< kernel is used by timer operations
-        parcel_thread,      ///< kernel is used by networking operations
-        custom_thread       ///< kernel is registered by the application
+        main_thread = 0,      ///< kernel thread represents main thread
+        worker_thread = 1,    ///< kernel thread is used to schedule HPX threads
+        io_thread = 2,        ///< kernel thread can be used for IO operations
+        timer_thread = 3,     ///< kernel is used by timer operations
+        parcel_thread = 4,    ///< kernel is used by networking operations
+        custom_thread = 5     ///< kernel is registered by the application
     };
 
     /// Return a human-readable name representing one of the kernel thread types
@@ -41,7 +41,7 @@ namespace hpx { namespace runtime_local {
         os_thread_type type_;            ///< HPX thread type
     };
 
-}}    // namespace hpx::runtime_local
+}    // namespace hpx::runtime_local
 
 ///////////////////////////////////////////////////////////////////////////////
 // These functions are officially part of the API

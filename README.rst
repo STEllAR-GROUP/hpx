@@ -91,7 +91,7 @@ If you would like to work with the cutting edge version of this repository
 <https://hpx-docs.stellar-group.org/branches/master/html/index.html>`_.
 We strongly recommend that you follow the current health status of the master
 branch by looking at our `continuous integration results website
-<https://cdash.cscs.ch//index.php?project=HPX>`_. While we try to keep the
+<https://cdash.rostam.cct.lsu.edu/index.php?project=HPX>`_. While we try to keep the
 master branch stable and usable, sometimes new bugs trick their way into the
 code base. The `CircleCI <https://circleci.com/gh/STEllAR-GROUP/hpx>`_
 continuous integration service additionally tracks the current build status for
@@ -156,7 +156,7 @@ Past and current funding and support for HPX is listed `here
      :alt: HPX Code Quality Assessment
 
 .. |codacy_coverage| image:: https://app.codacy.com/project/badge/Coverage/0b8cd5a874914edaba67ce3bb711e688    
-     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/dashboard
+     :target: https://app.codacy.com/gh/STEllAR-GROUP/hpx/coverage/dashboard
      :alt: HPX coverage report
 
 .. |JOSS| image:: https://joss.theoj.org/papers/022e5917b95517dff20cd3742ab95eca/status.svg
@@ -171,6 +171,6 @@ Past and current funding and support for HPX is listed `here
     :target: https://bestpractices.coreinfrastructure.org/projects/6093
     :alt: OpenSSF Best Practices
 
-.. |hpx_logo| image:: http://hpx.stellar-group.org/files/hpx_logo.png
+.. |hpx_logo| image:: http://hpx.stellar-group.org/files/hpx_logo_white.png
     :target: http://hpx.stellar-group.org/
     :alt: HPX Logo

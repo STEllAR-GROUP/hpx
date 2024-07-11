@@ -6,9 +6,7 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for component config data injection
@@ -16,9 +14,9 @@ namespace hpx { namespace traits {
     struct component_config_data
     {
         // by default no additional config data is injected into the factory
-        static char const* call() noexcept
+        static constexpr char const* call() noexcept
         {
             return nullptr;
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

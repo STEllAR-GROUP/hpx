@@ -158,15 +158,17 @@ namespace hpx::components {
     {
         std::string result;
 
-        if (type == component_invalid)
+        if (type == to_int(hpx::components::component_enum_type::invalid))
         {
             result = "component_invalid";
         }
-        else if ((type < component_last) && (get_derived_type(type) == 0))
+        else if ((type < to_int(hpx::components::component_enum_type::last)) &&
+            (get_derived_type(type) == 0))
         {
             result = components::detail::names[type];
         }
-        else if (get_derived_type(type) < component_last &&
+        else if (get_derived_type(type) <
+                to_int(hpx::components::component_enum_type::last) &&
             (get_derived_type(type) != 0))
         {
             result = components::detail::names[get_derived_type(type)];
@@ -180,7 +182,8 @@ namespace hpx::components {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wrestrict"
 #endif
-        if (type == get_base_type(type) || component_invalid == type)
+        if (type == get_base_type(type) ||
+            to_int(hpx::components::component_enum_type::invalid) == type)
         {
             result += "[" + std::to_string(type) + "]";
         }
@@ -201,11 +204,13 @@ namespace hpx::components {
         component_type get_agas_component_type(char const* name,
             char const* base_name, component_type base_type, bool enabled)
         {
-            component_type type = component_invalid;
+            component_type type =
+                to_int(hpx::components::component_enum_type::invalid);
             if (enabled)
             {
                 type = agas::register_factory(agas::get_locality_id(), name);
-                if (component_invalid == type)
+                if (to_int(hpx::components::component_enum_type::invalid) ==
+                    type)
                 {
                     HPX_THROW_EXCEPTION(hpx::error::duplicate_component_id,
                         "get_agas_component_type",
@@ -220,7 +225,8 @@ namespace hpx::components {
             if (base_name)
             {
                 // NOTE: This assumes that the derived component is loaded.
-                if (base_type == component_invalid)
+                if (base_type ==
+                    to_int(hpx::components::component_enum_type::invalid))
                 {
                     base_type = agas::get_component_id(base_name);
                 }

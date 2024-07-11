@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
 #include <type_traits>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // control the way managed_components are constructed
@@ -66,4 +64,4 @@ namespace hpx { namespace traits {
     template <typename T>
     using managed_component_dtor_policy_t =
         typename managed_component_dtor_policy<T>::type;
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

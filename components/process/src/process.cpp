@@ -17,8 +17,7 @@ HPX_REGISTER_COMPONENT_MODULE()
 
 typedef hpx::components::process::server::child child_type;
 
-HPX_REGISTER_COMPONENT(
-    hpx::components::component<child_type>,
-    hpx_components_process_child_factory, hpx::components::factory_enabled)
+HPX_REGISTER_COMPONENT(hpx::components::component<child_type>,
+    hpx_components_process_child_factory,
+    hpx::components::factory_state::enabled)
 HPX_DEFINE_GET_COMPONENT_TYPE(child_type)
-

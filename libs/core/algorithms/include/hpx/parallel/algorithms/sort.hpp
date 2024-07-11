@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 John Biddiscombe
-//  Copyright (c) 2015-2023 Hartmut Kaiser
+//  Copyright (c) 2015-2024 Hartmut Kaiser
 //  Copyright (c) 2015-2019 Francisco Jose Tapia
 //  Copyright (c) 2018 Taeguk Kwon
 //  Copyright (c) 2021 Akhil J Nair

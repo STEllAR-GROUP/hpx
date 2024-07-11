@@ -793,6 +793,22 @@ namespace hpx::performance_counters {
             return registry::instance().remove_counter(info, id, ec);
         }
 
+        namespace {
+
+            std::string list_available_counternames()
+            {
+                std::string result;
+                hpx::error_code ec;
+                discover_counter_types(
+                    [&result](counter_info const& info, error_code&) {
+                        result += "  " + info.fullname_ + '\n';
+                        return true;
+                    },
+                    discover_counters_mode::minimal, ec);
+                return result;
+            }
+        }    // namespace
+
         // create an arbitrary counter on this locality
         naming::gid_type create_counter_local(counter_info const& info)
         {
@@ -832,8 +848,10 @@ namespace hpx::performance_counters {
             {
                 HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                     "create_counter_local",
-                    "couldn't create performance counter: {} ({})",
-                    remove_counter_prefix(info.fullname_), ec.get_message());
+                    "couldn't create performance counter: {} ({})\n"
+                    "available counters:\n{}",
+                    remove_counter_prefix(info.fullname_), ec.get_message(),
+                    list_available_counternames());
             }
 
             return gid;
@@ -1199,7 +1217,7 @@ namespace hpx::performance_counters {
                 if (ec)
                     return {};
 
-                // Take target locality from base counter if if this is an
+                // Take target locality from base counter if this is an
                 // aggregating counter (the instance name is a base counter).
                 if (p.parentinstance_is_basename_)
                 {

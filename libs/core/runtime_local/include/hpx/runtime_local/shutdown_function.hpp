@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,9 +15,10 @@
 #include <hpx/functional/move_only_function.hpp>
 
 namespace hpx {
-    /// The type of a function which is registered to be executed as a
+
+    /// The type of the function which is registered to be executed as a
     /// shutdown or pre-shutdown function.
-    typedef hpx::move_only_function<void()> shutdown_function_type;
+    using shutdown_function_type = hpx::move_only_function<void()>;
 
     /// \brief Add a function to be executed by a HPX thread during
     /// \a hpx::finalize() but guaranteed before any shutdown function is
@@ -32,7 +33,7 @@ namespace hpx {
     ///           a pre-shutdown function.
     ///
     /// \note If this function is called while the pre-shutdown functions are
-    ///       being executed, or after that point, it will raise a invalid_status
+    ///       being executed, or after that point, it will raise an invalid_status
     ///       exception.
     ///
     /// \see    \a hpx::register_shutdown_function()
@@ -52,7 +53,7 @@ namespace hpx {
     ///           a shutdown function.
     ///
     /// \note If this function is called while the shutdown functions are
-    ///       being executed, or after that point, it will raise a invalid_status
+    ///       being executed, or after that point, it will raise an invalid_status
     ///       exception.
     ///
     /// \see    \a hpx::register_pre_shutdown_function()

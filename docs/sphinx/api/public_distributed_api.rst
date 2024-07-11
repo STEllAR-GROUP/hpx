@@ -157,23 +157,50 @@ Classes
    | :cpp:class:`hpx::distributed::latch` |
    +--------------------------------------+
 
+Member functions
+^^^^^^^^^^^^^^^^
+
+.. table:: `hpx` functions of class :cpp:class:`hpx::distributed::latch` from header ``hpx/latch.hpp``
+
+   +----------------------------------------------------------+
+   | Function                                                 |
+   +==========================================================+
+   | :cpp:func:`hpx::distributed::latch::count_down_and_wait` |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::arrive_and_wait`     |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::count_down`          |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::is_ready`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::try_wait`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::wait`                |
+   +----------------------------------------------------------+
+
+.. _public_distr_api_header_async:
+
+``hpx/async.hpp``
+===================
+
+The header :hpx-header:`libs/full/async_distributed/include,hpx/async.hpp`
+includes distributed implementations of :cpp:func:`hpx::async`,
+:cpp:func:`hpx::post`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow`.
+For information regarding the C++ standard library header, see :ref:`public_api`.
+
 Functions
 ---------
 
-.. table:: `hpx` functions of header ``hpx/latch.hpp``
+.. table:: Distributed implementation of functions of header ``hpx/async.hpp``
 
-   +---------------------------------------------------+
-   | Function                                          |
-   +===================================================+
-   | :cpp:func:`hpx::distributed::count_down_and_wait` |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::arrive_and_wait`     |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::count_down`          |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::is_ready`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::try_wait`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::wait`                |
-   +---------------------------------------------------+
+   +-------------------------------------------------------+
+   | Functions                                             |
+   +=======================================================+
+   | :ref:`modules_hpx/async_distributed/async.hpp_api`    |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/sync.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/post.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/dataflow.hpp_api` |
+   +-------------------------------------------------------+

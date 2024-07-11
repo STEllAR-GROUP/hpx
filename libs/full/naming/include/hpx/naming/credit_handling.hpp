@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011 Bryce Lelbach
 //  Copyright (c) 2007 Richard D. Guidry Jr.
 //
@@ -9,17 +9,12 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/modules/naming_base.hpp>
 #include <hpx/serialization/serialization_fwd.hpp>
 
 #include <cstddef>
 #include <cstdint>
-#include <functional>
-#include <iosfwd>
 #include <mutex>
-#include <string>
-#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::naming {

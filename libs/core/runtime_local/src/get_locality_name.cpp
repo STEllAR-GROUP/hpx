@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -11,31 +11,29 @@
 
 #include <string>
 
-namespace hpx { namespace detail {
+namespace hpx::detail {
 
     std::string get_locality_base_name()
     {
-        runtime* rt = get_runtime_ptr();
+        runtime const* rt = get_runtime_ptr();
         if (rt == nullptr)
         {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status,
                 "hpx::detail::get_locality_name",
                 "the runtime system is not operational at this point");
-            return "";
         }
         return rt->get_locality_name();
     }
 
     std::string get_locality_name()
     {
-        std::string basename = get_locality_base_name();
+        std::string const basename = get_locality_base_name();
         return basename + '#' + std::to_string(get_locality_id());
     }
-}}    // namespace hpx::detail
+}    // namespace hpx::detail
 
 namespace hpx {
 
-    ///////////////////////////////////////////////////////////////////////////
     std::string get_locality_name()
     {
         return detail::get_locality_name();

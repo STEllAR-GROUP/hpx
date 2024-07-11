@@ -487,20 +487,19 @@ namespace hpx::agas {
                 "agas::register_worker",
                 "attempt to register locality {} more than once",
                 header.endpoints);
-            return;
         }
 
         naming::address locality_addr(agas::get_locality(),
-            hpx::components::component_agas_locality_namespace,
+            to_int(components::component_enum_type::agas_locality_namespace),
             agas_client.locality_ns_->ptr());
         naming::address primary_addr(agas::get_locality(),
-            hpx::components::component_agas_primary_namespace,
+            to_int(components::component_enum_type::agas_primary_namespace),
             agas_client.primary_ns_.ptr());
         naming::address component_addr(agas::get_locality(),
-            hpx::components::component_agas_component_namespace,
+            to_int(components::component_enum_type::agas_component_namespace),
             agas_client.component_ns_->ptr());
         naming::address symbol_addr(agas::get_locality(),
-            hpx::components::component_agas_symbol_namespace,
+            to_int(components::component_enum_type::agas_symbol_namespace),
             agas_client.symbol_ns_.ptr());
 
         // assign cores to the new locality
@@ -768,6 +767,11 @@ namespace hpx::agas {
         spin();
     }    // }}}
 
+    // 26110: Caller failing to hold lock 'this->mtx' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void big_boot_barrier::notify()
     {
         naming::resolver_client& agas_client = naming::get_agas_client();
@@ -785,6 +789,9 @@ namespace hpx::agas {
         if (notify)
             cond.notify_all();
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     // This is triggered in runtime_impl::start, after the early action handler
     // has been replaced by the parcelhandler. We have to delay the notifications

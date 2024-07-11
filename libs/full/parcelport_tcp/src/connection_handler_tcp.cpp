@@ -81,6 +81,7 @@ namespace hpx::parcelset::policies::tcp {
     connection_handler::~connection_handler()
     {
         HPX_ASSERT(acceptor_ == nullptr);
+        delete acceptor_;    // silence overeager security reports
     }
 
     bool connection_handler::do_run()

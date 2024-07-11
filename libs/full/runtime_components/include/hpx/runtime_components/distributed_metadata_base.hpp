@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,29 +14,20 @@
 #include <hpx/async_distributed/transfer_continuation_action.hpp>
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/server/component_base.hpp>
-#include <hpx/futures/future.hpp>
-#include <hpx/naming_base/id_type.hpp>
 #include <hpx/preprocessor/cat.hpp>
 #include <hpx/preprocessor/expand.hpp>
 #include <hpx/preprocessor/nargs.hpp>
 
 #include <type_traits>
 
-namespace hpx { namespace components { namespace server {
-
-    namespace detail {
-
-        struct this_type
-        {
-        };
-    }    // namespace detail
+namespace hpx::components::server {
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename ConfigData, typename Derived = detail::this_type>
+    template <typename ConfigData, typename Derived = void>
     class distributed_metadata_base
-      : public hpx::components::component_base<typename std::conditional<
-            std::is_same<Derived, detail::this_type>::value,
-            distributed_metadata_base<ConfigData, Derived>, Derived>::type>
+      : public hpx::components::component_base<
+            std::conditional_t<std::is_void_v<Derived>,
+                distributed_metadata_base<ConfigData, Derived>, Derived>>
     {
     public:
         distributed_metadata_base()
@@ -60,7 +51,7 @@ namespace hpx { namespace components { namespace server {
     private:
         ConfigData data_;
     };
-}}}    // namespace hpx::components::server
+}    // namespace hpx::components::server
 
 #define HPX_DISTRIBUTED_METADATA_DECLARATION(...)                              \
     HPX_DISTRIBUTED_METADATA_DECLARATION_(__VA_ARGS__)                         \

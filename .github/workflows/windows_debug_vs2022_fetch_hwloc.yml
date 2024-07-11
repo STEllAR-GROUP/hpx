@@ -1,4 +1,5 @@
 # Copyright (c) 2024 Vedant Nimje
+# Copyright (c) 2024 The STE||AR Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -14,7 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: jwlawson/actions-setup-cmake@v1.14
+    - uses: jwlawson/actions-setup-cmake@v2.0
       with:
         cmake-version: '3.22.x'
     - name: Install dependencies
@@ -37,6 +38,9 @@ jobs:
               -DHPX_WITH_DEPRECATION_WARNINGS=OFF \
               -DHPX_WITH_TESTS_MAX_THREADS_PER_LOCALITY=2 \
               -DHPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION=ON \
+              -DHPX_COROUTINES_WITH_SWAP_CONTEXT_EMULATION=ON \
+              -DHPX_WITH_VERIFY_LOCKS=ON \
+              -DHPX_WITH_VERIFY_LOCKS_BACKTRACE=ON \
               -DHPX_WITH_CHECK_MODULE_DEPENDENCIES=On
     - name: Build
       shell: bash

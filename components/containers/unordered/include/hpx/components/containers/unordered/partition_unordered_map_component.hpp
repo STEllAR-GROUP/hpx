@@ -108,13 +108,14 @@ namespace hpx { namespace server {
             return *this;
         }
 
-        partition_unordered_map(partition_unordered_map&& rhs)
+        partition_unordered_map(partition_unordered_map&& rhs) noexcept
           : base_type(HPX_MOVE(rhs))
           , partition_unordered_map_(HPX_MOVE(rhs.partition_unordered_map_))
         {
         }
 
-        partition_unordered_map& operator=(partition_unordered_map&& rhs)
+        partition_unordered_map& operator=(
+            partition_unordered_map&& rhs) noexcept
         {
             if (this != &rhs)
             {

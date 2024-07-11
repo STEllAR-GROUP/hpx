@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //  Copyright (c)      2011 Thomas Heller
 //
@@ -42,13 +42,11 @@ namespace hpx::actions {
     template <typename Action>
     struct transfer_action final : transfer_base_action<Action>
     {
-    public:
         transfer_action(transfer_action const&) = delete;
         transfer_action(transfer_action&&) = delete;
         transfer_action& operator=(transfer_action const&) = delete;
         transfer_action& operator=(transfer_action&&) = delete;
 
-    public:
         using base_type = transfer_base_action<Action>;
 
         // construct an empty transfer_action to avoid serialization overhead
@@ -173,7 +171,8 @@ namespace hpx::actions {
 
         threads::thread_init_data data;
 #if defined(HPX_HAVE_THREAD_DESCRIPTION)
-#if HPX_HAVE_ITTNOTIFY != 0 && !defined(HPX_HAVE_APEX)
+#if defined(HPX_HAVE_ITTNOTIFY) && HPX_HAVE_ITTNOTIFY != 0 &&                  \
+    !defined(HPX_HAVE_APEX)
         data.description = threads::thread_description(
             actions::detail::get_action_name<Action>(),
             actions::detail::get_action_name_itt<Action>());

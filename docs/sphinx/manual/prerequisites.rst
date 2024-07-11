@@ -26,6 +26,8 @@ work, but we do not test |hpx| with other platforms, so please be warned.
    BlueGeneQ V1R2M0             PowerPC A2
    Windows   Any Windows system x86-32, x86-64
    Mac OSX   Any OSX system     x86-64
+   ARM       Any ARM system     Any architecture
+   RISC-V    Any RISC-V system  Any architecture
    ========= ================== ====================
 
 Supported compilers
@@ -56,7 +58,6 @@ The table below presents all the necessary prerequisites for building |hpx|.
    **Build System**       |cmake|_            3.18
    **Required Libraries** |boost|_            1.71.0
    \                      |hwloc|_            1.5
-   \                      |asio|_             1.12.0
    ====================== =================== ==================
 
 The most important dependencies are |boost|_ and |hwloc|_. The installation of Boost

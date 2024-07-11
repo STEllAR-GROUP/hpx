@@ -34,18 +34,18 @@ namespace hpx::compute::host {
             hpx::threads::resize(mask, topo.get_number_of_pus());
         }
 
-        auto& rp = hpx::resource::get_partitioner();
+        auto const& rp = hpx::resource::get_partitioner();
 
-        std::size_t num_os_threads = hpx::get_os_thread_count();
+        std::size_t const num_os_threads = hpx::get_os_thread_count();
         for (std::size_t num_thread = 0; num_thread != num_os_threads;
              ++num_thread)
         {
-            std::size_t pu_num = rp.get_pu_num(num_thread);
-            std::size_t numa_node = topo.get_numa_node_number(pu_num);
+            std::size_t const pu_num = rp.get_pu_num(num_thread);
+            std::size_t const numa_node = topo.get_numa_node_number(pu_num);
 
             auto const& mask = topo.get_thread_affinity_mask(pu_num);
 
-            std::size_t mask_size = hpx::threads::mask_size(mask);
+            std::size_t const mask_size = hpx::threads::mask_size(mask);
             for (std::size_t idx = 0; idx != mask_size; ++idx)
             {
                 if (hpx::threads::test(mask, idx))

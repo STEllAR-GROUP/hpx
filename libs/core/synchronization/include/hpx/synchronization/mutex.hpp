@@ -1,5 +1,5 @@
 //  Copyright (c) 2022 Bhumit Attarde
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2013-2015 Agustin Berge
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -15,9 +15,9 @@
 #include <hpx/coroutines/coroutine_fwd.hpp>
 #include <hpx/coroutines/thread_id_type.hpp>
 #include <hpx/modules/errors.hpp>
-#include <hpx/modules/threading_base.hpp>
 #include <hpx/synchronization/detail/condition_variable.hpp>
 #include <hpx/synchronization/spinlock.hpp>
+#include <hpx/threading_base/threading_base_fwd.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
 namespace hpx::threads {

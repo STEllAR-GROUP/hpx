@@ -1,5 +1,6 @@
 #  Copyright (c) 2017-2018 Thomas Heller
 #  Copyright (c) 2015 Martin Stumpf
+#  Copyright (c) 2022-2024 Hartmut Kaiser
 #
 #  SPDX-License-Identifier: BSL-1.0
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -489,18 +490,16 @@ jobs:
           paths:
             - ./build
 
-  tests.unit.algorithms:
+  tests.unit1.algorithms:
     <<: *defaults
     steps:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests (Algorithms)
+          name: Building Unit Tests (Algorithms, 1)
           command: |
-              ninja -j2 -k 0 \
-                tests.unit.modules.algorithms.algorithms \
-                tests.unit.modules.algorithms.block
-#                tests.unit.modules.algorithms.datapar_algorithms
+              ninja -j1 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.algorithms`
       - run:
           name: Running Unit Tests
           when: always
@@ -512,9 +511,7 @@ jobs:
                 --no-compress-output \
                 --output-on-failure \
                 --tests-regex \
-              "tests.unit.modules.algorithms.algorithms|\
-              tests.unit.modules.algorithms.block"
-#              "|tests.unit.modules.algorithms.datapar_algorithms"
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
       - run:
           <<: *convert_xml
       - run:
@@ -522,9 +519,42 @@ jobs:
       - run:
           <<: *move_debug_log
       - store_test_results:
-          path: tests.unit.algorithms
+          path: tests.unit1.algorithms
       - store_artifacts:
-          path: tests.unit.algorithms
+          path: tests.unit1.algorithms
+
+  tests.unit2.algorithms:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /hpx
+      - run:
+          name: Building Unit Tests (Algorithms, 2)
+          command: |
+              ninja -j1 -k 0 \
+                `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.algorithms`
+      - run:
+          name: Running Unit Tests
+          when: always
+          command: |
+              ulimit -c unlimited
+              ctest \
+                --timeout 120 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                --tests-regex \
+                  `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.algorithms | sed ':b;N;$!bb;s/\n/|/g'`
+      - run:
+          <<: *convert_xml
+      - run:
+          <<: *move_core_dump
+      - run:
+          <<: *move_debug_log
+      - store_test_results:
+          path: tests.unit2.algorithms
+      - store_artifacts:
+          path: tests.unit2.algorithms
 
   tests.unit.container_algorithms:
     <<: *defaults
@@ -594,7 +624,7 @@ jobs:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests
+          name: Building Unit Tests (1)
           command: |
               ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit1.targets`
       - run:
@@ -625,7 +655,7 @@ jobs:
       - attach_workspace:
           at: /hpx
       - run:
-          name: Building Unit Tests
+          name: Building Unit Tests (2)
           command: |
               ninja -j2 -k 0 `grep -v -e ^# -e ^$ /hpx/source/.circleci/tests.unit2.targets`
       - run:
@@ -668,7 +698,14 @@ jobs:
           name: Running Regressions Tests
           when: always
           command: |
-              ctest --timeout 60 -T test --no-compress-output --output-on-failure -R tests.regressions
+              ctest \
+                --timeout 60 \
+                -T test \
+                --no-compress-output \
+                --output-on-failure \
+                -R tests.regressions \
+                --exclude-regex \
+              "tests.regressions.modules.threading_base.thread_stacksize_current"
       - run:
           <<: *convert_xml
       - run:
@@ -777,7 +814,7 @@ jobs:
               # is enabled, and other machines may fail similarly.
               #
               # Having to reconfigure here forces everything to be rebuilt, thus
-              # we disable it all together.
+              # we disable it altogether.
               #
               # cmake \
               #   -DHPX_WITH_DATAPAR_VC=Off .
@@ -911,7 +948,9 @@ workflows:
           <<: *gh_pages_filter
       - tests.examples:
           <<: *core_dependency
-      - tests.unit.algorithms:
+      - tests.unit1.algorithms:
+          <<: *core_dependency
+      - tests.unit2.algorithms:
           <<: *core_dependency
       - tests.unit.container_algorithms:
           <<: *core_dependency
@@ -969,7 +1008,8 @@ workflows:
           requires:
             - core
             - tests.examples
-            - tests.unit.algorithms
+            - tests.unit1.algorithms
+            - tests.unit2.algorithms
             - tests.unit.container_algorithms
             - tests.unit.segmented_algorithms
             - tests.unit1

@@ -1,4 +1,5 @@
 //  Copyright (c) 2016 Bibek Wagle
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,20 +16,22 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace util { namespace detail {
+namespace hpx::util {
 
-    class pool_timer;
-}}}    // namespace hpx::util::detail
+    namespace detail {
 
-namespace hpx { namespace util {
+        class pool_timer;
+    }    // namespace detail
 
     class HPX_CORE_EXPORT pool_timer
     {
     public:
-        HPX_NON_COPYABLE(pool_timer);
-
-    public:
         pool_timer();
+
+        pool_timer(pool_timer const&) = delete;
+        pool_timer(pool_timer&&) = delete;
+        pool_timer& operator=(pool_timer const&) = delete;
+        pool_timer& operator=(pool_timer&&) = delete;
 
         pool_timer(hpx::function<bool()> const& f,
             hpx::function<void()> const& on_term,
@@ -37,15 +40,15 @@ namespace hpx { namespace util {
         ~pool_timer();
 
         bool start(hpx::chrono::steady_duration const& time_duration,
-            bool evaluate = false);
-        bool stop();
+            bool evaluate = false) const;
+        bool stop() const;
 
-        bool is_started() const;
-        bool is_terminated() const;
+        [[nodiscard]] bool is_started() const;
+        [[nodiscard]] bool is_terminated() const;
 
     private:
         std::shared_ptr<detail::pool_timer> timer_;
     };
-}}    // namespace hpx::util
+}    // namespace hpx::util
 
 #include <hpx/config/warnings_suffix.hpp>

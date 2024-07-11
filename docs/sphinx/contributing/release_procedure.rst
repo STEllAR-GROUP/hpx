@@ -1,6 +1,6 @@
 ..
     Copyright (c)      2021 ETH Zurich
-    Copyright (c) 2007-2017 Louisiana State University
+    Copyright (c) 2007-2023 Louisiana State University
 
     SPDX-License-Identifier: BSL-1.0
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -46,14 +46,13 @@ are completed to avoid confusion.
      *   Update collaborators
      *   Update grant information
 
-#. This step does not apply to patch releases. For both APEX and libCDS:
+#. This step does not apply to patch releases. For APEX:
 
    * Change the release branch to be the most current release tag available in
-     the APEX/libCDS ``git_external`` section in the main ``CMakeLists.txt``.
+     the APEX ``git_external`` section in the main ``CMakeLists.txt``.
      Please contact the maintainers of the respective packages to generate a new
      release to synchronize with the |hpx| release (`APEX
-     <http://github.com/UO-OACISS/xpress-apex>`_, `libCDS
-     <https://github.com/STEllAR-GROUP/libcds>`_).
+     <http://github.com/UO-OACISS/xpress-apex>`_).
 
 #. Make sure ``HPX_VERSION_MAJOR/MINOR/SUBMINOR`` in ``CMakeLists.txt`` contain
    the correct values. Change them if needed.
@@ -95,7 +94,7 @@ are completed to avoid confusion.
       The script requires that you have the |stellar| Group signing key.
 
    #. This step is not necessary for patch releases. Notify
-      ``hpx-users@stellar-group.org`` and ``stellar@cct.lsu.edu`` of the
+      ``hpx-users@stellar-group.org`` of the
       availability of the release candidate. Ask users to test the candidate by
       checking out the release candidate tag.
 
@@ -125,9 +124,8 @@ are completed to avoid confusion.
    script automatically tag the with the corresponding release number. The
    script requires that you have the |stellar| Group signing key.
 
-#. Update the websites (`hpx.stellar-group.org <https://hpx.stellar-group.org>`_,
-   `stellar-group.org <https://stellar-group.org>`_ and
-   `stellar.cct.lsu.edu <https://stellar.cct.lsu.edu>`_). You can login on
+#. Update the websites (`hpx.stellar-group.org <https://hpx.stellar-group.org>`_
+   and `stellar-group.org <https://stellar-group.org>`). You can login on
    wordpress through `this page <https://hpx.stellar-group.org/wp-login.php>`.
    You can update the pages with the following:
 

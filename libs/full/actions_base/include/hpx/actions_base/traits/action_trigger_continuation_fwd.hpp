@@ -1,4 +1,4 @@
-//  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2020-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +6,7 @@
 
 #pragma once
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Trait to determine the continuation type for an action
@@ -14,6 +14,8 @@ namespace hpx { namespace traits {
     struct action_trigger_continuation
     {
         template <typename F, typename... Ts>
-        static void call(Continuation&&, F&&, Ts&&...) noexcept;
+        static constexpr void call(Continuation&&, F&&, Ts&&...) noexcept
+        {
+        }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

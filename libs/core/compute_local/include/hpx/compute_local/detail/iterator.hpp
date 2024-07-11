@@ -9,7 +9,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/assert.hpp>
 #include <hpx/compute_local/detail/get_proxy_type.hpp>
 #include <hpx/compute_local/traits/allocator_traits.hpp>
 #include <hpx/iterator_support/iterator_adaptor.hpp>
@@ -27,21 +26,20 @@ namespace hpx::compute::detail {
             std::random_access_iterator_tag,
             typename traits::allocator_traits<Allocator>::reference>
     {
-        typedef hpx::util::iterator_adaptor<iterator<T, Allocator>,
+        using base_type = hpx::util::iterator_adaptor<iterator<T, Allocator>,
             typename traits::allocator_traits<Allocator>::pointer,
             typename traits::allocator_traits<Allocator>::value_type,
             std::random_access_iterator_tag,
-            typename traits::allocator_traits<Allocator>::reference>
-            base_type;
+            typename traits::allocator_traits<Allocator>::reference>;
 
-        typedef typename get_proxy_type<T>::type* proxy_type;
+        using proxy_type = typename get_proxy_type<T>::type*;
 
-        typedef typename traits::allocator_traits<Allocator>::const_reference
-            const_reference;
-        typedef typename traits::allocator_traits<Allocator>::target_type
-            target_type;
+        using const_reference =
+            typename traits::allocator_traits<Allocator>::const_reference;
+        using target_type =
+            typename traits::allocator_traits<Allocator>::target_type;
 
-        HPX_HOST_DEVICE iterator()
+        HPX_HOST_DEVICE iterator() noexcept
           : base_type(nullptr)
           , target_(nullptr)
         {
@@ -50,13 +48,13 @@ namespace hpx::compute::detail {
         // FIXME: should be private
         HPX_HOST_DEVICE
         iterator(typename traits::allocator_traits<Allocator>::pointer p,
-            std::size_t pos, target_type const& target)
+            std::size_t pos, target_type const& target) noexcept
           : base_type(p + pos)
           , target_(&target)
         {
         }
 
-        HPX_HOST_DEVICE iterator(iterator const& other)
+        HPX_HOST_DEVICE iterator(iterator const& other) noexcept
           : base_type(other)
           , target_(other.target_)
         {
@@ -71,7 +69,7 @@ namespace hpx::compute::detail {
             return *this;
         }
 
-        HPX_HOST_DEVICE target_type const& target() const
+        HPX_HOST_DEVICE target_type const& target() const noexcept
         {
             return *target_;
         }

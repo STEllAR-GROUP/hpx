@@ -31,13 +31,13 @@ HPX_REGISTER_COMPONENT_HEAP(barrier_type)
 HPX_DEFINE_COMPONENT_NAME(
     hpx::distributed::detail::barrier_node, hpx_lcos_barrier_node)
 
-HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(
-    hpx::distributed::detail::barrier_node, hpx::components::component_barrier)
+HPX_DEFINE_GET_COMPONENT_TYPE_STATIC(hpx::distributed::detail::barrier_node,
+    to_int(hpx::components::component_enum_type::barrier))
 
 HPX_REGISTER_ACTION(hpx::distributed::detail::barrier_node::gather_action,
     barrier_node_gather_action)
 
-namespace hpx { namespace distributed { namespace detail {
+namespace hpx::distributed::detail {
 
     barrier_node::barrier_node()
       : count_(0)
@@ -352,4 +352,4 @@ namespace hpx { namespace distributed { namespace detail {
         HPX_ASSERT(false);
 #endif
     }
-}}}    // namespace hpx::distributed::detail
+}    // namespace hpx::distributed::detail

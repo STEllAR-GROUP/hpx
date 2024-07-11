@@ -1,4 +1,5 @@
 //  Copyright (c) 2019 Mikael Simberg
+//  Copyright (c) 2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -28,8 +29,8 @@ namespace hpx::threads {
                 "cannot call resume_processing_unit from outside HPX, use"
                 "resume_processing_unit_cb instead");
         }
-        else if (!pool.get_scheduler()->has_scheduler_mode(
-                     policies::scheduler_mode::enable_elasticity))
+        if (!pool.get_scheduler()->has_scheduler_mode(
+                policies::scheduler_mode::enable_elasticity))
         {
             return hpx::make_exceptional_future<void>(HPX_GET_EXCEPTION(
                 hpx::error::invalid_status, "resume_processing_unit",
@@ -43,8 +44,7 @@ namespace hpx::threads {
     }
 
     void resume_processing_unit_cb(thread_pool_base& pool,
-        hpx::function<void(void)> callback, std::size_t virt_core,
-        error_code& ec)
+        hpx::function<void()> callback, std::size_t virt_core, error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_elasticity))
@@ -106,8 +106,7 @@ namespace hpx::threads {
     }
 
     void suspend_processing_unit_cb(thread_pool_base& pool,
-        hpx::function<void(void)> callback, std::size_t virt_core,
-        error_code& ec)
+        hpx::function<void()> callback, std::size_t virt_core, error_code& ec)
     {
         if (!pool.get_scheduler()->has_scheduler_mode(
                 policies::scheduler_mode::enable_elasticity))
@@ -152,15 +151,14 @@ namespace hpx::threads {
             HPX_THROW_EXCEPTION(hpx::error::invalid_status, "resume_pool",
                 "cannot call resume_pool from outside HPX, use resume_pool_cb "
                 "or the member function resume_direct instead");
-            return hpx::make_ready_future();
         }
 
         return hpx::async(
             [&pool]() -> void { return pool.resume_direct(throws); });
     }
 
-    void resume_pool_cb(thread_pool_base& pool,
-        hpx::function<void(void)> callback, error_code& /* ec */)
+    void resume_pool_cb(thread_pool_base& pool, hpx::function<void()> callback,
+        error_code& /* ec */)
     {
         auto resume_direct_wrapper =
             [&pool, callback = HPX_MOVE(callback)]() -> void {
@@ -186,7 +184,6 @@ namespace hpx::threads {
                 "cannot call suspend_pool from outside HPX, use "
                 "suspend_pool_cb or the member function suspend_direct "
                 "instead");
-            return hpx::make_ready_future();
         }
         if (hpx::this_thread::get_pool() == &pool)
         {
@@ -199,8 +196,8 @@ namespace hpx::threads {
             [&pool]() -> void { return pool.suspend_direct(throws); });
     }
 
-    void suspend_pool_cb(thread_pool_base& pool,
-        hpx::function<void(void)> callback, error_code& ec)
+    void suspend_pool_cb(
+        thread_pool_base& pool, hpx::function<void()> callback, error_code& ec)
     {
         if (threads::get_self_ptr() && hpx::this_thread::get_pool() == &pool)
         {

@@ -1,10 +1,11 @@
-//  Copyright (c) 2007-2012 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
 #include <hpx/hpx.hpp>
 #include <hpx/include/components.hpp>
@@ -15,16 +16,15 @@
 HPX_REGISTER_COMPONENT_MODULE()
 
 using hpx::test::server::action_move_semantics;
-
-typedef hpx::components::component<action_move_semantics>
-    action_move_semantics_type;
+using action_move_semantics_type =
+    hpx::components::component<action_move_semantics>;
 
 ///////////////////////////////////////////////////////////////////////////////
 // We use a special component registry for this component as it has to be
 // disabled by default. All tests requiring this component to be active will
 // enable it explicitly.
 HPX_REGISTER_COMPONENT(hpx::components::component<action_move_semantics>,
-    action_move_semantics, hpx::components::factory_disabled)
+    action_move_semantics, hpx::components::factory_state::disabled)
 
 ///////////////////////////////////////////////////////////////////////////////
 HPX_REGISTER_ACTION(
@@ -54,4 +54,5 @@ HPX_REGISTER_ACTION(hpx::test::server::action_move_semantics::
     action_move_semantics_return_test_non_movable_direct_action)
 
 HPX_DEFINE_GET_COMPONENT_TYPE(action_move_semantics)
+
 #endif

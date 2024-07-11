@@ -73,4 +73,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # standard for .cu files.
 set(CMAKE_CXX_STANDARD_DEFAULT 98)
 
-hpx_info("Using C++${HPX_CXX_STANDARD}")
+# Make sure HPX_WITH_CXX_STANDARD reflects the user's selection
+hpx_set_option(
+  HPX_WITH_CXX_STANDARD
+  VALUE ${HPX_CXX_STANDARD}
+  FORCE
+)
+
+hpx_info("Using C++${HPX_WITH_CXX_STANDARD}")

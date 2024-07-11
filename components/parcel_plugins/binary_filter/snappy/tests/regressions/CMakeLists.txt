@@ -23,6 +23,7 @@ foreach(test ${tests})
   )
 
   add_hpx_regression_test(
-    "components.parcel_plugins.coalescing" ${test} ${${test}_PARAMETERS}
+    "components.parcel_plugins.binary_filter.snappy" ${test}
+    ${${test}_PARAMETERS}
   )
 endforeach()

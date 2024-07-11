@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -19,6 +19,7 @@
 #include <hpx/parallel/util/result_types.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#include <exception>
 #if defined(HPX_HAVE_CXX17_STD_EXECUTION_POLICES)
 #include <execution>
 #endif
@@ -99,9 +100,11 @@ namespace hpx::parallel::detail {
 
         ///////////////////////////////////////////////////////////////////////
         // this equivalent to sequential execution
+        // clang-format off
         template <typename ExPolicy, typename... Args>
         HPX_HOST_DEVICE decltype(auto) operator()(
             ExPolicy&& policy, Args&&... args) const
+        // clang-format on
         {
 #if !defined(__CUDA_ARCH__)
             try

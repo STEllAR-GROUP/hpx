@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2012-2021 Hartmut Kaiser
+//  Copyright (c) 2012-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,13 +30,13 @@
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace agas {
+namespace hpx::agas {
 
     HPX_EXPORT naming::gid_type bootstrap_component_namespace_gid();
     HPX_EXPORT hpx::id_type bootstrap_component_namespace_id();
-}}    // namespace hpx::agas
+}    // namespace hpx::agas
 
-namespace hpx { namespace agas { namespace server {
+namespace hpx::agas::server {
 
     // Base name used to register the component
     static constexpr char const* const component_namespace_service_name =
@@ -67,7 +67,7 @@ namespace hpx { namespace agas { namespace server {
         std::string instance_name_;
 
     public:
-        // data structure holding all counters for the omponent_namespace
+        // data structure holding all counters for the component_namespace
         // component
         struct counter_data
         {
@@ -136,10 +136,9 @@ namespace hpx { namespace agas { namespace server {
 
         counter_data counter_data_;
 
-    public:
         component_namespace()
           : base_type(agas::component_ns_msb, agas::component_ns_lsb)
-          , type_counter(components::component_first_dynamic)
+          , type_counter(to_int(components::component_enum_type::first_dynamic))
         {
         }
 
@@ -174,8 +173,7 @@ namespace hpx { namespace agas { namespace server {
             component_namespace, get_component_type_name)
         HPX_DEFINE_COMPONENT_ACTION(component_namespace, get_num_localities)
     };
-
-}}}    // namespace hpx::agas::server
+}    // namespace hpx::agas::server
 
 HPX_REGISTER_ACTION_DECLARATION(
     hpx::agas::server::component_namespace::bind_prefix_action,

@@ -28,9 +28,11 @@ namespace hpx::threads {
 
             // run and free all registered exit functions for this thread
             auto* p = get_self_id_data();
-
-            p->run_thread_exit_callbacks();
-            p->free_thread_exit_callbacks();
+            if (HPX_LIKELY(p != nullptr))
+            {
+                p->run_thread_exit_callbacks();
+                p->free_thread_exit_callbacks();
+            }
 
             return threads::thread_result_type(
                 threads::thread_schedule_state::terminated,

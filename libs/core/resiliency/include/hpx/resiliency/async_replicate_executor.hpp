@@ -1,6 +1,6 @@
 //  Copyright (c) 2019 National Technology & Engineering Solutions of Sandia,
 //                     LLC (NTESS).
-//  Copyright (c) 2018-2023 Hartmut Kaiser
+//  Copyright (c) 2018-2024 Hartmut Kaiser
 //  Copyright (c) 2018-2019 Adrian Serio
 //  Copyright (c) 2019 Nikunj Gupta
 //
@@ -23,7 +23,6 @@
 
 #include <cstddef>
 #include <exception>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -119,7 +118,7 @@ namespace hpx::resiliency::experimental {
                                 HPX_MOVE(valid_results));
                         }
 
-                        if (bool(ex))
+                        if (static_cast<bool>(ex))
                         {
                             std::rethrow_exception(ex);
                         }
@@ -205,7 +204,7 @@ namespace hpx::resiliency::experimental {
                             return;
                         }
 
-                        if (bool(ex))
+                        if (static_cast<bool>(ex))
                         {
                             std::rethrow_exception(ex);
                         }
@@ -220,10 +219,9 @@ namespace hpx::resiliency::experimental {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times. Verify
-    // the result of those invocations using the given predicate \a pred.
-    // Run all the valid results against a user provided voting function.
-    // Return the valid output.
+    // Asynchronously launch given function f exactly n times. Verify the result
+    // of those invocations using the given predicate pred. Run all the valid
+    // results against a user provided voting function. Return the valid output.
     // clang-format off
     template <typename Executor, typename Vote, typename Pred, typename F,
         typename... Ts,
@@ -245,10 +243,9 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times. Verify
-    // the result of those invocations using the given predicate \a pred. Run
-    // all the valid results against a user provided voting function.
-    // Return the valid output.
+    // Asynchronously launch given function f exactly n times. Verify the result
+    // of those invocations using the given predicate pred. Run all the valid
+    // results against a user provided voting function. Return the valid output.
     // clang-format off
     template <typename Executor, typename Vote, typename F, typename... Ts,
         HPX_CONCEPT_REQUIRES_(
@@ -269,15 +266,12 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times. Verify
-    // the result of those invocations using the given predicate \a pred.
-    // Return the first valid result.
-    // clang-format off
+    // Asynchronously launch given function f exactly n times. Verify the result
+    // of those invocations using the given predicate pred. Return the first
+    // valid result. clang-format off
     template <typename Executor, typename Pred, typename F, typename... Ts,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::traits::is_one_way_executor_v<Executor> ||
-            hpx::traits::is_two_way_executor_v<Executor>
-        )>
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_one_way_executor_v<Executor> ||
+            hpx::traits::is_two_way_executor_v<Executor>)>
     // clang-format on
     decltype(auto) tag_invoke(async_replicate_validate_t, Executor&& exec,
         std::size_t n, Pred&& pred, F&& f, Ts&&... ts)
@@ -292,7 +286,7 @@ namespace hpx::resiliency::experimental {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // Asynchronously launch given function \a f exactly \a n times. Verify
+    // Asynchronously launch given function f exactly n times. Verify
     // the result of those invocations by checking for exception.
     // Return the first valid result.
     // clang-format off

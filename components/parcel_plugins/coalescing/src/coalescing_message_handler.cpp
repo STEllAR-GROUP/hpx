@@ -276,7 +276,16 @@ namespace hpx::plugins::parcel {
         std::swap(buff, buffer_);
 
         ++num_messages_;
+
+        // 26110: Caller failing to hold lock 'l'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
         l.unlock();
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         HPX_ASSERT(nullptr != pp_);
         buff(pp_);    // 'invoke' the buffer

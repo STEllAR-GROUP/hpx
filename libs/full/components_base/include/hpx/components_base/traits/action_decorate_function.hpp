@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,13 +13,13 @@
 
 #include <utility>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     // Customization point for action capabilities
     namespace detail {
 
-        // by default we return the unchanged function
+        // by default, we return the unchanged function
         template <typename Component, typename F>
         F&& decorate_function(wrap_int, naming::address_type, F&& f) noexcept
         {
@@ -82,4 +82,4 @@ namespace hpx { namespace traits {
                 0, lva, HPX_FORWARD(F, f));
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

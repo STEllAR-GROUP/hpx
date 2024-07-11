@@ -43,7 +43,7 @@ namespace hpx::parcelset {
     /// \param mode
     ///
     HPX_EXPORT bool do_background_work(std::size_t num_thread = 0,
-        parcelport_background_mode mode = parcelport_background_mode_all);
+        parcelport_background_mode mode = parcelport_background_mode::all);
 
     using write_handler_type = parcel_write_handler_type;
 

@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2020 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -18,17 +18,13 @@
 #include <cstdint>
 #include <string>
 #include <unordered_set>
-#include <utility>
 
 #include <hpx/config/warnings_prefix.hpp>
 
-namespace hpx { namespace actions { namespace detail {
+namespace hpx::actions::detail {
 
     class HPX_EXPORT per_action_data_counter_registry
     {
-    public:
-        HPX_NON_COPYABLE(per_action_data_counter_registry);
-
     public:
         using counter_function_type = hpx::function<std::int64_t(bool)>;
         using map_type =
@@ -47,6 +43,17 @@ namespace hpx { namespace actions { namespace detail {
 
         per_action_data_counter_registry() = default;
 
+        per_action_data_counter_registry(
+            per_action_data_counter_registry const&) = delete;
+        per_action_data_counter_registry(
+            per_action_data_counter_registry&&) = delete;
+        per_action_data_counter_registry& operator=(
+            per_action_data_counter_registry const&) = delete;
+        per_action_data_counter_registry& operator=(
+            per_action_data_counter_registry&&) = delete;
+
+        ~per_action_data_counter_registry() = default;
+
         static per_action_data_counter_registry& instance();
 
         void register_class(std::string action);
@@ -61,9 +68,7 @@ namespace hpx { namespace actions { namespace detail {
         }
 
     private:
-        struct tag
-        {
-        };
+        struct tag;
         friend struct hpx::util::static_<per_action_data_counter_registry, tag>;
 
         map_type map_;
@@ -89,14 +94,12 @@ namespace hpx { namespace actions { namespace detail {
     template <typename Action>
     register_per_action_data_counters<Action>
         register_per_action_data_counters<Action>::instance;
-}}}    // namespace hpx::actions::detail
+}    // namespace hpx::actions::detail
 
 #define HPX_REGISTER_PER_ACTION_DATA_COUNTER_TYPES(Action)                     \
-    namespace hpx { namespace actions { namespace detail {                     \
-                template register_per_action_data_counters<Action>             \
-                    register_per_action_data_counters<Action>::instance;       \
-            }                                                                  \
-        }                                                                      \
+    namespace hpx::actions::detail {                                           \
+        template register_per_action_data_counters<Action>                     \
+            register_per_action_data_counters<Action>::instance;               \
     }                                                                          \
     /**/
 

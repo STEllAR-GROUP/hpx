@@ -1,6 +1,6 @@
 /*=============================================================================
     Copyright (c) 2013 Shuangyang Yang
-    Copyright (c) 2007-2023 Hartmut Kaiser
+    Copyright (c) 2007-2024 Hartmut Kaiser
     Copyright (c) Christopher Diggins 2005
     Copyright (c) Pablo Aguilar 2005
     Copyright (c) Kevlin Henney 2001
@@ -107,7 +107,6 @@ namespace hpx::util::detail::any {
         void (*destruct)(void**) = nullptr;
         void (*clone)(void* const*, void**) = nullptr;
         void (*copy)(void* const*, void**) = nullptr;
-        bool (*equal_to)(void* const*, void* const*) = nullptr;
     };
 
     template <>
@@ -127,7 +126,6 @@ namespace hpx::util::detail::any {
         std::type_info const& (*get_type)() = nullptr;
         void (*static_delete)(void**) = nullptr;
         void (*destruct)(void**) = nullptr;
-        bool (*equal_to)(void* const*, void* const*) = nullptr;
     };
 
     ////////////////////////////////////////////////////////////////////////
@@ -472,7 +470,6 @@ namespace hpx::util::detail::any {
             base_type::destruct = Vtable::destruct;
             base_type::clone = Vtable::clone;
             base_type::copy = Vtable::copy;
-            base_type::equal_to = Vtable::equal_to;
         }
 
         [[nodiscard]] base_type* get_ptr() override
@@ -496,7 +493,6 @@ namespace hpx::util::detail::any {
             base_type::destruct = Vtable::destruct;
             base_type::clone = Vtable::clone;
             base_type::copy = Vtable::copy;
-            base_type::equal_to = Vtable::equal_to;
             base_type::stream_in = Vtable::stream_in;
             base_type::stream_out = Vtable::stream_out;
         }
@@ -520,7 +516,6 @@ namespace hpx::util::detail::any {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
             base_type::destruct = Vtable::destruct;
-            base_type::equal_to = Vtable::equal_to;
         }
 
         [[nodiscard]] base_type* get_ptr() override
@@ -542,7 +537,6 @@ namespace hpx::util::detail::any {
             base_type::get_type = Vtable::get_type;
             base_type::static_delete = Vtable::static_delete;
             base_type::destruct = Vtable::destruct;
-            base_type::equal_to = Vtable::equal_to;
             base_type::stream_in = Vtable::stream_in;
             base_type::stream_out = Vtable::stream_out;
         }
@@ -830,22 +824,6 @@ namespace hpx::util {
             }
         }
 
-        // equality operator
-        [[nodiscard]] bool equal_to(basic_any const& rhs) const noexcept
-        {
-            if (this == &rhs)    // same object
-            {
-                return true;
-            }
-
-            if (type() == rhs.type())    // same type
-            {
-                return table->equal_to(&object, &rhs.object);    // equal value?
-            }
-
-            return false;
-        }
-
     private:    // types
         friend struct detail::any::any_cast_support;
 
@@ -1043,22 +1021,6 @@ namespace hpx::util {
             }
         }
 
-        // equality operator
-        bool equal_to(basic_any const& rhs) const noexcept
-        {
-            if (this == &rhs)    // same object
-            {
-                return true;
-            }
-
-            if (type() == rhs.type())    // same type
-            {
-                return table->equal_to(&object, &rhs.object);    // equal value?
-            }
-
-            return false;
-        }
-
     private:    // types
         friend struct detail::any::any_cast_support;
         friend struct detail::any::stream_support;
@@ -1224,22 +1186,6 @@ namespace hpx::util {
             }
         }
 
-        // equality operator
-        bool equal_to(basic_any const& rhs) const noexcept
-        {
-            if (this == &rhs)    // same object
-            {
-                return true;
-            }
-
-            if (type() == rhs.type())    // same type
-            {
-                return table->equal_to(&object, &rhs.object);    // equal value?
-            }
-
-            return false;
-        }
-
     private:    // types
         friend struct detail::any::any_cast_support;
 
@@ -1400,22 +1346,6 @@ namespace hpx::util {
                     void, Char, std::false_type>();
                 object = nullptr;
             }
-        }
-
-        // equality operator
-        bool equal_to(basic_any const& rhs) const noexcept
-        {
-            if (this == &rhs)    // same object
-            {
-                return true;
-            }
-
-            if (type() == rhs.type())    // same type
-            {
-                return table->equal_to(&object, &rhs.object);    // equal value?
-            }
-
-            return false;
         }
 
     private:    // types

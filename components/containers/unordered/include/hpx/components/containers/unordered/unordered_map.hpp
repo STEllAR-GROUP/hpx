@@ -77,7 +77,7 @@ namespace hpx { namespace server {
             template <typename Archive>
             void serialize(Archive& ar, unsigned)
             {
-                ar& partition_& locality_id_;
+                ar & partition_ & locality_id_;
             }
         };
 
@@ -101,7 +101,7 @@ namespace hpx { namespace server {
         template <typename Archive>
         void serialize(Archive& ar, unsigned)
         {
-            ar& partitions_;
+            ar & partitions_;
         }
     };
 }}    // namespace hpx::server
@@ -593,9 +593,9 @@ namespace hpx {
             copy_from(rhs);
         }
 
-        unordered_map(unordered_map&& rhs)
-          : base_type(HPX_MOVE(rhs))
-          , hash_base_type(HPX_MOVE(rhs))
+        unordered_map(unordered_map&& rhs) noexcept
+          : base_type(HPX_MOVE(static_cast<base_type&&>(rhs)))
+          , hash_base_type(HPX_MOVE(static_cast<hash_base_type&&>(rhs)))
           , partitions_(HPX_MOVE(rhs.partitions_))
         {
         }
@@ -606,7 +606,7 @@ namespace hpx {
                 copy_from(rhs);
             return *this;
         }
-        unordered_map& operator=(unordered_map&& rhs)
+        unordered_map& operator=(unordered_map&& rhs) noexcept
         {
             if (this != &rhs)
             {

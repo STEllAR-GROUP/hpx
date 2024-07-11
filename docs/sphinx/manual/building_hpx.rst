@@ -26,7 +26,7 @@ but rather generates the files needed by your build tool (GNU make, Visual
 Studio, etc.) for building |hpx|. If CMake is not already installed in your
 system, you can download it and install it here: |cmake_download|_.
 
-Once |cmake| has been run, the build process can be started. The build process consists of the following parts:
+Once |cmake|_ has been run, the build process can be started. The build process consists of the following parts:
 
 * The |hpx| core libraries (target ``core``): This forms the basic set of |hpx|
   libraries.
@@ -44,9 +44,9 @@ Once |cmake| has been run, the build process can be started. The build process c
   :ref:`documentation`.
 
 
-The |hpx| build process is highly configurable through |cmake|, and various |cmake| variables
-influence the build process. A list with the most important |cmake| variables can be found in
-the section that follows, while the complete list of available |cmake| variables is in
+The |hpx| build process is highly configurable through |cmake|_, and various |cmake|_ variables
+influence the build process. A list with the most important |cmake|_ variables can be found in
+the section that follows, while the complete list of available |cmake|_ variables is in
 :ref:`cmake_variables`. These variables can be used to refine the recipes that can be found at
 :ref:`build_recipes`, a section that shows some basic steps on how to build |hpx| for a
 specific platform.
@@ -73,8 +73,8 @@ used CMake options.
 
 .. option:: HPX_WITH_CUDA
 
-   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard |cmake| variable,
-   like ``CMAKE_CXX_COMPILER``.
+   Enable support for CUDA. Use ``CMAKE_CUDA_COMPILER`` to set the CUDA compiler. This is a standard
+   |cmake|_ variable, like ``CMAKE_CXX_COMPILER``.
 
 .. option:: HPX_WITH_PARCELPORT_MPI
 
@@ -120,7 +120,7 @@ used CMake options.
 
    Build tests.
 
-For a complete list of available |cmake| variables that influence the build of
+For a complete list of available |cmake|_ variables that influence the build of
 |hpx|, see :ref:`cmake_variables`.
 
 .. _build_types:
@@ -128,9 +128,9 @@ For a complete list of available |cmake| variables that influence the build of
 Build types
 ===========
 
-|cmake| can be configured to generate project files suitable for builds that
+|cmake|_ can be configured to generate project files suitable for builds that
 have enabled debugging support or for an optimized build (without debugging
-support). The |cmake| variable used to set the build type is
+support). The |cmake|_ variable used to set the build type is
 ``CMAKE_BUILD_TYPE`` (for more information see the `CMake Documentation
 <https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>`_).
 Available build types are:
@@ -163,7 +163,7 @@ Unix variants
 -------------
 
 Once you have the source code and the dependencies and assuming all your dependencies are in paths
-known to |cmake|, the following gets you started:
+known to |cmake|_, the following gets you started:
 
 #. First, set up a separate build directory to configure the project:
 
@@ -181,7 +181,7 @@ known to |cmake|, the following gets you started:
 
     .. tip::
 
-       If you want to change |cmake| variables for your build, it is usually a good
+       If you want to change |cmake|_ variables for your build, it is usually a good
        idea to start with a clean build directory to avoid configuration problems.
        It is especially important that you use a clean build directory when changing
        between ``Release`` and ``Debug`` modes.
@@ -192,7 +192,8 @@ known to |cmake|, the following gets you started:
 
         $ cmake ..
 
-   * If your dependencies are in custom locations, you may need to tell |cmake| where to find them by passing one or more options to |cmake| as shown below:
+   * If your dependencies are in custom locations, you may need to tell |cmake|_
+     where to find them by passing one or more options to |cmake|_ as shown below:
 
     .. code-block:: shell-session
 
@@ -209,7 +210,7 @@ known to |cmake|, the following gets you started:
 
         $ cmake -DBoost_ROOT=~/packages/boost -DHwloc_ROOT=/packages/hwloc -DCMAKE_INSTALL_PREFIX=~/packages/hpx ~/downloads/hpx_1.5.1
 
-   * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|:
+   * If you want to try |hpx| without using a custom allocator pass ``-DHPX_WITH_MALLOC=system`` to |cmake|_:
 
     .. code-block:: shell-session
 
@@ -221,7 +222,7 @@ known to |cmake|, the following gets you started:
    .. important::
 
        If you are building |hpx| for a system with more than 64 processing units,
-       you must change the |cmake| variable ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
+       you must change the |cmake|_ variable ``HPX_WITH_MAX_CPU_COUNT`` (to a value at least as big as the
        number of (virtual) cores on your system). Note that the default value is 64.
 
    .. caution::

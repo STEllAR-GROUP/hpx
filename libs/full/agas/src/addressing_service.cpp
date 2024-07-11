@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Adelstein-Lelbach
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //  Copyright (c) 2016 Parsa Amini
 //  Copyright (c) 2016 Thomas Heller
 //
@@ -32,8 +32,9 @@
 #include <hpx/runtime_local/runtime_local_fwd.hpp>
 #include <hpx/serialization/serialize.hpp>
 #include <hpx/serialization/vector.hpp>
-#include <hpx/thread_support/assert_owns_lock.hpp>
+#include <hpx/synchronization/shared_mutex.hpp>
 #include <hpx/thread_support/unlock_guard.hpp>
+#include <hpx/type_support/assert_owns_lock.hpp>
 #include <hpx/util/get_entry_as.hpp>
 #include <hpx/util/insert_checked.hpp>
 
@@ -42,6 +43,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <sstream>
 #include <string>
 #include <system_error>
@@ -214,7 +216,7 @@ namespace hpx::agas {
                 locality_ns_->allocate(endpoints, 0, num_threads, prefix));
 
             {
-                std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+                std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
                 std::pair<resolved_localities_type::iterator, bool> const res =
                     resolved_localities_.emplace(prefix, endpoints);
 
@@ -240,7 +242,7 @@ namespace hpx::agas {
     void addressing_service::register_console(
         parcelset::endpoints_type const& eps)
     {
-        std::lock_guard<mutex_type> l(resolved_localities_mtx_);
+        std::lock_guard<hpx::shared_mutex> l(resolved_localities_mtx_);
         [[maybe_unused]] std::pair<resolved_localities_type::iterator,
             bool> const res =
             resolved_localities_.emplace(
@@ -250,14 +252,14 @@ namespace hpx::agas {
 
     bool addressing_service::has_resolved_locality(naming::gid_type const& gid)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+        std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         return resolved_localities_.find(gid) != resolved_localities_.end();
     }
 
     void addressing_service::pre_cache_endpoints(
         std::vector<parcelset::endpoints_type> const& endpoints)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         std::uint32_t locality_id = 0;
         for (parcelset::endpoints_type const& endpoint : endpoints)
         {
@@ -270,49 +272,54 @@ namespace hpx::agas {
     parcelset::endpoints_type const& addressing_service::resolve_locality(
         naming::gid_type const& gid, error_code& ec)
     {
-        std::unique_lock<mutex_type> l(resolved_localities_mtx_);
-        auto it = resolved_localities_.find(gid);
-        if (it == resolved_localities_.end() || it->second.empty())
+        resolved_localities_type::iterator it;
         {
-            // The locality hasn't been requested to be resolved yet. Do it now.
-            parcelset::endpoints_type endpoints;
-            {
-                hpx::unlock_guard<std::unique_lock<mutex_type>> ul(l);
-                endpoints = locality_ns_->resolve_locality(gid);
-                if (endpoints.empty())
-                {
-                    std::string const str = hpx::util::format(
-                        "couldn't resolve the given target locality ({})", gid);
-
-                    l.unlock();
-
-                    HPX_THROWS_IF(ec, hpx::error::bad_parameter,
-                        "addressing_service::resolve_locality", str);
-                    return resolved_localities_[naming::invalid_gid];
-                }
-            }
-
-            // Search again ... might have been added by a different thread
-            // already
+            std::shared_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
             it = resolved_localities_.find(gid);
-            if (it == resolved_localities_.end())
+            if (it != resolved_localities_.end() && !it->second.empty())
             {
-                if (HPX_UNLIKELY(!util::insert_checked(
-                        resolved_localities_.emplace(gid, endpoints), it)))
-                {
-                    l.unlock();
+                return it->second;
+            }
+        }
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
+        // The locality hasn't been requested to be resolved yet. Do it now.
+        parcelset::endpoints_type endpoints;
+        {
+            hpx::unlock_guard<std::unique_lock<hpx::shared_mutex>> ul(l);
+            endpoints = locality_ns_->resolve_locality(gid);
+            if (endpoints.empty())
+            {
+                std::string const str = hpx::util::format(
+                    "couldn't resolve the given target locality ({})", gid);
 
-                    HPX_THROWS_IF(ec, hpx::error::internal_server_error,
-                        "addressing_service::resolve_locality",
-                        "resolved locality insertion failed "
-                        "due to a locking error or memory corruption");
-                    return resolved_localities_[naming::invalid_gid];
-                }
+                l.unlock();
+
+                HPX_THROWS_IF(ec, hpx::error::bad_parameter,
+                    "addressing_service::resolve_locality", str);
+                return resolved_localities_[naming::invalid_gid];
             }
-            else if (it->second.empty() && !endpoints.empty())
+        }
+
+        // Search again ... might have been added by a different thread
+        // already
+        it = resolved_localities_.find(gid);
+        if (it == resolved_localities_.end())
+        {
+            if (HPX_UNLIKELY(!util::insert_checked(
+                    resolved_localities_.emplace(gid, endpoints), it)))
             {
-                resolved_localities_[gid] = HPX_MOVE(endpoints);
+                l.unlock();
+
+                HPX_THROWS_IF(ec, hpx::error::internal_server_error,
+                    "addressing_service::resolve_locality",
+                    "resolved locality insertion failed "
+                    "due to a locking error or memory corruption");
+                return resolved_localities_[naming::invalid_gid];
             }
+        }
+        else if (it->second.empty() && !endpoints.empty())
+        {
+            resolved_localities_[gid] = HPX_MOVE(endpoints);
         }
         return it->second;
     }
@@ -341,7 +348,7 @@ namespace hpx::agas {
     void addressing_service::remove_resolved_locality(
         naming::gid_type const& gid)
     {
-        std::lock_guard<mutex_type> l(resolved_localities_mtx_);
+        std::unique_lock<hpx::shared_mutex> l(resolved_localities_mtx_);
         if (auto const it = resolved_localities_.find(gid);
             it != resolved_localities_.end())
         {
@@ -425,7 +432,7 @@ namespace hpx::agas {
     {
         try
         {
-            if (type != components::component_invalid)
+            if (type != to_int(hpx::components::component_enum_type::invalid))
             {
                 std::vector<std::uint32_t> const p =
                     component_ns_->resolve_id(type);
@@ -468,7 +475,7 @@ namespace hpx::agas {
     {
         try
         {
-            if (type == components::component_invalid)
+            if (type == to_int(hpx::components::component_enum_type::invalid))
             {
                 return locality_ns_->get_num_localities();
             }
@@ -485,7 +492,7 @@ namespace hpx::agas {
     hpx::future<std::uint32_t> addressing_service::get_num_localities_async(
         components::component_type type) const
     {
-        if (type == components::component_invalid)
+        if (type == to_int(hpx::components::component_enum_type::invalid))
         {
             return locality_ns_->get_num_localities_async();
         }
@@ -546,7 +553,7 @@ namespace hpx::agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::get_component_id");
-            return components::component_invalid;
+            return to_int(hpx::components::component_enum_type::invalid);
         }
     }
 
@@ -587,7 +594,7 @@ namespace hpx::agas {
         catch (hpx::exception const& e)
         {
             HPX_RETHROWS_IF(ec, e, "addressing_service::register_factory");
-            return components::component_invalid;
+            return to_int(hpx::components::component_enum_type::invalid);
         }
     }
 
@@ -835,7 +842,9 @@ namespace hpx::agas {
     {
         // NOTE: This should still be migration safe.
         return naming::detail::strip_internal_bits_and_component_type_from_gid(
-                   msb) == get_local_locality().get_msb();
+                   msb) ==
+            naming::detail::strip_internal_bits_and_component_type_from_gid(
+                get_local_locality().get_msb());
     }
 
     bool addressing_service::resolve_locally_known_addresses(
@@ -854,7 +863,8 @@ namespace hpx::agas {
             {
                 HPX_ASSERT(rts_lva_);
 
-                addr.type_ = components::component_runtime_support;
+                addr.type_ = to_int(
+                    hpx::components::component_enum_type::runtime_support);
                 addr.address_ =
                     reinterpret_cast<naming::address::address_type>(rts_lva_);
                 return true;
@@ -876,7 +886,8 @@ namespace hpx::agas {
         if (naming::is_locality(id))
         {
             addr.locality_ = id;
-            addr.type_ = components::component_runtime_support;
+            addr.type_ =
+                to_int(hpx::components::component_enum_type::runtime_support);
             // addr.address_ will be supplied on the target locality
             return true;
         }
@@ -905,7 +916,8 @@ namespace hpx::agas {
             else
             {
                 addr.locality_ = dest;
-                addr.type_ = hpx::components::component_agas_primary_namespace;
+                addr.type_ = to_int(
+                    components::component_enum_type::agas_primary_namespace);
                 // addr.address_ will be supplied on the target locality
             }
             return true;
@@ -922,7 +934,8 @@ namespace hpx::agas {
             else
             {
                 addr.locality_ = dest;
-                addr.type_ = hpx::components::component_agas_symbol_namespace;
+                addr.type_ = to_int(
+                    components::component_enum_type::agas_symbol_namespace);
                 // addr.address_ will be supplied on the target locality
             }
             return true;
@@ -1008,7 +1021,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1120,7 +1133,7 @@ namespace hpx::agas {
         }
 
         // Resolve the gva to the real resolved address (which is just a gva
-        // with as fully resolved LVA and and offset of zero).
+        // with as fully resolved LVA and offset of zero).
         naming::gid_type const base_gid = hpx::get<0>(rep);
         gva const base_gva = hpx::get<1>(rep);
 
@@ -1209,8 +1222,9 @@ namespace hpx::agas {
                     if (get<0>(rep) == naming::invalid_gid ||
                         get<2>(rep) == naming::invalid_gid)
                         return false;
+
                     // Resolve the gva to the real resolved address (which is
-                    // just a gva with as fully resolved LVA and and offset of
+                    // just a gva with as fully resolved LVA and offset of
                     // zero).
                     naming::gid_type base_gid = get<0>(rep);
                     gva const base_gva = get<1>(rep);
@@ -1684,7 +1698,7 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
@@ -1736,7 +1750,7 @@ namespace hpx::agas {
             gva_cache_key const key(gid, count);
 
             {
-                std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+                std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
                 if (!gva_cache_->update_if(key, g, check_for_collisions))
                 {
                     if (LAGAS_ENABLED(warning))
@@ -1784,9 +1798,12 @@ namespace hpx::agas {
             return false;
         }
 
+        // don't look at cache if gid is marked as non-cache-able
+        HPX_ASSERT(naming::detail::store_in_cache(gid));
+
         gva_cache_key const k(gid);
 
-        std::unique_lock<mutex_type> lock(gva_cache_mtx_);
+        std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         if (gva_cache_key idbase_key; gva_cache_->get_entry(k, idbase_key, gva))
         {
             std::uint64_t const id_msb =
@@ -1819,12 +1836,17 @@ namespace hpx::agas {
             return;
         }
 
+        // 26115: Failing to release lock 'this->gva_cache_mtx_'
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26115)
+#endif
         try
         {
             LAGAS_(warning).format(
                 "addressing_service::clear_cache, clearing cache");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->clear();
 
@@ -1836,6 +1858,9 @@ namespace hpx::agas {
             HPX_RETHROWS_IF(ec, e, "addressing_service::clear_cache");
         }
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     void addressing_service::remove_cache_entry(
         naming::gid_type const& id, error_code& ec) const
@@ -1849,17 +1874,15 @@ namespace hpx::agas {
         }
 
         // don't look at cache if id is marked as non-cache-able
-        if (!naming::detail::store_in_cache(id))
+        if (!naming::detail::store_in_cache(id) || naming::is_locality(id))
         {
             if (&ec != &throws)
                 ec = make_success_code();
             return;
         }
 
-        naming::gid_type gid = naming::detail::get_stripped_gid(id);
-
         // don't look at the cache if the id is locally managed
-        if (naming::get_locality_id_from_gid(gid) ==
+        if (naming::get_locality_id_from_gid(id) ==
             naming::get_locality_id_from_gid(locality_))
         {
             if (&ec != &throws)
@@ -1867,11 +1890,12 @@ namespace hpx::agas {
             return;
         }
 
+        naming::gid_type gid = naming::detail::get_stripped_gid(id);
         try
         {
             LAGAS_(warning).format("addressing_service::remove_cache_entry");
 
-            std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+            std::unique_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
 
             gva_cache_->erase([&gid](std::pair<gva_cache_key, gva> const& p) {
                 return gid == p.first.get_gid();
@@ -1902,31 +1926,31 @@ namespace hpx::agas {
     // Helper functions to access the current cache statistics
     std::uint64_t addressing_service::get_cache_entries(bool /* reset */) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->size();
     }
 
     std::uint64_t addressing_service::get_cache_hits(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().hits(reset);
     }
 
     std::uint64_t addressing_service::get_cache_misses(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().misses(reset);
     }
 
     std::uint64_t addressing_service::get_cache_evictions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().evictions(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertions(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().insertions(reset);
     }
 
@@ -1934,55 +1958,55 @@ namespace hpx::agas {
     std::uint64_t addressing_service::get_cache_get_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_count(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_count(reset);
     }
 
     std::uint64_t addressing_service::get_cache_get_entry_time(bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_get_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_insertion_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_insert_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_update_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_update_entry_time(reset);
     }
 
     std::uint64_t addressing_service::get_cache_erase_entry_time(
         bool reset) const
     {
-        std::lock_guard<mutex_type> lock(gva_cache_mtx_);
+        std::shared_lock<hpx::shared_mutex> lock(gva_cache_mtx_);
         return gva_cache_->get_statistics().get_erase_entry_time(reset);
     }
 
@@ -2062,6 +2086,11 @@ namespace hpx::agas {
     }
 #endif
 
+    // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void addressing_service::send_refcnt_requests_non_blocking(
         [[maybe_unused]] std::unique_lock<addressing_service::mutex_type>& l,
         [[maybe_unused]] error_code& ec)
@@ -2200,6 +2229,9 @@ namespace hpx::agas {
         return lazy_results;
 #endif
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     void addressing_service::send_refcnt_requests_sync(
         std::unique_lock<addressing_service::mutex_type>& l, error_code& ec)

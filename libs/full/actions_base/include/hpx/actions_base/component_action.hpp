@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -29,7 +29,7 @@
 #include <hpx/config/warnings_prefix.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace actions {
+namespace hpx::actions {
 
     /// \cond NOINTERNAL
     namespace detail {
@@ -78,11 +78,10 @@ namespace hpx { namespace actions {
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...), typename Derived>
     struct action<R (Component::*)(Ps...), F, Derived>
-      : public basic_action<Component, R(Ps...),
+      : basic_action<Component, R(Ps...),
             detail::action_type_t<action<R (Component::*)(Ps...), F, Derived>,
                 Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
@@ -111,11 +110,10 @@ namespace hpx { namespace actions {
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) const, typename Derived>
     struct action<R (Component::*)(Ps...) const, F, Derived>
-      : public basic_action<Component const, R(Ps...),
+      : basic_action<Component const, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const, F, Derived>, Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
@@ -144,11 +142,10 @@ namespace hpx { namespace actions {
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) noexcept, F, Derived>
-      : public basic_action<Component, R(Ps...),
+      : basic_action<Component, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) noexcept, F, Derived>, Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
@@ -176,12 +173,11 @@ namespace hpx { namespace actions {
     template <typename Component, typename R, typename... Ps,
         R (Component::*F)(Ps...) const noexcept, typename Derived>
     struct action<R (Component::*)(Ps...) const noexcept, F, Derived>
-      : public basic_action<Component const, R(Ps...),
+      : basic_action<Component const, R(Ps...),
             detail::action_type_t<
                 action<R (Component::*)(Ps...) const noexcept, F, Derived>,
                 Derived>>
     {
-    public:
         using derived_type = detail::action_type_t<action, Derived>;
 
         static std::string get_action_name(naming::address_type lva)
@@ -202,9 +198,8 @@ namespace hpx { namespace actions {
                 lva, comptype, F, HPX_FORWARD(Ts, vs)...);
         }
     };
-
     /// \endcond
-}}    // namespace hpx::actions
+}    // namespace hpx::actions
 
 /// \def HPX_DEFINE_COMPONENT_ACTION(component, func, action_type)
 ///

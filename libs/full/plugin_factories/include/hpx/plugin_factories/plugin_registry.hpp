@@ -33,7 +33,7 @@ namespace hpx::plugins {
     /// \tparam Plugin   The plugin type this registry should be responsible for.
     template <typename Plugin, char const* const Name,
         char const* const Section, char const* const Suffix>
-    struct plugin_registry : public plugin_registry_base
+    struct plugin_registry : plugin_registry_base
     {
         /// \brief Return the ini-information for all contained components
         ///

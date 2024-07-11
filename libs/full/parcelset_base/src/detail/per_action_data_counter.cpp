@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2021 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,7 +12,6 @@
 #include <hpx/parcelset_base/detail/per_action_data_counter.hpp>
 
 #include <cstdint>
-#include <map>
 #include <mutex>
 #include <string>
 

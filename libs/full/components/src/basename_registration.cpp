@@ -1,4 +1,4 @@
-//  Copyright (c) 2011-2023 Hartmut Kaiser
+//  Copyright (c) 2011-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -21,6 +21,7 @@
 
 ///////////////////////////////////////////////////////////////////////////
 namespace hpx {
+
     namespace detail {
 
         std::string name_from_basename(
@@ -103,6 +104,11 @@ namespace hpx {
                 "hpx::find_from_basename", "no basename specified");
         }
 
+        // 26800: Use of a moved from object: ''basename''
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)
+#endif
         std::vector<hpx::future<hpx::id_type>> results;
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
@@ -115,6 +121,9 @@ namespace hpx {
             results.emplace_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         return results;
     }
 
@@ -138,7 +147,7 @@ namespace hpx {
     }
 
     hpx::future<bool> register_with_basename(
-        std::string basename, hpx::id_type id, std::size_t sequence_nr)
+        std::string basename, hpx::id_type const& id, std::size_t sequence_nr)
     {
         if (basename.empty())
         {
@@ -157,7 +166,7 @@ namespace hpx {
     }
 
     bool register_with_basename(hpx::launch::sync_policy, std::string basename,
-        hpx::id_type id, std::size_t sequence_nr, error_code& ec)
+        hpx::id_type const& id, std::size_t sequence_nr, error_code& ec)
     {
         if (basename.empty())
         {

@@ -1,5 +1,5 @@
 //  Copyright (c) 2012 Bryce Adelstein-Lelbach
-//  Copyright (c) 2013-2021 Hartmut Kaiser
+//  Copyright (c) 2013-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,13 +13,11 @@
 #include <hpx/components_base/server/component.hpp>
 #include <hpx/components_base/traits/is_component.hpp>
 
-#include <utility>
-
-namespace hpx { namespace components {
+namespace hpx::components {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
-    class abstract_component_base : private traits::detail::component_tag
+    class abstract_component_base : traits::detail::component_tag
     {
     public:
         using wrapping_type = component<Component>;
@@ -108,4 +106,4 @@ namespace hpx { namespace components {
                 const_cast<Component*>(static_cast<Component const*>(this)));
         }
     };
-}}    // namespace hpx::components
+}    // namespace hpx::components

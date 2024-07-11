@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/components_base/component_type.hpp>
 #include <hpx/naming_base/address.hpp>
 
-namespace hpx { namespace traits {
+namespace hpx::traits {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component, typename Enable = void>
@@ -22,4 +21,4 @@ namespace hpx { namespace traits {
                 addr.type_, components::get_component_type<Component>());
         }
     };
-}}    // namespace hpx::traits
+}    // namespace hpx::traits

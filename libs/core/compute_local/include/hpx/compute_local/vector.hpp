@@ -28,8 +28,7 @@ namespace hpx::compute {
     template <typename T, typename Allocator = std::allocator<T>>
     class vector
     {
-    private:
-        typedef traits::allocator_traits<Allocator> alloc_traits;
+        using alloc_traits = traits::allocator_traits<Allocator>;
 
     public:
         /// Member types (FIXME: add reference to std
@@ -60,7 +59,7 @@ namespace hpx::compute {
         {
         }
 
-        // Constructs the container with count copies of elements with value value
+        // Constructs the container with count copies of elements with value
         vector(size_type count, T const& value,
             Allocator const& alloc = Allocator())
           : size_(count)
@@ -112,7 +111,7 @@ namespace hpx::compute {
             hpx::parallel::util::copy(other.begin(), other.end(), begin());
         }
 
-        vector(vector&& other)
+        vector(vector&& other) noexcept
           : size_(other.size_)
           , capacity_(other.capacity_)
           , alloc_(HPX_MOVE(other.alloc_))
@@ -191,7 +190,7 @@ namespace hpx::compute {
             return *this;
         }
 
-        vector& operator=(vector&& other)
+        vector& operator=(vector&& other) noexcept
         {
             if (this == &other)
                 return *this;
@@ -242,9 +241,9 @@ namespace hpx::compute {
         // TODO: implement back()
 
         /// Returns pointer to the underlying array serving as element storage.
-        /// The pointer is such that range [data(); data() + size()) is always
-        /// a valid range, even if the container is empty (data() is not
-        /// dereferenceable in that case).
+        /// The pointer is such that range [data(); data() + size()) is always a
+        /// valid range, even if the container is empty (data() is not
+        /// dereference-able in that case).
         pointer data() noexcept
         {
             return data_;
@@ -284,16 +283,17 @@ namespace hpx::compute {
             return size_ == 0;
         }
 
-        /// Effects: If size <= size(), equivalent to calling pop_back()
-        /// size() - size times. If size() < size, appends size - size()
+        /// Effects: If size <= size(), equivalent to calling pop_back() size()
+        /// - size times. If size() < size, appends size - size()
         /// default-inserted elements to the sequence.
         ///
-        /// Requires: T shall be MoveInsertable and DefaultInsertable into *this.
+        /// Requires: T shall be MoveInsertable and DefaultInsertable into
+        /// *this.
         ///
-        /// Remarks: If an exception is thrown other than by the move constructor
-        /// of a non-CopyInsertable T there are no effects.
+        /// Remarks: If an exception is thrown other than by the move
+        /// constructor of a non-CopyInsertable T there are no effects.
         ///
-        void resize(size_type /* size */)
+        static void resize(size_type /* size */)
         {
             // TODO: implement this
         }
@@ -350,7 +350,7 @@ namespace hpx::compute {
         ///
         /// Complexity: Constant time.
         ///
-        void swap(vector& other)
+        void swap(vector& other) noexcept
         {
             vector tmp = HPX_MOVE(other);
             other = HPX_MOVE(*this);
@@ -358,7 +358,7 @@ namespace hpx::compute {
         }
 
         /// Effects: Erases all elements in the range [begin(),end()).
-        /// Destroys all elements in a. Invalidates all references, pointers,
+        /// Destroys all elements in 'a'. Invalidates all references, pointers,
         /// and iterators referring to the elements of a and may invalidate the
         /// past-the-end iterator.
         ///
@@ -381,7 +381,8 @@ namespace hpx::compute {
 
     /// Effects: x.swap(y);
     template <typename T, typename Allocator>
-    HPX_FORCEINLINE void swap(vector<T, Allocator>& x, vector<T, Allocator>& y)
+    HPX_FORCEINLINE void swap(
+        vector<T, Allocator>& x, vector<T, Allocator>& y) noexcept
     {
         x.swap(y);
     }

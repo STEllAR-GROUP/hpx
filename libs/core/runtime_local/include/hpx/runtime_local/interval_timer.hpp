@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2015 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,19 +13,15 @@
 #include <hpx/synchronization/spinlock.hpp>
 #include <hpx/timing/steady_clock.hpp>
 
-#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
+#include <hpx/config/warnings_prefix.hpp>
 
 namespace hpx::util {
+
     class interval_timer;
 }    // namespace hpx::util
 
@@ -35,13 +31,13 @@ namespace hpx::util::detail {
     class HPX_CORE_EXPORT interval_timer
       : public std::enable_shared_from_this<interval_timer>
     {
-    private:
         friend class util::interval_timer;
 
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
         interval_timer();
+
         interval_timer(hpx::function<bool()> const& f, std::int64_t microsecs,
             std::string const& description, bool pre_shutdown);
         interval_timer(hpx::function<bool()> const& f,
@@ -55,16 +51,16 @@ namespace hpx::util::detail {
 
         bool restart(bool evaluate);
 
-        bool is_started() const
+        [[nodiscard]] constexpr bool is_started() const noexcept
         {
             return is_started_;
         }
-        bool is_terminated() const
+        [[nodiscard]] constexpr bool is_terminated() const noexcept
         {
             return is_terminated_;
         }
 
-        std::int64_t get_interval() const;
+        [[nodiscard]] std::int64_t get_interval() const;
 
         void change_interval(std::int64_t new_interval);
 
@@ -110,10 +106,13 @@ namespace hpx::util {
     class HPX_CORE_EXPORT interval_timer
     {
     public:
-        HPX_NON_COPYABLE(interval_timer);
-
-    public:
         interval_timer();
+
+        interval_timer(interval_timer const&) = delete;
+        interval_timer(interval_timer&&) = delete;
+        interval_timer& operator=(interval_timer const&) = delete;
+        interval_timer& operator=(interval_timer&&) = delete;
+
         interval_timer(hpx::function<bool()> const& f, std::int64_t microsecs,
             std::string const& description = "", bool pre_shutdown = false);
         interval_timer(hpx::function<bool()> const& f,
@@ -130,40 +129,38 @@ namespace hpx::util {
 
         ~interval_timer();
 
-        bool start(bool evaluate = true)
+        bool start(bool evaluate = true) const
         {
             return timer_->start(evaluate);
         }
-        bool stop(bool terminate = false)
+        bool stop(bool terminate = false) const
         {
             return timer_->stop(terminate);
         }
 
-        bool restart(bool evaluate = true)
+        bool restart(bool evaluate = true) const
         {
             return timer_->restart(evaluate);
         }
 
-        bool is_started() const
+        [[nodiscard]] bool is_started() const
         {
             return timer_->is_started();
         }
-        bool is_terminated() const
+        [[nodiscard]] bool is_terminated() const
         {
             return timer_->is_terminated();
         }
 
-        std::int64_t get_interval() const;
+        [[nodiscard]] std::int64_t get_interval() const;
 
-        void change_interval(std::int64_t new_interval);
-
-        void change_interval(hpx::chrono::steady_duration const& new_interval);
+        void change_interval(std::int64_t new_interval) const;
+        void change_interval(
+            hpx::chrono::steady_duration const& new_interval) const;
 
     private:
         std::shared_ptr<detail::interval_timer> timer_;
     };
 }    // namespace hpx::util
 
-#if defined(HPX_MSVC_WARNING_PRAGMA)
-#pragma warning(pop)
-#endif
+#include <hpx/config/warnings_suffix.hpp>

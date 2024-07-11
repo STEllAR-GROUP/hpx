@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,7 +23,7 @@
 
 #include <type_traits>
 
-namespace hpx { namespace serialization {
+namespace hpx::serialization {
 
 #if !defined(__CUDA_ARCH__)
     // load compute::vector<T>
@@ -101,6 +101,7 @@ namespace hpx { namespace serialization {
 
     // save compute::vector<T>
     namespace detail {
+
         template <typename T, typename Allocator>
         void save_impl(output_archive& ar,
             compute::vector<T, Allocator> const& vs, std::false_type)
@@ -165,4 +166,4 @@ namespace hpx { namespace serialization {
     {
     }
 #endif
-}}    // namespace hpx::serialization
+}    // namespace hpx::serialization

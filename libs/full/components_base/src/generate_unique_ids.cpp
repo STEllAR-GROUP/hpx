@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2011      Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -14,7 +14,7 @@
 #include <cstddef>
 #include <mutex>
 
-namespace hpx { namespace util {
+namespace hpx::util {
 
     naming::gid_type unique_id_ranges::get_id(std::size_t count)
     {
@@ -27,15 +27,15 @@ namespace hpx { namespace util {
             lower_ = naming::invalid_gid;
 
             naming::gid_type lower;
-            std::size_t count_ = (std::max)(std::size_t(range_delta), count);
+            std::size_t const count_ = (std::max)(range_delta, count);
 
             {
                 hpx::unlock_guard ul(l);
                 lower = hpx::agas::get_next_id(count_);
             }
 
-            // we ignore the result if some other thread has already set the
-            // new lower range
+            // we ignore the result if some other thread has already set the new
+            // lower range
             if (!lower_)
             {
                 lower_ = lower;
@@ -47,4 +47,12 @@ namespace hpx { namespace util {
         lower_ += count;
         return result;
     }
-}}    // namespace hpx::util
+
+    void unique_id_ranges::set_range(
+        naming::gid_type const& lower, naming::gid_type const& upper)
+    {
+        std::lock_guard l(mtx_);
+        lower_ = lower;
+        upper_ = upper;
+    }
+}    // namespace hpx::util

@@ -11,8 +11,9 @@
 Quick start
 ===========
 
-The following steps will help you get started with |hpx|. After :ref:`installing_hpx`, you
-can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
+The following steps will help you get started with |hpx|. Before getting started, make sure you have
+all the necessary prerequisites, which are listed in :ref:`_prerequisites`. After :ref:`installing_hpx`,
+you can check how to run a simple example :ref:`hello_world`. :ref:`writing_task_based_applications`
 explains how you can get started with |hpx|. You can refer to our :ref:`migration_guide` if you use
 other APIs for parallelism (like |openmp|, |mpi| or |tbb|) and you would like to convert your code to
 |hpx| code.
@@ -25,7 +26,7 @@ Installing |hpx|
 The easiest way to install |hpx| on your system is by choosing one of the steps
 below:
 
-#. **vcpkg**
+#.* * vcpkg * *
 
    You can download and install |hpx| using the `vcpkg
    <https://github.com/Microsoft/vcpkg>`_ dependency manager:
@@ -34,7 +35,7 @@ below:
 
       $ vcpkg install hpx
 
-#. **Spack**
+#.* * Spack * *
 
    Another way to install |hpx| is using
    `Spack <https://spack.readthedocs.io/en/latest/>`_:
@@ -43,7 +44,7 @@ below:
 
       $ spack install hpx
 
-#. **Fedora**
+#.* * Fedora * *
 
    Installation can be done with
    `Fedora <https://fedoraproject.org/wiki/DNF>`_ as well:
@@ -52,7 +53,7 @@ below:
 
       $ dnf install hpx*
 
-#. **Arch Linux**
+#.* * Arch Linux * *
 
    |hpx| is available in the
    `Arch User Repository (AUR) <https://wiki.archlinux.org/title/Arch_User_Repository>`_
@@ -69,7 +70,7 @@ Hello, World!
 
 To get started with this minimal example you need to create a new project
 directory and a file ``CMakeLists.txt`` with the contents below in order to
-build an executable using |cmake| and |hpx|:
+build an executable using |cmake|_ and |hpx|:
 
 .. code-block:: cmake
 
@@ -91,7 +92,7 @@ Then, in your project directory run the following:
 .. code-block:: shell-session
 
    $ mkdir build && cd build
-   $ cmake -DCMAKE_PREFIX_PATH=/path/to/hpx/installation ..
+   $ cmake -DHPX_DIR=</path/to/hpx/installation> ..
    $ make all
    $ ./my_hpx_program
 
@@ -130,6 +131,10 @@ the two includes and ``hpx::cout``.
 
 .. caution::
 
+   Ensure that |hpx| is installed with ``HPX_WITH_DISTRIBUTED_RUNTIME=ON`` to
+   prevent encountering an error indicating that the ``HPX::iostreams_component``
+   target is not found.
+
    When including ``hpx_main.hpp`` the user-defined ``main`` gets renamed and
    the real ``main`` function is defined by |hpx|. This means that the
    user-defined ``main`` must include a return statement, unlike the real
@@ -151,7 +156,7 @@ distributed applications similarly to how you would write applications for a
 single node (see :ref:`why_hpx` and
 :ref:`writing_distributed_hpx_applications`).
 
-If you are already familiar with ``async`` and ``future``\ s from the C++ standard
+If you are already familiar with ``async`` and ``future`` from the C++ standard
 library, the same functionality is available in |hpx|.
 
 The following terminology is essential when talking about task-based C++

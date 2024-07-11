@@ -12,7 +12,8 @@
 #include <hpx/runtime_local/state.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads {
+namespace hpx::threads {
+
     // return whether thread manager is in the state described by st
     bool threadmanager_is(state st)
     {
@@ -22,8 +23,9 @@ namespace hpx { namespace threads {
             // we're probably either starting or stopping
             return st <= hpx::state::starting || st >= hpx::state::stopping;
         }
-        return (rt->get_thread_manager().status() == st);
+        return rt->get_thread_manager().status() == st;
     }
+
     bool threadmanager_is_at_least(state st)
     {
         hpx::runtime* rt = get_runtime_ptr();
@@ -32,6 +34,6 @@ namespace hpx { namespace threads {
             // we're probably either starting or stopping
             return false;
         }
-        return (rt->get_thread_manager().status() >= st);
+        return rt->get_thread_manager().status() >= st;
     }
-}}    // namespace hpx::threads
+}    // namespace hpx::threads

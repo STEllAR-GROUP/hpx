@@ -1,5 +1,5 @@
 //  Copyright (c) 2014 Thomas Heller
-//  Copyright (c) 2022-2023 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -17,14 +17,21 @@ namespace hpx::traits {
 
 #if !defined(HPX_SERIALIZATION_HAVE_ALLOW_RAW_POINTER_SERIALIZATION)
     template <typename T, typename Enable = void>
-    struct is_bitwise_serializable : std::is_arithmetic<T>
+    struct is_bitwise_serializable
+      : std::integral_constant<bool,
+            (std::is_trivially_copy_assignable_v<T> ||
+                (std::is_copy_assignable_v<T> &&
+                    std::is_trivially_copy_constructible_v<T>) ) &&
+                !std::is_pointer_v<T>>
     {
     };
 #else
     template <typename T, typename Enable = void>
     struct is_bitwise_serializable
       : std::integral_constant<bool,
-            std::is_arithmetic_v<T> || std::is_pointer_v<T>>
+            std::is_trivially_copy_assignable_v<T> ||
+                (std::is_copy_assignable_v<T> &&
+                    std::is_trivially_copy_constructible_v<T>)>
     {
     };
 #endif

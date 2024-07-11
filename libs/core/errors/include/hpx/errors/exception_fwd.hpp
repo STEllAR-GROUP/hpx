@@ -40,10 +40,19 @@ namespace hpx {
         /// \endcond
     };
 
+    // 26827: Did you forget to initialize an enum constant, or intend to use
+    // another type?.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26827)
+#endif
     constexpr bool operator&(throwmode lhs, throwmode rhs) noexcept
     {
         return static_cast<int>(lhs) & static_cast<int>(rhs);
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
 #define HPX_THROWMODE_UNSCOPED_ENUM_DEPRECATION_MSG                            \
     "The unscoped throwmode names are deprecated. Please use "                 \

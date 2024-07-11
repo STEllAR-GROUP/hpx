@@ -178,7 +178,7 @@ namespace hpx::parcelset {
             // Stop the handling of connections.
             void do_stop()
             {
-                while (do_background_work(0, parcelport_background_mode_all))
+                while (do_background_work(0, parcelport_background_mode::all))
                 {
                     if (threads::get_self_ptr())
                     {
@@ -234,18 +234,18 @@ namespace hpx::parcelset {
                 }
 
                 bool has_work = false;
-                if (mode & parcelport_background_mode_send)
+                if (mode & parcelport_background_mode::send)
                 {
                     has_work = sender_.background_work();
                 }
-                if (mode & parcelport_background_mode_receive)
+                if (mode & parcelport_background_mode::receive)
                 {
                     has_work = receiver_.background_work() || has_work;
                 }
                 return has_work;
             }
 
-            bool can_send_immediate()
+            bool can_send_immediate() const
             {
                 return enable_send_immediate_;
             }

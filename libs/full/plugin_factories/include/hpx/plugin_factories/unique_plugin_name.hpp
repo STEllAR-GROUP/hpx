@@ -1,5 +1,5 @@
 //  Copyright (c) 2011 Bryce Lelbach
-//  Copyright (c) 2013-2021 Hartmut Kaiser
+//  Copyright (c) 2013-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -19,17 +19,16 @@ namespace hpx::plugins {
 }    // namespace hpx::plugins
 
 #define HPX_DEF_UNIQUE_PLUGIN_NAME(PluginType, name)                           \
-    namespace hpx { namespace plugins {                                        \
-            template <>                                                        \
-            struct unique_plugin_name<PluginType>                              \
-            {                                                                  \
-                using type = char const*;                                      \
+    namespace hpx::plugins {                                                   \
+        template <>                                                            \
+        struct unique_plugin_name<PluginType>                                  \
+        {                                                                      \
+            using type = char const*;                                          \
                                                                                \
-                static constexpr type call(void) noexcept                      \
-                {                                                              \
-                    return HPX_PP_STRINGIZE(name);                             \
-                }                                                              \
-            };                                                                 \
-        }                                                                      \
+            static constexpr type call(void) noexcept                          \
+            {                                                                  \
+                return HPX_PP_STRINGIZE(name);                                 \
+            }                                                                  \
+        };                                                                     \
     }                                                                          \
     /**/

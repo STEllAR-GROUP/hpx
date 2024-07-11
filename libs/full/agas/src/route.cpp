@@ -77,7 +77,8 @@ namespace hpx::agas::server {
             }
 
             // retain don't store in cache flag
-            if (!naming::detail::store_in_cache(gid))
+            if (!naming::detail::store_in_cache(gid) &&
+                !naming::is_locality(gid))
             {
                 naming::detail::set_dont_store_in_cache(
                     hpx::get<0>(cache_address));

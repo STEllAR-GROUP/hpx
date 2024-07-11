@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -84,9 +84,9 @@ namespace hpx::components {
     class component_base : public detail::base_component
     {
     protected:
-        using this_component_type = std::conditional_t<
-            std::is_same_v<Component, components::detail::this_type>,
-            component_base, Component>;
+        using this_component_type =
+            std::conditional_t<std::is_void_v<Component>, component_base,
+                Component>;
 
     public:
         using wrapped_type = this_component_type;
