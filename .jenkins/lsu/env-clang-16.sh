@@ -37,3 +37,6 @@ configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
 # testing the topology code under conditions close to those on FreeBSD.
 configure_extra_options+=" -DHPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING=ON"
+
+# enable additional handshaking in MPI parcelport
+configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:ini=hpx.parcel.mpi.ack_handshake!=1"

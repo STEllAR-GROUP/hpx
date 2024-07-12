@@ -32,3 +32,6 @@ configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
+
+# enable additional handshaking in MPI parcelport
+configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:ini=hpx.parcel.mpi.ack_handshake!=1"

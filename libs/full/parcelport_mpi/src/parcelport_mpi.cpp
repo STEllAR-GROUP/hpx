@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2020 Google
 //
@@ -138,6 +138,17 @@ namespace hpx::parcelset {
                 return false;
             }
 
+            static bool enable_ack_handshakes(
+                util::runtime_configuration const& ini)
+            {
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.mpi.ack_handshake", 0) != 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+
         public:
             using sender_type = sender;
             parcelport(util::runtime_configuration const& ini,
@@ -148,6 +159,7 @@ namespace hpx::parcelset {
               , background_threads_(background_threads(ini))
               , multi_threaded_mpi_(multi_threaded_mpi(ini))
               , enable_send_immediate_(enable_send_immediate(ini))
+              , enable_ack_handshakes_(enable_ack_handshakes(ini))
             {
             }
 
@@ -193,9 +205,10 @@ namespace hpx::parcelset {
                 {
                     util::mpi_environment::scoped_lock l;
 
-                    [[maybe_unused]] int const ret =
+                    int const ret =
                         MPI_Barrier(util::mpi_environment::communicator());
-                    HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                    util::mpi_environment::check_mpi_error(
+                        l, HPX_CURRENT_SOURCE_LOCATION(), ret);
                 }
             }
 
@@ -209,7 +222,8 @@ namespace hpx::parcelset {
                 parcelset::locality const& l, error_code&)
             {
                 int const dest_rank = l.get<locality>().rank();
-                return sender_.create_connection(dest_rank, this);
+                return sender_.create_connection(
+                    dest_rank, this, enable_ack_handshakes_);
             }
 
             parcelset::locality agas_locality(
@@ -245,7 +259,7 @@ namespace hpx::parcelset {
                 return has_work;
             }
 
-            bool can_send_immediate() const
+            constexpr bool can_send_immediate() const noexcept
             {
                 return enable_send_immediate_;
             }
@@ -255,8 +269,8 @@ namespace hpx::parcelset {
                 sender::parcel_buffer_type buffer,
                 sender::callback_fn_type&& callbackFn)
             {
-                return sender_.send_immediate(
-                    pp, dest, HPX_MOVE(buffer), HPX_MOVE(callbackFn));
+                return sender_.send_immediate(pp, dest, HPX_MOVE(buffer),
+                    HPX_MOVE(callbackFn), enable_ack_handshakes_);
             }
 
             template <typename F>
@@ -326,6 +340,7 @@ namespace hpx::parcelset {
             std::size_t background_threads_;
             bool multi_threaded_mpi_;
             bool enable_send_immediate_;
+            bool enable_ack_handshakes_;
         };
     }    // namespace policies::mpi
 }    // namespace hpx::parcelset
@@ -333,7 +348,7 @@ namespace hpx::parcelset {
 #include <hpx/config/warnings_suffix.hpp>
 
 // Inject additional configuration data into the factory registry for this
-// type. This information ends up in the system wide configuration database
+// type. This information ends up in the system-wide configuration database
 // under the plugin specific section:
 //
 //      [hpx.parcel.mpi]

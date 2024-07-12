@@ -8,6 +8,9 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
+#include <hpx/assert.hpp>
+#include <hpx/concepts/has_xxx.hpp>
+#include <hpx/modules/errors.hpp>
 #include <hpx/modules/logging.hpp>
 #include <hpx/modules/mpi_base.hpp>
 #include <hpx/modules/runtime_configuration.hpp>
@@ -23,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::util {
 
-    int mpi_environment::MPI_MAX_TAG = 32767;
+    int mpi_environment::MPI_MAX_TAG = 8192;
 
     namespace detail {
 
@@ -111,20 +114,24 @@ namespace hpx::util {
     int mpi_environment::is_initialized_ = -1;
 
     ///////////////////////////////////////////////////////////////////////////
-    [[noreturn]] static void throw_wrong_mpi_mode(int required, int provided)
-    {
-        std::map<int, char const*> levels = {
-            {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
-            {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
-            {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
-            {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
+    namespace {
 
-        HPX_THROW_EXCEPTION(hpx::error::invalid_status,
-            "hpx::util::mpi_environment::init",
-            "MPI doesn't implement minimal requested thread level, required "
-            "{}, provided {}",
-            levels[required], levels[provided]);
-    }
+        [[noreturn]] void throw_wrong_mpi_mode(int required, int provided)
+        {
+            std::map<int, char const*> levels = {
+                {MPI_THREAD_SINGLE, "MPI_THREAD_SINGLE"},
+                {MPI_THREAD_FUNNELED, "MPI_THREAD_FUNNELED"},
+                {MPI_THREAD_SERIALIZED, "MPI_THREAD_SERIALIZED"},
+                {MPI_THREAD_MULTIPLE, "MPI_THREAD_MULTIPLE"}};
+
+            HPX_THROW_EXCEPTION(hpx::error::invalid_status,
+                "hpx::util::mpi_environment::init",
+                "MPI doesn't implement minimal requested thread level, "
+                "required "
+                "{}, provided {}",
+                levels[required], levels[provided]);
+        }
+    }    // namespace
 
     int mpi_environment::init(
         int*, char***, int const minimal, int const required, int& provided)
@@ -231,7 +238,7 @@ namespace hpx::util {
 
         MPI_Comm_dup(MPI_COMM_WORLD, &communicator_);
 
-        // explicitly disable multi-threaded mpi if needed
+        // explicitly disable multithreaded mpi if needed
         if (provided_threading_flag_ <= MPI_THREAD_SERIALIZED)
         {
             rtcfg.add_entry("hpx.parcel.mpi.multithreaded", "0");
@@ -250,6 +257,10 @@ namespace hpx::util {
                 "disable MPI multi-threading.");
         }
 
+        // let all errors be returned from MPI calls
+        MPI_Comm_set_errhandler(communicator_, MPI_ERRORS_RETURN);
+
+        // initialize status
         this_rank = rank();
 
 #if defined(HPX_HAVE_NETWORKING)
@@ -269,18 +280,27 @@ namespace hpx::util {
 
         rtcfg.add_entry("hpx.parcel.mpi.rank", std::to_string(this_rank));
         rtcfg.add_entry("hpx.parcel.mpi.processorname", get_processor_name());
-        void* max_tag_p;
-        int flag;
-        MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &max_tag_p, &flag);
+
+        scoped_lock l;
+
+        void* max_tag_p = nullptr;
+        int flag = 0;
+        int const ret =
+            MPI_Comm_get_attr(MPI_COMM_WORLD, MPI_TAG_UB, &max_tag_p, &flag);
+        check_mpi_error(l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
         if (flag)
-            MPI_MAX_TAG = *(int*) max_tag_p;
+        {
+            MPI_MAX_TAG =
+                static_cast<int>(*static_cast<int*>(max_tag_p) & ~MPI_ACK_MASK);
+        }
     }
 
     std::string mpi_environment::get_processor_name()
     {
         scoped_lock l;
 
-        char name[MPI_MAX_PROCESSOR_NAME + 1] = {'\0'};
+        char name[MPI_MAX_PROCESSOR_NAME + 1] = {};
         int len = 0;
         MPI_Get_processor_name(name, &len);
 
@@ -396,6 +416,56 @@ namespace hpx::util {
             locked = false;
             mtx_.unlock();
         }
+    }
+
+    namespace {
+
+        [[noreturn]] void report_error(
+            hpx::source_location const& sl, int error_code)
+        {
+            char error_string[MPI_MAX_ERROR_STRING + 1];
+            int error_len = sizeof(error_string);
+            int const ret =
+                MPI_Error_string(error_code, error_string, &error_len);
+            if (ret != MPI_SUCCESS)
+            {
+                HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                    sl.function_name(),
+                    "MPI error (%s/%d): couldn't retrieve error string for "
+                    "code %d",
+                    sl.file_name(), sl.line(), error_code);
+            }
+
+            HPX_THROW_EXCEPTION(hpx::error::internal_server_error,
+                sl.function_name(), "MPI error (%s/%d): %s", sl.file_name(),
+                sl.line(), error_string);
+        }
+    }    // namespace
+
+    void mpi_environment::check_mpi_error(
+        scoped_lock& l, hpx::source_location const& sl, int error_code)
+    {
+        if (error_code == MPI_SUCCESS)
+        {
+            return;
+        }
+
+        l.unlock();
+
+        report_error(sl, error_code);
+    }
+
+    void mpi_environment::check_mpi_error(
+        scoped_try_lock& l, hpx::source_location const& sl, int error_code)
+    {
+        if (error_code == MPI_SUCCESS)
+        {
+            return;
+        }
+
+        l.unlock();
+
+        report_error(sl, error_code);
     }
 }    // namespace hpx::util
 
