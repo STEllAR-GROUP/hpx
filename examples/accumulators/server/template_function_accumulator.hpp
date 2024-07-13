@@ -36,8 +36,10 @@ namespace examples { namespace server {
     /// component usually does not require AGAS requests.
     ///
     /// This component exposes 3 different actions: reset, add and query.
+    //[template_func_accumulator_server_inherit
     class template_function_accumulator
       : public hpx::components::component_base<template_function_accumulator>
+    //]
     {
     private:
         typedef hpx::spinlock mutex_type;
@@ -48,6 +50,7 @@ namespace examples { namespace server {
         {
         }
 
+        //[template_func_accumulator_server_exposed_func
         ///////////////////////////////////////////////////////////////////////
         // Exposed functionality of this component.
 
@@ -75,7 +78,9 @@ namespace examples { namespace server {
             std::lock_guard<mutex_type> l(mtx_);
             return value_;
         }
+        //]
 
+        //[template_func_accumulator_server_actions
         ///////////////////////////////////////////////////////////////////////
         // Each of the exposed functions needs to be encapsulated into an
         // action type, generating all required boilerplate code for threads,
@@ -95,6 +100,7 @@ namespace examples { namespace server {
                 add_action<T>>::type
         {
         };
+        //]
 
     private:
         mutable mutex_type mtx_;
@@ -102,6 +108,7 @@ namespace examples { namespace server {
     };
 }}    // namespace examples::server
 
+//[template_func_accumulator_registration_declarations
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::reset_action,
     managed_accumulator_reset_action)
@@ -109,5 +116,6 @@ HPX_REGISTER_ACTION_DECLARATION(
 HPX_REGISTER_ACTION_DECLARATION(
     examples::server::template_function_accumulator::query_action,
     managed_accumulator_query_action)
+//]
 
 #endif
