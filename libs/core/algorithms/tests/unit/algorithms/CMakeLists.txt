@@ -33,6 +33,7 @@ set(tests
     countif
     destroy
     destroyn
+    distance
     ends_with
     equal
     equal_binary
