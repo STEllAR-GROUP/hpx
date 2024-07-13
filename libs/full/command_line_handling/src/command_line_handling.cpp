@@ -817,6 +817,15 @@ namespace hpx::util {
 
         enable_logging_settings(vm, ini_config);
 
+        // handle command line arguments after logging defaults
+        if (vm.count("hpx:ini"))
+        {
+            std::vector<std::string> cfg =
+                vm["hpx:ini"].as<std::vector<std::string>>();
+            std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
+            cfgmap.add(cfg);
+        }
+
         if (rtcfg_.mode_ != hpx::runtime_mode::local)
         {
             // Set number of localities in configuration (do it everywhere, even
