@@ -1030,7 +1030,7 @@ hpx_option(
 hpx_option(
   HPX_WITH_NANOBENCH
   BOOL
-  "Use Nanobench for performance tests. Nanobench will be fetched using FetchContent (defualt: OFF)"
+  "Use Nanobench for performance tests. Nanobench will be fetched using FetchContent (default: OFF)"
   OFF
   CATEGORY "Build Targets"
   ADVANCED
