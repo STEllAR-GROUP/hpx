@@ -29,7 +29,8 @@ namespace hpx::util {
             "time taken for each epoch");
     }
 
-    void perftests_init(const hpx::program_options::variables_map& vm, const std::string test_name)
+    void perftests_init(const hpx::program_options::variables_map& vm,
+        const std::string test_name)
     {
         if (vm.count("detailed_bench"))
         {
@@ -145,8 +146,8 @@ average: {{average(elapsed)}}{{^-last}}
                         average += val;
                     }
                     strm << "\n       ],\n";
-                    strm << std::scientific << R"(      "average": )"<< average / series
-                         << "\n";
+                    strm << std::scientific << R"(      "average": )"
+                         << average / series << "\n";
                     strm << "    }";
                     ++outputs;
                 }
@@ -174,9 +175,9 @@ average: {{average(elapsed)}}{{^-last}}
                     strm << std::scientific << "average: " << average / series
                          << "\n\n";
                 }
-                strm <<
-                    "<CTestMeasurementFile type=\"image/png\" name=\"perftests\" >" <<
-                    "./" << test_name_ << ".png</CTestMeasurementFile>\n";
+                strm << "<CTestMeasurementFile type=\"image/png\" "
+                        "name=\"perftests\" >"
+                     << "./" << test_name_ << ".png</CTestMeasurementFile>\n";
             }
             return strm;
         }
@@ -214,8 +215,9 @@ average: {{average(elapsed)}}{{^-last}}
     {
         detail::bench().render(templ, strm);
         if (!detailed_)
-            strm << "<CTestMeasurementFile type=\"image/png\" name=\"perftests\">" <<
-                    "./" << test_name_ << ".png</CTestMeasurementFile>\n";
+            strm << "<CTestMeasurementFile type=\"image/png\" "
+                    "name=\"perftests\">"
+                 << "./" << test_name_ << ".png</CTestMeasurementFile>\n";
     }
 
     // Overload that uses a default nanobench template

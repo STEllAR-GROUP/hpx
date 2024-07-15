@@ -72,17 +72,14 @@ void run_benchmark(std::size_t vector_size1, std::size_t vector_size2,
     hpx::sort(par, std::begin(src1), std::end(src1));
     hpx::sort(par, std::begin(src2), std::end(src2));
 
-    hpx::util::perftests_report("hpx::merge", "seq", test_count, [&] {
-        hpx::merge(seq, first1, last1, first2, last2, dest);
-    });
+    hpx::util::perftests_report("hpx::merge", "seq", test_count,
+        [&] { hpx::merge(seq, first1, last1, first2, last2, dest); });
 
-    hpx::util::perftests_report("hpx::merge", "par", test_count, [&] {
-        hpx::merge(par, first1, last1, first2, last2, dest);
-    });
+    hpx::util::perftests_report("hpx::merge", "par", test_count,
+        [&] { hpx::merge(par, first1, last1, first2, last2, dest); });
 
-    hpx::util::perftests_report("hpx::merge", "par_unseq", test_count, [&] {
-        hpx::merge(par_unseq, first1, last1, first2, last2, dest);
-    });
+    hpx::util::perftests_report("hpx::merge", "par_unseq", test_count,
+        [&] { hpx::merge(par_unseq, first1, last1, first2, last2, dest); });
 
     hpx::util::perftests_print_times();
 }
