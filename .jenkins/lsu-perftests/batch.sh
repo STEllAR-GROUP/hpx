@@ -38,6 +38,7 @@ logfile=${build_dir}/reports/jenkins-hpx-${configuration_name}.log
 
 # Load python packages
 source /home/pansysk75/virtual_envs/perftests_env/bin/activate
+pip install scipy
 
 # Things went alright by default
 configure_build_errors=0
@@ -53,7 +54,7 @@ source ${src_dir}/.jenkins/lsu-perftests/env-${configuration_name}.sh
 # Dummy ctest to upload the html report of the perftest
 set +e
 ctest \
-    --verbose \
+    -VV \
     --output-on-failure \
     -S ${src_dir}/.jenkins/lsu-perftests/ctest.cmake \
     -DCTEST_BUILD_CONFIGURATION_NAME="${configuration_name}" \
@@ -61,3 +62,7 @@ ctest \
     -DCTEST_SOURCE_DIRECTORY="${src_dir}" \
     -DCTEST_BINARY_DIRECTORY="${build_dir}"
 set -e
+
+if [ -s $build_dir/index.html ]; then
+   cd $build_dir && sh $src_dir/.jenkins/lsu-perftests/comment_github.sh
+fi
