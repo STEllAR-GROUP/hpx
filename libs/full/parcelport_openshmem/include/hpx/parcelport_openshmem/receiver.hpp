@@ -25,6 +25,7 @@
 #include <mutex>
 #include <set>
 #include <utility>
+#include <cstring>
 
 namespace hpx::parcelset::policies::openshmem {
 
@@ -45,8 +46,6 @@ namespace hpx::parcelset::policies::openshmem {
 
         void run() noexcept
         {
-            util::openshmem_environment::scoped_lock l;
-            post_new_header(l);
         }
 
         bool background_work() noexcept
@@ -99,7 +98,7 @@ namespace hpx::parcelset::policies::openshmem {
         {
             HPX_ASSERT_OWNS_LOCK(header_lock);
 
-            util::openshmem_environment::scoped_try_lock l;
+            //util::openshmem_environment::scoped_try_lock l;
 
             // Caller failing to hold lock 'header_lock' before calling function
 #if defined(HPX_MSVC)
@@ -107,13 +106,18 @@ namespace hpx::parcelset::policies::openshmem {
 #pragma warning(disable : 26110)
 #endif
 
-            if (l.locked)
+            //if (l.locked)
             {
-                const auto idx = post_new_header(l);
+		std::size_t idx = post_new_header();
+
+		while(idx != -1UL) {
+		    idx = post_new_header(); //l);
+		}
+
                 header h = rcv_header_[idx];
                 rcv_header_[idx].reset();
 
-                l.unlock();
+                //l.unlock();
                 header_lock.unlock();
 
                 return std::make_shared<connection_type>(
@@ -127,11 +131,10 @@ namespace hpx::parcelset::policies::openshmem {
             return {};
         }
 
-        template <typename Lock>
-        std::size_t post_new_header([[maybe_unused]] Lock& l) noexcept
+        //template <typename Lock>
+        std::size_t post_new_header() noexcept //[[maybe_unused]] Lock& l) noexcept
         {
-            HPX_ASSERT_OWNS_LOCK(l);
-
+            //HPX_ASSERT_OWNS_LOCK(l);
             const auto self_ = hpx::util::openshmem_environment::rank();
 
             const std::size_t page_count =
@@ -158,6 +161,8 @@ namespace hpx::parcelset::policies::openshmem {
                 }
             }
 
+            (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+
             std::memcpy(reinterpret_cast<std::uint8_t*>(rcv_header_[idx].data()),
                 hpx::util::openshmem_environment::segments[idx].beg_addr,
                 data_seg[0] 
@@ -181,7 +186,7 @@ namespace hpx::parcelset::policies::openshmem {
                 }
             }
 
-            HPX_ASSERT_LOCKED(l, idx < 0);
+            //HPX_ASSERT_LOCKED(l, idx < 0);
             return idx;
         }
 

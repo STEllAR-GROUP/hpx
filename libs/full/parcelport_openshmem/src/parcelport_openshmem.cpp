@@ -72,12 +72,6 @@ namespace hpx::parcelset {
 
     namespace policies::openshmem {
 
-/*
-        int acquire_tag(sender* s) noexcept
-        {
-            return s->acquire_tag();
-        }
-*/
         void add_connection(
             sender* s, std::shared_ptr<sender_connection> const& ptr)
         {
@@ -107,12 +101,26 @@ namespace hpx::parcelset {
             static std::size_t background_threads(
                 [[maybe_unused]] util::runtime_configuration const& ini)
             {
-                /*
+		// limit the number of cores accessing MPI to one if
+                // multi-threading in MPI is disabled
+                if (!multi_threaded_openshmem(ini))
+                {
+                    return 1;
+                }
                 return hpx::util::get_entry_as<std::size_t>(ini,
                     "hpx.parcel.openshmem.background_threads",
                     HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS);
-                */
-                return 1UL;
+            }
+
+	    static bool multi_threaded_openshmem(
+                util::runtime_configuration const& ini)
+            {
+                if (hpx::util::get_entry_as<std::size_t>(
+                        ini, "hpx.parcel.openshmem.multithreaded", 1) != 0)
+                {
+                    return true;
+                }
+                return false;
             }
 
         public:
@@ -122,6 +130,7 @@ namespace hpx::parcelset {
               , stopped_(false)
               , receiver_(*this)
               , background_threads_(background_threads(ini))
+              , multi_threaded_openshmem_(multi_threaded_openshmem(ini))
             {
             }
 
@@ -244,6 +253,7 @@ namespace hpx::parcelset {
             }
 
             std::size_t background_threads_;
+	    bool multi_threaded_openshmem_;
 
             void early_write_handler(std::error_code const& ec, parcel const& p)
             {

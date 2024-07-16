@@ -54,7 +54,8 @@ namespace hpx::parcelset::policies::openshmem {
           , need_recv_tchunks(false)
           , chunks_idx_(0)
           , pp_(pp)
-        {
+        {		    
+std::cout << "receiver_connection" << std::endl;
             header_.assert_valid();
 
             num_bytes = header_.numbytes();
@@ -84,18 +85,23 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive()
         {
+std::cout << "recieve" << std::endl;
             switch (state_)
             {
             case initialized:
+std::cout << "rcvd_init" << std::endl;
                 return receive_transmission_chunks();
 
             case rcvd_transmission_chunks:
+std::cout << "rcvd_transmission_chunks" << std::endl;
                 return receive_data();
 
             case rcvd_data:
+std::cout << "rcvd_data" << std::endl;
                 return receive_chunks();
 
             case rcvd_chunks:
+std::cout << "rcvd_chunks" << std::endl;
                 return done();
 
             default:
@@ -106,6 +112,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_transmission_chunks()
         {
+std::cout << "receive_transmission_chunks" << std::endl;
             const auto idx = hpx::util::openshmem_environment::rank();
 
             const std::size_t sys_pgsz =
@@ -122,6 +129,7 @@ namespace hpx::parcelset::policies::openshmem {
             if (num_zero_copy_chunks != 0)
             {
                 buffer_.chunks_.resize(num_zero_copy_chunks);
+
                 const std::size_t num_bytes =
                     buffer_.transmission_chunks_.size() * sizeof(buffer_type::transmission_chunk_type);
                 const std::size_t rcv_numitrs =
@@ -160,6 +168,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool receive_data()
         {
+std::cout << "receive_data" << std::endl;
             if (!request_done())
             {
                 return false;
@@ -265,13 +274,15 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool done() noexcept
         {
+std::cout << "done" << std::endl;
             return request_done();
         }
 
         bool request_done() noexcept
         {
-            util::openshmem_environment::scoped_try_lock const l;
-            if(!l.locked) { return false; }
+std::cout << "request_done" << std::endl;
+            //util::openshmem_environment::scoped_try_lock const l;
+            //if(!l.locked) { return false; }
 
             hpx::util::openshmem_environment::quiet();
 

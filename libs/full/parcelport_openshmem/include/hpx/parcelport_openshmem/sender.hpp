@@ -43,8 +43,6 @@ namespace hpx::parcelset::policies::openshmem {
 
         void run() noexcept
         {
-            //hpx::util::openshmem_environment::scoped_lock l;
-            //get_next_free_tag();
         }
 
         connection_ptr create_connection(int dest, parcelset::parcelport* pp)

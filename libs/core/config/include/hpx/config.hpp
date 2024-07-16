@@ -118,6 +118,18 @@
 #  define HPX_HAVE_PARCELPORT_MPI_BACKGROUND_THREADS std::size_t(-1)
 #endif
 
+/// This defines the number of cores that perform background work for the MPI
+/// parcelport
+/// This value can be changed at runtime by setting the configuration parameter:
+///
+///   hpx.parcel.openshmem.background_threads = ...
+///
+/// (or by setting the corresponding environment variable
+/// HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS).
+#if !defined(HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS)
+#  define HPX_HAVE_PARCELPORT_OPENSHMEM_BACKGROUND_THREADS std::size_t(-1)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 /// This defines the number of outgoing (parcel-) connections kept alive (to
 /// each of the other localities). This value can be changed at runtime by

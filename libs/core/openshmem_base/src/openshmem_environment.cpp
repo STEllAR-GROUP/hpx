@@ -109,7 +109,7 @@ namespace hpx::util {
 
 namespace hpx::util {
 
-    hpx::spinlock openshmem_environment::mtx_;
+    openshmem_environment::mutex_type openshmem_environment::mtx_;
     bool openshmem_environment::enabled_ = false;
     bool openshmem_environment::has_called_init_ = false;
     int openshmem_environment::provided_threading_flag_ = 0;
@@ -123,13 +123,19 @@ namespace hpx::util {
     int openshmem_environment::init([[maybe_unused]] int* argc,
         [[maybe_unused]] char*** argv, [[maybe_unused]] int& provided)
     {
+	int provided_ = 0;
         if (!has_called_init_)
         {
-            shmem_init();
+std::cout << "SHMEM_INIT" << std::endl;
+	    shmem_init_thread(SHMEM_THREAD_MULTIPLE, &provided_);
             openshmem_environment::init_val_ = 1;
             has_called_init_ = true;
         }
-
+        if(provided_ != 0) {
+            HPX_THROW_EXCEPTION(error::invalid_status,
+                "hpx::util::openshmem_environment::init",
+                "OPENSHMEM initialization error");
+        }
         if (openshmem_environment::init_val_ == 0)
         {
             HPX_THROW_EXCEPTION(error::invalid_status,
@@ -206,12 +212,11 @@ namespace hpx::util {
             // all of the xmt signals are linearly arranged after the rcv signals
             //
             segments[i].xmt = hpx::util::openshmem_environment::shmem_buffer + beg_signal + page_count + i;
-
-            //segments[i].mut = &(openshmem_environment::segment_mutex[i]);
         }
 
         shmem_barrier_all();
 
+std::cout << "1 parcelport constructor" << std::endl << std::flush;
         return openshmem_environment::init_val_;
     }
 
@@ -235,7 +240,9 @@ namespace hpx::util {
 
         rtcfg.add_entry("hpx.parcel.bootstrap", "openshmem");
 
+std::cout << "2 parcelport constructor" << std::endl << std::flush;
         int retval = init(argc, argv, provided_threading_flag_);
+std::cout << "3 parcelport constructor" << std::endl << std::flush;
         if (1 != retval)
         {
             // explicitly disable openshmem if not run by openshmemrun
@@ -255,7 +262,8 @@ namespace hpx::util {
         }
 
 #if defined(HPX_HAVE_NETWORKING)
-        if (rank() == 0)
+	const auto rnk = rank();
+        if (rnk == 0)
         {
             rtcfg.mode_ = hpx::runtime_mode::console;
         }
@@ -269,15 +277,15 @@ namespace hpx::util {
         rtcfg.mode_ = hpx::runtime_mode::local;
 #endif
 
-        rtcfg.add_entry("hpx.parcel.openshmem.rank", std::to_string(rank()));
+        rtcfg.add_entry("hpx.parcel.openshmem.rank", std::to_string(rnk));
         rtcfg.add_entry(
             "hpx.parcel.openshmem.processorname", get_processor_name());
+std::cout << "4 parcelport constructor" << std::endl << std::flush;
     }
 
     std::string openshmem_environment::get_processor_name()
     {
-        scoped_lock l;
-
+std::cout << "5 parcelport constructor" << std::endl << std::flush;
         char name[1024 + 1] = {'\0'};
         const std::string rnkstr = std::to_string(rank());
         const int len = rnkstr.size();
@@ -291,18 +299,24 @@ namespace hpx::util {
         return name;
     }
 
-    void openshmem_environment::quiet() {
-        shmem_quiet();
-    }
+    void openshmem_environment::fence() { shmem_fence(); }
+    void openshmem_environment::quiet() { shmem_quiet(); }
 
-    void openshmem_environment::fence() {
-        shmem_fence();
+    int openshmem_environment::test(std::uint8_t * addr, const std::uint8_t value) {
+std::cout << "6 parcelport constructor" << std::endl << std::flush;
+	union {
+            std::uint8_t * oaddr;
+            volatile unsigned int* iaddr;
+	} tmp;
+	tmp.oaddr = addr;
+        return shmem_uint_test(tmp.iaddr, SHMEM_CMP_EQ, value);
     }
 
     void openshmem_environment::put_signal(const std::uint8_t* addr,
         const int node, std::uint8_t* raddr, const std::size_t size,
         std::uint8_t * sigaddr)
     {
+std::cout << "7 parcelport constructor" << std::endl << std::flush;
         if (rank() == node)
         {
             std::memmove(raddr, addr, size);
@@ -343,6 +357,8 @@ namespace hpx::util {
                 volatile unsigned int *,
                 unsigned int *
             >::type;
+
+std::cout << "8 parcelport constructor" << std::endl << std::flush;
 
         union {
             std::uint8_t * uaddr;
@@ -437,6 +453,7 @@ namespace hpx::util {
             >::type
 	>::type;
 	using wait_until_any_type = wait_until_any_wrapper<tag>;
+std::cout << "9 parcelport constructor" << std::endl << std::flush;
 #else
         #define SHMEM_VENDOR_STRING "SHMEM_VENDOR_STRING not defined"
 	using tag = err;
@@ -449,6 +466,7 @@ namespace hpx::util {
     void openshmem_environment::get(std::uint8_t* addr, const int node,
         const std::uint8_t* raddr, const std::size_t size)
     {
+std::cout << "10 parcelport constructor" << std::endl << std::flush;
         if (rank() == node)
         {
             std::memmove(addr, raddr, size);
@@ -462,11 +480,13 @@ namespace hpx::util {
 
     void openshmem_environment::global_barrier()
     {
+std::cout << "11 parcelport constructor" << std::endl << std::flush;
         shmem_barrier_all();
     }
 
     void openshmem_environment::finalize()
     {
+std::cout << "12 parcelport constructor" << std::endl << std::flush;
         if (enabled() && has_called_init())
         {
             scoped_lock l;
@@ -492,9 +512,9 @@ namespace hpx::util {
 
     int openshmem_environment::size()
     {
+std::cout << "13 parcelport constructor" << std::endl << std::flush;
         int res(0);
         if (enabled()) {
-            scoped_lock l;
             res = static_cast<int>(shmem_n_pes());
         }
         return res;
@@ -502,6 +522,7 @@ namespace hpx::util {
 
     int openshmem_environment::rank()
     {
+std::cout << "14 parcelport constructor" << std::endl << std::flush;
         return shmem_my_pe();
     }
 

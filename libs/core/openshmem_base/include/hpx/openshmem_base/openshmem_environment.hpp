@@ -57,6 +57,8 @@ namespace hpx { namespace util {
 	static void fence();
 	static void quiet();
 
+	static int test(std::uint8_t * addr, const std::uint8_t value);
+
         static void put_signal(const std::uint8_t* addr, const int rank,
             std::uint8_t* raddr, const std::size_t size, std::uint8_t * sigaddr);
 
@@ -65,8 +67,6 @@ namespace hpx { namespace util {
 
         static void get(std::uint8_t* addr, const int rank,
             const std::uint8_t* raddr, const std::size_t size);
-
-        static void quiet() { shmem_quiet(); }
 
         static void global_barrier();
 
@@ -112,10 +112,10 @@ namespace hpx { namespace util {
             bool locked;
         };
 
-        typedef hpx::spinlock mutex_type;
+        using mutex_type = hpx::spinlock;
 
     public:
-        static hpx::spinlock mtx_;
+        static mutex_type mtx_;
 
         static bool enabled_;
         static bool has_called_init_;

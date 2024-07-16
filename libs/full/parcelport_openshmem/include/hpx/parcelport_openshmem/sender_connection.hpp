@@ -67,14 +67,12 @@ namespace hpx::parcelset::policies::openshmem {
           : state_(initialized)
           , sender_(s)
           , dst_(dst)
-          , thd_id_(-1)
           , chunks_idx_(0)
           , ack_(0)
           , pp_(pp)
           , there_(parcelset::locality(locality(dst_)))
         {
-            thd_id_ =
-               hpx::get_worker_thread_num();    // current worker
+std::cout << "sender_connection_instantiated" << std::endl;
         }
 
         parcelset::locality const& destination() const noexcept
@@ -123,21 +121,27 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool send()
         {
+std::cout << "send" << std::endl;
             switch (state_)
             {
             case initialized:
+std::cout << "sent_init" << std::endl;
                 return send_header();
 
             case sent_header:
+std::cout << "sent_header" << std::endl;
                 return send_transmission_chunks();
 
             case sent_transmission_chunks:
+std::cout << "sent_transmission_chunks" << std::endl;
                 return send_data();
 
             case sent_data:
+std::cout << "sent_data" << std::endl;
                 return send_chunks();
 
             case sent_chunks:
+std::cout << "sent_chunks" << std::endl;
                 return done();
 
             default:
@@ -168,8 +172,11 @@ namespace hpx::parcelset::policies::openshmem {
                 const std::size_t header_numitrs_term = header_numitrs - 1;
 
                 const auto idx = dst_;
-
-                util::openshmem_environment::scoped_lock l;
+std::cout << "sendHeader0\t" << dst_ << ' ' << std::endl << std::flush;
+                //util::openshmem_environment::scoped_lock l;
+                //HPX_ASSERT_OWNS_LOCK(header_lock);
+                HPX_ASSERT(state_ == initialized);
+std::cout << "sendHeader1" << std::endl << std::flush;
 
                 // put from this localities openshmem shared memory segment
                 // into the remote locality (dst_)'s shared memory segment
@@ -196,6 +203,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool send_transmission_chunks()
         {
+std::cout << "send_transmission_chunks" << std::endl;
             HPX_ASSERT(state_ == sent_header);
             if (!request_done())
             {
@@ -209,7 +217,7 @@ namespace hpx::parcelset::policies::openshmem {
             {
                 const auto idx = dst_;
 
-                util::openshmem_environment::scoped_lock l;
+                //util::openshmem_environment::scoped_lock l;
 
                 const std::size_t sys_pgsz =
                     sysconf(_SC_PAGESIZE);
@@ -258,6 +266,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool send_data()
         {
+std::cout << "send_data" << std::endl;
             HPX_ASSERT(state_ == sent_transmission_chunks);
             if (!request_done())
             {
@@ -268,7 +277,13 @@ namespace hpx::parcelset::policies::openshmem {
             {   
                 const auto idx = dst_;
 
-                util::openshmem_environment::scoped_lock l;
+                //util::openshmem_environment::scoped_lock l;
+		std::cout << "is null" << idx << ' ' << (hpx::util::openshmem_environment::segments[idx].beg_addr == nullptr) << ' ' << (hpx::util::openshmem_environment::segments[idx].rcv == nullptr) << std::endl;
+
+		const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
+std::cout << "1pagsz\t" << sys_pgsz << ' ' << (buffer_.data_.size() * sizeof(std::uint8_t)) << std::endl;
+
+// issue here is page size < data size
 
                 const std::size_t sys_pgsz =
                     sysconf(_SC_PAGESIZE);
@@ -316,6 +331,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool send_chunks()
         {
+std::cout << "send_chunks" << std::endl;
             HPX_ASSERT(state_ == sent_data);
 
             const auto idx = dst_;
@@ -331,7 +347,10 @@ namespace hpx::parcelset::policies::openshmem {
                     }
 
                     {
-                        util::openshmem_environment::scoped_lock l;
+                        //util::openshmem_environment::scoped_lock l;
+
+		const std::size_t sys_pgsz = sysconf(_SC_PAGESIZE);
+std::cout << "2pagsz\t" << sys_pgsz << ' ' << (buffer_.data_.size() * sizeof(std::uint8_t)) << std::endl;
 
                         const std::size_t sys_pgsz =
                             sysconf(_SC_PAGESIZE);
@@ -382,6 +401,7 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool done()
         {
+std::cout << "done" << std::endl;
             if (!request_done())
             {
                 return false;
@@ -405,10 +425,12 @@ namespace hpx::parcelset::policies::openshmem {
 
         bool request_done()
         {
-            util::openshmem_environment::scoped_try_lock const l;
-            if(!l.locked) { return false; }
+std::cout << "request_done1" << std::endl;
+            //util::openshmem_environment::scoped_try_lock const l;
+            //if(!l.locked) { return false; }
 
-            hpx::util::openshmem_environment::quiet();
+            hpx::util::openshmem_environment::fence();
+std::cout << "request_done2" << std::endl;
 
             return true;
         }
@@ -416,7 +438,6 @@ namespace hpx::parcelset::policies::openshmem {
         connection_state state_;
         sender_type* sender_;
         int dst_;
-        int thd_id_;
 
         using handler_type = hpx::move_only_function<void(error_code const&)>;
         handler_type handler_;
