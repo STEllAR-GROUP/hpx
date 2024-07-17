@@ -84,20 +84,15 @@ namespace hpx::execution::experimental {
                     });
             }
 
-            /* TODO: The concept check below causes hard errors for templated
-             * invocables. Commenting it out is only a temporary fix. */
             // clang-format off
-            template <typename... Ts/*,
+            template <typename... Ts,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::is_invocable_v<F, Ts...>
-                )*/>
+                )>
             // clang-format on
             friend void tag_invoke(
                 set_value_t, then_receiver&& r, Ts&&... ts) noexcept
             {
-                static_assert(hpx::is_invocable_v<F, Ts...>,
-                    "Invalid argument types for invocable of then sender!");
-
                 // GCC 7 fails with an internal compiler error unless the actual
                 // body is in a helper function.
                 HPX_MOVE(r).set_value_helper(HPX_FORWARD(Ts, ts)...);
