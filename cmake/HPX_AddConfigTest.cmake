@@ -5,6 +5,7 @@
 # Copyright (c) 2017 Taeguk Kwon
 # Copyright (c) 2020 Giannis Gonidelis
 # Copyright (c) 2021-2024 Hartmut Kaiser
+# Copyright (c)      2024 Jacob Tucker
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -339,8 +340,19 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
     HPX_WITH_CXX11_ATOMIC_128BIT
     SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
     LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
-    FILE EXECUTE
+    FILE
+    DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT
   )
+  # Check if lockfree
+  if(HPX_WITH_CXX11_ATOMIC_128BIT)
+    add_hpx_config_test(
+      HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE
+      SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
+      LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+      FILE EXECUTE
+      DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT_LOCKFREE
+    )
+  endif()
   if(NOT MSVC)
     # Sometimes linking against libatomic is required, if the platform doesn't
     # support lock-free atomics. We already know that MSVC works
@@ -354,8 +366,19 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
         HPX_WITH_CXX11_ATOMIC_128BIT
         SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
         LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
-        FILE EXECUTE
+        FILE
+        DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT
       )
+      # Check if lockfree after adding -latomic
+      if(HPX_WITH_CXX11_ATOMIC_128BIT)
+        add_hpx_config_test(
+          HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE
+          SOURCE cmake/tests/cxx11_std_atomic_128bit.cpp
+          LIBRARIES ${HPX_CXX11_STD_ATOMIC_LIBRARIES}
+          FILE EXECUTE
+          DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT_LOCKFREE
+        )
+      endif()
       if(NOT HPX_WITH_CXX11_ATOMIC_128BIT)
         # Adding -latomic did not help, so we don't attempt to link to it later
         # but only if normal atomics don't require it
