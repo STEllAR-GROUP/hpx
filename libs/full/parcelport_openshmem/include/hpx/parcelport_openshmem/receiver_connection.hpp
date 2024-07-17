@@ -47,6 +47,7 @@ namespace hpx::parcelset::policies::openshmem {
         receiver_connection(int src, header h, Parcelport& pp) noexcept
           : state_(initialized)
           , src_(src)
+          , idx(0)
           , header_(h)
           , request_ptr_(false)
           , num_bytes(0)
@@ -57,6 +58,7 @@ namespace hpx::parcelset::policies::openshmem {
         {		    
 std::cout << "receiver_connection" << std::endl;
             header_.assert_valid();
+            idx = hpx::util::openshmem_environment::rank();
 
             num_bytes = header_.numbytes();
 
@@ -113,7 +115,6 @@ std::cout << "rcvd_chunks" << std::endl;
         bool receive_transmission_chunks()
         {
 std::cout << "receive_transmission_chunks" << std::endl;
-            const auto idx = hpx::util::openshmem_environment::rank();
 
             const std::size_t sys_pgsz =
                 sysconf(_SC_PAGESIZE);
@@ -142,16 +143,17 @@ std::cout << "receive_transmission_chunks" << std::endl;
 
                     auto chunk_beg = 0;
                     for(std::size_t i = 0; i < rcv_numitrs; ++i) {
-                        while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                        while(!hpx::util::openshmem_environment::test(hpx::util::openshmem_environment::segments[src_].rcv, 1)) {}
+                        (*(hpx::util::openshmem_environment::segments[src_].rcv)) = 0;
 
     		        std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data())+chunk_beg,
-                            hpx::util::openshmem_environment::segments[idx].beg_addr,
+                            hpx::util::openshmem_environment::segments[src_].beg_addr,
     			    data_seg[(i == rcv_numitrs_term)]
     		        );
 
                        if(i != rcv_numitrs_term) {
-                            (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
                             chunk_beg = i * sys_pgsz;
+
                             hpx::util::openshmem_environment::put_signal(nullptr, src_,
                                 nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
                         }
@@ -182,13 +184,11 @@ std::cout << "receive_data" << std::endl;
             }
             else
             {
-                const auto idx = hpx::util::openshmem_environment::rank();
-
                 const std::size_t sys_pgsz =
                    sysconf(_SC_PAGESIZE);
 
                 const std::size_t num_bytes =
-                    buffer_.data_.size() * sizeof(decltype(buffer_.data_);
+                    buffer_.data_.size() * sizeof(decltype(buffer_.data_));
 
                 const std::size_t rcv_numitrs =
                     (num_bytes + sys_pgsz - 1) / sys_pgsz;
@@ -200,15 +200,15 @@ std::cout << "receive_data" << std::endl;
                 auto chunk_beg = 0;
 
                 for(std::size_t i = 0; i < rcv_numitrs; ++i) {
-                    while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+                    while(!hpx::util::openshmem_environment::test(hpx::util::openshmem_environment::segments[src_].rcv, 1)) {}
+                    (*(hpx::util::openshmem_environment::segments[src_].rcv)) = 0;
 
 	    	    std::memcpy(reinterpret_cast<std::uint8_t*>(buffer_.transmission_chunks_.data())+chunk_beg,
-                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        hpx::util::openshmem_environment::segments[src_].beg_addr,
     			data_seg[(i == rcv_numitrs_term)]
 		    );
 
                     if(i != rcv_numitrs_term) {
-                       (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
                        chunk_beg = i * sys_pgsz;
                        hpx::util::openshmem_environment::put_signal(nullptr, src_,
                           nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
@@ -228,13 +228,11 @@ std::cout << "receive_data" << std::endl;
             const std::size_t sys_pgsz =
                 sysconf(_SC_PAGESIZE);
 
-            const auto idx = hpx::util::openshmem_environment::rank();
-
-            for(auto i = 0; i < buffer_.chunks_.size(); ++i) {
+            for(std::size_t i = 0; i < buffer_.chunks_.size(); ++i) {
                 buffer_.chunks_[i].resize(buffer_.transmission_chunks_[i].second);
             }
 
-            for(auto i = 0; i < buffer_.chunks_.size(); ++i) {
+            for(std::size_t i = 0; i < buffer_.chunks_.size(); ++i) {
                 data_type& c = buffer_.chunks_[i];
 
                 const std::size_t num_bytes = c.size() * sizeof(decltype(c.data()));
@@ -248,16 +246,15 @@ std::cout << "receive_data" << std::endl;
                 auto chunk_beg = 0;
 
                 for(std::size_t i = 0; i < rcv_numitrs; ++i) {
-                    while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
+                    while(!hpx::util::openshmem_environment::test(hpx::util::openshmem_environment::segments[src_].rcv, 1)) {}
+                    (*(hpx::util::openshmem_environment::segments[src_].rcv)) = 0;
 
                     std::memcpy(reinterpret_cast<std::uint8_t*>(c.data())+chunk_beg,
-                        hpx::util::openshmem_environment::segments[idx].beg_addr,
+                        hpx::util::openshmem_environment::segments[src_].beg_addr,
                         data_seg[(i == rcv_numitrs_term)]
                     );
 
                     if(i != rcv_numitrs_term) {
-                        (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
                         chunk_beg = i * sys_pgsz;
                         hpx::util::openshmem_environment::put_signal(nullptr, src_,
                             nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
@@ -295,6 +292,7 @@ std::cout << "request_done" << std::endl;
         connection_state state_;
 
         int src_;
+	int idx;
 
         header header_;
         buffer_type buffer_;

@@ -154,35 +154,45 @@ namespace hpx::parcelset::policies::openshmem {
             const std::size_t rcv_numitrs_term = rcv_numitrs - 1;
             std::size_t data_seg [2] = { sys_pgsz, num_bytes % sys_pgsz };
 
-    	    int idx = 0;
-            for(idx = 0; idx < page_count; ++idx) {
-                if(shmem_test(hpx::util::openshmem_environment::shmem_buffer + beg_rcv_signal + idx, SHMEM_CMP_EQ, 1)) {
-                    break;
+	    std::size_t idx = 0;
+	    {
+	        bool term = false;
+    	        while(!term) {
+                    for(idx = 0; idx < page_count; ++idx) {
+                        if(hpx::util::openshmem_environment::test(hpx::util::openshmem_environment::segments[idx].rcv, 1)) {
+			    term = true;
+                            break;
+                        }
+                    }
                 }
             }
 
             (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
-            std::memcpy(reinterpret_cast<std::uint8_t*>(rcv_header_[idx].data()),
+            std::memcpy(reinterpret_cast<std::uint8_t*>(rcv_header_.data()+(sizeof(header)*idx)),
                 hpx::util::openshmem_environment::segments[idx].beg_addr,
                 data_seg[0] 
             );
 
+            hpx::util::openshmem_environment::put_signal(nullptr, idx,
+                nullptr, 1, hpx::util::openshmem_environment::segments[self_].xmt);
+
             auto chunk_beg = sys_pgsz;
 
-            for(std::size_t itr = 1; itr < header_numitrs; ++itr) {
-                while(shmem_test(hpx::util::openshmem_environment::segments[idx].rcv, SHMEM_CMP_EQ, 1)) {}
+            for(std::size_t itr = 1; itr < rcv_numitrs; ++itr) {
+                while(hpx::util::openshmem_environment::test(hpx::util::openshmem_environment::segments[idx].rcv, 1)) {}
+                (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
 
                 std::memcpy(reinterpret_cast<std::uint8_t*>(rcv_header_[idx].data())+chunk_beg,
                     hpx::util::openshmem_environment::segments[idx].beg_addr,
                     data_seg[(itr == rcv_numitrs_term)]
                 );
 
-                if(i != rcv_numitrs_term) {
-                    (*(hpx::util::openshmem_environment::segments[idx].rcv)) = 0;
-                    chunk_beg = i * sys_pgsz;
-                    hpx::util::openshmem_environment::put_signal(nullptr, src_,
-                        nullptr, 0, hpx::util::openshmem_environment::segments[idx].xmt);
+                if(itr != rcv_numitrs_term) {
+                    chunk_beg = itr * sys_pgsz;
+
+                    hpx::util::openshmem_environment::put_signal(nullptr, idx,
+                       nullptr, 1, hpx::util::openshmem_environment::segments[self_].xmt);
                 }
             }
 
