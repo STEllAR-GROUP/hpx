@@ -179,6 +179,10 @@ foreach(test ${tests})
     FOLDER ${folder_name}
   )
 
+  target_link_libraries(
+    ${test}_test PRIVATE hpx_iterator_support_test_utilities
+  )
+
   add_hpx_unit_test(
     "modules.algorithms.algorithms" ${test} ${${test}_PARAMETERS}
   )
