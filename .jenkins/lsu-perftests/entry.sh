@@ -58,7 +58,7 @@ else
     github_commit_status="failure"
 fi
 
-cdash_build_id="$(cat jenkins-hpx-${configuration_name_with_build_type}-cdash-build-id.txt)"
+cdash_build_id="$(cat jenkins-hpx-${configuration_name}-cdash-build-id.txt)"
 
 if [[ -z "${ghprbPullId:-}" ]]; then
     .jenkins/common/set_github_status.sh \
@@ -66,7 +66,7 @@ if [[ -z "${ghprbPullId:-}" ]]; then
         "STEllAR-GROUP/hpx" \
         "${GIT_COMMIT}" \
         "${github_commit_status}" \
-        "${configuration_name_with_build_type}" \
+        "${configuration_name}" \
         "${cdash_build_id}" \
         "jenkins/lsu-perftests"
 else
@@ -79,7 +79,7 @@ else
         "${github_commit_repo}" \
         "${ghprbActualCommit}" \
         "${github_commit_status}" \
-        "${configuration_name_with_build_type}" \
+        "${configuration_name}" \
         "${cdash_build_id}" \
         "jenkins/lsu-perftests"
 fi
