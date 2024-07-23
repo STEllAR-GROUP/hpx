@@ -248,6 +248,7 @@ add_hpx_module(
     hpx_execution
     hpx_executors
     hpx_futures
+    hpx_iterator_support
     hpx_lcos_local
     hpx_pack_traversal
     hpx_serialization
