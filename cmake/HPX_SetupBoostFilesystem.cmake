@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 The STE||AR-Group
+# Copyright (c) 2019-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +7,8 @@
 if(HPX_FILESYSTEM_WITH_BOOST_FILESYSTEM_COMPATIBILITY)
   # In case find_package(HPX) is called multiple times
   if(NOT TARGET Boost::filesystem)
+    hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
+
     find_package(
       Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE
       COMPONENTS filesystem

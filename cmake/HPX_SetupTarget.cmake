@@ -10,6 +10,8 @@ cmake_policy(PUSH)
 
 hpx_set_cmake_policy(CMP0054 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
+hpx_set_cmake_policy(CMP0074 NEW)
+hpx_set_cmake_policy(CMP0167 OLD)
 
 function(hpx_setup_target target)
   # retrieve arguments

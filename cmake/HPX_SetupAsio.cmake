@@ -32,10 +32,7 @@ elseif(NOT TARGET Asio::asio AND NOT HPX_FIND_PACKAGE)
     GIT_TAG ${HPX_WITH_ASIO_TAG}
   )
 
-  fetchcontent_getproperties(asio)
-  if(NOT asio_POPULATED)
-    fetchcontent_populate(asio)
-  endif()
+  fetchcontent_makeavailable(asio)
   set(Asio_ROOT ${asio_SOURCE_DIR})
 
   add_library(asio INTERFACE)
