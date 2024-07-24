@@ -10,19 +10,15 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_NETWORKING) && defined(HPX_HAVE_PARCELPORT_MPI)
-#include <hpx/assert.hpp>
-#include <hpx/modules/synchronization.hpp>
+#include <hpx/modules/mpi_base.hpp>
 
 #include <atomic>
-#include <deque>
-#include <limits>
-#include <mutex>
 
 namespace hpx::parcelset::policies::mpi {
 
     struct tag_provider
     {
-        tag_provider()
+        constexpr tag_provider() noexcept
           : next_tag(0)
         {
         }

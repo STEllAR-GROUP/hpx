@@ -1,5 +1,5 @@
 //  Copyright (c) 2014-2015 Thomas Heller
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2023 Jiakun Yan
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -32,41 +32,53 @@ namespace hpx::parcelset::policies::mpi {
     struct receiver_connection
     {
     private:
-        enum connection_state
+        enum class connection_state : std::uint8_t
         {
-            initialized,
-            rcvd_transmission_chunks,
-            rcvd_data,
-            rcvd_chunks,
+            initialized = 1,
+            rcvd_transmission_chunks = 2,
+            rcvd_data = 3,
+            rcvd_chunks = 4,
+
+            acked_transmission_chunks = 5,
+            acked_data = 6
         };
 
         using data_type = std::vector<char>;
         using buffer_type =
             parcel_buffer<data_type, serialization::serialization_chunk>;
 
+        constexpr int ack_tag() const noexcept
+        {
+            return static_cast<int>(tag_ | util::mpi_environment::MPI_ACK_TAG);
+        }
+
     public:
         receiver_connection(
-            int src, std::vector<char> header_buffer, Parcelport& pp) noexcept
-          : state_(initialized)
+            int src, std::vector<char> header_buffer, Parcelport& pp)
+          : state_(connection_state::initialized)
           , src_(src)
           , request_(MPI_REQUEST_NULL)
           , request_ptr_(nullptr)
           , chunks_idx_(0)
           , zero_copy_chunks_idx_(0)
+          , needs_ack_handshake_(false)
+          , ack_(0)
           , pp_(pp)
         {
             header header_ = header(header_buffer.data());
             header_.assert_valid();
+
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
             data.time_ = timer_.elapsed_nanoseconds();
             data.bytes_ = static_cast<std::size_t>(header_.numbytes());
 #endif
             tag_ = header_.get_tag();
+            needs_ack_handshake_ = header_.get_ack_handshakes();
+
             // decode data
             buffer_.data_.resize(header_.numbytes_nonzero_copy());
-            char* piggy_back_data = header_.piggy_back_data();
-            if (piggy_back_data)
+            if (char* piggy_back_data = header_.piggy_back_data())
             {
                 need_recv_data = false;
                 memcpy(buffer_.data_.data(), piggy_back_data,
@@ -76,29 +88,38 @@ namespace hpx::parcelset::policies::mpi {
             {
                 need_recv_data = true;
             }
+
             need_recv_tchunks = false;
             if (header_.num_zero_copy_chunks() != 0)
             {
                 // decode transmission chunk
-                int num_zero_copy_chunks = header_.num_zero_copy_chunks();
-                int num_non_zero_copy_chunks =
+                int const num_zero_copy_chunks = header_.num_zero_copy_chunks();
+                int const num_non_zero_copy_chunks =
                     header_.num_non_zero_copy_chunks();
                 buffer_.num_chunks_.first = num_zero_copy_chunks;
                 buffer_.num_chunks_.second = num_non_zero_copy_chunks;
+
                 auto& tchunks = buffer_.transmission_chunks_;
                 tchunks.resize(num_zero_copy_chunks + num_non_zero_copy_chunks);
-                int tchunks_length = static_cast<int>(tchunks.size() *
-                    sizeof(buffer_type::transmission_chunk_type));
-                char* piggy_back_tchunk = header_.piggy_back_tchunk();
-                if (piggy_back_tchunk)
+                if (char* piggy_back_tchunk = header_.piggy_back_tchunk())
                 {
-                    memcpy(static_cast<void*>(tchunks.data()),
-                        piggy_back_tchunk, tchunks_length);
+#if defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
+                    int const tchunks_length = static_cast<int>(tchunks.size() *
+                        sizeof(buffer_type::transmission_chunk_type));
+                    memcpy(tchunks.data(), piggy_back_tchunk, tchunks_length);
+
+#if defined(HPX_GCC_VERSION) && !defined(HPX_CLANG_VERSION)
+#pragma GCC diagnostic pop
+#endif
                 }
                 else
                 {
                     need_recv_tchunks = true;
                 }
+
                 // zero-copy chunks
                 buffer_.chunks_.resize(num_zero_copy_chunks);
                 if (!pp_.allow_zero_copy_receive_optimizations())
@@ -112,17 +133,23 @@ namespace hpx::parcelset::policies::mpi {
         {
             switch (state_)
             {
-            case initialized:
+            case connection_state::initialized:
                 return receive_transmission_chunks(num_thread);
 
-            case rcvd_transmission_chunks:
+            case connection_state::rcvd_transmission_chunks:
+                return ack_transmission_chunks(num_thread);
+
+            case connection_state::rcvd_data:
+                return ack_data(num_thread);
+
+            case connection_state::rcvd_chunks:
+                return done(num_thread);
+
+            case connection_state::acked_transmission_chunks:
                 return receive_data(num_thread);
 
-            case rcvd_data:
+            case connection_state::acked_data:
                 return receive_chunks(num_thread);
-
-            case rcvd_chunks:
-                return done(num_thread);
 
             default:
                 HPX_ASSERT(false);
@@ -136,54 +163,148 @@ namespace hpx::parcelset::policies::mpi {
             {
                 util::mpi_environment::scoped_lock l;
 
-                [[maybe_unused]] int const ret =
-                    MPI_Irecv(buffer_.transmission_chunks_.data(),
-                        static_cast<int>(buffer_.transmission_chunks_.size() *
-                            sizeof(buffer_type::transmission_chunk_type)),
-                        MPI_BYTE, src_, tag_,
-                        util::mpi_environment::communicator(), &request_);
-                HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                int const ret = MPI_Irecv(buffer_.transmission_chunks_.data(),
+                    static_cast<int>(buffer_.transmission_chunks_.size() *
+                        sizeof(buffer_type::transmission_chunk_type)),
+                    MPI_BYTE, src_, tag_, util::mpi_environment::communicator(),
+                    &request_);
+                util::mpi_environment::check_mpi_error(
+                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
                 request_ptr_ = &request_;
+
+                state_ = connection_state::rcvd_transmission_chunks;
+                return ack_transmission_chunks(num_thread);
             }
 
-            state_ = rcvd_transmission_chunks;
-
+            // no need to acknowledge the transmission chunks
+            state_ = connection_state::rcvd_transmission_chunks;
             return receive_data(num_thread);
         }
 
-        bool receive_data(std::size_t num_thread = -1)
+        constexpr bool need_ack_transmission_chunks() const noexcept
         {
+            return needs_ack_handshake_ && need_recv_tchunks;
+        }
+
+        bool ack_transmission_chunks(std::size_t num_thread = -1)
+        {
+            if (!need_ack_transmission_chunks())
+            {
+                return receive_data(num_thread);
+            }
+
+            HPX_ASSERT(state_ == connection_state::rcvd_transmission_chunks);
+
             if (!request_done())
             {
                 return false;
             }
+            HPX_ASSERT(request_ptr_ == nullptr);
+
+            {
+                util::mpi_environment::scoped_lock l;
+
+                ack_ = static_cast<char>(
+                    connection_state::acked_transmission_chunks);
+                int const ret =
+                    MPI_Isend(&ack_, sizeof(ack_), MPI_BYTE, src_, ack_tag(),
+                        util::mpi_environment::communicator(), &request_);
+                util::mpi_environment::check_mpi_error(
+                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
+                request_ptr_ = &request_;
+            }
+
+            state_ = connection_state::acked_transmission_chunks;
+            return receive_data(num_thread);
+        }
+
+        constexpr bool need_ack_data() const noexcept
+        {
+            return needs_ack_handshake_ && need_recv_data;
+        }
+
+        bool receive_data(std::size_t num_thread = -1)
+        {
+            HPX_ASSERT(
+                (!need_ack_transmission_chunks() &&
+                    state_ == connection_state::rcvd_transmission_chunks) ||
+                (need_ack_transmission_chunks() &&
+                    state_ == connection_state::acked_transmission_chunks));
+
+            if (!request_done())
+            {
+                return false;
+            }
+            HPX_ASSERT(request_ptr_ == nullptr);
 
             if (need_recv_data)
             {
                 util::mpi_environment::scoped_lock l;
 
-                [[maybe_unused]] int const ret = MPI_Irecv(buffer_.data_.data(),
+                int const ret = MPI_Irecv(buffer_.data_.data(),
                     static_cast<int>(buffer_.data_.size()), MPI_BYTE, src_,
                     tag_, util::mpi_environment::communicator(), &request_);
-                HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                util::mpi_environment::check_mpi_error(
+                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
+                request_ptr_ = &request_;
+
+                state_ = connection_state::rcvd_data;
+                return ack_data(num_thread);
+            }
+
+            // no need to acknowledge the data sent
+            state_ = connection_state::rcvd_data;
+            return receive_chunks(num_thread);
+        }
+
+        bool ack_data(std::size_t num_thread = -1)
+        {
+            if (!need_ack_data())
+            {
+                return receive_chunks(num_thread);
+            }
+
+            HPX_ASSERT(state_ == connection_state::rcvd_data);
+
+            if (!request_done())
+            {
+                return false;
+            }
+            HPX_ASSERT(request_ptr_ == nullptr);
+
+            {
+                util::mpi_environment::scoped_lock l;
+
+                ack_ = static_cast<char>(connection_state::acked_data);
+                int const ret =
+                    MPI_Isend(&ack_, sizeof(ack_), MPI_BYTE, src_, ack_tag(),
+                        util::mpi_environment::communicator(), &request_);
+                util::mpi_environment::check_mpi_error(
+                    l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
                 request_ptr_ = &request_;
             }
 
-            state_ = rcvd_data;
-
+            state_ = connection_state::acked_data;
             return receive_chunks(num_thread);
         }
 
         bool receive_chunks(std::size_t num_thread = -1)
         {
+            HPX_ASSERT(
+                (!need_ack_data() && state_ == connection_state::rcvd_data) ||
+                (need_ack_data() && state_ == connection_state::acked_data));
+
             if (pp_.allow_zero_copy_receive_optimizations())
             {
                 if (!request_done())
                 {
                     return false;
                 }
+                HPX_ASSERT(request_ptr_ == nullptr);
 
                 // handle zero-copy receive, this should be done on the first entry
                 // to receive_chunks only
@@ -191,18 +312,18 @@ namespace hpx::parcelset::policies::mpi {
                 {
                     HPX_ASSERT(zero_copy_chunks_idx_ == 0);
 
-                    auto const num_zero_copy_chunks = static_cast<std::size_t>(
-                        static_cast<std::uint32_t>(buffer_.num_chunks_.first));
+                    auto const num_zero_copy_chunks =
+                        static_cast<std::size_t>(buffer_.num_chunks_.first);
                     if (num_zero_copy_chunks != 0)
                     {
                         HPX_ASSERT(
                             buffer_.chunks_.size() == num_zero_copy_chunks);
 
                         // De-serialize the parcels such that all data but the
-                        // zero-copy chunks are in place. This de-serialization also
-                        // allocates all zero-chunk buffers and stores those in the
-                        // chunks array for the subsequent networking to place the
-                        // received data directly.
+                        // zero-copy chunks are in place. This de-serialization
+                        // also allocates all zero-chunk buffers and stores
+                        // those in the chunks array for the subsequent
+                        // networking to place the received data directly.
                         for (std::size_t i = 0; i != num_zero_copy_chunks; ++i)
                         {
                             auto const chunk_size = static_cast<std::size_t>(
@@ -230,6 +351,7 @@ namespace hpx::parcelset::policies::mpi {
                     {
                         return false;
                     }
+                    HPX_ASSERT(request_ptr_ == nullptr);
 
                     auto& c = buffer_.chunks_[chunks_idx_++];
                     if (c.type_ == serialization::chunk_type::chunk_type_index)
@@ -239,9 +361,9 @@ namespace hpx::parcelset::policies::mpi {
 
                     // the zero-copy chunks come first in the transmission_chunks_
                     // array
-                    auto const chunk_size = static_cast<std::size_t>(
+                    auto const chunk_size =
                         buffer_.transmission_chunks_[zero_copy_chunks_idx_++]
-                            .second);
+                            .second;
 
                     // the parcel de-serialization above should have allocated the
                     // correct amount of memory
@@ -253,10 +375,11 @@ namespace hpx::parcelset::policies::mpi {
                     {
                         util::mpi_environment::scoped_lock l;
 
-                        [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
+                        int const ret = MPI_Irecv(c.data(),
                             static_cast<int>(chunk_size), MPI_BYTE, src_, tag_,
                             util::mpi_environment::communicator(), &request_);
-                        HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                        util::mpi_environment::check_mpi_error(
+                            l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
                         request_ptr_ = &request_;
                     }
@@ -275,6 +398,7 @@ namespace hpx::parcelset::policies::mpi {
                     {
                         return false;
                     }
+                    HPX_ASSERT(request_ptr_ == nullptr);
 
                     std::size_t const idx = chunks_idx_++;
                     std::size_t const chunk_size =
@@ -290,26 +414,30 @@ namespace hpx::parcelset::policies::mpi {
                     {
                         util::mpi_environment::scoped_lock l;
 
-                        [[maybe_unused]] int const ret = MPI_Irecv(c.data(),
+                        int const ret = MPI_Irecv(c.data(),
                             static_cast<int>(c.size()), MPI_BYTE, src_, tag_,
                             util::mpi_environment::communicator(), &request_);
-                        HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+                        util::mpi_environment::check_mpi_error(
+                            l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
                         request_ptr_ = &request_;
                     }
                 }
             }
-            state_ = rcvd_chunks;
 
+            state_ = connection_state::rcvd_chunks;
             return done(num_thread);
         }
 
         bool done(std::size_t num_thread = -1) noexcept
         {
+            HPX_ASSERT(state_ == connection_state::rcvd_chunks);
+
             if (!request_done())
             {
                 return false;
             }
+            HPX_ASSERT(request_ptr_ == nullptr);
 
 #if defined(HPX_HAVE_PARCELPORT_COUNTERS)
             parcelset::data_point& data = buffer_.data_point_;
@@ -350,9 +478,10 @@ namespace hpx::parcelset::policies::mpi {
             }
 
             int completed = 0;
-            [[maybe_unused]] int const ret =
+            int const ret =
                 MPI_Test(request_ptr_, &completed, MPI_STATUS_IGNORE);
-            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+            util::mpi_environment::check_mpi_error(
+                l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
             if (completed)
             {
@@ -377,6 +506,9 @@ namespace hpx::parcelset::policies::mpi {
         MPI_Request* request_ptr_;
         std::size_t chunks_idx_;
         std::size_t zero_copy_chunks_idx_;
+
+        bool needs_ack_handshake_;
+        char ack_;
 
         Parcelport& pp_;
 
