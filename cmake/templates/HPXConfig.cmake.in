@@ -142,12 +142,16 @@ include(HPX_SetupAllocator)
 
 include(HPX_SetupThreads)
 
-# Boost Separate boost targets to be unarily linked to some modules
-set(HPX_BOOST_ROOT "@Boost_ROOT@")
-# By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
-# HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
-  set(Boost_ROOT ${HPX_BOOST_ROOT})
+if(HPX_WITH_FETCH_BOOST)
+  include("${CMAKE_CURRENT_LIST_DIR}/hpx_boost_root-install.cmake")
+else()
+  # Boost Separate boost targets to be unarily linked to some modules
+  set(HPX_BOOST_ROOT "@Boost_ROOT@")
+  # By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+  # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+  if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+    set(Boost_ROOT ${HPX_BOOST_ROOT})
+  endif()
 endif()
 include(HPX_SetupBoost)
 include(HPX_SetupBoostFilesystem)
