@@ -90,6 +90,7 @@ cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
+hpx_set_cmake_policy(CMP0167 OLD)
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols

@@ -1,5 +1,6 @@
 # Copyright (c) 2018 Christopher Hinz
 # Copyright (c) 2014 Thomas Heller
+# Copyright (c) 2007-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -81,6 +82,13 @@ if(NOT TARGET hpx_dependencies_boost)
   # cmake-format: off
   set(Boost_ADDITIONAL_VERSIONS
       ${Boost_ADDITIONAL_VERSIONS}
+      "1.85.0" "1.85"
+      "1.84.0" "1.84"
+      "1.83.0" "1.83"
+      "1.82.0" "1.82"
+      "1.81.0" "1.81"
+      "1.80.0" "1.80"
+      "1.79.0" "1.79"
       "1.78.0" "1.78"
       "1.77.0" "1.77"
       "1.76.0" "1.76"
@@ -97,6 +105,8 @@ if(NOT TARGET hpx_dependencies_boost)
   )
 
   set(Boost_NO_BOOST_CMAKE ON) # disable the search for boost-cmake
+
+  hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
 
   # Find the headers and get the version
   find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
