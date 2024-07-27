@@ -328,7 +328,7 @@ std::cout << "7 parcelport constructor" << std::endl << std::flush;
             shmem_fence();
             shmem_uint8_put(sigaddr, sigaddr, 1, node);
 #else
-            shmem_uint8_put_signal(raddr, addr, size, sigaddr, 1, SHMEM_SIGNAL_SET, node);
+            shmem_uint8_put_signal(raddr, addr, size, reinterpret_cast<uint64_t*>(sigaddr), 1, SHMEM_SIGNAL_SET, node);
 #endif
         }
     }
