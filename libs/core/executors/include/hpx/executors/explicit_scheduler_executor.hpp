@@ -192,7 +192,14 @@ namespace hpx::execution::experimental {
                 typename hpx::traits::range_traits<S>::value_type;
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,
                 shape_element, Ts...>;
-                
+
+            /* A boolean as result_type is disallowed because the elements of a
+             * vector<bool> cannot be modified concurrently. */
+            static_assert(!std::is_same_v<result_type, bool>,
+                "Using an invocable that returns a boolean with "
+                "explicit_scheduler_executor::bulk_async_execution "
+                "can result in data races!");
+
 #ifdef HPX_HAVE_STDEXEC
 //            We are using HPX's bulk implementation for now, so this works for
 //            other types too.
