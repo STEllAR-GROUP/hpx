@@ -1,6 +1,7 @@
 # Copyright (c)      2020 Mikael Simberg
 # Copyright (c) 2007-2024 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
+# Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -576,6 +577,27 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
+
+# ## HPX STDEXEC configuration ##
+
+hpx_option(
+  HPX_WITH_STDEXEC BOOL
+  "Use STDEXEC executors instead of native HPX.(default: OFF)" OFF
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+hpx_option(
+  HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: ON)"
+  ON
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+hpx_option(
+  HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
+  CATEGORY "Executor"
+)
 
 # ##############################################################################
 # HPX SYCL configuration
@@ -1345,7 +1367,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   endif()
 endif()
 
-# External libraries/frameworks used by sme of the examples and benchmarks
+# External libraries/frameworks used by some of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
@@ -2263,6 +2285,9 @@ include(HPX_SetupValgrind)
 if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)
 endif()
+
+# Setup NVIDIA's stdexec if requested
+include(HPX_SetupStdexec)
 
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)

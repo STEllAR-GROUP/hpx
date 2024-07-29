@@ -9,6 +9,7 @@
 #include <hpx/modules/async_mpi.hpp>
 #include <hpx/modules/errors.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/string_util/case_conv.hpp>
 #include <hpx/tuple.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -141,9 +142,9 @@ int hpx_main()
                 {
                     data = 42;
                 }
-                auto result =
-                    hpx::get<0>(*(ex::just(&data, count, datatype, 0, comm) |
-                        mpi::transform_mpi(MPI_Ibcast) | tt::sync_wait()));
+                auto result = hpx::get<0>(
+                    *tt::sync_wait(ex::just(&data, count, datatype, 0, comm) |
+                        mpi::transform_mpi(MPI_Ibcast)));
                 if (rank != 0)
                 {
                     HPX_TEST_EQ(data, 42);
@@ -160,10 +161,9 @@ int hpx_main()
                 bool exception_thrown = false;
                 try
                 {
-                    mpi::transform_mpi(
+                    tt::sync_wait(mpi::transform_mpi(
                         error_sender<int*, int, MPI_Datatype, int, MPI_Comm>{},
-                        MPI_Ibcast) |
-                        tt::sync_wait();
+                        MPI_Ibcast));
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const& e)
@@ -207,15 +207,16 @@ int hpx_main()
                 bool exception_thrown = false;
                 try
                 {
-                    mpi::transform_mpi(
-                        ex::just(data, count, datatype, -1, comm), MPI_Ibcast) |
-                        tt::sync_wait();
+                    tt::sync_wait(mpi::transform_mpi(
+                        ex::just(data, count, datatype, -1, comm), MPI_Ibcast));
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const& e)
                 {
-                    HPX_TEST(std::string(e.what()).find(std::string(
-                                 "invalid root")) != std::string::npos);
+                    auto error_msg = std::string(e.what());
+                    hpx::string_util::to_lower(error_msg);
+                    HPX_TEST(error_msg.find(std::string("invalid root")) !=
+                        std::string::npos);
                     exception_thrown = true;
                 }
                 HPX_TEST(exception_thrown);
@@ -232,9 +233,8 @@ int hpx_main()
                 bool exception_thrown = false;
                 try
                 {
-                    mpi::transform_mpi(
-                        ex::just(data, count, datatype, -1, comm), MPI_Ibcast) |
-                        tt::sync_wait();
+                    tt::sync_wait(mpi::transform_mpi(
+                        ex::just(data, count, datatype, -1, comm), MPI_Ibcast));
                     HPX_TEST(false);
                 }
                 catch (std::runtime_error const&)

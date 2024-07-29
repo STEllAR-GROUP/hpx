@@ -34,16 +34,34 @@ struct custom_type_non_copyable
         custom_type_non_copyable const&) = delete;
 };
 
+class immovable
+{
+public:
+    immovable() = default;
+    immovable(immovable const&) = default;
+    immovable(immovable&&) = delete;
+    immovable& operator=(immovable const&) = default;
+    immovable& operator=(immovable&&) = delete;
+};
+
 template <typename... Ts>
 struct non_copyable_sender
 {
+#ifdef HPX_HAVE_STDEXEC
+    using sender_concept = ex::sender_t;
+#else
+    using is_sender = void;
+#endif
+
     hpx::tuple<std::decay_t<Ts>...> ts;
 
+    // clang-format off
     template <typename Env>
     friend auto tag_invoke(ex::get_completion_signatures_t,
-        non_copyable_sender const&, Env) noexcept
-        -> ex::completion_signatures<ex::set_value_t(Ts...),
-            ex::set_error_t(std::exception_ptr)>;
+        non_copyable_sender const&,
+        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
+                          ex::set_error_t(std::exception_ptr)>;
+    // clang-format on
 
     non_copyable_sender() = default;
     template <typename T,
@@ -64,7 +82,7 @@ struct non_copyable_sender
     non_copyable_sender& operator=(non_copyable_sender const&) = delete;
 
     template <typename R>
-    struct operation_state
+    struct operation_state : immovable
     {
         std::decay_t<R> r;
         hpx::tuple<std::decay_t<Ts>...> ts;
@@ -84,39 +102,45 @@ struct non_copyable_sender
         hpx::execution::experimental::connect_t, non_copyable_sender&& s,
         R&& r) noexcept
     {
-        return {std::forward<R>(r), std::move(s.ts)};
+        return {{}, std::forward<R>(r), std::move(s.ts)};
     }
 };
 
 template <typename... Ts>
-struct sender
+struct example_sender
 {
     hpx::tuple<std::decay_t<Ts>...> ts;
 
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender const&,
-        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
-        ex::set_error_t(std::exception_ptr)>;
+    using is_sender = void;
 
-    sender() = default;
+    // clang-format off
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t,
+        example_sender const&,
+        Env) noexcept -> ex::completion_signatures<ex::set_value_t(Ts...),
+                          ex::set_error_t(std::exception_ptr)>;
+    // clang-format on
+
+    example_sender() = default;
     template <typename T,
-        typename = std::enable_if_t<!std::is_same_v<std::decay_t<T>, sender>>>
-    sender(T&& t)
+        typename =
+            std::enable_if_t<!std::is_same_v<std::decay_t<T>, example_sender>>>
+    example_sender(T&& t)
       : ts(std::forward<T>(t))
     {
     }
     template <typename T1, typename T2, typename... Ts_>
-    sender(T1&& t1, T2&& t2, Ts_&&... ts)
+    example_sender(T1&& t1, T2&& t2, Ts_&&... ts)
       : ts(std::forward<T1>(t1), std::forward<T2>(t2), std::forward<Ts_>(ts)...)
     {
     }
-    sender(sender&&) = default;
-    sender(sender const&) = default;
-    sender& operator=(sender&&) = default;
-    sender& operator=(sender const&) = default;
+    example_sender(example_sender&&) = default;
+    example_sender(example_sender const&) = default;
+    example_sender& operator=(example_sender&&) = default;
+    example_sender& operator=(example_sender const&) = default;
 
     template <typename R>
-    struct operation_state
+    struct operation_state : immovable
     {
         std::decay_t<R> r;
         hpx::tuple<std::decay_t<Ts>...> ts;
@@ -133,16 +157,16 @@ struct sender
 
     template <typename R>
     friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, sender&& s, R&& r)
+        hpx::execution::experimental::connect_t, example_sender&& s, R&& r)
     {
-        return {std::forward<R>(r), std::move(s.ts)};
+        return {{}, std::forward<R>(r), std::move(s.ts)};
     }
 
     template <typename R>
     friend operation_state<R> tag_invoke(
-        hpx::execution::experimental::connect_t, sender& s, R&& r)
+        hpx::execution::experimental::connect_t, example_sender& s, R&& r)
     {
-        return {std::forward<R>(r), s.ts};
+        return {{}, std::forward<R>(r), s.ts};
     }
 };
 
@@ -175,7 +199,7 @@ struct large_non_copyable_sender : non_copyable_sender<Ts...>
 };
 
 template <typename... Ts>
-struct large_sender : sender<Ts...>
+struct large_sender : example_sender<Ts...>
 {
     // This padding only needs to be larger than the embedded storage in
     // any_sender. Adjust if needed.
@@ -186,12 +210,12 @@ struct large_sender : sender<Ts...>
         typename =
             std::enable_if_t<!std::is_same_v<std::decay_t<T>, large_sender>>>
     large_sender(T&& t)
-      : sender<Ts...>(std::forward<T>(t))
+      : example_sender<Ts...>(std::forward<T>(t))
     {
     }
     template <typename T1, typename T2, typename... Ts_>
     large_sender(T1&& t1, T2&& t2, Ts_&&... ts)
-      : sender<Ts...>(std::forward<T1>(t1), std::forward<T2>(t2),
+      : example_sender<Ts...>(std::forward<T1>(t1), std::forward<T2>(t2),
             std::forward<Ts_>(ts)...)
     {
     }
@@ -204,6 +228,10 @@ struct large_sender : sender<Ts...>
 struct error_receiver
 {
     std::atomic<bool>& set_error_called;
+
+    struct is_receiver
+    {
+    };
 
     friend void tag_invoke(hpx::execution::experimental::set_error_t,
         error_receiver&& r, std::exception_ptr&& e) noexcept
@@ -241,23 +269,27 @@ template <template <typename...> typename Sender, typename... Ts, typename F>
 void test_any_sender(F&& f, Ts&&... ts)
 {
     static_assert(std::is_copy_constructible_v<Sender<Ts...>>,
-        "This test requires the sender to be copy constructible.");
+        "This test requires the example_sender to be copy constructible.");
 
     Sender<std::decay_t<Ts>...> s{std::forward<Ts>(ts)...};
 
     ex::any_sender<std::decay_t<Ts>...> as1{s};
 
     static_assert(ex::is_sender_v<decltype(as1)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as1), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
-
-    check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as1);
-    check_error_types<hpx::variant<std::exception_ptr>>(as1);
-    check_sends_stopped<false>(as1);
+#endif
 
     auto as2 = as1;
 
     static_assert(ex::is_sender_v<decltype(as2)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as2), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
     check_error_types<hpx::variant<std::exception_ptr>>(as2);
@@ -347,7 +379,11 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
     ex::unique_any_sender<std::decay_t<Ts>...> as1{std::move(s)};
 
     static_assert(ex::is_sender_v<decltype(as1)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as1), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as1), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as1);
     check_error_types<hpx::variant<std::exception_ptr>>(as1);
@@ -356,7 +392,11 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
     auto as2 = std::move(as1);
 
     static_assert(ex::is_sender_v<decltype(as2)>);
+#ifdef HPX_HAVE_STDEXEC
+    static_assert(ex::is_sender_in_v<decltype(as2), ex::empty_env>);
+#else
     static_assert(ex::is_sender_v<decltype(as2), ex::empty_env>);
+#endif
 
     check_value_types<hpx::variant<hpx::tuple<Ts...>>>(as2);
     check_error_types<hpx::variant<std::exception_ptr>>(as2);
@@ -371,7 +411,7 @@ void test_unique_any_sender(F&& f, Ts&&... ts)
         HPX_TEST(set_value_called);
     }
 
-    // as1 has been moved so we always expect an exception here
+    // as1 has been moved, so we always expect an exception here
     {
         std::atomic<bool> set_value_called{false};
         try
@@ -401,7 +441,7 @@ void test_any_sender_set_error()
     ex::any_sender<> as1{std::move(s)};
     auto as2 = as1;
 
-    // We should be able to connect the sender multiple times; set_error should
+    // We should be able to connect the example_sender multiple times; set_error should
     // always be called
     {
         std::atomic<bool> set_error_called{false};
@@ -490,7 +530,7 @@ void test_unique_any_sender_set_error()
         HPX_TEST(set_error_called);
     }
 
-    // as1 has been moved so we always expect an exception here
+    // as1 has been moved, so we always expect an exception here
     {
         std::atomic<bool> set_error_called{false};
         try
@@ -524,19 +564,36 @@ void test_unique_any_sender_set_error()
 ex::unique_any_sender<> global_unique_any_sender{ex::just()};
 ex::any_sender<> global_any_sender{ex::just()};
 
+// This helper only makes sure that the sender returned from split is actually
+// started before being destructed.
+struct wait_globals
+{
+    ~wait_globals()
+    {
+        hpx::this_thread::experimental::sync_wait(std::move(global_any_sender));
+    }
+} waiter{};
+
 void test_globals()
 {
     global_unique_any_sender =
         std::move(global_unique_any_sender) | ex::ensure_started();
+#ifdef HPX_HAVE_STDEXEC
+    // P2300R8's ensure started returns non-copyable senders, so we need to split
+    // to pass it to a global_any_sender.
+    global_any_sender =
+        std::move(global_any_sender) | ex::ensure_started() | ex::split();
+#else
     global_any_sender = std::move(global_any_sender) | ex::ensure_started();
+#endif
 }
 
 int main()
 {
     // We can only wrap copyable senders in any_sender
-    test_any_sender<sender>([] {});
-    test_any_sender<sender, int>([](int x) { HPX_TEST_EQ(x, 42); }, 42);
-    test_any_sender<sender, int, double>(
+    test_any_sender<example_sender>([] {});
+    test_any_sender<example_sender, int>([](int x) { HPX_TEST_EQ(x, 42); }, 42);
+    test_any_sender<example_sender, int, double>(
         [](int x, double y) {
             HPX_TEST_EQ(x, 42);
             HPX_TEST_EQ(y, 3.14);
@@ -553,9 +610,10 @@ int main()
         42, 3.14);
 
     // We can wrap both copyable and non-copyable senders in unique_any_sender
-    test_unique_any_sender<sender>([] {});
-    test_unique_any_sender<sender, int>([](int x) { HPX_TEST_EQ(x, 42); }, 42);
-    test_unique_any_sender<sender, int, double>(
+    test_unique_any_sender<example_sender>([] {});
+    test_unique_any_sender<example_sender, int>(
+        [](int x) { HPX_TEST_EQ(x, 42); }, 42);
+    test_unique_any_sender<example_sender, int, double>(
         [](int x, double y) {
             HPX_TEST_EQ(x, 42);
             HPX_TEST_EQ(y, 3.14);

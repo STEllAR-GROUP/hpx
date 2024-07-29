@@ -7,6 +7,24 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+
+#ifdef HPX_HAVE_STDEXEC
+#include <hpx/execution_base/stdexec_forward.hpp>
+
+namespace hpx::execution::experimental {
+    template <typename OperationState>
+    inline constexpr bool is_operation_state_v =
+        operation_state<OperationState>;
+
+    template <typename OperationState>
+    struct is_operation_state
+      : std::bool_constant<operation_state<OperationState>>
+    {
+    };
+}    // namespace hpx::execution::experimental
+#else
+
 #include <hpx/config/constexpr.hpp>
 #include <hpx/functional/tag_invoke.hpp>
 #include <hpx/functional/traits/is_invocable.hpp>
@@ -101,3 +119,4 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_operation_state_v =
         meta::value<is_operation_state<O>>;
 }    // namespace hpx::execution::experimental
+#endif
