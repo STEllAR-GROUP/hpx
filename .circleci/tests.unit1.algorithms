@@ -72,7 +72,6 @@ tests.unit.modules.algorithms.algorithms.for_loop_n
 tests.unit.modules.algorithms.algorithms.for_loop_n_strided
 tests.unit.modules.algorithms.algorithms.for_loop_reduction
 tests.unit.modules.algorithms.algorithms.for_loop_reduction_async
-tests.unit.modules.algorithms.algorithms.for_loop_sender
 tests.unit.modules.algorithms.algorithms.for_loop_strided
 tests.unit.modules.algorithms.algorithms.generate
 tests.unit.modules.algorithms.algorithms.generate_sender

@@ -48,7 +48,6 @@ tests.unit.modules.algorithms.algorithms.reverse_copy
 tests.unit.modules.algorithms.algorithms.reverse_copy_sender
 tests.unit.modules.algorithms.algorithms.rotate
 tests.unit.modules.algorithms.algorithms.rotate_copy
-tests.unit.modules.algorithms.algorithms.rotate_sender
 tests.unit.modules.algorithms.algorithms.search
 tests.unit.modules.algorithms.algorithms.searchn
 tests.unit.modules.algorithms.algorithms.set_difference

@@ -606,7 +606,7 @@ void test_equal_binary_edge_cases_sender(
     }
 
     {
-        // only second range emtpy
+        // only second range empty
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
                 std::begin(c1), std::begin(c1)) |
