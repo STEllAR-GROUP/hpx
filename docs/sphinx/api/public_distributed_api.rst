@@ -181,7 +181,7 @@ Member functions
 .. _public_distr_api_header_async:
 
 ``hpx/async.hpp``
-===================
+=================
 
 The header :hpx-header:`libs/full/async_distributed/include,hpx/async.hpp`
 includes distributed implementations of :cpp:func:`hpx::async`,
@@ -204,3 +204,69 @@ Functions
    +-------------------------------------------------------+
    | :ref:`modules_hpx/async_distributed/dataflow.hpp_api` |
    +-------------------------------------------------------+
+
+.. _public_distr_api_header_components:
+
+``hpx/components.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/include/components.hpp`
+includes the components implementation. A component in `hpx` is a C++ class
+which can be created remotely and for which its member functions can be invoked
+remotely as well. More information about how components can be defined,
+created, and used can be found in :ref:`components`. :ref:`examples_accumulator`
+includes examples on the accumulator, template accumulator and template function
+accumulator.
+
+Macros
+------
+
+.. table:: `hpx` macros of header ``hpx/components.hpp``
+
+   +----------------------------------------------+
+   | Macro                                        |
+   +==============================================+
+   | :c:macro:`HPX_DEFINE_COMPONENT_ACTION`       |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_ACTION_DECLARATION`   |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_ACTION`               |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMMANDLINE_MODULE`   |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMPONENT`            |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMPONENT_MODULE`     |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_STARTUP_MODULE`       |
+   +----------------------------------------------+
+
+Classes
+-------
+
+.. table:: `hpx` classes of header ``hpx/components.hpp``
+
+   +----------------------------------------------------------+
+   | Class                                                    |
+   +==========================================================+
+   | :cpp:class:`hpx::components::client`                     |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::client_base`                |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component`                  |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component_base`             |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component_commandline_base` |
+   +----------------------------------------------------------+
+
+Functions
+---------
+
+.. table:: `hpx` functions of header ``hpx/components.hpp``
+
+   +----------------------------------------------------------+
+   | Function                                                 |
+   +==========================================================+
+   | :cpp:func:`hpx::new_`                                    |
+   +----------------------------------------------------------+

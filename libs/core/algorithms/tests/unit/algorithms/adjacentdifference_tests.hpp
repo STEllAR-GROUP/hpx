@@ -11,7 +11,6 @@
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
-#include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
 #include <cstddef>
 #include <iostream>
