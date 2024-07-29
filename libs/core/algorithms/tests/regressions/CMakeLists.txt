@@ -7,6 +7,7 @@
 set(tests
     count_3646
     fill_executor_5016
+    findfirstof_more_searched_for
     for_each_annotated_function
     for_loop_2281
     for_loop_5735

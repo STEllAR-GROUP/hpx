@@ -721,12 +721,12 @@ namespace hpx {
                         hpx::traits::is_output_iterator_v<FwdIter2>),
                 "Requires at least forward iterator or sequential execution.");
 
-            constexpr bool is_scheduler_policy =
+            constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if (hpx::parallel::detail::is_negative(count))
             {
-                if constexpr (is_scheduler_policy)
+                if constexpr (has_scheduler_executor)
                 {
                     count = static_cast<Size>(0);
                 }

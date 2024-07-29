@@ -325,10 +325,10 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, IterB first,
                 IterE last, T const& value, Proj&& proj)
             {
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {
@@ -390,10 +390,10 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, IterB first,
                 IterE last, Pred&& op, Proj&& proj)
             {
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {

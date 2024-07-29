@@ -377,10 +377,10 @@ namespace hpx::parallel {
                 Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {
@@ -389,12 +389,15 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
-                              std::size_t part_count) mutable -> bool {
+                              std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     detail::sequential_find_if<policy_type>(part_begin,
                         part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
@@ -411,9 +414,11 @@ namespace hpx::parallel {
                         hpx::util::end(results);
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
+                return util::partitioner<policy_type, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(decltype(policy),
+                                                     policy),
+                    first, detail::distance(first, last), HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -447,10 +452,10 @@ namespace hpx::parallel {
                 Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {
@@ -459,12 +464,15 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
-                              std::size_t part_count) mutable -> bool {
+                              std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     detail::sequential_find_if<policy_type>(part_begin,
                         part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
@@ -481,9 +489,11 @@ namespace hpx::parallel {
                         hpx::util::end(results);
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
+                return util::partitioner<policy_type, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(decltype(policy),
+                                                     policy),
+                    first, detail::distance(first, last), HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -516,10 +526,10 @@ namespace hpx::parallel {
                 Sent last, F&& op, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {
@@ -528,12 +538,15 @@ namespace hpx::parallel {
                 }
 
                 using policy_type = std::decay_t<ExPolicy>;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
                 auto f1 = [op = HPX_FORWARD(F, op), tok,
                               proj = HPX_FORWARD(Proj, proj)](
                               FwdIter part_begin,
-                              std::size_t part_count) mutable -> bool {
+                              std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     detail::sequential_find_if_not<policy_type>(part_begin,
                         part_count, tok, HPX_FORWARD(F, op),
                         HPX_FORWARD(Proj, proj));
@@ -550,9 +563,11 @@ namespace hpx::parallel {
                         hpx::util::end(results);
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy), first,
-                    detail::distance(first, last), HPX_MOVE(f1), HPX_MOVE(f2));
+                return util::partitioner<policy_type, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(decltype(policy),
+                                                     policy),
+                    first, detail::distance(first, last), HPX_MOVE(f1),
+                    HPX_MOVE(f2));
             }
         };
         /// \endcond

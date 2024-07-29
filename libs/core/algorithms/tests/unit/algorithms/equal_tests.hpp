@@ -122,9 +122,9 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
-    {
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
+    {
         auto snd_result = tt::sync_wait(
             ex::just(std::begin(c1), std::end(c1), std::begin(c2)) |
             hpx::equal(ex_policy.on(exec)));
@@ -142,8 +142,6 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
         auto snd_result =
             tt::sync_wait(ex::just(iterator(std::begin(c1)),
                               iterator(std::end(c1)), std::begin(c2)) |
@@ -156,6 +154,19 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         // verify values
         HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c1)),
+                              iterator(std::begin(c1)), std::begin(c2)) |
+                hpx::equal(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(result);
     }
 }
 
@@ -300,9 +311,9 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::iota(std::begin(c1), std::end(c1), first_value);
     std::iota(std::begin(c2), std::end(c2), first_value);
 
-    {
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
+    {
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
                 std::begin(c2), std::equal_to<>()) |
@@ -321,8 +332,6 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         std::uniform_int_distribution<> dis(0, c1.size() - 1);
         ++c1[dis(gen)];    //-V104
 
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
                 std::begin(c2), std::equal_to<>()) |
@@ -335,6 +344,19 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         // verify values
         HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c1)), iterator(std::begin(c1)),
+                std::begin(c2), std::equal_to<>()) |
+            hpx::equal(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(result);
     }
 }
 

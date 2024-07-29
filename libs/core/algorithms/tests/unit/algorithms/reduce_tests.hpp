@@ -363,13 +363,24 @@ void test_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op) |
-        hpx::reduce(ex_policy.on(exec)));
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op) |
+            hpx::reduce(ex_policy.on(exec)));
 
-    int r1 = hpx::get<0>(*snd_result);
+        int r1 = hpx::get<0>(*snd_result);
 
-    // verify values
-    int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
-    HPX_TEST_EQ(r1, r2);
+        // verify values
+        int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
+        HPX_TEST_EQ(r1, r2);
+    }
+
+    {
+        auto snd_result = tt::sync_wait(ex::just(iterator(std::begin(c)),
+                                            iterator(std::begin(c)), val, op) |
+            hpx::reduce(ex_policy.on(exec)));
+
+        int res = hpx::get<0>(*snd_result);
+        HPX_TEST_EQ(res, val);
+    }
 }

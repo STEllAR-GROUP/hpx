@@ -45,14 +45,52 @@ void test_lexicographical_compare_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                          std::begin(d), std::end(d)) |
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(d), std::end(d)) |
             hpx::lexicographical_compare(ex_policy.on(exec)));
 
-    bool res = hpx::get<0>(*snd_result);
+        bool res = hpx::get<0>(*snd_result);
 
-    HPX_TEST(!res);
+        HPX_TEST(!res);
+    }
+
+    {
+        // edge case: first1 == end1 && first2 != end2
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                std::begin(d), std::end(d)) |
+            hpx::lexicographical_compare(ex_policy.on(exec)));
+
+        bool res = hpx::get<0>(*snd_result);
+
+        HPX_TEST(res);
+    }
+
+    {
+        // edge case: first1 != end1 && first2 == end2
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(d), std::begin(d)) |
+            hpx::lexicographical_compare(ex_policy.on(exec)));
+
+        bool res = hpx::get<0>(*snd_result);
+
+        HPX_TEST(!res);
+    }
+
+    {
+        // edge case: first1 == end1 && first2 == end2
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                std::begin(d), std::begin(d)) |
+            hpx::lexicographical_compare(ex_policy.on(exec)));
+
+        bool res = hpx::get<0>(*snd_result);
+
+        HPX_TEST(!res);
+    }
 }
 
 template <typename IteratorTag>

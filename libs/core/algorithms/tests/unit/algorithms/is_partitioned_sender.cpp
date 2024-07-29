@@ -44,14 +44,40 @@ void test_is_partitioned_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                          [](std::size_t n) { return n % 2 == 0; }) |
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                [](std::size_t n) { return n % 2 == 0; }) |
             hpx::is_partitioned(ex_policy.on(exec)));
 
-    bool parted = hpx::get<0>(*snd_result);
+        bool parted = hpx::get<0>(*snd_result);
 
-    HPX_TEST(parted);
+        HPX_TEST(parted);
+    }
+
+    {
+        // 1st edge case: first == last
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                [](std::size_t) { return true; }) |
+            hpx::is_partitioned(ex_policy.on(exec)));
+
+        auto parted = hpx::get<0>(*snd_result);
+
+        HPX_TEST(parted);
+    }
+
+    {
+        // 2nd edge case: first + 1 == last
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(++std::begin(c)),
+                [](std::size_t) { return true; }) |
+            hpx::is_partitioned(ex_policy.on(exec)));
+
+        auto parted = hpx::get<0>(*snd_result);
+
+        HPX_TEST(parted);
+    }
 }
 
 template <typename IteratorTag>

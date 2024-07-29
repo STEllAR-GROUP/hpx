@@ -19,38 +19,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-template <typename ExPolicy, typename IteratorTag>
-void test_min_element(ExPolicy policy, IteratorTag)
-{
-    static_assert(hpx::is_execution_policy<ExPolicy>::value,
-        "hpx::is_execution_policy<ExPolicy>::value");
-
-    typedef std::vector<std::size_t>::iterator base_iterator;
-    typedef test::test_iterator<base_iterator, IteratorTag> iterator;
-
-    std::vector<std::size_t> c = test::random_iota(10007);
-
-    iterator end(std::end(c));
-    base_iterator ref_end(std::end(c));
-
-    iterator r = hpx::min_element(policy, iterator(std::begin(c)),
-        iterator(end), std::less<std::size_t>());
-    HPX_TEST(r != end);
-
-    base_iterator ref =
-        std::min_element(std::begin(c), std::end(c), std::less<std::size_t>());
-    HPX_TEST(ref != ref_end);
-    HPX_TEST_EQ(*ref, *r);
-
-    r = hpx::min_element(
-        policy, iterator(std::begin(c)), iterator(std::end(c)));
-    HPX_TEST(r != end);
-
-    ref = std::min_element(std::begin(c), std::end(c));
-    HPX_TEST(ref != ref_end);
-    HPX_TEST_EQ(*ref, *r);
-}
-
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_min_element_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -95,6 +63,13 @@ void test_min_element_sender(
     ref = std::min_element(std::begin(c), std::end(c));
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
+
+    // edge case: empty range
+    snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+        hpx::min_element(ex_policy.on(exec)));
+    r = hpx::get<0>(*snd_result);
+    HPX_TEST(r == iterator(std::begin(c)));
 }
 
 template <typename IteratorTag>

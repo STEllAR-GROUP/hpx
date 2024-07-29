@@ -72,6 +72,10 @@ void test_destroy_n_sender(
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     tt::sync_wait(
+        ex::just(iterator(p), -1) | hpx::destroy_n(ex_policy.on(exec)));
+    HPX_TEST_EQ(destruct_count.load(), static_cast<std::size_t>(0));
+
+    tt::sync_wait(
         ex::just(iterator(p), data_size) | hpx::destroy_n(ex_policy.on(exec)));
 
     HPX_TEST_EQ(destruct_count.load(), data_size);

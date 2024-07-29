@@ -193,8 +193,10 @@ namespace hpx::parallel {
         decltype(auto) parallel_sequential_destroy_n(
             ExPolicy&& policy, Iter first, std::size_t count)
         {
-            if constexpr (!hpx::execution_policy_has_scheduler_executor_v<
-                              ExPolicy>)
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+            if constexpr (!has_scheduler_executor)
             {
                 if (count == 0)
                 {
@@ -344,11 +346,12 @@ namespace hpx {
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             if (hpx::parallel::detail::is_negative(count))
             {
-                if constexpr (hpx::execution_policy_has_scheduler_executor_v<
-                                  ExPolicy>)
+                if constexpr (has_scheduler_executor)
                 {
                     count = static_cast<Size>(0);
                 }

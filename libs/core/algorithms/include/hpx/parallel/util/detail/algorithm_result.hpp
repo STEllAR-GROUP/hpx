@@ -23,6 +23,7 @@
 #include <hpx/execution_base/completion_signatures.hpp>
 #endif
 
+#include <hpx/execution_base/any_sender.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -203,7 +204,8 @@ namespace hpx::parallel::util::detail {
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
         // The return type of the initiating function.
-        using type = T;
+        using type =
+            decltype(hpx::execution::experimental::just(std::declval<T>()));
 
         template <typename T_>
         static constexpr auto get(T_&& t)
@@ -226,7 +228,7 @@ namespace hpx::parallel::util::detail {
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
         // The return type of the initiating function.
-        using type = void;
+        using type = decltype(hpx::execution::experimental::just());
 
         template <typename T_>
         static constexpr auto get(T_&& t)

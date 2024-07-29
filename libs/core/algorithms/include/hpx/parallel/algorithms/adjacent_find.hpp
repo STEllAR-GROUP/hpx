@@ -182,10 +182,10 @@ namespace hpx::parallel {
                 using result =
                     util::detail::algorithm_result<ExPolicy, FwdIter>;
 
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (first == last)
                     {
@@ -235,6 +235,13 @@ namespace hpx::parallel {
                     }
                     return HPX_MOVE(first);
                 };
+
+                if constexpr (has_scheduler_executor)
+                {
+                    // underflow prevention for the upcoming call
+                    if (count == 0)
+                        ++count;
+                }
 
                 using partitioner_type =
                     util::partitioner<policy_type, FwdIter, void>;

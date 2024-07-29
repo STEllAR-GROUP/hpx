@@ -76,8 +76,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    reverse_copy_sender_test<std::forward_iterator_tag>();
     reverse_copy_sender_test<std::random_access_iterator_tag>();
+    reverse_copy_sender_test<std::bidirectional_iterator_tag>();
 
     return hpx::local::finalize();
 }

@@ -147,17 +147,18 @@ namespace hpx::parallel {
                 Sent1 last1, Iter2 first2, Sent2 last2, Pred&& pred,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                auto const drop = detail::distance(first1, last1) -
-                    detail::distance(first2, last2);
+                auto distance1 = detail::distance(first1, last1);
+                auto distance2 = detail::distance(first2, last2);
 
-                if (drop < 0)
+                if (distance1 < distance2)
                     return false;
 
+                std::advance(first1, distance1 - distance2);
+
                 return hpx::parallel::detail::equal_binary().call(
-                    hpx::execution::seq, std::next(HPX_MOVE(first1), drop),
-                    HPX_MOVE(last1), HPX_MOVE(first2), HPX_MOVE(last2),
-                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
-                    HPX_FORWARD(Proj2, proj2));
+                    hpx::execution::seq, HPX_MOVE(first1), HPX_MOVE(last1),
+                    HPX_MOVE(first2), HPX_MOVE(last2), HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
@@ -167,17 +168,18 @@ namespace hpx::parallel {
                 Sent1 last1, FwdIter2 first2, Sent2 last2, Pred&& pred,
                 Proj1&& proj1, Proj2&& proj2)
             {
-                auto const drop = detail::distance(first1, last1) -
-                    detail::distance(first2, last2);
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if (drop < 0)
+                auto distance1 = detail::distance(first1, last1);
+                auto distance2 = detail::distance(first2, last2);
+                auto diff = distance1 - distance2;
+
+                if (distance1 < distance2)
                 {
-                    if constexpr (hpx::
-                                      execution_policy_has_scheduler_executor_v<
-                                          ExPolicy>)
+                    if constexpr (has_scheduler_executor)
                     {
-                        return hpx::execution::experimental::transfer_just(
-                            policy.executor().sched(), false);
+                        diff = 0;
                     }
                     else
                     {
@@ -186,11 +188,13 @@ namespace hpx::parallel {
                     }
                 }
 
+                std::advance(first1, diff);
+
                 return hpx::parallel::detail::equal_binary().call(
-                    HPX_FORWARD(ExPolicy, policy),
-                    std::next(HPX_MOVE(first1), drop), HPX_MOVE(last1),
-                    HPX_MOVE(first2), HPX_MOVE(last2), HPX_FORWARD(Pred, pred),
-                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                    HPX_FORWARD(ExPolicy, policy), HPX_MOVE(first1),
+                    HPX_MOVE(last1), HPX_MOVE(first2), HPX_MOVE(last2),
+                    HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
         };
         /// \endcond

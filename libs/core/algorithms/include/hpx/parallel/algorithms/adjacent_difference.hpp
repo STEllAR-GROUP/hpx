@@ -276,27 +276,34 @@ namespace hpx::parallel {
                     util::detail::algorithm_result<ExPolicy, FwdIter2>;
                 using difference_type =
                     typename std::iterator_traits<FwdIter1>::difference_type;
-
-                constexpr bool scheduler_policy =
+                constexpr bool has_scheduler_policy =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!scheduler_policy)
+                FwdIter1 prev = first;
+                difference_type count;
+
+                if (first == last)
                 {
-                    if (first == last)
+                    if constexpr (!has_scheduler_policy)
                     {
                         return result::get(HPX_MOVE(dest));
                     }
+                    else
+                    {
+                        count = static_cast<difference_type>(0);
+                    }
+                }
+                else
+                {
+                    count = detail::distance(first, last) - 1;
+
+                    hpx::traits::proxy_value_t<
+                        typename std::iterator_traits<FwdIter1>::value_type>
+                        tmp = *first++;
+                    *dest++ = HPX_MOVE(tmp);
                 }
 
-                difference_type count = detail::distance(first, last) - 1;
-
-                FwdIter1 prev = first;
-                hpx::traits::proxy_value_t<
-                    typename std::iterator_traits<FwdIter1>::value_type>
-                    tmp = *first++;
-                *dest++ = HPX_MOVE(tmp);
-
-                if constexpr (!scheduler_policy)
+                if constexpr (!has_scheduler_policy)
                 {
                     if (count == 0)
                     {

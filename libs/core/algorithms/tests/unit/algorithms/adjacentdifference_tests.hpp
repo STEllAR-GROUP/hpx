@@ -13,7 +13,6 @@
 #include <hpx/numeric.hpp>
 #include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
-
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -86,21 +85,38 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result =
         tt::sync_wait(ex::just(std::begin(c), std::end(c), std::begin(d)) |
             hpx::adjacent_difference(policy.on(exec)));
-#else
-    auto result = ex::just(std::begin(c), std::end(c), std::begin(d)) |
-        hpx::adjacent_difference(policy.on(exec)) | tt::sync_wait();
-#endif
 
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
         [](auto lhs, auto rhs) { return lhs == rhs; }));
-
     HPX_TEST(std::end(d) == hpx::get<0>(*result));
+
+    // 1st edge case: first == last
+    result =
+        tt::sync_wait(ex::just(std::begin(c), std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
+
+    std::adjacent_difference(std::begin(c), std::begin(c), std::begin(d_ans));
+
+    HPX_TEST(std::begin(d) == hpx::get<0>(*result));
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](auto lhs, auto rhs) { return lhs == rhs; }));
+
+    // 2nd edge case: first + 1 == last
+    result =
+        tt::sync_wait(ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
+
+    std::adjacent_difference(std::begin(c), ++std::begin(c), std::begin(d_ans));
+
+    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+        [](auto lhs, auto rhs) { return lhs == rhs; }));
+    HPX_TEST(++std::begin(d) == hpx::get<0>(*result));
 }
 
 template <typename ExPolicy>

@@ -508,20 +508,23 @@ namespace hpx::parallel {
                     typename std::iterator_traits<Iter1>::difference_type;
                 using difference_type2 =
                     typename std::iterator_traits<Iter2>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if (first1 == last1)
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        first2 == last2);
-                }
+                    if (first1 == last1)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(first2 == last2);
+                    }
 
-                if (first2 == last2)
-                {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if (first2 == last2)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(false);
+                    }
                 }
-
-                difference_type1 count1 = detail::distance(first1, last1);
 
                 // The specification of std::equal(_binary) states that if
                 // FwdIter1 and FwdIter2 meet the requirements of
@@ -530,11 +533,18 @@ namespace hpx::parallel {
                 //
                 // We perform this check for any iterator type better than input
                 // iterators. This could turn into a QoI issue.
+
+                difference_type1 count1 = detail::distance(first1, last1);
                 difference_type2 count2 = detail::distance(first2, last2);
-                if (count1 != count2)
+                bool different_lengths = (count1 != count2);
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if (different_lengths)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(false);
+                    }
                 }
 
                 auto policy = parallel::util::adapt_placement_mode(
@@ -543,27 +553,41 @@ namespace hpx::parallel {
 
                 using policy_type = decltype(policy);
                 using zip_iterator = hpx::util::zip_iterator<Iter1, Iter2>;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
 
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
                               proj2 = HPX_FORWARD(Proj2, proj2)](
-                              zip_iterator it,
-                              std::size_t part_count) mutable -> bool {
+                              zip_iterator it, std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     sequential_equal_binary<policy_type>(it, part_count, tok,
                         HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
                         HPX_FORWARD(Proj2, proj2));
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy),
+                return util::partitioner<policy_type, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(decltype(policy),
+                                                     policy),
                     zip_iterator(first1, first2), count1, HPX_MOVE(f1),
-                    [](auto&& results) -> bool {
+                    [different_lengths](auto&& results) -> bool {
+                        if constexpr (has_scheduler_executor)
+                        {
+                            if (different_lengths)
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            (void) different_lengths;
+                        }
+
                         return std::all_of(hpx::util::begin(results),
-                            hpx::util::end(results),
-                            [](hpx::future<bool>& val) { return val.get(); });
+                            hpx::util::end(results), hpx::functional::unwrap{});
                     });
             }
         };
@@ -592,14 +616,19 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2,
                 typename F>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& orgpolicy, FwdIter1 first1, FwdIter1 last1,
-                FwdIter2 first2, F&& f)
+            static decltype(auto) parallel(ExPolicy&& orgpolicy,
+                FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, F&& f)
             {
-                if (first1 == last1)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        true);
+                    if (first1 == last1)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(true);
+                    }
                 }
 
                 using difference_type =
@@ -613,22 +642,25 @@ namespace hpx::parallel {
                 using policy_type = std::decay_t<decltype(policy)>;
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
-                auto f1 = [f, tok](zip_iterator it,
-                              std::size_t part_count) mutable -> bool {
+                auto f1 = [f, tok](
+                              zip_iterator it, std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     sequential_equal<policy_type>(
                         it, part_count, tok, HPX_FORWARD(F, f));
                     return !tok.was_cancelled();
                 };
 
-                return util::partitioner<policy_type, bool>::call(
-                    HPX_FORWARD(decltype(policy), policy),
+                return util::partitioner<policy_type, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(decltype(policy),
+                                                     policy),
                     zip_iterator(first1, first2), count, HPX_MOVE(f1),
                     [](auto&& results) {
                         return std::all_of(hpx::util::begin(results),
-                            hpx::util::end(results),
-                            [](hpx::future<bool>& val) { return val.get(); });
+                            hpx::util::end(results), hpx::functional::unwrap{});
                     });
             }
         };

@@ -114,6 +114,20 @@ void test_find_end1_sender(
         iterator(std::end(c)), std::begin(h), std::end(h));
 
     HPX_TEST(index == test_index);
+
+    // 1st edge case: first2 == end2
+    snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                          std::begin(h), std::begin(h)) |
+            hpx::find_end(ex_policy.on(exec)));
+    HPX_TEST(iterator(std::end(c)) == hpx::get<0>(*snd_result));
+
+    // 2nd edge case: distance(first2, end2) > distance(first1, end1)
+    snd_result =
+        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                          std::begin(h), std::end(h)) |
+            hpx::find_end(ex_policy.on(exec)));
+    HPX_TEST(iterator(std::begin(c)) == hpx::get<0>(*snd_result));
 }
 
 template <typename ExPolicy, typename IteratorTag>

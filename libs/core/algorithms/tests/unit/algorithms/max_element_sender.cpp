@@ -62,6 +62,13 @@ void test_max_element_sender(
     ref = std::max_element(std::begin(c), std::end(c));
     HPX_TEST(ref != ref_end);
     HPX_TEST_EQ(*ref, *r);
+
+    // edge case: empty range
+    snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+        hpx::max_element(ex_policy.on(exec)));
+    r = hpx::get<0>(*snd_result);
+    HPX_TEST(r == iterator(std::begin(c)));
 }
 
 template <typename IteratorTag>

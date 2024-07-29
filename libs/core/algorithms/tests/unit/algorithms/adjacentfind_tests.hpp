@@ -82,10 +82,16 @@ void test_adjacent_find_sender(
             hpx::adjacent_find(ex_policy.on(exec)));
 
     iterator index = hpx::get<0>(*snd_result);
-
     base_iterator test_index = std::begin(c) + random_pos;
 
     HPX_TEST(index == iterator(test_index));
+
+    // edge case: first == last
+    snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+        hpx::adjacent_find(ex_policy.on(exec)));
+
+    HPX_TEST(iterator(std::begin(c)) == hpx::get<0>(*snd_result));
 }
 
 template <typename ExPolicy, typename IteratorTag>

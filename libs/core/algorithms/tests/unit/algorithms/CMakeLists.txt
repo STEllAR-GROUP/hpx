@@ -44,30 +44,31 @@ set(tests
     destroyn
     destroyn_sender
     ends_with
-    # ends_with_sender
+    ends_with_sender
     equal
     equal_binary
-    # equal_sender
+    equal_sender
+    equal_binary_sender
     exclusive_scan
     exclusive_scan2
     exclusive_scan_exception
     exclusive_scan_bad_alloc
     exclusive_scan_validate
     fill
-    # fill_sender
+    fill_sender
     filln
-    # filln_sender
+    filln_sender
     find
     find_sender
     findend
-    # findend_sender
+    findend_sender
     findfirstof
     findfirstof_binary
-    # findfirstof_sender
+    findfirstof_sender
     findif
-    # findif_sender
+    findif_sender
     findifnot
-    # findifnot_sender
+    findifnot_sender
     foreach
     foreach_executors
     foreach_prefetching
@@ -76,7 +77,7 @@ set(tests
     foreachn
     foreachn_exception
     foreachn_bad_alloc
-    # foreachn_sender
+    foreachn_sender
     for_loop
     for_loop_exception
     for_loop_induction
@@ -87,13 +88,13 @@ set(tests
     # for_loop_n_strided_sender
     for_loop_reduction
     for_loop_reduction_async
-    for_loop_sender
+    # for_loop_sender
     for_loop_strided
     # for_loop_strided_sender
     generate
-    # generate_sender
+    generate_sender
     generaten
-    # generaten_sender
+    generaten_sender
     is_heap
     # is_heap_sender
     is_heap_until
@@ -105,23 +106,23 @@ set(tests
     inplace_merge
     # inplace_merge_sender
     is_partitioned
-    # is_partitioned_sender
+    is_partitioned_sender
     is_sorted
-    # is_sorted_sender
+    is_sorted_sender
     is_sorted_until
-    # is_sorted_until_sender
+    is_sorted_until_sender
     lexicographical_compare
-    # lexicographical_compare_sender
+    lexicographical_compare_sender
     make_heap
     # make_heap_sender
     max_element
-    # max_element_sender
+    max_element_sender
     merge
     # merge_sender
     min_element
-    # min_element_sender
+    min_element_sender
     minmax_element
-    # minmax_element_sender
+    minmax_element_sender
     mismatch
     mismatch_binary
     # mismatch_sender
@@ -140,7 +141,7 @@ set(tests
     # partition_sender
     partition_copy
     reduce_
-    # reduce_sender
+    reduce_sender
     reduce_by_key
     remove
     # remove_sender
@@ -152,21 +153,20 @@ set(tests
     remove_copy
     remove_copy_if
     replace
-    # replace_sender
+    replace_sender
     replace_if
-    # replace_if_sender
+    replace_if_sender
     replace_copy
-    # replace_copy_sender
+    replace_copy_sender
     replace_copy_if
-    # replace_copy_if_sender
+    replace_copy_if_sender
     reverse
     reverse_copy
     reverse_sender
-    # reverse_copy_sender
+    reverse_copy_sender
     rotate
     rotate_copy
-    rotate_sender
-    # rotate_copy_sender
+    # rotate_sender rotate_copy_sender
     search
     # search_sender
     searchn
