@@ -32,7 +32,7 @@ void test_count(IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    // assure gen() does not evalulate to zero
+    // assure gen() does not evaluate to zero
     std::iota(std::begin(c), std::end(c), gen() + 1);
     std::size_t find_count = dis(gen);    //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
@@ -56,7 +56,7 @@ void test_count(ExPolicy&& policy, IteratorTag)
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
     std::vector<int> c(10007);
-    // assure gen() does not evalulate to zero
+    // assure gen() does not evaluate to zero
     std::iota(std::begin(c), std::end(c), gen() + 1);
     std::size_t find_count = dis(gen);    //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)
@@ -84,7 +84,7 @@ void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
     std::vector<int> c(10007);
-    // assure gen() does not evalulate to zero
+    // assure gen() does not evaluate to zero
     std::iota(std::begin(c), std::end(c), gen() + 1);
     std::size_t find_count = dis(gen);    //-V101
     for (std::size_t i = 0; i != find_count && i != c.size(); ++i)

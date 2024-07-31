@@ -11,6 +11,7 @@
 #include <hpx/async_base/dataflow.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
+#include <hpx/async_base/launch_policy.hpp>
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 namespace hpx::execution::experimental {

@@ -25,8 +25,8 @@ struct scheduler_schedule_from
 {
     using base = example_scheduler_template<scheduler_schedule_from>;
     template <typename... Args>
-    explicit scheduler_schedule_from(Args&&... ags)
-      : base(std::forward<Args>(ags)...)
+    explicit scheduler_schedule_from(Args&&... args)
+      : base(std::forward<Args>(args)...)
     {
     }
 };

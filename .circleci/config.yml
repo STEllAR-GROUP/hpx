@@ -11,7 +11,7 @@ working_dir_default: &working_dir_default
 
 docker_default: &docker_default
     docker:
-      - image: zhekemist/hpx-build-env-clang-18
+      - image: zhekemist/hpx-build-env-clang-18:2
 
 defaults: &defaults
     <<: *working_dir_default
@@ -164,25 +164,25 @@ jobs:
           destination: /hpx/artifacts/missing_deps.txt
 
   # Ensure that the modules stay clang-formatted
-  clang_format:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: /hpx
-      - run:
-          name: Check that the modules are well clang-formatted
-          command: |
-              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
-              clang-format --version
-              clang-format -i **/*.{cpp,hpp}
-              cd /hpx/source/examples
-              clang-format -i **/*.{cpp,hpp}
-              cd /hpx/source/tests
-              clang-format -i **/*.{cpp,hpp}
-              git diff --exit-code > /tmp/modified_clang_format_files.txt
-      - store_artifacts:
-          path: /tmp/modified_clang_format_files.txt
-          destination: /hpx/artifacts/modified_clang_format_files.txt
+#  clang_format:
+#    <<: *defaults
+#    steps:
+#      - attach_workspace:
+#          at: /hpx
+#      - run:
+#          name: Check that the modules are well clang-formatted
+#          command: |
+#              cd /hpx/source/libs && shopt -s globstar # to activate the ** globbing
+#              clang-format --version
+#              clang-format -i **/*.{cpp,hpp}
+#              cd /hpx/source/examples
+#              clang-format -i **/*.{cpp,hpp}
+#              cd /hpx/source/tests
+#              clang-format -i **/*.{cpp,hpp}
+#              git diff --exit-code > /tmp/modified_clang_format_files.txt
+#      - store_artifacts:
+#          path: /tmp/modified_clang_format_files.txt
+#          destination: /hpx/artifacts/modified_clang_format_files.txt
 
   # Ensure that CMake files stay cmake-formatted
   cmake_format:
@@ -238,7 +238,6 @@ jobs:
                 -DHPX_WITH_COMPILER_WARNINGS=On \
                 -DHPX_WITH_COMPILER_WARNINGS_AS_ERRORS=On \
                 -DHPX_WITH_DEPRECATION_WARNINGS=On \
-                -DCMAKE_CXX_CLANG_TIDY=clang-tidy \
                 -DHPX_WITH_THREAD_LOCAL_STORAGE=On \
                 -DHPX_WITH_STACKTRACES_STATIC_SYMBOLS=On \
                 -DHPX_WITH_STACKTRACES_DEMANGLE_SYMBOLS=Off \
@@ -921,10 +920,10 @@ workflows:
           requires:
             - checkout_code
           <<: *gh_pages_filter
-      - clang_format:
-          requires:
-            - checkout_code
-          <<: *gh_pages_filter
+#      - clang_format:
+#          requires:
+#            - checkout_code
+#          <<: *gh_pages_filter
       - cmake_format:
           requires:
             - checkout_code

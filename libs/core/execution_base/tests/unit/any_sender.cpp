@@ -556,11 +556,12 @@ void test_unique_any_sender_set_error()
 // This tests that the empty vtable types used in the implementation of any_*
 // are not destroyed too early. We use ensure_started inside the function to
 // trigger the use of the empty vtables for any_receiver and
-// any_operation_state. If the empty vtables are function-local statics they
-// would get constructed after s_global is constructed, and thus destroyed
-// before s_global is destroyed. This will typically lead to a segfault. If the
-// empty vtables are (constant) global variables they should be constructed
-// before s_global is constructed and destroyed after s_global is destroyed.
+// any_operation_state. If the empty vtables are function-local
+// static variables they would get constructed after s_global
+// is constructed, and thus destroyed before s_global is destroyed. This will
+// typically lead to a segfault. If the empty vtables are (constant) global
+// variables they should be constructed before s_global is constructed and
+// destroyed after s_global is destroyed.
 ex::unique_any_sender<> global_unique_any_sender{ex::just()};
 ex::any_sender<> global_any_sender{ex::just()};
 
