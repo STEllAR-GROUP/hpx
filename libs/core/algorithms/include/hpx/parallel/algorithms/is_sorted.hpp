@@ -272,7 +272,7 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
                 Proj&& proj)
             {
@@ -285,7 +285,7 @@ namespace hpx::parallel {
 
                 difference_type count = std::distance(first, last);
 
-                if (!has_scheduler_executor)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (count <= 1)
                         return result::get(true);

@@ -17,6 +17,7 @@
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution/executors/execution.hpp>
 #include <hpx/execution_base/traits/is_executor_parameters.hpp>
+#include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/iterator_support/range.hpp>
 #include <hpx/parallel/util/adapt_thread_priority.hpp>
 #include <hpx/parallel/util/detail/chunk_size.hpp>
