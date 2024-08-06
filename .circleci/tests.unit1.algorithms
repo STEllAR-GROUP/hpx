@@ -80,6 +80,7 @@ tests.unit.modules.algorithms.algorithms.generaten_sender
 tests.unit.modules.algorithms.algorithms.is_heap
 tests.unit.modules.algorithms.algorithms.is_heap_until
 tests.unit.modules.algorithms.algorithms.includes
+tests.unit.modules.algorithms.algorithms.includes_sender
 tests.unit.modules.algorithms.algorithms.inclusive_scan
 tests.unit.modules.algorithms.algorithms.inclusive_scan_exception
 tests.unit.modules.algorithms.algorithms.inplace_merge
