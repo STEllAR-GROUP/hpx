@@ -101,7 +101,7 @@ set(tests
     is_heap_until
     # is_heap_until_sender
     includes
-    # includes_sender
+    includes_sender
     inclusive_scan
     inclusive_scan_exception
     inplace_merge
@@ -128,7 +128,7 @@ set(tests
     mismatch_binary
     # mismatch_sender
     move
-    # move_sender
+    move_sender
     nth_element
     # nth_element_sender
     none_of
@@ -145,11 +145,11 @@ set(tests
     reduce_sender
     reduce_by_key
     remove
-    # remove_sender
+    remove_sender
     remove1
     remove2
     remove_if
-    # remove_if_sender
+    remove_if_sender
     remove_if1
     remove_copy
     remove_copy_if
@@ -169,7 +169,7 @@ set(tests
     rotate_copy
     # rotate_sender rotate_copy_sender
     search
-    # search_sender
+    search_sender
     searchn
     # searchn_sender
     set_difference
@@ -197,11 +197,13 @@ set(tests
     starts_with
     # starts_with_sender
     swapranges
-    # swapranges_sender
+    swapranges_sender
     transform
+    transform_sender
     transform_binary
+    transform_binary_sender
     transform_binary2
-    # transform_sender
+    transform_binary2_sender
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
@@ -223,7 +225,7 @@ set(tests
     uninitialized_value_construct
     uninitialized_value_constructn
     unique
-    # unique_sender
+    unique_sender
     unique_copy
 )
 

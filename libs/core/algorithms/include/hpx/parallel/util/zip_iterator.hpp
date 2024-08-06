@@ -104,6 +104,22 @@ namespace hpx::parallel::detail {
         return result_type{hpx::get<0>(t), hpx::get<1>(t)};
     }
 
+    // clang-format off
+    template <typename ZipIterSender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<ZipIterSender>
+        )>
+    // clang-format on
+    constexpr decltype(auto) get_iter_in_in_result(
+        ZipIterSender&& zipiter_sender)
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(ZipIterSender, zipiter_sender), [](auto&& zipiter) {
+                return get_iter_in_in_result(
+                    HPX_FORWARD(decltype(zipiter), zipiter));
+            });
+    }
+
     template <typename ZipIter>
     hpx::future<
         util::in_in_result<typename hpx::tuple_element<0,

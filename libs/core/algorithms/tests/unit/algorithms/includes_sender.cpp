@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -177,6 +178,77 @@ void test_includes2_sender(
     }
 }
 
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_includes_edge_cases_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    std::vector<std::size_t> c(10007);
+    std::size_t first_value = gen();    //-V101
+    std::iota(std::begin(c), std::end(c), first_value);
+
+    {
+        // only first range empty
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                std::begin(c), std::end(c), std::less<std::size_t>{}) |
+            hpx::includes(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected = std::includes(std::begin(c), std::begin(c),
+            std::begin(c), std::end(c), std::less<std::size_t>{});
+
+        HPX_TEST(!result);
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        // only second range empty
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(c), std::begin(c), std::less<std::size_t>{}) |
+            hpx::includes(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected = std::includes(std::begin(c), std::end(c), std::begin(c),
+            std::begin(c), std::less<std::size_t>{});
+
+        HPX_TEST(result);
+        HPX_TEST_EQ(result, expected);
+    }
+
+    {
+        // both ranges empty
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                std::begin(c), std::begin(c), std::less<std::size_t>{}) |
+            hpx::includes(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool expected = std::includes(std::begin(c), std::begin(c),
+            std::begin(c), std::begin(c), std::less<std::size_t>{});
+
+        HPX_TEST(result);
+        HPX_TEST_EQ(result, expected);
+    }
+}
+
 template <typename IteratorTag>
 void includes_sender_test1()
 {
@@ -199,6 +271,21 @@ void includes_sender_test2()
     test_includes2_sender(hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
+template <typename IteratorTag>
+void includes_sender_test_edge_cases()
+{
+    using namespace hpx::execution;
+    test_includes_edge_cases_sender(
+        hpx::launch::sync, seq(task), IteratorTag());
+    test_includes_edge_cases_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
+
+    test_includes_edge_cases_sender(
+        hpx::launch::async, par(task), IteratorTag());
+    test_includes_edge_cases_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
+}
+
 int hpx_main(hpx::program_options::variables_map& vm)
 {
     unsigned int seed = (unsigned int) std::time(nullptr);
@@ -213,6 +300,9 @@ int hpx_main(hpx::program_options::variables_map& vm)
 
     includes_sender_test2<std::forward_iterator_tag>();
     includes_sender_test2<std::random_access_iterator_tag>();
+
+    includes_sender_test_edge_cases<std::forward_iterator_tag>();
+    includes_sender_test_edge_cases<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

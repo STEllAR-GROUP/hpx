@@ -490,29 +490,33 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2, typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<FwdIter1B, FwdIter2>>
-            parallel(ExPolicy&& policy, FwdIter1B first, FwdIter1E last,
-                FwdIter2 dest, F&& f, Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1B first,
+                FwdIter1E last, FwdIter2 dest, F&& f, Proj&& proj)
             {
-                if (first != last)
-                {
-                    auto f1 = transform_iteration<ExPolicy, F, Proj>(
-                        HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                    return util::detail::get_in_out_result(
-                        util::foreach_partitioner<ExPolicy>::call(
-                            HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::zip_iterator(first, dest),
-                            detail::distance(first, last), HPX_MOVE(f1),
-                            hpx::identity_v));
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first == last)
+                    {
+                        using result_type =
+                            util::in_out_result<FwdIter1B, FwdIter2>;
+                        return util::detail::algorithm_result<ExPolicy,
+                            result_type>::get(result_type{
+                            HPX_MOVE(first), HPX_MOVE(dest)});
+                    }
                 }
 
-                using result_type = util::in_out_result<FwdIter1B, FwdIter2>;
+                auto f1 = transform_iteration<ExPolicy, F, Proj>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj, proj));
 
-                return util::detail::algorithm_result<ExPolicy,
-                    result_type>::get(result_type{
-                    HPX_MOVE(first), HPX_MOVE(dest)});
+                return util::detail::get_in_out_result(
+                    util::foreach_partitioner<ExPolicy>::call(
+                        HPX_FORWARD(ExPolicy, policy),
+                        hpx::util::zip_iterator(first, dest),
+                        detail::distance(first, last), HPX_MOVE(f1),
+                        hpx::identity_v));
             }
         };
         /// \endcond
@@ -712,33 +716,36 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2, typename FwdIter3, typename F,
                 typename Proj1, typename Proj2>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>>
-            parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
-                FwdIter2 first2, FwdIter3 dest, F&& f, Proj1&& proj1,
-                Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1B first1,
+                FwdIter1E last1, FwdIter2 first2, FwdIter3 dest, F&& f,
+                Proj1&& proj1, Proj2&& proj2)
             {
-                if (first1 != last1)
-                {
-                    auto f1 =
-                        transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-                            HPX_FORWARD(Proj2, proj2));
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                    return util::detail::get_in_in_out_result(
-                        util::foreach_partitioner<ExPolicy>::call(
-                            HPX_FORWARD(ExPolicy, policy),
-                            hpx::util::zip_iterator(first1, first2, dest),
-                            detail::distance(first1, last1), HPX_MOVE(f1),
-                            hpx::identity_v));
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first1 == last1)
+                    {
+                        using result_type = util::in_in_out_result<FwdIter1B,
+                            FwdIter2, FwdIter3>;
+
+                        return util::detail::algorithm_result<ExPolicy,
+                            result_type>::get(result_type{HPX_MOVE(first1),
+                            HPX_MOVE(first2), HPX_MOVE(dest)});
+                    }
                 }
 
-                using result_type =
-                    util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>;
+                auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
 
-                return util::detail::algorithm_result<ExPolicy,
-                    result_type>::get(result_type{
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)});
+                return util::detail::get_in_in_out_result(
+                    util::foreach_partitioner<ExPolicy>::call(
+                        HPX_FORWARD(ExPolicy, policy),
+                        hpx::util::zip_iterator(first1, first2, dest),
+                        detail::distance(first1, last1), HPX_MOVE(f1),
+                        hpx::identity_v));
             }
         };
         /// \endcond
@@ -787,21 +794,32 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename FwdIter1B, typename FwdIter1E,
                 typename FwdIter2B, typename FwdIter2E, typename FwdIter3,
                 typename F, typename Proj1, typename Proj2>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>>
-            parallel(ExPolicy&& policy, FwdIter1B first1, FwdIter1E last1,
-                FwdIter2B first2, FwdIter2E last2, FwdIter3 dest, F&& f,
-                Proj1&& proj1, Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1B first1,
+                FwdIter1E last1, FwdIter2B first2, FwdIter2E last2,
+                FwdIter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
-                if (first1 != last1 && first2 != last2)
-                {
-                    auto f1 =
-                        transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
-                            HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
-                            HPX_FORWARD(Proj2, proj2));
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                    // different versions of clang-format do different things
-                    // clang-format off
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (first1 == last1 || first2 == last2)
+                    {
+                        using result_type = util::in_in_out_result<FwdIter1B,
+                            FwdIter2B, FwdIter3>;
+
+                        return util::detail::algorithm_result<ExPolicy,
+                            result_type>::get(result_type{HPX_MOVE(first1),
+                            HPX_MOVE(first2), HPX_MOVE(dest)});
+                    }
+                }
+
+                auto f1 = transform_binary_iteration<ExPolicy, F, Proj1, Proj2>(
+                    HPX_FORWARD(F, f), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
+
+                // different versions of clang-format do different things
+                // clang-format off
                     return util::detail::get_in_in_out_result(
                         util::foreach_partitioner<ExPolicy>::call(
                             HPX_FORWARD(ExPolicy, policy),
@@ -809,15 +827,7 @@ namespace hpx::parallel {
                             (std::min) (detail::distance(first1, last1),
                                 detail::distance(first2, last2)),
                             HPX_MOVE(f1), hpx::identity_v));
-                    // clang-format on
-                }
-
-                using result_type =
-                    util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>;
-
-                return util::detail::algorithm_result<ExPolicy,
-                    result_type>::get(result_type{
-                    HPX_MOVE(first1), HPX_MOVE(first2), HPX_MOVE(dest)});
+                // clang-format on
             }
         };
         /// \endcond
@@ -942,9 +952,9 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter2>
-        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest, F f)
+        friend decltype(auto) tag_fallback_invoke(hpx::transform_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest,
+            F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -993,10 +1003,9 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter3>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter3>
-        tag_fallback_invoke(hpx::transform_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter3 dest,
-            F f)
+        friend decltype(auto) tag_fallback_invoke(hpx::transform_t,
+            ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            FwdIter3 dest, F f)
         {
             static_assert(hpx::traits::is_input_iterator_v<FwdIter1> &&
                     hpx::traits::is_input_iterator_v<FwdIter2>,

@@ -12,12 +12,14 @@ set(tests
     for_loop_2281
     for_loop_5735
     for_loop_with_auto_chunk_size
+    includes_empty_ranges
     minimal_findend
     num_cores
     reduce_3641
     scan_different_inits
     scan_non_commutative
     scan_shortlength
+    search_larger_2nd_range
     search_zerolength
     set_operations_3442
     stable_merge_2964

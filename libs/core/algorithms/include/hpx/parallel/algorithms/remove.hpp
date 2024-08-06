@@ -286,20 +286,24 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
-                ExPolicy&& policy, Iter first, Sent last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<Iter, bool*>;
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, Iter>;
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 difference_type count = detail::distance(first, last);
 
-                if (count == 0)
-                    return algorithm_result::get(HPX_MOVE(first));
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (count == 0)
+                        return algorithm_result::get(HPX_MOVE(first));
+                }
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
                 std::shared_ptr<bool[]> flags(new bool[count]);
@@ -326,8 +330,8 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [flags, first, count](
-                              auto&& results) mutable -> Iter {
-                    HPX_UNUSED(results);
+                              auto&&... results) mutable -> Iter {
+                    HPX_UNUSED_PACK(results);
 
                     auto part_begin = zip_iterator(first, flags.get());
                     auto dest = first;
@@ -407,9 +411,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::remove_if_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred pred)
+        friend decltype(auto) tag_fallback_invoke(hpx::remove_if_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -450,9 +453,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::remove_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T const& value)
+        friend decltype(auto) tag_fallback_invoke(hpx::remove_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, T const& value)
         {
             using Type = typename std::iterator_traits<FwdIter>::value_type;
 

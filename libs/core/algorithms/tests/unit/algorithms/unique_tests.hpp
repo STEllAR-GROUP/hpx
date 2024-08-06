@@ -514,7 +514,9 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
+
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     const int rand_base = std::rand();
     auto pred = [](const std::size_t a, const std::size_t b) -> bool {
@@ -525,17 +527,47 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
     d = c;
 
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
+            hpx::unique(ex_policy.on(exec)));
 
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
-        hpx::unique(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+        auto solution = std::unique(std::begin(d), std::end(d), pred);
 
-    auto result = hpx::get<0>(*snd_result);
-    auto solution = std::unique(std::begin(d), std::end(d), pred);
+        bool equality =
+            test::equal(std::begin(c), result.base(), std::begin(d), solution);
 
-    bool equality =
-        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+        HPX_TEST(equality);
+    }
 
-    HPX_TEST(equality);
+    {
+        // edge case: empty range
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)), pred) |
+            hpx::unique(ex_policy.on(exec)));
+
+        auto result = hpx::get<0>(*snd_result);
+        auto solution = std::unique(std::begin(d), std::begin(d), pred);
+
+        bool equality =
+            test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+        HPX_TEST(equality);
+    }
+
+    {
+        // edge case: one element
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(++std::begin(c)), pred) |
+            hpx::unique(ex_policy.on(exec)));
+
+        auto result = hpx::get<0>(*snd_result);
+        auto solution = std::unique(std::begin(d), ++std::begin(d), pred);
+
+        bool equality =
+            test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+        HPX_TEST(equality);
+    }
 }

@@ -341,10 +341,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::search_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, FwdIter2 s_first, FwdIter2 s_last, Pred op = Pred())
+        friend decltype(auto) tag_fallback_invoke(hpx::search_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, FwdIter2 s_first,
+            FwdIter2 s_last, Pred op = Pred())
         {
             return hpx::parallel::detail::search<FwdIter, FwdIter>().call(
                 HPX_FORWARD(ExPolicy, policy), first, last, s_first, s_last,
