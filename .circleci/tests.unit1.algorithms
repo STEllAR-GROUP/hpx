@@ -60,6 +60,7 @@ tests.unit.modules.algorithms.algorithms.foreach_executors
 tests.unit.modules.algorithms.algorithms.foreach_prefetching
 tests.unit.modules.algorithms.algorithms.foreach_sender
 tests.unit.modules.algorithms.algorithms.foreach_scheduler
+tests.unit.modules.algorithms.algorithms.foreach_std_policies
 tests.unit.modules.algorithms.algorithms.foreachn
 tests.unit.modules.algorithms.algorithms.foreachn_exception
 tests.unit.modules.algorithms.algorithms.foreachn_bad_alloc
