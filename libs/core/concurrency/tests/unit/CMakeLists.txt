@@ -8,6 +8,7 @@
 set(tests
     contiguous_index_queue
     freelist
+    lockfree_128uint
     lockfree_fifo
     non_contiguous_index_queue
     queue

@@ -16,11 +16,13 @@ set(concurrency_headers
     hpx/concurrency/detail/copy_payload.hpp
     hpx/concurrency/detail/freelist.hpp
     hpx/concurrency/detail/freelist_stack.hpp
+    hpx/concurrency/detail/lockfree_uint128_type.hpp
     hpx/concurrency/detail/non_contiguous_index_queue.hpp
     hpx/concurrency/detail/tagged_ptr.hpp
     hpx/concurrency/detail/tagged_ptr_dcas.hpp
     hpx/concurrency/detail/tagged_ptr_ptrcompression.hpp
     hpx/concurrency/detail/tagged_ptr_pair.hpp
+    hpx/concurrency/detail/uint128_type.hpp
     hpx/concurrency/queue.hpp
     hpx/concurrency/spinlock.hpp
     hpx/concurrency/spinlock_pool.hpp
