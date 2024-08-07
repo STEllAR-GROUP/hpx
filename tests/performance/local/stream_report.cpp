@@ -442,6 +442,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::size_t iterations = vm["iterations"].as<std::size_t>();
     std::size_t warmup_iterations = vm["warmup_iterations"].as<std::size_t>();
     std::size_t chunk_size = vm["chunk_size"].as<std::size_t>();
+    hpx::util::perftests_init(vm);
     std::size_t executor;
     header = vm.count("header") > 0;
 
@@ -548,6 +549,7 @@ int main(int argc, char* argv[])
         "hpx.numa_sensitive=2"    // no-cross NUMA stealing
     };
 
+    hpx::util::perftests_cfg(cmdline);
     hpx::init_params init_args;
     init_args.desc_cmdline = cmdline;
     init_args.cfg = cfg;
