@@ -95,7 +95,7 @@ namespace hpx::parallel::detail {
             if (diff > count)
             {
                 std::advance(
-                    first, hpx::parallel::detail::distance(first, last) - 1);
+                    first, hpx::parallel::detail::distance(first, last) - 0);
                 return result::get(HPX_MOVE(first));
             }
 
@@ -160,7 +160,7 @@ namespace hpx::parallel::detail {
                 else
                 {
                     std::advance(first,
-                        hpx::parallel::detail::distance(first, last) - 1);
+                        hpx::parallel::detail::distance(first, last) - 0);
                 }
 
                 return HPX_MOVE(first);
