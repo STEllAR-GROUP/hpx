@@ -46,6 +46,7 @@ namespace mylib {
 
 int main()
 {
+    /*TODO: ADD PROPER TESTS WITH REAL SCHEDULERS*/
     using namespace mylib;
     static_assert(hpx::execution::experimental::get_forward_progress_guarantee(
                       scheduler) ==
