@@ -221,13 +221,19 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename T>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, T const& val)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(HPX_MOVE(first));
+                    if (first == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            FwdIter>::get(HPX_MOVE(first));
+                    }
                 }
 
                 return for_each_n<FwdIter>().call(HPX_FORWARD(ExPolicy, policy),
@@ -260,9 +266,8 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename T>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-                ExPolicy&& policy, FwdIter first, std::size_t count,
-                T const& val)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                std::size_t count, T const& val)
             {
                 return for_each_n<FwdIter>().call(
                     HPX_FORWARD(ExPolicy, policy), first, count,
@@ -289,10 +294,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<
-            ExPolicy>::type
-        tag_fallback_invoke(fill_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T const& value)
+        friend decltype(auto) tag_fallback_invoke(fill_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -338,19 +341,27 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(fill_n_t, ExPolicy&& policy, FwdIter first,
-            Size count, T const& value)
+        friend decltype(auto) tag_fallback_invoke(fill_n_t, ExPolicy&& policy,
+            FwdIter first, Size count, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             // if count is representing a negative value, we do nothing
             if (hpx::parallel::detail::is_negative(count))
             {
-                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<Size>(0);
+                }
+                else
+                {
+                    return hpx::parallel::util::detail::algorithm_result<
+                        ExPolicy, FwdIter>::get(HPX_MOVE(first));
+                }
             }
 
             return hpx::parallel::detail::fill_n<FwdIter>().call(

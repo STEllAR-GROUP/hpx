@@ -224,30 +224,34 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
                 typename FwdIter2, typename Sent2, typename Pred,
                 typename Proj1, typename Proj2>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& orgpolicy, FwdIter1 first1, Sent1 last1,
-                FwdIter2 first2, Sent2 last2, Pred&& pred, Proj1&& proj1,
-                Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& orgpolicy,
+                FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
+                Pred&& pred, Proj1&& proj1, Proj2&& proj2)
             {
                 using zip_iterator =
                     hpx::util::zip_iterator<FwdIter1, FwdIter2>;
                 using reference = typename zip_iterator::reference;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 std::size_t const count1 = detail::distance(first1, last1);
                 std::size_t const count2 = detail::distance(first2, last2);
 
                 // An empty range is lexicographically less than any non-empty
                 // range
-                if (count1 == 0 && count2 != 0)
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        true);
-                }
+                    if (count1 == 0 && count2 != 0)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(true);
+                    }
 
-                if (count2 == 0 && count1 != 0)
-                {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if (count2 == 0 && count1 != 0)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(false);
+                    }
                 }
 
                 decltype(auto) policy = parallel::util::adapt_placement_mode(
@@ -279,10 +283,14 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [tok, first1, first2, last1, last2, pred, proj1,
-                              proj2](auto&& data) mutable -> bool {
+                              proj2](auto&&... data) mutable -> bool {
                     // make sure iterators embedded in function object that is
                     // attached to futures are invalidated
-                    util::detail::clear_container(data);
+                    static_assert(sizeof...(data) < 2);
+                    if constexpr (sizeof...(data) == 1)
+                    {
+                        util::detail::clear_container(data...);
+                    }
 
                     std::size_t mismatched = tok.get_data();
 
@@ -357,10 +365,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(hpx::lexicographical_compare_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
-            Pred pred = Pred())
+        friend decltype(auto) tag_fallback_invoke(
+            hpx::lexicographical_compare_t, ExPolicy&& policy, FwdIter1 first1,
+            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");

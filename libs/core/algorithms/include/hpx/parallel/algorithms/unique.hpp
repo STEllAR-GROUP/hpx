@@ -382,22 +382,26 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
-                ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
                 using zip_iterator = hpx::util::zip_iterator<FwdIter, bool*>;
                 using algorithm_result =
                     util::detail::algorithm_result<ExPolicy, FwdIter>;
                 using difference_type =
                     typename std::iterator_traits<FwdIter>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 difference_type count = detail::distance(first, last);
 
-                if (count < 2)
+                if constexpr (!has_scheduler_executor)
                 {
-                    std::advance(first, count);
-                    return algorithm_result::get(HPX_MOVE(first));
+                    if (count < 2)
+                    {
+                        std::advance(first, count);
+                        return algorithm_result::get(HPX_MOVE(first));
+                    }
                 }
 
 #if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
@@ -431,9 +435,8 @@ namespace hpx::parallel {
                 };
 
                 auto f2 = [flags, first, count](
-                              auto&& results) mutable -> FwdIter {
-                    // HPX_UNUSED(flags);
-                    HPX_UNUSED(results);
+                              auto&&... results) mutable -> FwdIter {
+                    HPX_UNUSED_PACK(results);
 
                     auto part_begin = zip_iterator(first, flags.get());
                     auto dest = first;
@@ -466,6 +469,13 @@ namespace hpx::parallel {
 
                     return dest;
                 };
+
+                if constexpr (has_scheduler_executor)
+                {
+                    // underflow prevention
+                    if (count == 0)
+                        ++count;
+                }
 
                 return util::partitioner<ExPolicy, FwdIter, void>::call(
                     HPX_FORWARD(ExPolicy, policy),
@@ -794,10 +804,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            FwdIter>::type
-        tag_fallback_invoke(hpx::unique_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, Pred pred = Pred())
+        friend decltype(auto) tag_fallback_invoke(hpx::unique_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");

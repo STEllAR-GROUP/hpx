@@ -132,6 +132,9 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename R, typename F>
         struct transform_stream_receiver
         {
+#ifdef HPX_HAVE_STDEXEC
+            using receiver_concept = hpx::execution::experimental::receiver_t;
+#endif
             std::decay_t<R> r;
             std::decay_t<F> f;
             cudaStream_t stream;
@@ -251,7 +254,33 @@ namespace hpx { namespace cuda { namespace experimental {
                             HPX_MOVE(r), HPX_MOVE(ep));
                     });
             }
+
+#ifdef HPX_HAVE_STDEXEC
+            template <typename... Ts>
+            friend void tag_invoke(hpx::execution::experimental::set_value_t,
+                transform_stream_receiver&& r, Ts&&... ts) noexcept
+            {
+                // set_value is in a member function only because of a
+                // compiler bug in GCC 7. When the body of set_value is
+                // inlined here compilation fails with an internal compiler
+                // error.
+                r.set_value(HPX_FORWARD(Ts, ts)...);
+            }
+#endif
         };
+
+#ifndef HPX_HAVE_STDEXEC
+        // This should be a hidden friend in transform_stream_receiver. However,
+        // nvcc does not know how to compile it with some argument types
+        // ("error: no instance of overloaded function std::forward matches the
+        // argument list").
+        template <typename R, typename F, typename... Ts>
+        void tag_invoke(hpx::execution::experimental::set_value_t,
+            transform_stream_receiver<R, F>&& r, Ts&&... ts)
+        {
+            r.set_value(HPX_FORWARD(Ts, ts)...);
+        }
+#endif
 
         template <typename S, typename F>
         struct transform_stream_sender
@@ -260,12 +289,72 @@ namespace hpx { namespace cuda { namespace experimental {
             std::decay_t<F> f;
             cudaStream_t stream{};
 
+#ifdef HPX_HAVE_STDEXEC
+            using sender_concept = hpx::execution::experimental::sender_t;
+
+            template <typename... Args>
+            struct invoke_function_transformation_helper
+            {
+                template <bool IsVoid, typename T>
+                struct set_value_void_checked
+                {
+                    using type = hpx::execution::experimental::set_value_t(T);
+                };
+
+                template <typename T>
+                struct set_value_void_checked<true, T>
+                {
+                    using type = hpx::execution::experimental::set_value_t();
+                };
+
+                static_assert(hpx::is_invocable_v<F, Args..., cudaStream_t>,
+                    "F not invocable with the value_types specified.");
+
+                using result_type =
+                    hpx::util::invoke_result_t<F, Args..., cudaStream_t>;
+                using set_value_result_type =
+                    typename set_value_void_checked<std::is_void_v<result_type>,
+                        result_type>::type;
+                using type =
+                    hpx::execution::experimental::completion_signatures<
+                        set_value_result_type>;
+            };
+
+            template <typename... Args>
+            using invoke_function_transformation =
+                invoke_function_transformation_helper<Args...>::type;
+
+            // clang-format off
+            template <typename Env>
+            friend auto tag_invoke(
+                hpx::execution::experimental::get_completion_signatures_t,
+                transform_stream_sender const&, Env const&)
+            -> hpx::execution::experimental::transform_completion_signatures_of<
+                S, Env,
+                hpx::execution::experimental::completion_signatures<
+                    hpx::execution::experimental::set_error_t(std::exception_ptr)
+                >,
+                invoke_function_transformation
+                // stop and error channel will be forwarded if they are present.
+            >;
+            // clang-format on
+
+            friend constexpr auto tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                transform_stream_sender const& s) noexcept
+            {
+                return hpx::execution::experimental::get_env(s.s);
+            }
+#else
             template <typename Tuple>
             struct invoke_result_helper;
 
             template <template <typename...> class Tuple, typename... Ts>
             struct invoke_result_helper<Tuple<Ts...>>
             {
+                static_assert(hpx::is_invocable_v<F, Ts..., cudaStream_t>,
+                    "F not invocable with the value_types specified.");
+
                 using result_type =
                     hpx::util::invoke_result_t<F, Ts..., cudaStream_t>;
 
@@ -294,11 +383,14 @@ namespace hpx { namespace cuda { namespace experimental {
                 static constexpr bool sends_stopped = false;
             };
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 transform_stream_sender const&, Env) noexcept
                 -> generate_completion_signatures<Env>;
+            // clang-format on
+#endif
 
             template <typename R>
             friend auto tag_invoke(hpx::execution::experimental::connect_t,
@@ -309,17 +401,6 @@ namespace hpx { namespace cuda { namespace experimental {
                         HPX_FORWARD(R, r), HPX_MOVE(s.f), s.stream});
             }
         };
-
-        // This should be a hidden friend in transform_stream_receiver. However,
-        // nvcc does not know how to compile it with some argument types
-        // ("error: no instance of overloaded function std::forward matches the
-        // argument list").
-        template <typename R, typename F, typename... Ts>
-        void tag_invoke(hpx::execution::experimental::set_value_t,
-            transform_stream_receiver<R, F>&& r, Ts&&... ts)
-        {
-            r.set_value(HPX_FORWARD(Ts, ts)...);
-        }
     }    // namespace detail
 
     // NOTE: This is not a customization of

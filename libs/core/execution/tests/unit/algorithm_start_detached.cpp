@@ -78,6 +78,11 @@ int main()
 
     // operator| overload
     {
+#ifndef HPX_HAVE_STDEXEC
+        // in P2300R8 start detached does not have an operator| as it is a
+        // sender consumer and not a sender adaptor, and only sender adaptors
+        // have operator| overloads
+
         std::atomic<bool> start_called{false};
         std::atomic<bool> connect_called{false};
         std::atomic<bool> tag_invoke_overload_called{false};
@@ -87,6 +92,7 @@ int main()
         HPX_TEST(start_called);
         HPX_TEST(connect_called);
         HPX_TEST(!tag_invoke_overload_called);
+#endif
     }
 
     // tag_invoke overload

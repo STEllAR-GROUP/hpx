@@ -723,10 +723,9 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::unary_transform_result<FwdIter1, FwdIter2>>
-        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
-            FwdIter1 first, Sent1 last, FwdIter2 dest, F f, Proj proj = Proj())
+        friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
+            ExPolicy&& policy, FwdIter1 first, Sent1 last, FwdIter2 dest, F f,
+            Proj proj = Proj())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -746,11 +745,8 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::unary_transform_result<hpx::traits::range_iterator_t<Rng>,
-                FwdIter>>
-        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
-            Rng&& rng, FwdIter dest, F f, Proj proj = Proj())
+        friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
+            ExPolicy&& policy, Rng&& rng, FwdIter dest, F f, Proj proj = Proj())
         {
             using iterator_type =
                 typename hpx::traits::range_traits<Rng>::iterator_type;
@@ -778,11 +774,10 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter3>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            ranges::binary_transform_result<FwdIter1, FwdIter2, FwdIter3>>::type
-        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
-            FwdIter1 first1, Sent1 last1, FwdIter2 first2, Sent2 last2,
-            FwdIter3 dest, F f, Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+        friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
+            ExPolicy&& policy, FwdIter1 first1, Sent1 last1, FwdIter2 first2,
+            Sent2 last2, FwdIter3 dest, F f, Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1> &&
                     hpx::traits::is_forward_iterator_v<FwdIter2>,
@@ -805,12 +800,9 @@ namespace hpx::ranges {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy,
-            ranges::binary_transform_result<hpx::traits::range_iterator_t<Rng1>,
-                hpx::traits::range_iterator_t<Rng2>, FwdIter>>
-        tag_fallback_invoke(hpx::ranges::transform_t, ExPolicy&& policy,
-            Rng1&& rng1, Rng2&& rng2, FwdIter dest, F f, Proj1 proj1 = Proj1(),
-            Proj2 proj2 = Proj2())
+        friend decltype(auto) tag_fallback_invoke(hpx::ranges::transform_t,
+            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, FwdIter dest, F f,
+            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
         {
             using iterator_type1 =
                 typename hpx::traits::range_traits<Rng1>::iterator_type;
