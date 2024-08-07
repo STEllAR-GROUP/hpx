@@ -12,7 +12,8 @@ set -ex
 hpx_targets=(
     "foreach_report_test"
     "future_overhead_report_test"
-    "stream_report_test")
+    "stream_report_test"
+    "unseq_first_n_report_test")
 hpx_test_options=(
     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
     --hpx:threads=4 --vector_size=104857 --work_delay=1 \
@@ -22,7 +23,10 @@ hpx_test_options=(
     --repetitions=40 --futures=207270"
     "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
     --vector_size=518176 --hpx:threads=4 --iterations=200 \
-    --warmup_iterations=20")
+    --warmup_iterations=20"
+    "--hpx:ini=hpx.thread_queue.init_threads_count=100 \
+    --hpx:threads=4 --vector_size=1048572 --work_delay=1 \
+    --chunk_size=0 --test_count=200")
 
 # Build binaries for performance tests
 ${perftests_dir}/driver.py -v -l $logfile build -b release -o build \
