@@ -1,5 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
-//  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2022-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -24,7 +24,7 @@
 #include <vector>
 
 using hpx::util::deferred_call;
-typedef std::vector<int>::iterator iter;
+using iter = std::vector<int>::iterator;
 
 ////////////////////////////////////////////////////////////////////////////////
 // A parallel executor that returns void for bulk_execute and hpx::future<void>
@@ -72,7 +72,17 @@ namespace hpx::parallel::execution {
 ////////////////////////////////////////////////////////////////////////////////
 // Tests to void_parallel_executor behavior for the bulk executes
 
-void bulk_test(int, hpx::thread::id tid, int passed_through)    //-V813
+template <typename Executor>
+decltype(auto) disable_run_as_child(Executor&& exec)
+{
+    auto hint = hpx::execution::experimental::get_hint(exec);
+    hint.runs_as_child_mode(hpx::threads::thread_execution_hint::none);
+
+    return hpx::experimental::prefer(hpx::execution::experimental::with_hint,
+        HPX_FORWARD(Executor, exec), hint);
+}
+
+void bulk_test(int, hpx::thread::id const& tid, int passed_through)    //-V813
 {
     HPX_TEST_NEQ(tid, hpx::this_thread::get_id());
     HPX_TEST_EQ(passed_through, 42);
@@ -92,8 +102,9 @@ void test_void_bulk_sync()
 
     executor exec;
     hpx::parallel::execution::bulk_sync_execute(
-        exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42);
-    hpx::parallel::execution::bulk_sync_execute(exec, &bulk_test, v, tid, 42);
+        disable_run_as_child(exec), hpx::bind(&bulk_test, _1, tid, _2), v, 42);
+    hpx::parallel::execution::bulk_sync_execute(
+        disable_run_as_child(exec), &bulk_test, v, tid, 42);
 }
 
 void test_void_bulk_async()
@@ -109,11 +120,12 @@ void test_void_bulk_async()
     using hpx::placeholders::_2;
 
     executor exec;
-    hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, hpx::bind(&bulk_test, _1, tid, _2), v, 42))
+    hpx::when_all(
+        hpx::parallel::execution::bulk_async_execute(disable_run_as_child(exec),
+            hpx::bind(&bulk_test, _1, tid, _2), v, 42))
         .get();
     hpx::when_all(hpx::parallel::execution::bulk_async_execute(
-                      exec, &bulk_test, v, tid, 42))
+                      disable_run_as_child(exec), &bulk_test, v, tid, 42))
         .get();
 }
 
@@ -122,16 +134,16 @@ void test_void_bulk_async()
 
 // Create shape argument for parallel_executor
 std::vector<hpx::util::iterator_range<iter>> split(
-    iter first, iter last, int parts)
+    iter first, iter const& last, int parts)
 {
-    typedef std::iterator_traits<iter>::difference_type sz_type;
-    sz_type count = std::distance(first, last);
-    sz_type increment = count / parts;
+    using sz_type = std::iterator_traits<iter>::difference_type;
+    sz_type const count = std::distance(first, last);
+    sz_type const increment = count / parts;
 
     std::vector<hpx::util::iterator_range<iter>> results;
     while (first != last)
     {
-        iter prev = first;
+        iter const prev = first;
         std::advance(first, (std::min)(increment, std::distance(first, last)));
         results.push_back(hpx::util::iterator_range(prev, first));
     }
@@ -139,7 +151,7 @@ std::vector<hpx::util::iterator_range<iter>> split(
 }
 
 // parallel sum using hpx's parallel executor
-int parallel_sum(iter first, iter last, int num_parts)
+int parallel_sum(iter const& first, iter const& last, int num_parts)
 {
     hpx::execution::parallel_executor exec;
 
@@ -158,22 +170,22 @@ int parallel_sum(iter first, iter last, int num_parts)
         [](int a, hpx::future<int>& b) -> int { return a + b.get(); });
 }
 
-// parallel sum using void parallel executer
-int void_parallel_sum(iter first, iter last, int num_parts)
+// parallel sum using void parallel executor
+int void_parallel_sum(iter const& first, iter const& last, int num_parts)
 {
     void_parallel_executor exec;
 
     std::vector<int> temp(num_parts + 1, 0);
     std::iota(std::begin(temp), std::end(temp), 0);
 
-    std::ptrdiff_t section_size = std::distance(first, last) / num_parts;
+    std::ptrdiff_t const section_size = std::distance(first, last) / num_parts;
 
     std::vector<hpx::future<void>> f =
         hpx::parallel::execution::bulk_async_execute(
             exec,
             [&](const int& i) {
-                iter b = first + i * section_size;    //-V104
-                iter e = first +
+                iter const b = first + i * section_size;    //-V104
+                iter const e = first +
                     (std::min)(std::distance(first, last),
                         static_cast<std::ptrdiff_t>(
                             (i + 1) * section_size)    //-V104
@@ -193,7 +205,7 @@ void sum_test()
     auto random_num = []() { return std::rand() % 50 - 25; };
     std::generate(std::begin(vec), std::end(vec), random_num);
 
-    int sum = std::accumulate(std::begin(vec), std::end(vec), 0);
+    int const sum = std::accumulate(std::begin(vec), std::end(vec), 0);
     int num_parts = std::rand() % 5 + 3;
 
     // Return futures holding results of parallel_sum and void_parallel_sum
@@ -235,7 +247,7 @@ int main(int argc, char* argv[])
     desc_commandline.add_options()("seed,s", value<unsigned int>(),
         "the random number generator seed to use for this run");
 
-    // By default this test should run on all available cores
+    // By default, this test should run on all available cores
     std::vector<std::string> const cfg = {"hpx.os_threads=all"};
 
     // Initialize and run HPX

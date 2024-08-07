@@ -400,8 +400,7 @@ namespace hpx::execution::experimental::detail {
                 hint.hint == -1)
             {
                 // apply hint if none was given
-                hint.mode = hpx::threads::thread_schedule_hint_mode::thread;
-                hint.hint = worker_thread + op_state->first_thread;
+                hint.schedule_hint(worker_thread + op_state->first_thread);
 
                 auto policy = hpx::execution::experimental::with_hint(
                     op_state->scheduler.policy(), hint);
