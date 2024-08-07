@@ -8,7 +8,7 @@
 
 set -eux
 
-pushd perftests-reports/reference-comparison
+# pushd perftests-reports/reference-comparison
 
 # In the order of replacement rule in sed:
 # - Remove the image as does not display in github comments (section Details in the report)
@@ -23,6 +23,6 @@ curl \
   -X POST \
   -H "Authorization: token ${GITHUB_TOKEN}" \
   https://api.github.com/repos/STEllAR-GROUP/hpx/issues/${ghprbPullId}/comments \
-  -d "{\"body\": \"<details><summary>Performance test report</summary>${report}<\/details>\"}"
+  -d "{\"body\": \"<details><summary>Performance test report<\/summary><table><tr><th>Test name<\/th><th>Executor<\/th><th>Mean Percentage Diff.<\/th><th>P value<\/th><\/tr>${report}<\/table><\/details>\"}"
 
-popd
+# popd
