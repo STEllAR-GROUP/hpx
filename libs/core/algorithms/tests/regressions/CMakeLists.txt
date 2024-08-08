@@ -14,6 +14,7 @@ set(tests
     for_loop_with_auto_chunk_size
     includes_empty_ranges
     minimal_findend
+    mismatch_differently_sized_ranges
     num_cores
     reduce_3641
     scan_different_inits

@@ -97,9 +97,9 @@ set(tests
     generaten
     generaten_sender
     is_heap
-    # is_heap_sender
+    is_heap_sender
     is_heap_until
-    # is_heap_until_sender
+    is_heap_until_sender
     includes
     includes_sender
     inclusive_scan
@@ -126,7 +126,8 @@ set(tests
     minmax_element_sender
     mismatch
     mismatch_binary
-    # mismatch_sender
+    mismatch_sender
+    mismatch_binary_sender
     move
     move_sender
     nth_element
@@ -195,7 +196,7 @@ set(tests
     stable_sort_exceptions
     # stable_sort_sender
     starts_with
-    # starts_with_sender
+    starts_with_sender
     swapranges
     swapranges_sender
     transform
@@ -210,7 +211,8 @@ set(tests
     transform_reduce_binary
     transform_reduce_binary_exception
     transform_reduce_binary_bad_alloc
-    # transform_reduce_sender
+    transform_reduce_sender
+    transform_reduce_binary_sender
     uninitialized_copy
     uninitialized_copyn
     uninitialized_default_construct

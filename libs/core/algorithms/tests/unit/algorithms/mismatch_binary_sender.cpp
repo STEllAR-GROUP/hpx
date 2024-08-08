@@ -11,17 +11,23 @@
 #include <string>
 #include <vector>
 
-#include "is_heap_tests.hpp"
+#include "mismatch_binary_tests.hpp"
 
 template <typename IteratorTag>
-void is_heap_until_sender_test()
+void mismatch_binary_sender_test()
 {
     using namespace hpx::execution;
-    test_is_heap_until_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_is_heap_until_sender(hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_is_heap_until_sender(hpx::launch::async, par(task), IteratorTag());
-    test_is_heap_until_sender(
+    test_mismatch_binary1_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_mismatch_binary1_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_mismatch_binary1_sender(hpx::launch::async, par(task), IteratorTag());
+    test_mismatch_binary1_sender(
+        hpx::launch::async, par_unseq(task), IteratorTag());
+
+    test_mismatch_binary2_sender(hpx::launch::sync, seq(task), IteratorTag());
+    test_mismatch_binary2_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_mismatch_binary2_sender(hpx::launch::async, par(task), IteratorTag());
+    test_mismatch_binary2_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }
 
@@ -34,7 +40,8 @@ int hpx_main(hpx::program_options::variables_map& vm)
     std::cout << "using seed: " << seed << std::endl;
     std::srand(seed);
 
-    is_heap_until_sender_test<std::random_access_iterator_tag>();
+    mismatch_binary_sender_test<std::forward_iterator_tag>();
+    mismatch_binary_sender_test<std::random_access_iterator_tag>();
 
     return hpx::local::finalize();
 }

@@ -489,7 +489,9 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
+
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<int> c1(10007);
     std::vector<int> c2(c1.size());
@@ -502,8 +504,6 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     iterator end1 = iterator(std::end(c1));
 
     {
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
         auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2)) |
             hpx::mismatch(ex_policy.on(exec)));
 
@@ -511,8 +511,10 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), c1.size());
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            static_cast<std::size_t>(std::distance(begin1, result.first)),
+            c1.size());
+        HPX_TEST_EQ(static_cast<std::size_t>(
+                        std::distance(std::begin(c2), result.second)),
             c2.size());
     }
 
@@ -520,8 +522,6 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         std::size_t changed_idx = dis(gen);    //-V104
         ++c1[changed_idx];
 
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
         auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2)) |
             hpx::mismatch(ex_policy.on(exec)));
 
@@ -529,8 +529,25 @@ void test_mismatch_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
         // verify values
         HPX_TEST_EQ(
-            std::size_t(std::distance(begin1, result.first)), changed_idx);
-        HPX_TEST_EQ(std::size_t(std::distance(std::begin(c2), result.second)),
+            static_cast<std::size_t>(std::distance(begin1, result.first)),
             changed_idx);
+        HPX_TEST_EQ(static_cast<std::size_t>(
+                        std::distance(std::begin(c2), result.second)),
+            changed_idx);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c1)),
+                              iterator(std::begin(c1)), std::begin(c2)) |
+                hpx::mismatch(ex_policy.on(exec)));
+
+        auto result = hpx::get<0>(*snd_result);
+
+        // verify values
+        HPX_TEST(result.first.base() == std::begin(c1));
+        HPX_TEST(result.second == std::begin(c2));
     }
 }

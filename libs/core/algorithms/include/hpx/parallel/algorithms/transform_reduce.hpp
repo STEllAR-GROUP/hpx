@@ -470,15 +470,21 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename T_, typename Reduce, typename Convert>
-            static util::detail::algorithm_result_t<ExPolicy, T> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first, Sent last, T_&& init, Reduce&& r,
                 Convert&& conv)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    T init_ = init;
-                    return util::detail::algorithm_result<ExPolicy, T>::get(
-                        HPX_MOVE(init_));
+                    if (first == last)
+                    {
+                        T init_ = init;
+                        return util::detail::algorithm_result<ExPolicy, T>::get(
+                            HPX_MOVE(init_));
+                    }
                 }
 
                 auto f1 = [r, conv](
@@ -527,7 +533,7 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Iter2, typename T_, typename Op1, typename Op2>
-            static util::detail::algorithm_result_t<ExPolicy, T> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first1, Sent last1, Iter2 first2,
                 T_&& init, Op1&& op1, Op2&& op2)
             {
@@ -535,11 +541,18 @@ namespace hpx::parallel {
                 using zip_iterator = hpx::util::zip_iterator<Iter, Iter2>;
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if (first1 == last1)
+                if constexpr (!has_scheduler_executor)
                 {
-                    return result::get(HPX_FORWARD(T_, init));
+                    if (first1 == last1)
+                    {
+                        T init_ = init;
+                        return result::get(HPX_MOVE(init_));
+                    }
                 }
+
 
                 difference_type count = detail::distance(first1, last1);
 
@@ -568,9 +581,10 @@ namespace hpx::parallel {
                     [init = HPX_FORWARD(T_, init), op1 = HPX_FORWARD(Op1, op1)](
                         auto&& results) mutable -> T {
                         T ret = HPX_MOVE(init);
-                        for (auto&& fut : results)
+                        for (auto&& result : results)
                         {
-                            ret = HPX_INVOKE(op1, HPX_MOVE(ret), fut.get());
+                            ret = HPX_INVOKE(op1, HPX_MOVE(ret),
+                                hpx::unwrap(result));
                         }
                         return ret;
                     });
@@ -605,7 +619,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
+        friend decltype(auto)
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter first, FwdIter last, T init, Reduce red_op, Convert conv_op)
         {
@@ -654,7 +668,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
+        friend decltype(auto)
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init)
         {
@@ -713,7 +727,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, T>
+        friend decltype(auto)
         tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
             FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
             Reduce red_op, Convert conv_op)
