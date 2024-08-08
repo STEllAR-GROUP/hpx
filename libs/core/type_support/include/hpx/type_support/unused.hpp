@@ -95,8 +95,6 @@ namespace hpx::util {
 #define HPX_UNUSED(x) ::hpx::util::unused = (x)
 #endif
 
-#define HPX_UNUSED_PACK(x) (void) (x, ...);
-
 #if defined(HPX_MSVC)
 #pragma warning(pop)
 #endif
