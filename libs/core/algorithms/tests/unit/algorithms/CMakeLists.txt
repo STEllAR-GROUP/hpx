@@ -60,15 +60,20 @@ set(tests
     foreachn_exception
     foreachn_bad_alloc
     for_loop
+    for_loop_sender
     for_loop_exception
     for_loop_induction
+    for_loop_induction_sender
     for_loop_induction_async
     for_loop_n
+    for_loop_n_sender
     for_loop_n_strided
+    for_loop_n_strided_sender
     for_loop_reduction
+    for_loop_reduction_sender
     for_loop_reduction_async
-    for_loop_sender
     for_loop_strided
+    for_loop_strided_sender
     generate
     generaten
     is_heap

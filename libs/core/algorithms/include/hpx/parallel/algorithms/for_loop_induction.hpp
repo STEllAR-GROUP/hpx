@@ -11,15 +11,68 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
+#include <hpx/concurrency/cache_line_data.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
+#include <hpx/execution/detail/execution_parameter_callbacks.hpp>
+#include <hpx/threading_base/thread_num_tss.hpp>
 
 #include <cstddef>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
+#include "hpx/concepts/concepts.hpp"
+
 namespace hpx::parallel::detail {
     /// \cond NOINTERNAL
+
+    template <typename T>
+    struct hpx_thread_local
+    {
+    private:
+        using array_type = hpx::util::cache_aligned_data<T>[];
+
+    public:
+        constexpr explicit hpx_thread_local(T const& init)
+        {
+            const std::size_t threads =
+                hpx::parallel::execution::detail::get_os_thread_count();
+            data_ = std::make_shared<array_type>(threads, init);
+        }
+
+        // clang-format off
+        template<typename O,
+            HPX_CONCEPT_REQUIRES_(
+                std::is_assignable_v<T&, O const&>
+            )>
+        // clang-format on
+        constexpr hpx_thread_local& operator=(O const& other)
+        {
+            data_[hpx::get_worker_thread_num()].data_ = other;
+            return *this;
+        }
+
+        constexpr operator T const&() const
+        {
+            return data_[hpx::get_worker_thread_num()].data_;
+        }
+
+        constexpr operator T&()
+        {
+            return data_[hpx::get_worker_thread_num()].data_;
+        }
+
+    private:
+        std::shared_ptr<array_type> data_;
+    };
+
+    template <typename Iterable, typename Stride>
+    HPX_HOST_DEVICE HPX_FORCEINLINE constexpr Iterable next(
+        const hpx_thread_local<Iterable>& val, Stride offset)
+    {
+        return hpx::parallel::detail::next(
+            static_cast<Iterable const&>(val), offset);
+    }
 
     ///////////////////////////////////////////////////////////////////////
     template <typename T>
@@ -54,7 +107,7 @@ namespace hpx::parallel::detail {
 
     private:
         std::decay_t<T> var_;
-        T curr_;
+        hpx_thread_local<T> curr_;
     };
 
     template <typename T>
@@ -94,7 +147,7 @@ namespace hpx::parallel::detail {
     private:
         T& live_out_var_;
         T var_;
-        T curr_;
+        hpx_thread_local<T> curr_;
     };
 
     ///////////////////////////////////////////////////////////////////////
@@ -123,6 +176,8 @@ namespace hpx::parallel::detail {
         HPX_HOST_DEVICE
         constexpr void next_iteration() noexcept
         {
+            /*for (std::size_t i{}; i < stride_; ++i)
+                ++curr_;*/
             curr_ = parallel::detail::next(curr_, stride_);
         }
 
@@ -131,7 +186,7 @@ namespace hpx::parallel::detail {
 
     private:
         std::decay_t<T> var_;
-        T curr_;
+        hpx_thread_local<T> curr_;
         std::size_t stride_;
     };
 
@@ -174,7 +229,7 @@ namespace hpx::parallel::detail {
     private:
         T& live_out_var_;
         T var_;
-        T curr_;
+        hpx_thread_local<T> curr_;
         std::size_t stride_;
     };
 
