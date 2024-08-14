@@ -62,6 +62,9 @@ namespace hpx::execution::experimental {
     using stdexec::empty_env;
     using stdexec::env_of_t;
 
+    using stdexec::env;
+    using stdexec::prop;
+
     // Queries
     using stdexec::forward_progress_guarantee;
 

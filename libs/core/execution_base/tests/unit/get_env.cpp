@@ -58,7 +58,7 @@ namespace mylib {
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    auto env3 = ex::make_env(ex::with(receiver_env, 42));
+    auto env3 = ex::prop(receiver_env, 42);
     using env3_t = decltype(env3);
 #else
     using env3_t = ex::make_env_t<receiver_env_t, int>;
@@ -72,7 +72,7 @@ namespace mylib {
             ex::get_env_t, receiver_3 const&) noexcept
         {
 #ifdef HPX_HAVE_STDEXEC
-            return ex::make_env(ex::with(receiver_env, 42));
+            return ex::prop(receiver_env, 42);
 #else
             return ex::make_env<receiver_env_t>(42);
 #endif
@@ -80,8 +80,8 @@ namespace mylib {
     };
 
 #ifdef HPX_HAVE_STDEXEC
-    auto env4 = ex::make_env(
-        std::move(env3), ex::with(receiver_env, std::string("42")));
+    auto env4 = ex::env(
+            std::move(env3), ex::prop(receiver_env, std::string("42")));
     using env4_t = decltype(env4);
 #else
     using env4_t = ex::make_env_t<receiver_env_t, std::string, env3_t>;
@@ -96,8 +96,8 @@ namespace mylib {
             receiver_3 rcv;
 
 #ifdef HPX_HAVE_STDEXEC
-            return ex::make_env(
-                ex::get_env(rcv), ex::with(receiver_env, std::string("42")));
+            return ex::env(
+                ex::get_env(rcv), ex::prop(receiver_env, std::string("42")));
 #else
             return ex::make_env<receiver_env_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
@@ -126,8 +126,8 @@ namespace mylib {
 #endif
 
 #ifdef HPX_HAVE_STDEXEC
-    auto env5 = ex::make_env(
-        std::move(env3), ex::with(receiver_env1, std::string("42")));
+    auto env5 = ex::env(
+        std::move(env3), ex::prop(receiver_env1, std::string("42")));
     using env5_t = decltype(env5);
 #else
     using env5_t = ex::make_env_t<receiver_env1_t, std::string, env3_t>;
@@ -141,8 +141,8 @@ namespace mylib {
         {
             receiver_3 rcv;
 #ifdef HPX_HAVE_STDEXEC
-            return ex::make_env(
-                ex::get_env(rcv), ex::with(receiver_env1, std::string("42")));
+            return ex::env(
+                ex::get_env(rcv), ex::prop(receiver_env1, std::string("42")));
 #else
             return ex::make_env<receiver_env1_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
@@ -198,11 +198,16 @@ int main()
     {
         mylib::receiver_4 rcv;
 #ifdef HPX_HAVE_STDEXEC
+        // The resulting env_ = env(env1, env2) will query env1 first and env2
+        // in that order, in order to find the resulting value of some query.
+        // In cases when both env1 and env2 support the same query, as seen here
+        // with receiver_env the result of env1 is picked.
         auto env = ex::get_env(rcv);
+        HPX_TEST_EQ(mylib::receiver_env(env), 42);
 #else
         auto env = ex::get_env(std::move(rcv));
-#endif
         HPX_TEST_EQ(mylib::receiver_env(env), std::string("42"));
+#endif
     }
     {
         mylib::receiver_5 rcv;
