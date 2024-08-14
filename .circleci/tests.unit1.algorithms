@@ -79,7 +79,9 @@ tests.unit.modules.algorithms.algorithms.generate_sender
 tests.unit.modules.algorithms.algorithms.generaten
 tests.unit.modules.algorithms.algorithms.generaten_sender
 tests.unit.modules.algorithms.algorithms.is_heap
+tests.unit.modules.algorithms.algorithms.is_heap_sender
 tests.unit.modules.algorithms.algorithms.is_heap_until
+tests.unit.modules.algorithms.algorithms.is_heap_until_sender
 tests.unit.modules.algorithms.algorithms.includes
 tests.unit.modules.algorithms.algorithms.includes_sender
 tests.unit.modules.algorithms.algorithms.inclusive_scan
@@ -93,3 +95,9 @@ tests.unit.modules.algorithms.algorithms.is_sorted_until
 tests.unit.modules.algorithms.algorithms.is_sorted_until_sender
 tests.unit.modules.algorithms.algorithms.lexicographical_compare
 tests.unit.modules.algorithms.algorithms.lexicographical_compare_sender
+tests.unit.modules.algorithms.algorithms.make_heap
+tests.unit.modules.algorithms.algorithms.max_element
+tests.unit.modules.algorithms.algorithms.max_element_sender
+tests.unit.modules.algorithms.algorithms.merge
+tests.unit.modules.algorithms.algorithms.min_element
+tests.unit.modules.algorithms.algorithms.min_element_sender

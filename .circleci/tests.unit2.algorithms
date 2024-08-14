@@ -4,16 +4,12 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-tests.unit.modules.algorithms.algorithms.make_heap
-tests.unit.modules.algorithms.algorithms.max_element
-tests.unit.modules.algorithms.algorithms.max_element_sender
-tests.unit.modules.algorithms.algorithms.merge
-tests.unit.modules.algorithms.algorithms.min_element
-tests.unit.modules.algorithms.algorithms.min_element_sender
 tests.unit.modules.algorithms.algorithms.minmax_element
 tests.unit.modules.algorithms.algorithms.minmax_element_sender
 tests.unit.modules.algorithms.algorithms.mismatch
+tests.unit.modules.algorithms.algorithms.mismatch_sender
 tests.unit.modules.algorithms.algorithms.mismatch_binary
+tests.unit.modules.algorithms.algorithms.mismatch_binary_sender
 tests.unit.modules.algorithms.algorithms.move
 tests.unit.modules.algorithms.algorithms.move_sender
 tests.unit.modules.algorithms.algorithms.nth_element
@@ -66,6 +62,7 @@ tests.unit.modules.algorithms.algorithms.stable_partition
 tests.unit.modules.algorithms.algorithms.stable_sort
 tests.unit.modules.algorithms.algorithms.stable_sort_exceptions
 tests.unit.modules.algorithms.algorithms.starts_with
+tests.unit.modules.algorithms.algorithms.starts_with_sender
 tests.unit.modules.algorithms.algorithms.swapranges
 tests.unit.modules.algorithms.algorithms.swapranges_sender
 tests.unit.modules.algorithms.algorithms.transform
@@ -77,7 +74,9 @@ tests.unit.modules.algorithms.algorithms.transform_binary2_sender
 tests.unit.modules.algorithms.algorithms.transform_exclusive_scan
 tests.unit.modules.algorithms.algorithms.transform_inclusive_scan
 tests.unit.modules.algorithms.algorithms.transform_reduce
+tests.unit.modules.algorithms.algorithms.transform_reduce_sender
 tests.unit.modules.algorithms.algorithms.transform_reduce_binary
+tests.unit.modules.algorithms.algorithms.transform_reduce_binary_sender
 tests.unit.modules.algorithms.algorithms.transform_reduce_binary_exception
 tests.unit.modules.algorithms.algorithms.transform_reduce_binary_bad_alloc
 tests.unit.modules.algorithms.algorithms.uninitialized_copy
