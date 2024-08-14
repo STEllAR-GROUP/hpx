@@ -121,7 +121,7 @@ namespace hpx::util {
     // this function initializes the map of nodes from the given a list of nodes
     std::string batch_environment::init_from_nodelist(
         std::vector<std::string> const& nodes, std::string const& agas_host,
-        bool have_tcp)
+        [[maybe_unused]] bool have_tcp)
     {
         if (debug_)
             std::cerr << "got node list" << std::endl;
@@ -246,7 +246,7 @@ namespace hpx::util {
     }
 
     std::string batch_environment::host_name(
-        std::string const& def_hpx_name) const
+        [[maybe_unused]] std::string const& def_hpx_name) const
     {
 #if defined(HPX_HAVE_PARCELPORT_TCP)
         std::string host = nodes_.empty() ? def_hpx_name : host_name();
