@@ -444,7 +444,7 @@ namespace hpx::experimental {
             template <typename Env>
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
-                sender const&, Env)
+                sender const&, Env const&)
                 -> hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(access_type),
                     hpx::execution::experimental::set_error_t(

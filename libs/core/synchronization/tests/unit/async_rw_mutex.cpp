@@ -158,9 +158,18 @@ void submit_senders(Executor&& exec, Senders& senders)
 {
     for (auto& sender : senders)
     {
+// Original code uses sync_wait inside an hpx scheduler. Sync_wait completely
+// blocks the thread with std synchronization primitives which causes it to hang
+#ifdef HPX_HAVE_STDEXEC
+        hpx::execution::experimental::start_detached(
+            hpx::execution::experimental::schedule(exec) |
+            hpx::execution::experimental::let_value(
+                [s = std::move(sender)]() mutable { return std::move(s); }));
+#else
         execute(exec, [sender = std::move(sender)]() mutable {
             sync_wait(std::move(sender));
         });
+#endif
     }
 }
 
