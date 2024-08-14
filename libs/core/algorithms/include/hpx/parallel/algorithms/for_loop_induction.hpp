@@ -65,7 +65,9 @@ namespace hpx::parallel::detail {
             return *this;
         }
 
+        // clang-format off
         constexpr operator T const&() const
+        // clang-format on
         {
             return data_[hpx::get_worker_thread_num()].data_;
         }
