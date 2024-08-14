@@ -16,8 +16,14 @@
 #include <hpx/execution/detail/execution_parameter_callbacks.hpp>
 #include <hpx/threading_base/thread_num_tss.hpp>
 
-#include <cstddef>
+#if !defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+#include <boost/shared_array.hpp>
+#else
 #include <memory>
+#endif
+
+#include <algorithm>
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 
@@ -30,14 +36,21 @@ namespace hpx::parallel::detail {
     struct hpx_thread_local
     {
     private:
-        using array_type = hpx::util::cache_aligned_data<T>[];
+        using element_type = hpx::util::cache_line_data<T>;
+
+#if defined(HPX_HAVE_CXX17_SHARED_PTR_ARRAY)
+        using array_type = std::shared_ptr<element_type[]>;
+#else
+        using array_type = boost::shared_array<element_type>;
+#endif
 
     public:
         constexpr explicit hpx_thread_local(T const& init)
         {
             const std::size_t threads =
                 hpx::parallel::execution::detail::get_os_thread_count();
-            data_ = std::make_shared<array_type>(threads, init);
+            data_.reset(new element_type[threads]);
+            std::fill_n(data_.get(), threads, element_type{init});
         }
 
         // clang-format off
@@ -63,7 +76,7 @@ namespace hpx::parallel::detail {
         }
 
     private:
-        std::shared_ptr<array_type> data_;
+        array_type data_;
     };
 
     template <typename Iterable, typename Stride>
