@@ -24,7 +24,7 @@ namespace tt = hpx::this_thread::experimental;
 
 // NOTE: This is not a conforming sync_wait_with_variant implementation.
 // It only exists to check that the tag_invoke overload is called.
-std::optional<std::tuple<>> tag_invoke(
+std::optional<std::variant<std::tuple<>>> tag_invoke(
     tt::sync_wait_with_variant_t, custom_sender2 s)
 {
     s.tag_invoke_overload_called = true;

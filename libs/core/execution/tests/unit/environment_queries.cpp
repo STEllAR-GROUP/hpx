@@ -83,7 +83,8 @@ namespace mylib {
             return true;
         };
 
-        friend bool operator==(stop_token const& a, stop_token const& b)
+        friend bool operator==([[maybe_unused]] stop_token const& a,
+            [[maybe_unused]] stop_token const& b)
         {
             return false;
         }

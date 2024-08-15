@@ -63,7 +63,7 @@ void test_concepts()
 {
     ex::run_loop loop;
 
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
     static_assert(ex::is_scheduler_v<decltype(sched)>,
         "ex::is_scheduler_v<decltype(sched)>");
 
@@ -149,7 +149,7 @@ struct check_context_receiver
 void test_sender_receiver_basic()
 {
     ex::run_loop loop;
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     bool executed{false};
@@ -169,7 +169,7 @@ hpx::thread::id sender_receiver_then_thread_id;
 void test_sender_receiver_then()
 {
     ex::run_loop loop;
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     hpx::thread::id parent_id = hpx::this_thread::get_id();
     bool executed{false};
@@ -202,7 +202,7 @@ void test_sender_receiver_then_wait()
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
 
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     std::atomic<std::size_t> then_count{0};
     bool executed{false};
@@ -276,7 +276,7 @@ void test_sender_receiver_then_sync_wait()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     std::atomic<std::size_t> then_count{0};
 
@@ -309,7 +309,7 @@ void test_sender_receiver_then_arguments()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     std::atomic<std::size_t> then_count{0};
 
@@ -354,7 +354,7 @@ void test_transfer_basic()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     hpx::thread::id current_id;
 
@@ -400,7 +400,7 @@ void test_transfer_arguments()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     hpx::thread::id current_id;
 
@@ -526,7 +526,7 @@ void test_transfer_just_void()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     auto begin = ex::transfer_just(sched);
     auto work1 = ex::then(begin,
@@ -548,7 +548,7 @@ void test_transfer_just_one_arg()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     auto begin = ex::transfer_just(sched, 3);
     auto work1 = ex::then(begin, [parent_id](int x) {
@@ -572,7 +572,7 @@ void test_transfer_just_two_args()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     auto begin = ex::transfer_just(sched, 3, std::string("hello"));
     auto work1 = ex::then(begin, [parent_id](int x, std::string y) {
@@ -600,7 +600,7 @@ void test_when_all()
 #else
     hpx::thread::id parent_id = hpx::this_thread::get_id();
 #endif
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     {
         auto work1 = ex::schedule(sched) | ex::then([parent_id]() {
@@ -753,7 +753,7 @@ void test_future_sender()
     // senders as futures
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 3);
         auto f = ex::make_future(std::move(s));
@@ -763,7 +763,7 @@ void test_future_sender()
     std::cout << "2\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = ex::transfer_just(sched, 3) | ex::make_future();
         HPX_TEST_EQ(f.get(), 3);
@@ -772,7 +772,7 @@ void test_future_sender()
     std::cout << "3\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = ex::just(3) | ex::make_future(sched);
         HPX_TEST_EQ(f.get(), 3);
@@ -781,7 +781,7 @@ void test_future_sender()
     std::cout << "4\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
         auto s = ex::schedule(sched) | ex::then([&] { called = true; });
@@ -793,7 +793,7 @@ void test_future_sender()
     std::cout << "5\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s1 = ex::transfer_just(sched, std::size_t(42));
         auto s2 = ex::transfer_just(sched, 3.14);
@@ -810,7 +810,7 @@ void test_future_sender()
     std::cout << "6\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = tt::sync_wait(
             ex::as_sender(ex::make_future(ex::transfer_just(sched, 42))));
@@ -824,7 +824,7 @@ void test_future_sender()
     std::cout << "7\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = hpx::async([]() {
             hpx::this_thread::sleep_for(std::chrono::seconds(1));
@@ -840,7 +840,7 @@ void test_future_sender()
     std::cout << "8\n";
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s1 = ex::transfer_just(sched, std::size_t(42));
         auto s2 = ex::transfer_just(sched, 3.14);
@@ -871,7 +871,7 @@ void test_ensure_started()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::schedule(sched) | ex::ensure_started());
@@ -887,7 +887,7 @@ void test_ensure_started()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started();
         auto result = tt::sync_wait(std::move(s));
@@ -903,7 +903,7 @@ void test_ensure_started()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started() |
             ex::transfer(sched);
@@ -917,7 +917,7 @@ void test_ensure_started()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
         auto s =
@@ -943,7 +943,7 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1006,7 +1006,7 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1069,7 +1069,7 @@ void test_ensure_started_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1134,7 +1134,7 @@ void test_split()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::schedule(sched) | ex::split());
@@ -1150,7 +1150,7 @@ void test_split()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 42) | ex::split();
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(std::move(s))), 42);
@@ -1165,7 +1165,7 @@ void test_split()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s =
             ex::transfer_just(sched, 42) | ex::split() | ex::transfer(sched);
@@ -1181,7 +1181,7 @@ void test_split()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto s = ex::transfer_just(sched, 42) | ex::split();
         HPX_TEST_EQ(hpx::get<0>(*tt::sync_wait(s)), 42);
@@ -1202,7 +1202,7 @@ void test_split_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1256,7 +1256,7 @@ void test_split_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1307,7 +1307,7 @@ void test_split_when_all()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> first_task_calls{0};
         std::atomic<std::size_t> successor_task_calls{0};
@@ -1362,7 +1362,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::schedule(sched) |
             ex::let_value([]() { return ex::just(42); })));
@@ -1382,7 +1382,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::schedule(sched) |
             ex::let_value([=]() { return ex::transfer_just(sched, 42); })));
@@ -1403,7 +1403,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::just() |
             ex::let_value([=]() { return ex::transfer_just(sched, 42); })));
@@ -1425,7 +1425,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
             ex::let_value([](int&) { return ex::just(42); }))));
@@ -1446,7 +1446,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
             ex::let_value(
@@ -1468,7 +1468,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result =
             hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int&) {
@@ -1492,7 +1492,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(
             ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
@@ -1516,7 +1516,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(
             ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
@@ -1542,7 +1542,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(
             *tt::sync_wait(ex::just(43) | ex::let_value([=](int& x) {
@@ -1568,7 +1568,7 @@ void test_let_value()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         bool exception_thrown = false;
 
@@ -1630,7 +1630,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
@@ -1662,7 +1662,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
@@ -1694,7 +1694,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
 #ifdef HPX_HAVE_STDEXEC
@@ -1727,7 +1727,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result =
             hpx::get<0>(*tt::sync_wait(ex::schedule(sched) | ex::then([]() {
@@ -1758,7 +1758,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result =
             hpx::get<0>(*tt::sync_wait(ex::schedule(sched) | ex::then([]() {
@@ -1789,7 +1789,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::just() | ex::then([]() {
             throw std::runtime_error("error");
@@ -1820,7 +1820,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::transfer_just(sched, 42) |
             ex::let_error([](std::exception_ptr) {
@@ -1847,7 +1847,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(ex::transfer_just(sched, 42) |
@@ -1875,7 +1875,7 @@ void test_let_error()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto result = hpx::get<0>(*tt::sync_wait(
             ex::just(42) | ex::let_error([=](std::exception_ptr) {
@@ -1904,7 +1904,7 @@ void test_detach()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         bool called = false;
         hpx::mutex mtx;
@@ -1941,7 +1941,7 @@ void test_detach()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         bool called = false;
         hpx::mutex mtx;
@@ -1980,7 +1980,7 @@ void test_keep_future_sender()
     // the future should be passed to then, not it's contained value
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>()) |
             ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }));
@@ -1993,7 +1993,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>().share()) |
             ex::then(
@@ -2008,7 +2008,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42)) |
             ex::then([](hpx::future<int>&& f) {
@@ -2027,7 +2027,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42).share()) |
             ex::then([](hpx::shared_future<int>&& f) {
@@ -2049,7 +2049,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
         auto f = hpx::async([&]() { called = true; });
@@ -2093,7 +2093,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
         auto f = hpx::async([&]() {
@@ -2137,7 +2137,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<bool> called{false};
         auto f = hpx::async([&]() {
@@ -2160,7 +2160,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> calls{0};
         auto sf = hpx::async([&]() { ++calls; }).share();
@@ -2194,7 +2194,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::atomic<std::size_t> calls{0};
         auto sf = hpx::async([&]() {
@@ -2242,7 +2242,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = hpx::async([&]() { return 42; });
 #ifdef HPX_HAVE_STDEXEC
@@ -2262,7 +2262,7 @@ void test_keep_future_sender()
 
     {
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
@@ -2287,7 +2287,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto sf = hpx::async([&]() {
             return custom_type_non_default_constructible_non_copyable{42};
@@ -2319,7 +2319,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = hpx::async([]() { return 42; });
         auto sf = hpx::async([]() { return 3.14; }).share();
@@ -2349,7 +2349,7 @@ void test_keep_future_sender()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         auto f = hpx::async([]() { return 42; });
         auto sf = hpx::async([]() { return 3.14; }).share();
@@ -2385,7 +2385,7 @@ void test_bulk()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         for (int n : ns)
         {
@@ -2419,7 +2419,7 @@ void test_bulk()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         for (auto n : ns)
         {
@@ -2459,7 +2459,7 @@ void test_bulk()
         // P2300R8 does not support bulk with generic iterables, only with a
         // range of integers, though it is expected that this will be extended.
         ex::run_loop loop;
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         std::unordered_set<std::string> string_map;
         std::vector<std::string> v = {"hello", "brave", "new", "world"};
@@ -2483,7 +2483,7 @@ void test_bulk()
 #ifdef HPX_HAVE_STDEXEC
         auto t = hpx::thread([&] { loop.run(); });
 #endif
-        auto sched = loop.get_scheduler();
+        [[maybe_unused]] auto sched = loop.get_scheduler();
 
         for (auto n : ns)
         {
@@ -2549,7 +2549,7 @@ void test_bulk()
 void test_completion_scheduler()
 {
     ex::run_loop loop;
-    auto sched = loop.get_scheduler();
+    [[maybe_unused]] auto sched = loop.get_scheduler();
 
     {
         auto sender = ex::schedule(sched);

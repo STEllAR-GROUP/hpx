@@ -26,6 +26,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
 #elif defined(HPX_CLANG_VERSION)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
