@@ -97,7 +97,7 @@ struct non_sender_7
 
 struct example_receiver
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using receiver_concept = ex::receiver_t;
 #else
     using is_receiver = void;
@@ -108,7 +108,7 @@ struct example_receiver
     }
     friend void tag_invoke(ex::set_stopped_t, example_receiver&&) noexcept {}
     friend void tag_invoke(ex::set_value_t, example_receiver&& r, int v)
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         noexcept
 #endif
     {
@@ -121,7 +121,7 @@ struct example_receiver
 template <typename... T>
 struct receiver_2
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using receiver_concept = ex::receiver_t;
 #else
     using is_receiver = void;
@@ -132,7 +132,7 @@ struct receiver_2
     }
     friend void tag_invoke(ex::set_stopped_t, receiver_2&&) noexcept {}
     friend void tag_invoke(ex::set_value_t, receiver_2&&, T...)
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         noexcept
 #endif
     {
@@ -142,7 +142,7 @@ struct receiver_2
 struct sender_1
 {
     using is_sender = void;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
@@ -180,7 +180,7 @@ struct sender_1
 struct sender_2
 {
     using is_sender = void;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using completion_signatures =
         ex::completion_signatures<ex::set_value_t(int),
             ex::set_error_t(std::exception_ptr)>;
@@ -244,7 +244,7 @@ template <bool val, typename T>
 struct sender_4
 {
     using is_sender = void;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using completion_signatures = std::conditional_t<val,
         ex::completion_signatures<ex::set_value_t(T),
             ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>,
@@ -275,7 +275,7 @@ struct void_receiver
     }
     friend void tag_invoke(ex::set_stopped_t, void_receiver&&) noexcept {}
     friend void tag_invoke(ex::set_value_t, void_receiver&&)
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         noexcept
 #endif
     {
@@ -285,7 +285,7 @@ struct void_receiver
 
 int main()
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     // different requirements
 #else
     using ex::detail::has_sender_types_v;
@@ -334,7 +334,7 @@ int main()
     static_assert(is_sender_v<sender_4<true, int>>, "sender_4 is a sender");
     static_assert(is_sender_v<sender_4<false, int>>, "sender_4 is a sender");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     // we need to be more specific now
     static_assert(ex::sender_to<sender_1, example_receiver&>,
         "sender_1 is a sender to example_receiver");
@@ -368,7 +368,7 @@ int main()
                           ex::env_of_t<receiver_2<std::string>>>>,
         "receiver_2<int>  does not support completion signatures of "
         "sender_4<true,std::string>");
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     /*TODO: CHECK THAT THE RECEIVER HAVING MORE COMPLETIONS THAT THE SENDER
      * IS ACTUALLY AN ERROR IN THE OLD VERSION*/
 
@@ -410,7 +410,7 @@ int main()
         "example_receiver does not support completion signatures of sender_1");
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     // Now sender_of checks for the existence of function signatures in the
     // completion signatures of the sender, not for the available set_value(...)
     // specializations.

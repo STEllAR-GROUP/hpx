@@ -44,7 +44,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
@@ -75,7 +75,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
@@ -110,7 +110,7 @@ int main()
         static_assert(ex::is_sender_v<decltype(s)>,
             "transfer_when_all must return a sender");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto csch =
             ex::get_completion_scheduler<ex::set_value_t>(ex::get_env(s));
 #else
@@ -148,7 +148,7 @@ int main()
 
         HPX_TEST(set_error_called);
         HPX_TEST(!tag_invoke_overload_called);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST(scheduler_schedule_called);
 #else
         HPX_TEST(!scheduler_schedule_called);

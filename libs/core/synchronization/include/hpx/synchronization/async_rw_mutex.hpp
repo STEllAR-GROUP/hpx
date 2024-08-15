@@ -438,7 +438,7 @@ namespace hpx::experimental {
             using access_type =
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename Env>
@@ -653,7 +653,7 @@ namespace hpx::experimental {
                 detail::async_rw_mutex_access_wrapper<readwrite_type, read_type,
                     AccessType>;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename Env>

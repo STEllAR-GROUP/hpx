@@ -78,7 +78,7 @@ int main()
 
     // operator| overload
     {
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         // in P2300R8 start detached does not have an operator| as it is a
         // sender consumer and not a sender adaptor, and only sender adaptors
         // have operator| overloads

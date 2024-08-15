@@ -14,7 +14,7 @@ namespace tt = hpx::this_thread::experimental;
 
 struct this_test_example_scheduler
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     struct example_sender
     {
         using is_sender = void;
@@ -28,7 +28,7 @@ struct this_test_example_scheduler
     };
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     friend constexpr example_sender tag_invoke(
         ex::schedule_t, this_test_example_scheduler) noexcept
     {

@@ -34,7 +34,7 @@ struct non_awaitable_sender
     using completion_signatures = Signatures;
 };
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
 using dependent = hpx::execution::experimental::completion_signatures<
     hpx::execution::experimental::set_value_t(bool),
     hpx::execution::experimental::set_error_t(std::exception_ptr),
@@ -98,7 +98,7 @@ struct awaitable_sender_1
     }
 };
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
 struct awaitable_sender_2
 {
     using promise_type = promise<hpx::suspend_always>;
@@ -113,7 +113,7 @@ struct awaitable_sender_3
     using promise_type = promise<awaiter>;
 
 private:
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     friend awaiter operator co_await(awaitable_sender_3);
 #else
     friend dependent operator co_await(awaitable_sender_3);
@@ -131,7 +131,7 @@ private:
     {
         return {};
     }
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     friend dependent tag_invoke(hpx::execution::experimental::as_awaitable_t,
         awaitable_sender_4,
         hpx::execution::experimental::detail::env_promise<
@@ -250,7 +250,7 @@ int main()
 
         static_assert(!ex::detail::has_free_operator_co_await_v<
                       awaitable_sender_1<awaiter>>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(
             ex::detail::has_free_operator_co_await_v<awaitable_sender_2>);
 #endif
@@ -263,7 +263,7 @@ int main()
 
         static_assert(ex::detail::has_member_operator_co_await_v<
             awaitable_sender_1<awaiter>>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(
             !ex::detail::has_member_operator_co_await_v<awaitable_sender_2>);
 #endif
@@ -275,13 +275,13 @@ int main()
             !ex::detail::has_member_operator_co_await_v<awaitable_sender_5>);
 
         static_assert(ex::is_awaitable_v<awaitable_sender_1<awaiter>>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_awaitable_v<awaitable_sender_2>);
 #endif
         static_assert(ex::is_awaitable_v<awaitable_sender_3>);
         static_assert(!ex::is_awaitable_v<awaitable_sender_4>);
         static_assert(!ex::is_awaitable_v<awaitable_sender_5>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_awaitable_v<awaitable_sender_2,
             ::promise<hpx::suspend_always>>);
 #endif
@@ -295,7 +295,7 @@ int main()
             hpx::functional::tag_invoke_result_t<ex::as_awaitable_t,
                 awaitable_sender_4, ::promise<awaiter>&>,
             awaiter>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         // P2300 does not have dependent completion signatures.
         static_assert(std::is_same_v<
             hpx::functional::tag_invoke_result_t<ex::as_awaitable_t,
@@ -354,7 +354,7 @@ int main()
     // sender
     {
         static_assert(ex::is_sender_v<awaitable_sender_1<awaiter>>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_v<awaitable_sender_2>);
         static_assert(ex::detail::is_enable_sender_v<awaitable_sender_2>);
         static_assert(
@@ -367,7 +367,7 @@ int main()
     // env promise
     {
         static_assert(is_sender_with_env_v<awaitable_sender_1<awaiter>>);
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         static_assert(is_sender_with_env_v<awaitable_sender_2>);
 #endif
         static_assert(is_sender_with_env_v<awaitable_sender_3>);

@@ -12,7 +12,7 @@
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 
 #if defined(HPX_GCC_VERSION)

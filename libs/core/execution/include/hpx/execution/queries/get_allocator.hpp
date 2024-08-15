@@ -7,7 +7,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 #else
 

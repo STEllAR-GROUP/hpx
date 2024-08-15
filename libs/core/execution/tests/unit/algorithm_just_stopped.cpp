@@ -6,7 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/config.hpp>
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution/algorithms/just.hpp>
 #else
 #include <hpx/modules/execution.hpp>
@@ -30,14 +30,14 @@ int main()
         auto s = ex::just_stopped();
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 #endif
 
         check_value_types<hpx::variant<>>(s);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         check_error_types<hpx::variant<>>(s);
 #else
         check_error_types<hpx::variant<std::exception_ptr>>(s);

@@ -67,7 +67,7 @@ auto signature_all(
 }
 // clang-format on
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 template <typename CompletionSignatures>
 struct test_helper
 {
@@ -94,7 +94,7 @@ void test_values(Values...)
 {
     using completion_signatures = decltype(signature_values(Values()...));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -119,7 +119,7 @@ void test_error(Error)
 {
     using completion_signatures = decltype(signature_error(Error()));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -142,7 +142,7 @@ void test_stopped()
 {
     using completion_signatures = decltype(signature_stopped());
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -167,7 +167,7 @@ void test_error_values(Error, Values...)
     using completion_signatures =
         decltype(signature_error_values(Error(), Values()...));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -193,7 +193,7 @@ void test_values_stopped(Values...)
     using completion_signatures =
         decltype(signature_values_stopped(Values()...));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -218,7 +218,7 @@ void test_error_stopped(Error)
 {
     using completion_signatures = decltype(signature_error_stopped(Error()));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -242,7 +242,7 @@ void test_all(Error, Values...)
 {
     using completion_signatures = decltype(signature_all(Error(), Values()...));
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using value_types =
         typename test_helper<completion_signatures>::value_types;
     using error_types =
@@ -284,7 +284,7 @@ using possibly_empty_variant_t =
 template <typename Signatures>
 struct sender_1
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_sender = void;
 #endif
     using completion_signatures = Signatures;
@@ -299,7 +299,7 @@ void test_sender1(Signatures)
     static_assert(hpx::meta::value<
         ex::detail::has_completion_signatures<sender_1<Signatures>>>);
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                      s, ex::empty_env{})),
         Signatures>);
@@ -312,7 +312,7 @@ void test_sender1(Signatures)
         std::is_same_v<ex::completion_signatures_of_t<sender_1<Signatures>>,
             Signatures>);
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     using value_types_of = ex::value_types_of_t<sender_1<Signatures>>;
     using value_types = possibly_empty_variant_t<
         typename Signatures::template value_types<hpx::tuple, hpx::variant>>;
@@ -330,12 +330,12 @@ void test_sender1(Signatures)
 template <typename Signatures>
 struct sender_2
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_sender = void;
 #endif
 };
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Signatures, typename Env = ex::empty_env>
 #else
 template <typename Signatures, typename Env = ex::no_env>
@@ -356,7 +356,7 @@ void test_sender2(Signatures)
         static_assert(
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                          s1, ex::empty_env{})),
             Signatures>);
@@ -370,7 +370,7 @@ void test_sender2(Signatures)
             std::is_same_v<ex::completion_signatures_of_t<sender_2<Signatures>>,
                 Signatures>);
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         using value_types_of = ex::value_types_of_t<sender_2<Signatures>>;
         using value_types =
             possibly_empty_variant_t<typename Signatures::template value_types<
@@ -386,14 +386,14 @@ void test_sender2(Signatures)
 #endif
     }
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<sender_2<Signatures>, ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<sender_2<Signatures>, ex::no_env>);
 #endif
 
         sender_2<Signatures> s2;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(
             hpx::functional::is_tag_invocable_v<ex::get_completion_signatures_t,
                 sender_2<Signatures>, ex::empty_env>);
@@ -415,7 +415,7 @@ void test_sender2(Signatures)
             Signatures>);
 #endif
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         using value_types_of =
             ex::value_types_of_t<sender_2<Signatures>, ex::no_env>;
         using value_types =
@@ -434,7 +434,7 @@ void test_sender2(Signatures)
     }
 }
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
 struct sender_3
 {
 };
@@ -476,7 +476,7 @@ struct promise
 
 struct awaiter
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     bool await_ready()
     {
         return true;
@@ -519,7 +519,7 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     awaitable_sender_1<Awaiter> s;
     static_assert(!hpx::meta::value<ex::detail::has_completion_signatures<
                       awaitable_sender_1<Awaiter>>>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(std::is_same_v<decltype(ex::get_completion_signatures(
                                      s, ex::empty_env{})),
         Signatures>);
@@ -534,7 +534,7 @@ void test_awaitable_sender1(Signatures&&, Awaiter&&)
     using value_types_of = ex::value_types_of_t<awaitable_sender_1<Awaiter>>;
     using error_types_of = ex::error_types_of_t<awaitable_sender_1<Awaiter>>;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     struct sender_with_given_signatures
     {
         using sender_concept = ex::sender_t;
@@ -694,14 +694,14 @@ int main()
         test_sender2(signature_all(std::exception_ptr(), int(), double()));
     }
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     test_sender3();
 #endif
 
 #if defined(HPX_HAVE_CXX20_COROUTINES)
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         test_awaitable_sender1(
             ex::completion_signatures<ex::set_value_t(),
                 ex::set_error_t(std::exception_ptr), ex::set_stopped_t()>{},

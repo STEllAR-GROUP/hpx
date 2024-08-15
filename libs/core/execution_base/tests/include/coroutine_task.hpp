@@ -311,7 +311,7 @@ private:
         static hpx::coroutine_handle<> await_suspend(
             hpx::coroutine_handle<_promise> h) noexcept
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             return h.promise().continuation().handle();
 #else
             return h.promise().continuation();
@@ -408,7 +408,7 @@ private:
     }
 
     // Make this task generally awaitable:
-    friend task_awaitable<> operator co_await(basic_task&& self) noexcept
+    friend task_awaitable<> operator co_await(basic_task && self) noexcept
     {
         static_assert(well_formed<awaiter_context_t, _promise>);
         return task_awaitable<>{std::exchange(self.coro_, {})};

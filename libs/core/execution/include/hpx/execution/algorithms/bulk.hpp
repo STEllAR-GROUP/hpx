@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
@@ -45,7 +45,7 @@ namespace hpx::execution::experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Shape> shape;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename... Args>
@@ -123,7 +123,7 @@ namespace hpx::execution::experimental {
             template <typename Receiver>
             struct bulk_receiver
             {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 using receiver_concept =
                     hpx::execution::experimental::receiver_t;
 #endif
@@ -155,7 +155,7 @@ namespace hpx::execution::experimental {
                 }
 
                 template <typename... Ts>
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 void set_value(Ts&&... ts) noexcept
 #else
                 void set_value(Ts&&... ts)
@@ -258,7 +258,7 @@ namespace hpx::execution::experimental {
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                     hpx::execution::experimental::get_env(sender)
 #else
                     sender

@@ -275,7 +275,7 @@ namespace hpx::execution::experimental {
         struct sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 #endif
             using completion_signatures =
@@ -303,7 +303,7 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             struct env
             {
                 std::decay_t<Scheduler> const& sched;

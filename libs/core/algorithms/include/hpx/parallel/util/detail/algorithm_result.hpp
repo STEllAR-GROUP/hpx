@@ -18,7 +18,7 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 // For is_sender
 #include <hpx/execution_base/completion_signatures.hpp>
 #endif

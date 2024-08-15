@@ -21,7 +21,7 @@ namespace mylib {
     inline constexpr struct query_t final : hpx::functional::tag<query_t>
     {
         friend constexpr auto tag_invoke(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             ex::forwarding_query_t, query_t) noexcept
 #else
             ex::forwarding_sender_query_t, query_t) noexcept
@@ -39,21 +39,21 @@ namespace mylib {
 
 int main()
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(ex::forwarding_query(mylib::query) == true,
 #else
     static_assert(ex::forwarding_sender_query(mylib::query) == true,
 #endif
         "non_query CPO is user implemented to return true");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(ex::forwarding_query(mylib::non_query) == false,
 #else
     static_assert(ex::forwarding_sender_query(mylib::non_query) == false,
 #endif
         "invokes tag_fallback which returns false by default");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(ex::forwarding_query(
 #else
     static_assert(ex::forwarding_sender_query(
@@ -61,7 +61,7 @@ int main()
                       ex::get_completion_scheduler<ex::set_value_t>) == true,
         "invokes CPO specialization that returns true");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(ex::forwarding_query(
 #else
     static_assert(ex::forwarding_sender_query(
@@ -69,7 +69,7 @@ int main()
                       ex::get_completion_scheduler<ex::set_error_t>) == true,
         "invokes CPO specialization that returns true");
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(ex::forwarding_query(
 #else
     static_assert(ex::forwarding_sender_query(

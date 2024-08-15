@@ -42,7 +42,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
@@ -71,13 +71,13 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         /*TODO: the following is unclear: https://rentry.org/4rzhctgx
          * So this is volatile to internal stdexec changes, and is thus disabled
          * check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s2);*/
@@ -107,13 +107,13 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         /* Disabled due to ambiguous order
          * check_value_types<hpx::variant<hpx::tuple<>,
          *   hpx::tuple<custom_type_non_default_constructible>>>(s2); */
@@ -146,13 +146,13 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         /* Disabled due to ambiguous order
          * check_value_types<hpx::variant<hpx::tuple<>,
          *   hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
@@ -185,7 +185,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -213,13 +213,13 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         /* Disabled due to ambiguous order
          * check_value_types<hpx::variant<hpx::tuple<>, hpx::tuple<int>>>(s); */
 #else
@@ -245,7 +245,7 @@ int main()
         HPX_TEST(tag_invoke_overload_called);
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -267,14 +267,14 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
 #endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         // the returned sender does not throw any errors
         check_error_types<hpx::variant<>>(s2);
 #else
@@ -301,7 +301,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
@@ -310,7 +310,7 @@ int main()
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
             s2);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         check_error_types<hpx::variant<>>(s2);
 #else
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -338,7 +338,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
@@ -347,7 +347,7 @@ int main()
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
             s2);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         check_error_types<hpx::variant<>>(s2);
 #else
         check_error_types<hpx::variant<std::exception_ptr>>(s2);

@@ -192,7 +192,7 @@ namespace hpx::execution::experimental {
 
             static_assert(
                 std::is_void_v<result_type>, "std::is_void_v<result_type>");
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 //            We are using HPX's bulk implementation for now, so this works for
 //            other types too.
 //            static_assert(

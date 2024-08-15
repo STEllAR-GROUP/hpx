@@ -132,7 +132,7 @@ namespace hpx { namespace cuda { namespace experimental {
         template <typename R, typename F>
         struct transform_stream_receiver
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using receiver_concept = hpx::execution::experimental::receiver_t;
 #endif
             std::decay_t<R> r;
@@ -255,7 +255,7 @@ namespace hpx { namespace cuda { namespace experimental {
                     });
             }
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             template <typename... Ts>
             friend void tag_invoke(hpx::execution::experimental::set_value_t,
                 transform_stream_receiver&& r, Ts&&... ts) noexcept
@@ -269,7 +269,7 @@ namespace hpx { namespace cuda { namespace experimental {
 #endif
         };
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         // This should be a hidden friend in transform_stream_receiver. However,
         // nvcc does not know how to compile it with some argument types
         // ("error: no instance of overloaded function std::forward matches the
@@ -289,7 +289,7 @@ namespace hpx { namespace cuda { namespace experimental {
             std::decay_t<F> f;
             cudaStream_t stream{};
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 
             template <typename... Args>

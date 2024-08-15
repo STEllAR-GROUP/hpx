@@ -83,7 +83,7 @@ namespace hpx::execution_base {
     }    // namespace this_thread
 }    // namespace hpx::execution_base
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 namespace hpx::this_thread::experimental {
     using namespace std::this_thread;

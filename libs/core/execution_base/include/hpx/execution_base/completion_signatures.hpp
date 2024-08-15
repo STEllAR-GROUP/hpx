@@ -31,7 +31,7 @@
 #include <system_error>
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
@@ -109,7 +109,7 @@ namespace hpx::execution::experimental {
         template <typename... Ts>
         using decayed_tuple = meta::invoke<decay_tuple<hpx::tuple>, Ts...>;
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         // test, if set_value_t(Ts...), set_error_t(Error, Ts...), or
         // set_stopped_t() are available, return meta::pack<Ts...>
         template <typename Tag, typename MetaF = meta::func<meta::pack>,
@@ -216,7 +216,7 @@ namespace hpx::execution::experimental {
 #endif
     }    // namespace detail
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     // A type Fn satisfies completion-signature if it is a function type with
     // one of the following forms:
     //
@@ -337,7 +337,7 @@ namespace hpx::execution::experimental {
           : std::true_type
         {
         };
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     }
 #else
         struct no_completion_signatures
@@ -474,7 +474,7 @@ namespace hpx::execution::experimental {
     //
     // A sender's destructor shall not block pending completion of submitted
     // operations.
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     template <typename Sender, typename... Env>
     struct is_sender_in
       : std::bool_constant<
@@ -1611,7 +1611,7 @@ namespace hpx::execution::experimental {
     {
     };
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
 #if defined(HPX_HAVE_CXX20_COROUTINES)
     namespace detail {
 
@@ -1644,7 +1644,7 @@ namespace hpx::execution::experimental {
                 connect_result_t<sender_type, receiver> op_state_;
             };
         };
-    }     // namespace detail
+    }    // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender

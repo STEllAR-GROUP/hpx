@@ -156,7 +156,7 @@ namespace hpx::execution::experimental {
             template <typename Sender>
             future_data_with_run_loop(init_no_addref no_addref,
                 other_allocator const& alloc,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 decltype(std::declval<hpx::execution::experimental::run_loop>()
                              .get_scheduler()) const& sched,
 #else
@@ -164,7 +164,7 @@ namespace hpx::execution::experimental {
 #endif
                 Sender&& sender)
               : base_type(no_addref, alloc, HPX_FORWARD(Sender, sender))
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
               //TODO: Keep an eye on this, it is based on the internal impl of
               // stdexec, so it is subect to change. This is currently relying
               // on the env struct to expose __loop_ as a public member.
@@ -232,7 +232,7 @@ namespace hpx::execution::experimental {
         ///////////////////////////////////////////////////////////////////////
         template <typename Sender, typename Allocator>
         auto make_future_with_run_loop(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
                          .get_scheduler()) const& sched,
 #else
@@ -338,7 +338,7 @@ namespace hpx::execution::experimental {
         friend constexpr HPX_FORCEINLINE auto tag_override_invoke(make_future_t,
             Sender&& sender, Allocator const& allocator = Allocator{})
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(
@@ -361,7 +361,7 @@ namespace hpx::execution::experimental {
             )>
         // clang-format on
         friend auto tag_invoke(make_future_t,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             decltype(std::declval<hpx::execution::experimental::run_loop>()
                          .get_scheduler()) const& sched,
 #else

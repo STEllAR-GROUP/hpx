@@ -8,7 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
@@ -339,7 +339,7 @@ namespace hpx::execution::experimental::detail {
     template <typename OperationState, typename F, typename Shape>
     struct bulk_receiver
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using receiver_concept = hpx::execution::experimental::receiver_t;
 #endif
         OperationState* op_state;
@@ -663,7 +663,7 @@ namespace hpx::execution::experimental::detail {
         thread_pool_bulk_sender& operator=(
             thread_pool_bulk_sender const&) = default;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using sender_concept = hpx::execution::experimental::sender_t;
 
         template <typename Env>
@@ -886,7 +886,7 @@ namespace hpx::execution::experimental {
         if constexpr (std::is_same_v<Policy, launch::sync_policy>)
         {
             // fall back to non-bulk scheduling if sync execution was requested
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             return hpx::execution::experimental::bulk(
                 HPX_FORWARD(Sender, sender), hpx::util::counting_shape(count),
                 HPX_FORWARD(F, f));

@@ -95,7 +95,7 @@ void test_rotate(Policy l, ExPolicy&& policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(mid),
                       iterator(std::end(c))) |
         hpx::rotate(policy.on(exec)));
@@ -141,7 +141,7 @@ void test_rotate_async_direct(Policy l, ExPolicy&& p, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     tt::sync_wait(hpx::rotate(p.on(exec), iterator(std::begin(c)),
         iterator(mid), iterator(std::end(c))));
 #else

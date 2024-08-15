@@ -63,7 +63,7 @@ namespace hpx::execution::experimental::detail {
         friend constexpr HPX_FORCEINLINE auto operator|(
             U&& u, partial_algorithm_base p)
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             auto scheduler =
                 hpx::execution::experimental::get_completion_scheduler<
                     hpx::execution::experimental::set_value_t>(

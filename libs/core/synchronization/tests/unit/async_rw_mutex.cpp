@@ -160,7 +160,7 @@ void submit_senders(Executor&& exec, Senders& senders)
     {
 // Original code uses sync_wait inside an hpx scheduler. Sync_wait completely
 // blocks the thread with std synchronization primitives which causes it to hang
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         hpx::execution::experimental::start_detached(
             hpx::execution::experimental::schedule(exec) |
             hpx::execution::experimental::let_value(

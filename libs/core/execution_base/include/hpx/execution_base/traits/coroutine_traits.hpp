@@ -35,7 +35,7 @@ namespace hpx::execution::experimental {
             meta::value<meta::one_of<T, void, bool>> ||
             is_instance_of<T, hpx::coroutine_handle>;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         // In P2300R7+ await ready also needs to be contextually convertible to bool.
         template <typename, typename = void>
         inline constexpr bool has_await_ready_contextually_convertible_to_bool =
@@ -86,7 +86,7 @@ namespace hpx::execution::experimental {
         template <typename Awaiter, typename Promise>
         inline constexpr bool is_with_await_suspend_v<Awaiter, Promise,
             std::enable_if_t<std::is_same_v<Promise, void>>> = true;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         // In P2300R8 "T is bool" is a sufficient condition for T to be an
         // await suspend result type.
         template <typename Awaiter, typename Promise>
@@ -113,7 +113,7 @@ namespace hpx::execution::experimental {
     template <typename Awaiter, typename Promise = void>
     struct is_awaiter
       : std::integral_constant<bool,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             detail::has_await_ready_contextually_convertible_to_bool<Awaiter> &&
 #else
             detail::has_await_ready<Awaiter> &&

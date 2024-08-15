@@ -136,7 +136,7 @@ namespace hpx::execution::experimental {
 
             std::decay_t<Future> future_;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             template <bool IsVoid, typename _result_type>
             struct set_value_void_checked
             {

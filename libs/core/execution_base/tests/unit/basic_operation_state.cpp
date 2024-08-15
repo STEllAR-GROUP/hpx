@@ -94,7 +94,7 @@ namespace mylib {
 int main()
 {
     {
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
         //        Normally the operation states should be invalid but the
         //        STDEXEC implementation does not match the proposed standard
         //        yet.
@@ -156,7 +156,7 @@ int main()
             tag_invoke(ex::start, std::declval<mylib::state<false> const&>())));
 
         // none of the operations work via the start CPO if they'd throw
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         /*TODO: Check if the following way of invoking the start cpo leads to
          * the required checks by the execution.op_state concept check. That
          * check goes through the operator() of start_t but I am not sure if

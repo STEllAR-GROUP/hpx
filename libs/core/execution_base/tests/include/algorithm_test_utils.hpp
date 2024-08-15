@@ -21,7 +21,7 @@
 
 #pragma once
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Scheduler>
 struct env_with_scheduler
 {
@@ -78,7 +78,7 @@ template <bool Expected, typename Env = hpx::execution::experimental::empty_env,
     typename Sender>
 inline void check_sends_stopped(Sender&&)
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     // See check_value_types
     using UnderlyingSender = std::remove_reference_t<Sender>;
     constexpr bool sends_stopped =
@@ -129,7 +129,7 @@ struct void_sender
 template <typename... Ts>
 struct error_sender
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using sender_concept = hpx::execution::experimental::sender_t;
 #endif
 
@@ -237,7 +237,7 @@ struct callback_receiver
     std::decay_t<F> f;
     std::atomic<bool>& set_value_called;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
 #else
     struct is_receiver
@@ -278,7 +278,7 @@ struct error_callback_receiver
     std::atomic<bool>& set_error_called;
     bool expect_set_value = false;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
 #endif
 
@@ -306,7 +306,7 @@ struct error_callback_receiver
 
 struct expect_stopped_receiver
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_receiver = void;
 #endif
 
@@ -528,7 +528,7 @@ struct custom_sender
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -577,7 +577,7 @@ struct custom_sender_multi_tuple
     std::atomic<bool>& tag_invoke_overload_called;
 
     bool expect_set_value = true;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -744,7 +744,7 @@ struct example_scheduler_template
     struct my_sender
     {
         using is_sender = void;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         friend env_with_scheduler<std::conditional_t<std::is_void_v<Derived>,
             example_scheduler_template, Derived>>
         tag_invoke(
@@ -809,7 +809,7 @@ struct example_scheduler_template
 };
 
 using example_scheduler = example_scheduler_template<void>;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 struct scheduler2 : example_scheduler_template<scheduler2>
 {
     explicit scheduler2(example_scheduler s)
@@ -869,7 +869,7 @@ namespace my_namespace {
     {
         struct my_sender
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using sender_concept = hpx::execution::experimental::sender_t;
 #endif
             template <typename R>
@@ -890,7 +890,7 @@ namespace my_namespace {
             {
                 return operation_state<R>{std::forward<R>(r)};
             }
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             friend env_with_scheduler<my_scheduler_template> tag_invoke(
                 hpx::execution::experimental::get_env_t,
                 my_sender const&) noexcept

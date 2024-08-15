@@ -18,7 +18,7 @@ namespace ex = hpx::execution::experimental;
 static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_schedule_calls = 0;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 struct dummy_scheduler
 {
 };
@@ -27,7 +27,7 @@ template <typename Scheduler = dummy_scheduler>
 #endif
 struct example_sender_template
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_sender = void;
 
     using completion_signatures = ex::completion_signatures<ex::set_value_t(),
@@ -60,7 +60,7 @@ struct example_sender_template
         return {};
     }
 };
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 using example_sender = example_sender_template<>;
 #else
 using example_sender = example_sender_template;
@@ -85,7 +85,7 @@ struct non_scheduler_3
 
 struct scheduler_1
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using sender_1 = example_sender_template<scheduler_1>;
 
     friend sender_1 tag_invoke(ex::schedule_t, scheduler_1)
@@ -114,7 +114,7 @@ struct scheduler_1
 
 struct scheduler_2
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using sender_2 = example_sender_template<scheduler_2>;
 #endif
 
@@ -129,7 +129,7 @@ struct scheduler_2
     }
 };
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 example_sender_template<scheduler_2> tag_invoke(ex::schedule_t, scheduler_2)
 #else
 example_sender tag_invoke(ex::schedule_t, scheduler_2)
@@ -145,7 +145,7 @@ int main()
 
     static_assert(
         !is_scheduler_v<non_scheduler_1>, "non_scheduler_1 is not a scheduler");
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     // In P2300 the result of a `schedule` member function is mandated to be a sender,
     // so the evaluation of the following triggers a compilation error.
     static_assert(
@@ -169,7 +169,7 @@ int main()
     HPX_TEST_EQ(tag_invoke_schedule_calls, std::size_t(1));
 
     static_assert(std::is_same_v<ex::schedule_result_t<scheduler_1>,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                       example_sender_template<scheduler_1>
 #else
                       example_sender
@@ -177,7 +177,7 @@ int main()
                       >,
         "Result of scheduler is a example_sender");
     static_assert(std::is_same_v<ex::schedule_result_t<scheduler_2>,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                       example_sender_template<scheduler_2>
 #else
                       example_sender

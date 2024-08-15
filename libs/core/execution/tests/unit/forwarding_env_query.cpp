@@ -16,7 +16,7 @@
 
 namespace mylib {
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     struct derived_forwarding_query_t
       : hpx::execution::experimental::forwarding_query_t
     {
@@ -27,7 +27,7 @@ namespace mylib {
       : hpx::functional::tag<non_query_t>
     {
         friend constexpr auto tag_invoke(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             hpx::execution::experimental::forwarding_query_t,
 #else
             hpx::execution::experimental::forwarding_env_query_t,
@@ -42,7 +42,7 @@ namespace mylib {
 
 int main()
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(hpx::execution::experimental::forwarding_query(
                       mylib::non_query) == true,
 #else
@@ -50,7 +50,7 @@ int main()
                       mylib::non_query) == true,
 #endif
         "non_query CPO is user implemented that returns true");
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     // P2300R8: "forwarding_query(execution::get_scheduler) is a core constant
     // expression and has value true."
     static_assert(hpx::execution::experimental::forwarding_query(
@@ -62,7 +62,7 @@ int main()
         "environmental query falls back to false");
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(hpx::execution::experimental::forwarding_query(
                       mylib::derived_forwarding_query) == true,
         "derived_forwarding_query is a forwarding query");

@@ -31,7 +31,7 @@ namespace hpx::execution::experimental {
     //   3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P>
     //      is true.
     //   4. Otherwise, e.
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     struct as_awaitable_t;
 
     struct connect_awaitable_t;

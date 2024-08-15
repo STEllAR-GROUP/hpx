@@ -9,7 +9,7 @@
 
 #include <hpx/config.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include <hpx/execution_base/stdexec_forward.hpp>
 #endif
 
@@ -96,7 +96,7 @@ namespace hpx::when_all_vector_detail {
         {
         };
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         // Dummy parameter introduced to please GCC11 which enforces
         // explicit specialization in non-namespace scope as an error.
         // Reference: https://cplusplus.com/forum/general/58906/#msg318049
@@ -177,7 +177,7 @@ namespace hpx::when_all_vector_detail {
 
             struct when_all_vector_receiver
             {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 using receiver_concept =
                     hpx::execution::experimental::receiver_t;
 #endif
@@ -254,7 +254,7 @@ namespace hpx::when_all_vector_detail {
                 // clang-format off
                 friend auto tag_invoke(hpx::execution::experimental::get_env_t,
                     when_all_vector_receiver const& r)
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                     noexcept
                     -> hpx::execution::experimental::make_env_t<
                         hpx::execution::experimental::env_of_t<receiver_type>,
@@ -314,7 +314,7 @@ namespace hpx::when_all_vector_detail {
 
             // The first error sent by any predecessor sender is stored in a
             // optional of a variant of the error_types
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using error_types =
                 typename hpx::execution::experimental::error_types_of_t<
                     when_all_vector_sender_impl<
@@ -427,14 +427,14 @@ namespace hpx::when_all_vector_detail {
                     }
                     else
                     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                         if constexpr (hpx::execution::experimental::
                                           sends_stopped<Sender>)
                         {
 #endif
                             hpx::execution::experimental::set_stopped(
                                 HPX_MOVE(receiver));
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                         }
                         else
                         {

@@ -19,7 +19,7 @@ namespace mylib {
       : hpx::functional::tag<non_query_t>
     {
         friend constexpr auto tag_invoke(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             hpx::execution::experimental::forwarding_query_t,
 #else
             hpx::execution::experimental::forwarding_scheduler_query_t,
@@ -34,7 +34,7 @@ namespace mylib {
 
 int main()
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     static_assert(hpx::execution::experimental::forwarding_query(
 #else
     static_assert(hpx::execution::experimental::forwarding_scheduler_query(
@@ -42,7 +42,7 @@ int main()
                       mylib::non_query) == true,
         "non_query CPO is user implemented to return true");
 
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     static_assert(hpx::execution::experimental::forwarding_scheduler_query(
                       hpx::execution::experimental::get_scheduler) == false,
         "invokes tag_fallback which returns false by default");

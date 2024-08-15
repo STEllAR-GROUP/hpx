@@ -66,7 +66,7 @@ namespace hpx::execution::experimental {
         struct keep_future_sender_base
         {
             std::decay_t<Future> future;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(

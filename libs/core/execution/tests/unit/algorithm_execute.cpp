@@ -8,7 +8,7 @@
 #include <hpx/execution/algorithms/execute.hpp>
 #include <hpx/modules/testing.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #include "algorithm_test_utils.hpp"
 #endif
 
@@ -21,12 +21,12 @@ namespace ex = hpx::execution::experimental;
 static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_execute_calls = 0;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Scheduler>
 #endif
 struct execute_example_sender
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using is_sender = void;
 
     friend env_with_scheduler<Scheduler> tag_invoke(
@@ -58,7 +58,7 @@ struct execute_example_sender
 
 struct scheduler_1
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using my_sender = execute_example_sender<scheduler_1>;
 #else
     using my_sender = execute_example_sender;
@@ -83,7 +83,7 @@ struct scheduler_1
 
 struct scheduler_2
 {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using my_sender = execute_example_sender<scheduler_2>;
 #else
     using my_sender = execute_example_sender;
@@ -99,7 +99,7 @@ struct scheduler_2
         return false;
     }
 };
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 scheduler_2::my_sender tag_invoke(ex::schedule_t, scheduler_2)
 {
     ++friend_tag_invoke_schedule_calls;

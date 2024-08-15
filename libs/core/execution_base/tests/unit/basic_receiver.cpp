@@ -22,7 +22,7 @@ bool value_called = false;
 namespace mylib {
     struct receiver_1
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using is_receiver = void;
 #endif
         friend void tag_invoke(ex::set_stopped_t, receiver_1&&) noexcept
@@ -37,7 +37,7 @@ namespace mylib {
         }
 
         friend void tag_invoke(ex::set_value_t, receiver_1&&, int)
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             noexcept
 #endif
         {
@@ -47,7 +47,7 @@ namespace mylib {
 
     struct receiver_2
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using is_receiver = void;
 #endif
         friend void tag_invoke(ex::set_stopped_t, receiver_2&&) noexcept
@@ -63,7 +63,7 @@ namespace mylib {
 
     struct receiver_3
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using is_receiver = void;
 #endif
         friend void tag_invoke(ex::set_stopped_t, receiver_3&&) noexcept
@@ -142,7 +142,7 @@ namespace mylib {
 
     struct non_receiver_4
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         using is_receiver = void;
 #endif
         friend void tag_invoke(ex::set_stopped_t, non_receiver_4&&) noexcept
@@ -205,14 +205,14 @@ namespace mylib {
     };
 }    // namespace mylib
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 #endif
 
 int main()
 {
     using ex::is_receiver;
     using ex::is_receiver_of;
-#ifndef HPX_HAVE_STDEXEC
+#if !defined(HPX_HAVE_STDEXEC)
     using ex::is_nothrow_receiver_of;
 
     static_assert(!is_nothrow_receiver_of<mylib::receiver_1,

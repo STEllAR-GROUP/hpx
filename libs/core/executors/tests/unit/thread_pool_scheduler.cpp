@@ -67,7 +67,7 @@ struct check_context_receiver
     hpx::mutex& mtx;
     hpx::condition_variable& cond;
     bool& executed;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using receiver_concept = ex::receiver_t;
 #endif
     template <typename E>
@@ -232,7 +232,7 @@ struct callback_receiver
     hpx::mutex& mtx;
     hpx::condition_variable& cond;
     bool& executed;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     using receiver_concept = ex::receiver_t;
 #endif
 
@@ -583,7 +583,7 @@ void test_when_all()
             ex::when_all(std::move(work1), std::move(work2), std::move(work3));
 
         bool executed{false};
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(std::move(when1) |
             ex::then([parent_id, &executed](int x, std::string y, double z) {
                 HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
@@ -626,7 +626,7 @@ void test_when_all()
 
         try
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::when_all(std::move(work1), std::move(work2)) |
                 ex::then([parent_id](int x, std::string y) {
                     HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
@@ -673,7 +673,7 @@ void test_when_all()
 
         try
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::when_all(std::move(work1), std::move(work2)) |
                 ex::then([parent_id](int x, std::string y) {
                     HPX_TEST_NEQ(parent_id, hpx::this_thread::get_id());
@@ -713,7 +713,7 @@ void test_future_sender()
             "a future should be adaptable to a sender");
         static_assert(std::is_same_v<
                           std::decay_t<decltype(*tt::sync_wait(std::move(fs)))>,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                           std::tuple<>>,
 #else
                           hpx::tuple<>>,
@@ -790,7 +790,7 @@ void test_future_sender()
             "a shared_future should be adaptable as a sender");
         static_assert(
             std::is_same_v<std::decay_t<decltype(*tt::sync_wait(sfs))>,
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 std::tuple<>>,
 #else
                 hpx::tuple<>>,
@@ -933,7 +933,7 @@ void test_ensure_started()
     ex::thread_pool_scheduler sched{};
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(sched) | ex::ensure_started());
 #else
         ex::schedule(sched) | ex::ensure_started() | tt::sync_wait();
@@ -953,7 +953,7 @@ void test_ensure_started()
 
     {
         auto s = ex::transfer_just(sched, 42) | ex::ensure_started()
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             | ex::split()
 #endif
             ;
@@ -980,7 +980,7 @@ void test_ensure_started_when_all()
             started = true;
             cond.notify_one();
         }) | ex::ensure_started()
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             | ex::split();
 #endif
         ;
@@ -996,7 +996,7 @@ void test_ensure_started_when_all()
             ++successor_task_calls;
             return 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
@@ -1025,7 +1025,7 @@ void test_ensure_started_when_all()
             cond.notify_one();
             return 3;
         }) | ex::ensure_started()
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             | ex::split()
 #endif
             ;
@@ -1042,7 +1042,7 @@ void test_ensure_started_when_all()
             ++successor_task_calls;
             return x + 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
@@ -1071,7 +1071,7 @@ void test_ensure_started_when_all()
             cond.notify_one();
             return 3;
         }) | ex::ensure_started()
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             | ex::split()
 #endif
             ;
@@ -1087,7 +1087,7 @@ void test_ensure_started_when_all()
             ++successor_task_calls;
             return x + 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
@@ -1109,7 +1109,7 @@ void test_split()
     ex::thread_pool_scheduler sched{};
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(sched) | ex::split());
 #else
         ex::schedule(sched) | ex::split() | tt::sync_wait();
@@ -1153,7 +1153,7 @@ void test_split_when_all()
             ++successor_task_calls;
             return 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
@@ -1184,7 +1184,7 @@ void test_split_when_all()
             ++successor_task_calls;
             return x + 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; }))),
@@ -1216,7 +1216,7 @@ void test_split_when_all()
             ++successor_task_calls;
             return x + 2;
         });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*(tt::sync_wait(ex::when_all(succ1, succ2) |
                 ex::then([](int const& x, int const& y) { return x + y; })))),
@@ -1239,7 +1239,7 @@ void test_let_value()
 
     // void predecessor
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) |
             ex::let_value([]() { return ex::just(42); }))));
 #else
@@ -1250,7 +1250,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) |
             ex::let_value([=]() { return ex::transfer_just(sched, 42); }))));
 #else
@@ -1262,7 +1262,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*tt::sync_wait((ex::just() |
             ex::let_value([=]() { return ex::transfer_just(sched, 42); }))));
 #else
@@ -1275,7 +1275,7 @@ void test_let_value()
 
     // int predecessor, value ignored
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
             ex::let_value([](int&) { return ex::just(42); }))));
 #else
@@ -1287,7 +1287,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 43) |
             ex::let_value(
                 [=](int&) { return ex::transfer_just(sched, 42); }))));
@@ -1300,7 +1300,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result =
             hpx::get<0>(*(tt::sync_wait(ex::just(43) | ex::let_value([=](int&) {
                 return ex::transfer_just(sched, 42);
@@ -1315,7 +1315,7 @@ void test_let_value()
 
     // int predecessor, value used
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(
             ex::transfer_just(sched, 43) | ex::let_value([](int& x) {
                 return ex::just(42) | ex::then([&](int y) { return x + y; });
@@ -1331,7 +1331,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(
             ex::transfer_just(sched, 43) | ex::let_value([=](int& x) {
                 return ex::transfer_just(sched, 42) |
@@ -1348,7 +1348,7 @@ void test_let_value()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(
             *(tt::sync_wait(ex::just(43) | ex::let_value([=](int& x) {
                 return ex::transfer_just(sched, 42) |
@@ -1369,7 +1369,7 @@ void test_let_value()
 
         try
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::transfer_just(sched, 43) | ex::then([](int x) {
                 throw std::runtime_error("error");
                 return x;
@@ -1421,7 +1421,7 @@ void test_let_error()
     // void predecessor
     {
         std::atomic<bool> called{false};
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(sched) | ex::then([]() {
             throw std::runtime_error("error");
         }) | ex::let_error([&called](std::exception_ptr& ep) {
@@ -1443,7 +1443,7 @@ void test_let_error()
 
     {
         std::atomic<bool> called{false};
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(sched) | ex::then([]() {
             throw std::runtime_error("error");
         }) | ex::let_error([=, &called](std::exception_ptr& ep) {
@@ -1465,7 +1465,7 @@ void test_let_error()
 
     {
         std::atomic<bool> called{false};
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::just() | ex::then([]() {
             throw std::runtime_error("error");
         }) | ex::let_error([=, &called](std::exception_ptr& ep) {
@@ -1487,7 +1487,7 @@ void test_let_error()
 
     // int predecessor
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result =
             hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
                 throw std::runtime_error("error");
@@ -1509,7 +1509,7 @@ void test_let_error()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result =
             hpx::get<0>(*(tt::sync_wait(ex::schedule(sched) | ex::then([]() {
                 throw std::runtime_error("error");
@@ -1531,7 +1531,7 @@ void test_let_error()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::just() | ex::then([]() {
             throw std::runtime_error("error");
             return 43;
@@ -1553,7 +1553,7 @@ void test_let_error()
 
     // predecessor doesn't throw, let sender is ignored
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 42) |
             ex::let_error([](std::exception_ptr) {
                 HPX_TEST(false);
@@ -1571,7 +1571,7 @@ void test_let_error()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(tt::sync_wait(ex::transfer_just(sched, 42) |
             ex::let_error([=](std::exception_ptr) {
                 HPX_TEST(false);
@@ -1589,7 +1589,7 @@ void test_let_error()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto result = hpx::get<0>(*(
             tt::sync_wait(ex::just(42) | ex::let_error([=](std::exception_ptr) {
                 HPX_TEST(false);
@@ -1614,7 +1614,7 @@ void test_detach()
         bool called = false;
         hpx::mutex mtx;
         hpx::condition_variable cond;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         ex::start_detached(ex::schedule(sched) | ex::then([&]() {
             std::unique_lock l{mtx};
             called = true;
@@ -1641,7 +1641,7 @@ void test_detach()
         bool called = false;
         hpx::mutex mtx;
         hpx::condition_variable cond;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         ex::start_detached(ex::schedule(sched) | ex::then([&]() {
             std::lock_guard l{mtx};
             called = true;
@@ -1670,7 +1670,7 @@ void test_keep_future_sender()
 {
     // the future should be passed to then, not it's contained value
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>()) |
             ex::then([](hpx::future<void>&& f) { HPX_TEST(f.is_ready()); }));
 #else
@@ -1681,7 +1681,7 @@ void test_keep_future_sender()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<void>().share()) |
             ex::then(
                 [](hpx::shared_future<void>&& f) { HPX_TEST(f.is_ready()); }));
@@ -1694,7 +1694,7 @@ void test_keep_future_sender()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42)) |
             ex::then([](hpx::future<int>&& f) {
                 HPX_TEST(f.is_ready());
@@ -1711,7 +1711,7 @@ void test_keep_future_sender()
     }
 
     {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::keep_future(hpx::make_ready_future<int>(42).share()) |
             ex::then([](hpx::shared_future<int>&& f) {
                 HPX_TEST(f.is_ready());
@@ -1851,7 +1851,7 @@ void test_keep_future_sender()
     // Keep future alive across on
     {
         auto f = hpx::async([&]() { return 42; });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(f)) |
             ex::transfer(ex::thread_pool_scheduler{}))));
 #else
@@ -1864,7 +1864,7 @@ void test_keep_future_sender()
 
     {
         auto sf = hpx::async([&]() { return 42; }).share();
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}))));
 #else
@@ -1885,7 +1885,7 @@ void test_keep_future_sender()
         // or storing a const&. The copy is not possible because the type is
         // noncopyable, and storing a reference is not acceptable since the
         // reference may outlive the value.
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto r = hpx::get<0>(*(tt::sync_wait(ex::keep_future(std::move(sf)) |
             ex::transfer(ex::thread_pool_scheduler{}))));
 #else
@@ -1903,7 +1903,7 @@ void test_keep_future_sender()
 
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(hpx::get<0>(*(tt::sync_wait(
                         ex::when_all(ex::keep_future(std::move(f)),
                             ex::keep_future(sf)) |
@@ -1923,7 +1923,7 @@ void test_keep_future_sender()
 
         auto fun = hpx::unwrapping(
             [](int&& x, double const& y) { return x * 2 + (int(y) / 2); });
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         HPX_TEST_EQ(
             hpx::get<0>(*(tt::sync_wait(
                 ex::when_all(
@@ -1949,7 +1949,7 @@ void test_bulk()
         std::vector<int> v(n, 0);
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(
             ex::schedule(ex::thread_pool_scheduler{}) | ex::bulk(n, [&](int i) {
                 ++v[i];
@@ -1973,7 +1973,7 @@ void test_bulk()
         std::vector<int> v(n, -1);
         hpx::thread::id parent_id = hpx::this_thread::get_id();
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         auto v_out = hpx::get<0>(*(tt::sync_wait(
             ex::transfer_just(ex::thread_pool_scheduler{}, std::move(v)) |
             ex::bulk(n, [&parent_id](int i, std::vector<int>& v) {
@@ -2003,7 +2003,7 @@ void test_bulk()
         std::vector<std::string> v_ref = v;
 
         hpx::mutex mtx;
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         tt::sync_wait(ex::schedule(ex::thread_pool_scheduler{}) |
             ex::bulk(std::move(v), [&](std::string const& s) {
                 std::lock_guard lk(mtx);
@@ -2034,7 +2034,7 @@ void test_bulk()
 
         try
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             tt::sync_wait(ex::transfer_just(ex::thread_pool_scheduler{}) |
                 ex::bulk(n, [&v, i_fail](int i) {
                     if (i == i_fail)
@@ -2093,7 +2093,7 @@ void test_completion_scheduler()
         auto sender = ex::schedule(ex::thread_pool_scheduler{});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender
@@ -2113,7 +2113,7 @@ void test_completion_scheduler()
         using hpx::functional::tag_invoke;
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender
@@ -2129,7 +2129,7 @@ void test_completion_scheduler()
         auto sender = ex::transfer_just(ex::thread_pool_scheduler{}, 42);
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender
@@ -2146,7 +2146,7 @@ void test_completion_scheduler()
             ex::bulk(ex::schedule(ex::thread_pool_scheduler{}), 10, [](int) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender
@@ -2165,7 +2165,7 @@ void test_completion_scheduler()
             [](int) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender
@@ -2184,7 +2184,7 @@ void test_completion_scheduler()
             10, [](int, int) {});
         auto completion_scheduler =
             ex::get_completion_scheduler<ex::set_value_t>(
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
                 ex::get_env(sender)
 #else
                 sender

@@ -76,7 +76,7 @@ namespace hpx { namespace mpi { namespace experimental {
         template <typename R, typename F>
         struct transform_mpi_receiver
         {
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using is_receiver = void;
 #endif
             HPX_NO_UNIQUE_ADDRESS std::decay_t<R> r;
@@ -149,7 +149,7 @@ namespace hpx { namespace mpi { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> s;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
             using is_sender = void;
 
             template <typename... Args>

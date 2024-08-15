@@ -59,7 +59,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -87,7 +87,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -117,7 +117,7 @@ int main()
             });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -147,7 +147,7 @@ int main()
             });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -172,7 +172,7 @@ int main()
         auto s1 = ex::bulk(ex::just(42), 10, [](int, int x) { return ++x; });
 
         static_assert(ex::is_sender_v<decltype(s1)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s1), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s1), ex::empty_env>);
@@ -186,7 +186,7 @@ int main()
         auto s2 = ex::bulk(std::move(s1), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
@@ -199,7 +199,7 @@ int main()
         auto s3 = ex::bulk(std::move(s2), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s3)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s3), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s3), ex::empty_env>);
@@ -212,7 +212,7 @@ int main()
         auto s4 = ex::bulk(std::move(s3), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
@@ -239,7 +239,7 @@ int main()
             ex::bulk(10, f) | ex::bulk(10, f);
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -269,7 +269,7 @@ int main()
                 false});
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -296,7 +296,7 @@ int main()
             ex::just(), 0, [](int) { throw std::runtime_error("error"); });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -321,7 +321,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -352,7 +352,7 @@ int main()
             ex::bulk(std::move(s3), 10, [](int, int) { HPX_TEST(false); });
 
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
@@ -380,7 +380,7 @@ int main()
                 true});
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);

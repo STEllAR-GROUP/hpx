@@ -85,7 +85,7 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     auto result =
         tt::sync_wait(ex::just(std::begin(c), std::end(c), std::begin(d)) |
             hpx::adjacent_difference(policy.on(exec)));
@@ -139,7 +139,7 @@ void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     auto result = tt::sync_wait(hpx::adjacent_difference(
         p.on(exec), std::begin(c), std::end(c), std::begin(d)));
 #else

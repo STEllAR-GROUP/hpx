@@ -7,7 +7,7 @@
 #pragma once
 #include <hpx/config.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 
 /* TODO: Find out what diagnostics should be disabled for stdexec to compile.
  * currently it seems to need at least "-Wgnu-zero-variadic-macro-arguments"

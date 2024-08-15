@@ -68,7 +68,7 @@ struct sender_with_completion_scheduler : void_sender
     {
     }
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
     struct my_env
     {
         scheduler_transfer const& sched;
@@ -115,7 +115,7 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -144,7 +144,7 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -174,7 +174,7 @@ int main()
                 example_scheduler{scheduler_schedule_called,
                     scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -205,7 +205,7 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -234,7 +234,7 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -267,7 +267,7 @@ int main()
             ex::transfer(example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -300,7 +300,7 @@ int main()
             scheduler_schedule_from{example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called}});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -342,7 +342,7 @@ int main()
             sender_with_completion_scheduler{std::move(source_scheduler)},
             destination_scheduler);
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -387,7 +387,7 @@ int main()
             sender_with_completion_scheduler{std::move(source_scheduler)},
             destination_scheduler);
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -420,7 +420,7 @@ int main()
             example_scheduler{scheduler_schedule_called,
                 scheduler_execute_called, tag_invoke_overload_called});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
 #else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
@@ -436,7 +436,7 @@ int main()
         ex::start(os);
         HPX_TEST(set_error_called);
         HPX_TEST(!tag_invoke_overload_called);
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         // schedule is called anyways
         HPX_TEST(scheduler_schedule_called);
 #else
