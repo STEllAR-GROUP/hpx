@@ -80,8 +80,10 @@ namespace mylib {
     };
 
 #if defined(HPX_HAVE_STDEXEC)
-    auto env4 =
-        ex::env(std::move(env3), ex::prop(receiver_env, std::string("42")));
+    // clang-format off
+    auto env4 = ex::env(
+        std::move(env3), ex::prop(receiver_env, std::string("42")));
+    // clang-format on
     using env4_t = decltype(env4);
 #else
     using env4_t = ex::make_env_t<receiver_env_t, std::string, env3_t>;
@@ -126,8 +128,10 @@ namespace mylib {
 #endif
 
 #if defined(HPX_HAVE_STDEXEC)
+    // clang-format off
     auto env5 =
         ex::env(std::move(env3), ex::prop(receiver_env1, std::string("42")));
+    // clang-format on
     using env5_t = decltype(env5);
 #else
     using env5_t = ex::make_env_t<receiver_env1_t, std::string, env3_t>;

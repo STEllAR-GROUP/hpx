@@ -255,6 +255,13 @@ namespace hpx::when_all_vector_detail {
                 friend auto tag_invoke(hpx::execution::experimental::get_env_t,
                     when_all_vector_receiver const& r)
 #if defined(HPX_HAVE_STDEXEC)
+// TODO: This part should be using the newer env/prop utilities based on P3325
+// but doing so results in an invalid memory access in the when_all_vector test.
+// It is worth noting that make_env and env behave different in the following
+// way:
+// make_env(empty_env, with<tag, val>) -> with<tag, val>
+// env(empty_env, prop<tag, val>) -> env<env<>, prop<tag, val>>
+// But it is not clear at the moment why that cause an invalid memory access.
                     noexcept
                     -> hpx::execution::experimental::make_env_t<
                         hpx::execution::experimental::env_of_t<receiver_type>,
