@@ -168,7 +168,8 @@ set(tests
     reverse_copy_sender
     rotate
     rotate_copy
-    # rotate_sender rotate_copy_sender
+    rotate_sender
+    rotate_copy_sender
     search
     search_sender
     searchn
