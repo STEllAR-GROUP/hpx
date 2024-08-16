@@ -366,7 +366,7 @@ std::cout << "send_chunks" << std::endl;
                         auto amt = 0;
                         for(std::size_t itr = 0; itr < header_numitrs; ++itr) {
                             hpx::util::openshmem_environment::put_signal(
-                                    reinterpret_cast<const std::uint8_t*>(c.data_.cpos_ + amt), dst_,
+				     reinterpret_cast<const std::uint8_t*>(const_cast<void*>(c.data_.cpos_)) + amt, dst_,
                                 hpx::util::openshmem_environment::segments[src_].beg_addr,
                                 data_seg[(itr == header_numitrs_term)],
                                 hpx::util::openshmem_environment::segments[src_].rcv
