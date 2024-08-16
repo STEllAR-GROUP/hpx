@@ -73,14 +73,10 @@ void test_for_each_explicit_sender_direct_async(
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result = tt::sync_wait(hpx::for_each(
         policy.on(exec), iterator(std::begin(c)), iterator(std::end(c)), f));
-#else
-    auto result = hpx::for_each(policy.on(exec), iterator(std::begin(c)),
-                      iterator(std::end(c)), f) |
-        tt::sync_wait();
-#endif
+
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
@@ -113,14 +109,11 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result = tt::sync_wait(
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(policy.on(exec)));
-#else
-    auto result = ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
-        hpx::for_each(policy.on(exec)) | tt::sync_wait();
-#endif
+
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values

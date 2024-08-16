@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
@@ -69,6 +70,7 @@ void test_find(ExPolicy&& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Policy, typename ExPolicy, typename IteratorTag>
 void test_find_explicit_sender_direct(Policy l, ExPolicy&& policy, IteratorTag)
 {
@@ -117,20 +119,17 @@ void test_find_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result = tt::sync_wait(
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
         hpx::find(policy.on(exec)));
-#else
-    auto result =
-        ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
-        hpx::find(policy.on(exec)) | tt::sync_wait();
-#endif
+
 
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(hpx::get<0>(*result) == iterator(test_index));
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_async(ExPolicy&& p, IteratorTag)
@@ -156,6 +155,7 @@ void test_find_async(ExPolicy&& p, IteratorTag)
     HPX_TEST(f.get() == iterator(test_index));
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Policy, typename ExPolicy, typename IteratorTag>
 void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
 {
@@ -176,19 +176,16 @@ void test_find_explicit_sender_direct_async(Policy l, ExPolicy&& p, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result = tt::sync_wait(hpx::find(
         p.on(exec), iterator(std::begin(c)), iterator(std::end(c)), int(1)));
-#else
-    auto result = hpx::find(p.on(exec), iterator(std::begin(c)),
-                      iterator(std::end(c)), int(1)) |
-        tt::sync_wait();
-#endif
+
     // create iterator at position of value to be found
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(hpx::get<0>(*result) == iterator(test_index));
 }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>

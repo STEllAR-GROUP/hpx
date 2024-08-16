@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/is_heap.hpp>
 
@@ -140,6 +141,7 @@ void test_is_heap(
     }
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -161,8 +163,8 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     std::make_heap(std::begin(c), heap_end_iter);
 
     {
-        auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
             hpx::is_heap(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
@@ -175,8 +177,8 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     {
         // edge case: empty range
 
-        auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
             hpx::is_heap(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
@@ -190,8 +192,8 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     {
         // edge case: range with only one element
 
-        auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(++std::begin(c))) |
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(++std::begin(c))) |
             hpx::is_heap(ex_policy.on(exec)));
 
         bool result = hpx::get<0>(*snd_result);
@@ -265,8 +267,8 @@ void test_is_heap_until_sender(
         HPX_TEST(result.base() == ++std::begin(c));
         HPX_TEST(result.base() == solution);
     }
-
 }
+#endif
 
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_is_heap_with_pred(

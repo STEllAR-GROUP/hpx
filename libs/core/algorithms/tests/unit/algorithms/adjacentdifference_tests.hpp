@@ -8,6 +8,7 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -68,6 +69,7 @@ void test_adjacent_difference_direct(Policy l, ExPolicy policy)
     HPX_TEST(std::end(d) == it);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Policy, typename ExPolicy>
 void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
 {
@@ -117,6 +119,7 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
         [](auto lhs, auto rhs) { return lhs == rhs; }));
     HPX_TEST(++std::begin(d) == hpx::get<0>(*result));
 }
+#endif
 
 template <typename ExPolicy>
 void test_adjacent_difference_async(ExPolicy&& p)
@@ -155,14 +158,10 @@ void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-#ifdef HPX_HAVE_STDEXEC
+
     auto result = tt::sync_wait(hpx::adjacent_difference(
         p.on(exec), std::begin(c), std::end(c), std::begin(d)));
-#else
-    auto result = hpx::adjacent_difference(
-                      p.on(exec), std::begin(c), std::end(c), std::begin(d)) |
-        tt::sync_wait();
-#endif
+
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),

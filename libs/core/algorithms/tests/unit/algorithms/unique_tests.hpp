@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/unique.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -503,6 +504,7 @@ void test_unique_bad_alloc()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -571,3 +573,4 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         HPX_TEST(equality);
     }
 }
+#endif

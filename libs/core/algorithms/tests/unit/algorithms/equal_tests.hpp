@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/equal.hpp>
 
@@ -102,6 +103,7 @@ void test_equal1(ExPolicy&& policy, IteratorTag)
     }
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -169,6 +171,7 @@ void test_equal1_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         HPX_TEST(result);
     }
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_equal1_async(ExPolicy&& p, IteratorTag)
@@ -291,6 +294,7 @@ void test_equal2(ExPolicy&& policy, IteratorTag)
     }
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -359,6 +363,7 @@ void test_equal2_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         HPX_TEST(result);
     }
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_equal2_async(ExPolicy&& p, IteratorTag)

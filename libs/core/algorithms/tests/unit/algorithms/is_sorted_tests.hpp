@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -421,6 +422,7 @@ void test_sorted_bad_alloc_seq(IteratorTag)
     HPX_TEST(caught_bad_alloc);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_is_sorted_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -473,3 +475,4 @@ void test_is_sorted_sender(
         HPX_TEST(is_ordered);
     }
 }
+#endif

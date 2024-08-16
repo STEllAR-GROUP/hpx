@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
 #include <hpx/parallel/container_algorithms/all_any_none.hpp>
@@ -67,6 +68,7 @@ void test_all_of(ExPolicy&& policy, IteratorTag)
     }
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_all_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -101,6 +103,7 @@ void test_all_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         HPX_TEST_EQ(result, expected);
     }
 }
+#endif
 
 template <typename IteratorTag, typename Proj = hpx::identity>
 void test_all_of_ranges_seq(IteratorTag, Proj proj = Proj())

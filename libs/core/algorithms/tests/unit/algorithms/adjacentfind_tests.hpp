@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -52,6 +53,7 @@ void test_adjacent_find(ExPolicy policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -93,6 +95,7 @@ void test_adjacent_find_sender(
 
     HPX_TEST(iterator(std::begin(c)) == hpx::get<0>(*snd_result));
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_adjacent_find_async(ExPolicy p, IteratorTag)

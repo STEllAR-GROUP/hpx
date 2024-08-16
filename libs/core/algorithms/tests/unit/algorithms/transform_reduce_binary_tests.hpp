@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -84,6 +85,7 @@ void test_transform_reduce_binary_async(ExPolicy&& p, IteratorTag)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_transform_reduce_binary_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -132,3 +134,4 @@ void test_transform_reduce_binary_sender(
                 std::begin(c), std::begin(c), std::begin(d), init));
     }
 }
+#endif

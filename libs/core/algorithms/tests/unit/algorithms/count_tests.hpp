@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
 
@@ -70,6 +71,7 @@ void test_count(ExPolicy&& policy, IteratorTag)
     HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -102,6 +104,7 @@ void test_count_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     HPX_TEST_EQ(num_items, static_cast<std::int64_t>(find_count));
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_count_async(ExPolicy&& p, IteratorTag)

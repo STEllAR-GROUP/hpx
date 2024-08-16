@@ -18,66 +18,44 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_sender
     adjacentfind
     adjacentfind_binary
-    adjacentfind_sender
     all_of
-    all_of_sender
     any_of
-    any_of_sender
     copy
-    copy_sender
     copyif_random
     copyif_forward
     copyif_exception
     copyif_bad_alloc
     copyn
-    copyn_sender
     count
-    count_sender
     countif
-    countif_sender
     destroy
-    destroy_sender
     destroyn
-    destroyn_sender
     distance
     ends_with
-    ends_with_sender
     equal
     equal_binary
-    equal_sender
-    equal_binary_sender
     exclusive_scan
     exclusive_scan2
     exclusive_scan_exception
     exclusive_scan_bad_alloc
     exclusive_scan_validate
     fill
-    fill_sender
     filln
-    filln_sender
     find
-    find_sender
     findend
-    findend_sender
     findfirstof
     findfirstof_binary
-    findfirstof_sender
     findif
-    findif_sender
     findifnot
-    findifnot_sender
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_sender
     foreach_scheduler
     foreachn
     foreachn_exception
     foreachn_bad_alloc
-    foreachn_sender
     for_loop
     for_loop_exception
     for_loop_induction
@@ -88,78 +66,50 @@ set(tests
     for_loop_reduction_async
     for_loop_strided
     generate
-    generate_sender
     generaten
-    generaten_sender
     is_heap
-    is_heap_sender
     is_heap_until
-    is_heap_until_sender
     includes
-    includes_sender
     inclusive_scan
     inclusive_scan_exception
     inplace_merge
     is_partitioned
-    is_partitioned_sender
     is_sorted
-    is_sorted_sender
     is_sorted_until
-    is_sorted_until_sender
     lexicographical_compare
-    lexicographical_compare_sender
     make_heap
     max_element
-    max_element_sender
     merge
     min_element
-    min_element_sender
     minmax_element
-    minmax_element_sender
     mismatch
     mismatch_binary
-    mismatch_sender
-    mismatch_binary_sender
     move
-    move_sender
     nth_element
     none_of
-    none_of_sender
     parallel_sort
     partial_sort
     partial_sort_copy
     partition
     partition_copy
     reduce_
-    reduce_sender
     reduce_by_key
     remove
-    remove_sender
     remove1
     remove2
     remove_if
-    remove_if_sender
     remove_if1
     remove_copy
     remove_copy_if
     replace
-    replace_sender
     replace_if
-    replace_if_sender
     replace_copy
-    replace_copy_sender
     replace_copy_if
-    replace_copy_if_sender
     reverse
     reverse_copy
-    reverse_sender
-    reverse_copy_sender
     rotate
     rotate_copy
-    rotate_sender
-    rotate_copy_sender
     search
-    search_sender
     searchn
     set_difference
     set_intersection
@@ -174,23 +124,16 @@ set(tests
     stable_sort
     stable_sort_exceptions
     starts_with
-    starts_with_sender
     swapranges
-    swapranges_sender
     transform
-    transform_sender
     transform_binary
-    transform_binary_sender
     transform_binary2
-    transform_binary2_sender
     transform_exclusive_scan
     transform_inclusive_scan
     transform_reduce
     transform_reduce_binary
     transform_reduce_binary_exception
     transform_reduce_binary_bad_alloc
-    transform_reduce_sender
-    transform_reduce_binary_sender
     uninitialized_copy
     uninitialized_copyn
     uninitialized_default_construct
@@ -205,12 +148,75 @@ set(tests
     uninitialized_value_construct
     uninitialized_value_constructn
     unique
-    unique_sender
     unique_copy
 )
 
 if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} foreach_std_policies)
+endif()
+
+if(HPX_WITH_STDEXEC)
+  set(tests
+      ${tests}
+      adjacentdifference_sender
+      adjacentfind_sender
+      all_of_sender
+      any_of_sender
+      copy_sender
+      copyn_sender
+      count_sender
+      countif_sender
+      destroy_sender
+      destroyn_sender
+      ends_with_sender
+      equal_sender
+      equal_binary_sender
+      fill_sender
+      filln_sender
+      find_sender
+      findend_sender
+      findfirstof_sender
+      findif_sender
+      findifnot_sender
+      foreach_sender
+      foreachn_sender
+      generate_sender
+      generaten_sender
+      is_heap_sender
+      is_heap_until_sender
+      includes_sender
+      is_partitioned_sender
+      is_sorted_sender
+      is_sorted_until_sender
+      lexicographical_compare_sender
+      max_element_sender
+      min_element_sender
+      minmax_element_sender
+      mismatch_sender
+      mismatch_binary_sender
+      move_sender
+      none_of_sender
+      reduce_sender
+      remove_sender
+      remove_if_sender
+      replace_sender
+      replace_if_sender
+      replace_copy_sender
+      replace_copy_if_sender
+      reverse_sender
+      reverse_copy_sender
+      rotate_sender
+      rotate_copy_sender
+      search_sender
+      starts_with_sender
+      swapranges_sender
+      transform_sender
+      transform_binary_sender
+      transform_binary2_sender
+      transform_reduce_sender
+      transform_reduce_binary_sender
+      unique_sender
+  )
 endif()
 
 foreach(test ${tests})

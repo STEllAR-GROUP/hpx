@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/memory.hpp>
 #include <hpx/modules/testing.hpp>
@@ -96,6 +97,7 @@ void test_destroy(ExPolicy&& policy, IteratorTag)
     std::free(p);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_destroy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 {
@@ -128,6 +130,7 @@ void test_destroy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     std::free(p);
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_destroy_async(ExPolicy&& policy, IteratorTag)

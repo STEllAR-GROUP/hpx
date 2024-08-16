@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
@@ -371,6 +372,7 @@ void test_for_each_n(ExPolicy policy, IteratorTag)
     HPX_TEST_EQ(count, c.size());
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_for_each_n_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -407,6 +409,7 @@ void test_for_each_n_sender(
     });
     HPX_TEST_EQ(count, c.size());
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_for_each_n_async(ExPolicy p, IteratorTag)

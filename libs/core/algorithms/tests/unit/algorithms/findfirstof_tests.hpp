@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 
@@ -73,6 +74,7 @@ void test_find_first_of(ExPolicy&& policy, IteratorTag)
     HPX_TEST(index == iterator(test_index));
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
 void test_find_first_of_sender(
     LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
@@ -108,6 +110,7 @@ void test_find_first_of_sender(
 
     HPX_TEST(index == iterator(test_index));
 }
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_find_first_of_async(ExPolicy&& p, IteratorTag)
