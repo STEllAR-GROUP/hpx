@@ -74,6 +74,13 @@ namespace mylib {
     struct stop_token
     {
 #if defined(HPX_HAVE_STDEXEC)
+        // TODO: Find out the correct type for this alias.
+        // Based on:
+        // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/
+        // p2300r10.html#design-cancellation-summary
+        template<typename T>
+        using callback_type = void;
+
         bool stop_requested() const noexcept
         {
             return false;
