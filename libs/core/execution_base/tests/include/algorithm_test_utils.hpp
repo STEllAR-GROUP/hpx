@@ -528,7 +528,6 @@ struct custom_sender
     std::atomic<bool>& connect_called;
     std::atomic<bool>& tag_invoke_overload_called;
 
-#if defined(HPX_HAVE_STDEXEC)
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -536,7 +535,8 @@ struct custom_sender
         -> hpx::execution::experimental::completion_signatures<
             hpx::execution::experimental::set_value_t(),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
-#else
+
+#if !defined(HPX_HAVE_STDEXEC)
     template <template <class...> class Tuple,
         template <class...> class Variant>
     using value_types = Variant<Tuple<>>;
@@ -577,7 +577,7 @@ struct custom_sender_multi_tuple
     std::atomic<bool>& tag_invoke_overload_called;
 
     bool expect_set_value = true;
-#if defined(HPX_HAVE_STDEXEC)
+
     template <typename Env>
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
@@ -586,7 +586,8 @@ struct custom_sender_multi_tuple
             hpx::execution::experimental::set_value_t(int),
             hpx::execution::experimental::set_value_t(std::string),
             hpx::execution::experimental::set_error_t(std::exception_ptr)>;
-#else
+
+#if !defined(HPX_HAVE_STDEXEC)
     template <template <class...> class Tuple,
         template <class...> class Variant>
     using value_types = Variant<Tuple<>>;
