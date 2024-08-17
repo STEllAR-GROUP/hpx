@@ -452,50 +452,6 @@ void test_merge_bad_alloc_async(ExPolicy&& policy, IteratorTag)
     HPX_TEST(returned_from_algorithm);
 }
 
-template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
-void test_merge_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
-{
-    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
-        "hpx::is_async_execution_policy_v<ExPolicy>");
-
-    using base_iterator = std::vector<std::size_t>::iterator;
-    using iterator = test::test_iterator<base_iterator, IteratorTag>;
-
-    namespace ex = hpx::execution::experimental;
-    namespace tt = hpx::this_thread::experimental;
-    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
-
-    int rand_base = _gen();
-    std::less<std::size_t> comp{};
-
-    std::size_t const size1 = 300007, size2 = 123456;
-    std::vector<std::size_t> src1(size1), src2(size2), dest_res(size1 + size2),
-        dest_sol(size1 + size2);
-
-    std::generate(std::begin(src1), std::end(src1), random_fill(rand_base, 6));
-    std::generate(std::begin(src2), std::end(src2), random_fill(rand_base, 8));
-    std::sort(std::begin(src1), std::end(src1), comp);
-    std::sort(std::begin(src2), std::end(src2), comp);
-
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
-    auto snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(src1)), iterator(std::end(src1)),
-            iterator(std::begin(src2)), iterator(std::end(src2)),
-            iterator(std::begin(dest_res)), comp) |
-        hpx::merge(ex_policy.on(exec)));
-
-    auto result = hpx::get<0>(*snd_result);
-
-    auto solution = std::merge(std::begin(src1), std::end(src1),
-        std::begin(src2), std::end(src2), std::begin(dest_sol), comp);
-
-    bool equality = test::equal(
-        std::begin(dest_res), result.base(), std::begin(dest_sol), solution);
-
-    HPX_TEST(equality);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag, typename DataType>
 void test_merge_etc(IteratorTag, DataType, int rand_base)

@@ -32,7 +32,6 @@ set(tests
     copyif_forward
     copyif_exception
     copyif_bad_alloc
-    # copyif_sender
     copyn
     copyn_sender
     count
@@ -84,14 +83,10 @@ set(tests
     for_loop_induction
     for_loop_induction_async
     for_loop_n
-    # for_loop_n_sender
     for_loop_n_strided
-    # for_loop_n_strided_sender
     for_loop_reduction
     for_loop_reduction_async
-    # for_loop_sender
     for_loop_strided
-    # for_loop_strided_sender
     generate
     generate_sender
     generaten
@@ -105,7 +100,6 @@ set(tests
     inclusive_scan
     inclusive_scan_exception
     inplace_merge
-    # inplace_merge_sender
     is_partitioned
     is_partitioned_sender
     is_sorted
@@ -115,11 +109,9 @@ set(tests
     lexicographical_compare
     lexicographical_compare_sender
     make_heap
-    # make_heap_sender
     max_element
     max_element_sender
     merge
-    # merge_sender
     min_element
     min_element_sender
     minmax_element
@@ -131,16 +123,12 @@ set(tests
     move
     move_sender
     nth_element
-    # nth_element_sender
     none_of
     none_of_sender
     parallel_sort
     partial_sort
-    # partial_sort_sender
     partial_sort_copy
-    # partial_sort_copy_sender
     partition
-    # partition_sender
     partition_copy
     reduce_
     reduce_sender
@@ -173,29 +161,18 @@ set(tests
     search
     search_sender
     searchn
-    # searchn_sender
     set_difference
-    # set_difference_sender
     set_intersection
-    # set_intersection_sender
     set_symmetric_difference
-    # set_symmetric_difference_sender
     set_union
-    # set_union_sender
     shift_left
-    # shift_left_sender
     shift_right
-    # shift_right_sender
     sort
-    # sort_sender
     sort_by_key
-    # sort_by_key_sender
     sort_exceptions
     stable_partition
-    # stable_partition_sender
     stable_sort
     stable_sort_exceptions
-    # stable_sort_sender
     starts_with
     starts_with_sender
     swapranges

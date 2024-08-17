@@ -709,37 +709,3 @@ void test_stable_sort1_async_str(ExPolicy&& policy, Compare comp = Compare())
     bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
     HPX_TEST(is_sorted);
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-template <typename LnPolicy, typename ExPolicy>
-void test_stable_sort_sender(LnPolicy ln_policy, ExPolicy&& ex_policy)
-{
-    using T = std::size_t;
-    using Compare = std::less<T>;
-
-    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
-        "hpx::is_async_execution_policy_v<ExPolicy>");
-    msg(typeid(ExPolicy).name(), typeid(T).name(), typeid(Compare).name(), sync,
-        random);
-
-    namespace ex = hpx::execution::experimental;
-    namespace tt = hpx::this_thread::experimental;
-    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
-
-    Compare comp{};
-    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
-    // Fill vector with random values
-    std::vector<T> c(HPX_SORT_TEST_SIZE);
-    rnd_fill<T>(c, (std::numeric_limits<T>::min)(),
-        (std::numeric_limits<T>::max)(), T(std::rand()));
-
-    std::uint64_t t = hpx::chrono::high_resolution_clock::now();
-    tt::sync_wait(ex::just(c.begin(), c.end(), comp) |
-        hpx::stable_sort(ex_policy.on(exec)));
-    std::uint64_t elapsed = hpx::chrono::high_resolution_clock::now() - t;
-
-    bool is_sorted = (verify_(c, comp, elapsed, true) != 0);
-    HPX_TEST(is_sorted);
-}
