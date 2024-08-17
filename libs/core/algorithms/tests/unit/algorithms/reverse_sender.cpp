@@ -117,7 +117,6 @@ void test_reverse_async_direct(Policy l, ExPolicy&& p, IteratorTag)
     tt::sync_wait(hpx::reverse(
         p.on(exec), iterator(std::begin(c)), iterator(std::end(c))));
 
-
     std::reverse(std::begin(d1), std::end(d1));
 
     std::size_t count = 0;

@@ -213,10 +213,9 @@ namespace hpx::parallel {
 
                 auto end_first = std::next(first1, dist2);
 
-                return detail::equal_binary{}.call(hpx::execution::seq,
-                    first1, end_first, first2,
-                        last2, HPX_FORWARD(Pred, pred),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                return detail::equal_binary{}.call(hpx::execution::seq, first1,
+                    end_first, first2, last2, HPX_FORWARD(Pred, pred),
+                    HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
             }
 
             template <typename ExPolicy, typename FwdIter1, typename Sent1,
@@ -239,10 +238,11 @@ namespace hpx::parallel {
                         // make sure that the two ranges passed to equal_binary
                         // have different length to get `false` as return value
                         dist2 = 0;
-                    } else
+                    }
+                    else
                     {
                         return util::detail::algorithm_result<ExPolicy,
-                        bool>::get(false);
+                            bool>::get(false);
                     }
                 }
 
@@ -250,8 +250,8 @@ namespace hpx::parallel {
 
                 return detail::equal_binary{}.call(
                     HPX_FORWARD(ExPolicy, policy), first1, end_first, first2,
-                        last2, HPX_FORWARD(Pred, pred),
-                        HPX_FORWARD(Proj1, proj1), HPX_FORWARD(Proj2, proj2));
+                    last2, HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj1, proj1),
+                    HPX_FORWARD(Proj2, proj2));
             }
         };
         /// \endcond

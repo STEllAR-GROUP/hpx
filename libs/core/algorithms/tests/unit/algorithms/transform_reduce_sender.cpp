@@ -54,10 +54,10 @@ void test_transform_reduce_sender(
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     {
-        auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                             init, reduce_op, convert_op) |
-               hpx::transform_reduce(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)), init,
+                reduce_op, convert_op) |
+            hpx::transform_reduce(ex_policy.on(exec)));
 
         result_type r1 = hpx::get<0>(*snd_result);
 
@@ -71,14 +71,13 @@ void test_transform_reduce_sender(
         HPX_TEST_EQ(get<1>(r1), get<1>(r2));
     }
 
-
     {
         // edge case: empty range
 
-        auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
-                             init, reduce_op, convert_op) |
-               hpx::transform_reduce(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)), init,
+                reduce_op, convert_op) |
+            hpx::transform_reduce(ex_policy.on(exec)));
 
         result_type r1 = hpx::get<0>(*snd_result);
 

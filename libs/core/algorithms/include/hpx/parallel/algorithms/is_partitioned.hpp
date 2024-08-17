@@ -178,9 +178,8 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first, Sent last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;

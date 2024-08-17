@@ -470,9 +470,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename T_, typename Reduce, typename Convert>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first, Sent last, T_&& init, Reduce&& r,
-                Convert&& conv)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, T_&& init, Reduce&& r, Convert&& conv)
             {
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -533,9 +532,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Iter2, typename T_, typename Op1, typename Op2>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first1, Sent last1, Iter2 first2,
-                T_&& init, Op1&& op1, Op2&& op2)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first1,
+                Sent last1, Iter2 first2, T_&& init, Op1&& op1, Op2&& op2)
             {
                 using result = util::detail::algorithm_result<ExPolicy, T>;
                 using zip_iterator = hpx::util::zip_iterator<Iter, Iter2>;
@@ -552,7 +550,6 @@ namespace hpx::parallel {
                         return result::get(HPX_MOVE(init_));
                     }
                 }
-
 
                 difference_type count = detail::distance(first1, last1);
 
@@ -583,8 +580,8 @@ namespace hpx::parallel {
                         T ret = HPX_MOVE(init);
                         for (auto&& result : results)
                         {
-                            ret = HPX_INVOKE(op1, HPX_MOVE(ret),
-                                hpx::unwrap(result));
+                            ret = HPX_INVOKE(
+                                op1, HPX_MOVE(ret), hpx::unwrap(result));
                         }
                         return ret;
                     });
@@ -619,9 +616,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, T init, Reduce red_op, Convert conv_op)
+        friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, T init,
+            Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
@@ -668,9 +665,9 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init)
+        friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
+            ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            T init)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");
@@ -727,10 +724,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(transform_reduce_t, ExPolicy&& policy,
-            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, T init,
-            Reduce red_op, Convert conv_op)
+        friend decltype(auto) tag_fallback_invoke(transform_reduce_t,
+            ExPolicy&& policy, FwdIter1 first1, FwdIter1 last1, FwdIter2 first2,
+            T init, Reduce red_op, Convert conv_op)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");

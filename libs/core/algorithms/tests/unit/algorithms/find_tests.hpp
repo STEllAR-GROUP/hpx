@@ -124,7 +124,6 @@ void test_find_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), int(1)) |
         hpx::find(policy.on(exec)));
 
-
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(hpx::get<0>(*result) == iterator(test_index));

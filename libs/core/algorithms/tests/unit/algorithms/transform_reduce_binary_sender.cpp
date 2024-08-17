@@ -4,7 +4,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <hpx/init.hpp>
 
 #include <iostream>
@@ -14,15 +13,17 @@
 
 #include "transform_reduce_binary_tests.hpp"
 
-
 template <typename IteratorTag>
 void transform_reduce_binary_sender_test()
 {
     using namespace hpx::execution;
-    test_transform_reduce_binary_sender(hpx::launch::sync, seq(task), IteratorTag());
-    test_transform_reduce_binary_sender(hpx::launch::sync, unseq(task), IteratorTag());
+    test_transform_reduce_binary_sender(
+        hpx::launch::sync, seq(task), IteratorTag());
+    test_transform_reduce_binary_sender(
+        hpx::launch::sync, unseq(task), IteratorTag());
 
-    test_transform_reduce_binary_sender(hpx::launch::async, par(task), IteratorTag());
+    test_transform_reduce_binary_sender(
+        hpx::launch::async, par(task), IteratorTag());
     test_transform_reduce_binary_sender(
         hpx::launch::async, par_unseq(task), IteratorTag());
 }

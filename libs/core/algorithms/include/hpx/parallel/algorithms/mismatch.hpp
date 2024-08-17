@@ -593,9 +593,9 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static decltype(auto)
-            parallel(ExPolicy&& orgpolicy, Iter1 first1, Sent1 last1,
-                Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& orgpolicy, Iter1 first1,
+                Sent1 last1, Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
+                Proj2&& proj2)
             {
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -605,8 +605,8 @@ namespace hpx::parallel {
                     if (first1 == last1 || first2 == last2)
                     {
                         return util::detail::algorithm_result<ExPolicy,
-                            util::in_in_result<Iter1, Iter2>>::
-                            get(util::in_in_result<Iter1, Iter2>{first1, first2});
+                            util::in_in_result<Iter1, Iter2>>::get(util::
+                                in_in_result<Iter1, Iter2>{first1, first2});
                     }
                 }
 
@@ -622,8 +622,7 @@ namespace hpx::parallel {
 
                 using policy_type = std::decay_t<decltype(policy)>;
 
-                hpx::parallel::util::cancellation_token<std::size_t> tok(
-                    count);
+                hpx::parallel::util::cancellation_token<std::size_t> tok(count);
 
                 auto f1 = [tok, f = HPX_FORWARD(F, f),
                               proj1 = HPX_FORWARD(Proj1, proj1),
@@ -679,9 +678,10 @@ namespace hpx::parallel {
         decltype(auto) get_pair(InInSender&& in_in_sender) noexcept
         {
             return hpx::execution::experimental::then(
-             HPX_FORWARD(InInSender, in_in_sender), [](auto&& in_in_result) {
-                 return get_pair(HPX_FORWARD(decltype(in_in_result), in_in_result));
-             });
+                HPX_FORWARD(InInSender, in_in_sender), [](auto&& in_in_result) {
+                    return get_pair(
+                        HPX_FORWARD(decltype(in_in_result), in_in_result));
+                });
         }
 
         template <typename I1, typename I2>

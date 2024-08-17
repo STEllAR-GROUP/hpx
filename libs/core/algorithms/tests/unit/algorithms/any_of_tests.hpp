@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <hpx/algorithm.hpp>
 #include <hpx/config.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/identity.hpp>

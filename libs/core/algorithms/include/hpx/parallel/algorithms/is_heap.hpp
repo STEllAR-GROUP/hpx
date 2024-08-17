@@ -263,9 +263,8 @@ namespace hpx::parallel {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            decltype(auto) operator()(
-                ExPolicy&& orgpolicy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            decltype(auto) operator()(ExPolicy&& orgpolicy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 using type = typename std::iterator_traits<Iter>::value_type;
@@ -283,7 +282,8 @@ namespace hpx::parallel {
                         // underflow prevention
                         ++count;
                     }
-                } else
+                }
+                else
                 {
                     if (count <= 1)
                     {
@@ -362,9 +362,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 return is_heap_helper()(HPX_FORWARD(ExPolicy, policy), first,
                     last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
@@ -399,9 +398,8 @@ namespace hpx::parallel {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            decltype(auto) operator()(
-                ExPolicy&& orgpolicy, Iter first, Sent last, Comp comp,
-                Proj proj)
+            decltype(auto) operator()(ExPolicy&& orgpolicy, Iter first,
+                Sent last, Comp comp, Proj proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, Iter>;
                 using type = typename std::iterator_traits<Iter>::value_type;
@@ -419,11 +417,13 @@ namespace hpx::parallel {
                     {
                         count = 0;
                         second = last;
-                    } else
+                    }
+                    else
                     {
                         return result::get(HPX_MOVE(last));
                     }
-                } else
+                }
+                else
                 {
                     second = first + 1;
                     --count;
@@ -500,9 +500,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 return is_heap_until_helper()(HPX_FORWARD(ExPolicy, policy),
                     first, last, HPX_FORWARD(Comp, comp),
@@ -532,9 +531,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp comp = Comp())
+        friend decltype(auto) tag_fallback_invoke(is_heap_t, ExPolicy&& policy,
+            RandIter first, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
@@ -585,9 +583,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp comp = Comp())
+        friend decltype(auto) tag_fallback_invoke(is_heap_until_t,
+            ExPolicy&& policy, RandIter first, RandIter last,
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");

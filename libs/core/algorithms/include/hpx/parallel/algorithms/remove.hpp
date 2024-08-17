@@ -329,8 +329,7 @@ namespace hpx::parallel {
                         });
                 };
 
-                auto f2 =
-                    [flags, first, count](auto&&...) mutable -> Iter {
+                auto f2 = [flags, first, count](auto&&...) mutable -> Iter {
                     auto part_begin = zip_iterator(first, flags.get());
                     auto dest = first;
                     auto part_size = count;

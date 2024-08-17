@@ -272,9 +272,8 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static decltype(auto) parallel(
-                ExPolicy&& policy, FwdIter first, Sent last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
                 using difference_type =
                     typename std::iterator_traits<FwdIter>::difference_type;

@@ -390,9 +390,8 @@ namespace hpx::parallel {
 
         template <typename ExPolicy, typename FwdIter1, typename Sent,
             typename FwdIter2>
-        decltype(auto) rotate_copy_helper(
-            ExPolicy policy, FwdIter1 first, FwdIter1 new_first, Sent last,
-            FwdIter2 dest_first)
+        decltype(auto) rotate_copy_helper(ExPolicy policy, FwdIter1 first,
+            FwdIter1 new_first, Sent last, FwdIter2 dest_first)
         {
             constexpr bool has_scheduler_executor =
                 hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
@@ -403,31 +402,31 @@ namespace hpx::parallel {
             if constexpr (!has_scheduler_executor)
             {
                 auto p = hpx::execution::parallel_task_policy()
-                         .on(policy.executor())
-                         .with(policy.parameters());
+                             .on(policy.executor())
+                             .with(policy.parameters());
 
                 hpx::future<copy_return_type> f =
                     detail::copy<copy_return_type>().call2(
                         p, non_seq(), new_first, last, dest_first);
 
-                return f.then([p, first, new_first](hpx::future<copy_return_type>&& result)
+                return f.then([p, first, new_first](
+                                  hpx::future<copy_return_type>&& result)
                                   -> hpx::future<copy_return_type> {
                     copy_return_type p1 = result.get();
                     return detail::copy<copy_return_type>().call2(
                         p, non_seq(), first, new_first, p1.out);
                 });
-            } else
+            }
+            else
             {
                 return detail::copy<copy_return_type>().call(
-                        policy, new_first, last, dest_first)
-                | hpx::execution::experimental::let_value(
-                    [policy, first, new_first](copy_return_type& result) {
-                        return detail::copy<copy_return_type>().call(
-                        policy, first, new_first, result.out);
-                    }
-                );
+                           policy, new_first, last, dest_first) |
+                    hpx::execution::experimental::let_value(
+                        [policy, first, new_first](copy_return_type& result) {
+                            return detail::copy<copy_return_type>().call(
+                                policy, first, new_first, result.out);
+                        });
             }
-
         }
 
         template <typename IterPair>
@@ -450,9 +449,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter1, typename Sent,
                 typename FwdIter2>
-            static decltype(auto)
-            parallel(ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
-                Sent last, FwdIter2 dest_first)
+            static decltype(auto) parallel(ExPolicy&& policy, FwdIter1 first,
+                FwdIter1 new_first, Sent last, FwdIter2 dest_first)
             {
                 return util::detail::algorithm_result<ExPolicy, IterPair>::get(
                     rotate_copy_helper(HPX_FORWARD(ExPolicy, policy), first,
@@ -578,10 +576,9 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter2>
             )>
         // clang-format on
-        friend decltype(auto)
-        tag_fallback_invoke(hpx::rotate_copy_t, ExPolicy&& policy,
-            FwdIter1 first, FwdIter1 new_first, FwdIter1 last,
-            FwdIter2 dest_first)
+        friend decltype(auto) tag_fallback_invoke(hpx::rotate_copy_t,
+            ExPolicy&& policy, FwdIter1 first, FwdIter1 new_first,
+            FwdIter1 last, FwdIter2 dest_first)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");

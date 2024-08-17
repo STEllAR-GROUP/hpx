@@ -100,7 +100,6 @@ void test_rotate(Policy l, ExPolicy&& policy, IteratorTag)
                       iterator(std::end(c))) |
         hpx::rotate(policy.on(exec)));
 
-
     base_iterator mid1 = std::begin(d1);
     std::advance(mid1, mid_pos);
     std::rotate(std::begin(d1), mid1, std::end(d1));
