@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/is_heap.hpp>
 
@@ -154,6 +156,7 @@ void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<std::size_t> c(10007);
@@ -218,6 +221,7 @@ void test_is_heap_until_sender(
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<std::size_t> c(10007);

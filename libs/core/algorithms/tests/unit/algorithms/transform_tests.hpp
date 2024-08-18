@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/transform.hpp>
 
@@ -327,7 +329,6 @@ void test_transform_sender(
         tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                           std::begin(d), add_one()) |
             hpx::transform(ex_policy.on(exec)));
-
     auto result = hpx::get<0>(*snd_result);
 
     HPX_TEST(result == std::end(d));

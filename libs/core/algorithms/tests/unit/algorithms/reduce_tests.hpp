@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/reduce.hpp>
 
@@ -369,21 +371,20 @@ void test_reduce_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)), val, op) |
             hpx::reduce(ex_policy.on(exec)));
-
-        int r1 = hpx::get<0>(*snd_result);
+        int result = hpx::get<0>(*snd_result);
 
         // verify values
-        int r2 = std::accumulate(std::begin(c), std::end(c), val, op);
-        HPX_TEST_EQ(r1, r2);
+        int expected = std::accumulate(std::begin(c), std::end(c), val, op);
+        HPX_TEST_EQ(result, expected);
     }
 
     {
         auto snd_result = tt::sync_wait(ex::just(iterator(std::begin(c)),
                                             iterator(std::begin(c)), val, op) |
             hpx::reduce(ex_policy.on(exec)));
+        int result = hpx::get<0>(*snd_result);
 
-        int res = hpx::get<0>(*snd_result);
-        HPX_TEST_EQ(res, val);
+        HPX_TEST_EQ(result, val);
     }
 }
 #endif

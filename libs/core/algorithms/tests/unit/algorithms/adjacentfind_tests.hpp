@@ -1,4 +1,5 @@
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -79,21 +81,27 @@ void test_adjacent_find_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+    {
+        auto snd_result =
+           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+               hpx::adjacent_find(ex_policy.on(exec)));
+
+        iterator index = hpx::get<0>(*snd_result);
+        base_iterator test_index = std::begin(c) + random_pos;
+
+        HPX_TEST(index == iterator(test_index));
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
             hpx::adjacent_find(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    iterator index = hpx::get<0>(*snd_result);
-    base_iterator test_index = std::begin(c) + random_pos;
-
-    HPX_TEST(index == iterator(test_index));
-
-    // edge case: first == last
-    snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
-        hpx::adjacent_find(ex_policy.on(exec)));
-
-    HPX_TEST(iterator(std::begin(c)) == hpx::get<0>(*snd_result));
+        HPX_TEST(iterator(std::begin(c)) == result);
+    }
 }
 #endif
 

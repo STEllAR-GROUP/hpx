@@ -1,3 +1,4 @@
+//  Copyright (c) 2014-2020 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0

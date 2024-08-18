@@ -1,5 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
 //  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 

@@ -1,4 +1,5 @@
 //  Copyright (c) 2015 Daniel Bourgeois
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -454,7 +455,7 @@ void test_is_sorted_sender(
     }
 
     {
-        // 1st edge case: first == last
+        // edge case: empty range
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
             hpx::is_sorted(ex_policy.on(exec)));
@@ -465,7 +466,7 @@ void test_is_sorted_sender(
     }
 
     {
-        // 2nd edge case: first + 1 == last
+        // edge case: range of size 1
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(++std::begin(c))) |
             hpx::is_sorted(ex_policy.on(exec)));

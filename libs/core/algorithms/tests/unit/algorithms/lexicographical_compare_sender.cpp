@@ -1,3 +1,4 @@
+//  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -5,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -57,39 +59,39 @@ void test_lexicographical_compare_sender(
     }
 
     {
-        // edge case: first1 == end1 && first2 != end2
+        // edge case: only first range is empty
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
                 std::begin(d), std::end(d)) |
             hpx::lexicographical_compare(ex_policy.on(exec)));
+        bool result = hpx::get<0>(*snd_result);
 
-        bool res = hpx::get<0>(*snd_result);
-
-        HPX_TEST(res);
+        HPX_TEST(result);
     }
 
     {
-        // edge case: first1 != end1 && first2 == end2
+        // edge case: only second range is empty
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                 std::begin(d), std::begin(d)) |
             hpx::lexicographical_compare(ex_policy.on(exec)));
+        bool result = hpx::get<0>(*snd_result);
 
-        bool res = hpx::get<0>(*snd_result);
-
-        HPX_TEST(!res);
+        HPX_TEST(!result);
     }
 
     {
-        // edge case: first1 == end1 && first2 == end2
+        // edge case: both ranges are empty
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
                 std::begin(d), std::begin(d)) |
             hpx::lexicographical_compare(ex_policy.on(exec)));
+        bool result = hpx::get<0>(*snd_result);
 
-        bool res = hpx::get<0>(*snd_result);
-
-        HPX_TEST(!res);
+        HPX_TEST(!result);
     }
 }
 

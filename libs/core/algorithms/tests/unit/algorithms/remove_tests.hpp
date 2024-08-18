@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/remove.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -757,8 +759,8 @@ void test_remove_if_sender(
     auto snd_result = tt::sync_wait(
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
         hpx::remove_if(ex_policy.on(exec)));
-
     auto result = hpx::get<0>(*snd_result);
+
     auto solution = std::remove_if(std::begin(d), std::end(d), pred);
 
     bool equality =

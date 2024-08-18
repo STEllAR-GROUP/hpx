@@ -1,10 +1,12 @@
-//  Copyright (c) 2024 Tobias Wukovitsch
+//  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c)      2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -58,17 +60,16 @@ void test_transform_reduce_sender(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)), init,
                 reduce_op, convert_op) |
             hpx::transform_reduce(ex_policy.on(exec)));
-
-        result_type r1 = hpx::get<0>(*snd_result);
+        result_type result = hpx::get<0>(*snd_result);
 
         // verify values
-        result_type r2 = std::accumulate(std::begin(c), std::end(c), init,
+        result_type expected = std::accumulate(std::begin(c), std::end(c), init,
             [&reduce_op, &convert_op](result_type res, std::size_t val) {
                 return reduce_op(res, convert_op(val));
             });
 
-        HPX_TEST_EQ(get<0>(r1), get<0>(r2));
-        HPX_TEST_EQ(get<1>(r1), get<1>(r2));
+        HPX_TEST_EQ(get<0>(result), get<0>(expected));
+        HPX_TEST_EQ(get<1>(result), get<1>(expected));
     }
 
     {
@@ -78,18 +79,17 @@ void test_transform_reduce_sender(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c)), init,
                 reduce_op, convert_op) |
             hpx::transform_reduce(ex_policy.on(exec)));
-
-        result_type r1 = hpx::get<0>(*snd_result);
+        result_type result = hpx::get<0>(*snd_result);
 
         // verify values
-        result_type r2 = std::accumulate(std::begin(c), std::begin(c), init,
+        result_type expected = std::accumulate(std::begin(c), std::begin(c), init,
             [&reduce_op, &convert_op](result_type res, std::size_t val) {
                 return reduce_op(res, convert_op(val));
             });
 
-        HPX_TEST(r1 == init);
-        HPX_TEST_EQ(get<0>(r1), get<0>(r2));
-        HPX_TEST_EQ(get<1>(r1), get<1>(r2));
+        HPX_TEST(result == init);
+        HPX_TEST_EQ(get<0>(result), get<0>(expected));
+        HPX_TEST_EQ(get<1>(result), get<1>(expected));
     }
 }
 

@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -512,7 +513,6 @@ void test_mismatch_binary1_sender(
         auto snd_result =
             tt::sync_wait(ex::just(begin1, end1, std::begin(c2), std::end(c2)) |
                 hpx::mismatch(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
 
         // verify values
@@ -529,7 +529,6 @@ void test_mismatch_binary1_sender(
         auto snd_result =
             tt::sync_wait(ex::just(begin1, end1, std::begin(c2), std::end(c2)) |
                 hpx::mismatch(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
 
         // verify values
@@ -569,7 +568,6 @@ void test_mismatch_binary2_sender(
         auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2),
                                             std::end(c2), std::equal_to<>()) |
             hpx::mismatch(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
 
         // verify values
@@ -586,7 +584,6 @@ void test_mismatch_binary2_sender(
         auto snd_result = tt::sync_wait(ex::just(begin1, end1, std::begin(c2),
                                             std::end(c2), std::equal_to<>()) |
             hpx::mismatch(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
 
         // verify values
@@ -603,7 +600,6 @@ void test_mismatch_binary2_sender(
             ex::just(iterator(std::begin(c1)), iterator(std::begin(c1)),
                 std::begin(c2), std::end(c2), std::equal_to<>()) |
             hpx::mismatch(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
 
         // verify values

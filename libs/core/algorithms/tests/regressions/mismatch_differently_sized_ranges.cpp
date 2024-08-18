@@ -9,6 +9,7 @@
 // proceed as usual and not just return the first iterators of both ranges.
 
 #include <hpx/algorithm.hpp>
+#include <hpx/executors/execution_policy.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -27,8 +28,8 @@ void mismatch_differently_size_ranges_test()
 
     auto expected = std::mismatch(a.begin(), a.end(), b.begin(), b.end());
 
-    //HPX_TEST((a.begin() + 2) == result.first);
-    //HPX_TEST((b.begin() + 2) == result.second);
+    HPX_TEST((a.begin() + 2) == result.first);
+    HPX_TEST((b.begin() + 2) == result.second);
     HPX_TEST(result == expected);
 }
 

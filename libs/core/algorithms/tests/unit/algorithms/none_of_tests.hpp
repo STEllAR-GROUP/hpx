@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution>
 #include <hpx/algorithm.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
@@ -93,7 +95,6 @@ void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                 [](auto v) { return v != 0; }) |
             hpx::none_of(ex_policy.on(exec)));
-
         bool result = hpx::get<0>(*snd_result);
 
         // verify values

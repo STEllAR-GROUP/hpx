@@ -1,3 +1,4 @@
+//  Copyright (c) 2014 Grant Mercer
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -5,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -29,6 +31,7 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<std::size_t> c(10007);
@@ -45,7 +48,6 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                 std::begin(h), std::end(h)) |
             hpx::search(ex_policy.on(exec)));
-
         iterator index = hpx::get<0>(*snd_result);
 
         base_iterator test_index = std::begin(c) + c.size() / 2;
@@ -55,12 +57,13 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         // edge case: only second range is empty
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                 std::begin(h), std::begin(h)) |
             hpx::search(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto expected = std::search(iterator(std::begin(c)),
             iterator(std::end(c)), std::begin(h), std::begin(h));
 
@@ -70,12 +73,13 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         // edge case: both ranges are empty
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
                 std::begin(h), std::begin(h)) |
             hpx::search(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto expected = std::search(iterator(std::begin(c)),
             iterator(std::begin(c)), std::begin(h), std::begin(h));
 
@@ -85,12 +89,13 @@ void test_search_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         // edge case: second range is larger than the first range
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(h)), iterator(std::end(h)),
                 std::begin(c), std::end(c)) |
             hpx::search(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto expected = std::search(iterator(std::begin(h)),
             iterator(std::end(h)), std::begin(c), std::end(c));
 

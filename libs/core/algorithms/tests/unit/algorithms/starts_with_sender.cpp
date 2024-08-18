@@ -1,3 +1,5 @@
+//  Copyright (c) 2018 Christopher Ogle
+//  Copyright (c) 2020 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -5,6 +7,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -56,8 +59,8 @@ void test_starts_with_sender(
                               iterator(std::begin(some_more_ints)),
                               iterator(std::end(some_more_ints))) |
                 hpx::starts_with(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         HPX_TEST_EQ(result, true);
     }
 
@@ -70,8 +73,8 @@ void test_starts_with_sender(
                               iterator(std::begin(some_wrong_ints)),
                               iterator(std::end(some_wrong_ints))) |
                 hpx::starts_with(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         HPX_TEST_EQ(result, false);
     }
 }

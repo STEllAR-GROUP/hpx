@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c)      2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/unique.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -516,8 +518,8 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
-
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     const int rand_base = std::rand();
@@ -533,8 +535,8 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
             hpx::unique(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto solution = std::unique(std::begin(d), std::end(d), pred);
 
         bool equality =
@@ -545,11 +547,12 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         // edge case: empty range
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::begin(c)), pred) |
             hpx::unique(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto solution = std::unique(std::begin(d), std::begin(d), pred);
 
         bool equality =
@@ -560,11 +563,12 @@ void test_unique_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     {
         // edge case: one element
+
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(++std::begin(c)), pred) |
             hpx::unique(ex_policy.on(exec)));
-
         auto result = hpx::get<0>(*snd_result);
+
         auto solution = std::unique(std::begin(d), ++std::begin(d), pred);
 
         bool equality =

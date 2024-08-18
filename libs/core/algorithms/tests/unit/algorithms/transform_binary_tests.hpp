@@ -1,5 +1,6 @@
 //  Copyright (c) 2014-2016 Hartmut Kaiser
 //  Copyright (c) 2021 Giannis Gonidelis
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -353,8 +354,8 @@ void test_transform_binary_sender(
 
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
-
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<int> c1(10007);
@@ -369,7 +370,6 @@ void test_transform_binary_sender(
         tt::sync_wait(ex::just(iterator(std::begin(c1)), iterator(std::end(c1)),
                           std::begin(c2), std::begin(d1), add()) |
             hpx::transform(ex_policy.on(exec)));
-
     auto result = hpx::get<0>(*snd_result);
 
     HPX_TEST(result == std::end(d1));

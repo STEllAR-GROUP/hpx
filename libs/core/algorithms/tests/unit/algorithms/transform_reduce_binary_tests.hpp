@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +7,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -99,6 +100,7 @@ void test_transform_reduce_binary_sender(
     namespace ex = hpx::execution::experimental;
     namespace tt = hpx::this_thread::experimental;
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     std::vector<int> c = test::random_iota<int>(1007);
@@ -110,10 +112,9 @@ void test_transform_reduce_binary_sender(
             tt::sync_wait(ex::just(iterator(std::begin(c)),
                               iterator(std::end(c)), std::begin(d), init) |
                 hpx::transform_reduce(ex_policy.on(exec)));
+        int result = hpx::get<0>(*snd_result);
 
-        int r = hpx::get<0>(*snd_result);
-
-        HPX_TEST_EQ(r,
+        HPX_TEST_EQ(result,
             std::inner_product(
                 std::begin(c), std::end(c), std::begin(d), init));
     }
@@ -125,11 +126,10 @@ void test_transform_reduce_binary_sender(
             tt::sync_wait(ex::just(iterator(std::begin(c)),
                               iterator(std::begin(c)), std::begin(d), init) |
                 hpx::transform_reduce(ex_policy.on(exec)));
+        int result = hpx::get<0>(*snd_result);
 
-        int r = hpx::get<0>(*snd_result);
-
-        HPX_TEST_EQ(init, r);
-        HPX_TEST_EQ(r,
+        HPX_TEST_EQ(init, result);
+        HPX_TEST_EQ(result,
             std::inner_product(
                 std::begin(c), std::begin(c), std::begin(d), init));
     }

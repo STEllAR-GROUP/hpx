@@ -1,5 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
-//  copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,6 +9,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/find.hpp>
 
@@ -105,31 +107,43 @@ void test_find_end1_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                          std::begin(h), std::end(h)) |
-            hpx::find_end(ex_policy.on(exec)));
+    {
+        auto snd_result =
+           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                             std::begin(h), std::end(h)) |
+               hpx::find_end(ex_policy.on(exec)));
 
-    iterator index = hpx::get<0>(*snd_result);
+        iterator index = hpx::get<0>(*snd_result);
 
-    iterator test_index = std::find_end(iterator(std::begin(c)),
-        iterator(std::end(c)), std::begin(h), std::end(h));
+        iterator test_index = std::find_end(iterator(std::begin(c)),
+            iterator(std::end(c)), std::begin(h), std::end(h));
 
-    HPX_TEST(index == test_index);
+        HPX_TEST(index == test_index);
+    }
 
-    // 1st edge case: first2 == end2
-    snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                          std::begin(h), std::begin(h)) |
-            hpx::find_end(ex_policy.on(exec)));
-    HPX_TEST(iterator(std::end(c)) == hpx::get<0>(*snd_result));
+    {
+        // edge case: first2 == end2
 
-    // 2nd edge case: distance(first2, end2) > distance(first1, end1)
-    snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
-                          std::begin(h), std::end(h)) |
-            hpx::find_end(ex_policy.on(exec)));
-    HPX_TEST(iterator(std::begin(c)) == hpx::get<0>(*snd_result));
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                              std::begin(h), std::begin(h)) |
+                hpx::find_end(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(iterator(std::end(c)) == result);
+    }
+
+    {
+        // edge case: distance(first2, end2) > distance(first1, end1)
+
+        auto snd_result =
+            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                              std::begin(h), std::end(h)) |
+                hpx::find_end(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(iterator(std::begin(c)) == result);
+    }
 }
 #endif
 
@@ -245,7 +259,6 @@ void test_find_end2_sender(
         tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                           std::begin(h), std::end(h)) |
             hpx::find_end(ex_policy.on(exec)));
-
     iterator index = hpx::get<0>(*snd_result);
 
     iterator test_index = std::find_end(iterator(std::begin(c)),

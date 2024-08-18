@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,8 +7,9 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/identity.hpp>
@@ -83,18 +85,17 @@ void test_any_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
 
     using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
 
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
     int iseq[] = {0, 23, 10007};
     for (int i : iseq)
     {
         std::vector<int> c = test::fill_all_any_none<int>(10007, i);    //-V106
 
-        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
-
         auto snd_result = tt::sync_wait(
             ex::just(iterator(std::begin(c)), iterator(std::end(c)),
                 [](auto v) { return v != 0; }) |
             hpx::any_of(ex_policy.on(exec)));
-
         bool result = hpx::get<0>(*snd_result);
 
         // verify values

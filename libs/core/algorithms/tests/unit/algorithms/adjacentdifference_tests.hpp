@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -87,37 +88,46 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
 
-    auto result =
-        tt::sync_wait(ex::just(std::begin(c), std::end(c), std::begin(d)) |
-            hpx::adjacent_difference(policy.on(exec)));
+    {
+        auto snd_result =
+            tt::sync_wait(ex::just(std::begin(c), std::end(c), std::begin(d)) |
+                hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+        std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](auto lhs, auto rhs) { return lhs == rhs; }));
-    HPX_TEST(std::end(d) == hpx::get<0>(*result));
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+        HPX_TEST(std::end(d) == result);
+    }
 
-    // 1st edge case: first == last
-    result =
-        tt::sync_wait(ex::just(std::begin(c), std::begin(c), std::begin(d)) |
-            hpx::adjacent_difference(policy.on(exec)));
+    {
+        // edge case: empty range
+        auto snd_result =
+            tt::sync_wait(ex::just(std::begin(c), std::begin(c), std::begin(d)) |
+                hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    std::adjacent_difference(std::begin(c), std::begin(c), std::begin(d_ans));
+        std::adjacent_difference(std::begin(c), std::begin(c), std::begin(d_ans));
 
-    HPX_TEST(std::begin(d) == hpx::get<0>(*result));
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](auto lhs, auto rhs) { return lhs == rhs; }));
+        HPX_TEST(std::begin(d) == result);
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+    }
 
-    // 2nd edge case: first + 1 == last
-    result =
-        tt::sync_wait(ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
-            hpx::adjacent_difference(policy.on(exec)));
+    {
+        // edge case: range of size one
+        auto snd_result =
+            tt::sync_wait(ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
+                hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    std::adjacent_difference(std::begin(c), ++std::begin(c), std::begin(d_ans));
+        std::adjacent_difference(std::begin(c), ++std::begin(c), std::begin(d_ans));
 
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](auto lhs, auto rhs) { return lhs == rhs; }));
-    HPX_TEST(++std::begin(d) == hpx::get<0>(*result));
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+        HPX_TEST(++std::begin(d) == result);
+    }
 }
 #endif
 

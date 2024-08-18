@@ -1,3 +1,5 @@
+//  Copyright (c) 2007-2014 Hartmut Kaiser
+//  Copyright (c) 2021 Chuanqiu He
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0

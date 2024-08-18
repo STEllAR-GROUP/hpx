@@ -1,3 +1,4 @@
+//  Copyright (c) 2014-2016 Hartmut Kaiser
 //  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -5,6 +6,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 
@@ -41,42 +43,49 @@ void test_minmax_element_sender(
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
-    auto snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
-                          std::less<std::size_t>()) |
+    {
+        auto snd_result =
+           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
+                             std::less<std::size_t>()) |
+               hpx::minmax_element(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(result.min != end && result.max != end);
+
+        auto ref = std::minmax_element(
+            std::begin(c), std::end(c), std::less<std::size_t>());
+        HPX_TEST(ref.first != ref_end && ref.second != ref_end);
+
+        HPX_TEST_EQ(*ref.first, *result.min);
+        HPX_TEST_EQ(*ref.second, *result.max);
+    }
+
+    {
+        auto snd_result =
+           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+               hpx::minmax_element(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        HPX_TEST(result.min != end && result.max != end);
+
+        auto ref = std::minmax_element(std::begin(c), std::end(c));
+        HPX_TEST(ref.first != ref_end && ref.second != ref_end);
+
+        HPX_TEST_EQ(*ref.first, *result.min);
+        HPX_TEST_EQ(*ref.second, *result.max);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
             hpx::minmax_element(ex_policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    auto r = hpx::get<0>(*snd_result);
-    HPX_TEST(r.min != end && r.max != end);
-
-    auto ref = std::minmax_element(
-        std::begin(c), std::end(c), std::less<std::size_t>());
-    HPX_TEST(ref.first != ref_end && ref.second != ref_end);
-
-    HPX_TEST_EQ(*ref.first, *r.min);
-    HPX_TEST_EQ(*ref.second, *r.max);
-
-    snd_result =
-        tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
-            hpx::minmax_element(ex_policy.on(exec)));
-
-    r = hpx::get<0>(*snd_result);
-    HPX_TEST(r.min != end && r.max != end);
-
-    ref = std::minmax_element(std::begin(c), std::end(c));
-    HPX_TEST(ref.first != ref_end && ref.second != ref_end);
-
-    HPX_TEST_EQ(*ref.first, *r.min);
-    HPX_TEST_EQ(*ref.second, *r.max);
-
-    // edge case: empty range
-    snd_result = tt::sync_wait(
-        ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
-        hpx::minmax_element(ex_policy.on(exec)));
-
-    r = hpx::get<0>(*snd_result);
-    HPX_TEST(
-        r.min == iterator(std::begin(c)) && r.max == iterator(std::begin(c)));
+        HPX_TEST(
+            result.min == iterator(std::begin(c)) && result.max == iterator(std::begin(c)));
+    }
 }
 
 template <typename IteratorTag>
