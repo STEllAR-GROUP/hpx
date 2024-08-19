@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/algorithm.hpp>
 #include <hpx/config.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/numeric.hpp>
@@ -103,12 +103,13 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
 
     {
         // edge case: empty range
-        auto snd_result =
-            tt::sync_wait(ex::just(std::begin(c), std::begin(c), std::begin(d)) |
-                hpx::adjacent_difference(policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(std::begin(c), std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
-        std::adjacent_difference(std::begin(c), std::begin(c), std::begin(d_ans));
+        std::adjacent_difference(
+            std::begin(c), std::begin(c), std::begin(d_ans));
 
         HPX_TEST(std::begin(d) == result);
         HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
@@ -117,12 +118,13 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
 
     {
         // edge case: range of size one
-        auto snd_result =
-            tt::sync_wait(ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
-                hpx::adjacent_difference(policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
-        std::adjacent_difference(std::begin(c), ++std::begin(c), std::begin(d_ans));
+        std::adjacent_difference(
+            std::begin(c), ++std::begin(c), std::begin(d_ans));
 
         HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
             [](auto lhs, auto rhs) { return lhs == rhs; }));

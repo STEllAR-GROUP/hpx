@@ -108,10 +108,10 @@ void test_find_end1_sender(
     auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
 
     {
-        auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                             std::begin(h), std::end(h)) |
-               hpx::find_end(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(h), std::end(h)) |
+            hpx::find_end(ex_policy.on(exec)));
 
         iterator index = hpx::get<0>(*snd_result);
 
@@ -124,10 +124,10 @@ void test_find_end1_sender(
     {
         // edge case: first2 == end2
 
-        auto snd_result =
-            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
-                              std::begin(h), std::begin(h)) |
-                hpx::find_end(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                std::begin(h), std::begin(h)) |
+            hpx::find_end(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
         HPX_TEST(iterator(std::end(c)) == result);
@@ -136,10 +136,10 @@ void test_find_end1_sender(
     {
         // edge case: distance(first2, end2) > distance(first1, end1)
 
-        auto snd_result =
-            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
-                              std::begin(h), std::end(h)) |
-                hpx::find_end(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c)),
+                std::begin(h), std::end(h)) |
+            hpx::find_end(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
         HPX_TEST(iterator(std::begin(c)) == result);

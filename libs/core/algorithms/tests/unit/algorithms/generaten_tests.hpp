@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <hpx/algorithm.hpp>
 #include <hpx/config.hpp>
+#include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>

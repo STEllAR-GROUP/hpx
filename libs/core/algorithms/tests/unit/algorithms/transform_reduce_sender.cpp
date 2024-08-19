@@ -82,8 +82,8 @@ void test_transform_reduce_sender(
         result_type result = hpx::get<0>(*snd_result);
 
         // verify values
-        result_type expected = std::accumulate(std::begin(c), std::begin(c), init,
-            [&reduce_op, &convert_op](result_type res, std::size_t val) {
+        result_type expected = std::accumulate(std::begin(c), std::begin(c),
+            init, [&reduce_op, &convert_op](result_type res, std::size_t val) {
                 return reduce_op(res, convert_op(val));
             });
 

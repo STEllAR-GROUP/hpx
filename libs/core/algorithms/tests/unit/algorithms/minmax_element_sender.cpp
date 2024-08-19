@@ -45,9 +45,9 @@ void test_minmax_element_sender(
 
     {
         auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
-                             std::less<std::size_t>()) |
-               hpx::minmax_element(ex_policy.on(exec)));
+            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
+                              std::less<std::size_t>()) |
+                hpx::minmax_element(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
         HPX_TEST(result.min != end && result.max != end);
@@ -61,9 +61,9 @@ void test_minmax_element_sender(
     }
 
     {
-        auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
-               hpx::minmax_element(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::minmax_element(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
         HPX_TEST(result.min != end && result.max != end);
@@ -83,8 +83,8 @@ void test_minmax_element_sender(
             hpx::minmax_element(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
-        HPX_TEST(
-            result.min == iterator(std::begin(c)) && result.max == iterator(std::begin(c)));
+        HPX_TEST(result.min == iterator(std::begin(c)) &&
+            result.max == iterator(std::begin(c)));
     }
 }
 

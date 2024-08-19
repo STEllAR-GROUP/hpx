@@ -135,7 +135,7 @@ void test_for_each_execute_on_sender(Policy l, ExPolicy&& policy, IteratorTag)
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(
             ex::execute_on(scheduler_t(l), std::forward<ExPolicy>(policy))));
-    auto result = hpx::get<0>(*result);
+    auto result = hpx::get<0>(*snd_result);
 
     HPX_TEST(result == iterator(std::end(c)));
 

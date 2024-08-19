@@ -8,8 +8,8 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/execution>
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/identity.hpp>

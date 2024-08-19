@@ -43,23 +43,23 @@ void test_max_element_sender(
 
     {
         auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
-                             std::less<std::size_t>()) |
-               hpx::max_element(ex_policy.on(exec)));
+            tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(end),
+                              std::less<std::size_t>()) |
+                hpx::max_element(ex_policy.on(exec)));
         iterator result = hpx::get<0>(*snd_result);
 
         HPX_TEST(result != end);
 
-        base_iterator ref =
-            std::max_element(std::begin(c), std::end(c), std::less<std::size_t>());
+        base_iterator ref = std::max_element(
+            std::begin(c), std::end(c), std::less<std::size_t>());
         HPX_TEST(ref != ref_end);
         HPX_TEST_EQ(*ref, *result);
     }
 
     {
-        auto snd_result =
-           tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
-               hpx::max_element(ex_policy.on(exec)));
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::max_element(ex_policy.on(exec)));
         auto result = hpx::get<0>(*snd_result);
 
         HPX_TEST(result != end);
