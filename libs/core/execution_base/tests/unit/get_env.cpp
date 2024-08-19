@@ -31,7 +31,11 @@ namespace mylib {
     {
         using is_receiver = void;
 
+#ifdef HPX_HAVE_STDEXEC
+        decltype(auto) get_env() const noexcept
+#else
         friend some_env tag_invoke(ex::get_env_t, receiver_2 const&) noexcept
+#endif
         {
             return some_env{};
         }
@@ -42,11 +46,9 @@ namespace mylib {
     {
         // clang-format off
         template <typename Env>
-            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
-                receiver_env_t, Env>
-        auto operator()(Env const& e) const
+        decltype(auto) operator()(Env const& e) const noexcept
         {
-            return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
+            return e.query(*this);
         }
         // clang-format on
     } receiver_env{};
@@ -68,15 +70,19 @@ namespace mylib {
     {
         using is_receiver = void;
 
+#if defined(HPX_HAVE_STDEXEC)
+        decltype(auto) get_env() const noexcept
+        {
+            auto f = ex::prop(receiver_env, 42);
+            return f;
+        }
+#else
         friend constexpr auto tag_invoke(
             ex::get_env_t, receiver_3 const&) noexcept
         {
-#if defined(HPX_HAVE_STDEXEC)
-            return ex::prop(receiver_env, 42);
-#else
             return ex::make_env<receiver_env_t>(42);
-#endif
         }
+#endif
     };
 
 #if defined(HPX_HAVE_STDEXEC)
@@ -93,32 +99,44 @@ namespace mylib {
     {
         using is_receiver = void;
 
+#if defined(HPX_HAVE_STDEXEC)
+        decltype(auto) get_env() const noexcept
+        {
+            receiver_3 rcv;
+
+            /* Due to https://github.com/llvm/llvm-project/issues/88077
+            * The following line never compiles, and if it does, it misbehaves.
+            * return ex::env(
+            *           ex::prop(receiver_env, std::string("42")),
+            *           ex::get_env(rcv)
+            *       );
+            *
+            * The following is a workaround */
+
+            auto e = ex::get_env(rcv);
+            auto p = ex::prop(receiver_env, std::string("42"));
+
+            return ex::env(std::move(e), std::move(p));
+        }
+#else
         friend auto tag_invoke(ex::get_env_t, receiver_4 const&) noexcept
         {
             receiver_3 rcv;
 
-#if defined(HPX_HAVE_STDEXEC)
-            return ex::env(
-                ex::get_env(rcv), ex::prop(receiver_env, std::string("42")));
-#else
             return ex::make_env<receiver_env_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
-#endif
         }
+#endif
     };
 
 #if defined(HPX_HAVE_STDEXEC)
     inline constexpr struct receiver_env1_t final : ex::forwarding_query_t
     {
-        // clang-format off
         template <typename Env>
-            requires ex::stdexec_non_standard_tag_invoke::tag_invocable<
-                receiver_env1_t, Env>
-        auto operator()(Env const& e) const
+        decltype(auto) operator()(Env const& e) const noexcept
         {
-            return ex::stdexec_non_standard_tag_invoke::tag_invoke(*this, e);
+            return e.query(*this);
         }
-        // clang-format on
     } receiver_env1{};
 #else
     inline constexpr struct receiver_env1_t final
@@ -141,17 +159,27 @@ namespace mylib {
     {
         using is_receiver = void;
 
+#if defined(HPX_HAVE_STDEXEC)
+        decltype(auto) get_env() const noexcept
+        {
+            receiver_3 rcv;
+            /* Same as receiver_4
+             * This would cause the compiler to crash:
+             * return ex::env(
+             *    ex::get_env(rcv), ex::prop(receiver_env1, std::string("42")));
+             * */
+            auto e = ex::get_env(rcv);
+            auto p = ex::prop(receiver_env1, std::string("42"));
+            return ex::env(std::move(e), std::move(p));
+        }
+#else
         friend auto tag_invoke(ex::get_env_t, receiver_5 const&) noexcept
         {
             receiver_3 rcv;
-#if defined(HPX_HAVE_STDEXEC)
-            return ex::env(
-                ex::get_env(rcv), ex::prop(receiver_env1, std::string("42")));
-#else
             return ex::make_env<receiver_env1_t>(
                 std::string("42"), ex::get_env(std::move(rcv)));
-#endif
         }
+#endif
     };
 }    // namespace mylib
 
