@@ -78,7 +78,7 @@ namespace mylib {
         // Based on:
         // https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2024/
         // p2300r10.html#design-cancellation-summary
-        template<typename T>
+        template <typename T>
         using callback_type = void;
 
         bool stop_requested() const noexcept
@@ -99,8 +99,10 @@ namespace mylib {
     };
 
 #if defined(HPX_HAVE_STDEXEC)
+    // clang-format off
     using stop_token_env_t = ex::env<allocator_env_t,
         ex::prop<ex::get_stop_token_t, stop_token>>;
+    // clang-format on
 #else
     using stop_token_env_t =
         ex::make_env_t<ex::get_stop_token_t, stop_token, allocator_env_t>;

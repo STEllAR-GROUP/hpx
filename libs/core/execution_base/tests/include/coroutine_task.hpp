@@ -408,7 +408,7 @@ private:
     }
 
     // Make this task generally awaitable:
-    friend task_awaitable<> operator co_await(basic_task && self) noexcept
+    friend task_awaitable<> operator co_await(basic_task&& self) noexcept
     {
         static_assert(well_formed<awaiter_context_t, _promise>);
         return task_awaitable<>{std::exchange(self.coro_, {})};

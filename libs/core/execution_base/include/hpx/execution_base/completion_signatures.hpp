@@ -1644,7 +1644,7 @@ namespace hpx::execution::experimental {
                 connect_result_t<sender_type, receiver> op_state_;
             };
         };
-    }    // namespace detail
+    }     // namespace detail
 #endif    // HPX_HAVE_CXX20_COROUTINES
 
     /// End definitions from coroutine_utils and sender
