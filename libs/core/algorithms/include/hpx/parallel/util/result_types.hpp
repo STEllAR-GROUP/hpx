@@ -61,25 +61,26 @@ namespace hpx::parallel::util {
         return p.in2;
     }
 
-    // clang-format off
-    template <typename Sender,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_sender_v<Sender>
-        )>
-    // clang-format on
-    decltype(auto) get_in2_element(Sender&& sender)
-    {
-        return hpx::execution::experimental::then(
-            HPX_FORWARD(Sender, sender), [](auto&& p) {
-                return get_in2_element(HPX_FORWARD(decltype(p), p));
-            });
-    }
-
     template <typename I1, typename I2>
     hpx::future<I2> get_in2_element(hpx::future<util::in_in_result<I1, I2>>&& f)
     {
         return hpx::make_future<I2>(
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
+    }
+
+    // clang-format off
+    template <typename InInResultSender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<InInResultSender>
+        )>
+    // clang-format on
+    decltype(auto) get_in2_element(InInResultSender&& result_sender)
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(InInResultSender, result_sender), [](auto&& result) {
+                return util::get_in2_element(
+                    HPX_FORWARD(decltype(result), result));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -272,31 +273,19 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
     }
 
-    namespace functional {
-
-        struct get_third_element
-        {
-            // clang-format off
-            template <typename T>
-            decltype(auto) operator()(T&& val) const
-            {
-                return hpx::parallel::util::get_third_element(
-                    HPX_FORWARD(T, val));
-            }
-            // clang-format on
-        };
-    }    // namespace functional
-
     // clang-format off
-    template <typename Sender,
+    template <typename InInOutResultSender,
         HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::is_sender_v<Sender>
+            hpx::execution::experimental::is_sender_v<InInOutResultSender>
         )>
     // clang-format on
-    decltype(auto) get_third_element(Sender&& sender)
+    decltype(auto) get_third_element(InInOutResultSender&& result_sender)
     {
         return hpx::execution::experimental::then(
-            HPX_FORWARD(Sender, sender), functional::get_third_element{});
+            HPX_FORWARD(InInOutResultSender, result_sender), [](auto&& result) {
+                return util::get_third_element(
+                    HPX_FORWARD(decltype(result), result));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////

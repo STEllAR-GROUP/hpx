@@ -435,7 +435,7 @@ namespace hpx::parallel {
 
                     difference_type loc = tok.get_data();
                     std::advance(first, loc);
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 using partitioner_type =

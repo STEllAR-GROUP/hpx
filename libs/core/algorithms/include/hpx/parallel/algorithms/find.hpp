@@ -11,7 +11,6 @@
 /// \headerfile hpx/algorithm.hpp
 
 #pragma once
-#include <sys/stat.h>
 
 #if defined(DOXYGEN)
 namespace hpx {
@@ -881,7 +880,7 @@ namespace hpx::parallel {
                     {
                         first = detail::advance_to_sentinel(first, last);
                     }
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 using partitioner_type =
@@ -973,7 +972,7 @@ namespace hpx::parallel {
                     {
                         first = detail::advance_to_sentinel(first, last);
                     }
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 using partitioner_type =
@@ -1064,7 +1063,7 @@ namespace hpx::parallel {
                     {
                         first = detail::advance_to_sentinel(first, last);
                     }
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 using partitioner_type =
@@ -1180,7 +1179,7 @@ namespace hpx::parallel {
                     {
                         first1 = last1;
                     }
-                    return HPX_MOVE(first1);
+                    return first1;
                 };
 
                 using partitioner_type =
@@ -1287,7 +1286,7 @@ namespace hpx::parallel {
                         first = last;
                     }
 
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 using partitioner_type =

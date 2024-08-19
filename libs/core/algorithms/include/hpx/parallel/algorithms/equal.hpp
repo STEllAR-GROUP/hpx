@@ -583,7 +583,7 @@ namespace hpx::parallel {
                         }
                         else
                         {
-                            (void) different_lengths;
+                            HPX_UNUSED(different_lengths);
                         }
 
                         return std::all_of(hpx::util::begin(results),

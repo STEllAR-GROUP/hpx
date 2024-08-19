@@ -493,6 +493,10 @@ namespace hpx::parallel {
             static decltype(auto) parallel(ExPolicy&& policy, FwdIter1B first,
                 FwdIter1E last, FwdIter2 dest, F&& f, Proj&& proj)
             {
+                using result_type = util::in_out_result<FwdIter1B, FwdIter2>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, result_type>;
+
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
@@ -500,11 +504,8 @@ namespace hpx::parallel {
                 {
                     if (first == last)
                     {
-                        using result_type =
-                            util::in_out_result<FwdIter1B, FwdIter2>;
-                        return util::detail::algorithm_result<ExPolicy,
-                            result_type>::get(result_type{
-                            HPX_MOVE(first), HPX_MOVE(dest)});
+                        return algorithm_result::get(
+                            result_type{HPX_MOVE(first), HPX_MOVE(dest)});
                     }
                 }
 
@@ -720,6 +721,11 @@ namespace hpx::parallel {
                 FwdIter1E last1, FwdIter2 first2, FwdIter3 dest, F&& f,
                 Proj1&& proj1, Proj2&& proj2)
             {
+                using result_type =
+                    util::in_in_out_result<FwdIter1B, FwdIter2, FwdIter3>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, result_type>;
+
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
@@ -727,12 +733,9 @@ namespace hpx::parallel {
                 {
                     if (first1 == last1)
                     {
-                        using result_type = util::in_in_out_result<FwdIter1B,
-                            FwdIter2, FwdIter3>;
-
-                        return util::detail::algorithm_result<ExPolicy,
-                            result_type>::get(result_type{HPX_MOVE(first1),
-                            HPX_MOVE(first2), HPX_MOVE(dest)});
+                        return algorithm_result::get(
+                            result_type{HPX_MOVE(first1), HPX_MOVE(first2),
+                                HPX_MOVE(dest)});
                     }
                 }
 
@@ -798,6 +801,11 @@ namespace hpx::parallel {
                 FwdIter1E last1, FwdIter2B first2, FwdIter2E last2,
                 FwdIter3 dest, F&& f, Proj1&& proj1, Proj2&& proj2)
             {
+                using result_type =
+                    util::in_in_out_result<FwdIter1B, FwdIter2B, FwdIter3>;
+                using algorithm_result =
+                    util::detail::algorithm_result<ExPolicy, result_type>;
+
                 constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
@@ -805,12 +813,9 @@ namespace hpx::parallel {
                 {
                     if (first1 == last1 || first2 == last2)
                     {
-                        using result_type = util::in_in_out_result<FwdIter1B,
-                            FwdIter2B, FwdIter3>;
-
-                        return util::detail::algorithm_result<ExPolicy,
-                            result_type>::get(result_type{HPX_MOVE(first1),
-                            HPX_MOVE(first2), HPX_MOVE(dest)});
+                        return algorithm_result::get(
+                            result_type{HPX_MOVE(first1), HPX_MOVE(first2),
+                                HPX_MOVE(dest)});
                     }
                 }
 

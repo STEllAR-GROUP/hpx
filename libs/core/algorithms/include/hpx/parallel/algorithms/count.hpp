@@ -332,8 +332,9 @@ namespace hpx::parallel {
                 {
                     if (first == last)
                     {
-                        return util::detail::algorithm_result<ExPolicy,
-                            difference_type>::get(0L);
+                        return util::detail::
+                            algorithm_result<ExPolicy, difference_type>::get(
+                                static_cast<difference_type>(0));
                     }
                 }
 
@@ -397,8 +398,9 @@ namespace hpx::parallel {
                 {
                     if (first == last)
                     {
-                        return util::detail::algorithm_result<ExPolicy,
-                            difference_type>::get(0L);
+                        return util::detail::
+                            algorithm_result<ExPolicy, difference_type>::get(
+                                static_cast<difference_type>(0));
                     }
                 }
 

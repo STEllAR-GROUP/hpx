@@ -291,7 +291,7 @@ namespace hpx::parallel {
                     }
                 }
 
-                Iter second = ++first;
+                Iter second = first + 1;
                 --count;
 
                 decltype(auto) policy = parallel::util::adapt_placement_mode(
@@ -415,7 +415,7 @@ namespace hpx::parallel {
                 {
                     if constexpr (has_scheduler_executor)
                     {
-                        count = 0;
+                        count = static_cast<difference_type>(0);
                         second = last;
                     }
                     else
@@ -469,7 +469,7 @@ namespace hpx::parallel {
 
                     std::advance(second, find_res);
 
-                    return HPX_MOVE(second);
+                    return second;
                 };
 
                 using partitioner_type =

@@ -526,8 +526,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        // for silencing the unused capture warning
-                        (void) first;
+                        HPX_UNUSED(first);
                     }
 
                     return min_element::sequential_minmax_element_ind(
@@ -680,8 +679,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        // for silencing the unused capture warning
-                        (void) first;
+                        HPX_UNUSED(first);
                     }
 
                     return max_element::sequential_minmax_element_ind(
@@ -863,8 +861,7 @@ namespace hpx::parallel {
                     }
                     else
                     {
-                        // for silencing the unused capture warning
-                        (void) first;
+                        HPX_UNUSED(first);
                     }
 
                     return minmax_element::sequential_minmax_element_ind(

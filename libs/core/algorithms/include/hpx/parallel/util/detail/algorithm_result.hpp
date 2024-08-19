@@ -19,7 +19,7 @@
 #include <hpx/type_support/unused.hpp>
 
 #ifdef HPX_HAVE_STDEXEC
-// For is_sender
+// for is_sender
 #include <hpx/execution_base/completion_signatures.hpp>
 #endif
 
@@ -203,7 +203,7 @@ namespace hpx::parallel::util::detail {
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
-        // The return type of the initiating function.
+        // Due to the nature of senders, this only serves as a dummy.
         using type =
             decltype(hpx::execution::experimental::just(std::declval<T>()));
 
@@ -227,7 +227,7 @@ namespace hpx::parallel::util::detail {
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
-        // The return type of the initiating function.
+        // Due to the nature of senders, this only serves as a dummy.
         using type = decltype(hpx::execution::experimental::just());
 
         template <typename T_>

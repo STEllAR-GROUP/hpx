@@ -233,7 +233,7 @@ namespace hpx::parallel {
                     {
                         first = last;
                     }
-                    return HPX_MOVE(first);
+                    return first;
                 };
 
                 if constexpr (has_scheduler_executor)
