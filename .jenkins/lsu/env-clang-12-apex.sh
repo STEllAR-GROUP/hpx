@@ -7,12 +7,13 @@
 
 module purge
 module load cmake
-module load llvm/17
-module load boost/1.84.0-${build_type,,}
+module load llvm/12
+module load boost/1.75.0-${build_type,,}
 module load hwloc
 module load openmpi
-module load papi
-module load otf2
+module load pwrapi/1.1.1
+module load papi/7.0.1
+module load otf2/3.0.3
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"

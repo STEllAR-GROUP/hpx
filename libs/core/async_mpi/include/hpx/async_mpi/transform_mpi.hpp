@@ -76,9 +76,6 @@ namespace hpx { namespace mpi { namespace experimental {
         template <typename R, typename F>
         struct transform_mpi_receiver
         {
-#ifdef HPX_HAVE_STDEXEC
-            using is_receiver = void;
-#endif
             HPX_NO_UNIQUE_ADDRESS std::decay_t<R> r;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
@@ -149,65 +146,6 @@ namespace hpx { namespace mpi { namespace experimental {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Sender> s;
             HPX_NO_UNIQUE_ADDRESS std::decay_t<F> f;
 
-#ifdef HPX_HAVE_STDEXEC
-            using is_sender = void;
-
-            template <typename... Args>
-            struct invoke_function_transformation_helper
-            {
-                template <bool IsVoid, typename T>
-                struct set_value_void_checked
-                {
-                    using type = hpx::execution::experimental::set_value_t(T);
-                };
-
-                template <typename T>
-                struct set_value_void_checked<true, T>
-                {
-                    using type = hpx::execution::experimental::set_value_t();
-                };
-
-                static_assert(hpx::is_invocable_v<F, Args..., MPI_Request*>,
-                    "F not invocable with the value_types specified.");
-
-                using result_type =
-                    hpx::util::invoke_result_t<F, Args..., MPI_Request*>;
-                using set_value_result_type =
-                    typename set_value_void_checked<std::is_void_v<result_type>,
-                        result_type>::type;
-                using type =
-                    hpx::execution::experimental::completion_signatures<
-                        set_value_result_type>;
-            };
-
-            template <typename... Args>
-            using invoke_function_transformation =
-                invoke_function_transformation_helper<Args...>::type;
-
-            template <typename Err>
-            using default_set_error =
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(Err)>;
-
-            using no_set_stopped_signature =
-                hpx::execution::experimental::completion_signatures<>;
-
-            // clang-format off
-            template <typename Env>
-            friend auto tag_invoke(
-                hpx::execution::experimental::get_completion_signatures_t,
-                transform_mpi_sender const&, Env const&)
-            -> hpx::execution::experimental::transform_completion_signatures_of<
-                Sender, Env,
-                hpx::execution::experimental::completion_signatures<
-                    hpx::execution::experimental::set_error_t(std::exception_ptr)
-                >,
-                invoke_function_transformation,
-                default_set_error,
-                no_set_stopped_signature
-            >;
-            // clang-format on
-#else
             template <typename Env>
             struct generate_completion_signatures
             {
@@ -244,14 +182,11 @@ namespace hpx { namespace mpi { namespace experimental {
                 static constexpr bool sends_stopped = false;
             };
 
-            // clang-format off
             template <typename Env>
             friend auto tag_invoke(
                 hpx::execution::experimental::get_completion_signatures_t,
                 transform_mpi_sender const&, Env)
-            -> generate_completion_signatures<Env>;
-            // clang-format on
-#endif
+                -> generate_completion_signatures<Env>;
 
             template <typename R>
             friend constexpr auto tag_invoke(

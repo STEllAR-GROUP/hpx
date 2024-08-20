@@ -7,11 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-
 #include <hpx/errors/try_catch_exception_ptr.hpp>
 #include <hpx/execution_base/completion_signatures.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -89,12 +84,12 @@ namespace hpx::execution::experimental {
                     HPX_FORWARD(Receiver, receiver)};
             }
 
-            // clang-format off
             template <typename Tag1>
-            friend auto tag_invoke(get_completion_signatures_t,
-                read_sender<Tag1>,
-                no_env) -> dependent_completion_signatures<no_env>;
+            friend auto tag_invoke(
+                get_completion_signatures_t, read_sender<Tag1>, no_env)
+                -> dependent_completion_signatures<no_env>;
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t, read_sender, Env)
             {
@@ -166,5 +161,3 @@ namespace hpx::execution::experimental {
         }
     } read{};
 }    // namespace hpx::execution::experimental
-
-#endif

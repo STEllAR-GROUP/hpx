@@ -7,9 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
 #include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -67,5 +64,3 @@ namespace hpx::execution::experimental {
     using stop_token_of_t = std::remove_cv_t<
         std::remove_reference_t<decltype(get_stop_token(std::declval<T>()))>>;
 }    // namespace hpx::execution::experimental
-
-#endif

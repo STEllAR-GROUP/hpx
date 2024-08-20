@@ -8,11 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/optional.hpp>
 #include <hpx/datastructures/tuple.hpp>
@@ -73,12 +68,12 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = false;
             };
 
-            // clang-format off
             template <typename Env>
-            friend auto tag_invoke(get_completion_signatures_t,
-                schedule_from_sender const&,
-                Env) -> generate_completion_signatures<Env>;
+            friend auto tag_invoke(
+                get_completion_signatures_t, schedule_from_sender const&, Env)
+                -> generate_completion_signatures<Env>;
 
+            // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
                     meta::value<meta::one_of<
@@ -370,5 +365,3 @@ namespace hpx::execution::experimental {
         }
     } schedule_from{};
 }    // namespace hpx::execution::experimental
-
-#endif

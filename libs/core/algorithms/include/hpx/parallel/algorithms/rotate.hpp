@@ -4,9 +4,10 @@
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+/// \file hpx/parallel/algorithms/rotate.hpp
 /// \page hpx::rotate, hpx::rotate_copy
 /// \headerfile hpx/algorithm.hpp
-/// \file hpx/parallel/algorithms/rotate.hpp
 
 #pragma once
 
@@ -265,58 +266,27 @@ namespace hpx::parallel {
 
             detail::reverse<FwdIter> r;
 
-            auto&& process = [=](auto&& f1, auto&& f2) mutable {
-                // propagate exceptions, if appropriate
-                constexpr bool handle_futures =
-                    hpx::traits::is_future_v<decltype((f1))> &&
-                    hpx::traits::is_future_v<decltype((f2))>;
+            return hpx::dataflow(
+                hpx::launch::sync,
+                [=](auto&& f1, auto&& f2) mutable {
+                    // propagate exceptions, if appropriate
+                    constexpr bool handle_futures =
+                        hpx::traits::is_future_v<decltype((f1))> &&
+                        hpx::traits::is_future_v<decltype((f2))>;
 
-                if constexpr (handle_futures)
-                {
-                    f1.get();
-                    f2.get();
-                }
+                    if constexpr (handle_futures)
+                    {
+                        f1.get();
+                        f2.get();
+                    }
 
-                r.call(p(hpx::execution::non_task), first, last);
+                    r.call(p(hpx::execution::non_task), first, last);
 
-                std::advance(first, size_right);
-                return util::in_out_result<FwdIter, Sent>{first, last};
-            };
-
-            using rcall_left_t =
-                decltype(r.call(left_policy, first, new_first));
-            using rcall_right_t =
-                decltype(r.call(right_policy, new_first, last));
-
-            // Sanity check
-            static_assert(std::is_same_v<rcall_left_t, rcall_right_t>);
-
-            constexpr bool handle_senders =
-                hpx::execution::experimental::is_sender_v<rcall_left_t>;
-            constexpr bool handle_futures =
-                hpx::traits::is_future_v<rcall_left_t>;
-            constexpr bool handle_both = handle_senders && handle_futures;
-
-            static_assert(handle_senders || handle_futures,
-                "the reverse operation must return either a sender or a "
-                "future");
-
-            // Futures pass the concept check for senders, so if something is
-            // both a future and a sender we treat it as a future.
-            if constexpr (handle_futures || handle_both)
-            {
-                return hpx::dataflow(hpx::launch::sync, std::move(process),
-                    r.call(left_policy, first, new_first),
-                    r.call(right_policy, new_first, last));
-            }
-            else if constexpr (handle_senders && !handle_both)
-            {
-                return hpx::execution::experimental::then(
-                    hpx::execution::experimental::when_all(
-                        r.call(left_policy, first, new_first),
-                        r.call(right_policy, new_first, last)),
-                    std::move(process));
-            }
+                    std::advance(first, size_right);
+                    return util::in_out_result<FwdIter, Sent>{first, last};
+                },
+                r.call(left_policy, first, new_first),
+                r.call(right_policy, new_first, last));
         }
 
         template <typename IterPair>

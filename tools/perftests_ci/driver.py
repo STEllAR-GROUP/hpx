@@ -93,13 +93,9 @@ if buildinfo:
               '-b',
               action='store_true',
               help='enable building of '+ var._project_name +' examples')
-    @args.arg('--environment', '-e', nargs='?', help='path to environment file')
     def test(run_mpi_tests, perftests_only, verbose_ctest, examples_build_dir,
-             build_examples, environment):
+             build_examples):
         import test
-
-        if environment:
-            env.load(environment)
 
         if perftests_only:
             test.run_perftests()
@@ -135,12 +131,7 @@ if buildinfo:
               type=int,
               help='number of executions of the benchmark executable, whose \
               results are then merged together')
-    @args.arg('--environment', '-e', nargs='?', help='path to environment file')
-    def run(local, run_output, targets_and_opts, n_executions, environment):
-
-        if environment:
-            env.load(environment)
-
+    def run(local, run_output, targets_and_opts, n_executions):
         # options
         targets_and_opts = ' '.join(targets_and_opts).lstrip()
 

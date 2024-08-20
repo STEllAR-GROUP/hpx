@@ -7,11 +7,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-
 #include <hpx/execution/queries/read.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
@@ -142,5 +137,3 @@ namespace hpx::execution::experimental {
         return hpx::execution::experimental::read(get_scheduler);
     }
 }    // namespace hpx::execution::experimental
-
-#endif

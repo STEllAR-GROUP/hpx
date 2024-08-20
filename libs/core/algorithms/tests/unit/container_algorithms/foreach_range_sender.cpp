@@ -77,7 +77,8 @@ void test_for_each_explicit_sender_direct_async(
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-    auto result = tt::sync_wait(hpx::ranges::for_each(policy.on(exec), rng, f));
+    auto result =
+        hpx::ranges::for_each(policy.on(exec), rng, f) | tt::sync_wait();
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
@@ -113,8 +114,8 @@ void test_for_each_explicit_sender(Policy l, ExPolicy&& policy, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-    auto result = tt::sync_wait(
-        ex::just(rng, f) | hpx::ranges::for_each(policy.on(exec)));
+    auto result = ex::just(rng, f) | hpx::ranges::for_each(policy.on(exec)) |
+        tt::sync_wait();
     HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values

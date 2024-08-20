@@ -6,8 +6,8 @@
 
 module purge
 module load cmake
-module load llvm/17
-module load boost/1.83.0-${build_type,,}
+module load llvm/12
+module load boost/1.75.0-${build_type,,}
 module load hwloc
 module load openmpi
 module load pwrapi/1.1.1
@@ -28,8 +28,6 @@ configure_extra_options+=" -DHPX_WITH_FETCH_LCI=ON"
 configure_extra_options+=" -DCMAKE_C_COMPILER=clang"
 configure_extra_options+=" -DCMAKE_C_FLAGS=-fPIC"
 configure_extra_options+=" -DHPX_WITH_LOGGING=OFF"
-configure_extra_options+=" -DHPX_WITH_DATAPAR_BACKEND=EVE"
-configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
@@ -37,3 +35,5 @@ configure_extra_options+=" -DHPX_WITH_FETCH_EVE=ON"
 # Make sure HWLOC does not report 'cores'. This is purely an option to enable
 # testing the topology code under conditions close to those on FreeBSD.
 configure_extra_options+=" -DHPX_TOPOLOGY_WITH_ADDITIONAL_HWLOC_TESTING=ON"
+
+configure_extra_options+=" -DHPX_COROUTINES_WITH_THREAD_SCHEDULE_HINT_RUNS_AS_CHILD=ON"

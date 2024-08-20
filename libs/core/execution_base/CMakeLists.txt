@@ -4,8 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 set(execution_base_headers
     hpx/execution_base/agent_base.hpp
     hpx/execution_base/agent_ref.hpp
@@ -21,7 +19,6 @@ set(execution_base_headers
     hpx/execution_base/receiver.hpp
     hpx/execution_base/resource_base.hpp
     hpx/execution_base/sender.hpp
-    hpx/execution_base/stdexec_forward.hpp
     hpx/execution_base/this_thread.hpp
     hpx/execution_base/traits/is_executor.hpp
     hpx/execution_base/traits/is_executor_parameters.hpp
@@ -48,12 +45,6 @@ set(execution_base_sources agent_ref.cpp any_sender.cpp
                            spinlock_deadlock_detection.cpp this_thread.cpp
 )
 
-set(optional_dependencies)
-
-if(TARGET STDEXEC::stdexec)
-  set(execution_base_optional_dependencies STDEXEC::stdexec)
-endif()
-
 include(HPX_AddModule)
 add_hpx_module(
   core execution_base
@@ -61,7 +52,6 @@ add_hpx_module(
   SOURCES ${execution_base_sources}
   HEADERS ${execution_base_headers}
   COMPAT_HEADERS ${execution_base_compat_headers}
-  DEPENDENCIES ${execution_base_optional_dependencies}
   MODULE_DEPENDENCIES
     hpx_assertion
     hpx_config

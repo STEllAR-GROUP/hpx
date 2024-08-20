@@ -5,7 +5,6 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/config.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
 #include <hpx/init.hpp>
@@ -53,11 +52,13 @@ void test_execution_then_return_int()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 =
-        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](int value) {
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-            return 2 * value;
-        }));
+    hpx::future<int> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)),
+            [](int value) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+                return 2 * value;
+            }));
     HPX_TEST(f2.valid());
     try
     {
@@ -78,10 +79,11 @@ void test_execution_then_return_void()
     hpx::future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 =
-        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](auto) {
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }));
+    hpx::future<void> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }));
     HPX_TEST(f2.valid());
     try
     {
@@ -102,11 +104,13 @@ void test_execution_then_return_int_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<int> f2 =
-        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](int value) {
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-            return 2 * value;
-        }));
+    hpx::future<int> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)),
+            [](int value) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+                return 2 * value;
+            }));
     HPX_TEST(f2.valid());
     try
     {
@@ -127,10 +131,11 @@ void test_execution_then_return_void_shared()
     hpx::shared_future<int> f1 =
         hpx::make_ready_future_after(std::chrono::milliseconds(100), 1);
     HPX_TEST(f1.valid());
-    hpx::future<void> f2 =
-        ex::make_future(ex::then(ex::as_sender(std::move(f1)), [](auto) {
-            hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }));
+    hpx::future<void> f2 = hpx::execution::experimental::make_future(
+        hpx::execution::experimental::then(
+            hpx::execution::experimental::as_sender(std::move(f1)), [](auto) {
+                hpx::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }));
     HPX_TEST(f2.valid());
     try
     {
@@ -153,11 +158,7 @@ int hpx_main()
         std::atomic<bool> set_value_called{false};
         auto s = ex::then(ex::just(), [] {});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -174,11 +175,7 @@ int hpx_main()
         std::atomic<bool> set_value_called{false};
         auto s = ex::then(ex::just(0), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -199,11 +196,7 @@ int hpx_main()
                 return x;
             });
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
@@ -226,11 +219,7 @@ int hpx_main()
                 return std::move(x);
             });
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
@@ -248,11 +237,7 @@ int hpx_main()
         std::atomic<bool> set_value_called{false};
         auto s1 = ex::then(ex::just(0), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s1)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s1), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s1), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s1);
         check_error_types<hpx::variant<std::exception_ptr>>(s1);
@@ -260,11 +245,7 @@ int hpx_main()
 
         auto s2 = ex::then(std::move(s1), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -272,11 +253,7 @@ int hpx_main()
 
         auto s3 = ex::then(std::move(s2), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s3)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s3), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s3), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s3);
         check_error_types<hpx::variant<std::exception_ptr>>(s3);
@@ -284,11 +261,7 @@ int hpx_main()
 
         auto s4 = ex::then(std::move(s3), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s4);
         check_error_types<hpx::variant<std::exception_ptr>>(s4);
@@ -305,11 +278,7 @@ int hpx_main()
         std::atomic<bool> set_value_called{false};
         auto s1 = ex::then(ex::just(), []() { return 3; });
         static_assert(ex::is_sender_v<decltype(s1)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s1), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s1), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s1);
         check_error_types<hpx::variant<std::exception_ptr>>(s1);
@@ -317,11 +286,7 @@ int hpx_main()
 
         auto s2 = ex::then(std::move(s1), [](int x) { return x / 1.5; });
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<double>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -330,11 +295,7 @@ int hpx_main()
         auto s3 =
             ex::then(std::move(s2), [](double x) -> int { return int(x / 2); });
         static_assert(ex::is_sender_v<decltype(s3)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s3), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s3), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s3);
         check_error_types<hpx::variant<std::exception_ptr>>(s3);
@@ -343,11 +304,7 @@ int hpx_main()
         auto s4 =
             ex::then(std::move(s3), [](int x) { return std::to_string(x); });
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<std::string>>>(s4);
         check_error_types<hpx::variant<std::exception_ptr>>(s4);
@@ -368,11 +325,7 @@ int hpx_main()
             ex::then([](double x) -> int { return int(x / 2); }) |
             ex::then([](int x) { return std::to_string(x); });
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<std::string>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -394,11 +347,7 @@ int hpx_main()
             custom_transformer{tag_invoke_overload_called,
                 custom_transformer_call_operator_called, false});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -419,11 +368,7 @@ int hpx_main()
         auto s =
             ex::then(ex::just(), [] { throw std::runtime_error("error"); });
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -440,44 +385,28 @@ int hpx_main()
         std::atomic<bool> set_error_called{false};
         auto s1 = ex::then(ex::just(0), [](int x) { return ++x; });
         static_assert(ex::is_sender_v<decltype(s1)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s1), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s1), ex::empty_env>);
-#endif
 
         auto s2 = ex::then(std::move(s1), [](int x) {
             throw std::runtime_error("error");
             return ++x;
         });
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         auto s3 = ex::then(std::move(s2), [](int x) {
             HPX_TEST(false);
             return ++x;
         });
         static_assert(ex::is_sender_v<decltype(s3)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s3), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s3), ex::empty_env>);
-#endif
 
         auto s4 = ex::then(std::move(s3), [](int x) {
             HPX_TEST(false);
             return ++x;
         });
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s4);
         check_error_types<hpx::variant<std::exception_ptr>>(s4);
@@ -498,11 +427,7 @@ int hpx_main()
             custom_transformer{tag_invoke_overload_called,
                 custom_transformer_call_operator_called, true});
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);

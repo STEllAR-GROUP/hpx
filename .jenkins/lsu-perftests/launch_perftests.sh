@@ -55,8 +55,7 @@ for executable in "${hpx_targets[@]}"; do
 
     # Run performance tests
     ${perftests_dir}/driver.py -v -l $logfile_tmp perftest run --local True \
-        --run_output $result --targets-and-opts "${run_command[@]}" \
-        --n_executions $n_executions -e $envfile ||
+        --run_output $result --targets-and-opts "${run_command[@]}" --n_executions $n_executions  ||
         {
             echo 'Running failed'
             test_errors=1

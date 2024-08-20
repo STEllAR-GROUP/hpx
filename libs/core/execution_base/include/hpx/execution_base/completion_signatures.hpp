@@ -31,10 +31,6 @@
 #include <system_error>
 #endif
 
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#endif
-
 namespace hpx::execution::experimental {
 
     // empty_variant will be returned by execution::value_types_of_t and
@@ -109,7 +105,6 @@ namespace hpx::execution::experimental {
         template <typename... Ts>
         using decayed_tuple = meta::invoke<decay_tuple<hpx::tuple>, Ts...>;
 
-#ifndef HPX_HAVE_STDEXEC
         // test, if set_value_t(Ts...), set_error_t(Error, Ts...), or
         // set_stopped_t() are available, return meta::pack<Ts...>
         template <typename Tag, typename MetaF = meta::func<meta::pack>,
@@ -213,10 +208,8 @@ namespace hpx::execution::experimental {
           : meta::invoke<meta::func<compose_signatures>, Signatures...>
         {
         };
-#endif
     }    // namespace detail
 
-#ifndef HPX_HAVE_STDEXEC
     // A type Fn satisfies completion-signature if it is a function type with
     // one of the following forms:
     //
@@ -261,6 +254,7 @@ namespace hpx::execution::experimental {
         struct completion_signals_of_sender_depend_on_execution_environment
         {
         };
+
 #if defined(HPX_HAVE_CXX20_COROUTINES)
         // https://github.com/NVIDIA/stdexec/pull/733#issue-1537242117
         //
@@ -321,7 +315,6 @@ namespace hpx::execution::experimental {
     template <typename Env>
     using dependent_completion_signatures =
         detail::dependent_completion_signatures<Env>;
-#endif    // NOT HPX_HAVE_STDEXEC
 
     namespace detail {
 
@@ -337,9 +330,7 @@ namespace hpx::execution::experimental {
           : std::true_type
         {
         };
-#ifdef HPX_HAVE_STDEXEC
-    }
-#else
+
         struct no_completion_signatures
         {
         };
@@ -369,7 +360,7 @@ namespace hpx::execution::experimental {
 #else
         template <typename Sender>
         inline constexpr bool is_enable_sender_v = has_is_sender_v<Sender>;
-#endif    // HPX_HAVE_CXX20_COROUTINES
+#endif
     }    // namespace detail
 
     // execution::get_completion_signatures is a customization point object. Let
@@ -459,7 +450,6 @@ namespace hpx::execution::experimental {
             }
         }
     } get_completion_signatures{};
-#endif    // NOT HPX_HAVE_STDEXEC
 
     // A sender is a type that is describing an asynchronous operation. The
     // operation itself might not have started yet. In order to get the result
@@ -474,99 +464,6 @@ namespace hpx::execution::experimental {
     //
     // A sender's destructor shall not block pending completion of submitted
     // operations.
-#ifdef HPX_HAVE_STDEXEC
-    template <typename Sender, typename... Env>
-    struct is_sender_in
-      : std::bool_constant<
-            hpx::execution::experimental::sender_in<Sender, Env...>>
-    {
-    };
-
-    template <typename Sender, typename... Env>
-    inline constexpr bool is_sender_in_v = is_sender_in<Sender, Env...>::value;
-
-    template <typename Sender>
-    struct is_sender
-      : std::bool_constant<hpx::execution::experimental::sender<Sender>>
-    {
-    };
-
-    template <typename Sender>
-    inline constexpr bool is_sender_v = is_sender<Sender>::value;
-
-    // \see is_sender
-    template <typename Sender, typename Receiver>
-    struct is_sender_to
-      : std::bool_constant<
-            hpx::execution::experimental::sender_to<Sender, Receiver>>
-    {
-    };
-
-    template <typename Sender, typename Receiver>
-    inline constexpr bool is_sender_to_v =
-        is_sender_to<Sender, Receiver>::value;
-
-    // The sender_of concept defines the requirements for a sender type that on
-    // successful completion sends the specified set of value types.
-    template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
-    struct is_sender_of
-      : std::bool_constant<
-            hpx::execution::experimental::sender_of<Sender, Signal, Env>>
-    {
-    };
-
-    template <typename Sender, typename Signal,
-        typename Env = hpx::execution::experimental::empty_env>
-    inline constexpr bool is_sender_of_v =
-        is_sender_of<Sender, Signal, Env>::value;
-
-    // As outlined in the original implementation:
-    //
-    // Alias template single-sender-value-type is defined as follows:
-    //
-    // 1. If value_types_of_t<S, E, Tuple, Variant> would have the form
-    // Variant<Tuple<T>>, then single-sender-value-type<S, E> is an alias for
-    // type T.
-    // 2. Otherwise, if value_types_of_t<S, E, Tuple, Variant> would
-    // have the form Variant<Tuple<>> or Variant<>, then
-    // single-sender-value-type<S, E> is an alias for type void.
-    // 3. Otherwise, single-sender-value-type<S, E> is ill-formed.
-    //
-    template <typename Sender,
-        typename Env = hpx::execution::experimental::empty_env>
-    using single_sender_value_t =
-        hpx::execution::experimental::stdexec_internal::__single_sender_value_t<
-            Sender, Env>;
-
-    template <typename A, typename B>
-    inline constexpr bool is_derived_from_v = std::derived_from<A, B>;
-
-    // Does not exist in P2300
-    //    template<typename Promise>
-    //    using with_awaitable_senders =
-    //    hpx::execution::experimental::with_awaitable_senders<Promise>;
-
-    template <typename ReceiverID>
-    using operation = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation<ReceiverID>;
-
-    template <typename ReceiverID>
-    using promise = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise<ReceiverID>;
-
-    template <typename Rec>
-    using promise_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__promise_t<Rec>;
-
-    template <typename Rec>
-    using operation_t = hpx::execution::experimental::stdexec_internal::
-        __connect_awaitable_::__operation_t<Rec>;
-
-    using connect_awaitable_t =
-        hpx::execution::experimental::stdexec_internal::__connect_awaitable_t;
-    inline constexpr connect_awaitable_t connect_awaitable{};
-#else
     template <typename Sender, typename Env = no_env>
     struct is_sender;
 
@@ -1246,11 +1143,9 @@ namespace hpx::execution::experimental {
                 return tag_invoke(as_awaitable, HPX_FORWARD(Ty, value), *this);
             }
 
-            // clang-format off
             template <typename T>
-            friend auto tag_invoke(
-                get_env_t, env_promise<T> const&) noexcept -> T const&;
-            // clang-format on
+            friend auto tag_invoke(get_env_t, env_promise<T> const&) noexcept
+                -> T const&;
         };
 
         struct with_awaitable_senders_base
@@ -1470,13 +1365,11 @@ namespace hpx::execution::experimental {
             }
 
             // Pass through the get_env receiver query
-            // clang-format off
-            friend auto tag_invoke(
-                get_env_t, type const& self) -> env_of_t<Receiver>
+            friend auto tag_invoke(get_env_t, type const& self)
+                -> env_of_t<Receiver>
             {
                 return get_env(self.rcvr);
             }
-            // clang-format on
 
             Receiver& rcvr;
         };
@@ -1601,17 +1494,14 @@ namespace hpx::execution::experimental {
         }
 #endif    // HPX_HAVE_CXX20_COROUTINES
     } connect{};
-#endif    // NOT HPX_HAVE_STDEXEC
 
     template <typename Sender, typename Receiver>
     struct has_nothrow_connect
       : std::integral_constant<bool,
-            noexcept(hpx::execution::experimental::connect(
-                std::declval<Sender>(), std::declval<Receiver>()))>
+            noexcept(connect(std::declval<Sender>(), std::declval<Receiver>()))>
     {
     };
 
-#ifndef HPX_HAVE_STDEXEC
 #if defined(HPX_HAVE_CXX20_COROUTINES)
     namespace detail {
 
@@ -1813,5 +1703,4 @@ namespace hpx::execution::experimental {
     using make_completion_signatures =
         meta::type<detail::make_helper<Sender, Env, AddlSignatures,
             meta::func<SetValue>, meta::func1<SetError>, SendsStopped>>;
-#endif    // NOT HPX_HAVE_STDEXEC
 }    // namespace hpx::execution::experimental

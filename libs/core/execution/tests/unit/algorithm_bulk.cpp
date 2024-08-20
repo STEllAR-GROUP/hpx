@@ -59,11 +59,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -87,11 +83,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -117,11 +109,7 @@ int main()
             });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(s);
@@ -147,11 +135,7 @@ int main()
             });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(s);
@@ -172,11 +156,7 @@ int main()
         auto s1 = ex::bulk(ex::just(42), 10, [](int, int x) { return ++x; });
 
         static_assert(ex::is_sender_v<decltype(s1)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s1), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s1), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s1);
         check_error_types<hpx::variant<std::exception_ptr>>(s1);
@@ -186,11 +166,7 @@ int main()
         auto s2 = ex::bulk(std::move(s1), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -199,11 +175,7 @@ int main()
         auto s3 = ex::bulk(std::move(s2), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s3)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s3), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s3), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s3);
         check_error_types<hpx::variant<std::exception_ptr>>(s3);
@@ -212,11 +184,7 @@ int main()
         auto s4 = ex::bulk(std::move(s3), 10, f);
 
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s4);
         check_error_types<hpx::variant<std::exception_ptr>>(s4);
@@ -239,11 +207,7 @@ int main()
             ex::bulk(10, f) | ex::bulk(10, f);
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -269,11 +233,7 @@ int main()
                 false});
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -296,11 +256,7 @@ int main()
             ex::just(), 0, [](int) { throw std::runtime_error("error"); });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -321,11 +277,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -352,11 +304,7 @@ int main()
             ex::bulk(std::move(s3), 10, [](int, int) { HPX_TEST(false); });
 
         static_assert(ex::is_sender_v<decltype(s4)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s4), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s4), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s4);
         check_error_types<hpx::variant<std::exception_ptr>>(s4);
@@ -380,11 +328,7 @@ int main()
                 true});
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);

@@ -15,7 +15,6 @@ set(tests
     execution_context
     get_env
     execute_may_block_caller
-    stdexec
 )
 
 if(HPX_WITH_CXX20_COROUTINES)

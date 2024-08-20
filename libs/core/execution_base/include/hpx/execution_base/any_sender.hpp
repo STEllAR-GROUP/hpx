@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
 #include <hpx/assert.hpp>
 #include <hpx/errors/error.hpp>
 #include <hpx/errors/throw_exception.hpp>
@@ -344,15 +343,7 @@ namespace hpx::execution::experimental::detail {
         }
     };
 
-    class immovable
-    {
-    public:
-        immovable() = default;
-        immovable(immovable&&) = delete;
-    };
-
-    //    class HPX_CORE_EXPORT any_operation_state : immovable
-    class HPX_CORE_EXPORT any_operation_state : immovable
+    class HPX_CORE_EXPORT any_operation_state
     {
         using base_type = detail::any_operation_state_base;
         template <typename Sender, typename Receiver>
@@ -364,7 +355,7 @@ namespace hpx::execution::experimental::detail {
 
     public:
         template <typename Sender, typename Receiver>
-        any_operation_state(immovable, Sender&& sender, Receiver&& receiver)
+        any_operation_state(Sender&& sender, Receiver&& receiver)
         {
             storage.template store<impl_type<Sender, Receiver>>(
                 HPX_FORWARD(Sender, sender), HPX_FORWARD(Receiver, receiver));
@@ -385,8 +376,6 @@ namespace hpx::execution::experimental::detail {
     template <typename... Ts>
     struct any_receiver_base
     {
-        using is_receiver = void;
-
         virtual ~any_receiver_base() = default;
         virtual void move_into(void* p) = 0;
         virtual void set_value(Ts... ts) && = 0;
@@ -490,8 +479,6 @@ namespace hpx::execution::experimental::detail {
         storage_type storage{};
 
     public:
-        using is_receiver = void;
-
         template <typename Receiver,
             typename = std::enable_if_t<
                 !std::is_same_v<std::decay_t<Receiver>, any_receiver>>>
@@ -519,24 +506,14 @@ namespace hpx::execution::experimental::detail {
         any_receiver& operator=(any_receiver const&) = delete;
 
         friend void tag_invoke(hpx::execution::experimental::set_value_t,
-            any_receiver&& r, Ts&&... ts) noexcept
+            any_receiver&& r, Ts... ts)
         {
             // We first move the storage to a temporary variable so that this
             // any_receiver is empty after this set_value. Doing
             // HPX_MOVE(storage.get()).set_value(...) would leave us with a
             // non-empty any_receiver holding a moved-from receiver.
             auto moved_storage = HPX_MOVE(r.storage);
-
-            // the caller of set_value needs to forward errors to set_error
-            try
-            {
-                HPX_MOVE(moved_storage.get()).set_value(HPX_FORWARD(Ts, ts)...);
-            }
-            catch (...)
-            {
-                HPX_MOVE(moved_storage.get())
-                    .set_error(std::current_exception());
-            }
+            HPX_MOVE(moved_storage.get()).set_value(HPX_MOVE(ts)...);
         }
 
         friend void tag_invoke(hpx::execution::experimental::set_error_t,
@@ -663,7 +640,7 @@ namespace hpx::execution::experimental::detail {
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) && override
         {
-            return {{}, HPX_MOVE(sender), HPX_MOVE(receiver)};
+            return any_operation_state{HPX_MOVE(sender), HPX_MOVE(receiver)};
         }
     };
 
@@ -698,13 +675,12 @@ namespace hpx::execution::experimental::detail {
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) & override
         {
-            return any_operation_state{{}, sender, HPX_MOVE(receiver)};
+            return any_operation_state{sender, HPX_MOVE(receiver)};
         }
 
         any_operation_state connect(any_receiver<Ts...>&& receiver) && override
         {
-            return any_operation_state{
-                {}, HPX_MOVE(sender), HPX_MOVE(receiver)};
+            return any_operation_state{HPX_MOVE(sender), HPX_MOVE(receiver)};
         }
     };
 }    // namespace hpx::execution::experimental::detail
@@ -753,8 +729,6 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
-        using is_sender = void;
-
         unique_any_sender() = default;
 
         template <typename Sender,
@@ -783,20 +757,11 @@ namespace hpx::execution::experimental {
         unique_any_sender& operator=(unique_any_sender&&) = default;
         unique_any_sender& operator=(unique_any_sender const&) = delete;
 
-#ifdef HPX_HAVE_STDEXEC
-        // TODO: Remove this
-        using completion_signatures =
-            hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
-#else
-        // clang-format off
         template <typename Env>
-        friend auto tag_invoke(get_completion_signatures_t,
-            unique_any_sender const&,
-            Env) noexcept -> completion_signatures<set_value_t(Ts...),
-                              set_error_t(std::exception_ptr)>;
-        // clang-format on
-#endif
+        friend auto tag_invoke(
+            get_completion_signatures_t, unique_any_sender const&, Env) noexcept
+            -> completion_signatures<set_value_t(Ts...),
+                set_error_t(std::exception_ptr)>;
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(
@@ -830,8 +795,6 @@ namespace hpx::execution::experimental {
         storage_type storage{};
 
     public:
-        using is_sender = void;    // Indicate that any_sender is a sender
-
         any_sender() = default;
 
         template <typename Sender,
@@ -870,19 +833,10 @@ namespace hpx::execution::experimental {
         any_sender& operator=(any_sender&&) = default;
         any_sender& operator=(any_sender const&) = default;
 
-#ifdef HPX_HAVE_STDEXEC
-        // TODO: Remove this
-        using completion_signatures =
-            hpx::execution::experimental::completion_signatures<
-                set_value_t(Ts...), set_error_t(std::exception_ptr)>;
-#else
-        // clang-format off
         template <typename Env>
         friend auto tag_invoke(get_completion_signatures_t, any_sender const&,
             Env) noexcept -> completion_signatures<set_value_t(Ts...),
-                              set_error_t(std::exception_ptr)>;
-        // clang-format on
-#endif
+            set_error_t(std::exception_ptr)>;
 
         template <typename R>
         friend detail::any_operation_state tag_invoke(

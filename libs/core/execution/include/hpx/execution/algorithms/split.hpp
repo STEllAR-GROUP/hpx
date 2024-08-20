@@ -8,11 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
@@ -123,12 +118,12 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = true;
             };
 
-            // clang-format off
             template <typename Env>
-            friend auto tag_invoke(get_completion_signatures_t,
-                split_sender const&,
-                Env) -> generate_completion_signatures<Env>;
+            friend auto tag_invoke(
+                get_completion_signatures_t, split_sender const&, Env)
+                -> generate_completion_signatures<Env>;
 
+            // clang-format off
             template <typename CPO, typename Scheduler_ = Scheduler,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
@@ -700,5 +695,3 @@ namespace hpx::execution::experimental {
         }
     } split{};
 }    // namespace hpx::execution::experimental
-
-#endif

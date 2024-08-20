@@ -1,5 +1,4 @@
 # Copyright (c) 2020 ETH Zurich
-# Copyright (c) 2024 Alireza Kheirkhahan
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,9 +7,10 @@
 module purge
 module load cmake
 module load gcc/13
-module load boost/1.84.0-${build_type,,}
+module load boost/1.83.0-${build_type,,}
 module load hwloc
 module load openmpi
+module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"

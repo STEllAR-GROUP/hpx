@@ -101,7 +101,8 @@ namespace hpx::lcos::detail {
     {
         if (runs_child_ != threads::invalid_thread_id)
         {
-            [[maybe_unused]] auto* thrd = get_thread_id_data(runs_child_);
+            auto* thrd = get_thread_id_data(runs_child_);
+            (void) thrd;
             LTM_(debug).format(
                 "task_object::~task_object({}), description({}): "
                 "destroy runs_as_child thread",
@@ -283,7 +284,7 @@ namespace hpx::lcos::detail {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     // clang-format off
-                    constexpr void (*p)(std::decay_t<Callback>&&) noexcept =
+                    constexpr void (*p)(Callback&&) noexcept =
                         &future_data_base::run_on_completed;
                     // clang-format on
                     run_on_completed_on_new_thread(util::deferred_call(
@@ -317,12 +318,11 @@ namespace hpx::lcos::detail {
     // Set the callback which needs to be invoked when the future becomes ready.
     // If the future is ready the function will be invoked immediately.
     void future_data_base<traits::detail::future_data_void>::set_on_completed(
-        completed_callback_type&& data_sink)
+        completed_callback_type data_sink)
     {
         if (!data_sink)
             return;
 
-        hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
         if (is_ready(std::memory_order_relaxed))
         {
             // invoke the callback (continuation) function right away
@@ -330,6 +330,8 @@ namespace hpx::lcos::detail {
         }
         else
         {
+            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
+
             std::unique_lock l(mtx_);
             if (is_ready())
             {

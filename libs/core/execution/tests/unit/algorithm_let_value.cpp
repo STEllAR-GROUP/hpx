@@ -17,9 +17,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <hpx/type_support/meta.hpp>
-#include <hpx/type_support/pack.hpp>
-
 namespace ex = hpx::execution::experimental;
 
 // This overload is only used to check dispatching. It is not a useful
@@ -44,11 +41,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -73,11 +66,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
@@ -102,11 +91,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<
             hpx::variant<hpx::tuple<custom_type_non_default_constructible>>>(
@@ -134,11 +119,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<
             hpx::tuple<custom_type_non_default_constructible_non_copyable>>>(
@@ -164,11 +145,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -192,11 +169,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s);
         check_error_types<hpx::variant<std::exception_ptr>>(s);
@@ -218,11 +191,7 @@ int main()
         HPX_TEST(tag_invoke_overload_called);
 
         static_assert(ex::is_sender_v<decltype(s)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s);
         check_error_types<hpx::variant<>>(s);
@@ -234,31 +203,16 @@ int main()
         std::atomic<bool> set_error_called{false};
         std::atomic<bool> let_value_callback_called{false};
         auto s1 = error_sender{};
-        auto s2 = std::move(s1) | ex::let_value([&]() {
+        auto s2 = ex::let_value(std::move(s1), [&]() {
             let_value_callback_called = true;
             return void_sender();
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);
-        check_sends_stopped<false>(void_sender());
-        // In STDEXEC the sender returned by let_value has completion signatures
-        // equal to the union of the:
-        // - completion signatures of the sender returned by the function for
-        //   the input given by the predecessor sender
-        // - completion signatures of the predecessor sender for the CPOs other
-        //   than set_value
-        // - set_error(std::exception_ptr)
-
-        // Here, error sender does not send stopped so we expect
-        // let_value(error_sender, [](){...}) not to send stopped either.
         check_sends_stopped<false>(s2);
 
         auto r = error_callback_receiver<check_exception_ptr>{
@@ -283,11 +237,7 @@ int main()
         });
 
         static_assert(ex::is_sender_v<decltype(s2)>);
-#ifdef HPX_HAVE_STDEXEC
-        static_assert(ex::is_sender_in_v<decltype(s2), ex::empty_env>);
-#else
         static_assert(ex::is_sender_v<decltype(s2), ex::empty_env>);
-#endif
 
         check_value_types<hpx::variant<hpx::tuple<int>>>(s2);
         check_error_types<hpx::variant<std::exception_ptr>>(s2);

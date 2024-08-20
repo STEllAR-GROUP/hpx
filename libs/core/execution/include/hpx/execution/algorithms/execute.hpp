@@ -8,11 +8,6 @@
 #pragma once
 
 #include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-#else
-
 #include <hpx/execution/algorithms/start_detached.hpp>
 #include <hpx/execution/algorithms/then.hpp>
 #include <hpx/execution_base/sender.hpp>
@@ -50,5 +45,3 @@ namespace hpx::execution::experimental {
         }
     } execute{};
 }    // namespace hpx::execution::experimental
-
-#endif

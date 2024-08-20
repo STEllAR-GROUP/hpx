@@ -200,15 +200,6 @@ namespace hpx::execution::experimental {
                 "explicit_scheduler_executor::bulk_async_execution "
                 "can result in data races!");
 
-#ifdef HPX_HAVE_STDEXEC
-//            We are using HPX's bulk implementation for now, so this works for
-//            other types too.
-//            static_assert(
-//                std::is_integral_v<S>,
-//                "P2300 expects bulk to be called only with integral types"
-//            );
-#endif
-
             if constexpr (std::is_void_v<result_type>)
             {
                 return bulk(schedule(exec.sched_), shape,

@@ -352,8 +352,8 @@ void test_for_each_sender(Policy l, ExPolicy&& p, IteratorTag)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-    auto result = hpx::get<0>(
-        *tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec))));
+    auto result = hpx::get<0>(*(ex::just(rng, f) |
+        hpx::ranges::for_each(p.on(exec)) | tt::sync_wait()));
     HPX_TEST(result == iterator(std::end(c)));
 
     // verify values
@@ -387,7 +387,7 @@ void test_for_each_exception_sender(Policy l, ExPolicy&& p, IteratorTag)
         using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-        tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)));
+        ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)) | tt::sync_wait();
 
         HPX_TEST(false);
     }
@@ -426,7 +426,7 @@ void test_for_each_bad_alloc_sender(Policy l, ExPolicy&& p, IteratorTag)
         using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
         auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-        tt::sync_wait(ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)));
+        ex::just(rng, f) | hpx::ranges::for_each(p.on(exec)) | tt::sync_wait();
 
         HPX_TEST(false);
     }

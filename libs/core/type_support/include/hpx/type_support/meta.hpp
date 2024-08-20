@@ -41,7 +41,7 @@ namespace hpx::meta {
     using identity = T;
 
     template <typename T>
-    inline constexpr auto value = T::value;
+    inline constexpr bool value = T::value;
 
     template <typename T, typename U>
     inline constexpr bool value<std::is_same<T, U>> = false;
@@ -507,17 +507,13 @@ namespace hpx::meta {
     using get_id_t = hpx::type_identity_t<
         hpx::meta::invoke<get_id_func<value<has_id<T>>>, T>>;
 
-    // clang-format off
     template <typename T, typename... As>
     inline constexpr bool is_constructible_from_v =
-        std::is_destructible_v<T> && std::is_constructible_v<T, As...>;
-    // Clang format bug: thinks   ^^this is a double reference
+        std::is_destructible_v<T>&& std::is_constructible_v<T, As...>;
 
     template <typename T, typename... As>
     inline constexpr bool is_nothrow_constructible_from_v =
-        is_constructible_from_v<T, As...> &&
-    // Clang format bug: thinks       this^^ is a double reference
-        std::is_nothrow_constructible_v<T, As...>;
-    // clang-format on
+        is_constructible_from_v<T, As...>&&
+            std::is_nothrow_constructible_v<T, As...>;
 
 }    // namespace hpx::meta

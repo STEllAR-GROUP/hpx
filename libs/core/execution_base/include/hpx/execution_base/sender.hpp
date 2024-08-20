@@ -7,30 +7,6 @@
 
 #pragma once
 
-#include <hpx/config.hpp>
-
-#ifdef HPX_HAVE_STDEXEC
-#include <hpx/execution_base/stdexec_forward.hpp>
-
-namespace hpx::execution::experimental {
-    template <typename Scheduler>
-    inline constexpr bool is_scheduler_v = scheduler<Scheduler>;
-
-    template <typename Scheduler>
-    struct is_scheduler : std::bool_constant<is_scheduler_v<Scheduler>>
-    {
-    };
-    // defined in completion signatures instead, to follow the original
-    // file structure.
-    namespace detail {
-        // Dummy type used in place of a scheduler if none is given
-        struct no_scheduler
-        {
-        };
-    }    // namespace detail
-}    // namespace hpx::execution::experimental
-#else
-
 #include <hpx/config/constexpr.hpp>
 #include <hpx/execution_base/coroutine_utils.hpp>
 #include <hpx/execution_base/get_env.hpp>
@@ -217,5 +193,3 @@ namespace hpx::execution::experimental {
         };
     }    // namespace detail
 }    // namespace hpx::execution::experimental
-
-#endif
