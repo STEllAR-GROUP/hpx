@@ -22,7 +22,7 @@ Checks: >
     misc-non-copyable-objects
     misc-use-after-move
     misc-virtual-near-miss
-# WarningsAsErrors: '*'
+WarningsAsErrors: '*'
 HeaderFilterRegex: '.*hpx.*'
 CheckOptions:
   - key: bugprone-assert-side-effect.CheckFunctionCalls
