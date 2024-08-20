@@ -36,7 +36,7 @@ namespace hpx::lcos::detail {
 
     template <typename Future, typename SourceState, typename DestinationState>
     HPX_FORCEINLINE void transfer_result(
-        SourceState&& src, DestinationState const& dest)
+        SourceState&& src, DestinationState& dest)
     {
         hpx::detail::try_catch_exception_ptr(
             [&]() {
@@ -88,6 +88,8 @@ namespace hpx::lcos::detail {
         }
         else
         {
+            hpx::intrusive_ptr<Continuation> cont_(&cont);
+
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     using inner_shared_state_ptr =
@@ -109,13 +111,12 @@ namespace hpx::lcos::detail {
 
                     // Bind an on_completed handler to this future that will
                     // transfer its result to the new future.
-                    hpx::intrusive_ptr<Continuation> cont_(&cont);
                     ptr->execute_deferred();
                     ptr->set_on_completed(
                         [inner_state = HPX_MOVE(inner_state),
                             cont_ = HPX_MOVE(cont_)]() mutable -> void {
                             return transfer_result<inner_future>(
-                                HPX_MOVE(inner_state), HPX_MOVE(cont_));
+                                HPX_MOVE(inner_state), cont_);
                         });
                 },
                 [&](std::exception_ptr ep) {
@@ -404,13 +405,6 @@ namespace hpx::lcos::detail {
     class unwrap_continuation : public future_data<ContResult>
     {
     private:
-        template <typename Inner>
-        void on_inner_ready(
-            traits::detail::shared_state_ptr_for_t<Inner>&& inner_state)
-        {
-            transfer_result<Inner>(HPX_MOVE(inner_state), this);
-        }
-
         template <typename Outer>
         void on_outer_ready(
             traits::detail::shared_state_ptr_for_t<Outer>&& outer_state)
@@ -443,11 +437,13 @@ namespace hpx::lcos::detail {
                     }
 
                     ptr->execute_deferred();
+
+                    // attach continuation on inner ready
                     ptr->set_on_completed(
                         [this_ = HPX_MOVE(this_),
                             inner = HPX_MOVE(inner_state)]() mutable -> void {
-                            this_->template on_inner_ready<inner_future>(
-                                HPX_MOVE(inner));
+                            transfer_result<inner_future>(
+                                HPX_MOVE(inner), this_);
                         });
                 },
                 [&](std::exception_ptr ep) {

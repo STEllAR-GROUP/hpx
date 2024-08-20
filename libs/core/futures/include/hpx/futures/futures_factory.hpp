@@ -50,7 +50,7 @@ namespace hpx::lcos::local {
             using result_type = typename Base::result_type;
             using init_no_addref = typename Base::init_no_addref;
 
-            F f_;
+            std::decay_t<F> f_;
 
             explicit task_object(F const& f)
               : f_(f)
