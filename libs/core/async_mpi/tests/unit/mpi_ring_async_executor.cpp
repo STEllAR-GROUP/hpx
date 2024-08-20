@@ -170,7 +170,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
 // the normal int main function that is called at startup and runs on an OS
 // thread the user must call hpx::local::init to start the hpx runtime which
 // will execute hpx_main on an hpx thread
-int main(int argc, char* argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
 #if !defined(HPX_HAVE_STDEXEC)
     // if this test is run with distributed runtime, we need to make sure
