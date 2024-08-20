@@ -250,7 +250,7 @@ int hpx_main()
     return hpx::local::finalize();
 }
 
-int main(int argc, char* argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
 #if !defined(HPX_HAVE_STDEXEC)
     // Disable MPI tests because they
