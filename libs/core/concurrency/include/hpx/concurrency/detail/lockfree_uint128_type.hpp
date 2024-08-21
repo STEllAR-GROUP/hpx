@@ -10,8 +10,8 @@
 
 #include <atomic>
 
-#if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE)
-/* this will only be true if the target supports cmpxchg16b */
+/* Note: currently only supported on Linux */
+#if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__linux__)
 template <>
 inline bool std::atomic<hpx::lockfree::uint128_type>::is_lock_free()
     const noexcept
@@ -56,4 +56,4 @@ inline bool std::atomic<hpx::lockfree::uint128_type>::compare_exchange_strong(
         : "cc", "memory");
     return result;
 }
-#endif    // !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE)
+#endif    // !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__linux__)
