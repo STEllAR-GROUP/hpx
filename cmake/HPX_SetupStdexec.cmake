@@ -80,6 +80,7 @@ if(HPX_WITH_STDEXEC)
         COMPONENT cmake
       )
 
+      add_library(Stdexec::Stdexec ALIAS Stdexec)
       add_library(STDEXEC::stdexec ALIAS Stdexec)
 
       # fetchcontent_makeavailable(Stdexec)
