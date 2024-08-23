@@ -1154,13 +1154,13 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename IterOrR, typename Size,
                 typename F, typename... Ts>
-            static auto parallel(ExPolicy&& policy, IterOrR iter_or_r,
+            static decltype(auto) parallel(ExPolicy&& policy, IterOrR iter_or_r,
                 Size size, F&& f, Ts&&... ts)
             {
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (size == 0)
                     {
@@ -1171,7 +1171,7 @@ namespace hpx::parallel {
                 if constexpr (sizeof...(Ts) == 0)
                 {
                     if constexpr (hpx::is_async_execution_policy_v<ExPolicy> ||
-                        is_scheduler_policy)
+                        has_scheduler_executor)
                     {
                         return util::detail::algorithm_result<ExPolicy>::get(
                             util::partitioner<ExPolicy>::call(
@@ -1190,14 +1190,6 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    // any of the induction or reduction operations prevent us
-                    // from sharing the part_iteration between threads
-                    decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
-                            HPX_FORWARD(ExPolicy, policy),
-                            hpx::threads::thread_sharing_hint::
-                                do_not_share_function);
-
                     using policy_type = std::decay_t<decltype(policy)>;
 
                     // we need to decay copy here to properly transport
@@ -1209,10 +1201,10 @@ namespace hpx::parallel {
 
                     return util::detail::algorithm_result<policy_type>::get(
                         util::partitioner<policy_type>::call_with_index(
-                            hinted_policy, iter_or_r, size, 1,
+                            HPX_FORWARD(ExPolicy, policy), iter_or_r, size, 1,
                             part_iterations<policy_type, F, void, args_type>{
                                 HPX_FORWARD(F, f), args},
-                            [=](auto&&) mutable {
+                            [=](auto&&...) mutable {
                                 auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();
@@ -1335,10 +1327,10 @@ namespace hpx::parallel {
             static auto parallel(ExPolicy&& policy, B first, Size size,
                 S stride, F&& f, Ts&&... ts)
             {
-                constexpr bool is_scheduler_policy =
+                constexpr bool has_scheduler_executor =
                     hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
-                if constexpr (!is_scheduler_policy)
+                if constexpr (!has_scheduler_executor)
                 {
                     if (size == 0)
                     {
@@ -1348,7 +1340,7 @@ namespace hpx::parallel {
 
                 if constexpr (sizeof...(Ts) == 0)
                 {
-                    if constexpr (!is_scheduler_policy)
+                    if constexpr (!has_scheduler_executor)
                     {
                         if (stride == 1)
                         {
@@ -1357,12 +1349,14 @@ namespace hpx::parallel {
                                     HPX_FORWARD(ExPolicy, policy), first, size,
                                     part_iterations<ExPolicy, F, S>{
                                         HPX_FORWARD(F, f)},
-                                    [](auto&&) { return hpx::util::unused; }));
+                                    [](auto&&...) {
+                                        return hpx::util::unused;
+                                    }));
                         }
                     }
 
                     if constexpr (hpx::is_async_execution_policy_v<ExPolicy> ||
-                        is_scheduler_policy)
+                        has_scheduler_executor)
                     {
                         return util::detail::algorithm_result<ExPolicy>::get(
                             util::partitioner<ExPolicy>::call_with_index(
@@ -1370,7 +1364,7 @@ namespace hpx::parallel {
                                 stride,
                                 part_iterations<ExPolicy, F, S>{
                                     HPX_FORWARD(F, f), stride},
-                                [](auto&&) { return hpx::util::unused; }));
+                                [](auto&&...) { return hpx::util::unused; }));
                     }
                     else
                     {
@@ -1384,14 +1378,6 @@ namespace hpx::parallel {
                 }
                 else
                 {
-                    // any of the induction or reduction operations prevent us
-                    // from sharing the part_iteration between threads
-                    decltype(auto) hinted_policy =
-                        parallel::util::adapt_sharing_mode(
-                            HPX_FORWARD(ExPolicy, policy),
-                            hpx::threads::thread_sharing_hint::
-                                do_not_share_function);
-
                     using policy_type = std::decay_t<decltype(policy)>;
 
                     // we need to decay copy here to properly transport
@@ -1403,10 +1389,10 @@ namespace hpx::parallel {
 
                     return util::detail::algorithm_result<policy_type>::get(
                         util::partitioner<policy_type>::call_with_index(
-                            hinted_policy, first, size, stride,
+                            HPX_FORWARD(ExPolicy, policy), first, size, stride,
                             part_iterations<policy_type, F, S, args_type>{
                                 HPX_FORWARD(F, f), stride, args},
-                            [=](auto&&) mutable {
+                            [=](auto&&...) mutable {
                                 auto pack =
                                     hpx::util::make_index_pack_t<sizeof...(
                                         Ts)>();
@@ -1564,9 +1550,8 @@ namespace hpx::parallel {
         // reshuffle arguments, last argument is function object, will go first
         template <typename ExPolicy, typename B, typename Size, typename S,
             std::size_t... Is, typename... Args>
-        util::detail::algorithm_result_t<ExPolicy> for_loop_n(ExPolicy&& policy,
-            B first, Size size, S stride, hpx::util::index_pack<Is...>,
-            Args&&... args)
+        decltype(auto) for_loop_n(ExPolicy&& policy, B first, Size size,
+            S stride, hpx::util::index_pack<Is...>, Args&&... args)
         {
             // stride shall not be zero
             HPX_ASSERT(stride != 0);
@@ -1653,10 +1638,9 @@ namespace hpx::experimental {
                 (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::experimental::for_loop_strided_t,
-            ExPolicy&& policy, std::decay_t<I> first, I last, S stride,
-            Args&&... args)
+        friend decltype(auto) tag_fallback_invoke(
+            hpx::experimental::for_loop_strided_t, ExPolicy&& policy,
+            std::decay_t<I> first, I last, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_strided must be called with at least a function "
@@ -1704,9 +1688,9 @@ namespace hpx::experimental {
                 (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::experimental::for_loop_n_t, ExPolicy&& policy,
-            I first, Size size, Args&&... args)
+        friend decltype(auto) tag_fallback_invoke(
+            hpx::experimental::for_loop_n_t, ExPolicy&& policy, I first,
+            Size size, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n must be called with at least a function object");
@@ -1753,9 +1737,9 @@ namespace hpx::experimental {
                 (hpx::traits::is_iterator_v<I> || std::is_integral_v<I>)
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy>
-        tag_fallback_invoke(hpx::experimental::for_loop_n_strided_t,
-            ExPolicy&& policy, I first, Size size, S stride, Args&&... args)
+        friend decltype(auto) tag_fallback_invoke(
+            hpx::experimental::for_loop_n_strided_t, ExPolicy&& policy, I first,
+            Size size, S stride, Args&&... args)
         {
             static_assert(sizeof...(Args) >= 1,
                 "for_loop_n_strided must be called with at least a function "
