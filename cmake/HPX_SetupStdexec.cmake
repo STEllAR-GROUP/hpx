@@ -42,7 +42,7 @@ if(HPX_WITH_STDEXEC)
       )
 
       fetchcontent_getproperties(Stdexec)
-      if(NOT stdexec_POPULATED)
+      if(NOT Stdexec_POPULATED)
         fetchcontent_populate(Stdexec)
       endif()
       set(Stdexec_ROOT ${stdexec_SOURCE_DIR})
@@ -76,14 +76,15 @@ if(HPX_WITH_STDEXEC)
       install(
         EXPORT HPXStdexecTarget
         NAMESPACE Stdexec::
+        FILE HPXStdexecTarget.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${HPX_PACKAGE_NAME}
         COMPONENT cmake
       )
 
+      # TODO: Enforce a single spelling
       add_library(Stdexec::Stdexec ALIAS Stdexec)
       add_library(STDEXEC::stdexec ALIAS Stdexec)
 
-      # fetchcontent_makeavailable(Stdexec)
     endif()
 
   else()

@@ -30,11 +30,13 @@ endif()
 
 # Stdexec can be installed by HPX or externally installed. In the first case we use
 # exported targets, in the second we find Stdexec again using find_package.
-if(HPX_WITH_FETCH_STDEXEC)
-  include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
-else()
-  set(Stdexec_ROOT "@Stdexec_ROOT@")
-  include(HPX_SetupStdexec)
+if(HPX_WITH_STDEXEC)
+  if(HPX_WITH_FETCH_STDEXEC)
+    include("${CMAKE_CURRENT_LIST_DIR}/HPXStdexecTarget.cmake")
+  else()
+    set(Stdexec_ROOT "@Stdexec_ROOT@")
+    include(HPX_SetupStdexec)
+  endif()
 endif()
 
 
