@@ -3,12 +3,11 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/init.hpp>
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -39,8 +38,9 @@ void test_contains_subrange(IteratorTag)
     c1.at(mid + 1) = 2;
     c1.at(mid + 2) = 3;
 
-
-    bool result = hpx::ranges::contains_subrange(iterator(std::begin(c1)), iterator(std::end(c1)), iterator(std::begin(c2)), iterator(std::end(c2)));
+    bool result = hpx::ranges::contains_subrange(iterator(std::begin(c1)),
+        iterator(std::end(c1)), iterator(std::begin(c2)),
+        iterator(std::end(c2)));
     HPX_TEST_EQ(result, true);
 }
 
@@ -48,7 +48,7 @@ template <typename ExPolicy, typename IteratorTag>
 void test_contains_subrange(ExPolicy&& policy, IteratorTag)
 {
     static_assert(hpx::is_execution_policy_v<ExPolicy>,
-            "hpx::is_execution_policy_v<ExPolicy>");
+        "hpx::is_execution_policy_v<ExPolicy>");
     typedef std::vector<int>::iterator base_iterator;
     typedef test::test_iterator<base_iterator, IteratorTag> iterator;
 
@@ -61,7 +61,9 @@ void test_contains_subrange(ExPolicy&& policy, IteratorTag)
     c1.at(mid + 1) = 2;
     c1.at(mid + 2) = 3;
 
-    bool result1 = hpx::ranges::contains_subrange(policy, iterator(std::begin(c1)), iterator(std::end(c1)), iterator(std::begin(c2)), iterator(std::end(c2)));
+    bool result1 = hpx::ranges::contains_subrange(policy,
+        iterator(std::begin(c1)), iterator(std::end(c1)),
+        iterator(std::begin(c2)), iterator(std::end(c2)));
     HPX_TEST_EQ(result1, true);
 }
 
@@ -83,8 +85,9 @@ void test_contains_subrange_async(ExPolicy&& policy, IteratorTag)
     c1.at(mid + 1) = 2;
     c1.at(mid + 2) = 3;
 
-    hpx::future<bool> result = hpx::ranges::contains_subrange(policy, iterator(std::begin(c1)),
-            iterator(std::end(c1)), iterator(std::begin(c2)), iterator(std::end(c2)));
+    hpx::future<bool> result = hpx::ranges::contains_subrange(policy,
+        iterator(std::begin(c1)), iterator(std::end(c1)),
+        iterator(std::begin(c2)), iterator(std::end(c2)));
     result.wait();
     HPX_TEST_EQ(result.get(), true);
 }
@@ -131,12 +134,13 @@ void test_contains_subrange_exception(IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::ranges::contains_subrange(decorated_iterator(std::begin(c1),
-                    []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c1),
-                []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::begin(c2)),
-                decorated_iterator(std::end(c2)));
+        hpx::ranges::contains_subrange(
+            decorated_iterator(
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(
+                std::end(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::begin(c2)),
+            decorated_iterator(std::end(c2)));
         HPX_TEST(false);
     }
 
@@ -177,12 +181,13 @@ void test_contains_subrange_exception(ExPolicy&& policy, IteratorTag)
     bool caught_exception = false;
     try
     {
-        hpx::ranges::contains_subrange(policy, decorated_iterator(std::begin(c1),
-                    []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c1),
-                []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::begin(c2)),
-                decorated_iterator(std::end(c2)));
+        hpx::ranges::contains_subrange(policy,
+            decorated_iterator(
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(
+                std::end(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::begin(c2)),
+            decorated_iterator(std::end(c2)));
 
         HPX_TEST(false);
     }
@@ -224,12 +229,12 @@ void test_contains_subrange_exception_async(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::future<bool> result = hpx::ranges::contains_subrange(policy,
-                decorated_iterator(std::begin(c1),
-                    []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::end(c1),
-                []() { throw std::runtime_error("test"); }),
-                decorated_iterator(std::begin(c2)),
-                decorated_iterator(std::end(c2)));
+            decorated_iterator(
+                std::begin(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(
+                std::end(c1), []() { throw std::runtime_error("test"); }),
+            decorated_iterator(std::begin(c2)),
+            decorated_iterator(std::end(c2)));
         result.get();
         HPX_TEST(false);
     }
@@ -291,7 +296,8 @@ void test_contains_subrange_bad_alloc(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::ranges::contains_subrange(policy,
-            decorated_iterator(std::begin(c1), []() { throw std::bad_alloc(); }),
+            decorated_iterator(
+                std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::begin(c2)),
             decorated_iterator(std::end(c2)));
@@ -333,7 +339,8 @@ void test_contains_subrange_bad_alloc_async(ExPolicy&& policy, IteratorTag)
     try
     {
         hpx::future<bool> result = hpx::ranges::contains_subrange(policy,
-            decorated_iterator(std::begin(c1), []() { throw std::bad_alloc(); }),
+            decorated_iterator(
+                std::begin(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::end(c1), []() { throw std::bad_alloc(); }),
             decorated_iterator(std::begin(c2)),
             decorated_iterator(std::end(c2)));

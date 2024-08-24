@@ -9,7 +9,6 @@
 #include <hpx/coroutines/thread_enums.hpp>
 #include <hpx/execution/algorithms/detail/predicates.hpp>
 #include <hpx/executors/execution_policy.hpp>
-#include <hpx/unwrap.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
 #include <hpx/parallel/algorithms/detail/contains.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
@@ -23,6 +22,7 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/identity.hpp>
+#include <hpx/unwrap.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
@@ -87,7 +87,8 @@ namespace hpx::parallel { namespace detail {
     struct contains_subrange_helper;
 
     template <typename ExPolicy, typename T>
-    struct contains_subrange_helper<ExPolicy, T, std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
+    struct contains_subrange_helper<ExPolicy, T,
+        std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static constexpr T get(T& t)
         {
@@ -101,7 +102,8 @@ namespace hpx::parallel { namespace detail {
     };
 
     template <typename ExPolicy, typename T>
-    struct contains_subrange_helper<ExPolicy, T, std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
+    struct contains_subrange_helper<ExPolicy, T,
+        std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
         static constexpr T get(T& t)
         {
@@ -143,16 +145,14 @@ namespace hpx::parallel { namespace detail {
             FwdIter2 first2, Sent2 last2, Pred pred, Proj1&& proj1,
             Proj2&& proj2)
         {
-
-            auto itr = hpx::ranges::search(
-                policy, first1, last1, first2, last2,
+            auto itr = hpx::ranges::search(policy, first1, last1, first2, last2,
                 HPX_MOVE(pred), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
 
             return util::detail::algorithm_result<ExPolicy, bool>::get(
-                contains_subrange_helper<ExPolicy, FwdIter1>().get(itr) != last1);
+                contains_subrange_helper<ExPolicy, FwdIter1>().get(itr) !=
+                last1);
         }
-
     };
 
 }}    // namespace hpx::parallel::detail
@@ -163,15 +163,12 @@ namespace hpx::ranges {
       : hpx::functional::detail::tag_fallback<contains_t>
     {
     private:
-
         //clang-format off
         template <typename Iterator, typename Sentinel, typename T,
             typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::traits::is_iterator_v<Iterator> &&
-                hpx::traits::is_iterator_v<Iterator> &&
-                hpx::is_invocable_v<Proj,
-                    typename std::iterator_traits<Iterator>::value_type>)>
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<Iterator>&& hpx::
+                    traits::is_iterator_v<Iterator>&& hpx::is_invocable_v<Proj,
+                        typename std::iterator_traits<Iterator>::value_type>)>
 
         //clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_t, Iterator first,
@@ -188,39 +185,31 @@ namespace hpx::ranges {
         }
 
         //clang-format off
-        template <typename Rng, typename T,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(hpx::traits::is_range_v<Rng> &&
-                hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-            )>
+        template <typename Rng, typename T, typename Proj = hpx::identity,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_range_v<Rng>&&
+                    hpx::parallel::traits::is_projected_range_v<Proj, Rng>)>
 
         //clang-format on
-        friend bool tag_fallback_invoke(hpx::ranges::contains_t, Rng&& rng,
-            const T& t, Proj proj = Proj())
+        friend bool tag_fallback_invoke(
+            hpx::ranges::contains_t, Rng&& rng, const T& t, Proj proj = Proj())
         {
-
             return parallel::detail::contains().call(hpx::execution::seq,
-                    hpx::util::begin(rng), hpx::util::end(rng), t,
-                    HPX_MOVE(proj));
+                hpx::util::begin(rng), hpx::util::end(rng), t, HPX_MOVE(proj));
         }
 
         //clang-format off
-        template <typename ExPolicy, typename Iterator,
-            typename Sentinel, typename T,
-            typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                    hpx::is_execution_policy_v<ExPolicy> &&
-                    hpx::traits::is_iterator_v<Iterator> &&
-                    hpx::traits::is_iterator_v<Iterator> &&
-                    hpx::is_invocable_v<Proj,
-                        typename std::iterator_traits<Iterator>::value_type>
-            )>
+        template <typename ExPolicy, typename Iterator, typename Sentinel,
+            typename T, typename Proj = hpx::identity,
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<
+                ExPolicy>&& hpx::traits::is_iterator_v<Iterator>&& hpx::traits::
+                    is_iterator_v<Iterator>&& hpx::is_invocable_v<Proj,
+                        typename std::iterator_traits<Iterator>::value_type>)>
 
         //clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy, Iterator first,
-            Sentinel last, T const& val, Proj&& proj = Proj())
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            Iterator first, Sentinel last, T const& val, Proj&& proj = Proj())
         {
             static_assert(hpx::traits::is_iterator_v<Iterator>,
                 "Required at least iterator.");
@@ -236,21 +225,19 @@ namespace hpx::ranges {
         //clang-format off
         template <typename ExPolicy, typename Rng, typename T,
             typename Proj = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_range_v<Rng> &&
-                hpx::parallel::traits::is_projected_range_v<Proj, Rng>
-            )>
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<ExPolicy>&&
+                    hpx::traits::is_range_v<Rng>&&
+                        hpx::parallel::traits::is_projected_range_v<Proj, Rng>)>
 
         //clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(hpx::ranges::contains_t,
-            ExPolicy&& policy, Rng&& rng, const T& t, Proj proj = Proj())
+        tag_fallback_invoke(hpx::ranges::contains_t, ExPolicy&& policy,
+            Rng&& rng, const T& t, Proj proj = Proj())
         {
-            return parallel::detail::contains().call(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::begin(rng), hpx::util::end(rng), t,
-                    HPX_MOVE(proj));
+            return parallel::detail::contains().call(
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng),
+                hpx::util::end(rng), t, HPX_MOVE(proj));
         }
 
     } contains{};
@@ -263,19 +250,17 @@ namespace hpx::ranges {
         template <typename FwdIter1, typename Sent1, typename FwdIter2,
             typename Sent2, typename Pred = ranges::equal_to,
             typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_iterator_v<FwdIter1> &&
-                    hpx::traits::is_sentinel_for_v<Sent1,FwdIter1> &&
-                    hpx::traits::is_iterator_v<FwdIter2> &&
-                    hpx::traits::is_sentinel_for_v<Sent2,FwdIter2> &&
-                    hpx::is_invocable_v<Pred,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<
+                FwdIter1>&& hpx::traits::is_sentinel_for_v<Sent1,
+                FwdIter1>&& hpx::traits::is_iterator_v<FwdIter2>&&
+                    hpx::traits::is_sentinel_for_v<Sent2,
+                        FwdIter2>&& hpx::is_invocable_v<Pred,
                         typename std::iterator_traits<FwdIter1>::value_type,
-                        typename std::iterator_traits<FwdIter2>::value_type> &&
-                    hpx::is_invocable_v<Proj1,
-                        typename std::iterator_traits<FwdIter1>::value_type> &&
-                    hpx::is_invocable_v<Proj2,
-                        typename std::iterator_traits<FwdIter2>::value_type>
-            )>
+                        typename std::iterator_traits<
+                            FwdIter2>::value_type>&& hpx::is_invocable_v<Proj1,
+                        typename std::iterator_traits<
+                            FwdIter1>::value_type>&& hpx::is_invocable_v<Proj2,
+                        typename std::iterator_traits<FwdIter2>::value_type>)>
 
         //clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_subrange_t,
@@ -297,47 +282,44 @@ namespace hpx::ranges {
 
         //clang-format off
         template <typename Rng1, typename Rng2,
-                  typename Pred = hpx::ranges::equal_to,
-                  typename Proj1 = hpx::identity,
-                  typename Proj2 = hpx::identity,
-                  HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_range_v<Rng1> &&
-                    hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                    hpx::traits::is_range_v<Rng2> &&
-                    hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
-                    hpx::parallel::traits::is_indirect_callable_v<hpx::execution::sequenced_policy,
-                        Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
-                        hpx::parallel::traits::projected_range<Proj2, Rng2>
-                    >
-                  )>
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_range_v<
+                Rng1>&& hpx::parallel::traits::is_projected_range_v<Proj1,
+                Rng1>&& hpx::traits::is_range_v<Rng2>&&
+                    hpx::parallel::traits::is_projected_range_v<Proj2, Rng2>&&
+                        hpx::parallel::traits::is_indirect_callable_v<
+                            hpx::execution::sequenced_policy, Pred,
+                            hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                            hpx::parallel::traits::projected_range<Proj2,
+                                Rng2>>)>
 
         //clang-format on
         friend bool tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
-            return hpx::parallel::detail::contains_subrange().call(hpx::execution::seq,
-                    hpx::util::begin(rng1), hpx::util::end(rng1),
-                    hpx::util::begin(rng2), hpx::util::end(rng2),
-                    HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
+            return hpx::parallel::detail::contains_subrange().call(
+                hpx::execution::seq, hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), HPX_MOVE(pred), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
 
         //clang-format off
         template <typename ExPolicy, typename FwdIter1, typename Sent1,
             typename FwdIter2, typename Sent2,
             typename Pred = hpx::ranges::equal_to,
-            typename Proj1 = hpx::identity,
-            typename Proj2 = hpx::identity,
-            HPX_CONCEPT_REQUIRES_(
-                hpx::is_execution_policy_v<ExPolicy> &&
-                hpx::traits::is_iterator_v<FwdIter1> &&
-                hpx::traits::is_sentinel_for_v<Sent1,FwdIter1> &&
-                hpx::traits::is_iterator_v<FwdIter2> &&
-                hpx::traits::is_sentinel_for_v<Sent2,FwdIter2> &&
-                hpx::is_invocable_v<Pred,
-                    typename std::iterator_traits<FwdIter1>::value_type,
-                    typename std::iterator_traits<FwdIter2>::value_type>
-            )>
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            HPX_CONCEPT_REQUIRES_(hpx::is_execution_policy_v<
+                ExPolicy>&& hpx::traits::is_iterator_v<FwdIter1>&&
+                    hpx::traits::is_sentinel_for_v<Sent1,
+                        FwdIter1>&& hpx::traits::is_iterator_v<FwdIter2>&&
+                        hpx::traits::is_sentinel_for_v<Sent2,
+                            FwdIter2>&& hpx::is_invocable_v<Pred,
+                            typename std::iterator_traits<FwdIter1>::value_type,
+                            typename std::iterator_traits<
+                                FwdIter2>::value_type>)>
 
         //clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
@@ -361,31 +343,30 @@ namespace hpx::ranges {
 
         //clang-format off
         template <typename ExPolicy, typename Rng1, typename Rng2,
-                  typename Pred = hpx::ranges::equal_to,
-                  typename Proj1 = hpx::identity,
-                  typename Proj2 = hpx::identity,
-                HPX_CONCEPT_REQUIRES_(
-                    hpx::traits::is_range_v<Rng1> &&
-                    hpx::parallel::traits::is_projected_range_v<Proj1, Rng1> &&
-                    hpx::traits::is_range_v<Rng2> &&
-                    hpx::parallel::traits::is_projected_range_v<Proj2, Rng2> &&
-                    hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
-                        Pred, hpx::parallel::traits::projected_range<Proj1, Rng1>,
-                        hpx::parallel::traits::projected_range<Proj2, Rng2>
-                    >
-                )>
+            typename Pred = hpx::ranges::equal_to,
+            typename Proj1 = hpx::identity, typename Proj2 = hpx::identity,
+            HPX_CONCEPT_REQUIRES_(hpx::traits::is_range_v<
+                Rng1>&& hpx::parallel::traits::is_projected_range_v<Proj1,
+                Rng1>&& hpx::traits::is_range_v<Rng2>&&
+                    hpx::parallel::traits::is_projected_range_v<Proj2, Rng2>&&
+                        hpx::parallel::traits::is_indirect_callable_v<ExPolicy,
+                            Pred,
+                            hpx::parallel::traits::projected_range<Proj1, Rng1>,
+                            hpx::parallel::traits::projected_range<Proj2,
+                                Rng2>>)>
 
         //clang-format on
         friend typename parallel::util::detail::algorithm_result<ExPolicy,
             bool>::type
-        tag_fallback_invoke(hpx::ranges::contains_subrange_t,
-            ExPolicy&& policy, Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(),
-            Proj1 proj1 = Proj1(), Proj2 proj2 = Proj2())
+        tag_fallback_invoke(hpx::ranges::contains_subrange_t, ExPolicy&& policy,
+            Rng1&& rng1, Rng2&& rng2, Pred pred = Pred(), Proj1 proj1 = Proj1(),
+            Proj2 proj2 = Proj2())
         {
-            return hpx::parallel::detail::contains_subrange().call(HPX_FORWARD(ExPolicy, policy),
-                    hpx::util::begin(rng1), hpx::util::end(rng1),
-                    hpx::util::begin(rng2), hpx::util::end(rng2),
-                    HPX_MOVE(pred), HPX_MOVE(proj1), HPX_MOVE(proj2));
+            return hpx::parallel::detail::contains_subrange().call(
+                HPX_FORWARD(ExPolicy, policy), hpx::util::begin(rng1),
+                hpx::util::end(rng1), hpx::util::begin(rng2),
+                hpx::util::end(rng2), HPX_MOVE(pred), HPX_MOVE(proj1),
+                HPX_MOVE(proj2));
         }
 
     } contains_subrange{};

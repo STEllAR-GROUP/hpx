@@ -6,9 +6,8 @@
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/future.hpp>
-#include <hpx/modules/testing.hpp>
 #include <hpx/init.hpp>
-
+#include <hpx/modules/testing.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -36,8 +35,8 @@ void test_contains(IteratorTag)
     const std::size_t n = c.size();
     c.at(n / 2) = 1;
 
-    bool result1 =
-        hpx::ranges::contains(iterator(std::begin(c)), iterator(std::end(c)), int(1));
+    bool result1 = hpx::ranges::contains(
+        iterator(std::begin(c)), iterator(std::end(c)), int(1));
     HPX_TEST_EQ(result1, true);
 }
 
@@ -111,7 +110,6 @@ void contains_test()
     test_contains<std::forward_iterator_tag>();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IteratorTag>
 void test_contains_exception(IteratorTag)
@@ -127,7 +125,7 @@ void test_contains_exception(IteratorTag)
     try
     {
         hpx::ranges::contains(decorated_iterator(std::begin(c),
-                          []() { throw std::runtime_error("test"); }),
+                                  []() { throw std::runtime_error("test"); }),
             decorated_iterator(std::end(c)), int(0));
 
         HPX_TEST(false);
@@ -250,7 +248,6 @@ void contains_exception_test()
     test_contains_exception<std::random_access_iterator_tag>();
     test_contains_exception<std::forward_iterator_tag>();
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 
