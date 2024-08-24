@@ -15,7 +15,6 @@ set(algorithms_headers
     hpx/parallel/algorithms/adjacent_difference.hpp
     hpx/parallel/algorithms/adjacent_find.hpp
     hpx/parallel/algorithms/all_any_none.hpp
-    hpx/parallel/algorithms/contains.hpp
     hpx/parallel/algorithms/copy.hpp
     hpx/parallel/algorithms/count.hpp
     hpx/parallel/algorithms/destroy.hpp
@@ -105,6 +104,7 @@ set(algorithms_headers
     hpx/parallel/container_algorithms/adjacent_difference.hpp
     hpx/parallel/container_algorithms/adjacent_find.hpp
     hpx/parallel/container_algorithms/all_any_none.hpp
+    hpx/parallel/container_algorithms/contains.hpp
     hpx/parallel/container_algorithms/copy.hpp
     hpx/parallel/container_algorithms/count.hpp
     hpx/parallel/container_algorithms/destroy.hpp

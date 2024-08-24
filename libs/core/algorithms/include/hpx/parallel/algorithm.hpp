@@ -16,7 +16,6 @@
 // Parallelism TS V1
 #include <hpx/parallel/algorithms/adjacent_find.hpp>
 #include <hpx/parallel/algorithms/all_any_none.hpp>
-#include <hpx/parallel/algorithms/contains.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 #include <hpx/parallel/algorithms/count.hpp>
 #include <hpx/parallel/algorithms/equal.hpp>

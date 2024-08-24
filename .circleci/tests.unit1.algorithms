@@ -10,7 +10,6 @@ tests.unit.modules.algorithms.algorithms.adjacentfind
 tests.unit.modules.algorithms.algorithms.adjacentfind_binary
 tests.unit.modules.algorithms.algorithms.all_of
 tests.unit.modules.algorithms.algorithms.any_of
-tests.unit.modules.algorithms.algorithms.contains
 tests.unit.modules.algorithms.algorithms.copy
 tests.unit.modules.algorithms.algorithms.copyif_random
 tests.unit.modules.algorithms.algorithms.copyif_forward

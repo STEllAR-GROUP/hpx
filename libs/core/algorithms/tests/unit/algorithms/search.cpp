@@ -39,6 +39,12 @@ void test_search1_without_expolicy(IteratorTag)
     base_iterator test_index = std::begin(c) + c.size() / 2;
 
     HPX_TEST(index == iterator(test_index));
+
+    h[0] = 2;
+    iterator end_index = hpx::search(iterator(std::begin(c)), iterator(std::end(c)),
+        std::begin(h), std::end(h));
+
+    HPX_TEST(end_index == iterator(std::end(c)));
 }
 
 template <typename ExPolicy, typename IteratorTag>

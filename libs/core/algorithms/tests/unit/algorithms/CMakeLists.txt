@@ -23,7 +23,6 @@ set(tests
     adjacentfind_binary
     all_of
     any_of
-    contains
     copy
     copyif_random
     copyif_forward
