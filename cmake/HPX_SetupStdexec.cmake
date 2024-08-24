@@ -4,7 +4,10 @@
 #  Distributed under the Boost Software License, Version 1.0. (See accompanying
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20 AND HPX_WITH_CXX20_STD_IDENTITY AND NOT WIN32)
+if(HPX_WITH_CXX_STANDARD GREATER_EQUAL 20
+   AND HPX_WITH_CXX20_STD_IDENTITY
+   AND NOT MSVC
+)
   set(HPX_WITH_STDEXEC
       ON
       CACHE BOOL "Enabled by default for C++20" FORCE

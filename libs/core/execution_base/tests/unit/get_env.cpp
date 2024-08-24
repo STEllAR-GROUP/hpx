@@ -31,7 +31,7 @@ namespace mylib {
     {
         using is_receiver = void;
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
         decltype(auto) get_env() const noexcept
 #else
         friend some_env tag_invoke(ex::get_env_t, receiver_2 const&) noexcept
