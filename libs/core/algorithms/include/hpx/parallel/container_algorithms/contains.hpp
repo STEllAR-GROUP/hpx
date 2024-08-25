@@ -13,7 +13,6 @@
 #include <hpx/parallel/algorithms/detail/contains.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/distance.hpp>
-#include <hpx/parallel/algorithms/detail/search.hpp>
 #include <hpx/parallel/container_algorithms/search.hpp>
 #include <hpx/parallel/util/adapt_placement_mode.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
@@ -22,7 +21,6 @@
 #include <hpx/parallel/util/partitioner.hpp>
 #include <hpx/parallel/util/zip_iterator.hpp>
 #include <hpx/type_support/identity.hpp>
-#include <hpx/unwrap.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
