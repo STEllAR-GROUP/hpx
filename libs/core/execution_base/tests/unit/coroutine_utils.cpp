@@ -35,10 +35,8 @@ struct non_awaitable_sender
 };
 
 #if !defined(HPX_HAVE_STDEXEC)
-using dependent = hpx::execution::experimental::completion_signatures<
-    hpx::execution::experimental::set_value_t(bool),
-    hpx::execution::experimental::set_error_t(std::exception_ptr),
-    hpx::execution::experimental::set_stopped_t()>;
+using dependent = hpx::execution::experimental::dependent_completion_signatures<
+    hpx::execution::experimental::no_env>;
 #endif
 
 template <typename Awaiter>
@@ -82,19 +80,12 @@ struct awaiter
     }
 };
 
-struct invalid_awaiter
-{
-    bool await_ready();
-    bool await_suspend(hpx::coroutine_handle<>);
-    //void await_resume();
-};
-
 template <typename Awaiter>
 struct awaitable_sender_1
 {
     Awaiter operator co_await()
     {
-        return {};
+        return Awaiter{};
     }
 };
 
@@ -178,6 +169,7 @@ struct recv_set_value
     }
 };
 
+// Utility used below
 template <class T>
 T& unmove(T&& t)
 {
@@ -300,31 +292,31 @@ int main()
         static_assert(std::is_same_v<
             hpx::functional::tag_invoke_result_t<ex::as_awaitable_t,
                 awaitable_sender_4, ex::detail::env_promise<ex::no_env>&>,
-            ex::detail::dependent_completion_signatures<no_env>>);
+            ex::detail::dependent_completion_signatures<ex::no_env>>);
         static_assert(std::is_same_v<
             decltype(ex::get_awaiter(std::declval<awaitable_sender_4>(),
-                static_cast<ex::detail::env_promise<no_env>*>(nullptr))),
-            ex::detail::dependent_completion_signatures<no_env>>);
+                static_cast<ex::detail::env_promise<ex::no_env>*>(nullptr))),
+            ex::detail::dependent_completion_signatures<ex::no_env>>);
         // clang-format off
         static_assert(ex::is_awaiter_v<decltype(
                 ex::get_awaiter(std::declval<awaitable_sender_4>(),
-                    static_cast<ex::detail::env_promise<no_env>*>(nullptr)))>);
+                    static_cast<ex::detail::env_promise<ex::no_env>*>(nullptr)))>);
         static_assert(ex::detail::has_await_suspend_v<decltype(
                 ex::get_awaiter(std::declval<awaitable_sender_4>(),
-                    static_cast<ex::detail::env_promise<no_env>*>(nullptr)))>);
+                    static_cast<ex::detail::env_promise<ex::no_env>*>(nullptr)))>);
         static_assert(ex::detail::is_with_await_suspend_v<
             decltype(ex::get_awaiter(std::declval<awaitable_sender_4>(),
-                static_cast<ex::detail::env_promise<no_env>*>(nullptr))),
-            ex::detail::env_promise<no_env>>);
+                static_cast<ex::detail::env_promise<ex::no_env>*>(nullptr))),
+            ex::detail::env_promise<ex::no_env>>);
         // clang-format on
         static_assert(ex::is_awaitable_v<awaitable_sender_4,
-            ex::detail::env_promise<no_env>>);
+            ex::detail::env_promise<ex::no_env>>);
         static_assert(ex::is_awaitable_v<awaitable_sender_4,
-            ex::detail::env_promise<empty_env>>);
+            ex::detail::env_promise<ex::empty_env>>);
         static_assert(ex::is_awaitable_v<awaitable_sender_5,
-            ex::detail::env_promise<no_env>>);
+            ex::detail::env_promise<ex::no_env>>);
         static_assert(ex::is_awaitable_v<awaitable_sender_5,
-            ex::detail::env_promise<empty_env>>);
+            ex::detail::env_promise<ex::empty_env>>);
 #endif
     }
 
@@ -358,7 +350,7 @@ int main()
         static_assert(ex::is_sender_v<awaitable_sender_2>);
         static_assert(ex::detail::is_enable_sender_v<awaitable_sender_2>);
         static_assert(
-            ex::detail::is_sender_plain_v<awaitable_sender_2, no_env>);
+            ex::detail::is_sender_plain_v<awaitable_sender_2, ex::no_env>);
 #endif
         static_assert(ex::is_sender_v<awaitable_sender_3>);
         static_assert(ex::is_sender_v<awaitable_sender_4>);
