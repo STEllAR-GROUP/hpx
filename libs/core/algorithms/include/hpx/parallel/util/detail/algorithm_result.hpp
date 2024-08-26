@@ -18,12 +18,11 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
-#ifdef HPX_HAVE_STDEXEC
+#if defined(HPX_HAVE_STDEXEC)
 // for is_sender
 #include <hpx/execution_base/completion_signatures.hpp>
 #endif
 
-#include <hpx/execution_base/any_sender.hpp>
 #include <type_traits>
 #include <utility>
 

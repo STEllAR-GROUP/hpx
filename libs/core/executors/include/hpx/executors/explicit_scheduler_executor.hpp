@@ -188,6 +188,15 @@ namespace hpx::execution::experimental {
             explicit_scheduler_executor const& exec, F&& f, S const& shape,
             Ts&&... ts)
         {
+#if defined(HPX_HAVE_STDEXEC)
+//            We are using HPX's bulk implementation for now, so this works for
+//            other types too.
+//            static_assert(
+//                std::is_integral_v<S>,
+//                "P2300 expects bulk to be called only with integral types"
+//            );
+#endif
+
             using shape_element =
                 typename hpx::traits::range_traits<S>::value_type;
             using result_type = hpx::util::detail::invoke_deferred_result_t<F,

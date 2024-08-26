@@ -95,12 +95,10 @@ void test_for_each_execute_on_async(Policy l, ExPolicy&& policy, IteratorTag)
 
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
-    auto snd_result = tt::sync_wait(hpx::for_each(
+    auto result = tt::sync_wait(hpx::for_each(
         ex::execute_on(scheduler_t(l), std::forward<ExPolicy>(policy)),
         iterator(std::begin(c)), iterator(std::end(c)), f));
-    auto result = hpx::get<0>(*snd_result);
-
-    HPX_TEST(result == iterator(std::end(c)));
+    HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;
@@ -131,13 +129,11 @@ void test_for_each_execute_on_sender(Policy l, ExPolicy&& policy, IteratorTag)
 
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
-    auto snd_result = tt::sync_wait(
+    auto result = tt::sync_wait(
         ex::just(iterator(std::begin(c)), iterator(std::end(c)), f) |
         hpx::for_each(
             ex::execute_on(scheduler_t(l), std::forward<ExPolicy>(policy))));
-    auto result = hpx::get<0>(*snd_result);
-
-    HPX_TEST(result == iterator(std::end(c)));
+    HPX_TEST(hpx::get<0>(*result) == iterator(std::end(c)));
 
     // verify values
     std::size_t count = 0;

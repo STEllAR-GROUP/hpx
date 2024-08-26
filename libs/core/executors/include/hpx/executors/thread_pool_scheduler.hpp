@@ -275,7 +275,9 @@ namespace hpx::execution::experimental {
         struct sender
         {
             HPX_NO_UNIQUE_ADDRESS std::decay_t<Scheduler> scheduler;
-
+#if defined(HPX_HAVE_STDEXEC)
+            using sender_concept = hpx::execution::experimental::sender_t;
+#endif
             using completion_signatures =
                 hpx::execution::experimental::completion_signatures<
                     hpx::execution::experimental::set_value_t(),
@@ -301,7 +303,33 @@ namespace hpx::execution::experimental {
             {
                 return {s.scheduler, HPX_FORWARD(Receiver, receiver)};
             }
+#if defined(HPX_HAVE_STDEXEC)
+            struct env
+            {
+                std::decay_t<Scheduler> const& sched;
+                // clang-format off
+                template <typename CPO,
+                    HPX_CONCEPT_REQUIRES_(
+                        meta::value<meta::one_of<
+                            CPO, set_value_t, set_stopped_t>>
+                    )>
+                // clang-format on
+                friend constexpr auto tag_invoke(
+                    hpx::execution::experimental::get_completion_scheduler_t<
+                        CPO>,
+                    env const& e) noexcept
+                {
+                    return e.sched;
+                }
+            };
 
+            friend constexpr env tag_invoke(
+                hpx::execution::experimental::get_env_t,
+                sender const& s) noexcept
+            {
+                return {s.scheduler};
+            };
+#else
             // clang-format off
             template <typename CPO,
                 HPX_CONCEPT_REQUIRES_(
@@ -315,6 +343,7 @@ namespace hpx::execution::experimental {
             {
                 return s.scheduler;
             }
+#endif
         };
 
         friend constexpr hpx::execution::experimental::

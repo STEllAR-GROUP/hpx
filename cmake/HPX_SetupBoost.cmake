@@ -109,7 +109,7 @@ if(NOT TARGET hpx_dependencies_boost)
   hpx_set_cmake_policy(CMP0167 OLD) # use CMake's FindBoost for now
 
   # Find the headers and get the version
-  find_package(Boost ${Boost_MINIMUM_VERSION} REQUIRED)
+  find_package(Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE MODULE REQUIRED)
   if(NOT Boost_VERSION_STRING)
     set(Boost_VERSION_STRING
         "${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}"
