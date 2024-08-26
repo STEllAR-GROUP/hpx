@@ -8,6 +8,10 @@
 #include <hpx/execution/algorithms/execute.hpp>
 #include <hpx/modules/testing.hpp>
 
+#if defined(HPX_HAVE_STDEXEC)
+#include "algorithm_test_utils.hpp"
+#endif
+
 #include <cstddef>
 #include <exception>
 #include <type_traits>
@@ -17,20 +21,36 @@ namespace ex = hpx::execution::experimental;
 static std::size_t friend_tag_invoke_schedule_calls = 0;
 static std::size_t tag_invoke_execute_calls = 0;
 
-struct sender
+#if defined(HPX_HAVE_STDEXEC)
+template <typename Scheduler>
+#endif
+struct execute_example_sender
 {
-    template <typename Env>
-    friend auto tag_invoke(ex::get_completion_signatures_t, sender const&, Env)
-        -> ex::completion_signatures<ex::set_value_t(),
-            ex::set_error_t(std::exception_ptr)>;
+#if defined(HPX_HAVE_STDEXEC)
+    using is_sender = void;
 
+    friend env_with_scheduler<Scheduler> tag_invoke(
+        ex::get_env_t, execute_example_sender const&) noexcept
+    {
+        return {};
+    }
+#endif
+
+    // clang-format off
+    template <typename Env>
+    friend auto tag_invoke(ex::get_completion_signatures_t,
+        execute_example_sender const&,
+        Env) -> ex::completion_signatures<ex::set_value_t(),
+                 ex::set_error_t(std::exception_ptr)>;
     struct operation_state
     {
         friend void tag_invoke(ex::start_t, operation_state&) noexcept {};
     };
+    // clang-format on
 
     template <typename R>
-    friend operation_state tag_invoke(ex::connect_t, sender&&, R&&) noexcept
+    friend operation_state tag_invoke(
+        ex::connect_t, execute_example_sender&&, R&&) noexcept
     {
         return {};
     }
@@ -38,7 +58,13 @@ struct sender
 
 struct scheduler_1
 {
-    friend sender tag_invoke(ex::schedule_t, scheduler_1)
+#if defined(HPX_HAVE_STDEXEC)
+    using my_sender = execute_example_sender<scheduler_1>;
+#else
+    using my_sender = execute_example_sender;
+#endif
+
+    friend my_sender tag_invoke(ex::schedule_t, scheduler_1)
     {
         ++friend_tag_invoke_schedule_calls;
         return {};
@@ -57,16 +83,29 @@ struct scheduler_1
 
 struct scheduler_2
 {
-    bool operator==(scheduler_1 const&) const noexcept
+#if defined(HPX_HAVE_STDEXEC)
+    using my_sender = execute_example_sender<scheduler_2>;
+#else
+    using my_sender = execute_example_sender;
+#endif
+
+    bool operator==(scheduler_2 const&) const noexcept
     {
         return true;
     }
 
-    bool operator!=(scheduler_1 const&) const noexcept
+    bool operator!=(scheduler_2 const&) const noexcept
     {
         return false;
     }
 };
+#if defined(HPX_HAVE_STDEXEC)
+scheduler_2::my_sender tag_invoke(ex::schedule_t, scheduler_2)
+{
+    ++friend_tag_invoke_schedule_calls;
+    return {};
+}
+#endif
 
 template <typename F>
 void tag_invoke(ex::execute_t, scheduler_2, F&&)
@@ -76,17 +115,23 @@ void tag_invoke(ex::execute_t, scheduler_2, F&&)
 
 struct f_struct_1
 {
-    void operator()(){};
+    // clang-format off
+    void operator()() {};
+    // clang-format on
 };
 
 struct f_struct_2
 {
-    void operator()(int){};
+    // clang-format off
+    void operator()(int) {};
+    // clang-format on
 };
 
 struct f_struct_3
 {
-    void operator()(int = 42){};
+    // clang-format off
+    void operator()(int = 42) {};
+    // clang-format on
 };
 
 void f_fun_1() {}

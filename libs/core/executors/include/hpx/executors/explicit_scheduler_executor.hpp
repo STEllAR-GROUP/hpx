@@ -192,7 +192,14 @@ namespace hpx::execution::experimental {
 
             static_assert(
                 std::is_void_v<result_type>, "std::is_void_v<result_type>");
-
+#if defined(HPX_HAVE_STDEXEC)
+//            We are using HPX's bulk implementation for now, so this works for
+//            other types too.
+//            static_assert(
+//                std::is_integral_v<S>,
+//                "P2300 expects bulk to be called only with integral types"
+//            );
+#endif
             return bulk(schedule(exec.sched_), shape,
                 hpx::bind_back(HPX_FORWARD(F, f), HPX_FORWARD(Ts, ts)...));
         }

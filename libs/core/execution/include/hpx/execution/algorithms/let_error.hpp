@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/variant.hpp>
@@ -136,10 +141,12 @@ namespace hpx::execution::experimental {
                 // clang-format on
             };
 
+            // clang-format off
             template <typename Env>
             friend auto tag_invoke(get_completion_signatures_t,
                 let_error_sender const&, Env) noexcept
                 -> generate_completion_signatures<Env>;
+            // clang-format on
 
             // clang-format off
             template <typename CPO, typename Scheduler_ = Scheduler,
@@ -469,3 +476,5 @@ namespace hpx::execution::experimental {
         }
     } let_error{};
 }    // namespace hpx::execution::experimental
+
+#endif

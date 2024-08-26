@@ -31,6 +31,7 @@ namespace hpx::execution::experimental {
     //   3. Otherwise, sender-awaitable{e, p} if awaitable-sender<E, P>
     //      is true.
     //   4. Otherwise, e.
+#if !defined(HPX_HAVE_STDEXEC)
     struct as_awaitable_t;
 
     struct connect_awaitable_t;
@@ -60,8 +61,8 @@ namespace hpx::execution::experimental {
     // await-expression. In practice, the coroutine is never resumed, and the
     // unhandled_stopped of the coroutine caller's promise type is called.
     //
-    template <typename Promise>
-    struct with_awaitable_senders;
+    //    template <typename Promise>
+    //    struct with_awaitable_senders;
 
     struct promise_base;
 
@@ -72,6 +73,7 @@ namespace hpx::execution::experimental {
 
     template <typename ReceiverId>
     struct operation;
+#endif
 }    // namespace hpx::execution::experimental
 
 #endif    // HPX_HAVE_CXX20_COROUTINES

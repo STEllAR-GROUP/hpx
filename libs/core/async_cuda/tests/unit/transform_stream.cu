@@ -284,12 +284,14 @@ int hpx_main()
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{}) |
             cu::transform_stream(increment{});
-        ex::when_all(ex::just(&p_h), std::move(s), ex::just(sizeof(type)),
-            ex::just(cudaMemcpyDeviceToHost)) |
+        tt::sync_wait(
+            ex::when_all(ex::just(&p_h), std::move(s), ex::just(sizeof(type)),
+                ex::just(cudaMemcpyDeviceToHost)) |
             cu::transform_stream(cuda_memcpy_async{}) |
             ex::then(&cu::check_cuda_error) |
             ex::then([&p_h] { HPX_TEST_EQ(p_h, 3); }) |
-            ex::transfer(ex::thread_pool_scheduler{}) | tt::sync_wait();
+            ex::transfer(ex::thread_pool_scheduler{}));
+
 
         cu::check_cuda_error(cudaFree(p));
     }
