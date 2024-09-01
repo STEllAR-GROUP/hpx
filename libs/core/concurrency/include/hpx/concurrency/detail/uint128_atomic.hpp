@@ -7,6 +7,7 @@
 #pragma once
 
 #include <hpx/concurrency/detail/uint128_type.hpp>
+#include <cstddef>
 
 #include <atomic>
 
@@ -69,7 +70,7 @@ namespace hpx::lockfree {
 #else
 
 namespace hpx::lockfree {
-    /* Fallback to aliasing std implementation if custom implementation is not supported */
+    /* Alias std::atomic if custom implementation isn't supported */
     using uint128_atomic = std::atomic<uint128_type>;
 }    // namespace hpx::lockfree
 #endif    // !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__linux__)
