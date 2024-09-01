@@ -8,7 +8,6 @@
 set(tests
     contiguous_index_queue
     freelist
-    lockfree_128uint
     lockfree_fifo
     non_contiguous_index_queue
     queue
@@ -17,6 +16,7 @@ set(tests
     stack_destructor
     stack_stress
     tagged_ptr
+    uint128_atomic
 )
 
 set(contiguous_index_queue_PARAMETERS THREADS_PER_LOCALITY 4)

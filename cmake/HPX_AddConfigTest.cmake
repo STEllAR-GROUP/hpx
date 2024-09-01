@@ -360,7 +360,7 @@ function(hpx_check_for_cxx11_std_atomic_128bit)
         FILE
         DEFINITIONS HPX_HAVE_CXX11_STD_ATOMIC_128BIT
       )
-      # Check if lockfree
+      # Check if lockfree after adding -latomic
       if(HPX_WITH_CXX11_ATOMIC_128BIT)
         add_hpx_config_test(
           HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE

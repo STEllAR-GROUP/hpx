@@ -13,7 +13,7 @@
 #pragma once
 
 #include <hpx/config.hpp>
-#include <hpx/concurrency/detail/lockfree_uint128_type.hpp>
+#include <hpx/concurrency/detail/uint128_atomic.hpp>
 #include <hpx/type_support/bit_cast.hpp>
 
 #include <cstddef>    // for std::size_t
@@ -41,7 +41,11 @@ namespace hpx::lockfree {
     template <typename Left, typename Right>
     struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
+        #if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__clang__)
+        using compressed_ptr_pair_t = uint128_atomic;
+        #else
         using compressed_ptr_pair_t = uint128_type;
+        #endif
         // compressed_ptr_t must be of the same size as a pointer
         using compressed_ptr_t = std::size_t;
         using tag_t = std::uint16_t;
