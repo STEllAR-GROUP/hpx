@@ -41,11 +41,11 @@ namespace hpx::lockfree {
     template <typename Left, typename Right>
     struct HPX_LOCKFREE_DCAS_ALIGNMENT tagged_ptr_pair
     {
-        #if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__clang__)
+#if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__clang__)
         using compressed_ptr_pair_t = uint128_atomic;
-        #else
+#else
         using compressed_ptr_pair_t = uint128_type;
-        #endif
+#endif
         // compressed_ptr_t must be of the same size as a pointer
         using compressed_ptr_t = std::size_t;
         using tag_t = std::uint16_t;

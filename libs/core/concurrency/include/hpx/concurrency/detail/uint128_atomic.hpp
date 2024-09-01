@@ -13,19 +13,18 @@
 /* Note: currently only supported on Linux */
 #if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__clang__)
 
-namespace hpx::lockfree
-{
+namespace hpx::lockfree {
     struct uint128_atomic : std::atomic<uint128_type>
     {
         using std::atomic<uint128_type>::atomic;
-        
+
         bool is_lock_free() const noexcept
         {
             return true;
         }
 
-        bool compare_exchange_weak(
-            hpx::lockfree::uint128_type& expected, hpx::lockfree::uint128_type desired,
+        bool compare_exchange_weak(hpx::lockfree::uint128_type& expected,
+            hpx::lockfree::uint128_type desired,
             std::memory_order memOrder) noexcept
         {
             (void) memOrder;
@@ -42,8 +41,8 @@ namespace hpx::lockfree
             return result;
         }
 
-        bool compare_exchange_strong(
-            hpx::lockfree::uint128_type& expected, hpx::lockfree::uint128_type desired,
+        bool compare_exchange_strong(hpx::lockfree::uint128_type& expected,
+            hpx::lockfree::uint128_type desired,
             std::memory_order memOrder) noexcept
         {
             (void) memOrder;
@@ -59,6 +58,6 @@ namespace hpx::lockfree
                 : "cc", "memory");
             return result;
         }
-    }; 
-}
+    };
+}    // namespace hpx::lockfree
 #endif    // !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__linux__)
