@@ -19,7 +19,7 @@ namespace hpx::lockfree {
         using std::atomic<uint128_type>::atomic;
 
         constexpr uint128_atomic(std::size_t l, std::size_t r) noexcept
-        : std::atomic<uint128_type>(uint128_type{l, r})
+          : std::atomic<uint128_type>(uint128_type{l, r})
         {
         }
 
