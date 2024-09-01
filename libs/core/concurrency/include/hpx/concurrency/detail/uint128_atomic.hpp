@@ -11,16 +11,19 @@
 
 #include <atomic>
 
-/* Note: currently only supported on Clang */
-#if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__clang__)
+/* Note: currently only supported on Linux */
+#if !defined(HPX_WITH_CXX11_ATOMIC_128BIT_LOCKFREE) && defined(__linux__)
 
 namespace hpx::lockfree {
-    struct uint128_atomic : std::atomic<uint128_type>
+    struct uint128_atomic : std::atomic<hpx::lockfree::uint128_type>
     {
-        using std::atomic<uint128_type>::atomic;
-
         constexpr uint128_atomic(std::size_t l, std::size_t r) noexcept
-          : std::atomic<uint128_type>(uint128_type{l, r})
+          : std::atomic<hpx::lockfree::uint128_type>(uint128_type{l, r})
+        {
+        }
+
+        constexpr uint128_atomic(hpx::lockfree::uint128_type value) noexcept
+          : std::atomic<hpx::lockfree::uint128_type>(value)
         {
         }
 
