@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/assert.hpp>
+#include <hpx/concepts/concepts.hpp>
 #include <hpx/datastructures/tuple.hpp>
 #include <hpx/execution/traits/is_execution_policy.hpp>
 #include <hpx/executors/execution_policy.hpp>
@@ -15,6 +16,7 @@
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
 #include <hpx/functional/invoke_result.hpp>
 #include <hpx/iterator_support/traits/is_iterator.hpp>
+#include <hpx/parallel/unseq/simd_helpers.hpp>
 #include <hpx/type_support/identity.hpp>
 
 #include <algorithm>
@@ -149,7 +151,6 @@ namespace hpx::parallel::util {
 
     ///////////////////////////////////////////////////////////////////////////
     namespace detail {
-
         // Helper class to repeatedly call a function starting from a given
         // iterator position till the predicate returns true.
         template <typename Iterator>
@@ -184,6 +185,17 @@ namespace hpx::parallel::util {
                 begin, end, HPX_FORWARD(Pred, pred));
         }
     };
+
+    template <typename Begin, typename End, typename Pred, typename ExPolicy,
+        HPX_CONCEPT_REQUIRES_(hpx::traits::is_random_access_iterator_v<Begin>&&
+                hpx::is_unsequenced_execution_policy_v<ExPolicy>)>
+    HPX_HOST_DEVICE HPX_FORCEINLINE Begin tag_invoke(
+        hpx::parallel::util::loop_pred_t<ExPolicy>, Begin HPX_RESTRICT begin,
+        End HPX_RESTRICT end, Pred&& pred)
+    {
+        return unseq_first_n(
+            begin, std::distance(begin, end), HPX_FORWARD(Pred, pred));
+    }
 
 #if !defined(HPX_COMPUTE_DEVICE_CODE)
     template <typename ExPolicy>
