@@ -1,4 +1,5 @@
 //  Copyright (c) 2017-2018 Taeguk Kwon
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,6 +7,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/remove.hpp>
 #include <hpx/type_support/unused.hpp>
@@ -688,3 +691,81 @@ void test_remove_bad_alloc(bool test_for_remove_if = false)
     test_remove_bad_alloc_async(seq(task), IteratorTag(), test_for_remove_if);
     test_remove_bad_alloc_async(par(task), IteratorTag(), test_for_remove_if);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_remove_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    int rand_base = g();
+    int value = rand_base + 2;
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), value) |
+        hpx::remove(ex_policy.on(exec)));
+
+    auto result = hpx::get<0>(*snd_result);
+
+    auto solution = std::remove(std::begin(d), std::end(d), value);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_remove_if_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    int rand_base = g();
+    auto pred = [rand_base](const int a) -> bool { return a == rand_base; };
+
+    std::size_t const size = 10007;
+    std::vector<int> c(size), d;
+    std::generate(std::begin(c), std::end(c), random_fill(rand_base, 6));
+    d = c;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    auto snd_result = tt::sync_wait(
+        ex::just(iterator(std::begin(c)), iterator(std::end(c)), pred) |
+        hpx::remove_if(ex_policy.on(exec)));
+    auto result = hpx::get<0>(*snd_result);
+
+    auto solution = std::remove_if(std::begin(d), std::end(d), pred);
+
+    bool equality =
+        test::equal(std::begin(c), result.base(), std::begin(d), solution);
+
+    HPX_TEST(equality);
+}
+#endif

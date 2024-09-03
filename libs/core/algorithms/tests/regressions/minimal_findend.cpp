@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <iterator>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace test {
@@ -69,7 +70,7 @@ void find_end_failing_test()
     bool caught_exception = false;
     try
     {
-        [[maybe_unused]] auto ret =
+        std::ignore =
             std::find_end(decorated_iterator(std::begin(c),
                               []() { throw std::runtime_error("error"); }),
                 decorated_iterator(

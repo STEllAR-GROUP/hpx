@@ -136,12 +136,12 @@ namespace hpx::parallel {
     namespace detail {
 
         /// \cond NOINTERNAL
-        inline bool sequential_is_partitioned(
-            std::vector<hpx::future<bool>>&& res)
+        template <typename T>
+        inline bool sequential_is_partitioned(std::vector<T>&& res)
         {
             auto first = res.begin();
             auto const last = res.end();
-            while (first != last && first->get())
+            while (first != last && hpx::unwrap(*first))
             {
                 ++first;
             }
@@ -150,7 +150,7 @@ namespace hpx::parallel {
                 ++first;
                 while (first != last)
                 {
-                    if (first->get())
+                    if (hpx::unwrap(*first))
                         return false;
                     ++first;
                 }
@@ -178,28 +178,34 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& policy, Iter first, Sent last, Pred&& pred,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Pred&& pred, Proj&& proj)
             {
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 difference_type count = std::distance(first, last);
-                if (count <= 1)
-                    return result::get(true);
+
+                if constexpr (!has_scheduler_executor)
+                {
+                    if (count <= 1)
+                        return result::get(true);
+                }
 
                 util::invoke_projected<Pred, Proj> pred_projected(
                     HPX_FORWARD(Pred, pred), HPX_FORWARD(Proj, proj));
-
                 util::cancellation_token<> tok;
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 // Note: replacing the invoke() with HPX_INVOKE()
                 // below makes gcc generate errors
                 auto f1 = [tok, pred_projected = HPX_MOVE(pred_projected)](
-                              Iter part_begin,
-                              std::size_t part_count) mutable -> bool {
+                              Iter part_begin, std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     bool fst_bool = HPX_INVOKE(pred_projected, *part_begin);
                     if (part_count == 1)
                         return fst_bool;
@@ -226,9 +232,9 @@ namespace hpx::parallel {
                     return sequential_is_partitioned(HPX_MOVE(results));
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), first, count, HPX_MOVE(f1),
-                    HPX_MOVE(f2));
+                return util::partitioner<ExPolicy, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(ExPolicy, policy),
+                    first, count, HPX_MOVE(f1), HPX_MOVE(f2));
             }
         };
         /// \endcond
@@ -263,10 +269,8 @@ namespace hpx {
                 hpx::traits::is_forward_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(hpx::is_partitioned_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, Pred pred)
+        friend decltype(auto) tag_fallback_invoke(hpx::is_partitioned_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, Pred pred)
         {
             return hpx::parallel::detail::is_partitioned<FwdIter, FwdIter>()
                 .call(HPX_FORWARD(ExPolicy, policy), first, last,
