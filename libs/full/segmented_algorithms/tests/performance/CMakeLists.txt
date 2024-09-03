@@ -24,4 +24,9 @@ foreach(benchmark ${benchmarks})
   add_hpx_performance_test(
     "modules.segmented_algorithms" ${benchmark} ${${benchmark}_PARAMETERS}
   )
+
+  add_hpx_performance_report_test(
+    "modules.segmented_algorithms" ${benchmark}_perftest
+    ${${benchmark}_perftest_PARAMETERS}
+  )
 endforeach()

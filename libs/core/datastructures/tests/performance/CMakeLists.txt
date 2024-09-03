@@ -24,4 +24,8 @@ foreach(test ${tests})
   add_hpx_performance_test(
     "modules.datastructures" ${test} ${${test}_PARAMETERS}
   )
+
+  add_hpx_performance_report_test(
+    "modules.datastructures" ${test}_perftest ${${test}_perftest_PARAMETERS}
+  )
 endforeach()

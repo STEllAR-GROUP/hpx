@@ -288,6 +288,42 @@ function(add_hpx_performance_test subcategory name)
   )
 endfunction(add_hpx_performance_test)
 
+function(add_hpx_performance_report_test subcategory name)
+  string(REPLACE "_perftest" "" name ${name})
+  add_test_and_deps_test(
+    "performance"
+    "${subcategory}"
+    ${name}_perftest
+    EXECUTABLE
+    ${name}
+    PSEUDO_DEPS_NAME
+    ${name}
+    ${ARGN}
+    "--hpx:print_cdash_img_path"
+    "--test_count=100"
+  )
+  find_package(Python REQUIRED)
+
+  if(NOT ARGN STREQUAL "")
+    string(REPLACE "THREADS_PER_LOCALITY" "--hpx:threads=" ARGN ${ARGN})
+    string(REPLACE "LOCALITIES" "--hpx:localities=" ARGN ${ARGN})
+    string(REPLACE "--" " --" ARGN ${ARGN})
+  endif()
+
+  add_custom_target(
+    ${name}_cdash_results
+    COMMAND
+      sh -c
+      "${CMAKE_BINARY_DIR}/bin/${name}_test ${ARGN} --test_count=1000 --hpx:detailed_bench >${CMAKE_BINARY_DIR}/${name}.json"
+    COMMAND
+      ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/perftests_plot.py
+      ${CMAKE_BINARY_DIR}/${name}.json
+      ${CMAKE_SOURCE_DIR}/tools/perftests_ci/perftest/references/lsu_default/${name}.json
+      ${CMAKE_BINARY_DIR}/${name}
+  )
+  add_dependencies(${name}_cdash_results ${name}_test)
+endfunction(add_hpx_performance_report_test)
+
 function(add_hpx_example_test subcategory name)
   add_test_and_deps_test("examples" "${subcategory}" ${name} ${ARGN})
 endfunction(add_hpx_example_test)
