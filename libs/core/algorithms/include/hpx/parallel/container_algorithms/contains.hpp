@@ -25,8 +25,6 @@
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
-#include "hpx/config/forward.hpp"
-#include "hpx/iterator_support/traits/is_sentinel_for.hpp"
 
 namespace hpx::parallel { namespace detail {
     struct contains : public algorithm<contains, bool>
@@ -88,14 +86,9 @@ namespace hpx::parallel { namespace detail {
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
-        static constexpr T get(T& t)
+        static bool get(T& itr, T& last)
         {
-            return HPX_FORWARD(T, t);
-        }
-
-        static constexpr T get(hpx::future<T>& t)
-        {
-            return t.get();
+            return itr != last;
         }
     };
 
@@ -103,14 +96,10 @@ namespace hpx::parallel { namespace detail {
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
-        static constexpr T get(T& t)
+        static hpx::future<bool> get(hpx::future<T>& itr, T& last)
         {
-            return HPX_FORWARD(T, t);
-        }
-
-        static constexpr T get(hpx::future<T>& t)
-        {
-            return t.get();
+            return itr.then(
+                [&last](hpx::future<T> it) { return it.get() != last; });
         }
     };
 
@@ -148,8 +137,7 @@ namespace hpx::parallel { namespace detail {
                 HPX_FORWARD(Proj2, proj2));
 
             return util::detail::algorithm_result<ExPolicy, bool>::get(
-                contains_subrange_helper<ExPolicy, FwdIter1>().get(itr) !=
-                last1);
+                contains_subrange_helper<ExPolicy, FwdIter1>().get(itr, last1));
         }
     };
 
