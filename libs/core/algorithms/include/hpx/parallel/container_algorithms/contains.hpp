@@ -154,7 +154,8 @@ namespace hpx::ranges {
             typename Proj = hpx::identity,
             HPX_CONCEPT_REQUIRES_(hpx::traits::is_iterator_v<Iterator> &&
                 hpx::traits::is_iterator_v<Iterator> &&
-                hpx::is_invocable_v<Proj, typename std::iterator_traits<Iterator>::value_type>
+                hpx::is_invocable_v<Proj,
+                typename std::iterator_traits<Iterator>::value_type>
                 )>
 
         // clang-format on
