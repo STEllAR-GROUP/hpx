@@ -86,7 +86,7 @@ namespace hpx::parallel { namespace detail {
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<!hpx::is_async_execution_policy_v<ExPolicy>>>
     {
-        static bool get(T& itr, T& last)
+        static bool get_result(T& itr, T& last)
         {
             return itr != last;
         }
@@ -96,7 +96,7 @@ namespace hpx::parallel { namespace detail {
     struct contains_subrange_helper<ExPolicy, T,
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy>>>
     {
-        static hpx::future<bool> get(hpx::future<T>& itr, T& last)
+        static hpx::future<bool> get_result(hpx::future<T>& itr, T& last)
         {
             return itr.then(
                 [&last](hpx::future<T> it) { return it.get() != last; });
@@ -136,8 +136,8 @@ namespace hpx::parallel { namespace detail {
                 HPX_MOVE(pred), HPX_FORWARD(Proj1, proj1),
                 HPX_FORWARD(Proj2, proj2));
 
-            return util::detail::algorithm_result<ExPolicy, bool>::get(
-                contains_subrange_helper<ExPolicy, FwdIter1>().get(itr, last1));
+            return contains_subrange_helper<ExPolicy, FwdIter1>().get_result(
+                itr, last1);
         }
     };
 
