@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2021 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c) 2014-2015 Thomas Heller
 //  Copyright (c)      2023 Jiakun Yan
 //
@@ -35,11 +35,13 @@ namespace hpx::parcelset::policies::mpi {
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
 
-        void run() noexcept {}
+        constexpr static void run() noexcept {}
 
-        connection_ptr create_connection(int dest, parcelset::parcelport* pp)
+        connection_ptr create_connection(
+            int dest, parcelset::parcelport* pp, bool enable_ack_handshakes)
         {
-            return std::make_shared<connection_type>(this, dest, pp);
+            return std::make_shared<connection_type>(
+                this, dest, pp, enable_ack_handshakes);
         }
 
         void add(connection_ptr const& ptr)
@@ -101,12 +103,14 @@ namespace hpx::parcelset::policies::mpi {
         using parcel_buffer_type = parcel_buffer<buffer_type, chunk_type>;
         using callback_fn_type =
             hpx::move_only_function<void(error_code const&)>;
+
         bool send_immediate(parcelset::parcelport* pp,
             parcelset::locality const& dest, parcel_buffer_type buffer,
-            callback_fn_type&& callbackFn)
+            callback_fn_type&& callbackFn, bool enable_ack_handshakes)
         {
             int dest_rank = dest.get<locality>().rank();
-            auto connection = create_connection(dest_rank, pp);
+            auto connection =
+                create_connection(dest_rank, pp, enable_ack_handshakes);
             connection->buffer_ = HPX_MOVE(buffer);
             connection->async_write(HPX_MOVE(callbackFn), nullptr);
             return true;

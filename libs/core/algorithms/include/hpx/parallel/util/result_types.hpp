@@ -68,6 +68,21 @@ namespace hpx::parallel::util {
             HPX_MOVE(f), [](util::in_in_result<I1, I2>&& p) { return p.in2; });
     }
 
+    // clang-format off
+    template <typename InInResultSender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<InInResultSender>
+        )>
+    // clang-format on
+    decltype(auto) get_in2_element(InInResultSender&& result_sender)
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(InInResultSender, result_sender), [](auto&& result) {
+                return util::get_in2_element(
+                    HPX_FORWARD(decltype(result), result));
+            });
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename I, typename O>
     struct in_out_result
@@ -139,8 +154,7 @@ namespace hpx::parallel::util {
         {
             // clang-format off
             template <typename T>
-            auto operator()(T&& val) const -> decltype(
-                hpx::parallel::util::get_second_element(HPX_FORWARD(T, val)))
+            decltype(auto) operator()(T&& val) const
             {
                 return hpx::parallel::util::get_second_element(
                     HPX_FORWARD(T, val));
@@ -155,9 +169,7 @@ namespace hpx::parallel::util {
             hpx::execution::experimental::is_sender_v<Sender>
         )>
     // clang-format on
-    auto get_second_element(Sender&& sender)
-        -> decltype(hpx::execution::experimental::then(
-            HPX_FORWARD(Sender, sender), functional::get_second_element{}))
+    decltype(auto) get_second_element(Sender&& sender)
     {
         return hpx::execution::experimental::then(
             HPX_FORWARD(Sender, sender), functional::get_second_element{});
@@ -259,6 +271,21 @@ namespace hpx::parallel::util {
     {
         return hpx::make_future<O>(
             HPX_MOVE(f), [](in_in_out_result<I1, I2, O>&& p) { return p.out; });
+    }
+
+    // clang-format off
+    template <typename InInOutResultSender,
+        HPX_CONCEPT_REQUIRES_(
+            hpx::execution::experimental::is_sender_v<InInOutResultSender>
+        )>
+    // clang-format on
+    decltype(auto) get_third_element(InInOutResultSender&& result_sender)
+    {
+        return hpx::execution::experimental::then(
+            HPX_FORWARD(InInOutResultSender, result_sender), [](auto&& result) {
+                return util::get_third_element(
+                    HPX_FORWARD(decltype(result), result));
+            });
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -394,6 +421,21 @@ namespace hpx::parallel::util {
             return result_type{hpx::get<0>(t), hpx::get<1>(t)};
         }
 
+        // clang-format off
+        template <typename ZipIterSender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<ZipIterSender>
+            )>
+        // clang-format on
+        decltype(auto) get_in_out_result(ZipIterSender&& zipiter_sender)
+        {
+            return hpx::execution::experimental::then(
+                HPX_FORWARD(ZipIterSender, zipiter_sender), [](auto&& zipiter) {
+                    return get_in_out_result(
+                        HPX_FORWARD(decltype(zipiter), zipiter));
+                });
+        }
+
         template <typename ZipIter>
         hpx::future<
             in_out_result<typename hpx::tuple_element<0,
@@ -462,6 +504,21 @@ namespace hpx::parallel::util {
 
             iterator_tuple_type t = zipiter.get_iterator_tuple();
             return result_type{hpx::get<0>(t), hpx::get<1>(t), hpx::get<2>(t)};
+        }
+
+        // clang-format off
+        template <typename ZipIterSender,
+            HPX_CONCEPT_REQUIRES_(
+                hpx::execution::experimental::is_sender_v<ZipIterSender>
+            )>
+        // clang-format on
+        decltype(auto) get_in_in_out_result(ZipIterSender&& zipiter_sender)
+        {
+            return hpx::execution::experimental::then(
+                HPX_FORWARD(ZipIterSender, zipiter_sender), [](auto&& zipiter) {
+                    return get_in_in_out_result(
+                        HPX_FORWARD(decltype(zipiter), zipiter));
+                });
         }
 
         template <typename ZipIter>

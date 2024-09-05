@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file component_commandline.hpp
+/// \page HPX_REGISTER_COMMANDLINE_MODULE
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -53,6 +57,15 @@ namespace hpx::components {
     /***/
 
 ///////////////////////////////////////////////////////////////////////////////
+/**
+ * @brief Macro to register a command-line module with the HPX runtime.
+ *
+ * This macro facilitates the registration of a command-line module with the HPX
+ * runtime system. A command-line module typically provides additional command-line
+ * options that can be used to configure the HPX application.
+ *
+ * @param add_options_function The function that adds custom command-line options.
+ */
 #define HPX_REGISTER_COMMANDLINE_MODULE(add_options_function)                  \
     HPX_REGISTER_COMMANDLINE_OPTIONS()                                         \
     HPX_REGISTER_COMMANDLINE_REGISTRY(                                         \

@@ -271,28 +271,38 @@ namespace hpx::parallel {
             template <typename ExPolicy, typename Iter1, typename Sent1,
                 typename Iter2, typename Sent2, typename F, typename Proj1,
                 typename Proj2>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& policy, Iter1 first1, Sent1 last1, Iter2 first2,
-                Sent2 last2, F&& f, Proj1&& proj1, Proj2&& proj2)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter1 first1,
+                Sent1 last1, Iter2 first2, Sent2 last2, F&& f, Proj1&& proj1,
+                Proj2&& proj2)
             {
-                if (first1 == last1)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        false);
+                    if (first2 == last2)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(true);
+                    }
+                    if (first1 == last1)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            bool>::get(false);
+                    }
                 }
-                if (first2 == last2)
-                {
-                    return util::detail::algorithm_result<ExPolicy, bool>::get(
-                        true);
-                }
+
+                using intermediate_result_t =
+                    std::conditional_t<has_scheduler_executor, char, bool>;
 
                 util::cancellation_token<> tok;
 
-                auto f1 =
-                    [first1, last1, first2, last2, tok, f = HPX_FORWARD(F, f),
-                        proj1 = HPX_FORWARD(Proj1, proj1),
-                        proj2 = HPX_FORWARD(Proj2, proj2)](Iter2 part_begin,
-                        std::size_t part_count) mutable -> bool {
+                auto f1 = [first1, last1, first2, last2, tok,
+                              f = HPX_FORWARD(F, f),
+                              proj1 = HPX_FORWARD(Proj1, proj1),
+                              proj2 = HPX_FORWARD(Proj2, proj2)](
+                              Iter2 part_begin, std::size_t part_count) mutable
+                    -> intermediate_result_t {
                     Iter2 part_end = detail::next(part_begin, part_count);
 
                     auto value = HPX_INVOKE(proj2, *part_begin);
@@ -351,13 +361,12 @@ namespace hpx::parallel {
 
                 auto f2 = [](auto&& results) {
                     return std::all_of(hpx::util::begin(results),
-                        hpx::util::end(results),
-                        [](hpx::future<bool>& val) { return val.get(); });
+                        hpx::util::end(results), hpx::functional::unwrap{});
                 };
 
-                return util::partitioner<ExPolicy, bool>::call(
-                    HPX_FORWARD(ExPolicy, policy), first2,
-                    detail::distance(first2, last2), HPX_MOVE(f1),
+                return util::partitioner<ExPolicy, bool,
+                    intermediate_result_t>::call(HPX_FORWARD(ExPolicy, policy),
+                    first2, detail::distance(first2, last2), HPX_MOVE(f1),
                     HPX_MOVE(f2));
             }
         };
@@ -385,9 +394,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy, bool>
-        tag_fallback_invoke(includes_t, ExPolicy&& policy, FwdIter1 first1,
-            FwdIter1 last1, FwdIter2 first2, FwdIter2 last2, Pred op = Pred())
+        friend decltype(auto) tag_fallback_invoke(includes_t, ExPolicy&& policy,
+            FwdIter1 first1, FwdIter1 last1, FwdIter2 first2, FwdIter2 last2,
+            Pred op = Pred())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter1>,
                 "Requires at least forward iterator.");

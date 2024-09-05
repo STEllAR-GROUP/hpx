@@ -158,8 +158,8 @@ The ``system`` configuration section
      * This is initialized to the base directory the current executable has been
        loaded from.
 
-The `|hpx| configuration section
-.................................
+The |hpx| configuration section
+...............................
 
 .. code-block:: ini
 
@@ -275,7 +275,7 @@ The `|hpx| configuration section
        to sleep after being idle for ``hpx.max_idle_loop_count`` iterations.
        This setting is applicable only if
        ``HPX_WITH_THREAD_MANAGER_IDLE_BACKOFF`` is set during configuration in
-       |cmake|. By default this is defined by the preprocessor constant
+       |cmake|_. By default this is defined by the preprocessor constant
        ``HPX_IDLE_BACKOFF_TIME_MAX``. This is an internal setting that you
        should change only if you know exactly what you are doing.
    * * ``hpx.exception_verbosity``

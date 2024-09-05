@@ -30,7 +30,6 @@ namespace hpx::parcelset::policies::mpi {
     template <typename Parcelport>
     struct receiver
     {
-        using handles_header_type = std::set<std::pair<int, int>>;
         using connection_type = receiver_connection<Parcelport>;
         using connection_ptr = std::shared_ptr<connection_type>;
         using connection_list = std::deque<connection_ptr>;
@@ -112,9 +111,11 @@ namespace hpx::parcelset::policies::mpi {
                 if (request_done_locked(l, hdr_request_, &status))
                 {
                     int recv_size = 0;
-                    [[maybe_unused]] int const ret =
+                    int const ret =
                         MPI_Get_count(&status, MPI_CHAR, &recv_size);
-                    HPX_ASSERT(ret == MPI_SUCCESS);
+                    util::mpi_environment::check_mpi_error(
+                        l, HPX_CURRENT_SOURCE_LOCATION(), ret);
+
                     std::vector<char> recv_header(header_buffer_.begin(),
                         header_buffer_.begin() + recv_size);
 
@@ -139,11 +140,12 @@ namespace hpx::parcelset::policies::mpi {
         void post_new_header([[maybe_unused]] Lock& l) noexcept
         {
             HPX_ASSERT_OWNS_LOCK(l);
-            [[maybe_unused]] int const ret = MPI_Irecv(header_buffer_.data(),
+            int const ret = MPI_Irecv(header_buffer_.data(),
                 static_cast<int>(header_buffer_.size()), MPI_BYTE,
                 MPI_ANY_SOURCE, 0, util::mpi_environment::communicator(),
                 &hdr_request_);
-            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+            util::mpi_environment::check_mpi_error(
+                l, HPX_CURRENT_SOURCE_LOCATION(), ret);
         }
 
         Parcelport& pp_;
@@ -152,21 +154,19 @@ namespace hpx::parcelset::policies::mpi {
         MPI_Request hdr_request_;
         std::vector<char> header_buffer_;
 
-        hpx::spinlock handles_header_mtx_;
-        handles_header_type handles_header_;
-
         hpx::spinlock connections_mtx_;
         connection_list connections_;
 
         template <typename Lock>
-        static bool request_done_locked([[maybe_unused]] Lock& l,
-            MPI_Request& r, MPI_Status* status) noexcept
+        static bool request_done_locked(
+            Lock& l, MPI_Request& r, MPI_Status* status) noexcept
         {
             HPX_ASSERT_OWNS_LOCK(l);
 
             int completed = 0;
-            [[maybe_unused]] int const ret = MPI_Test(&r, &completed, status);
-            HPX_ASSERT_LOCKED(l, ret == MPI_SUCCESS);
+            int const ret = MPI_Test(&r, &completed, status);
+            util::mpi_environment::check_mpi_error(
+                l, HPX_CURRENT_SOURCE_LOCATION(), ret);
 
             return completed ? true : false;
         }

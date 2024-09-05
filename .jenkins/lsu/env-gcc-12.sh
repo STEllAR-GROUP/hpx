@@ -1,4 +1,5 @@
 # Copyright (c) 2020 ETH Zurich
+# Copyright (c) 2024 Alireza Kheirkhahan
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -10,7 +11,6 @@ module load gcc/12
 module load boost/1.81.0-${build_type,,}
 module load hwloc
 module load openmpi
-module load pwrapi/1.1.1
 
 export HPXRUN_RUNWRAPPER=srun
 export CXX_STD="20"
@@ -32,3 +32,6 @@ configure_extra_options+=" -DHPX_WITH_EVE_TAG=main"
 
 # The pwrapi library still needs to be set up properly on rostam
 # configure_extra_options+=" -DHPX_WITH_POWER_COUNTER=ON"
+
+# enable additional handshaking in MPI parcelport
+configure_extra_options+=" -DHPX_WITH_TESTS_COMMAND_LINE=--hpx:ini=hpx.parcel.mpi.ack_handshake!=1"

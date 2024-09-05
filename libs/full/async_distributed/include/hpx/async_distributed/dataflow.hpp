@@ -4,7 +4,42 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file dataflow.hpp
+/// \page hpx::dataflow (distributed)
+/// \headerfile hpx/async.hpp
+
 #pragma once
+
+#if defined(DOXYGEN)
+
+namespace hpx {
+    // clang-format off
+
+    /// \brief The distributed implementation of \c hpx::dataflow can be used by
+    ///        giving an action instance as argument instead of a function,
+    ///        and also by providing another argument with the locality ID or
+    ///        the target ID. The action executes asynchronously.
+    ///
+    /// \note Its behavior is similar to \c hpx::async with the exception that if
+    ///       one of the arguments is a future, then \c hpx::dataflow will wait
+    ///       for the future to be ready to launch the thread.
+    ///
+    /// \tparam Action The type of action instance
+    /// \tparam Target The type of target where the action should be executed
+    /// \tparam Ts     The type of any additional arguments
+    ///
+    /// \param action  The action instance to be executed
+    /// \param target  The target where the action should be executed
+    /// \param ts      Additional arguments
+    ///
+    /// \returns \c hpx::future referring to the shared state created by this call
+    ///          to \c hpx::dataflow
+    template <typename Action, typename Target, typename... Ts>
+    decltype(auto) dataflow(Action&& action, Target&& target, Ts&&... ts);
+    // clang-format on
+}    // namespace hpx
+
+#else
 
 #include <hpx/config.hpp>
 #include <hpx/async_local/dataflow.hpp>
@@ -115,3 +150,5 @@ namespace hpx {
             HPX_FORWARD(F, f), Action{}, HPX_FORWARD(Ts, ts)...);
     }
 }    // namespace hpx
+
+#endif

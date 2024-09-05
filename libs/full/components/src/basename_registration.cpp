@@ -104,6 +104,11 @@ namespace hpx {
                 "hpx::find_from_basename", "no basename specified");
         }
 
+        // 26800: Use of a moved from object: ''basename''
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26800)
+#endif
         std::vector<hpx::future<hpx::id_type>> results;
         for (std::size_t i = 0; i != ids.size(); ++i)
         {
@@ -116,6 +121,9 @@ namespace hpx {
             results.emplace_back(
                 agas::on_symbol_namespace_event(HPX_MOVE(name), true));
         }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
         return results;
     }
 

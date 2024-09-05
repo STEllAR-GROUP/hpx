@@ -1,4 +1,5 @@
 # Copyright (c) 2020 ETH Zurich
+# Copyright (c) 2024 Alireza Kheirkhahan
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,7 +8,7 @@
 module purge
 module load cmake
 module load gcc/12
-module load boost/1.82.0-${build_type,,}
+module load boost/1.81.0-${build_type,,}
 module load hwloc
 module load cuda/12
 module load openmpi

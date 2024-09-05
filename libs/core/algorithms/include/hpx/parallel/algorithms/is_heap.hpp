@@ -263,19 +263,32 @@ namespace hpx::parallel {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            util::detail::algorithm_result_t<ExPolicy, bool> operator()(
-                ExPolicy&& orgpolicy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            decltype(auto) operator()(ExPolicy&& orgpolicy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, bool>;
                 using type = typename std::iterator_traits<Iter>::value_type;
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 difference_type count = detail::distance(first, last);
-                if (count <= 1)
+
+                if constexpr (has_scheduler_executor)
                 {
-                    return result::get(true);
+                    if (count == 0)
+                    {
+                        // underflow prevention
+                        ++count;
+                    }
+                }
+                else
+                {
+                    if (count <= 1)
+                    {
+                        return result::get(true);
+                    }
                 }
 
                 Iter second = first + 1;
@@ -307,15 +320,19 @@ namespace hpx::parallel {
                         });
                 };
 
-                auto f2 = [tok](auto&& data) mutable -> bool {
-                    // make sure iterators embedded in function object that is
-                    // attached to futures are invalidated
-                    util::detail::clear_container(data);
+                auto f2 = [tok, count](auto&&... data) mutable -> bool {
+                    static_assert(sizeof...(data) < 2);
+                    if constexpr (sizeof...(data) == 1)
+                    {
+                        // make sure iterators embedded in function object that
+                        // is attached to futures are invalidated
+                        util::detail::clear_container(data...);
+                    }
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
-                    return find_res != 0;
+                    return find_res == count;
                 };
 
                 using partitioner_type =
@@ -345,9 +362,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, bool> parallel(
-                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 return is_heap_helper()(HPX_FORWARD(ExPolicy, policy), first,
                     last, HPX_FORWARD(Comp, comp), HPX_FORWARD(Proj, proj));
@@ -382,23 +398,36 @@ namespace hpx::parallel {
         {
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            util::detail::algorithm_result_t<ExPolicy, Iter> operator()(
-                ExPolicy&& orgpolicy, Iter first, Sent last, Comp comp,
-                Proj proj)
+            decltype(auto) operator()(ExPolicy&& orgpolicy, Iter first,
+                Sent last, Comp comp, Proj proj)
             {
                 using result = util::detail::algorithm_result<ExPolicy, Iter>;
                 using type = typename std::iterator_traits<Iter>::value_type;
                 using difference_type =
                     typename std::iterator_traits<Iter>::difference_type;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 difference_type count = detail::distance(first, last);
+
+                Iter second;
                 if (count <= 1)
                 {
-                    return result::get(HPX_MOVE(last));
+                    if constexpr (has_scheduler_executor)
+                    {
+                        count = static_cast<difference_type>(0);
+                        second = last;
+                    }
+                    else
+                    {
+                        return result::get(HPX_MOVE(last));
+                    }
                 }
-
-                Iter second = first + 1;
-                --count;
+                else
+                {
+                    second = first + 1;
+                    --count;
+                }
 
                 decltype(auto) policy = parallel::util::adapt_placement_mode(
                     HPX_FORWARD(ExPolicy, orgpolicy),
@@ -426,17 +455,21 @@ namespace hpx::parallel {
                         });
                 };
 
-                auto f2 = [tok, second](auto&& data) mutable -> Iter {
-                    // make sure iterators embedded in function object that is
-                    // attached to futures are invalidated
-                    util::detail::clear_container(data);
+                auto f2 = [tok, second](auto&&... data) mutable -> Iter {
+                    static_assert(sizeof...(data) < 2);
+                    if constexpr (sizeof...(data) == 1)
+                    {
+                        // make sure iterators embedded in function object that is
+                        // attached to futures are invalidated
+                        util::detail::clear_container(data...);
+                    }
 
                     difference_type find_res =
                         static_cast<difference_type>(tok.get_data());
 
                     std::advance(second, find_res);
 
-                    return HPX_MOVE(second);
+                    return second;
                 };
 
                 using partitioner_type =
@@ -467,9 +500,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename Comp, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
-                ExPolicy&& policy, Iter first, Sent last, Comp&& comp,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, Iter first,
+                Sent last, Comp&& comp, Proj&& proj)
             {
                 return is_heap_until_helper()(HPX_FORWARD(ExPolicy, policy),
                     first, last, HPX_FORWARD(Comp, comp),
@@ -499,10 +531,8 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            bool>::type
-        tag_fallback_invoke(is_heap_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp comp = Comp())
+        friend decltype(auto) tag_fallback_invoke(is_heap_t, ExPolicy&& policy,
+            RandIter first, RandIter last, Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");
@@ -553,10 +583,9 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            RandIter>::type
-        tag_fallback_invoke(is_heap_until_t, ExPolicy&& policy, RandIter first,
-            RandIter last, Comp comp = Comp())
+        friend decltype(auto) tag_fallback_invoke(is_heap_until_t,
+            ExPolicy&& policy, RandIter first, RandIter last,
+            Comp comp = Comp())
         {
             static_assert(hpx::traits::is_random_access_iterator_v<RandIter>,
                 "Requires a random access iterator.");

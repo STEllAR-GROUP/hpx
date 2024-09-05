@@ -5,7 +5,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution/algorithms/just.hpp>
+#else
 #include <hpx/modules/execution.hpp>
+#endif
+
 #include <hpx/modules/testing.hpp>
 
 #include "algorithm_test_utils.hpp"
@@ -25,11 +32,20 @@ int main()
         auto s = ex::just_error(std::runtime_error("error"));
 
         static_assert(ex::is_sender_v<decltype(s)>);
+#if defined(HPX_HAVE_STDEXEC)
+        static_assert(ex::is_sender_in_v<decltype(s), ex::empty_env>);
+#else
         static_assert(ex::is_sender_v<decltype(s), ex::empty_env>);
+#endif
 
         check_value_types<hpx::variant<>>(s);
+#if defined(HPX_HAVE_STDEXEC)
+        // no longer throws exceptions in the form std::exception_ptr in STDEXEC
+        check_error_types<hpx::variant<std::runtime_error>>(s);
+#else
         check_error_types<hpx::variant<std::exception_ptr, std::runtime_error>>(
             s);
+#endif
         check_sends_stopped<false>(s);
 
         auto r = error_callback_receiver<check_exception_ptr>{

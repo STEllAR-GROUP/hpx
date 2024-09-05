@@ -25,7 +25,7 @@ elseif(HPX_WITH_GIT_BRANCH)
 else()
   # HPX_VERSION is always available, use as fallback
   set(HPX_DEPREPORT_VERSION "latest")
-  set(HPX_DEPREPORT_CAPTION "Version ${HPX_VERSION}${HPX_VERSION_TAG}")
+  set(HPX_DEPREPORT_CAPTION "Version ${HPX_VERSION_FULL}")
 endif()
 
 # cmake-format: off

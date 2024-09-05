@@ -309,6 +309,11 @@ namespace hpx::lcos::local {
             {
             }
 
+            // 26110: Caller failing to hold lock 'l' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
             template <typename T1, typename Lock>
             hpx::future<void> push(T1&& val, Lock& l)
             {
@@ -387,6 +392,9 @@ namespace hpx::lcos::local {
                 }
                 return hpx::make_ready_future(HPX_MOVE(val));
             }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
             template <typename Lock>
             bool is_empty(Lock& l) const noexcept

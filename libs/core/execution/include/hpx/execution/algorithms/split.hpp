@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+
 #include <hpx/allocator_support/allocator_deleter.hpp>
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
@@ -57,7 +62,7 @@ namespace hpx::execution::experimental {
         template <typename Receiver>
         struct error_visitor
         {
-            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
 
             template <typename Error>
             void operator()(Error const& error) noexcept
@@ -71,7 +76,7 @@ namespace hpx::execution::experimental {
         template <typename Receiver>
         struct value_visitor
         {
-            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver> receiver;
+            HPX_NO_UNIQUE_ADDRESS std::decay_t<Receiver>& receiver;
 
             template <typename Ts>
             void operator()(Ts const& ts) noexcept
@@ -118,12 +123,12 @@ namespace hpx::execution::experimental {
                 static constexpr bool sends_stopped = true;
             };
 
-            template <typename Env>
-            friend auto tag_invoke(
-                get_completion_signatures_t, split_sender const&, Env)
-                -> generate_completion_signatures<Env>;
-
             // clang-format off
+            template <typename Env>
+            friend auto tag_invoke(get_completion_signatures_t,
+                split_sender const&,
+                Env) -> generate_completion_signatures<Env>;
+
             template <typename CPO, typename Scheduler_ = Scheduler,
                 HPX_CONCEPT_REQUIRES_(
                     hpx::execution::experimental::is_scheduler_v<Scheduler_> &&
@@ -286,16 +291,12 @@ namespace hpx::execution::experimental {
 
                     void operator()(error_type const& error)
                     {
-                        hpx::visit(error_visitor<Receiver>{HPX_FORWARD(
-                                       Receiver, receiver)},
-                            error);
+                        hpx::visit(error_visitor<Receiver>{receiver}, error);
                     }
 
                     void operator()(value_type const& ts)
                     {
-                        hpx::visit(value_visitor<Receiver>{HPX_FORWARD(
-                                       Receiver, receiver)},
-                            ts);
+                        hpx::visit(value_visitor<Receiver>{receiver}, ts);
                     }
                 };
 
@@ -699,3 +700,5 @@ namespace hpx::execution::experimental {
         }
     } split{};
 }    // namespace hpx::execution::experimental
+
+#endif

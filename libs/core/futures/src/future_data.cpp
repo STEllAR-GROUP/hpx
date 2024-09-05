@@ -101,12 +101,11 @@ namespace hpx::lcos::detail {
     {
         if (runs_child_ != threads::invalid_thread_id)
         {
-            auto* thrd = get_thread_id_data(runs_child_);
-            (void) thrd;
+            [[maybe_unused]] auto* thrd = get_thread_id_data(runs_child_);
             LTM_(debug).format(
                 "task_object::~task_object({}), description({}): "
                 "destroy runs_as_child thread",
-                thrd, thrd->get_description(), thrd->get_thread_phase());
+                thrd, thrd->get_description());
 
             runs_child_ = threads::invalid_thread_id;
         }
@@ -253,9 +252,7 @@ namespace hpx::lcos::detail {
 
     // make sure continuation invocation does not recurse deeper than allowed
     template <typename Callback>
-    void
-    future_data_base<traits::detail::future_data_void>::handle_on_completed(
-        Callback&& on_completed)
+    void handle_on_completed_impl(Callback&& on_completed)
     {
         // We need to run the completion on a new thread if we are on a non HPX
         // thread.
@@ -273,10 +270,14 @@ namespace hpx::lcos::detail {
 #endif
         }
 
+        using future_data_base =
+            future_data_base<traits::detail::future_data_void>;
+
         if (!is_hpx_thread || !recurse_asynchronously)
         {
             // directly execute continuation on this thread
-            run_on_completed(HPX_FORWARD(Callback, on_completed));
+            future_data_base::run_on_completed(
+                HPX_FORWARD(Callback, on_completed));
         }
         else
         {
@@ -284,7 +285,7 @@ namespace hpx::lcos::detail {
             hpx::detail::try_catch_exception_ptr(
                 [&]() {
                     // clang-format off
-                    constexpr void (*p)(Callback&&) noexcept =
+                    constexpr void (*p)(std::decay_t<Callback>&&) noexcept =
                         &future_data_base::run_on_completed;
                     // clang-format on
                     run_on_completed_on_new_thread(util::deferred_call(
@@ -306,39 +307,41 @@ namespace hpx::lcos::detail {
         }
     }
 
-    // We need only one explicit instantiation here as the second version
-    // (single callback) is implicitly instantiated below.
-    using completed_callback_vector_type =
-        future_data_refcnt_base::completed_callback_vector_type;
+    void handle_on_completed(
+        future_data_refcnt_base::completed_callback_type&& on_completed)
+    {
+        handle_on_completed_impl(HPX_MOVE(on_completed));
+    }
 
-    template HPX_CORE_EXPORT void
-    future_data_base<traits::detail::future_data_void>::handle_on_completed<
-        completed_callback_vector_type>(completed_callback_vector_type&&);
+    void handle_on_completed(
+        future_data_refcnt_base::completed_callback_vector_type&& on_completed)
+    {
+        handle_on_completed_impl(HPX_MOVE(on_completed));
+    }
 
     // Set the callback which needs to be invoked when the future becomes ready.
     // If the future is ready the function will be invoked immediately.
     void future_data_base<traits::detail::future_data_void>::set_on_completed(
-        completed_callback_type data_sink)
+        completed_callback_type&& data_sink)
     {
         if (!data_sink)
             return;
 
+        hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
         if (is_ready(std::memory_order_relaxed))
         {
             // invoke the callback (continuation) function right away
-            handle_on_completed(HPX_MOVE(data_sink));
+            handle_on_completed_impl(HPX_MOVE(data_sink));
         }
         else
         {
-            hpx::intrusive_ptr<future_data_base> this_(this);    // keep alive
-
             std::unique_lock l(mtx_);
             if (is_ready())
             {
                 l.unlock();
 
                 // invoke the callback (continuation) function
-                handle_on_completed(HPX_MOVE(data_sink));
+                handle_on_completed_impl(HPX_MOVE(data_sink));
             }
             else
             {

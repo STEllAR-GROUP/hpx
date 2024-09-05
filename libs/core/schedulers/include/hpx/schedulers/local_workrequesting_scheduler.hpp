@@ -749,7 +749,16 @@ namespace hpx::threads::policies {
             scheduler_data& d, steal_request& req) noexcept
         {
             bool ret = d.requests_->get(&req);
+
+            // 26813: Use 'bitwise and' to check if a flag is set.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26813)
+#endif
             while (ret && req.state_ == steal_request::state::failed)
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
             {
                 // forget the received steal request
                 --data_[req.num_thread_].data_.requested_;
@@ -780,10 +789,19 @@ namespace hpx::threads::policies {
                 // Steal request was either returned by another worker or
                 // picked up by us.
 
+                // 26813: Use 'bitwise and' to check if a flag is set.
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26813)
+#endif
                 if (req.state_ == steal_request::state::idle ||
                     d.queue_->get_pending_queue_length(
                         std::memory_order_relaxed) != 0)
                 {
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
+
 #if defined(HPX_HAVE_WORKREQUESTING_STEAL_STATISTICS)
                     ++d.steal_requests_discarded_;
 #endif

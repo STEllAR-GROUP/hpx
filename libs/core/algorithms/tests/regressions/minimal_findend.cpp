@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <iterator>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace test {
@@ -69,11 +70,12 @@ void find_end_failing_test()
     bool caught_exception = false;
     try
     {
-        std::find_end(decorated_iterator(std::begin(c),
-                          []() { throw std::runtime_error("error"); }),
-            decorated_iterator(
-                std::end(c), []() { throw std::runtime_error("error"); }),
-            std::begin(h), std::end(h));
+        std::ignore =
+            std::find_end(decorated_iterator(std::begin(c),
+                              []() { throw std::runtime_error("error"); }),
+                decorated_iterator(
+                    std::end(c), []() { throw std::runtime_error("error"); }),
+                std::begin(h), std::end(h));
 
         // should never reach this point
         HPX_TEST(false);

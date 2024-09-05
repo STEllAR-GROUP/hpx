@@ -1,5 +1,6 @@
 //  Copyright (c) 2015 Daniel Bourgeois
 //  Copyright (c) 2022 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,9 +8,12 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
 #include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
+#include <hpx/numeric.hpp>
+#include <hpx/parallel/algorithms/adjacent_difference.hpp>
 
 #include <cstddef>
 #include <iostream>
@@ -67,6 +71,7 @@ void test_adjacent_difference_direct(Policy l, ExPolicy policy)
     HPX_TEST(std::end(d) == it);
 }
 
+#if defined(HPX_HAVE_STDEXEC)
 template <typename Policy, typename ExPolicy>
 void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
 {
@@ -83,16 +88,51 @@ void test_adjacent_difference_sender(Policy l, ExPolicy&& policy)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-    auto result = ex::just(std::begin(c), std::end(c), std::begin(d)) |
-        hpx::adjacent_difference(policy.on(exec)) | tt::sync_wait();
 
-    std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
+    {
+        auto snd_result =
+            tt::sync_wait(ex::just(std::begin(c), std::end(c), std::begin(d)) |
+                hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
 
-    HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
-        [](auto lhs, auto rhs) { return lhs == rhs; }));
+        std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
-    HPX_TEST(std::end(d) == hpx::get<0>(*result));
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+        HPX_TEST(std::end(d) == result);
+    }
+
+    {
+        // edge case: empty range
+        auto snd_result = tt::sync_wait(
+            ex::just(std::begin(c), std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        std::adjacent_difference(
+            std::begin(c), std::begin(c), std::begin(d_ans));
+
+        HPX_TEST(std::begin(d) == result);
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+    }
+
+    {
+        // edge case: range of size one
+        auto snd_result = tt::sync_wait(
+            ex::just(std::begin(c), ++std::begin(c), std::begin(d)) |
+            hpx::adjacent_difference(policy.on(exec)));
+        auto result = hpx::get<0>(*snd_result);
+
+        std::adjacent_difference(
+            std::begin(c), ++std::begin(c), std::begin(d_ans));
+
+        HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),
+            [](auto lhs, auto rhs) { return lhs == rhs; }));
+        HPX_TEST(++std::begin(d) == result);
+    }
 }
+#endif
 
 template <typename ExPolicy>
 void test_adjacent_difference_async(ExPolicy&& p)
@@ -131,9 +171,10 @@ void test_adjacent_difference_async_direct(Policy l, ExPolicy&& p)
     using scheduler_t = ex::thread_pool_policy_scheduler<Policy>;
 
     auto exec = ex::explicit_scheduler_executor(scheduler_t(l));
-    auto result = hpx::adjacent_difference(
-                      p.on(exec), std::begin(c), std::end(c), std::begin(d)) |
-        tt::sync_wait();
+
+    auto result = tt::sync_wait(hpx::adjacent_difference(
+        p.on(exec), std::begin(c), std::end(c), std::begin(d)));
+
     std::adjacent_difference(std::begin(c), std::end(c), std::begin(d_ans));
 
     HPX_TEST(std::equal(std::begin(d), std::end(d), std::begin(d_ans),

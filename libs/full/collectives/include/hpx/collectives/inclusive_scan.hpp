@@ -172,8 +172,20 @@ namespace hpx::traits {
                         std::vector<std::decay_t<T>> dest;
                         dest.resize(data.size());
 
-                        hpx::inclusive_scan(data.begin(), data.end(),
-                            dest.begin(), HPX_FORWARD(F, op));
+                        if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
+                        {
+                            hpx::inclusive_scan(data.begin(), data.end(),
+                                dest.begin(), HPX_FORWARD(F, op));
+                        }
+                        else
+                        {
+                            hpx::inclusive_scan(data.begin(), data.end(),
+                                dest.begin(), [&](auto lhs, auto rhs) {
+                                    return HPX_FORWARD(F, op)(
+                                        static_cast<bool>(lhs),
+                                        static_cast<bool>(rhs));
+                                });
+                        }
 
                         std::swap(data, dest);
                         data_available = true;

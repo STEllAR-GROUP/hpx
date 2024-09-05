@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -47,7 +47,7 @@ namespace hpx { namespace performance_counters {
     registry::counter_type_map_type::iterator registry::locate_counter_type(
         std::string const& type_name)
     {
-        counter_type_map_type::iterator it = countertypes_.find(type_name);
+        auto it = countertypes_.find(type_name);
         if (it == countertypes_.end())
         {
             // if the full type is not available, try to locate the object name
@@ -64,8 +64,7 @@ namespace hpx { namespace performance_counters {
     registry::counter_type_map_type::const_iterator
     registry::locate_counter_type(std::string const& type_name) const
     {
-        counter_type_map_type::const_iterator it =
-            countertypes_.find(type_name);
+        auto it = countertypes_.find(type_name);
         if (it == countertypes_.end())
         {
             // if the full type is not available, try to locate the object name
@@ -91,7 +90,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it != countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -131,17 +130,15 @@ namespace hpx { namespace performance_counters {
 
         if (type_name.find_first_of("*?[]") == std::string::npos)
         {
-            counter_type_map_type::iterator it = locate_counter_type(type_name);
+            auto it = locate_counter_type(type_name);
             if (it == countertypes_.end())
             {
                 // compose a list of known counter types
                 std::string types;
-                counter_type_map_type::const_iterator end = countertypes_.end();
-                for (counter_type_map_type::const_iterator it =
-                         countertypes_.begin();
-                     it != end; ++it)
+                auto end = countertypes_.end();
+                for (auto it_ct = countertypes_.begin(); it_ct != end; ++it_ct)
                 {
-                    types += "  " + (*it).first + "\n";
+                    types += "  " + it_ct->first + "\n";
                 }
 
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -158,11 +155,11 @@ namespace hpx { namespace performance_counters {
                     &expand_counter_info, _1, discover_counter, std::ref(ec));
             }
 
-            counter_info info = (*it).second.info_;
+            counter_info info = it->second.info_;
             info.fullname_ = fullname;
 
-            if (!(*it).second.discover_counters_.empty() &&
-                !(*it).second.discover_counters_(
+            if (!it->second.discover_counters_.empty() &&
+                !it->second.discover_counters_(
                     info, discover_counter, mode, ec))
             {
                 return counter_status::invalid_data;
@@ -195,17 +192,17 @@ namespace hpx { namespace performance_counters {
                      countertypes_.begin();
                  it != end; ++it)
             {
-                if (!std::regex_match((*it).first, rx))
+                if (!std::regex_match(it->first, rx))
                     continue;
                 found_one = true;
 
                 // propagate parameters
-                counter_info info = (*it).second.info_;
+                counter_info info = it->second.info_;
                 if (!p.parameters_.empty())
                     info.fullname_ += "@" + p.parameters_;
 
-                if (!(*it).second.discover_counters_.empty() &&
-                    !(*it).second.discover_counters_(
+                if (!it->second.discover_counters_.empty() &&
+                    !it->second.discover_counters_(
                         info, discover_counter, mode, ec))
                 {
                     return counter_status::invalid_data;
@@ -216,12 +213,10 @@ namespace hpx { namespace performance_counters {
             {
                 // compose a list of known counter types
                 std::string types;
-                counter_type_map_type::const_iterator end = countertypes_.end();
-                for (counter_type_map_type::const_iterator it =
-                         countertypes_.begin();
-                     it != end; ++it)
+                auto end_ct = countertypes_.end();
+                for (auto it = countertypes_.begin(); it != end_ct; ++it)
                 {
-                    types += "  " + (*it).first + "\n";
+                    types += "  " + it->first + "\n";
                 }
 
                 HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -242,7 +237,7 @@ namespace hpx { namespace performance_counters {
     /// \brief Call the supplied function for all registered counter types.
     counter_status registry::discover_counter_types(
         discover_counter_func discover_counter, discover_counters_mode mode,
-        error_code& ec)
+        error_code& ec) const
     {
         // Introducing this temporary silence a report about a potential memory
         // from clang's static analyzer
@@ -258,11 +253,10 @@ namespace hpx { namespace performance_counters {
             discover_counter_ = HPX_MOVE(discover_counter);
         }
 
-        for (counter_type_map_type::value_type const& d : countertypes_)
+        for (auto const& [k, v] : countertypes_)
         {
-            if (!d.second.discover_counters_.empty() &&
-                !d.second.discover_counters_(
-                    d.second.info_, discover_counter_, mode, ec))
+            if (!v.discover_counters_.empty() &&
+                !v.discover_counters_(v.info_, discover_counter_, mode, ec))
             {
                 return counter_status::invalid_data;
             }
@@ -286,18 +280,15 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::const_iterator it =
-            locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             // compose a list of known counter types
             std::string types;
-            counter_type_map_type::const_iterator end = countertypes_.end();
-            for (counter_type_map_type::const_iterator it =
-                     countertypes_.begin();
-                 it != end; ++it)
+            auto end = countertypes_.end();
+            for (auto it_ct = countertypes_.begin(); it_ct != end; ++it_ct)
             {
-                types += "  " + (*it).first + "\n";
+                types += "  " + it_ct->first + "\n";
             }
 
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -307,7 +298,7 @@ namespace hpx { namespace performance_counters {
             return counter_status::counter_type_unknown;
         }
 
-        if ((*it).second.create_counter_.empty())
+        if (it->second.create_counter_.empty())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "registry::get_counter_create_function",
@@ -315,7 +306,7 @@ namespace hpx { namespace performance_counters {
             return counter_status::invalid_data;
         }
 
-        func = (*it).second.create_counter_;
+        func = it->second.create_counter_;
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -334,8 +325,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::const_iterator it =
-            locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -344,7 +334,7 @@ namespace hpx { namespace performance_counters {
             return counter_status::counter_type_unknown;
         }
 
-        if ((*it).second.discover_counters_.empty())
+        if (it->second.discover_counters_.empty())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "registry::get_counter_discovery_function",
@@ -353,7 +343,7 @@ namespace hpx { namespace performance_counters {
             return counter_status::invalid_data;
         }
 
-        func = (*it).second.discover_counters_;
+        func = it->second.discover_counters_;
 
         if (&ec != &throws)
             ec = make_success_code();
@@ -371,7 +361,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -426,6 +416,15 @@ namespace hpx { namespace performance_counters {
         return create_raw_counter(info, func, id, ec);
     }
 
+    namespace {
+
+        constexpr bool is_not_counter_type(
+            counter_type ct, counter_type ct1, counter_type ct2) noexcept
+        {
+            return ct != ct1 || ct != ct2;
+        }
+    }    // namespace
+
     counter_status registry::create_raw_counter(counter_info const& info,
         hpx::function<std::int64_t(bool)> const& f, naming::gid_type& id,
         error_code& ec)
@@ -437,7 +436,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -447,19 +446,18 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the counter type requested is supported
-        if ((counter_type::raw != (*it).second.info_.type_ ||
-                counter_type::raw != info.type_) &&
-            (counter_type::monotonically_increasing !=
-                    (*it).second.info_.type_ ||
-                counter_type::monotonically_increasing != info.type_) &&
-            (counter_type::aggregating != (*it).second.info_.type_ ||
-                counter_type::aggregating != info.type_) &&
-            (counter_type::elapsed_time != (*it).second.info_.type_ ||
-                counter_type::elapsed_time != info.type_) &&
-            (counter_type::average_count != (*it).second.info_.type_ ||
-                counter_type::average_count != info.type_) &&
-            (counter_type::average_timer != (*it).second.info_.type_ ||
-                counter_type::average_timer != info.type_))
+        if (is_not_counter_type(
+                counter_type::raw, it->second.info_.type_, info.type_) &&
+            is_not_counter_type(counter_type::monotonically_increasing,
+                it->second.info_.type_, info.type_) &&
+            is_not_counter_type(counter_type::aggregating,
+                it->second.info_.type_, info.type_) &&
+            is_not_counter_type(counter_type::elapsed_time,
+                it->second.info_.type_, info.type_) &&
+            is_not_counter_type(counter_type::average_count,
+                it->second.info_.type_, info.type_) &&
+            is_not_counter_type(counter_type::average_timer,
+                it->second.info_.type_, info.type_))
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
                 "registry::create_raw_counter",
@@ -473,14 +471,14 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
         // create the counter as requested
         try
         {
-            typedef components::component<server::raw_counter> counter_t;
+            using counter_t = components::component<server::raw_counter>;
             id = components::server::construct<counter_t>(complemented_info, f);
         }
         catch (hpx::exception const& e)
@@ -522,7 +520,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -532,9 +530,9 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the counter type requested is supported
-        if (!((counter_type::histogram == (*it).second.info_.type_ &&
+        if (!((counter_type::histogram == it->second.info_.type_ &&
                   counter_type::histogram == info.type_) ||
-                (counter_type::raw_values == (*it).second.info_.type_ &&
+                (counter_type::raw_values == it->second.info_.type_ &&
                     counter_type::raw_values == info.type_)))
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -546,14 +544,14 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
         // create the counter as requested
         try
         {
-            typedef components::component<server::raw_values_counter> counter_t;
+            using counter_t = components::component<server::raw_values_counter>;
             id = components::server::construct<counter_t>(complemented_info, f);
         }
         catch (hpx::exception const& e)
@@ -586,7 +584,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -597,7 +595,7 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
@@ -608,8 +606,8 @@ namespace hpx { namespace performance_counters {
             {
             case counter_type::elapsed_time:
             {
-                typedef components::component<server::elapsed_time_counter>
-                    counter_t;
+                using counter_t =
+                    components::component<server::elapsed_time_counter>;
                 id =
                     components::server::construct<counter_t>(complemented_info);
             }
@@ -671,7 +669,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -681,7 +679,7 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_type::aggregating != (*it).second.info_.type_ ||
+        if (counter_type::aggregating != it->second.info_.type_ ||
             counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -694,7 +692,7 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
@@ -717,13 +715,12 @@ namespace hpx { namespace performance_counters {
             // create base counter only if it does not exist yet
             if (p.countername_ == "average")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::mean>>
-                    counter_t;
+                        boost::accumulators::tag::mean>>;
 
                 if (parameters.size() > 1)
-                    reset_base_counter = (parameters[1] != 0) ? true : false;
+                    reset_base_counter = parameters[1] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0,
@@ -731,13 +728,12 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "stddev")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::variance>>
-                    counter_t;
+                        boost::accumulators::tag::variance>>;
 
                 if (parameters.size() > 1)
-                    reset_base_counter = (parameters[1] != 0) ? true : false;
+                    reset_base_counter = parameters[1] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0,
@@ -745,17 +741,16 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "rolling_average")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::rolling_mean>>
-                    counter_t;
+                        boost::accumulators::tag::rolling_mean>>;
 
                 std::size_t window_size = 10;    // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
                 if (parameters.size() > 2)
-                    reset_base_counter = (parameters[2] != 0) ? true : false;
+                    reset_base_counter = parameters[2] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
@@ -763,17 +758,16 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "rolling_stddev")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::rolling_variance>>
-                    counter_t;
+                        boost::accumulators::tag::rolling_variance>>;
 
                 std::size_t window_size = 10;    // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
                 if (parameters.size() > 2)
-                    reset_base_counter = (parameters[2] != 0) ? true : false;
+                    reset_base_counter = parameters[2] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
@@ -781,13 +775,12 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "median")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::median>>
-                    counter_t;
+                        boost::accumulators::tag::median>>;
 
                 if (parameters.size() > 1)
-                    reset_base_counter = (parameters[1] != 0) ? true : false;
+                    reset_base_counter = parameters[1] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0,
@@ -795,13 +788,12 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "max")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::max>>
-                    counter_t;
+                        boost::accumulators::tag::max>>;
 
                 if (parameters.size() > 1)
-                    reset_base_counter = (parameters[1] != 0) ? true : false;
+                    reset_base_counter = parameters[1] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0,
@@ -809,13 +801,12 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "min")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     hpx::performance_counters::server::statistics_counter<
-                        boost::accumulators::tag::min>>
-                    counter_t;
+                        boost::accumulators::tag::min>>;
 
                 if (parameters.size() > 1)
-                    reset_base_counter = (parameters[1] != 0) ? true : false;
+                    reset_base_counter = parameters[1] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval, 0,
@@ -823,16 +814,16 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "rolling_min")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::statistics_counter<hpx::util::tag::rolling_min>>
-                    counter_t;
+                using counter_t = hpx::components::component<
+                    hpx::performance_counters::server::statistics_counter<
+                        hpx::util::tag::rolling_min>>;
 
                 std::size_t window_size = 10;    // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
                 if (parameters.size() > 2)
-                    reset_base_counter = (parameters[2] != 0) ? true : false;
+                    reset_base_counter = parameters[2] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
@@ -840,16 +831,16 @@ namespace hpx { namespace performance_counters {
             }
             else if (p.countername_ == "rolling_max")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::statistics_counter<hpx::util::tag::rolling_max>>
-                    counter_t;
+                using counter_t = hpx::components::component<
+                    hpx::performance_counters::server::statistics_counter<
+                        hpx::util::tag::rolling_max>>;
 
                 std::size_t window_size = 10;    // default rolling window size
                 if (parameters.size() > 1)
                     window_size = parameters[1];
 
                 if (parameters.size() > 2)
-                    reset_base_counter = (parameters[2] != 0) ? true : false;
+                    reset_base_counter = parameters[2] != 0;
 
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_name, sample_interval,
@@ -897,7 +888,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -907,7 +898,7 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_type::aggregating != (*it).second.info_.type_ ||
+        if (counter_type::aggregating != it->second.info_.type_ ||
             counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -919,7 +910,7 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
@@ -935,33 +926,33 @@ namespace hpx { namespace performance_counters {
             // create base counter only if it does not exist yet
             if (p.countername_ == "add")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::arithmetics_counter<std::plus<double>>>
-                    counter_t;
+                using counter_t =
+                    hpx::components::component<hpx::performance_counters::
+                            server::arithmetics_counter<std::plus<double>>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "subtract")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::arithmetics_counter<std::minus<double>>>
-                    counter_t;
+                using counter_t =
+                    hpx::components::component<hpx::performance_counters::
+                            server::arithmetics_counter<std::minus<double>>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "multiply")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::arithmetics_counter<std::multiplies<double>>>
-                    counter_t;
+                using counter_t = hpx::components::component<
+                    hpx::performance_counters::server::arithmetics_counter<
+                        std::multiplies<double>>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "divide")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::arithmetics_counter<std::divides<double>>>
-                    counter_t;
+                using counter_t =
+                    hpx::components::component<hpx::performance_counters::
+                            server::arithmetics_counter<std::divides<double>>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
@@ -1008,7 +999,7 @@ namespace hpx { namespace performance_counters {
         if (!status_is_valid(status))
             return status;
 
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -1018,7 +1009,7 @@ namespace hpx { namespace performance_counters {
         }
 
         // make sure the requested counter type is supported
-        if (counter_type::aggregating != (*it).second.info_.type_ ||
+        if (counter_type::aggregating != it->second.info_.type_ ||
             counter_type::aggregating != info.type_)
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -1030,7 +1021,7 @@ namespace hpx { namespace performance_counters {
 
         // make sure parent instance name is set properly
         counter_info complemented_info = info;
-        complement_counter_info(complemented_info, (*it).second.info_, ec);
+        complement_counter_info(complemented_info, it->second.info_, ec);
         if (ec)
             return counter_status::invalid_data;
 
@@ -1046,55 +1037,50 @@ namespace hpx { namespace performance_counters {
             // create base counter only if it does not exist yet
             if (p.countername_ == "mean")
             {
-                typedef hpx::components::component<hpx::performance_counters::
-                        server::arithmetics_counter_extended<
-                            boost::accumulators::tag::mean>>
-                    counter_t;
+                using counter_t =
+                    hpx::components::component<hpx::performance_counters::
+                            server::arithmetics_counter_extended<
+                                boost::accumulators::tag::mean>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "variance")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     performance_counters::server::arithmetics_counter_extended<
-                        boost::accumulators::tag::variance>>
-                    counter_t;
+                        boost::accumulators::tag::variance>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "median")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     performance_counters::server::arithmetics_counter_extended<
-                        boost::accumulators::tag::median>>
-                    counter_t;
+                        boost::accumulators::tag::median>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "min")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     performance_counters::server::arithmetics_counter_extended<
-                        boost::accumulators::tag::min>>
-                    counter_t;
+                        boost::accumulators::tag::min>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "max")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     performance_counters::server::arithmetics_counter_extended<
-                        boost::accumulators::tag::max>>
-                    counter_t;
+                        boost::accumulators::tag::max>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
             else if (p.countername_ == "count")
             {
-                typedef hpx::components::component<
+                using counter_t = hpx::components::component<
                     performance_counters::server::arithmetics_counter_extended<
-                        boost::accumulators::tag::count>>
-                    counter_t;
+                        boost::accumulators::tag::count>>;
                 gid = components::server::construct<counter_t>(
                     complemented_info, base_counter_names);
             }
@@ -1146,7 +1132,7 @@ namespace hpx { namespace performance_counters {
             return status;
 
         // make sure the type of the new counter is known to the registry
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -1208,7 +1194,7 @@ namespace hpx { namespace performance_counters {
             return status;
 
         // make sure the type of the counter is known to the registry
-        counter_type_map_type::iterator it = locate_counter_type(type_name);
+        auto it = locate_counter_type(type_name);
         if (it == countertypes_.end())
         {
             HPX_THROWS_IF(ec, hpx::error::bad_parameter,
@@ -1217,7 +1203,7 @@ namespace hpx { namespace performance_counters {
             return counter_status::counter_type_unknown;
         }
 
-        info = (*it).second.info_;
+        info = it->second.info_;
 
         if (&ec != &throws)
             ec = make_success_code();

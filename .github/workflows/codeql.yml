@@ -50,7 +50,9 @@ jobs:
         queries: security-and-quality
 
     - name: Install CMake
-      uses: ssrobins/install-cmake@v1
+      uses: jwlawson/actions-setup-cmake@v2.0
+      with:
+        cmake-version: '3.22.x'
 
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
@@ -80,6 +82,7 @@ jobs:
         # filter out all files from downloaded dependencies
         patterns: |
           -**/_deps/**
+          -**/concurrentqueue.hpp
         input: sarif-results/cpp.sarif
         output: sarif-results/cpp.sarif
 

@@ -439,7 +439,7 @@
 #  define HPX_HAVE_MAX_CPU_COUNT 256
 #endif
 
-#if !defined(HPX_HAVE_MAX_CPU_COUNT)
+#if !defined(HPX_HAVE_MAX_CPU_COUNT) && !defined(HPX_HAVE_MORE_THAN_64_THREADS)
 #define HPX_HAVE_MAX_CPU_COUNT 64
 #endif
 

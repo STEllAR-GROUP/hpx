@@ -257,22 +257,39 @@ namespace hpx::traits {
                     communication::reduce_tag>::name(),
                 which, generation,
                 // step function (invoked once for get)
-                [&t](auto& data, std::size_t which) {
-                    data[which] = HPX_FORWARD(T, t);
+                [&t](auto& data, std::size_t site) {
+                    data[site] = HPX_FORWARD(T, t);
                 },
                 // finalizer (invoked once after all data has been received)
                 [op = HPX_FORWARD(F, op)](
                     auto& data, bool&, std::size_t) mutable {
                     HPX_ASSERT(!data.empty());
-                    if (data.size() > 1)
+
+                    if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
                     {
-                        auto it = data.begin();
-                        return Communicator::template handle_bool<
-                            std::decay_t<T>>(hpx::reduce(++it, data.end(),
-                            HPX_MOVE(data[0]), HPX_FORWARD(F, op)));
+                        if (data.size() > 1)
+                        {
+                            auto it = data.begin();
+                            return hpx::reduce(++it, data.end(),
+                                HPX_MOVE(data[0]), HPX_FORWARD(F, op));
+                        }
+                        return HPX_MOVE(data[0]);
                     }
-                    return Communicator::template handle_bool<std::decay_t<T>>(
-                        HPX_MOVE(data[0]));
+                    else
+                    {
+                        if (data.size() > 1)
+                        {
+                            auto it = data.begin();
+                            return static_cast<bool>(hpx::reduce(++it,
+                                data.end(), static_cast<bool>(data[0]),
+                                [&](auto lhs, auto rhs) {
+                                    return HPX_FORWARD(F, op)(
+                                        static_cast<bool>(lhs),
+                                        static_cast<bool>(rhs));
+                                }));
+                        }
+                        return static_cast<bool>(data[0]);
+                    }
                 });
         }
 
@@ -285,8 +302,8 @@ namespace hpx::traits {
                     communication::reduce_tag>::name(),
                 which, generation,
                 // step function (invoked for each set)
-                [t = HPX_FORWARD(T, t)](auto& data, std::size_t which) mutable {
-                    data[which] = HPX_FORWARD(T, t);
+                [t = HPX_FORWARD(T, t)](auto& data, std::size_t site) mutable {
+                    data[site] = HPX_FORWARD(T, t);
                 },
                 // no finalizer
                 nullptr);

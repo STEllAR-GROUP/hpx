@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,7 +7,9 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
 #include <hpx/algorithm.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/init.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/type_support/identity.hpp>
@@ -66,6 +69,42 @@ void test_none_of(ExPolicy&& policy, IteratorTag)
         HPX_TEST_EQ(result, expected);
     }
 }
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_none_of_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<int>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    int iseq[] = {0, 1, 3};
+    for (int i : iseq)
+    {
+        std::vector<int> c = test::fill_all_any_none<int>(3, i);    //-V106
+
+        auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                [](auto v) { return v != 0; }) |
+            hpx::none_of(ex_policy.on(exec)));
+        bool result = hpx::get<0>(*snd_result);
+
+        // verify values
+        bool expected = std::none_of(
+            std::begin(c), std::end(c), [](auto v) { return v != 0; });
+
+        HPX_TEST_EQ(result, expected);
+    }
+}
+#endif
 
 template <typename IteratorTag, typename Proj = hpx::identity>
 void test_none_of_ranges_seq(IteratorTag, Proj proj = Proj())

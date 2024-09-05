@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Hartmut Kaiser
+# Copyright (c) 2013-2024 Hartmut Kaiser
 # Copyright (c) 2014 Thomas Heller
 # Copyright (c) 2016 John Biddiscombe
 #
@@ -181,11 +181,15 @@ function(write_config_defines_file)
     endif()
   endforeach()
 
+  string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
+  set(TEMP_FILENAME
+      "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}"
+  )
+
   # if the user has not specified a template, generate a proper header file
   if(NOT OPTION_TEMPLATE)
-    string(TOUPPER ${OPTION_NAMESPACE} NAMESPACE_UPPER)
     set(PREAMBLE
-        "//  Copyright (c) 2019-2023 STE||AR Group\n"
+        "//  Copyright (c) 2019-2024 STE||AR Group\n"
         "//\n"
         "//  SPDX-License-Identifier: BSL-1.0\n"
         "//  Distributed under the Boost Software License, Version 1.0. (See accompanying\n"
@@ -195,13 +199,11 @@ function(write_config_defines_file)
         "\n"
         "#pragma once\n"
     )
-    set(TEMP_FILENAME
-        "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${NAMESPACE_UPPER}"
-    )
     file(WRITE ${TEMP_FILENAME} ${PREAMBLE} ${hpx_config_defines} "\n")
     configure_file("${TEMP_FILENAME}" "${OPTION_FILENAME}" COPYONLY)
-    file(REMOVE "${TEMP_FILENAME}")
   else()
-    configure_file("${OPTION_TEMPLATE}" "${OPTION_FILENAME}" @ONLY)
+    configure_file("${OPTION_TEMPLATE}" "${TEMP_FILENAME}" @ONLY)
+    configure_file("${TEMP_FILENAME}" "${OPTION_FILENAME}" COPYONLY)
   endif()
+  file(REMOVE "${TEMP_FILENAME}")
 endfunction()

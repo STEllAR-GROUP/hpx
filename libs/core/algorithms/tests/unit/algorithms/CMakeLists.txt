@@ -18,7 +18,6 @@ endforeach()
 # add tests
 set(tests
     adjacentdifference
-    adjacentdifference_sender
     adjacentfind
     adjacentfind_binary
     all_of
@@ -33,6 +32,7 @@ set(tests
     countif
     destroy
     destroyn
+    distance
     ends_with
     equal
     equal_binary
@@ -44,7 +44,6 @@ set(tests
     fill
     filln
     find
-    find_sender
     findend
     findfirstof
     findfirstof_binary
@@ -53,7 +52,6 @@ set(tests
     foreach
     foreach_executors
     foreach_prefetching
-    foreach_sender
     foreach_scheduler
     foreachn
     foreachn_exception
@@ -66,7 +64,6 @@ set(tests
     for_loop_n_strided
     for_loop_reduction
     for_loop_reduction_async
-    for_loop_sender
     for_loop_strided
     generate
     generaten
@@ -110,10 +107,8 @@ set(tests
     replace_copy_if
     reverse
     reverse_copy
-    reverse_sender
     rotate
     rotate_copy
-    rotate_sender
     search
     searchn
     set_difference
@@ -160,6 +155,70 @@ if(HPX_WITH_CXX17_STD_EXECUTION_POLICES)
   set(tests ${tests} foreach_std_policies)
 endif()
 
+if(HPX_WITH_STDEXEC)
+  set(tests
+      ${tests}
+      adjacentdifference_sender
+      adjacentfind_sender
+      all_of_sender
+      any_of_sender
+      copy_sender
+      copyn_sender
+      count_sender
+      countif_sender
+      destroy_sender
+      destroyn_sender
+      ends_with_sender
+      equal_sender
+      equal_binary_sender
+      fill_sender
+      filln_sender
+      find_sender
+      findend_sender
+      findfirstof_sender
+      findif_sender
+      findifnot_sender
+      foreach_sender
+      foreachn_sender
+      generate_sender
+      generaten_sender
+      is_heap_sender
+      is_heap_until_sender
+      includes_sender
+      is_partitioned_sender
+      is_sorted_sender
+      is_sorted_until_sender
+      lexicographical_compare_sender
+      max_element_sender
+      min_element_sender
+      minmax_element_sender
+      mismatch_sender
+      mismatch_binary_sender
+      move_sender
+      none_of_sender
+      reduce_sender
+      remove_sender
+      remove_if_sender
+      replace_sender
+      replace_if_sender
+      replace_copy_sender
+      replace_copy_if_sender
+      reverse_sender
+      reverse_copy_sender
+      rotate_sender
+      rotate_copy_sender
+      search_sender
+      starts_with_sender
+      swapranges_sender
+      transform_sender
+      transform_binary_sender
+      transform_binary2_sender
+      transform_reduce_sender
+      transform_reduce_binary_sender
+      unique_sender
+  )
+endif()
+
 foreach(test ${tests})
   set(sources ${test}.cpp)
 
@@ -176,6 +235,10 @@ foreach(test ${tests})
     EXCLUDE_FROM_ALL
     HPX_PREFIX ${HPX_BUILD_PREFIX}
     FOLDER ${folder_name}
+  )
+
+  target_link_libraries(
+    ${test}_test PRIVATE hpx_iterator_support_test_utilities
   )
 
   add_hpx_unit_test(

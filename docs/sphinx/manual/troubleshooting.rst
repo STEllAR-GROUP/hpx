@@ -27,7 +27,7 @@ one the options found in `Support for deploying and using HPX <hpx_github_suppor
 ``HPX::iostreams_component" target not found``
 ----------------------------------------------
 
-You may see a |cmake| error message that looks a bit like this:
+You may see a |cmake|_ error message that looks a bit like this:
 
 .. code-block:: text
 
@@ -50,7 +50,7 @@ This usually happens if you are trying to use |hpx| iostreams functionality such
 as ``hpx::cout`` but are not linking against it. The iostreams functionality is
 not part of the core |hpx| library, and must be linked to explicitly. Typically
 this can be solved by adding ``COMPONENT_DEPENDENCIES iostreams`` to a call to
-``add_hpx_library/add_hpx_executable/hpx_setup_target`` if using |cmake|. See
+``add_hpx_library/add_hpx_executable/hpx_setup_target`` if using |cmake|_. See
 :ref:`creating_hpx_projects` for more details.
 
 ``Fail compiling for examples with hpx::future and co_await``

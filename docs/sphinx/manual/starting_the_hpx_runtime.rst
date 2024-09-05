@@ -50,7 +50,7 @@ The only change to your code you have to make is to include the file
 the first |hpx| thread of the application. The runtime system will be
 initialized behind the scenes before the function ``main()`` is executed and
 will automatically stop after ``main()`` has returned. For this method to work
-you must link your application to the |cmake| target ``HPX::wrap_main``. This is
+you must link your application to the |cmake|_ target ``HPX::wrap_main``. This is
 done automatically if you are using the provided macros
 (:ref:`using_hpx_cmake_macros`) to set up your application, but must be done
 explicitly if you are using targets directly (:ref:`using_hpx_cmake_targets`).

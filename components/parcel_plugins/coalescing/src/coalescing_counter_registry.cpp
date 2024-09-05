@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2022 Hartmut Kaiser
+//  Copyright (c) 2016-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -30,10 +30,12 @@ namespace hpx::plugins::parcel {
 
     ///////////////////////////////////////////////////////////////////////////
     void coalescing_counter_registry::register_action(std::string const& name,
-        get_counter_type num_parcels, get_counter_type num_messages,
-        get_counter_type num_parcels_per_message,
-        get_counter_type average_time_between_parcels,
-        get_counter_values_creator_type time_between_parcels_histogram_creator)
+        get_counter_type const& num_parcels,
+        get_counter_type const& num_messages,
+        get_counter_type const& num_parcels_per_message,
+        get_counter_type const& average_time_between_parcels,
+        get_counter_values_creator_type const&
+            time_between_parcels_histogram_creator)
     {
         if (name.empty())
         {
@@ -56,29 +58,28 @@ namespace hpx::plugins::parcel {
         else
         {
             // replace the existing functions
-            (*it).second.num_parcels = num_parcels;
-            (*it).second.num_messages = num_messages;
-            (*it).second.num_parcels_per_message = num_parcels_per_message;
-            (*it).second.average_time_between_parcels =
+            it->second.num_parcels = num_parcels;
+            it->second.num_messages = num_messages;
+            it->second.num_parcels_per_message = num_parcels_per_message;
+            it->second.average_time_between_parcels =
                 average_time_between_parcels;
-            (*it).second.time_between_parcels_histogram_creator =
+            it->second.time_between_parcels_histogram_creator =
                 time_between_parcels_histogram_creator;
 
-            if ((*it).second.min_boundary != (*it).second.max_boundary)
+            if (it->second.min_boundary != it->second.max_boundary)
             {
                 // instantiate actual histogram collection
                 coalescing_counter_registry::get_counter_values_type result;
-                time_between_parcels_histogram_creator(
-                    (*it).second.min_boundary, (*it).second.max_boundary,
-                    (*it).second.num_buckets, result);
+                time_between_parcels_histogram_creator(it->second.min_boundary,
+                    it->second.max_boundary, it->second.num_buckets, result);
             }
 
             // silence warnings
-            (void) (*it).second.num_parcels;
-            (void) (*it).second.num_messages;
-            (void) (*it).second.num_parcels_per_message;
-            (void) (*it).second.average_time_between_parcels;
-            (void) (*it).second.time_between_parcels_histogram_creator;
+            (void) it->second.num_parcels;
+            (void) it->second.num_messages;
+            (void) it->second.num_parcels_per_message;
+            (void) it->second.average_time_between_parcels;
+            (void) it->second.time_between_parcels_histogram_creator;
         }
     }
 
@@ -114,9 +115,8 @@ namespace hpx::plugins::parcel {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_parcels_counter",
                 "unknown action type");
-            return get_counter_type();
         }
-        return (*it).second.num_parcels;
+        return it->second.num_parcels;
     }
 
     coalescing_counter_registry::get_counter_type
@@ -132,9 +132,8 @@ namespace hpx::plugins::parcel {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
-            return get_counter_type();
         }
-        return (*it).second.num_messages;
+        return it->second.num_messages;
     }
 
     coalescing_counter_registry::get_counter_type
@@ -150,9 +149,8 @@ namespace hpx::plugins::parcel {
             HPX_THROW_EXCEPTION(hpx::error::bad_parameter,
                 "coalescing_counter_registry::get_num_messages_counter",
                 "unknown action type");
-            return get_counter_type();
         }
-        return (*it).second.num_parcels_per_message;
+        return it->second.num_parcels_per_message;
     }
 
     coalescing_counter_registry::get_counter_type
@@ -169,9 +167,8 @@ namespace hpx::plugins::parcel {
                 "coalescing_counter_registry::"
                 "get_average_time_between_parcels_counter",
                 "unknown action type");
-            return get_counter_type();
         }
-        return (*it).second.average_time_between_parcels;
+        return it->second.average_time_between_parcels;
     }
 
     coalescing_counter_registry::get_counter_values_type
@@ -189,20 +186,19 @@ namespace hpx::plugins::parcel {
                 "coalescing_counter_registry::"
                 "get_time_between_parcels_histogram_counter",
                 "unknown action type");
-            return &coalescing_counter_registry::empty_histogram;
         }
 
-        if ((*it).second.time_between_parcels_histogram_creator.empty())
+        if (it->second.time_between_parcels_histogram_creator.empty())
         {
             // no parcel of this type has been sent yet
-            (*it).second.min_boundary = min_boundary;
-            (*it).second.max_boundary = max_boundary;
-            (*it).second.num_buckets = num_buckets;
+            it->second.min_boundary = min_boundary;
+            it->second.max_boundary = max_boundary;
+            it->second.num_buckets = num_buckets;
             return coalescing_counter_registry::get_counter_values_type();
         }
 
         coalescing_counter_registry::get_counter_values_type result;
-        (*it).second.time_between_parcels_histogram_creator(
+        it->second.time_between_parcels_histogram_creator(
             min_boundary, max_boundary, num_buckets, result);
         return result;
     }
@@ -281,11 +277,11 @@ namespace hpx::plugins::parcel {
                 for (map_type::const_iterator it = map_.begin(); it != end;
                      ++it)
                 {
-                    if (!std::regex_match((*it).first, rx))
+                    if (!std::regex_match(it->first, rx))
                         continue;
 
                     performance_counters::counter_path_elements cp = p;
-                    cp.parameters_ = (*it).first;
+                    cp.parameters_ = it->first;
                     if (!additional_parameters.empty())
                         cp.parameters_ += additional_parameters;
 
@@ -304,7 +300,7 @@ namespace hpx::plugins::parcel {
                     for (map_type::const_iterator it = map_.begin(); it != end;
                          ++it)
                     {
-                        types += "  " + (*it).first + "\n";
+                        types += "  " + it->first + "\n";
                     }
                 }
 
@@ -348,10 +344,10 @@ namespace hpx::plugins::parcel {
                 // compose a list of known action types
                 std::string types;
                 map_type::const_iterator end = map_.end();
-                for (map_type::const_iterator it = map_.begin(); it != end;
-                     ++it)
+                for (map_type::const_iterator it_ct = map_.begin();
+                     it_ct != end; ++it_ct)
                 {
-                    types += "  " + (*it).first + "\n";
+                    types += "  " + it_ct->first + "\n";
                 }
 
                 l.unlock();

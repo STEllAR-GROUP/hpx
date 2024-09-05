@@ -84,8 +84,37 @@ def get_info_from_file(source):
 # The text in the rst file should be:
 # :hpx-header:`base_path,file_name`
 link_hpx_headers = {
-    "libs/full/include/include": ["hpx/algorithm.hpp", "hpx/barrier.hpp", "hpx/channel.hpp", "hpx/future.hpp", "hpx/latch.hpp", "hpx/runtime.hpp"],
-    "libs/core/include_local/include": ["hpx/any.hpp", "hpx/chrono.hpp", "hpx/condition_variable.hpp", "hpx/exception.hpp", "hpx/execution.hpp", "hpx/functional.hpp", "hpx/mutex.hpp", "hpx/memory.hpp", "hpx/numeric.hpp", "hpx/optional.hpp", "hpx/source_location.hpp", "hpx/system_error.hpp", "hpx/task_block.hpp", "hpx/experimental/task_group.hpp", "hpx/thread.hpp", "hpx/semaphore.hpp", "hpx/shared_mutex.hpp", "hpx/stop_token.hpp", "hpx/tuple.hpp", "hpx/type_traits.hpp", "hpx/unwrap.hpp"],
+    "libs/full/include/include": [
+        "hpx/algorithm.hpp",
+        "hpx/barrier.hpp",
+        "hpx/channel.hpp",
+        "hpx/future.hpp",
+        "hpx/latch.hpp",
+        "hpx/runtime.hpp"
+    ],
+    "libs/core/include_local/include": [
+        "hpx/any.hpp",
+        "hpx/chrono.hpp",
+        "hpx/condition_variable.hpp",
+        "hpx/exception.hpp",
+        "hpx/execution.hpp",
+        "hpx/functional.hpp",
+        "hpx/mutex.hpp",
+        "hpx/memory.hpp",
+        "hpx/numeric.hpp",
+        "hpx/optional.hpp",
+        "hpx/source_location.hpp",
+        "hpx/system_error.hpp",
+        "hpx/task_block.hpp",
+        "hpx/experimental/task_group.hpp",
+        "hpx/thread.hpp",
+        "hpx/semaphore.hpp",
+        "hpx/shared_mutex.hpp",
+        "hpx/stop_token.hpp",
+        "hpx/tuple.hpp",
+        "hpx/type_traits.hpp",
+        "hpx/unwrap.hpp"
+    ],
     "libs/full/init_runtime/include": ["hpx/init.hpp"],
     "libs/core/version/include": ["hpx/version.hpp"],
     "wrap/include": ["hpx/wrap_main.hpp"]
@@ -337,7 +366,7 @@ rst_prolog += '''
 .. |hpx_dependency_report| replace:: |hpx| Dependency report
 .. _hpx_dependency_report: ../../report/index.html
 .. |hpx_single_html| replace:: |hpx| Single HTML documentation
-.. _hpx_single_html: ../singlehtml/index.h
+.. _hpx_single_html: ../singlehtml/index.html
 .. |hpx_pdf| replace:: |hpx| PDF documentation
 .. _hpx_pdf: ../pdf/HPX.pdf
 
@@ -568,6 +597,8 @@ rst_prolog += '''
 .. _cpp17_n4755: http://wg21.link/n4755
 .. |cpp19_n4808| replace:: N4808
 .. _cpp19_n4808: http://wg21.link/n4808
+.. |cpp26_n4948| replace:: N4948
+.. _cpp26_n4948: http://wg21.link/n4948
 .. |cpp20_p0075r1| replace:: P0075R1
 .. _cpp20_p0075r1: http://wg21.link/p0075r1
 .. |cpp20_p0443| replace:: P0443
@@ -576,6 +607,8 @@ rst_prolog += '''
 .. _p0792: http://wg21.link/p0792
 .. |p0159| replace:: P0159
 .. _p0159: http://wg21.link/p0159
+.. |cpp26_p1144| replace:: P1144
+.. _cpp26_p1144: https://wg21.link/p1144
 .. |p1393| replace:: P1393
 .. _p1393: http://wg21.link/p1393
 .. |p2220| replace:: P2220
@@ -744,15 +777,16 @@ html_context = {
     'github_version': 'master/docs/sphinx/',
 }
 
+# In case no commit is found, link to the master
 if "@HPX_WITH_GIT_COMMIT_SHORT@" != "":
     html_context['commit'] = "@HPX_WITH_GIT_COMMIT_SHORT@"
 else:
-    html_context['commit'] = "unknown"
+    html_context['commit'] = "master"
 
 if "@HPX_WITH_GIT_COMMIT@" != "":
     html_context['fullcommit'] = "@HPX_WITH_GIT_COMMIT@"
 else:
-    html_context['fullcommit'] = "unknown"
+    html_context['fullcommit'] = "master"
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

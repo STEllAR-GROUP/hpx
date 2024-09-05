@@ -767,6 +767,11 @@ namespace hpx::agas {
         spin();
     }    // }}}
 
+    // 26110: Caller failing to hold lock 'this->mtx' before calling function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110)
+#endif
     void big_boot_barrier::notify()
     {
         naming::resolver_client& agas_client = naming::get_agas_client();
@@ -784,6 +789,9 @@ namespace hpx::agas {
         if (notify)
             cond.notify_all();
     }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
     // This is triggered in runtime_impl::start, after the early action handler
     // has been replaced by the parcelhandler. We have to delay the notifications

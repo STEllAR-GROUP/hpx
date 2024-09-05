@@ -187,8 +187,22 @@ namespace hpx::traits {
 
                         // first value is not taken into account
                         auto it = data.begin();
-                        hpx::exclusive_scan(it, data.end(), dest.begin(), *it,
-                            HPX_FORWARD(F, op));
+
+                        if constexpr (!std::is_same_v<std::decay_t<T>, bool>)
+                        {
+                            hpx::exclusive_scan(it, data.end(), dest.begin(),
+                                *it, HPX_FORWARD(F, op));
+                        }
+                        else
+                        {
+                            hpx::exclusive_scan(it, data.end(), dest.begin(),
+                                static_cast<bool>(*it),
+                                [&](auto lhs, auto rhs) {
+                                    return HPX_FORWARD(F, op)(
+                                        static_cast<bool>(lhs),
+                                        static_cast<bool>(rhs));
+                                });
+                        }
 
                         std::swap(data, dest);
                         data_available = true;

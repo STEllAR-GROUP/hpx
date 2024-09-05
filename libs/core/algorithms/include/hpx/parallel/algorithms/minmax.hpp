@@ -493,13 +493,19 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(HPX_MOVE(first));
+                    if (first == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            FwdIter>::get(HPX_MOVE(first));
+                    }
                 }
 
                 auto f1 = [f, proj, policy](
@@ -508,9 +514,21 @@ namespace hpx::parallel {
                         policy, it, part_count, f, proj);
                 };
 
-                auto f2 = [policy, f = HPX_FORWARD(F, f),
+                auto f2 = [policy, first, f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj)](
                               auto&& positions) -> FwdIter {
+                    if constexpr (has_scheduler_executor)
+                    {
+                        if (positions.size() == 0)
+                        {
+                            return first;
+                        }
+                    }
+                    else
+                    {
+                        HPX_UNUSED(first);
+                    }
+
                     return min_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
@@ -628,13 +646,19 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        FwdIter>::get(HPX_MOVE(first));
+                    if (first == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            FwdIter>::get(HPX_MOVE(first));
+                    }
                 }
 
                 auto f1 = [f, proj, policy](
@@ -643,9 +667,21 @@ namespace hpx::parallel {
                         policy, it, part_count, f, proj);
                 };
 
-                auto f2 = [policy, f = HPX_FORWARD(F, f),
+                auto f2 = [policy, first, f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj)](
                               auto&& positions) -> FwdIter {
+                    if constexpr (has_scheduler_executor)
+                    {
+                        if (positions.size() == 0)
+                        {
+                            return first;
+                        }
+                    }
+                    else
+                    {
+                        HPX_UNUSED(first);
+                    }
+
                     return max_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
@@ -789,18 +825,22 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename FwdIter, typename Sent,
                 typename F, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy,
-                minmax_element_result<FwdIter>>
-            parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, Sent last, F&& f, Proj&& proj)
             {
                 using result_type = minmax_element_result<FwdIter>;
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
                 result_type result = {first, first};
-                if (first == last || ++first == last)
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        result_type>::get(HPX_MOVE(result));
+                    if (first == last || ++first == last)
+                    {
+                        return util::detail::algorithm_result<ExPolicy,
+                            result_type>::get(HPX_MOVE(result));
+                    }
                 }
 
                 auto f1 = [f, proj, policy](FwdIter it, std::size_t part_count)
@@ -809,9 +849,21 @@ namespace hpx::parallel {
                         policy, it, part_count, f, proj);
                 };
 
-                auto f2 = [policy, f = HPX_FORWARD(F, f),
+                auto f2 = [policy, first, f = HPX_FORWARD(F, f),
                               proj = HPX_FORWARD(Proj, proj)](
                               auto&& positions) -> result_type {
+                    if constexpr (has_scheduler_executor)
+                    {
+                        if (positions.size() == 0)
+                        {
+                            return result_type{first, first};
+                        }
+                    }
+                    else
+                    {
+                        HPX_UNUSED(first);
+                    }
+
                     return minmax_element::sequential_minmax_element_ind(
                         policy, positions.begin(), positions.size(), f, proj);
                 };
@@ -862,10 +914,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::min_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F f = F())
+        friend decltype(auto) tag_fallback_invoke(hpx::min_element_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -906,10 +956,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(hpx::max_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F f = F())
+        friend decltype(auto) tag_fallback_invoke(hpx::max_element_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -950,10 +998,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            minmax_element_result<FwdIter>>
-        tag_fallback_invoke(hpx::minmax_element_t, ExPolicy&& policy,
-            FwdIter first, FwdIter last, F f = F())
+        friend decltype(auto) tag_fallback_invoke(hpx::minmax_element_t,
+            ExPolicy&& policy, FwdIter first, FwdIter last, F f = F())
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");

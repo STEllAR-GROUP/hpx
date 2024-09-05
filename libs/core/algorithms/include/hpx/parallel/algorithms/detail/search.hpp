@@ -65,51 +65,64 @@ namespace hpx::parallel::detail {
 
         template <typename ExPolicy, typename FwdIter2, typename Sent2,
             typename Pred, typename Proj1, typename Proj2>
-        static hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        parallel(ExPolicy&& orgpolicy, FwdIter first, Sent last,
-            FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
+        static decltype(auto) parallel(ExPolicy&& orgpolicy, FwdIter first,
+            Sent last, FwdIter2 s_first, Sent2 s_last, Pred&& op, Proj1&& proj1,
             Proj2&& proj2)
         {
             using reference = typename std::iterator_traits<FwdIter>::reference;
-
             using difference_type =
                 typename std::iterator_traits<FwdIter>::difference_type;
-
             using s_difference_type =
                 typename std::iterator_traits<FwdIter2>::difference_type;
-
             using result =
                 hpx::parallel::util::detail::algorithm_result<ExPolicy,
                     FwdIter>;
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
 
             // Use of hpx::distance instead of std::distance to support
             // sentinels
             s_difference_type diff =
                 hpx::parallel::detail::distance(s_first, s_last);
-            if (diff <= 0)
-                return result::get(HPX_MOVE(first));
+
+            if constexpr (!has_scheduler_executor)
+            {
+                if (diff <= 0)
+                    return result::get(HPX_MOVE(first));
+            }
 
             difference_type count =
                 hpx::parallel::detail::distance(first, last);
-            if (diff > count)
+
+            if constexpr (!has_scheduler_executor)
             {
-                std::advance(
-                    first, hpx::parallel::detail::distance(first, last) - 0);
-                return result::get(HPX_MOVE(first));
+                if (diff > count)
+                {
+                    std::advance(
+                        first, hpx::parallel::detail::distance(first, last));
+                    return result::get(HPX_MOVE(first));
+                }
+            }
+
+            hpx::parallel::util::cancellation_token<difference_type> tok(count);
+            auto partitioner_count = count - (diff - 1);
+
+            if constexpr (has_scheduler_executor)
+            {
+                if (diff <= 0 || diff > count)
+                    partitioner_count = 0;
+
+                if (diff <= 0)
+                    tok.cancel(0);
             }
 
             decltype(auto) policy = parallel::util::adapt_placement_mode(
                 HPX_FORWARD(ExPolicy, orgpolicy),
                 hpx::threads::thread_placement_hint::breadth_first);
-
             using policy_type = std::decay_t<decltype(policy)>;
-
             using partitioner =
                 hpx::parallel::util::partitioner<decltype(policy), FwdIter,
                     void>;
-
-            hpx::parallel::util::cancellation_token<difference_type> tok(count);
 
             auto f1 = [diff, count, tok, s_first, op = HPX_FORWARD(Pred, op),
                           proj1 = HPX_FORWARD(Proj1, proj1),
@@ -148,10 +161,15 @@ namespace hpx::parallel::detail {
                     });
             };
 
-            auto f2 = [=](auto&& data) mutable -> FwdIter {
-                // make sure iterators embedded in function object that is
-                // attached to futures are invalidated
-                util::detail::clear_container(data);
+            auto f2 = [=](auto&&... data) mutable -> FwdIter {
+                static_assert(sizeof...(data) < 2);
+                if constexpr (sizeof...(data) == 1)
+                {
+                    // make sure iterators embedded in function object that is
+                    // attached to futures are invalidated
+                    util::detail::clear_container(data...);
+                }
+
                 difference_type search_res = tok.get_data();
                 if (search_res != count)
                 {
@@ -159,16 +177,16 @@ namespace hpx::parallel::detail {
                 }
                 else
                 {
-                    std::advance(first,
-                        hpx::parallel::detail::distance(first, last) - 0);
+                    std::advance(
+                        first, hpx::parallel::detail::distance(first, last));
                 }
 
                 return HPX_MOVE(first);
             };
 
             return partitioner::call_with_index(
-                HPX_FORWARD(decltype(policy), policy), first,
-                count - (diff - 1), 1, HPX_MOVE(f1), HPX_MOVE(f2));
+                HPX_FORWARD(decltype(policy), policy), first, partitioner_count,
+                1, HPX_MOVE(f1), HPX_MOVE(f2));
         }
     };
 

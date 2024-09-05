@@ -157,23 +157,116 @@ Classes
    | :cpp:class:`hpx::distributed::latch` |
    +--------------------------------------+
 
+Member functions
+^^^^^^^^^^^^^^^^
+
+.. table:: `hpx` functions of class :cpp:class:`hpx::distributed::latch` from header ``hpx/latch.hpp``
+
+   +----------------------------------------------------------+
+   | Function                                                 |
+   +==========================================================+
+   | :cpp:func:`hpx::distributed::latch::count_down_and_wait` |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::arrive_and_wait`     |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::count_down`          |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::is_ready`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::try_wait`            |
+   +----------------------------------------------------------+
+   | :cpp:func:`hpx::distributed::latch::wait`                |
+   +----------------------------------------------------------+
+
+.. _public_distr_api_header_async:
+
+``hpx/async.hpp``
+=================
+
+The header :hpx-header:`libs/full/async_distributed/include,hpx/async.hpp`
+includes distributed implementations of :cpp:func:`hpx::async`,
+:cpp:func:`hpx::post`, :cpp:func:`hpx::sync`, and :cpp:func:`hpx::dataflow`.
+For information regarding the C++ standard library header, see :ref:`public_api`.
+
 Functions
 ---------
 
-.. table:: `hpx` functions of header ``hpx/latch.hpp``
+.. table:: Distributed implementation of functions of header ``hpx/async.hpp``
 
-   +---------------------------------------------------+
-   | Function                                          |
-   +===================================================+
-   | :cpp:func:`hpx::distributed::count_down_and_wait` |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::arrive_and_wait`     |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::count_down`          |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::is_ready`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::try_wait`            |
-   +---------------------------------------------------+
-   | :cpp:func:`hpx::distributed::wait`                |
-   +---------------------------------------------------+
+   +-------------------------------------------------------+
+   | Functions                                             |
+   +=======================================================+
+   | :ref:`modules_hpx/async_distributed/async.hpp_api`    |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/sync.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/post.hpp_api`     |
+   +-------------------------------------------------------+
+   | :ref:`modules_hpx/async_distributed/dataflow.hpp_api` |
+   +-------------------------------------------------------+
+
+.. _public_distr_api_header_components:
+
+``hpx/components.hpp``
+======================
+
+The header :hpx-header:`libs/full/include/include,hpx/include/components.hpp`
+includes the components implementation. A component in `hpx` is a C++ class
+which can be created remotely and for which its member functions can be invoked
+remotely as well. More information about how components can be defined,
+created, and used can be found in :ref:`components`. :ref:`examples_accumulator`
+includes examples on the accumulator, template accumulator and template function
+accumulator.
+
+Macros
+------
+
+.. table:: `hpx` macros of header ``hpx/components.hpp``
+
+   +----------------------------------------------+
+   | Macro                                        |
+   +==============================================+
+   | :c:macro:`HPX_DEFINE_COMPONENT_ACTION`       |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_ACTION_DECLARATION`   |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_ACTION`               |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMMANDLINE_MODULE`   |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMPONENT`            |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_COMPONENT_MODULE`     |
+   +----------------------------------------------+
+   | :c:macro:`HPX_REGISTER_STARTUP_MODULE`       |
+   +----------------------------------------------+
+
+Classes
+-------
+
+.. table:: `hpx` classes of header ``hpx/components.hpp``
+
+   +----------------------------------------------------------+
+   | Class                                                    |
+   +==========================================================+
+   | :cpp:class:`hpx::components::client`                     |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::client_base`                |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component`                  |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component_base`             |
+   +----------------------------------------------------------+
+   | :cpp:class:`hpx::components::component_commandline_base` |
+   +----------------------------------------------------------+
+
+Functions
+---------
+
+.. table:: `hpx` functions of header ``hpx/components.hpp``
+
+   +----------------------------------------------------------+
+   | Function                                                 |
+   +==========================================================+
+   | :cpp:func:`hpx::new_`                                    |
+   +----------------------------------------------------------+

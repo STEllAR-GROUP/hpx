@@ -86,7 +86,16 @@ namespace hpx::util {
 
         using mutex_type = hpx::spinlock;
 
+        static void check_mpi_error(
+            scoped_lock& l, hpx::source_location const& sl, int error);
+        static void check_mpi_error(
+            scoped_try_lock& l, hpx::source_location const& sl, int error);
+
+        // The highest order bit is used for acknowledgement messages
         static int MPI_MAX_TAG;
+
+        constexpr static unsigned int MPI_ACK_MASK = 0xC000;
+        constexpr static unsigned int MPI_ACK_TAG = 0x4000;
 
     private:
         static mutex_type mtx_;

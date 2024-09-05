@@ -118,9 +118,14 @@ namespace hpx::local::detail {
         hpx::program_options::variables_map const& vm,
         std::string const& default_)
     {
-        // command line options is used preferred
+        // command line option is used preferred
         if (vm.count("hpx:queuing"))
-            return vm["hpx:queuing"].as<std::string>();
+        {
+            std::string queuing = vm["hpx:queuing"].as<std::string>();
+            if (!queuing.empty() && queuing[0] == '!')
+                queuing.erase(0);
+            return queuing;
+        }
 
         // use either cfgmap value or default
         return cfgmap.get_value<std::string>("hpx.scheduler", default_);
@@ -498,8 +503,13 @@ namespace hpx::local::detail {
         hpx::program_options::variables_map& vm,
         std::vector<std::string>& ini_config)
     {
+#if !defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         bool const debug_clp = vm.count("hpx:debug-clp");
 
+        // fill logging default
+        enable_logging_settings(vm, ini_config);
+
+        // handle command line arguments after logging defaults
         if (vm.count("hpx:ini"))
         {
             std::vector<std::string> cfg =
@@ -507,6 +517,7 @@ namespace hpx::local::detail {
             std::copy(cfg.begin(), cfg.end(), std::back_inserter(ini_config));
             cfgmap.add(cfg);
         }
+#endif
 
         use_process_mask_ =
             (cfgmap.get_value<int>("hpx.use_process_mask", 0) > 0) ||
@@ -622,12 +633,12 @@ namespace hpx::local::detail {
         // handle high-priority threads
         handle_high_priority_threads(vm, ini_config);
 
-        enable_logging_settings(vm, ini_config);
-
+#if !defined(HPX_HAVE_DISTRIBUTED_RUNTIME)
         if (debug_clp)
         {
             print_config(ini_config);
         }
+#endif
 
         return true;
     }

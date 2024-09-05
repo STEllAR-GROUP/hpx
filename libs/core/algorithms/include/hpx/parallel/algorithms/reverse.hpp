@@ -299,10 +299,8 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename BidirIter, typename Sent,
                 typename FwdIter>
-            static util::detail::algorithm_result_t<ExPolicy,
-                util::in_out_result<BidirIter, FwdIter>>
-            parallel(ExPolicy&& policy, BidirIter first, Sent last,
-                FwdIter dest_first)
+            static decltype(auto) parallel(ExPolicy&& policy, BidirIter first,
+                Sent last, FwdIter dest_first)
             {
                 auto last2{hpx::ranges::next(first, last)};
                 typedef std::reverse_iterator<BidirIter> iterator;
@@ -402,9 +400,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::reverse_copy_t, ExPolicy&& policy,
-            BidirIter first, BidirIter last, FwdIter dest)
+        friend decltype(auto) tag_fallback_invoke(hpx::reverse_copy_t,
+            ExPolicy&& policy, BidirIter first, BidirIter last, FwdIter dest)
         {
             static_assert(hpx::traits::is_bidirectional_iterator_v<BidirIter>,
                 "Requires at least bidirectional iterator.");

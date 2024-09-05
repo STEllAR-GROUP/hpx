@@ -19,12 +19,12 @@ namespace hpx::runtime_local {
     enum class os_thread_type
     {
         unknown = -1,
-        main_thread = 0,    ///< kernel thread represents main thread
-        worker_thread,      ///< kernel thread is used to schedule HPX threads
-        io_thread,          ///< kernel thread can be used for IO operations
-        timer_thread,       ///< kernel is used by timer operations
-        parcel_thread,      ///< kernel is used by networking operations
-        custom_thread       ///< kernel is registered by the application
+        main_thread = 0,      ///< kernel thread represents main thread
+        worker_thread = 1,    ///< kernel thread is used to schedule HPX threads
+        io_thread = 2,        ///< kernel thread can be used for IO operations
+        timer_thread = 3,     ///< kernel is used by timer operations
+        parcel_thread = 4,    ///< kernel is used by networking operations
+        custom_thread = 5     ///< kernel is registered by the application
     };
 
     /// Return a human-readable name representing one of the kernel thread types

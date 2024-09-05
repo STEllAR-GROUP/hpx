@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file client_base.hpp
+/// \page hpx::components::client_base
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -193,11 +197,14 @@ template <>
 struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
   : future_data_base<id_type>
 {
-    HPX_NON_COPYABLE(future_data);
-
     using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
 
     future_data() = default;
+
+    future_data(future_data const&) = delete;
+    future_data(future_data&&) = delete;
+    future_data& operator=(future_data const&) = delete;
+    future_data& operator=(future_data&&) = delete;
 
     explicit future_data(init_no_addref no_addref)
       : future_data_base(no_addref)
@@ -279,6 +286,13 @@ namespace hpx::components {
     }    // namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
+    /// This class template serves as a base class for client components,
+    /// providing common functionality such as managing shared state, ID
+    /// retrieval, and asynchronous operations.
+    ///
+    /// @tparam Derived The derived client component type.
+    /// @tparam Stub The stub type used for communication.
+    /// @tparam Data The extra data type used for additional information.
     template <typename Derived, typename Stub, typename Data>
     class client_base : public detail::make_stub<Stub>::type
     {
@@ -335,9 +349,8 @@ namespace hpx::components {
         {
         }
         explicit client_base(hpx::future<hpx::id_type>&& f) noexcept
-          : shared_state_(
-                hpx::traits::future_access<future_type>::get_shared_state(
-                    HPX_MOVE(f)))
+          : shared_state_(hpx::traits::future_access<
+                hpx::future<hpx::id_type>>::get_shared_state(HPX_MOVE(f)))
         {
         }
 

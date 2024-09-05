@@ -151,6 +151,12 @@ namespace hpx::lcos::local {
             return true;
         }
 
+        // 26110: Caller failing to hold lock 'l' before calling function
+        // 26117: Releasing unheld lock '*lock' in function
+#if defined(HPX_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 26110 26117)
+#endif
         template <typename Lock = hpx::no_mutex>
         void store_received(std::size_t step, T&& val, Lock* lock = nullptr)
         {
@@ -184,6 +190,9 @@ namespace hpx::lcos::local {
             // set value in promise, but only after the lock went out of scope
             entry->set_value(HPX_MOVE(val));
         }
+#if defined(HPX_MSVC)
+#pragma warning(pop)
+#endif
 
         bool empty() const noexcept
         {

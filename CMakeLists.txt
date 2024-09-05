@@ -1,6 +1,7 @@
 # Copyright (c)      2020 Mikael Simberg
 # Copyright (c) 2007-2024 Hartmut Kaiser
 # Copyright (c) 2011-2014 Thomas Heller
+# Copyright (c)      2024 Isidoros Tsaousis-Seiras
 # Copyright (c) 2007-2008 Chirag Dekate
 # Copyright (c)      2011 Bryce Lelbach
 # Copyright (c)      2011 Vinay C Amatya
@@ -58,14 +59,18 @@ endif()
 # Build all of HPX
 # ##############################################################################
 set(HPX_VERSION_MAJOR 1)
-set(HPX_VERSION_MINOR 10)
+set(HPX_VERSION_MINOR 11)
 set(HPX_VERSION_SUBMINOR 0)
-set(HPX_VERSION_DATE 20230804)
+set(HPX_VERSION_DATE 20240529)
 set(HPX_VERSION_TAG "-trunk")
 
 set(HPX_VERSION
     "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}"
 )
+set(HPX_VERSION_FULL
+    "${HPX_VERSION_MAJOR}.${HPX_VERSION_MINOR}.${HPX_VERSION_SUBMINOR}${HPX_VERSION_TAG}"
+)
+
 set(HPX_LIBRARY_VERSION "${HPX_VERSION}")
 set(HPX_SOVERSION ${HPX_VERSION_MAJOR})
 set(HPX_PACKAGE_NAME HPX)
@@ -86,6 +91,7 @@ cmake_policy(VERSION 3.18)
 hpx_set_cmake_policy(CMP0042 NEW)
 hpx_set_cmake_policy(CMP0060 NEW)
 hpx_set_cmake_policy(CMP0074 NEW)
+hpx_set_cmake_policy(CMP0167 OLD)
 
 # We save the passed compiler flag to a special variable. This is needed for our
 # build system unit tests. Some flags might influence the created symbols
@@ -149,6 +155,12 @@ if(MSVC)
 endif()
 
 # ##############################################################################
+# Disable check for compiler compatibility by default
+hpx_option(
+  HPX_WITH_IGNORE_COMPILER_COMPATIBILITY BOOL
+  "Ignore compiler incompatibility in dependent projects (default: ON)." ON
+  ADVANCED
+)
 
 # ##############################################################################
 # Set our build options cache variables which are customizable by users
@@ -156,7 +168,7 @@ endif()
 
 hpx_option(
   HPX_WITH_DEPRECATION_WARNINGS BOOL
-  "Enable warnings for deprecated facilities. (default: ON)" ON ADVANCED
+  "Enable warnings for deprecated facilities (default: ON)." ON ADVANCED
 )
 
 if(HPX_WITH_DEPRECATION_WARNINGS)
@@ -179,7 +191,7 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   hpx_option(
     HPX_WITH_STACKOVERFLOW_DETECTION
     BOOL
-    "Enable stackoverflow detection for HPX threads/coroutines. (default: OFF, debug: ON)"
+    "Enable stackoverflow detection for HPX threads/coroutines (default: OFF, debug: ON)."
     ${HPX_WITH_STACKOVERFLOW_DETECTION_DEFAULT}
     ADVANCED
   )
@@ -566,6 +578,27 @@ if(HPX_WITH_CUDA AND HPX_WITH_HIP)
  Note: HPX_WITH_HIP is automatically enabled when compiling with hipcc."
   )
 endif()
+
+# ## HPX STDEXEC configuration ##
+
+hpx_option(
+  HPX_WITH_STDEXEC BOOL
+  "Use STDEXEC executors instead of native HPX.(default: OFF)" OFF
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+hpx_option(
+  HPX_WITH_FETCH_STDEXEC BOOL "Use FetchContent to fetch STDEXEC.(default: ON)"
+  ON
+  CATEGORY "Executor"
+  ADVANCED
+)
+
+hpx_option(
+  HPX_WITH_STDEXEC_TAG STRING "STDEXEC repository tag or branch" "main"
+  CATEGORY "Executor"
+)
 
 # ##############################################################################
 # HPX SYCL configuration
@@ -1335,7 +1368,7 @@ if(HPX_WITH_NETWORKING AND HPX_WITH_PARCELPORT_LCI)
   endif()
 endif()
 
-# External libraries/frameworks used by sme of the examples and benchmarks
+# External libraries/frameworks used by some of the examples and benchmarks
 hpx_option(
   HPX_WITH_EXAMPLES_OPENMP BOOL
   "Enable examples requiring OpenMP support (default: OFF)." OFF
@@ -2254,6 +2287,9 @@ if(HPX_WITH_CUDA OR HPX_WITH_HIP)
   hpx_add_config_define(HPX_HAVE_GPU_SUPPORT)
 endif()
 
+# Setup NVIDIA's stdexec if requested
+include(HPX_SetupStdexec)
+
 if(HPX_WITH_SANITIZERS)
   hpx_add_config_define(HPX_HAVE_SANITIZERS)
 endif()
@@ -2321,7 +2357,7 @@ if(HPX_WITH_GIT_BRANCH AND ((NOT HPX_WITH_GIT_TAG) OR "${HPX_WITH_GIT_TAG}x"
 )
   string(REGEX MATCH "^release-[0-9]+.[0-9]+.X$" matched ${HPX_WITH_GIT_BRANCH})
   if(matched)
-    set(HPX_WITH_GIT_TAG "v${HPX_VERSION}")
+    set(HPX_WITH_GIT_TAG "v${HPX_VERSION_FULL}")
     hpx_info("Setting HPX_WITH_GIT_TAG to: " "${HPX_WITH_GIT_TAG}")
   endif()
 endif()

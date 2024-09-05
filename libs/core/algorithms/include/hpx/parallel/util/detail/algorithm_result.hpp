@@ -18,6 +18,11 @@
 #include <hpx/futures/future.hpp>
 #include <hpx/type_support/unused.hpp>
 
+#if defined(HPX_HAVE_STDEXEC)
+// for is_sender
+#include <hpx/execution_base/completion_signatures.hpp>
+#endif
+
 #include <type_traits>
 #include <utility>
 
@@ -197,8 +202,9 @@ namespace hpx::parallel::util::detail {
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
-        // The return type of the initiating function.
-        using type = T;
+        // Due to the nature of senders, this only serves as a dummy.
+        using type =
+            decltype(hpx::execution::experimental::just(std::declval<T>()));
 
         template <typename T_>
         static constexpr auto get(T_&& t)
@@ -220,8 +226,8 @@ namespace hpx::parallel::util::detail {
         std::enable_if_t<hpx::is_async_execution_policy_v<ExPolicy> &&
             hpx::execution_policy_has_scheduler_executor_v<ExPolicy>>>
     {
-        // The return type of the initiating function.
-        using type = void;
+        // Due to the nature of senders, this only serves as a dummy.
+        using type = decltype(hpx::execution::experimental::just());
 
         template <typename T_>
         static constexpr auto get(T_&& t)

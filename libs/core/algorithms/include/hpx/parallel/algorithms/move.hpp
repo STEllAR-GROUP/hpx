@@ -158,8 +158,7 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename FwdIter1, typename FwdIter2>
-            static typename util::detail::algorithm_result<ExPolicy,
-                util::in_out_result<FwdIter1, FwdIter2>>::type
+            static decltype(auto)
             parallel(
                 ExPolicy&& policy, FwdIter1 first, FwdIter1 last, FwdIter2 dest)
             {
@@ -225,10 +224,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter1> &&
                 hpx::traits::is_iterator_v<FwdIter2>)>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter2>
-        tag_fallback_invoke(move_t, ExPolicy&& policy, FwdIter1 first,
-            FwdIter1 last, FwdIter2 dest)
+        friend decltype(auto) tag_fallback_invoke(move_t, ExPolicy&& policy,
+            FwdIter1 first, FwdIter1 last, FwdIter2 dest)
         {
             return hpx::parallel::util::get_second_element(
                 hpx::parallel::detail::transfer<

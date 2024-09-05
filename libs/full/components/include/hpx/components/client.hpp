@@ -4,6 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/// \file component_commandline.hpp
+/// \page hpx::components::client
+/// \headerfile hpx/components.hpp
+
 #pragma once
 
 #include <hpx/config.hpp>
@@ -14,6 +18,11 @@
 
 namespace hpx::components {
 
+    /// @brief The client class is a wrapper that manages a distributed component.
+    /// It extends \c client_base with specific \c Component and \c Data types.
+    ///
+    /// @tparam Component The type of the component.
+    /// @tparam Data The type of the data associated with the client (default is void).
     template <typename Component, typename Data = void>
     class client : public client_base<client<Component, Data>, Component, Data>
     {
