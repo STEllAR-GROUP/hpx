@@ -8,11 +8,11 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/config/defines.hpp>
+#include <hpx/concurrency/stack.hpp>
 
 #include <cstddef>
 #include <memory>
 #include <new>
-#include <stack>
 #include <type_traits>
 #include <utility>
 
@@ -56,6 +56,7 @@ namespace hpx::util {
             explicit allocated_cache(Allocator const& a) noexcept(
                 noexcept(std::is_nothrow_copy_constructible_v<Allocator>))
               : alloc(a)
+              , data(0)
             {
             }
 
@@ -82,8 +83,9 @@ namespace hpx::util {
                 }
                 else
                 {
-                    p = data.top().first;
-                    data.pop();
+                    std::pair<T*, size_type> pair;
+                    data.pop(pair);
+                    p = pair.first;
                 }
 
                 ++allocated;
@@ -104,16 +106,15 @@ namespace hpx::util {
         private:
             void clear_cache() noexcept
             {
-                while (!data.empty())
+                std::pair<T*, size_type> p;
+                while (data.pop(p))
                 {
-                    traits::deallocate(
-                        alloc, data.top().first, data.top().second);
-                    data.pop();
+                    traits::deallocate(alloc, p.first, p.second);
                 }
             }
 
             HPX_NO_UNIQUE_ADDRESS Allocator alloc;
-            std::stack<std::pair<T*, size_type>> data;
+            hpx::lockfree::stack<std::pair<T*, size_type>> data;
             std::size_t allocated = 0;
             std::size_t deallocated = 0;
         };
