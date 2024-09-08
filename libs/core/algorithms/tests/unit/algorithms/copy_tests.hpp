@@ -1,5 +1,6 @@
 //  Copyright (c) 2021 Srinivas Yadav
 //  Copyright (c) 2014 Grant Mercer
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/copy.hpp>
 
@@ -69,6 +72,42 @@ void test_copy(ExPolicy&& policy, IteratorTag)
         }));
     HPX_TEST_EQ(count, d.size());
 }
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_copy_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    std::vector<std::size_t> c(10007);
+    std::vector<std::size_t> d(c.size());
+    std::iota(std::begin(c), std::end(c), gen());
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    tt::sync_wait(ex::just(iterator(std::begin(c)), iterator(std::end(c)),
+                      std::begin(d)) |
+        hpx::copy(ex_policy.on(exec)));
+
+    std::size_t count = 0;
+    HPX_TEST(std::equal(std::begin(c), std::end(c), std::begin(d),
+        [&count](std::size_t v1, std::size_t v2) -> bool {
+            HPX_TEST_EQ(v1, v2);
+            ++count;
+            return v1 == v2;
+        }));
+    HPX_TEST_EQ(count, d.size());
+}
+#endif
 
 template <typename ExPolicy, typename IteratorTag>
 void test_copy_async(ExPolicy&& p, IteratorTag)

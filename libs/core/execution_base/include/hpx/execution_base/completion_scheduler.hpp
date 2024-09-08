@@ -8,12 +8,41 @@
 #pragma once
 
 #include <hpx/config.hpp>
+#include <hpx/functional/tag_invoke.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#include <utility>
+
+namespace hpx::execution::experimental { namespace detail {
+    // clang-format off
+    template <typename CPO, typename Sender>
+    concept has_completion_scheduler_v = requires(Sender&& s) {
+        {
+            hpx::execution::experimental::get_completion_scheduler<CPO>(
+                hpx::execution::experimental::get_env(std::forward<Sender>(s)))
+        } -> hpx::execution::experimental::scheduler;
+    };
+
+    template <typename ReceiverCPO, typename Sender, typename AlgorithmCPO,
+        typename... Ts>
+    concept is_completion_scheduler_tag_invocable_v = requires(
+        AlgorithmCPO alg, Sender&& snd, Ts&&... ts) {
+        tag_invoke(alg,
+            hpx::execution::experimental::get_completion_scheduler<ReceiverCPO>(
+                hpx::execution::experimental::get_env(snd)),
+            std::forward<Sender>(snd), std::forward<Ts>(ts)...);
+    };
+    // clang-format on
+}}    // namespace hpx::execution::experimental::detail
+
+#else
+
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/execution_base/get_env.hpp>
 #include <hpx/execution_base/receiver.hpp>
 #include <hpx/execution_base/sender.hpp>
 #include <hpx/functional/detail/tag_fallback_invoke.hpp>
-#include <hpx/functional/tag_invoke.hpp>
 
 #include <type_traits>
 
@@ -76,9 +105,9 @@ namespace hpx::execution::experimental {
     //
     // clang-format off
     template <typename CPO,
-        HPX_CONCEPT_REQUIRES_(
-            hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
-        )>
+            HPX_CONCEPT_REQUIRES_(
+                    hpx::execution::experimental::detail::is_receiver_cpo_v<CPO>
+            )>
     // clang-format on
     struct get_completion_scheduler_t final
       : hpx::functional::tag<get_completion_scheduler_t<CPO>>
@@ -159,3 +188,5 @@ namespace hpx::execution::experimental {
                 AlgorithmCPO, Ts...>::value;
     }    // namespace detail
 }    // namespace hpx::execution::experimental
+
+#endif

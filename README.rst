@@ -75,7 +75,7 @@ Documentation
 =============
 
 If you plan to use HPX we suggest to start with the latest released version
-which can be downloaded `here <https://stellar.cct.lsu.edu/downloads/>`_.
+which can be downloaded `here <https://github.com/STEllAR-GROUP/hpx/releases/>`_.
 
 To quickly get started with HPX on most Linux distributions you can read the
 quick start guide `here

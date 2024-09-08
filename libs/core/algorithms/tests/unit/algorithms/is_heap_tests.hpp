@@ -1,5 +1,6 @@
 //  Copyright (c) 2017 Taeguk Kwon
 //  Copyright (c) 2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -7,6 +8,8 @@
 
 #pragma once
 
+#include <hpx/config.hpp>
+#include <hpx/execution.hpp>
 #include <hpx/modules/testing.hpp>
 #include <hpx/parallel/algorithms/is_heap.hpp>
 
@@ -139,6 +142,137 @@ void test_is_heap(
         HPX_TEST(result.base() == solution);
     }
 }
+
+#if defined(HPX_HAVE_STDEXEC)
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_is_heap_sender(LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::size_t(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::is_heap(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool solution = std::is_heap(std::begin(c), std::end(c));
+
+        HPX_TEST_EQ(result, solution);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+            hpx::is_heap(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool solution = std::is_heap(std::begin(c), std::begin(c));
+
+        HPX_TEST(result);
+        HPX_TEST_EQ(result, solution);
+    }
+
+    {
+        // edge case: range with only one element
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(++std::begin(c))) |
+            hpx::is_heap(ex_policy.on(exec)));
+
+        bool result = hpx::get<0>(*snd_result);
+
+        bool solution = std::is_heap(std::begin(c), ++std::begin(c));
+
+        HPX_TEST(result);
+        HPX_TEST_EQ(result, solution);
+    }
+}
+
+template <typename LnPolicy, typename ExPolicy, typename IteratorTag>
+void test_is_heap_until_sender(
+    LnPolicy ln_policy, ExPolicy&& ex_policy, IteratorTag)
+{
+    static_assert(hpx::is_async_execution_policy_v<ExPolicy>,
+        "hpx::is_async_execution_policy_v<ExPolicy>");
+
+    using base_iterator = std::vector<std::size_t>::iterator;
+    using iterator = test::test_iterator<base_iterator, IteratorTag>;
+
+    namespace ex = hpx::execution::experimental;
+    namespace tt = hpx::this_thread::experimental;
+    using scheduler_t = ex::thread_pool_policy_scheduler<LnPolicy>;
+
+    auto exec = ex::explicit_scheduler_executor(scheduler_t(ln_policy));
+
+    std::vector<std::size_t> c(10007);
+    std::iota(std::begin(c), std::end(c), std::size_t(gen()));
+
+    auto heap_end_iter = std::next(std::begin(c), dis(gen));
+    std::make_heap(std::begin(c), heap_end_iter);
+
+    {
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::end(c))) |
+            hpx::is_heap_until(ex_policy.on(exec)));
+
+        iterator result = hpx::get<0>(*snd_result);
+
+        auto solution = std::is_heap_until(std::begin(c), std::end(c));
+
+        HPX_TEST(result.base() == solution);
+    }
+
+    {
+        // edge case: empty range
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(std::begin(c))) |
+            hpx::is_heap_until(ex_policy.on(exec)));
+
+        iterator result = hpx::get<0>(*snd_result);
+
+        auto solution = std::is_heap_until(std::begin(c), std::begin(c));
+
+        HPX_TEST(result.base() == std::begin(c));
+        HPX_TEST(result.base() == solution);
+    }
+
+    {
+        // edge case: range of length 1
+
+        auto snd_result = tt::sync_wait(
+            ex::just(iterator(std::begin(c)), iterator(++std::begin(c))) |
+            hpx::is_heap_until(ex_policy.on(exec)));
+
+        iterator result = hpx::get<0>(*snd_result);
+
+        auto solution = std::is_heap_until(std::begin(c), ++std::begin(c));
+
+        HPX_TEST(result.base() == ++std::begin(c));
+        HPX_TEST(result.base() == solution);
+    }
+}
+#endif
 
 template <typename IteratorTag, typename DataType, typename Pred>
 void test_is_heap_with_pred(

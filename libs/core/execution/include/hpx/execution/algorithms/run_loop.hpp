@@ -7,6 +7,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+
 #include <hpx/assert.hpp>
 #include <hpx/concepts/concepts.hpp>
 #include <hpx/errors/try_catch_exception_ptr.hpp>
@@ -239,11 +244,13 @@ namespace hpx::execution::experimental {
                             std::exception_ptr),
                         hpx::execution::experimental::set_stopped_t()>;
 
+                // clang-format off
                 template <typename Env>
                 friend auto tag_invoke(
                     hpx::execution::experimental::get_completion_signatures_t,
-                    run_loop_sender const&, Env) noexcept
-                    -> completion_signatures;
+                    run_loop_sender const&,
+                    Env) noexcept -> completion_signatures;
+                // clang-format on
 
                 run_loop& loop;
             };
@@ -405,3 +412,4 @@ namespace hpx::execution::experimental {
         set_error(HPX_MOVE(receiver), std::current_exception());
     }
 }    // namespace hpx::execution::experimental
+#endif

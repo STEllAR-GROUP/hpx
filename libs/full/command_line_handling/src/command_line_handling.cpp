@@ -504,7 +504,7 @@ namespace hpx::util {
             agas_host.empty() ? HPX_INITIAL_IP_ADDRESS : agas_host);
 #endif
 
-        bool run_agas_server = false;
+        [[maybe_unused]] bool run_agas_server = false;
         [[maybe_unused]] std::string hpx_host;
         [[maybe_unused]] std::uint16_t hpx_port = 0;
 

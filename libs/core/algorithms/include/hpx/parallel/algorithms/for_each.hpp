@@ -625,19 +625,29 @@ namespace hpx {
                 std::is_integral_v<Size>
             )>
         // clang-format on
-        friend parallel::util::detail::algorithm_result_t<ExPolicy, FwdIter>
-        tag_fallback_invoke(hpx::for_each_n_t, ExPolicy&& policy, FwdIter first,
-            Size count, F f)
+        friend decltype(auto) tag_fallback_invoke(hpx::for_each_n_t,
+            ExPolicy&& policy, FwdIter first, Size count, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Requires at least forward iterator.");
 
+            constexpr bool has_scheduler_executor =
+                hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             // if count is representing a negative value, we do nothing
             if (parallel::detail::is_negative(count))
             {
-                using result =
-                    parallel::util::detail::algorithm_result<ExPolicy, FwdIter>;
-                return result::get(HPX_MOVE(first));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<Size>(0);
+                }
+                else
+                {
+                    using result =
+                        parallel::util::detail::algorithm_result<ExPolicy,
+                            FwdIter>;
+                    return result::get(HPX_MOVE(first));
+                }
             }
 
             return hpx::parallel::detail::for_each_n<FwdIter>().call(

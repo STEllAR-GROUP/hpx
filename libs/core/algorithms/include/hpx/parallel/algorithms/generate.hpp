@@ -245,7 +245,7 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename Iter, typename Sent,
                 typename F>
-            static util::detail::algorithm_result_t<ExPolicy, Iter> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, Iter first, Sent last, F&& f)
             {
                 auto f1 = [policy, f = HPX_FORWARD(F, f)](
@@ -287,7 +287,7 @@ namespace hpx::parallel {
             }
 
             template <typename ExPolicy, typename F>
-            static util::detail::algorithm_result_t<ExPolicy, FwdIter> parallel(
+            static decltype(auto) parallel(
                 ExPolicy&& policy, FwdIter first, std::size_t count, F&& f)
             {
                 auto f1 = [policy, f = HPX_FORWARD(F, f)](FwdIter part_begin,
@@ -322,9 +322,7 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             generate_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
@@ -365,18 +363,26 @@ namespace hpx {
                 std::is_integral_v<Size>
             )>
         // clang-format on
-        friend hpx::parallel::util::detail::algorithm_result_t<ExPolicy,
-            FwdIter>
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             generate_n_t, ExPolicy&& policy, FwdIter first, Size count, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
 
+            constexpr bool has_scheduler_executor =
+                execution_policy_has_scheduler_executor_v<ExPolicy>;
+
             if (hpx::parallel::detail::is_negative(count))
             {
-                return hpx::parallel::util::detail::algorithm_result<ExPolicy,
-                    FwdIter>::get(HPX_MOVE(first));
+                if constexpr (has_scheduler_executor)
+                {
+                    count = static_cast<Size>(0);
+                }
+                else
+                {
+                    return hpx::parallel::util::detail::algorithm_result<
+                        ExPolicy, FwdIter>::get(HPX_MOVE(first));
+                }
             }
 
             return hpx::parallel::detail::generate_n<FwdIter>().call(

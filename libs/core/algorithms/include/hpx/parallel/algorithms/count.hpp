@@ -322,14 +322,20 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename IterB, typename IterE,
                 typename T, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, difference_type>
-            parallel(ExPolicy&& policy, IterB first, IterE last, T const& value,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, IterB first,
+                IterE last, T const& value, Proj&& proj)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        difference_type>::get(0);
+                    if (first == last)
+                    {
+                        return util::detail::
+                            algorithm_result<ExPolicy, difference_type>::get(
+                                static_cast<difference_type>(0));
+                    }
                 }
 
                 auto f1 =
@@ -382,14 +388,20 @@ namespace hpx::parallel {
 
             template <typename ExPolicy, typename IterB, typename IterE,
                 typename Pred, typename Proj>
-            static util::detail::algorithm_result_t<ExPolicy, difference_type>
-            parallel(ExPolicy&& policy, IterB first, IterE last, Pred&& op,
-                Proj&& proj)
+            static decltype(auto) parallel(ExPolicy&& policy, IterB first,
+                IterE last, Pred&& op, Proj&& proj)
             {
-                if (first == last)
+                constexpr bool has_scheduler_executor =
+                    hpx::execution_policy_has_scheduler_executor_v<ExPolicy>;
+
+                if constexpr (!has_scheduler_executor)
                 {
-                    return util::detail::algorithm_result<ExPolicy,
-                        difference_type>::get(0);
+                    if (first == last)
+                    {
+                        return util::detail::
+                            algorithm_result<ExPolicy, difference_type>::get(
+                                static_cast<difference_type>(0));
+                    }
                 }
 
                 auto f1 = count_iteration<ExPolicy, Pred, Proj>(
@@ -425,10 +437,8 @@ namespace hpx {
                 hpx::traits::is_iterator_v<FwdIter>
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_fallback_invoke(count_t, ExPolicy&& policy, FwdIter first,
-            FwdIter last, T const& value)
+        friend decltype(auto) tag_fallback_invoke(count_t, ExPolicy&& policy,
+            FwdIter first, FwdIter last, T const& value)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,
                 "Required at least forward iterator.");
@@ -478,9 +488,7 @@ namespace hpx {
                 >
             )>
         // clang-format on
-        friend typename hpx::parallel::util::detail::algorithm_result<ExPolicy,
-            typename std::iterator_traits<FwdIter>::difference_type>::type
-        tag_fallback_invoke(
+        friend decltype(auto) tag_fallback_invoke(
             count_if_t, ExPolicy&& policy, FwdIter first, FwdIter last, F f)
         {
             static_assert(hpx::traits::is_forward_iterator_v<FwdIter>,

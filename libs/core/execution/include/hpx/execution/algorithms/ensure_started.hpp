@@ -8,6 +8,11 @@
 #pragma once
 
 #include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+#else
+
 #include <hpx/allocator_support/internal_allocator.hpp>
 #include <hpx/allocator_support/traits/is_allocator.hpp>
 #include <hpx/concepts/concepts.hpp>
@@ -155,3 +160,5 @@ namespace hpx::execution::experimental {
         }
     } ensure_started{};
 }    // namespace hpx::execution::experimental
+
+#endif

@@ -51,18 +51,21 @@ inline constexpr bool indirect_stop_token_provider<void> =
 template <typename Fn, typename = std::enable_if_t<std::is_invocable_v<Fn>>,
     typename = std::enable_if_t<std::is_nothrow_move_constructible_v<Fn> &&
         std::is_nothrow_invocable_v<Fn>>>
+
+// clang-format off
 struct scope_guard
 {
     Fn fn_;
     scope_guard(Fn fn) noexcept
-      : fn_((Fn &&) fn)
+      : fn_((Fn&&) fn)
     {
     }
     ~scope_guard()
     {
-        ((Fn &&) fn_)();
+        ((Fn&&) fn_)();
     }
 };
+// clang-format on
 
 struct forward_stop_request
 {
@@ -308,7 +311,11 @@ private:
         static hpx::coroutine_handle<> await_suspend(
             hpx::coroutine_handle<_promise> h) noexcept
         {
+#if defined(HPX_HAVE_STDEXEC)
+            return h.promise().continuation().handle();
+#else
             return h.promise().continuation();
+#endif
         }
         static void await_resume() noexcept {}
     };
@@ -336,8 +343,8 @@ private:
         }
         using context_t =
             typename Context::template promise_context_t<_promise>;
-        friend context_t tag_invoke(
-            hpx::execution::experimental::get_env_t, const _promise& self)
+        friend context_t tag_invoke(hpx::execution::experimental::get_env_t,
+            const _promise& self) noexcept
         {
             return self.context_;
         }
@@ -416,10 +423,12 @@ private:
         hpx::execution::experimental::set_error_t(std::exception_ptr),
         hpx::execution::experimental::set_stopped_t()>;
 
+    // clang-format off
     friend auto tag_invoke(
         hpx::execution::experimental::get_completion_signatures_t,
         const basic_task&, auto) -> std::conditional_t<std::is_void_v<T>,
-        task_traits_t<>, task_traits_t<T>>;
+                                     task_traits_t<>, task_traits_t<T>>;
+    // clang-format on
 
     explicit basic_task(hpx::coroutine_handle<promise_type> hcoro) noexcept
       : coro_(hcoro)

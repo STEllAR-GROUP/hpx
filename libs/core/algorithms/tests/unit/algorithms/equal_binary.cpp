@@ -1,4 +1,5 @@
 //  Copyright (c) 2014-2020 Hartmut Kaiser
+//  Copyright (c) 2024 Tobias Wukovitsch
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -102,6 +103,26 @@ void equal_binary_bad_alloc_test()
     test_equal_binary_bad_alloc<std::forward_iterator_tag>();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename IteratorTag>
+void test_equal_binary_edge_cases()
+{
+    using namespace hpx::execution;
+
+    test_equal_binary_edge_cases(seq, IteratorTag());
+    test_equal_binary_edge_cases(par, IteratorTag());
+
+    test_equal_binary_edge_cases(seq(task), IteratorTag());
+    test_equal_binary_edge_cases(par(task), IteratorTag());
+}
+
+void equal_binary_edge_cases_test()
+{
+    test_equal_binary_edge_cases<std::forward_iterator_tag>();
+    test_equal_binary_edge_cases<std::random_access_iterator_tag>();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 int hpx_main(hpx::program_options::variables_map& vm)
 {
@@ -115,6 +136,7 @@ int hpx_main(hpx::program_options::variables_map& vm)
     equal_binary_test2();
     equal_binary_exception_test();
     equal_binary_bad_alloc_test();
+    equal_binary_edge_cases_test();
     return hpx::local::finalize();
 }
 

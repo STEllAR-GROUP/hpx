@@ -6,6 +6,7 @@
 
 #include <hpx/execution/algorithms/run_loop.hpp>
 
+#if !defined(HPX_HAVE_STDEXEC)
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx::execution::experimental::detail {
 
@@ -22,3 +23,4 @@ namespace hpx::execution::experimental::detail {
         }
     }
 }    // namespace hpx::execution::experimental::detail
+#endif

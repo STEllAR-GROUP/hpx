@@ -5,7 +5,6 @@
 #  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 tests.unit.modules.algorithms.algorithms.adjacentdifference
-tests.unit.modules.algorithms.algorithms.adjacentdifference_sender
 tests.unit.modules.algorithms.algorithms.adjacentfind
 tests.unit.modules.algorithms.algorithms.adjacentfind_binary
 tests.unit.modules.algorithms.algorithms.all_of
@@ -31,7 +30,6 @@ tests.unit.modules.algorithms.algorithms.exclusive_scan_validate
 tests.unit.modules.algorithms.algorithms.fill
 tests.unit.modules.algorithms.algorithms.filln
 tests.unit.modules.algorithms.algorithms.find
-tests.unit.modules.algorithms.algorithms.find_sender
 tests.unit.modules.algorithms.algorithms.findend
 tests.unit.modules.algorithms.algorithms.findfirstof
 tests.unit.modules.algorithms.algorithms.findfirstof_binary
@@ -40,7 +38,6 @@ tests.unit.modules.algorithms.algorithms.findifnot
 tests.unit.modules.algorithms.algorithms.foreach
 tests.unit.modules.algorithms.algorithms.foreach_executors
 tests.unit.modules.algorithms.algorithms.foreach_prefetching
-tests.unit.modules.algorithms.algorithms.foreach_sender
 tests.unit.modules.algorithms.algorithms.foreach_scheduler
 tests.unit.modules.algorithms.algorithms.foreachn
 tests.unit.modules.algorithms.algorithms.foreachn_exception
@@ -53,7 +50,6 @@ tests.unit.modules.algorithms.algorithms.for_loop_n
 tests.unit.modules.algorithms.algorithms.for_loop_n_strided
 tests.unit.modules.algorithms.algorithms.for_loop_reduction
 tests.unit.modules.algorithms.algorithms.for_loop_reduction_async
-tests.unit.modules.algorithms.algorithms.for_loop_sender
 tests.unit.modules.algorithms.algorithms.for_loop_strided
 tests.unit.modules.algorithms.algorithms.generate
 tests.unit.modules.algorithms.algorithms.generaten
@@ -74,3 +70,5 @@ tests.unit.modules.algorithms.algorithms.min_element
 tests.unit.modules.algorithms.algorithms.minmax_element
 tests.unit.modules.algorithms.algorithms.mismatch
 tests.unit.modules.algorithms.algorithms.mismatch_binary
+tests.unit.modules.algorithms.algorithms.move
+tests.unit.modules.algorithms.algorithms.nth_element

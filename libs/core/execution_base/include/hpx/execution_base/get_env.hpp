@@ -12,6 +12,42 @@
 #include <hpx/type_support/meta.hpp>
 #include <hpx/type_support/unwrap_ref.hpp>
 
+#if defined(HPX_HAVE_STDEXEC)
+#include <hpx/execution_base/stdexec_forward.hpp>
+
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wextra"
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#endif
+
+#include <exec/env.hpp>
+
+#if defined(HPX_GCC_VERSION)
+#pragma GCC diagnostic pop
+#elif defined(HPX_CLANG_VERSION)
+#pragma clang diagnostic pop
+#endif
+
+namespace hpx::execution::experimental {
+    using exec::with_t;
+
+    using exec::with;
+    using exec::without;
+
+    using exec::make_env;
+    using exec::make_env_t;
+
+    using exec::write;
+    using exec::write_env;
+
+    using exec::read_with_default;
+}    // namespace hpx::execution::experimental
+#else
+
 #include <type_traits>
 #include <utility>
 
@@ -239,3 +275,4 @@ namespace hpx::execution::experimental {
     inline constexpr bool is_environment_provider_v =
         std::is_same_v<T, hpx::util::invoke_result_t<get_env_t, T>>;
 }    // namespace hpx::execution::experimental
+#endif

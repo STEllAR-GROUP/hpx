@@ -197,11 +197,14 @@ template <>
 struct HPX_EXPORT hpx::lcos::detail::future_data<hpx::id_type>
   : future_data_base<id_type>
 {
-    HPX_NON_COPYABLE(future_data);
-
     using init_no_addref = future_data_base<hpx::id_type>::init_no_addref;
 
     future_data() = default;
+
+    future_data(future_data const&) = delete;
+    future_data(future_data&&) = delete;
+    future_data& operator=(future_data const&) = delete;
+    future_data& operator=(future_data&&) = delete;
 
     explicit future_data(init_no_addref no_addref)
       : future_data_base(no_addref)

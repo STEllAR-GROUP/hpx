@@ -97,9 +97,11 @@ namespace hpx::util {
         template <typename... Ts>
         static constexpr std::false_type all_of(...);
 
+        // clang-format off
         template <typename... Ts>
-        static constexpr auto all_of(int)
-            -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
+        static constexpr auto all_of(
+            int) -> always_true<std::enable_if_t<is_true<Ts>::value>...>;
+        // clang-format on
     }    // namespace detail
 
     template <typename... Ts>
@@ -120,10 +122,11 @@ namespace hpx::util {
 
         template <typename... Ts>
         static constexpr std::true_type any_of(...);
-
+        // clang-format off
         template <typename... Ts>
-        static constexpr auto any_of(int)
-            -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
+        static constexpr auto any_of(
+            int) -> always_false<std::enable_if_t<is_false<Ts>::value>...>;
+        // clang-format on
     }    // namespace detail
 
     template <typename... Ts>
@@ -328,7 +331,7 @@ namespace hpx::util {
 
         /// Append a given type to the given pack.
         template <typename Pack, typename T>
-        using append_t = typename prepend<Pack, T>::type;
+        using append_t = typename append<Pack, T>::type;
 
         template <template <typename...> class NewPack, typename OldPack>
         struct change_pack;
