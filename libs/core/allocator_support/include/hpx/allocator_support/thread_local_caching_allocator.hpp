@@ -73,19 +73,18 @@ namespace hpx::util {
             pointer allocate(size_type n)
             {
                 pointer p;
-                if (data.empty())
+                std::pair<T*, size_type> pair;
+                if (data.pop(pair))
+                {
+                    p = pair.first;
+                }
+                else
                 {
                     p = traits::allocate(alloc, n);
                     if (p == nullptr)
                     {
                         throw std::bad_alloc();
                     }
-                }
-                else
-                {
-                    std::pair<T*, size_type> pair;
-                    data.pop(pair);
-                    p = pair.first;
                 }
 
                 ++allocated;
