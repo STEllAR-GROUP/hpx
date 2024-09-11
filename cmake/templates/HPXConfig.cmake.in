@@ -92,6 +92,26 @@ if("${HPX_WITH_DATAPAR_BACKEND}" STREQUAL "SVE")
   endif()
 endif()
 
+if(HPX_WITH_FETCH_BOOST)
+  # Boost has been installed alongside HPX
+  # Let HPX_SetupBoost find it
+  set(HPX_BOOST_ROOT "${CMAKE_CURRENT_LIST_DIR}/../")
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
+else()
+  # Boost Separate boost targets to be unarily linked to some modules
+  set(HPX_BOOST_ROOT "@Boost_ROOT@")
+  # By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
+  # HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
+  if(NOT Boost_ROOT AND NOT "$ENV{BOOST_ROOT}")
+  set(Boost_ROOT ${HPX_BOOST_ROOT})
+  endif()
+  include(HPX_SetupBoost)
+  include(HPX_SetupBoostFilesystem)
+  include(HPX_SetupBoostIostreams)
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/HPXInternalTargets.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/HPXTargets.cmake")
 
@@ -156,17 +176,6 @@ endif()
 include(HPX_SetupAllocator)
 
 include(HPX_SetupThreads)
-
-# Boost Separate boost targets to be unarily linked to some modules
-set(HPX_BOOST_ROOT "@Boost_ROOT@")
-# By default Boost_ROOT is set to HPX_BOOST_ROOT (not necessary for PAPI or
-# HWLOC cause we are specifying HPX_<lib>_ROOT as an HINT to find_package)
-if(NOT Boost_ROOT AND NOT DEFINED ENV{BOOST_ROOT})
-  set(Boost_ROOT ${HPX_BOOST_ROOT})
-endif()
-include(HPX_SetupBoost)
-include(HPX_SetupBoostFilesystem)
-include(HPX_SetupBoostIostreams)
 
 # HIP
 include(HPX_SetupHIP)
