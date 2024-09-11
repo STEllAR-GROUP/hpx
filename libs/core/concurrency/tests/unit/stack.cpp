@@ -73,7 +73,7 @@ void ranged_unsynchronized_push_test()
     HPX_TEST(!stk.unsynchronized_pop(out));
 }
 
-void fixed_size_stack_test()
+void variable_size_stack_test()
 {
     hpx::lockfree::stack<long, std::allocator<long>, 128> stk;
 
@@ -89,7 +89,7 @@ void fixed_size_stack_test()
     HPX_TEST(stk.empty());
 }
 
-void fixed_size_stack_test_exhausted()
+void variable_size_stack_test_exhausted()
 {
     hpx::lockfree::stack<long, std::allocator<long>, 2> stk;
 
@@ -206,8 +206,8 @@ int main()
     unsafe_stack_test();
     ranged_push_test();
     ranged_unsynchronized_push_test();
-    fixed_size_stack_test();
-    fixed_size_stack_test_exhausted();
+    variable_size_stack_test();
+    variable_size_stack_test_exhausted();
     bounded_stack_test_exhausted();
     stack_consume_one_test();
     stack_consume_all_test();

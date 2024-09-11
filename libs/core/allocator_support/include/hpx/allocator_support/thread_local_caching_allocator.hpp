@@ -1,4 +1,4 @@
-//  Copyright (c) 2023 Hartmut Kaiser
+//  Copyright (c) 2023-2024 Hartmut Kaiser
 //
 //  SPDX-License-Identifier: BSL-1.0
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -8,7 +8,6 @@
 
 #include <hpx/config.hpp>
 #include <hpx/allocator_support/config/defines.hpp>
-#include <hpx/concurrency/stack.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -21,8 +20,10 @@ namespace hpx::util {
 #if defined(HPX_ALLOCATOR_SUPPORT_HAVE_CACHING) &&                             \
     !((defined(HPX_HAVE_CUDA) && defined(__CUDACC__)) ||                       \
         defined(HPX_HAVE_HIP))
+
     ///////////////////////////////////////////////////////////////////////////
-    template <typename T = char, typename Allocator = std::allocator<T>>
+    template <template <typename, typename> class Stack, typename T = char,
+        typename Allocator = std::allocator<T>>
     struct thread_local_caching_allocator
     {
         HPX_NO_UNIQUE_ADDRESS Allocator alloc;
@@ -38,7 +39,7 @@ namespace hpx::util {
         template <typename U>
         struct rebind
         {
-            using other = thread_local_caching_allocator<U,
+            using other = thread_local_caching_allocator<Stack, U,
                 typename traits::template rebind_alloc<U>>;
         };
 
@@ -113,7 +114,7 @@ namespace hpx::util {
             }
 
             HPX_NO_UNIQUE_ADDRESS Allocator alloc;
-            hpx::lockfree::stack<std::pair<T*, size_type>> data;
+            Stack<std::pair<T*, size_type>, Allocator> data;
             std::size_t allocated = 0;
             std::size_t deallocated = 0;
         };
@@ -134,7 +135,7 @@ namespace hpx::util {
 
         template <typename U, typename Alloc>
         explicit thread_local_caching_allocator(
-            thread_local_caching_allocator<U, Alloc> const&
+            thread_local_caching_allocator<Stack, U, Alloc> const&
                 rhs) noexcept(noexcept(std::
                 is_nothrow_copy_constructible_v<Alloc>))
           : alloc(rhs.alloc)
@@ -198,7 +199,8 @@ namespace hpx::util {
         }
     };
 #else
-    template <typename T = char, typename Allocator = std::allocator<T>>
+    template <template <typename, typename> class Stack, typename T = char,
+        typename Allocator = std::allocator<T>>
     using thread_local_caching_allocator = Allocator;
 #endif
 }    // namespace hpx::util

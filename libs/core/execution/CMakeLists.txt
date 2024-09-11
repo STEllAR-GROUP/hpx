@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022 The STE||AR-Group
+# Copyright (c) 2019-2024 The STE||AR-Group
 #
 # SPDX-License-Identifier: BSL-1.0
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -160,6 +160,7 @@ add_hpx_module(
   MODULE_DEPENDENCIES
     hpx_async_base
     hpx_async_combinators
+    hpx_concurrency
     hpx_config
     hpx_threading
     hpx_pack_traversal
