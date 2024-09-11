@@ -49,7 +49,7 @@ if(NOT TARGET hpx_dependencies_boost)
 
     find_package(
       Boost ${Boost_MINIMUM_VERSION} NO_POLICY_SCOPE REQUIRED
-      COMPONENTS ${__boost_libraries} HINTS ${HPX_BOOST_ROOT}
+      COMPONENTS ${__boost_libraries} HINTS ${HPX_BOOST_ROOT} $ENV{BOOST_ROOT}
     )
 
     add_library(hpx_dependencies_boost INTERFACE IMPORTED)
@@ -82,7 +82,8 @@ if(NOT TARGET hpx_dependencies_boost)
     )
 
     # Need to explicitly list header-only dependencies, since Cmake-Boost has
-    # installs each library's headers individually, as opposed to b2-built Boost.
+    # installs each library's headers individually, as opposed to b2-built
+    # Boost.
     set(__boost_libraries
         ${__boost_libraries}
         accumulators
