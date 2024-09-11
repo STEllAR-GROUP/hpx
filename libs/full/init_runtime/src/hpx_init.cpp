@@ -134,11 +134,7 @@ namespace hpx::detail {
 #if defined(__FreeBSD__)
         freebsd_environ = env;
 #endif
-        // set a handler for std::abort, std::at_quick_exit, and std::atexit
-        [[maybe_unused]] auto const prev_signal =
-            std::signal(SIGABRT, detail::on_abort);
-        HPX_ASSERT(prev_signal != SIG_ERR);
-
+        // set a handler for std::at_quick_exit, and std::atexit
         [[maybe_unused]] auto const ret_at_exit = std::atexit(detail::on_exit);
         HPX_ASSERT(ret_at_exit == 0);
 
@@ -715,7 +711,7 @@ namespace hpx {
             if (!f.empty())
                 return rt.run(hpx::bind_front(f, vm));
 
-            // Run this runtime instance without an hpx_main
+            // Run this runtime instance without a hpx_main
             return rt.run();
         }
 
@@ -736,7 +732,7 @@ namespace hpx {
                 return rt.start(hpx::bind_front(f, vm));
             }
 
-            // Run this runtime instance without an hpx_main
+            // Run this runtime instance without a hpx_main
             return rt.start();
         }
 

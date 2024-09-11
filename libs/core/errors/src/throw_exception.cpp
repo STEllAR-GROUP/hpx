@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2022 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -62,6 +62,23 @@ namespace hpx::detail {
         {
             ec = make_error_code(static_cast<hpx::error>(errcode), msg,
                 func.c_str(), file.c_str(), line,
+                (ec.category() == hpx::get_lightweight_hpx_category()) ?
+                    hpx::throwmode::lightweight :
+                    hpx::throwmode::plain);
+        }
+    }
+
+    void throws_bad_alloc_if(
+        hpx::error_code& ec, char const* func, char const* file, long line)
+    {
+        if (&ec == &hpx::throws)
+        {
+            throw hpx::bad_alloc_exception();
+        }
+        else
+        {
+            ec = make_error_code(hpx::error::out_of_memory, "out of memory",
+                func, file, line,
                 (ec.category() == hpx::get_lightweight_hpx_category()) ?
                     hpx::throwmode::lightweight :
                     hpx::throwmode::plain);

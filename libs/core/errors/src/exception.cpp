@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2023 Hartmut Kaiser
+//  Copyright (c) 2007-2024 Hartmut Kaiser
 //  Copyright (c)      2011 Bryce Lelbach
 //
 //  SPDX-License-Identifier: BSL-1.0
@@ -140,6 +140,11 @@ namespace hpx {
         return {this->std::system_error::code().value(), *this};
     }
 
+    bad_alloc_exception::bad_alloc_exception()
+      : hpx::exception(hpx::error::out_of_memory)
+    {
+    }
+
     static custom_exception_info_handler_type custom_exception_info_handler;
 
     void set_custom_exception_info_handler(custom_exception_info_handler_type f)
@@ -236,8 +241,7 @@ namespace hpx::detail {
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    inline constexpr bool is_of_lightweight_hpx_category(
-        Exception const&) noexcept
+    constexpr bool is_of_lightweight_hpx_category(Exception const&) noexcept
     {
         return false;
     }
@@ -276,6 +280,18 @@ namespace hpx::detail {
         }
 
         std::rethrow_exception(get_exception(e, func, file, line));
+    }
+
+    HPX_CORE_EXPORT void throw_bad_alloc_exception(
+        [[maybe_unused]] char const* func, [[maybe_unused]] char const* file,
+        [[maybe_unused]] long line)
+    {
+        if (pre_exception_handler)
+        {
+            pre_exception_handler();
+        }
+
+        throw hpx::bad_alloc_exception();
     }
 
     ///////////////////////////////////////////////////////////////////////////
