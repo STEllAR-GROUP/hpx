@@ -18,10 +18,11 @@ namespace hpx {
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
     /// The function \a hpx::finalize is the main way to (gracefully) exit any
-    /// HPX application. It should be called from one locality only (usually
-    /// the console) and it will notify all connected localities to finish
-    /// execution. Only after all other localities have exited this function
-    /// will return, allowing to exit the console locality as well.
+    /// HPX application. It must be called at least once, but can be called
+    /// multiple times as well. However, only the first invocation will have
+    /// effect. It will notify all connected localities to finish execution.
+    /// Only after all other localities have exited this function will return,
+    /// allowing to exit the console locality as well.
     ///
     /// During the execution of this function the runtime system will invoke
     /// all registered shutdown functions (see \a hpx::init) on all localities.
@@ -73,10 +74,11 @@ namespace hpx {
     /// \brief Main function to gracefully terminate the HPX runtime system.
     ///
     /// The function \a hpx::finalize is the main way to (gracefully) exit any
-    /// HPX application. It should be called from one locality only (usually
-    /// the console) and it will notify all connected localities to finish
-    /// execution. Only after all other localities have exited this function
-    /// will return, allowing to exit the console locality as well.
+    /// HPX application. It must be called at least once, but can be called
+    /// multiple times as well. However, only the first invocation will have
+    /// effect. It will notify all connected localities to finish execution.
+    /// Only after all other localities have exited this function will return,
+    /// allowing to exit the console locality as well.
     ///
     /// During the execution of this function the runtime system will invoke
     /// all registered shutdown functions (see \a hpx::init) on all localities.

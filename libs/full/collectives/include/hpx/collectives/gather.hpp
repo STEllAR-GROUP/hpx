@@ -113,13 +113,13 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param  basename    The base name identifying the gather operation
-    /// \param  result      The value to transmit to the central gather point
+    /// \param basename     The base name identifying the gather operation
+    /// \param local_result The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the gather operation on the given
@@ -134,9 +134,8 @@ namespace hpx { namespace collectives {
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<decay_t<T>>>
-    gather_there(char const* basename, T&& result,
+    template <typename T> hpx::future<void>
+    gather_there(char const* basename, T&& local_result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg(),
         root_site_arg root_site = root_site_arg());
@@ -146,13 +145,13 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  result      The value to transmit to the central gather point
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result The value to transmit to the central gather point
     ///                     from this call site.
     /// \param this_site    The sequence number of this invocation (usually
     ///                     the locality id). This value is optional and
     ///                     defaults to whatever hpx::get_locality_id() returns.
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the gather operation on the given
@@ -167,9 +166,8 @@ namespace hpx { namespace collectives {
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<decay_t<T>>>
-    gather_there(communicator comm, T&& result,
+    template <typename T> hpx::future<void>
+    gather_there(communicator fid, T&& local_result,
         this_site_arg this_site = this_site_arg(),
         generation_arg generation = generation_arg());
 
@@ -178,10 +176,10 @@ namespace hpx { namespace collectives {
     /// This function transmits the value given by \a result to a central gather
     /// site (where the corresponding \a gather_here is executed)
     ///
-    /// \param  comm        A communicator object returned from \a create_communicator
-    /// \param  result      The value to transmit to the central gather point
+    /// \param fid          A communicator object returned from \a create_communicator
+    /// \param local_result The value to transmit to the central gather point
     ///                     from this call site.
-    /// \param  generation  The generational counter identifying the sequence
+    /// \param generation   The generational counter identifying the sequence
     ///                     number of the gather operation performed on the
     ///                     given base name. This is optional and needs to be
     ///                     supplied only if the gather operation on the given
@@ -199,9 +197,8 @@ namespace hpx { namespace collectives {
     ///             gathered values. It will become ready once the gather
     ///             operation has been completed.
     ///
-    template <typename T>
-    hpx::future<std::vector<decay_t<T>>>
-    gather_there(communicator comm, T&& result,
+    template <typename T> hpx::future<void>
+    gather_there(communicator fid, T&& local_result,
         generation_arg generation,
         this_site_arg this_site = this_site_arg());
 }}    // namespace hpx::collectives
